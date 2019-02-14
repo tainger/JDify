@@ -87,6 +87,36 @@ endpoint 实现 DalaranEndpoint 接口, 并且通过 DalaranComponent 声明 typ
 
 demo 提供的 listener 和 endpoint 就是通过上述方式编写.
 
+如 `netty-http-listener`:
+
+```java
+@DalaranComponent("netty-http-listener", configType = NettyHttpConfig::class)
+class NettyHttpListener(
+        private val config: NettyHttpConfig
+) : DalaranListener {
+
+    private val camelComponentScheme = "netty4-http"
+
+    override fun getUri(properties: Map<String, String>): String =
+            "$camelComponentScheme:${config.protocol}://${config.host}:${config.port}/${config.path}?httpMethodRestrict=${config.method}"
+}
+```
+
+又如 `http-request`:
+
+```java
+@DalaranComponent("http-request", configType = HttpRequestConfig::class)
+class HttpRequestEndpoint(
+        private val config: HttpRequestConfig
+) : DalaranEndpoint {
+    private val uri = "%s4://%s:%s%s?bridgeEndpoint=true"
+    override fun configure(route: RouteDefinition, properties: Map<String, String>) {
+        val uri = DalaranPropertyUtils.uriFormat(uri, properties, config.protocol.value, config.host, config.port, config.path)
+        route.setHeader("CamelHttpMethod", constant(config.method)).to(uri)
+    }
+}
+```
+
 ## 可视化配置设计
 
 示例的结构化配置即为可视化配置的基础, 允许配置方引入 component, 选择 type, 并且根据所指定的 config class 自动绘制配置界面, 根据配置参数类型自动处理.
