@@ -10,5 +10,5 @@ import java.lang.annotation.Target;
 public @interface DalaranComponent {
     String value();
 
-    Class configType();
+    Class configType() default Object.class;
 }

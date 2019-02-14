@@ -17,6 +17,24 @@
             <artifactId>dalaran-http-request</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>io.terminus</groupId>
+            <artifactId>dalaran-netty-http-listener</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.terminus</groupId>
+            <artifactId>dalaran-message-translator</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+
+        <!-- target http server -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+            <version>1.5.14.RELEASE</version>
+        </dependency>
     </dependencies>
 
 </project>

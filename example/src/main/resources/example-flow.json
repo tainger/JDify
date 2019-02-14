@@ -7,24 +7,24 @@
   "listener": {
     "type": "netty-http-listener",
     "config": {
-      "protocol": "http",
+      "protocol": "HTTP",
       "host": "0.0.0.0",
-      "port": "{{port}}",
+      "port": 8184,
       "path": "/orderItems",
       "method": "POST"
     }
   },
   "endpoints": [
     {
-      "type": "json2object",
+      "type": "gson-to-object",
       "config": {
-        "outType": "io.terminus.test.OrderItem"
+        "targetType": "io.terminus.dalaran.example.OrderItem"
       }
     },
     {
-      "type": "object-mapping",
+      "type": "message-convert",
       "config": {
-        "targetModel": "io.terminus.test.ExtOrderItem",
+        "targetModel": "io.terminus.dalaran.example.ExtOrderItem",
         "mapping": {
           "itemName": "${header.name}",
           "itemPrice": "${body.price}",
@@ -33,11 +33,12 @@
       }
     },
     {
-      "type": "object2json"
+      "type": "object-to-gson"
     },
     {
       "type": "http-request",
       "config": {
+        "protocol": "HTTP",
         "method": "POST",
         "host": "{{targetHost}}",
         "port": "{{targetPort}}",

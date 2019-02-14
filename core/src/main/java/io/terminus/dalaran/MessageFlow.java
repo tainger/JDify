@@ -6,27 +6,27 @@ import org.apache.camel.model.RouteDefinition;
 import java.util.List;
 import java.util.Map;
 
-public class MessageFlow extends RouteBuilder {
+public class MessageFlow {
 
-    private DalaranListener listener;
+    private Listener listener;
 
-    private List<DalaranEndpoint> endpoints;
+    private List<Endpoint> endpoints;
 
     private Map<String, String> properties;
 
-    public DalaranListener getListener() {
+    public Listener getListener() {
         return listener;
     }
 
-    public void setListener(DalaranListener listener) {
+    public void setListener(Listener listener) {
         this.listener = listener;
     }
 
-    public List<DalaranEndpoint> getEndpoints() {
+    public List<Endpoint> getEndpoints() {
         return endpoints;
     }
 
-    public void setEndpoints(List<DalaranEndpoint> endpoints) {
+    public void setEndpoints(List<Endpoint> endpoints) {
         this.endpoints = endpoints;
     }
 
@@ -38,10 +38,45 @@ public class MessageFlow extends RouteBuilder {
         this.properties = properties;
     }
 
-    public void configure() {
-        RouteDefinition routeDefinition = from(listener.getUri(properties));
-        for (DalaranEndpoint endpoint : endpoints) {
-            endpoint.configure(routeDefinition, properties);
+    public static class Listener {
+        private String type;
+        private Object config;
+
+        public String getType() {
+            return type;
+        }
+
+        public void setType(String type) {
+            this.type = type;
+        }
+
+        public Object getConfig() {
+            return config;
+        }
+
+        public void setConfig(Object config) {
+            this.config = config;
+        }
+    }
+
+    public static class Endpoint {
+        private String type;
+        private Object config;
+
+        public String getType() {
+            return type;
+        }
+
+        public void setType(String type) {
+            this.type = type;
+        }
+
+        public Object getConfig() {
+            return config;
+        }
+
+        public void setConfig(Object config) {
+            this.config = config;
         }
     }
 }

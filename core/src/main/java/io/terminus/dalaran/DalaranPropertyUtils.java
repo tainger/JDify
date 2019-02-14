@@ -8,7 +8,7 @@ public final class DalaranPropertyUtils {
 
     public static String getProperty(Map<String, String> properties, String configValue) {
         // TODO 性能问题...
-        Pattern pattern = Pattern.compile("^(?:\\{\\{)?<key>.+(?:\\}\\})$");
+        Pattern pattern = Pattern.compile("^(?:\\{\\{)(?<key>.*)(?:\\}\\})$");
         Matcher matcher = pattern.matcher(configValue);
         if (matcher.find()) {
             String key = matcher.group("key");
@@ -25,5 +25,10 @@ public final class DalaranPropertyUtils {
             propertyArgs[i] = getProperty(properties, args[i]);
         }
         return String.format(uri, propertyArgs);
+    }
+
+    public static Class getComponentConfigType(String type){
+
+        return null;
     }
 }

@@ -1,13 +1,17 @@
 package io.terminus.dalaran.component.message.convert
 
+import io.terminus.dalaran.DalaranComponent
 import io.terminus.dalaran.DalaranEndpoint
+import io.terminus.dalaran.DalaranPropertyUtils
 import org.apache.camel.model.RouteDefinition
-import org.apache.camel.model.dataformat.JsonLibrary
 
-class MessageConvertEndpoint : DalaranEndpoint {
-    override fun getType() = "message-convert"
+@DalaranComponent("message-convert", configType = MessageConvertConfig::class)
+class MessageConvertEndpoint : DalaranEndpoint<MessageConvertConfig> {
 
-    override fun configure(route: RouteDefinition, properties: Map<String, String>) {
-        TODO("dozer...")
+    private val uri = "dozer?targetModel=%s&mappingFile=test-mapping.xml"
+
+    override fun configure(route: RouteDefinition, properties: Map<String, String>, config: MessageConvertConfig) {
+        val uri = DalaranPropertyUtils.uriFormat(uri, properties, config.targetModel)
+        route.to(uri)
     }
 }
