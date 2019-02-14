@@ -18,7 +18,7 @@ public class Test {
         Gson newGson = gson.newBuilder().
                 registerTypeAdapter(MessageFlow.Listener.class, new DalaranComponentTypeAdapter(gson, "listener")).
                 registerTypeAdapter(MessageFlow.Endpoint.class, new DalaranComponentTypeAdapter(gson, "endpoint")).create();
-        InputStream in = Test.class.getResourceAsStream("/example-flow.json");
+        InputStream in = Test.class.getResourceAsStream("/example-flow-dubbo.json");
 
         Reader reader = new InputStreamReader(in);
         MessageFlow messageFlow = newGson.fromJson(reader, MessageFlow.class);

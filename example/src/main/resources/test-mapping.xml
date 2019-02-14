@@ -6,17 +6,13 @@
     <mapping>
         <class-a>org.apache.camel.component.dozer.ExpressionMapper</class-a>
         <class-b>io.terminus.dalaran.example.ExtOrderItem</class-b>
-        <field custom-converter-id="_expressionMapping" custom-converter-param="simple:\${header.name}">
+        <field custom-converter-id="_expressionMapping" custom-converter-param="simple:\${body[0].name}">
             <a>expression</a>
             <b>itemName</b>
         </field>
-        <field custom-converter-id="_expressionMapping" custom-converter-param="simple:\${body.price}">
+        <field custom-converter-id="_expressionMapping" custom-converter-param="simple:\${body[0].price}">
             <a>expression</a>
             <b>itemPrice</b>
-        </field>
-        <field custom-converter-id="_expressionMapping" custom-converter-param="simple:\${header.Content-Type}">
-            <a>expression</a>
-            <b>test</b>
         </field>
     </mapping>
 </mappings>
