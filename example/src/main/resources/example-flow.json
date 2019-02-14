@@ -1,0 +1,48 @@
+{
+  "properties": {
+    "port": 8184,
+    "targetHost": "localhost",
+    "targetPort": 8080
+  },
+  "listener": {
+    "type": "netty-http-listener",
+    "config": {
+      "protocol": "http",
+      "host": "0.0.0.0",
+      "port": "{{port}}",
+      "path": "/orderItems",
+      "method": "POST"
+    }
+  },
+  "endpoints": [
+    {
+      "type": "json2object",
+      "config": {
+        "outType": "io.terminus.test.OrderItem"
+      }
+    },
+    {
+      "type": "object-mapping",
+      "config": {
+        "targetModel": "io.terminus.test.ExtOrderItem",
+        "mapping": {
+          "itemName": "${header.name}",
+          "itemPrice": "${body.price}",
+          "test": "${header.Content-Type}"
+        }
+      }
+    },
+    {
+      "type": "object2json"
+    },
+    {
+      "type": "http-request",
+      "config": {
+        "method": "POST",
+        "host": "{{targetHost}}",
+        "port": "{{targetPort}}",
+        "path": "/orders"
+      }
+    }
+  ]
+}
