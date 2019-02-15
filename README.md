@@ -91,14 +91,11 @@ demo 提供的 listener 和 endpoint 就是通过上述方式编写.
 
 ```java
 @DalaranComponent("netty-http-listener", configType = NettyHttpConfig::class)
-class NettyHttpListener(
-        private val config: NettyHttpConfig
-) : DalaranListener {
-
+class NettyHttpListener : DalaranListener<NettyHttpConfig> {
     private val camelComponentScheme = "netty4-http"
 
-    override fun getUri(properties: Map<String, String>): String =
-            "$camelComponentScheme:${config.protocol}://${config.host}:${config.port}/${config.path}?httpMethodRestrict=${config.method}"
+    override fun getUri(properties: Map<String, String>, config: NettyHttpConfig): String =
+            "$camelComponentScheme:${config.protocol.value}://${config.host}:${config.port}${config.path}?httpMethodRestrict=${config.method}"
 }
 ```
 
@@ -106,11 +103,9 @@ class NettyHttpListener(
 
 ```java
 @DalaranComponent("http-request", configType = HttpRequestConfig::class)
-class HttpRequestEndpoint(
-        private val config: HttpRequestConfig
-) : DalaranEndpoint {
+class HttpRequestEndpoint : DalaranEndpoint<HttpRequestConfig> {
     private val uri = "%s4://%s:%s%s?bridgeEndpoint=true"
-    override fun configure(route: RouteDefinition, properties: Map<String, String>) {
+    override fun configure(route: RouteDefinition, properties: Map<String, String>, config: HttpRequestConfig) {
         val uri = DalaranPropertyUtils.uriFormat(uri, properties, config.protocol.value, config.host, config.port, config.path)
         route.setHeader("CamelHttpMethod", constant(config.method)).to(uri)
     }
@@ -122,7 +117,10 @@ class HttpRequestEndpoint(
 示例的结构化配置即为可视化配置的基础, 允许配置方引入 component, 选择 type, 并且根据所指定的 config class 自动绘制配置界面, 根据配置参数类型自动处理.
 String, Integer, Long 等常用类型直接生成对用输入框, 实现了 DalaranConfigEnum 接口的 enum 会自动生成 Select, 后续还可以提供更多可视化配置的方式.
 
-## 已知可能风险
+## 已知风险点
 
 1. 完全基于 camel, 目前没有做接口层屏蔽, 理论上来说, 做了意义也不大, 相当于又设计一层路由.
 2. 可用配置是基于 config 模型类, 有些非 string 类型的参数, 目前的 property 替换方式是不支持的, 因为 json 内容会先转化为 config 对象, 类型不匹配情况下无法处理.
+3. 对于 问题2, camel 本身有 {component}.json 文件来描述, 可用于配置, 如果考虑直接解析的话, 可能不用自己再封装一层. 有意思的是没有搜到类似文章使用或说明, 从代码来看, 也就 maven plugin 用了, 在官网也只找到一段描述.
+    * Camel Catalog: Is a standalone JAR camel-catalog that contains catalog information about the Apache Camel release. Such as information about each of the Camel components, with documentation in json schema format. This is intended for SPI to leverage for tooling, such as being able to implement Apache Camel component editors that can provide the set of options the component offers, with documentation included.
+4. 可视化方面, 除了 Fuse 之外, 没有找到合适的 editor. 如果要自己做, 目前设计的角度是基于自己设计的 json dsl, 而非 camel dsl.
