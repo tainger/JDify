@@ -1,33 +1,33 @@
 {
   "properties": {
+    "port": 8184,
     "targetHost": "localhost",
     "targetPort": 8080
   },
   "listener": {
-    "type": "dubbo-provider",
+    "type": "netty-http-listener",
     "config": {
-      "registryAddress": "zookeeper://localhost:2181",
-      "serviceId": "io.terminus.dalaran.example.OrderService",
-      "method": "getUserOrders",
-      "version": "terminus",
-      "parameterTypes": [
-        "java.lang.String"
-      ]
+      "protocol": "HTTP",
+      "host": "0.0.0.0",
+      "port": 8184,
+      "path": "/orderItems",
+      "method": "POST"
     }
   },
   "endpoints": [
-    //    {
-    //      "type": "gson-to-object",
-    //      "config": {
-    //        "targetType": "io.terminus.dalaran.example.OrderItem"
-    //      }
-    //    },
+    {
+      "type": "gson-to-object",
+      "config": {
+        "targetType": "io.terminus.dalaran.example.OrderItem"
+      }
+    },
     {
       "type": "message-convert",
       "config": {
         "targetModel": "io.terminus.dalaran.example.ExtOrderItem",
+        "mappingFile": "test-mapping.xml",
         "mapping": {
-          "itemName": "${body[0]}",
+          "itemName": "${header.name}",
           "itemPrice": "${body.price}",
           "test": "${header.Content-Type}"
         }
@@ -44,12 +44,6 @@
         "host": "{{targetHost}}",
         "port": "{{targetPort}}",
         "path": "/orders"
-      }
-    },
-    {
-      "type": "gson-to-object",
-      "config": {
-        "targetType": "io.terminus.dalaran.example.TestOrder"
       }
     }
   ]
