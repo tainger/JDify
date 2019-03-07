@@ -1,0 +1,49 @@
+{
+  "properties": {
+    "port": 8184,
+    "targetHost": "localhost",
+    "targetPort": 8080
+  },
+  "listener": {
+    "type": "netty-http-listener",
+    "config": {
+      "protocol": "HTTP",
+      "host": "0.0.0.0",
+      "port": 8184,
+      "path": "/orderItemsOther",
+      "method": "POST"
+    }
+  },
+  "endpoints": [
+    {
+      "type": "gson-to-object",
+      "config": {
+        "targetType": "io.terminus.dalaran.example.OrderItem"
+      }
+    },
+    {
+      "type": "message-convert",
+      "config": {
+        "targetModel": "io.terminus.dalaran.example.ExtOrderItem",
+        "mapping": {
+          "itemName": "${header.name}",
+          "itemPrice": "${body.price}",
+          "test": "${header.Content-Type}"
+        }
+      }
+    },
+    {
+      "type": "object-to-gson"
+    },
+    {
+      "type": "http-request",
+      "config": {
+        "protocol": "HTTP",
+        "method": "POST",
+        "host": "{{targetHost}}",
+        "port": "{{targetPort}}",
+        "path": "/form_orders"
+      }
+    }
+  ]
+}
