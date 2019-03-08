@@ -1,6 +1,6 @@
 package io.terminus.dalaran.component.http.request
 
-class HttpRequestConfig(
+class HttpClientConfig(
         val protocol: HttpRequestProtocol,
         val host: String,
         val port: String,

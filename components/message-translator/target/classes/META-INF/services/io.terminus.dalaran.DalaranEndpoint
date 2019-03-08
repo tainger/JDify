@@ -1,3 +1,3 @@
 io.terminus.dalaran.component.message.convert.GsonToObjectEndpoint
-io.terminus.dalaran.component.message.convert.MessageConvertEndpoint
-io.terminus.dalaran.component.message.convert.ObjectToGsonEndpoint
+io.terminus.dalaran.component.message.convert.MessageConvertExecutor
+io.terminus.dalaran.component.message.convert.ObjectToGsonExecutor

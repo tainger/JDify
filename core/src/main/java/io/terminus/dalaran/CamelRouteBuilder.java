@@ -20,11 +20,12 @@ public class CamelRouteBuilder extends RouteBuilder {
         List<Pipeline.Endpoint> endpointList = messageFlow.getEndpoints();
         DalaranComponentContainer<DalaranTrigger> dalaranListenerContainer = DalaranComponentLoader.getListenerContainer(listener.getType());
 
+        // TODO 替换 properties
         // TODO check
-        RouteDefinition routeDefinition = from(dalaranListenerContainer.getComponent().getUri(messageFlow.getProperties(), listener.getConfig()));
+        RouteDefinition routeDefinition = from(dalaranListenerContainer.getComponent().buildFromUri(listener.getConfig()));
         for (Pipeline.Endpoint endpoint : endpointList) {
             DalaranComponentContainer<DalaranExecutor> dalaranEndpointContainer = DalaranComponentLoader.getEndpointContainer(endpoint.getType());
-            dalaranEndpointContainer.getComponent().configure(routeDefinition, messageFlow.getProperties(), endpoint.getConfig());
+            dalaranEndpointContainer.getComponent().configure(routeDefinition, endpoint.getConfig());
         }
     }
 }

@@ -7,6 +7,6 @@ import io.terminus.dalaran.DalaranTrigger
 class NettyHttpListener : DalaranTrigger<NettyHttpConfig> {
     private val camelComponentScheme = "netty4-http"
 
-    override fun getUri(properties: Map<String, String>, config: NettyHttpConfig): String =
+    override fun buildFromUri(config: NettyHttpConfig): String =
             "$camelComponentScheme:${config.protocol.value}://${config.host}:${config.port}${config.path}?httpMethodRestrict=${config.method}"
 }
