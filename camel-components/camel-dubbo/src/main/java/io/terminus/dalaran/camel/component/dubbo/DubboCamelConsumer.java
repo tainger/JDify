@@ -87,7 +87,7 @@ public class DubboCamelConsumer extends DefaultConsumer {
     }
 
     private Class createClass() {
-        // TODO 这里有问题, 一个interface 的多个方法会挂, 因为第一次的时候类以及生成了
+        // TODO 这里有问题, 一个interface 的多个方法会挂, 因为第一次的时候类以及生成了, 理论上可以通过独立 classloader 的方式解决, 类已存在但是方法不存在的情况下, 可以删除 classloader 重新整合 create class
         try {
             ClassPool pool = ClassGenerator.getClassPool(Thread.currentThread().getContextClassLoader());
             CtClass dubboInterfaceCtClass = pool.getOrNull(endpoint.getServiceId());

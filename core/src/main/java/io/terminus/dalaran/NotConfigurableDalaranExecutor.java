@@ -4,7 +4,7 @@ import org.apache.camel.model.RouteDefinition;
 
 import java.util.Map;
 
-public interface NotConfigurableDalaranEndpoint extends DalaranEndpoint {
+public interface NotConfigurableDalaranExecutor extends DalaranExecutor {
     @Override
     default void configure(RouteDefinition route, Map properties, Object config) {
         configure(route, properties);

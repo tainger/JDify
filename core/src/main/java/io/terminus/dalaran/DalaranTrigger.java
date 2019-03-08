@@ -2,6 +2,6 @@ package io.terminus.dalaran;
 
 import java.util.Map;
 
-public interface DalaranListener<T> {
+public interface DalaranTrigger<T> {
     String getUri(Map<String, String> properties, T config);
 }

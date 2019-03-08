@@ -10,7 +10,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
 
-public class MessageFlowLoader {
+public class PipelineLoader {
 
     // TODO 瞎写一下=.=
     public static void loadMessageFlows() throws Exception {
@@ -18,17 +18,17 @@ public class MessageFlowLoader {
 
         Gson gson = new Gson();
         Gson newGson = gson.newBuilder().
-                registerTypeAdapter(MessageFlow.Listener.class, new DalaranComponentTypeAdapter(gson, "listener")).
-                registerTypeAdapter(MessageFlow.Endpoint.class, new DalaranComponentTypeAdapter(gson, "endpoint")).create();
+                registerTypeAdapter(Pipeline.Listener.class, new DalaranComponentTypeAdapter(gson, "listener")).
+                registerTypeAdapter(Pipeline.Endpoint.class, new DalaranComponentTypeAdapter(gson, "endpoint")).create();
 
         ModelCamelContext camelContext = new DefaultCamelContext();
         camelContext.start();
 
-        URL in = MessageFlowLoader.class.getResource("/dalaran");
+        URL in = PipelineLoader.class.getResource("/dalaran");
         File file = new File(in.toURI());
         for (File messageFlowFile : file.listFiles()) {
             Reader reader = new InputStreamReader(new FileInputStream(messageFlowFile));
-            MessageFlow messageFlow = newGson.fromJson(reader, MessageFlow.class);
+            Pipeline messageFlow = newGson.fromJson(reader, Pipeline.class);
             CamelRouteBuilder routeBuilder = new CamelRouteBuilder(messageFlow);
             camelContext.addRoutes(routeBuilder);
             System.out.println("load [" + messageFlowFile + "] ...");

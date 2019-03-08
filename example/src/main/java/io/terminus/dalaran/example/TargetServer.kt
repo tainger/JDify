@@ -1,6 +1,6 @@
 package io.terminus.dalaran.example
 
-import io.terminus.dalaran.MessageFlowLoader
+import io.terminus.dalaran.PipelineLoader
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.web.bind.annotation.PostMapping
@@ -35,6 +35,6 @@ class TestController {
 }
 
 fun main(args: Array<String>) {
-    MessageFlowLoader.loadMessageFlows()
+    PipelineLoader.loadMessageFlows()
     SpringApplication.run(Application::class.java)
 }
