@@ -1,0 +1,1 @@
+可以吧 dubbo camel component 怎么写的也说一下

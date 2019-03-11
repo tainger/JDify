@@ -25,6 +25,10 @@
 
 > camel component 的编写标准详见[Writing Camel components](http://camel.apache.org/writing-components.html)
 
+### XMind
+
+![](../images/xmind.jpg)
+
 ### 核心逻辑
 
 ```sequence
