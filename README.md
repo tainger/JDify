@@ -31,3 +31,7 @@
 * [触发器开发](./docs/developer/writing-trigger.md)
 * [执行器开发](./docs/developer/writing-executor.md)
 * [其他](./docs/developer/other.md)
+
+## 管理员手册
+
+* [运行监控]

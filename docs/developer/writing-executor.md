@@ -36,3 +36,10 @@ public interface UnconfigurableDalaranExecutor extends DalaranExecutor {
     void configure(RouteDefinition route);
 }
 ```
+
+## 核心执行器
+
+有些执行器开发会比较复杂, 在此记录设计文档:
+
+* [数据映射](./core-components/mapper.md)
+* [路由](./core-components/router.md)
