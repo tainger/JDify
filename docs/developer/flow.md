@@ -19,7 +19,7 @@ Flow 示意图, 其中蓝色节点为 Trigger, 白色节点为 Processor:
     "targetHost": "localhost",
     "targetPort": 8080
   },
-  "listener": { // 触发器, 触发集成流程, 下面为一个 基于 netty 的 http 触发器
+  "trigger": { // 触发器, 触发集成流程, 下面为一个 基于 netty 的 http 触发器
     "type": "netty-http-listener",
     "config": {
       "protocol": "http",
@@ -29,7 +29,7 @@ Flow 示意图, 其中蓝色节点为 Trigger, 白色节点为 Processor:
       "method": "POST"
     }
   },
-  "endpoints": [ // 执行节点, Demo 目前只支持单流程, 复杂流程后面再搞, 理论上嵌一个 路由或者逻辑节点即可
+  "processors": [ // 执行节点, Demo 目前只支持单流程, 复杂流程后面再搞, 理论上嵌一个 路由或者逻辑节点即可
     {
       "type": "json2object", // 将接受到的 Http json 转化为对象
       "config": {
@@ -64,4 +64,4 @@ Flow 示意图, 其中蓝色节点为 Trigger, 白色节点为 Processor:
 }
 ```
 
-上述主要配置为 listener 和 endpoints, 主要是声明一个 type 和 config, type 声明了要使用何种 listener 或 endpoints, config 提供了其所需要的配置内容.
+上述主要配置为 trigger 和 processors, 主要是声明一个 type 和 config, type 声明了要使用何种 trigger 或 processors, config 提供了其所需要的配置内容.

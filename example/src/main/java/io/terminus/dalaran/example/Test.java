@@ -25,7 +25,7 @@ public class Test {
         camelContext.addRoutes(route2);
 
         Thread.sleep(60000);
-        
+
         camelContext.stopRoute(route1.getRouteCollection().getRoutes().get(0).getId());
 
         synchronized (Test.class) {
@@ -36,8 +36,8 @@ public class Test {
     private static RouteBuilder buildRoute(String json) {
         Gson gson = new Gson();
         Gson newGson = gson.newBuilder().
-                registerTypeAdapter(DalaranFlow.Listener.class, new DalaranComponentTypeAdapter(gson, "listener")).
-                registerTypeAdapter(DalaranFlow.Endpoint.class, new DalaranComponentTypeAdapter(gson, "endpoint")).create();
+                registerTypeAdapter(DalaranTriggerConfig.class, new DalaranComponentTypeAdapter(gson, "trigger")).
+                registerTypeAdapter(DalaranProcessorConfig.class, new DalaranComponentTypeAdapter(gson, "processors")).create();
         InputStream in = Test.class.getResourceAsStream(json);
 
         Reader reader = new InputStreamReader(in);

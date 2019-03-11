@@ -16,16 +16,16 @@ public class CamelRouteBuilder extends RouteBuilder {
     @Override
     // TODO 先随便写一下让 demo 能通
     public void configure() {
-        DalaranFlow.Listener listener = messageFlow.getListener();
-        List<DalaranFlow.Endpoint> endpointList = messageFlow.getEndpoints();
-        DalaranComponentContainer<DalaranTrigger> dalaranListenerContainer = DalaranComponentLoader.getListenerContainer(listener.getType());
+        DalaranTriggerConfig trigger = messageFlow.getTrigger();
+        List<DalaranProcessorConfig> processorList = messageFlow.getProcessors();
+        DalaranComponentContainer<DalaranTrigger> dalaranListenerContainer = DalaranComponentLoader.getTriggerContainer(trigger.getType());
 
         // TODO 替换 properties
         // TODO check
-        RouteDefinition routeDefinition = from(dalaranListenerContainer.getComponent().buildRouterUri(listener.getConfig()));
-        for (DalaranFlow.Endpoint endpoint : endpointList) {
-            DalaranComponentContainer<DalaranProcessor> dalaranEndpointContainer = DalaranComponentLoader.getEndpointContainer(endpoint.getType());
-            dalaranEndpointContainer.getComponent().configure(routeDefinition, endpoint.getConfig());
+        RouteDefinition routeDefinition = from(dalaranListenerContainer.getComponent().buildRouterUri(trigger.getConfig()));
+        for (DalaranProcessorConfig processor : processorList) {
+            DalaranComponentContainer<DalaranProcessor> dalaranEndpointContainer = DalaranComponentLoader.getProcessorContainer(processor.getType());
+            dalaranEndpointContainer.getComponent().configure(routeDefinition, processor.getConfig());
         }
     }
 }

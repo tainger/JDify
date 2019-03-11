@@ -18,8 +18,8 @@ public class DalaranFlowLoader {
 
         Gson gson = new Gson();
         Gson newGson = gson.newBuilder().
-                registerTypeAdapter(DalaranFlow.Listener.class, new DalaranComponentTypeAdapter(gson, "listener")).
-                registerTypeAdapter(DalaranFlow.Endpoint.class, new DalaranComponentTypeAdapter(gson, "endpoint")).create();
+                registerTypeAdapter(DalaranTriggerConfig.class, new DalaranComponentTypeAdapter(gson, "trigger")).
+                registerTypeAdapter(DalaranProcessorConfig.class, new DalaranComponentTypeAdapter(gson, "processor")).create();
 
         ModelCamelContext camelContext = new DefaultCamelContext();
         camelContext.start();

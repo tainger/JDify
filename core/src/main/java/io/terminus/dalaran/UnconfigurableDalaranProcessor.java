@@ -1,13 +1,13 @@
 package io.terminus.dalaran;
 
-import org.apache.camel.model.RouteDefinition;
+import org.apache.camel.model.ProcessorDefinition;
 
 public interface UnconfigurableDalaranProcessor extends DalaranProcessor {
     @Override
-    default void configure(RouteDefinition route, Object config) {
+    default void configure(ProcessorDefinition route, Object config) {
         configure(route);
     }
 
-    void configure(RouteDefinition route);
+    void configure(ProcessorDefinition route);
 
 }

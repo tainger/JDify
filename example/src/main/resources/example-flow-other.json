@@ -4,7 +4,7 @@
     "targetHost": "localhost",
     "targetPort": 8080
   },
-  "listener": {
+  "trigger": {
     "type": "netty-http-listener",
     "config": {
       "protocol": "HTTP",
@@ -14,7 +14,7 @@
       "method": "POST"
     }
   },
-  "endpoints": [
+  "processors": [
     {
       "type": "gson-to-object",
       "config": {

@@ -1,33 +1,30 @@
 package io.terminus.dalaran;
 
-import org.apache.camel.builder.RouteBuilder;
-import org.apache.camel.model.RouteDefinition;
-
 import java.util.List;
 import java.util.Map;
 
 public class DalaranFlow {
 
-    private Listener listener;
+    private DalaranTriggerConfig trigger;
 
-    private List<Endpoint> endpoints;
+    private List<DalaranProcessorConfig> processors;
 
     private Map<String, String> properties;
 
-    public Listener getListener() {
-        return listener;
+    public DalaranTriggerConfig getTrigger() {
+        return trigger;
     }
 
-    public void setListener(Listener listener) {
-        this.listener = listener;
+    public void setTrigger(DalaranTriggerConfig trigger) {
+        this.trigger = trigger;
     }
 
-    public List<Endpoint> getEndpoints() {
-        return endpoints;
+    public List<DalaranProcessorConfig> getProcessors() {
+        return processors;
     }
 
-    public void setEndpoints(List<Endpoint> endpoints) {
-        this.endpoints = endpoints;
+    public void setProcessors(List<DalaranProcessorConfig> processors) {
+        this.processors = processors;
     }
 
     public Map<String, String> getProperties() {
@@ -36,47 +33,5 @@ public class DalaranFlow {
 
     public void setProperties(Map<String, String> properties) {
         this.properties = properties;
-    }
-
-    public static class Listener {
-        private String type;
-        private Object config;
-
-        public String getType() {
-            return type;
-        }
-
-        public void setType(String type) {
-            this.type = type;
-        }
-
-        public Object getConfig() {
-            return config;
-        }
-
-        public void setConfig(Object config) {
-            this.config = config;
-        }
-    }
-
-    public static class Endpoint {
-        private String type;
-        private Object config;
-
-        public String getType() {
-            return type;
-        }
-
-        public void setType(String type) {
-            this.type = type;
-        }
-
-        public Object getConfig() {
-            return config;
-        }
-
-        public void setConfig(Object config) {
-            this.config = config;
-        }
     }
 }

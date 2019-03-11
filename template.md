@@ -3,7 +3,7 @@ const messageFlow = {
     "configuration": {
         "port": 3306
     },
-    "listener":{
+    "trigger":{
         // <from uri="netty4-http:http://0.0.0.0:{{nettyPort}}/orderItemsForm1?httpMethodRestrict=POST"/>
         "type": "netty-http-listener",
         "params": {
@@ -14,7 +14,7 @@ const messageFlow = {
             "method": "POST"
         }
     },
-    "endpoints":[
+    "processors":[
         {
             /*
             <convertBodyTo type="java.lang.String"/>

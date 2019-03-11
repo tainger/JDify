@@ -36,10 +36,10 @@ public class DalaranComponentTypeAdapter extends TypeAdapter {
             in.beginObject();
             if ("type".equals(in.nextName())) {
                 componentType = in.nextString();
-                if ("listener".equals(type)) {
-                    componentContainer = DalaranComponentLoader.getListenerContainer(componentType);
+                if ("trigger".equals(type)) {
+                    componentContainer = DalaranComponentLoader.getTriggerContainer(componentType);
                 } else {
-                    componentContainer = DalaranComponentLoader.getEndpointContainer(componentType);
+                    componentContainer = DalaranComponentLoader.getProcessorContainer(componentType);
                 }
             }
             if (componentContainer == null) {
@@ -58,17 +58,17 @@ public class DalaranComponentTypeAdapter extends TypeAdapter {
         }
 
 
-        // TODO 理论上可以搞个基类, 但是担心 listener 和 endpoint 后期分歧, 先瞎写一下
-        if ("listener".equals(type)) {
-            DalaranFlow.Listener listener = new DalaranFlow.Listener();
-            listener.setType(componentType);
-            listener.setConfig(config);
-            return listener;
+        // TODO 理论上可以搞个基类, 但是担心 trigger 和 processor 后期分歧, 先瞎写一下
+        if ("trigger".equals(type)) {
+            DalaranTriggerConfig trigger = new DalaranTriggerConfig();
+            trigger.setType(componentType);
+            trigger.setConfig(config);
+            return trigger;
         } else {
-            DalaranFlow.Endpoint endpoint = new DalaranFlow.Endpoint();
-            endpoint.setType(componentType);
-            endpoint.setConfig(config);
-            return endpoint;
+            DalaranProcessorConfig processor = new DalaranProcessorConfig();
+            processor.setType(componentType);
+            processor.setConfig(config);
+            return processor;
         }
     }
 }

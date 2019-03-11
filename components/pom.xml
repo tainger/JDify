@@ -14,6 +14,7 @@
         <module>message-translator</module>
         <module>http-request</module>
         <module>dubbo-provider</module>
+        <module>basic</module>
     </modules>
 
     <artifactId>dalaran-components</artifactId>

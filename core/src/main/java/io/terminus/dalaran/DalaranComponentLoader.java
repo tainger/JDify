@@ -8,37 +8,37 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class DalaranComponentLoader {
 
-    private static final Map<String, DalaranComponentContainer<DalaranTrigger>> listenerMapping = new ConcurrentHashMap<>();
-    private static final Map<String, DalaranComponentContainer<DalaranProcessor>> endpointMapping = new ConcurrentHashMap<>();
+    private static final Map<String, DalaranComponentContainer<DalaranTrigger>> triggerMapping = new ConcurrentHashMap<>();
+    private static final Map<String, DalaranComponentContainer<DalaranProcessor>> processorMapping = new ConcurrentHashMap<>();
 
     public static void loadComponents() {
-        ServiceLoader.load(DalaranTrigger.class).forEach(listener -> {
-            Class componentClass = listener.getClass();
+        ServiceLoader.load(DalaranTrigger.class).forEach(trigger -> {
+            Class componentClass = trigger.getClass();
             DalaranComponent dalaranComponent = (DalaranComponent) componentClass.getDeclaredAnnotation(DalaranComponent.class);
             if (dalaranComponent != null) {
-                String listenerType = dalaranComponent.value();
-                DalaranComponentContainer<DalaranTrigger> componentContainer = new DalaranComponentContainer<>(listenerType, componentClass, dalaranComponent.configType(), listener);
-                listenerMapping.put(listenerType, componentContainer);
+                String triggerType = dalaranComponent.value();
+                DalaranComponentContainer<DalaranTrigger> componentContainer = new DalaranComponentContainer<>(triggerType, componentClass, dalaranComponent.configType(), trigger);
+                triggerMapping.put(triggerType, componentContainer);
             }
         });
-        ServiceLoader.load(DalaranProcessor.class).forEach(endpoint -> {
-            Class componentClass = endpoint.getClass();
+        ServiceLoader.load(DalaranProcessor.class).forEach(processor -> {
+            Class componentClass = processor.getClass();
             DalaranComponent dalaranComponent = (DalaranComponent) componentClass.getDeclaredAnnotation(DalaranComponent.class);
             if (dalaranComponent != null) {
-                String endpointType = dalaranComponent.value();
-                DalaranComponentContainer<DalaranProcessor> componentContainer = new DalaranComponentContainer<>(endpointType, componentClass, dalaranComponent.configType(), endpoint);
-                endpointMapping.put(endpointType, componentContainer);
+                String processorType = dalaranComponent.value();
+                DalaranComponentContainer<DalaranProcessor> componentContainer = new DalaranComponentContainer<>(processorType, componentClass, dalaranComponent.configType(), processor);
+                processorMapping.put(processorType, componentContainer);
             }
         });
 
     }
 
-    public static DalaranComponentContainer<DalaranTrigger> getListenerContainer(String type) {
-        return listenerMapping.get(type);
+    public static DalaranComponentContainer<DalaranTrigger> getTriggerContainer(String type) {
+        return triggerMapping.get(type);
     }
 
-    public static DalaranComponentContainer<DalaranProcessor> getEndpointContainer(String type) {
-        return endpointMapping.get(type);
+    public static DalaranComponentContainer<DalaranProcessor> getProcessorContainer(String type) {
+        return processorMapping.get(type);
     }
 
 }

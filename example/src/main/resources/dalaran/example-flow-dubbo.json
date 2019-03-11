@@ -3,7 +3,7 @@
     "targetHost": "localhost",
     "targetPort": 8080
   },
-  "listener": {
+  "trigger": {
     "type": "dubbo-provider",
     "config": {
       "registryAddress": "zookeeper://localhost:2181",
@@ -15,7 +15,7 @@
       ]
     }
   },
-  "endpoints": [
+  "processors": [
     //    {
     //      "type": "gson-to-object",
     //      "config": {
