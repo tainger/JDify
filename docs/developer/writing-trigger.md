@@ -2,7 +2,7 @@
 
 > 因为触发器默认为单例, 所以不推荐使用任何成员变量
 
-编写一个触发器, 和编写执行器非常相似, 只需要实现 `DalaranTrigger` 接口, 并标记 `@DalaranComponent` 注解即可, `DalaranTrigger` 接口如下.
+编写一个触发器, 和编写处理器非常相似, 只需要实现 `DalaranTrigger` 接口, 并标记 `@DalaranComponent` 注解即可, `DalaranTrigger` 接口如下.
 
 ```java
 public interface DalaranTrigger<T> {

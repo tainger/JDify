@@ -1,8 +1,8 @@
-## 执行器开发
+## 处理器开发
 
-> 因为执行器默认为单例, 所以不推荐使用任何成员变量
+> 因为处理器默认为单例, 所以不推荐使用任何成员变量
 
-编写一个执行器, 只需要实现 `DalaranProcessor` 接口, 并标记 `@DalaranComponent` 注解即可, `DalaranProcessor` 接口如下.
+编写一个处理器, 只需要实现 `DalaranProcessor` 接口, 并标记 `@DalaranComponent` 注解即可, `DalaranProcessor` 接口如下.
 
 ```java
 public interface DalaranProcessor<T> {
@@ -27,7 +27,7 @@ public class DalaranHttpClient implements DalaranProcessor<HttpClientConfig> {
 }
 ```
 
-> 如果是无配置执行器, 可以实现 `UnconfigurableDalaranProcessor` 接口, 该接口对 `DalaranProcessor` 进行了包装, `configure` 接口仅有 `RouteDefinition` 一个入参.
+> 如果是无配置处理器, 可以实现 `UnconfigurableDalaranProcessor` 接口, 该接口对 `DalaranProcessor` 进行了包装, `configure` 接口仅有 `RouteDefinition` 一个入参.
 
 ```java
 public interface UnconfigurableDalaranProcessor extends DalaranProcessor {
@@ -39,9 +39,9 @@ public interface UnconfigurableDalaranProcessor extends DalaranProcessor {
 }
 ```
 
-## 核心执行器
+## 核心处理器
 
-多数执行器都十分简单, 特别是 Camel 本身已经提供的 Component, 有些执行器开发会比较复杂, 在此单独记录设计文档:
+多数处理器都十分简单, 特别是 Camel 本身已经提供的 Component, 有些处理器开发会比较复杂, 在此单独记录设计文档:
 
 * [数据映射](./core-components/mapper.md)
 * [路由](./core-components/router.md)

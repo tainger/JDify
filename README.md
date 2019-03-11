@@ -20,7 +20,7 @@
 * [概述](./docs/user/overview.md)
 * [快速开始](./docs/user/quick-start.md)
 * [触发器](./docs/user/trigger/index.md)
-* [执行器](./docs/user/processor/index.md)
+* [处理器](./docs/user/processor/index.md)
 * [流程设计器](./docs/user/flow-design.md)
 
 ## 开发者手册
@@ -29,7 +29,7 @@
 * [集成流程](./docs/developer/flow.md)
 * [流程设计器配置](./docs/developer/flow-design.md)
 * [触发器开发](./docs/developer/writing-trigger.md)
-* [执行器开发](./docs/developer/writing-processor.md)
+* [处理器开发](./docs/developer/writing-processor.md)
 * [其他](./docs/developer/other.md)
 
 ## 管理员手册
