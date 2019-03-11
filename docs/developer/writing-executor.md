@@ -45,4 +45,6 @@ public interface UnconfigurableDalaranProcessor extends DalaranProcessor {
 
 * [数据映射](./core-components/mapper.md)
 * [路由](./core-components/router.md)
+* [子流程](./core-components/sub-flow.md)
 * [Dubbo consumer](./core-components/dubbo-consumer.md)
+
