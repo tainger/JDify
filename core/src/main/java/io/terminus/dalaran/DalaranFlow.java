@@ -6,7 +6,7 @@ import org.apache.camel.model.RouteDefinition;
 import java.util.List;
 import java.util.Map;
 
-public class Pipeline {
+public class DalaranFlow {
 
     private Listener listener;
 

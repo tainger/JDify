@@ -9,7 +9,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class DalaranComponentLoader {
 
     private static final Map<String, DalaranComponentContainer<DalaranTrigger>> listenerMapping = new ConcurrentHashMap<>();
-    private static final Map<String, DalaranComponentContainer<DalaranExecutor>> endpointMapping = new ConcurrentHashMap<>();
+    private static final Map<String, DalaranComponentContainer<DalaranProcessor>> endpointMapping = new ConcurrentHashMap<>();
 
     public static void loadComponents() {
         ServiceLoader.load(DalaranTrigger.class).forEach(listener -> {
@@ -21,12 +21,12 @@ public class DalaranComponentLoader {
                 listenerMapping.put(listenerType, componentContainer);
             }
         });
-        ServiceLoader.load(DalaranExecutor.class).forEach(endpoint -> {
+        ServiceLoader.load(DalaranProcessor.class).forEach(endpoint -> {
             Class componentClass = endpoint.getClass();
             DalaranComponent dalaranComponent = (DalaranComponent) componentClass.getDeclaredAnnotation(DalaranComponent.class);
             if (dalaranComponent != null) {
                 String endpointType = dalaranComponent.value();
-                DalaranComponentContainer<DalaranExecutor> componentContainer = new DalaranComponentContainer<>(endpointType, componentClass, dalaranComponent.configType(), endpoint);
+                DalaranComponentContainer<DalaranProcessor> componentContainer = new DalaranComponentContainer<>(endpointType, componentClass, dalaranComponent.configType(), endpoint);
                 endpointMapping.put(endpointType, componentContainer);
             }
         });
@@ -37,7 +37,7 @@ public class DalaranComponentLoader {
         return listenerMapping.get(type);
     }
 
-    public static DalaranComponentContainer<DalaranExecutor> getEndpointContainer(String type) {
+    public static DalaranComponentContainer<DalaranProcessor> getEndpointContainer(String type) {
         return endpointMapping.get(type);
     }
 

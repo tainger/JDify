@@ -1,6 +1,6 @@
 ## flow
 
-Flow 示意图, 其中蓝色节点为 Trigger, 白色节点为 Executor:
+Flow 示意图, 其中蓝色节点为 Trigger, 白色节点为 Processor:
 
 ![](./docs/images/flow.jpg)
 

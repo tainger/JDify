@@ -60,12 +60,12 @@ public class DalaranComponentTypeAdapter extends TypeAdapter {
 
         // TODO 理论上可以搞个基类, 但是担心 listener 和 endpoint 后期分歧, 先瞎写一下
         if ("listener".equals(type)) {
-            Pipeline.Listener listener = new Pipeline.Listener();
+            DalaranFlow.Listener listener = new DalaranFlow.Listener();
             listener.setType(componentType);
             listener.setConfig(config);
             return listener;
         } else {
-            Pipeline.Endpoint endpoint = new Pipeline.Endpoint();
+            DalaranFlow.Endpoint endpoint = new DalaranFlow.Endpoint();
             endpoint.setType(componentType);
             endpoint.setConfig(config);
             return endpoint;

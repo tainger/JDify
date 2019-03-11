@@ -2,10 +2,10 @@
 
 > 因为执行器默认为单例, 所以不推荐使用任何成员变量
 
-编写一个执行器, 只需要实现 `DalaranExecutor` 接口, 并标记 `@DalaranComponent` 注解即可, `DalaranExecutor` 接口如下.
+编写一个执行器, 只需要实现 `DalaranProcessor` 接口, 并标记 `@DalaranComponent` 注解即可, `DalaranProcessor` 接口如下.
 
 ```java
-public interface DalaranExecutor<T> {
+public interface DalaranProcessor<T> {
     void configure(RouteDefinition route, T config);
 }
 ```
@@ -16,7 +16,7 @@ public interface DalaranExecutor<T> {
 
 ```java
 @DalaranComponent(value = "http-client", configType = HttpClientConfig.class)
-public class DalaranHttpClient implements DalaranExecutor<HttpClientConfig> {
+public class DalaranHttpClient implements DalaranProcessor<HttpClientConfig> {
     private static final String HTTP_URI = "%s4://%s:%s%s?bridgeEndpoint=true";
 
     @Override
@@ -27,10 +27,10 @@ public class DalaranHttpClient implements DalaranExecutor<HttpClientConfig> {
 }
 ```
 
-> 如果是无配置执行器, 可以实现 `UnconfigurableDalaranExecutor` 接口, 该接口对 `DalaranExecutor` 进行了包装, `configure` 接口仅有 `RouteDefinition` 一个入参.
+> 如果是无配置执行器, 可以实现 `UnconfigurableDalaranProcessor` 接口, 该接口对 `DalaranProcessor` 进行了包装, `configure` 接口仅有 `RouteDefinition` 一个入参.
 
 ```java
-public interface UnconfigurableDalaranExecutor extends DalaranExecutor {
+public interface UnconfigurableDalaranProcessor extends DalaranProcessor {
     @Override
     default void configure(RouteDefinition route, Object config) {
         configure(route);

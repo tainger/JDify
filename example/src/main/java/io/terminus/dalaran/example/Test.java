@@ -36,12 +36,12 @@ public class Test {
     private static RouteBuilder buildRoute(String json) {
         Gson gson = new Gson();
         Gson newGson = gson.newBuilder().
-                registerTypeAdapter(Pipeline.Listener.class, new DalaranComponentTypeAdapter(gson, "listener")).
-                registerTypeAdapter(Pipeline.Endpoint.class, new DalaranComponentTypeAdapter(gson, "endpoint")).create();
+                registerTypeAdapter(DalaranFlow.Listener.class, new DalaranComponentTypeAdapter(gson, "listener")).
+                registerTypeAdapter(DalaranFlow.Endpoint.class, new DalaranComponentTypeAdapter(gson, "endpoint")).create();
         InputStream in = Test.class.getResourceAsStream(json);
 
         Reader reader = new InputStreamReader(in);
-        Pipeline messageFlow = newGson.fromJson(reader, Pipeline.class);
+        DalaranFlow messageFlow = newGson.fromJson(reader, DalaranFlow.class);
         return new CamelRouteBuilder(messageFlow);
     }
 }

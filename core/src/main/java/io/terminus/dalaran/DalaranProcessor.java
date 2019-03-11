@@ -4,6 +4,6 @@ import org.apache.camel.model.RouteDefinition;
 
 import java.util.Map;
 
-public interface DalaranExecutor<T> {
+public interface DalaranProcessor<T> {
     void configure(RouteDefinition route, T config);
 }

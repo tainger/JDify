@@ -2,9 +2,7 @@ package io.terminus.dalaran;
 
 import org.apache.camel.model.RouteDefinition;
 
-import java.util.Map;
-
-public interface UnconfigurableDalaranExecutor extends DalaranExecutor {
+public interface UnconfigurableDalaranProcessor extends DalaranProcessor {
     @Override
     default void configure(RouteDefinition route, Object config) {
         configure(route);
