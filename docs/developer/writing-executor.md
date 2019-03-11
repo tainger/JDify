@@ -1,5 +1,7 @@
 ## 执行器开发
 
+> 因为执行器默认为单例, 所以不推荐使用任何成员变量
+
 编写一个执行器, 只需要实现 `DalaranExecutor` 接口, 并标记 `@DalaranComponent` 注解即可, `DalaranExecutor` 接口如下.
 
 ```java
@@ -39,7 +41,8 @@ public interface UnconfigurableDalaranExecutor extends DalaranExecutor {
 
 ## 核心执行器
 
-有些执行器开发会比较复杂, 在此记录设计文档:
+多数执行器都十分简单, 特别是 Camel 本身已经提供的 Component, 有些执行器开发会比较复杂, 在此单独记录设计文档:
 
 * [数据映射](./core-components/mapper.md)
 * [路由](./core-components/router.md)
+* [Dubbo consumer](./core-components/dubbo-consumer.md)

@@ -25,7 +25,20 @@
 
 > camel component 的编写标准详见[Writing Camel components](http://camel.apache.org/writing-components.html)
 
+### 核心逻辑
+
+```sequence
+Dalaran -> DalaranComponentLoader: 加载所有触发器和执行器
+Dalaran -> DalaranFlowLoader: 加载所有集成流程
+DalaranFlowLoader -> CamelRouteBuilder: 转化为 Camel Java dsl
+CamelRouteBuilder -> DalaranComponentLoader: 过程中拉取所需触发器和执行器
+CamelRouteBuilder -> DalaranFlowLoader: 注册并生效
+
+```
+
+![](../images/startup-flow.jpg)
 
 ### 核心类图
 
 ![](../images/core-class.jpg)
+
