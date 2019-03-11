@@ -24,3 +24,8 @@
 如果现有的 Camel component 不能满足需求, 可以自行定制 camel component, 在新的 trigger/executor 内加入其依赖即可, 如我们自行编写的 `Dubbo Component`:
 
 > camel component 的编写标准详见[Writing Camel components](http://camel.apache.org/writing-components.html)
+
+
+### 核心类图
+
+![](../images/core-class.jpg)

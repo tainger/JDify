@@ -8,7 +8,7 @@ public class DalaranDubboProvider implements DalaranTrigger<DubboProviderConfig>
 
     private static final String DUBBO_PROVIDER_URI = "dubbo:?registryAddress=%s&serviceId=%s&method=%s&version=%s";
 
-    public String buildFromUri(DubboProviderConfig config) {
+    public String buildRouterUri(DubboProviderConfig config) {
         return String.format(DUBBO_PROVIDER_URI, config.getRegistryAddress(), config.getServiceId(), config.getMethod(), config.getVersion());
     }
 }

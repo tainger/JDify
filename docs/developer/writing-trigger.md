@@ -4,11 +4,11 @@
 
 ```java
 public interface DalaranTrigger<T> {
-    String buildFromUri(T config);
+    String buildRouterUri(T config);
 }
 ```
 
-接口中只有一个 buildFromUri 方法, 会传入该接口声明的配置实例, 在实现方法内返回 `Camel from uri` 即可.
+接口中只有一个 buildRouterUri 方法, 会传入该接口声明的配置实例, 在实现方法内返回 `Camel from uri` 即可.
 
 下面例子为接收 Dubbo 请求的 `http-provider`, 本质上是在配置过程中, 声明了 `dubbo` 的 `component`, 以及相关配置, 最后返回 `Camel uri`:
 
@@ -19,7 +19,7 @@ public class DalaranDubboProvider implements DalaranTrigger<DubboProviderConfig>
 
     private static final String DUBBO_PROVIDER_URI = "dubbo:?registryAddress=%s&serviceId=%s&method=%s&version=%s";
 
-    public String buildFromUri(DubboProviderConfig config) {
+    public String buildRouterUri(DubboProviderConfig config) {
         return String.format(DUBBO_PROVIDER_URI, config.getRegistryAddress(), config.getServiceId(), config.getMethod(), config.getVersion());
     }
 }
