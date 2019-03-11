@@ -13,6 +13,7 @@
         <module>netty-http-listener</module>
         <module>message-translator</module>
         <module>http-request</module>
+        <module>dubbo-provider</module>
     </modules>
 
     <artifactId>dalaran-components</artifactId>

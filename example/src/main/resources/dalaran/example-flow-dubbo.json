@@ -1,0 +1,57 @@
+{
+  "properties": {
+    "targetHost": "localhost",
+    "targetPort": 8080
+  },
+  "listener": {
+    "type": "dubbo-provider",
+    "config": {
+      "registryAddress": "zookeeper://localhost:2181",
+      "serviceId": "io.terminus.dalaran.example.OrderService",
+      "method": "getUserOrders",
+      "version": "terminus",
+      "parameterTypes": [
+        "java.lang.String"
+      ]
+    }
+  },
+  "endpoints": [
+    //    {
+    //      "type": "gson-to-object",
+    //      "config": {
+    //        "targetType": "io.terminus.dalaran.example.OrderItem"
+    //      }
+    //    },
+    {
+      "type": "message-convert",
+      "config": {
+        "targetModel": "io.terminus.dalaran.example.ExtOrderItem",
+        "mappingFile": "test-mapping-dubbo.xml",
+        "mapping": {
+          "itemName": "${body[0]}",
+          "itemPrice": "${body.price}",
+          "test": "${header.Content-Type}"
+        }
+      }
+    },
+    {
+      "type": "object-to-gson"
+    },
+    {
+      "type": "http-request",
+      "config": {
+        "protocol": "HTTP",
+        "method": "POST",
+        "host": "{{targetHost}}",
+        "port": "{{targetPort}}",
+        "path": "/orders_dubbo"
+      }
+    },
+    {
+      "type": "gson-to-object",
+      "config": {
+        "targetType": "io.terminus.dalaran.example.TestOrder"
+      }
+    }
+  ]
+}

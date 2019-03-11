@@ -12,11 +12,13 @@
         <module>core</module>
         <module>components</module>
         <module>example</module>
+        <module>camel-components</module>
     </modules>
 
     <properties>
         <camel.version>2.23.1</camel.version>
         <kotlin.version>1.3.20</kotlin.version>
+        <dubbo.version>2.6.5</dubbo.version>
     </properties>
 
 </project>

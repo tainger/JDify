@@ -6,7 +6,7 @@ public class ExtOrderItem {
 
     private Long id;
 
-    private List<String> itemName;
+    private String itemName;
     private String test;
 
     private Double itemPrice;
@@ -19,11 +19,11 @@ public class ExtOrderItem {
         this.id = id;
     }
 
-    public List<String> getItemName() {
+    public String getItemName() {
         return itemName;
     }
 
-    public void setItemName(List<String> itemName) {
+    public void setItemName(String itemName) {
         this.itemName = itemName;
     }
 

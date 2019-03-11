@@ -1,5 +1,6 @@
 package io.terminus.dalaran.example
 
+import io.terminus.dalaran.PipelineLoader
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.web.bind.annotation.PostMapping
@@ -16,7 +17,7 @@ data class Order(
 
 class TargetOrderItem {
     var id: Long? = null
-    var itemName: List<String>? = null
+    var itemName: String? = null
     var test: String? = null
     var itemPrice: Double? = null
 }
@@ -24,12 +25,16 @@ class TargetOrderItem {
 @RestController
 class TestController {
     @PostMapping("/orders")
-    fun orders(@RequestBody orderItem: TargetOrderItem, req: HttpServletRequest) = Order("${orderItem.itemName}: ${orderItem.itemPrice}")
+    fun orders(@RequestBody orderItem: ExtOrderItem, req: HttpServletRequest) = Order("${orderItem.itemName}: ${orderItem.itemPrice}")
+
+    @PostMapping("/orders_dubbo")
+    fun ordersDubbo(@RequestBody orderItem: TargetOrderItem, req: HttpServletRequest) = Order("${orderItem.itemName}: ${orderItem.itemPrice}")
 
     @PostMapping("/form_orders")
     fun formOrders(orderItem: TargetOrderItem, req: HttpServletRequest) = Order("form ${orderItem.itemName}: ${orderItem.itemPrice}")
 }
 
 fun main(args: Array<String>) {
+    PipelineLoader.loadMessageFlows()
     SpringApplication.run(Application::class.java)
 }

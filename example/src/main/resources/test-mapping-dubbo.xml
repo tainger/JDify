@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mappings xmlns="http://dozermapper.github.io/schema/bean-mapping"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://dozermapper.github.io/schema/bean-mapping http://dozermapper.github.io/schema/bean-mapping.xsd">
+
+    <mapping>
+        <class-a>org.apache.camel.component.dozer.ExpressionMapper</class-a>
+        <class-b>io.terminus.dalaran.example.ExtOrderItem</class-b>
+        <field custom-converter-id="_expressionMapping" custom-converter-param="simple:\${body[0].name}">
+            <a>expression</a>
+            <b>itemName</b>
+        </field>
+        <field custom-converter-id="_expressionMapping" custom-converter-param="simple:\${body[0].price}">
+            <a>expression</a>
+            <b>itemPrice</b>
+        </field>
+    </mapping>
+</mappings>
