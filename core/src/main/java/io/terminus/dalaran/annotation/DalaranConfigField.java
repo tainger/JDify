@@ -8,6 +8,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.FIELD})
 public @interface DalaranConfigField {
+    String label() default "";
 
-
+    FieldInputType inputType() default FieldInputType.Auto;
 }
