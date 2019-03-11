@@ -1,6 +1,6 @@
 package io.terminus.dalaran.component.message.convert
 
-import io.terminus.dalaran.DalaranComponent
+import io.terminus.dalaran.annotation.DalaranComponent
 import io.terminus.dalaran.DalaranExecutor
 import io.terminus.dalaran.DalaranPropertyUtils
 import org.apache.camel.model.RouteDefinition

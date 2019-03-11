@@ -1,6 +1,6 @@
 package io.terminus.dalaran.component.netty.http
 
-import io.terminus.dalaran.DalaranComponent
+import io.terminus.dalaran.annotation.DalaranComponent
 import io.terminus.dalaran.DalaranTrigger
 
 @DalaranComponent("netty-http-listener", configType = NettyHttpConfig::class)

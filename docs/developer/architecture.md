@@ -30,7 +30,7 @@
 ```sequence
 Dalaran -> DalaranComponentLoader: 加载所有触发器和执行器
 Dalaran -> DalaranFlowLoader: 加载所有集成流程
-DalaranFlowLoader -> CamelRouteBuilder: 转化为 Camel Java dsl
+DalaranFlowLoader -> CamelRouteBuilder: 转化为 Camel Java ds
 CamelRouteBuilder -> DalaranComponentLoader: 过程中拉取所需触发器和执行器
 CamelRouteBuilder -> DalaranFlowLoader: 注册并生效
 

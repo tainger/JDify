@@ -1,5 +1,7 @@
 package io.terminus.dalaran;
 
+import io.terminus.dalaran.annotation.DalaranComponent;
+
 import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.concurrent.ConcurrentHashMap;
