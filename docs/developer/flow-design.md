@@ -6,3 +6,10 @@ String, Integer, Long 等常用类型直接生成对用输入框, 实现了 Dala
 ## 录入模式
 
 根据类型自动生成的表单, 会有两种录入模式, 一种是根据具体的类型而启用的方式, 如 String, Integer, Select 之类的, 另外一种是表达式, 从环境变量或者是上下文中获取参数, 例如: `${database.url}`
+
+
+## 界面示意
+
+![](./docs/images/flow-design.jpg)
+
+![](./docs/images/flow-config.jpg)
