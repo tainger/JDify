@@ -16,12 +16,6 @@
     }
   },
   "processors": [
-    //    {
-    //      "type": "gson-to-object",
-    //      "config": {
-    //        "targetType": "io.terminus.dalaran.example.OrderItem"
-    //      }
-    //    },
     {
       "type": "message-convert",
       "config": {
@@ -34,11 +28,11 @@
         }
       }
     },
+//    {
+//      "type": "object-to-gson"
+//    },
     {
-      "type": "object-to-gson"
-    },
-    {
-      "type": "http-request",
+      "type": "http-client",
       "config": {
         "protocol": "HTTP",
         "method": "POST",
@@ -46,12 +40,13 @@
         "port": "{{targetPort}}",
         "path": "/orders_dubbo"
       }
-    },
-    {
-      "type": "gson-to-object",
-      "config": {
-        "targetType": "io.terminus.dalaran.example.TestOrder"
-      }
     }
+//  ,
+//    {
+//      "type": "gson-to-object",
+//      "config": {
+//        "targetType": "io.terminus.dalaran.example.TestOrder"
+//      }
+//    }
   ]
 }

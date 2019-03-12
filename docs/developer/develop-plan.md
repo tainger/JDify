@@ -18,6 +18,9 @@
     * Kafka producer
     * Dubbo consumer
     * Router
+    * Loop
+    * Filter
+    * Branch: 使用 camel multicast
     * Mapper: 提供基本映射, mapping function 下版提供
 
 > 视东购项目需求调整优先级
@@ -30,7 +33,6 @@
     * RocketMQ producer
     * SAP HANA client
     * SOAP client
-    * Branch
     * Mapping function
     * Database read
     * Database write
