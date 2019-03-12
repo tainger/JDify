@@ -65,3 +65,34 @@ Flow 示意图, 其中蓝色节点为 Trigger, 白色节点为 Processor:
 ```
 
 上述主要配置为 trigger 和 processors, 主要是声明一个 type 和 config, type 声明了要使用何种 trigger 或 processors, config 提供了其所需要的配置内容.
+
+
+## 另一种配置方式
+
+考虑到触发器/处理器复用的角度, 可以将触发器/处理器配置的内容作为实例保存, 而 Flow 中配置时引用其实例 Id 即可.
+
+举例:
+
+```json
+{
+  "properties": {
+    "port": 8184,
+    "targetHost": "localhost",
+    "targetPort": 8080
+  },
+  "trigger": {
+    "type": "netty-http-listener",
+    "config": "onOrderCreated"
+  },
+  "processors": [
+    {
+      "type": "object-mapping",
+      "config": "TerminusOrderToERPOrder"
+    },
+    {
+      "type": "http-request",
+      "config": "CallCreateOrder"
+    }
+  ]
+}
+```
