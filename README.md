@@ -23,7 +23,6 @@
 * [处理器](./docs/user/processor/index.md)
 * [模型](./docs/user/model.md)
 * [流程设计器](./docs/user/flow-design.md)
-* [发布](./docs/user/deploy.md)
 
 ## 开发者手册
 
@@ -33,6 +32,9 @@
 * [触发器开发](./docs/developer/writing-trigger.md)
 * [处理器开发](./docs/developer/writing-processor.md)
 * [模型](./docs/developer/model.md)
+* [发布](./docs/developer/publish.md)
+* [监控](./docs/developer/monitor.md)
+* [开发计划](./docs/developer/develop-plan.md)
 * [其他](./docs/developer/other.md)
 
 ## 管理员手册

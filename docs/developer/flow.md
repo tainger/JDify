@@ -96,3 +96,5 @@ Flow 示意图, 其中蓝色节点为 Trigger, 白色节点为 Processor:
   ]
 }
 ```
+
+> 考虑使用这种方式, 组件实例可以复用, 其次也可以将 config 内容与其 component 调用分离, 这部分需要做个 poc
