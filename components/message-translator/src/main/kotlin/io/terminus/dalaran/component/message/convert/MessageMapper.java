@@ -6,7 +6,7 @@ import io.terminus.dalaran.annotation.DalaranComponent;
 import org.apache.camel.model.ProcessorDefinition;
 import org.apache.camel.model.dataformat.JsonLibrary;
 
-@DalaranComponent(value = "message-convert", configType = MessageMapperConfig.class)
+@DalaranComponent(value = "message-mapper", configType = MessageMapperConfig.class)
 public class MessageMapper implements DalaranProcessor<MessageMapperConfig> {
 
     private String DOZER_URI = "dozer?targetModel=%s&mappingFile=%s";
