@@ -1,6 +1,9 @@
 ## 架构设计
 
-集成平台整体设计是基于 [Apache Camel](http://camel.apache.org) 的, Camel 的介绍本文不在赘述.
+集成平台整体设计是基于 [Apache Camel](http://camel.apache.org) 的, Camel 的详细说明本文不再赘述.
+
+> Apache Camel is a powerful open source integration framework based on known Enterprise Integration Patterns with powerful bean integration.
+
 其作为集成平台底层的路由调度框架, 上述 `触发器/处理器` 等逻辑组件, 也是基于 Camel 的 component 标准进行扩展和配置封装.
 上述的 `集成流程` 本质上也是 Camel DSL 的封装.
 
@@ -30,6 +33,10 @@
 
 ![](../images/xmind.jpg)
 
+### 核心类图
+
+![](../images/core-class.jpg)
+
 ### 核心逻辑
 
 ```sequence
@@ -42,8 +49,4 @@ CamelRouteBuilder -> DalaranFlowLoader: 注册并生效
 ```
 
 ![](../images/startup-flow.jpg)
-
-### 核心类图
-
-![](../images/core-class.jpg)
 
