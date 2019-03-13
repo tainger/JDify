@@ -17,10 +17,10 @@
     * Http client
     * Kafka producer
     * Dubbo consumer
+    * Exception
     * Router
-    * Loop
-    * Filter
     * Branch: 使用 camel multicast
+    * Loop
     * Mapper: 提供基本映射, mapping function 下版提供
 
 > 视东购项目需求调整优先级
@@ -37,3 +37,15 @@
     * Database read
     * Database write
     * Script: 脚本语言还未定, 大概率 Java 或者 JS
+    * Dynamic Router
+    * Delayer
+    * Cache
+    * Async: 异步执行
+
+### 可能不需要的组件
+
+* 处理器:
+    * Filter
+    * Splitter
+    * Aggregator
+    * Sequencer
