@@ -12,22 +12,19 @@ public class DalaranComponentLoader {
     private static final Map<String, DalaranComponentContainer<DalaranProcessor>> processorMapping = new ConcurrentHashMap<>();
 
     public static void loadComponents() {
-        ServiceLoader.load(DalaranTrigger.class).forEach(trigger -> {
-            Class componentClass = trigger.getClass();
+        ServiceLoader.load(Component.class).forEach(component -> {
+            Class componentClass = component.getClass();
             DalaranComponent dalaranComponent = (DalaranComponent) componentClass.getDeclaredAnnotation(DalaranComponent.class);
-            if (dalaranComponent != null) {
-                String triggerType = dalaranComponent.value();
-                DalaranComponentContainer<DalaranTrigger> componentContainer = new DalaranComponentContainer<>(triggerType, componentClass, dalaranComponent.configType(), trigger);
-                triggerMapping.put(triggerType, componentContainer);
+            if (dalaranComponent == null) {
+                return;
             }
-        });
-        ServiceLoader.load(DalaranProcessor.class).forEach(processor -> {
-            Class componentClass = processor.getClass();
-            DalaranComponent dalaranComponent = (DalaranComponent) componentClass.getDeclaredAnnotation(DalaranComponent.class);
-            if (dalaranComponent != null) {
-                String processorType = dalaranComponent.value();
-                DalaranComponentContainer<DalaranProcessor> componentContainer = new DalaranComponentContainer<>(processorType, componentClass, dalaranComponent.configType(), processor);
-                processorMapping.put(processorType, componentContainer);
+            String componentType = dalaranComponent.value();
+            if (component instanceof DalaranTrigger) {
+                DalaranComponentContainer<DalaranTrigger> componentContainer = new DalaranComponentContainer<>(componentType, componentClass, dalaranComponent.configType(), (DalaranTrigger) component);
+                triggerMapping.put(componentType, componentContainer);
+            } else if (component instanceof DalaranProcessor) {
+                DalaranComponentContainer<DalaranProcessor> componentContainer = new DalaranComponentContainer<>(componentType, componentClass, dalaranComponent.configType(), (DalaranProcessor) component);
+                processorMapping.put(componentType, componentContainer);
             }
         });
 

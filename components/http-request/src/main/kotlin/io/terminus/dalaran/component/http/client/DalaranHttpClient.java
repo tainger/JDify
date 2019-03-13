@@ -1,4 +1,4 @@
-package io.terminus.dalaran.component.http.request;
+package io.terminus.dalaran.component.http.client;
 
 import io.terminus.dalaran.DalaranProcessor;
 import io.terminus.dalaran.annotation.DalaranComponent;
@@ -11,7 +11,7 @@ public class DalaranHttpClient implements DalaranProcessor<HttpClientConfig> {
 
     @Override
     public void configure(ProcessorDefinition route, HttpClientConfig config) {
-        String uri = String.format(HTTP_URI, config.getProtocol().getValue(), config.getHost(), config.getPort(), config.getPath());
-        route.setHeader("CamelHttpMethod", Builder.constant(config.getMethod())).to(uri);
+        String uri = String.format(HTTP_URI, config.getProtocol().name().toLowerCase(), config.getHost(), config.getPort(), config.getPath());
+        route.setHeader("CamelHttpMethod", Builder.constant(config.getMethod().name())).to(uri);
     }
 }

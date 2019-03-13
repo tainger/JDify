@@ -45,6 +45,7 @@ public class DalaranComponentTypeAdapter extends TypeAdapter {
             if (componentContainer == null) {
 
                 // TODO throw
+                in.endObject();
                 return null;
             }
             if (in.peek() != END_OBJECT) {
