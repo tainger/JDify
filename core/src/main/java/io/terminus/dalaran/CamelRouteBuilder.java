@@ -1,5 +1,7 @@
 package io.terminus.dalaran;
 
+import io.terminus.dalaran.message.DalaranDBMessage;
+import io.terminus.dalaran.message.DalaranMessage;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.model.RouteDefinition;
 
@@ -19,6 +21,8 @@ public class CamelRouteBuilder extends RouteBuilder {
         DalaranTriggerConfig trigger = messageFlow.getTrigger();
         List<DalaranProcessorConfig> processorList = messageFlow.getProcessors();
         DalaranComponentContainer<DalaranTrigger> dalaranListenerContainer = DalaranComponentLoader.getTriggerContainer(trigger.getType());
+
+
 
         // TODO 替换 properties
         // TODO check
