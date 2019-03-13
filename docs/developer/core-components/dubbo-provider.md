@@ -1,1 +1,16 @@
-可以吧 dubbo camel component 怎么写的也说一下
+##Dubbo扩展——触发器
+
+处理接口实现：
+
+```java
+@DalaranComponent(value = "dubbo-provider", configType = DubboProviderConfig.class)
+public class DalaranDubboProvider implements DalaranTrigger<DubboProviderConfig> {
+
+    private static final String DUBBO_PROVIDER_URI = "dubbo:?registryAddress=%s&serviceId=%s&method=%s&version=%s";
+
+    public String buildRouterUri(DubboProviderConfig config) {
+        return String.format(DUBBO_PROVIDER_URI, config.getRegistryAddress(), config.getServiceId(), config.getMethod(), config.getVersion());
+    }
+}
+```
+

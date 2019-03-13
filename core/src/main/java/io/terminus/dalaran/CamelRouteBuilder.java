@@ -20,6 +20,8 @@ public class CamelRouteBuilder extends RouteBuilder {
         List<DalaranProcessorConfig> processorList = messageFlow.getProcessors();
         DalaranComponentContainer<DalaranTrigger> dalaranListenerContainer = DalaranComponentLoader.getTriggerContainer(trigger.getType());
 
+
+
         // TODO 替换 properties
         // TODO check
         RouteDefinition routeDefinition = from(dalaranListenerContainer.getComponent().buildRouterUri(trigger.getConfig()));
