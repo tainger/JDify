@@ -12,7 +12,8 @@ import javax.servlet.http.HttpServletRequest
 open class Application
 
 data class Order(
-        val orderNumber: String
+        val orderNumber: String,
+        val orderPrice: Double = 666.66
 )
 
 class TargetOrderItem {
@@ -32,9 +33,32 @@ class TestController {
 
     @PostMapping("/form_orders")
     fun formOrders(orderItem: TargetOrderItem, req: HttpServletRequest) = Order("form ${orderItem.itemName}: ${orderItem.itemPrice}")
+
+    @PostMapping("/testOrder")
+    fun testOrder() = Order("test: Order", 999.98)
+
+
+    @PostMapping("/callA")
+    fun a(req: HttpServletRequest): String {
+        println("start a")
+        Thread.sleep(3000)
+        println("end a")
+        return "a"
+    }
+
+    @PostMapping("/callB")
+    fun b(req: HttpServletRequest): String {
+        println("start b")
+        Thread.sleep(5000)
+        println("end b")
+        return "b"
+    }
+
+    @PostMapping("/callAll")
+    fun all(req: HttpServletRequest) = "all"
 }
 
 fun main(args: Array<String>) {
-    DalaranFlowLoader.loadMessageFlows()
+//    DalaranFlowLoader.loadMessageFlows()
     SpringApplication.run(Application::class.java)
 }

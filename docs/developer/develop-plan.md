@@ -12,15 +12,11 @@
     * Timer
     * Http listener
     * Dubbo provider
-    * Kafka consumer
 * 处理器:
     * Http client
-    * Kafka producer
     * Dubbo consumer
     * Exception
-    * Router
-    * Branch: 使用 camel multicast
-    * Loop
+    * ReTry
     * Mapper: 提供基本映射, mapping function 下版提供
 
 > 视东购项目需求调整优先级
@@ -29,10 +25,16 @@
 
 * 触发器:
     * RocketMQ consumer
+    * Kafka consumer
 * 处理器:
     * RocketMQ producer
+    * Kafka producer
     * SAP HANA client
     * SOAP client
+    * Branch: 分支, 可以并行
+    * Aggregator: 配合 Branch 做聚合
+    * Router
+    * Loop
     * Mapping function
     * Database read
     * Database write
@@ -46,6 +48,5 @@
 
 * 处理器:
     * Filter
-    * Splitter
-    * Aggregator
     * Sequencer
+    * Splitter:
