@@ -1,7 +1,5 @@
 package io.terminus.dalaran;
 
-import io.terminus.dalaran.message.DalaranDBMessage;
-import io.terminus.dalaran.message.DalaranMessage;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.model.RouteDefinition;
 

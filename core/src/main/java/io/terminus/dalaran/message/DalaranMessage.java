@@ -9,7 +9,7 @@ public class  DalaranMessage {
 
     private MessageModel model;
 
-    private String value;
+    private String type;
 
     public MessageModel getModel() {
         return model;
@@ -17,13 +17,5 @@ public class  DalaranMessage {
 
     public void setModel(MessageModel model) {
         this.model = model;
-    }
-
-    public String getValue() {
-        return value;
-    }
-
-    public void setValue(String value) {
-        this.value = value;
     }
 }

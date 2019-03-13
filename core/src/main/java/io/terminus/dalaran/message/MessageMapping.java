@@ -7,19 +7,11 @@ import io.terminus.dalaran.message.model.MessageModel;
  */
 public class MessageMapping {
 
-    private MessageModel originModel;
-
     private MessageModel targetModel;
 
+    private MessageModel destinationModel;
+
     private MessageProcessFunction function;
-
-    public MessageModel getOriginModel() {
-        return originModel;
-    }
-
-    public void setOriginModel(MessageModel originModel) {
-        this.originModel = originModel;
-    }
 
     public MessageModel getTargetModel() {
         return targetModel;
@@ -27,6 +19,14 @@ public class MessageMapping {
 
     public void setTargetModel(MessageModel targetModel) {
         this.targetModel = targetModel;
+    }
+
+    public MessageModel getDestinationModel() {
+        return destinationModel;
+    }
+
+    public void setDestinationModel(MessageModel destinationModel) {
+        this.destinationModel = destinationModel;
     }
 
     public MessageProcessFunction getFunction() {

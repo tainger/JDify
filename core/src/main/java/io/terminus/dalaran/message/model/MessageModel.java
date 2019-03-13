@@ -7,7 +7,7 @@ public class MessageModel {
 
     private String columnName;
 
-    private MessageModel model;
+    private String columnType;
 
     public String getColumnName() {
         return columnName;
@@ -15,5 +15,13 @@ public class MessageModel {
 
     public void setColumnName(String columnName) {
         this.columnName = columnName;
+    }
+
+    public String getColumnType() {
+        return columnType;
+    }
+
+    public void setColumnType(String columnType) {
+        this.columnType = columnType;
     }
 }
