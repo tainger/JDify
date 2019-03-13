@@ -55,9 +55,19 @@ MessageModel： 用于描述字段信息
 ```java
 public class MessageModel {
 
-    private String columnName;
+    private String fieldName;
 
-    private String columnType;
+    private String fieldType;
+}
+```
+
+DalaranMessage: 用于描述具体对象，modelType为输入数据的类型，比如JSON，XML等
+```java
+public class  DalaranMessage {
+
+    private List<MessageModel> fields;
+
+    private ModelType type;
 }
 ```
 
@@ -65,19 +75,21 @@ MessageMapping: 用于描述字段映射
 ```java
 public class MessageMapping {
 
-    private MessageModel targetModel;
+    private List<MessageModel> targetModel;
 
-    private MessageModel destinationModel;
+    private List<MessageModel> destinationModel;
 
     private MessageProcessFunction function;
 }
 ```
 
-MessageMappingSet: 用于描述一组映射关系，modelType为输入数据的类型，比如JSON，XML等
+MessageMappingSet: 用于描述一组映射关系
 ```java
 public class MessageMappingSet {
-
-    private ModelType modelType;
+    
+    private DalaranMessage target;
+    
+    private DalaranMessage destination;
 
     private List<MessageMapping> mappings;
 }

@@ -16,20 +16,20 @@ public class TestMapping {
     public static void main(String[] args) throws Exception {
 
         MessageModel model1 = new MessageModel();
-        model1.setColumnName("name");
-        model1.setColumnType("String");
+        model1.setFieldName("name");
+        model1.setFieldType("String");
 
         MessageModel model2 = new MessageModel();
-        model2.setColumnName("number");
-        model2.setColumnType("long");
+        model2.setFieldName("number");
+        model2.setFieldType("long");
 
         MessageModel model3 = new MessageModel();
-        model3.setColumnName("userName");
-        model3.setColumnType("String");
+        model3.setFieldName("userName");
+        model3.setFieldType("String");
 
         MessageModel model4 = new MessageModel();
-        model4.setColumnName("userNumber");
-        model4.setColumnType("long");
+        model4.setFieldName("userNumber");
+        model4.setFieldType("long");
 
         MessageMapping mapping1 = new MessageMapping();
         mapping1.setTargetModel(model1);

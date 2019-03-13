@@ -5,23 +5,23 @@ package io.terminus.dalaran.message.model;
  */
 public class MessageModel {
 
-    private String columnName;
+    private String fieldName;
 
-    private String columnType;
+    private String fieldType;
 
-    public String getColumnName() {
-        return columnName;
+    public String getFieldName() {
+        return fieldName;
     }
 
-    public void setColumnName(String columnName) {
-        this.columnName = columnName;
+    public void setFieldName(String fieldName) {
+        this.fieldName = fieldName;
     }
 
-    public String getColumnType() {
-        return columnType;
+    public String getFieldType() {
+        return fieldType;
     }
 
-    public void setColumnType(String columnType) {
-        this.columnType = columnType;
+    public void setFieldType(String fieldType) {
+        this.fieldType = fieldType;
     }
 }
