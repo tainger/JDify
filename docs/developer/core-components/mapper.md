@@ -47,7 +47,13 @@ class MessageConvertProcessor : DalaranProcessor<MessageConvertConfig> {
 
 (1)(3) 这两个流程的关键点在于需要通过前端配置信息获取操作对象的结构，并将其转换成dalaran的内部对象（可能是我们根据其结构生成的class，也可能直接是map结构）
 
-（2）该流程的关键点在于通过前端配置信息获取字段映射的详细内容，并根据该内容生成相应的xml文件 
+（2）该流程的关键点在于通过前端配置信息获取字段映射的详细内容，并根据该内容生成相应的xml文件
+
+####数据映射操作界面
+![](./docs/images/mapper-function.jpg)
+
+![](./docs/images/mapper.jpg)
+
 
 涉及的数据模型：
 
