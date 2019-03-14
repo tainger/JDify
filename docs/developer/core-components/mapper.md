@@ -51,21 +51,11 @@ class MessageConvertProcessor : DalaranProcessor<MessageConvertConfig> {
 
 涉及的数据模型：
 
-MessageModel： 用于描述字段信息
-```java
-public class MessageModel {
-
-    private String fieldName;
-
-    private String fieldType;
-}
-```
-
 DalaranMessage: 用于描述具体对象，modelType为输入数据的类型，比如JSON，XML等
 ```java
 public class  DalaranMessage {
 
-    private List<Map<String, Object>> fields;
+    private Map<String, Object> fields;
 
     private ModelType type;
 }
@@ -73,13 +63,9 @@ public class  DalaranMessage {
 
 MessageMapping: 用于描述字段映射
 ```java
-public class MessageMapping {
+public class FieldMapping {
     
-    private Map<String, String> fieldMapping;
-
-    //private List<MessageModel> targetModel;
-
-    //private List<MessageModel> destinationModel;
+    private Map<List<String>, List<String>> fieldMapping;
 
     private MessageProcessFunction function;
 }
@@ -93,7 +79,7 @@ public class MessageMapping {
     
     private DalaranMessage destination;
 
-    private List<MessageMapping> mappings;
+    private List<FieldMapping> mappings;
 }
 ```
 
