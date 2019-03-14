@@ -11,16 +11,17 @@
 * 触发器:
     * Timer
     * Http listener
-    * Dubbo provider
+    * SOAP listener ?
+    * Dubbo provider ?
 * 处理器:
     * Http client
-    * SOAP client: [Camel soap](http://camel.apache.org/soap.html)
-    * Dubbo consumer
-    * Branch: 分支, 可以并行
-    * Aggregator: 配合 Branch 做聚合
     * ReTry
     * Delayer
     * Mapper: 提供基本映射, mapping function 下版提供
+    * SOAP client: [Camel soap](http://camel.apache.org/soap.html)
+    * Branch: 分支, 可以并行
+    * Aggregator: 配合 Branch 做聚合
+    * Dubbo consumer ?
 
 > 视东购项目需求调整优先级
 

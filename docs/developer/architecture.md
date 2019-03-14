@@ -6,9 +6,7 @@
 
 Camel 提供了一系列集成向的 Component, 另外还有一套成熟的路由调度, 基于 Camel 做集成平台会减少很多底层工作量.
 
-其作为集成平台底层的路由调度框架, 上述 `触发器/处理器` 等逻辑组件, 也是基于 Camel 的 component 标准进行扩展和配置封装.
-
-上述的 `集成流程` 本质上也是 Camel DSL 的封装.
+上述 `触发器/处理器` 等逻辑组件, 也是基于 Camel 的 component 标准进行扩展和配置封装, `集成流程` 本质上也是 Camel DSL 的封装.
 
 > Apache Camel 基于 Apache License 2.0 授权协议, 商业友好.
 
@@ -21,6 +19,10 @@ Camel 提供了一系列集成向的 Component, 另外还有一套成熟的路�
 * Flow (集成流程): 指从集成事件触发, 到所有集成动作完成的整体过程编排, 一般描述了整体的集成逻辑.
 * Message (集成消息): 集成流程节点间传递的内容, 我们称之为 Message, 一般带有固定格式, 以 Model 为结构描述.
 * Model (模型): 即 MessageModel, 描述了消息的结构化模型, 数据映射转换也是基于模型处理.
+
+Flow 示意图, 其中蓝色节点为 Trigger, 白色节点为 Processor:
+
+![](../images/flow.jpg)
 
 ### 可扩展设计
 

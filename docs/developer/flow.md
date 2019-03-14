@@ -1,9 +1,5 @@
 ## flow
 
-Flow 示意图, 其中蓝色节点为 Trigger, 白色节点为 Processor:
-
-![](./docs/images/flow.jpg)
-
 ## 集成流程演示
 
 假设我们要做一个 http -> http 的集成流程, 过程中需要做一下参数映射.
