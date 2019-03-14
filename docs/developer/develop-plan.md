@@ -14,9 +14,12 @@
     * Dubbo provider
 * 处理器:
     * Http client
+    * SOAP client: [Camel soap](http://camel.apache.org/soap.html)
     * Dubbo consumer
-    * Exception
+    * Branch: 分支, 可以并行
+    * Aggregator: 配合 Branch 做聚合
     * ReTry
+    * Delayer
     * Mapper: 提供基本映射, mapping function 下版提供
 
 > 视东购项目需求调整优先级
@@ -27,22 +30,19 @@
     * RocketMQ consumer
     * Kafka consumer
 * 处理器:
-    * RocketMQ producer
-    * Kafka producer
     * SAP HANA client
-    * SOAP client
-    * Branch: 分支, 可以并行
-    * Aggregator: 配合 Branch 做聚合
+    * Exception
     * Router
     * Loop
+    * Async: 异步执行
     * Mapping function
     * Database read
     * Database write
     * Script: 脚本语言还未定, 大概率 Java 或者 JS
-    * Dynamic Router
-    * Delayer
     * Cache
-    * Async: 异步执行
+    * Dynamic Router
+    * RocketMQ producer
+    * Kafka producer
 
 ### 可能不需要的组件
 
