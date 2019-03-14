@@ -65,7 +65,7 @@ DalaranMessage: 用于描述具体对象，modelType为输入数据的类型，�
 ```java
 public class  DalaranMessage {
 
-    private List<MessageModel> fields;
+    private List<Map<String, Object>> fields;
 
     private ModelType type;
 }
@@ -74,10 +74,12 @@ public class  DalaranMessage {
 MessageMapping: 用于描述字段映射
 ```java
 public class MessageMapping {
+    
+    private Map<String, String> fieldMapping;
 
-    private List<MessageModel> targetModel;
+    //private List<MessageModel> targetModel;
 
-    private List<MessageModel> destinationModel;
+    //private List<MessageModel> destinationModel;
 
     private MessageProcessFunction function;
 }
@@ -85,7 +87,7 @@ public class MessageMapping {
 
 MessageMappingSet: 用于描述一组映射关系
 ```java
-public class MessageMappingSet {
+public class MessageMapping {
     
     private DalaranMessage target;
     
