@@ -61,17 +61,30 @@ public class  DalaranMessage {
 }
 ```
 
-MessageMapping: 用于描述字段映射
+FieldMapping: 用于描述字段映射
 ```java
 public class FieldMapping {
     
     private Map<List<String>, List<String>> fieldMapping;
 
-    private MessageProcessFunction function;
+    private FieldProcessFunction function;
 }
 ```
 
-MessageMappingSet: 用于描述一组映射关系
+FieldProcessFunction
+```java
+public class FieldProcessFunction {
+    
+    private List<String> fieldsIn;
+    
+    private List<String> fieldsOut;
+    
+    private FunctionExecution execution; //function执行逻辑
+}
+
+```
+
+MessageMapping: 用于描述一组映射关系
 ```java
 public class MessageMapping {
     
@@ -83,4 +96,4 @@ public class MessageMapping {
 }
 ```
 
-我们数据映射中使用的xml文件通过解析MessageMappingSet结构生成
+我们数据映射中使用的xml文件通过解析MessageMapping结构生成
