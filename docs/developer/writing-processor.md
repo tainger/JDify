@@ -1,36 +1,51 @@
-## 触发器开发
+## 处理器开发
 
-> 因为触发器默认为单例, 所以不推荐使用任何成员变量
+> 因为处理器默认为单例, 所以不推荐使用任何成员变量
 
-编写一个触发器, 和编写处理器非常相似, 只需要实现 `DalaranTrigger` 接口, 并标记 `@DalaranComponent` 注解即可, `DalaranTrigger` 接口如下.
+编写一个处理器, 只需要实现 `DalaranProcessor` 接口, 并标记 `@DalaranComponent` 注解即可, `DalaranProcessor` 接口如下.
 
 ```java
-public interface DalaranTrigger<T> {
-    String buildRouterUri(T config);
+public interface DalaranProcessor<T> {
+    void configure(RouteDefinition route, T config);
 }
 ```
 
-接口中只有一个 buildRouterUri 方法, 会传入该接口声明的配置实例, 在实现方法内返回 `Camel from uri` 即可.
+接口中只有一个 configure 方法, 会传入 `RouteDefinition` 和该接口声明的配置实例, 在实现方法内通过 `Java DSL` 调用 `RouteDefinition` 即可完成 `camel` 相关路由配置.
 
-下面例子为接收 Dubbo 请求的 `http-provider`, 本质上是在配置过程中, 声明了 `dubbo` 的 `component`, 以及相关配置, 最后返回 `Camel uri`:
-
+下面例子为发起 Http 请求的 `http-client`, 便是在配置过程中, 声明了使用 `http4` 的 `component`, 并且完成了 `http method` 配置:
 
 ```java
-@DalaranComponent(value = "dubbo-provider", configType = DubboProviderConfig.class)
-public class DalaranDubboProvider implements DalaranTrigger<DubboProviderConfig> {
+@DalaranComponent(value = "http-client", configType = HttpClientConfig.class)
+public class DalaranHttpClient implements DalaranProcessor<HttpClientConfig> {
+    private static final String HTTP_URI = "%s4://%s:%s%s?bridgeEndpoint=true";
 
-    private static final String DUBBO_PROVIDER_URI = "dubbo:?registryAddress=%s&serviceId=%s&method=%s&version=%s";
-
-    public String buildRouterUri(DubboProviderConfig config) {
-        return String.format(DUBBO_PROVIDER_URI, config.getRegistryAddress(), config.getServiceId(), config.getMethod(), config.getVersion());
+    @Override
+    public void configure(RouteDefinition route, HttpClientConfig config) {
+        String uri = String.format(HTTP_URI, config.getProtocol().getValue(), config.getHost(), config.getPort(), config.getPath());
+        route.setHeader("CamelHttpMethod", Builder.constant(config.getMethod())).to(uri);
     }
 }
 ```
 
-> 理论上不存在无配置触发器, 所以不提供无配置触发器接口.
+> 如果是无配置处理器, 可以实现 `UnconfigurableDalaranProcessor` 接口, 该接口对 `DalaranProcessor` 进行了包装, `configure` 接口仅有 `RouteDefinition` 一个入参.
 
-### 核心触发器
+```java
+public interface UnconfigurableDalaranProcessor extends DalaranProcessor {
+    @Override
+    default void configure(RouteDefinition route, Object config) {
+        configure(route);
+    }
+    void configure(RouteDefinition route);
+}
+```
 
-多数触发器都十分简单, 特别是 Camel 本身已经提供的 Component, 有些触发器开发会比较复杂, 在此单独记录设计文档:
+## 核心处理器
 
-* [Dubbo provider](./core-components/dubbo-provider.md)
+多数处理器都十分简单, 特别是 Camel 本身已经提供的 Component, 有些处理器开发会比较复杂, 在此单独记录设计文档:
+
+* [数据映射](./core-components/mapper.md)
+* [路由](./core-components/router.md)
+* [子流程](./core-components/sub-flow.md)
+* [Dubbo consumer](./core-components/dubbo-consumer.md)
+* [Exception](./core-components/exception.md)
+
