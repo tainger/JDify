@@ -6,7 +6,7 @@
 
 Camel 提供了一系列集成向的 Component, 另外还有一套成熟的路由调度, 基于 Camel 做集成平台会减少很多底层工作量.
 
-上述 `触发器/处理器` 等逻辑组件, 也是基于 Camel 的 component 标准进行扩展和配置封装, `集成流程` 本质上也是 Camel DSL 的封装.
+下述 `触发器/处理器` 等逻辑组件, 也是基于 Camel 的 component 标准进行扩展和配置封装, `集成流程` 本质上也是 Camel DSL 的封装.
 
 > Apache Camel 基于 Apache License 2.0 授权协议, 商业友好.
 
