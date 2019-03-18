@@ -1,6 +1,5 @@
 package io.terminus.dalaran.example
 
-import io.terminus.dalaran.DalaranFlowLoader
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.web.bind.annotation.PostMapping

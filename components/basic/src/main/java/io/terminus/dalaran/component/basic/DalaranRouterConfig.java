@@ -1,6 +1,6 @@
 package io.terminus.dalaran.component.basic;
 
-import io.terminus.dalaran.DalaranProcessorConfig;
+import io.terminus.dalaran.model.DalaranComponentInstance;
 
 import java.util.List;
 
@@ -18,7 +18,7 @@ public class DalaranRouterConfig {
     class Route {
         private String when;
 
-        private DalaranProcessorConfig processor;
+        private DalaranComponentInstance processor;
 
         public String getWhen() {
             return when;
@@ -28,11 +28,11 @@ public class DalaranRouterConfig {
             this.when = when;
         }
 
-        public DalaranProcessorConfig getProcessor() {
+        public DalaranComponentInstance getProcessor() {
             return processor;
         }
 
-        public void setProcessor(DalaranProcessorConfig processor) {
+        public void setProcessor(DalaranComponentInstance processor) {
             this.processor = processor;
         }
     }

@@ -1,7 +1,7 @@
 package io.terminus.dalaran.component.basic;
 
-import io.terminus.dalaran.DalaranComponentContainer;
-import io.terminus.dalaran.DalaranComponentLoader;
+import io.terminus.dalaran.impl.DalaranComponentContainer;
+import io.terminus.dalaran.impl.DalaranComponentLoader;
 import io.terminus.dalaran.DalaranProcessor;
 import org.apache.camel.model.ChoiceDefinition;
 import org.apache.camel.model.ProcessorDefinition;
@@ -17,6 +17,11 @@ public class DalaranRouter implements DalaranProcessor<DalaranRouterConfig> {
             DalaranComponentContainer<DalaranProcessor> dalaranEndpointContainer = DalaranComponentLoader.getProcessorContainer(routeConfig.getProcessor().getType());
             // TODO config 替换掉参数配置
             dalaranEndpointContainer.getComponent().configure(routeDefinition, routeConfig.getProcessor().getConfig());
+
+
+
+            route.setHeader()
+
         }
     }
 }
