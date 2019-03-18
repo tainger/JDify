@@ -26,6 +26,27 @@
         "port": "{{targetPort}}",
         "path": "/orders_dubbo"
       }
+    },
+    {
+      "type": "router",
+      "config": {
+        "routes": [
+          {
+            "when": "abc",
+            "processor": {
+              "type":"route-type",
+              "configInstanceId": "aaabbbccc",
+              "config":{
+                "a":"a1"
+              }
+            }
+          }
+        ],
+        "mappings": {
+          "target":"t",
+          "source":"s"
+        }
+      }
     }
   ]
 }

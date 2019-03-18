@@ -13,14 +13,14 @@ import lombok.val;
 import org.apache.camel.CamelContext;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.model.RouteDefinition;
-import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.beanutils.BeanUtilsBean;
+import org.apache.commons.beanutils.ConvertUtilsBean;
 
 import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
@@ -37,10 +37,11 @@ public class DalaranCamelContext implements DalaranContext {
     @Override
     public void addFlow(DalaranFlow dalaranFlow) {
         val route = new RouteDefinition();
+        // TODO route need an u id
+//        route.setId(UID);
         val trigger = dalaranFlow.getTrigger();
         val processorList = dalaranFlow.getProcessors();
         val triggerContainer = getTriggerContainer(trigger.getType());
-        // TODO 替换 properties
         // TODO check
 
         // TODO 临时扔一下, 这部分要抽出去, config 也需要 cache
@@ -50,6 +51,11 @@ public class DalaranCamelContext implements DalaranContext {
             val processorContainer = getProcessorContainer(processor.getType());
             Object processorConfig = DalaranPropertyUtils.convertConfig(processor.getConfig(), dalaranFlow.getProperties(), processorContainer.getConfigClass());
             processorContainer.getComponent().configure(route, processorConfig);
+        }
+        try {
+            camelContext.addRouteDefinition(route);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -90,6 +96,7 @@ public class DalaranCamelContext implements DalaranContext {
                 return;
             }
             String componentType = dalaranComponent.value();
+            DalaranPropertyUtils.registerConfigType(dalaranComponent.configType());
             if (component instanceof DalaranTrigger) {
                 addTrigger(componentType, dalaranComponent.configType(), (DalaranTrigger) component);
             } else if (component instanceof DalaranProcessor) {
