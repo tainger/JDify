@@ -10,7 +10,7 @@ import java.util.function.Supplier;
 /**
  * Created by jingdi on 2019/3/18
  */
-@DalaranComponent(value = "custom-mapper", configType = CustomMapperConfig.class)
+@DalaranComponent(value = "custom-convert", configType = CustomMapperConfig.class)
 public class CustomMessageMapper implements DalaranProcessor<CustomMapperConfig> {
 
     @Override
