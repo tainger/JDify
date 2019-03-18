@@ -1,6 +1,7 @@
 package io.terminus.dalaran.util;
 
-import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.beanutils.BeanUtilsBean;
+import org.apache.commons.beanutils.ConvertUtilsBean;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
@@ -9,11 +10,24 @@ import java.util.regex.Pattern;
 
 public final class DalaranPropertyUtils {
 
+
+
     public static <T> T convertConfig(Map<String, Object> configMap, Map<String, String> properties, Class<T> configType) {
         try {
             T config = configType.newInstance();
             replaceEnv(configMap, properties);
-            BeanUtils.populate(config, configMap);
+            // TODO 临时做一下 enum 的转换
+            BeanUtilsBean beanUtilsBean = new BeanUtilsBean(new ConvertUtilsBean() {
+                @Override
+                public Object convert(String value, Class clazz) {
+                    if (clazz.isEnum()){
+                        return Enum.valueOf(clazz, value);
+                    }else{
+                        return super.convert(value, clazz);
+                    }
+                }
+            });
+            beanUtilsBean.populate(config, configMap);
             return config;
         } catch (InstantiationException e) {
             e.printStackTrace();

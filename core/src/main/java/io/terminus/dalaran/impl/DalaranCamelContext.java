@@ -43,21 +43,14 @@ public class DalaranCamelContext implements DalaranContext {
         // TODO 替换 properties
         // TODO check
 
-        try {
-            Object config = DalaranPropertyUtils.convertConfig(trigger.getConfig(), dalaranFlow.getProperties(), triggerContainer.getConfigClass());
-            route.from(triggerContainer.getComponent().buildRouterUri(config));
-            for (DalaranComponentInstance processor : processorList) {
-                val processorContainer = getProcessorContainer(processor.getType());
-                Object processorConfig = DalaranPropertyUtils.convertConfig(processor.getConfig(), dalaranFlow.getProperties(), processorContainer.getConfigClass());
-                BeanUtils.populate(processorConfig, processor.getConfig());
-                processorContainer.getComponent().configure(route, processorConfig);
-            }
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
+        // TODO 临时扔一下, 这部分要抽出去, config 也需要 cache
+        Object config = DalaranPropertyUtils.convertConfig(trigger.getConfig(), dalaranFlow.getProperties(), triggerContainer.getConfigClass());
+        route.from(triggerContainer.getComponent().buildRouterUri(config));
+        for (DalaranComponentInstance processor : processorList) {
+            val processorContainer = getProcessorContainer(processor.getType());
+            Object processorConfig = DalaranPropertyUtils.convertConfig(processor.getConfig(), dalaranFlow.getProperties(), processorContainer.getConfigClass());
+            processorContainer.getComponent().configure(route, processorConfig);
         }
-
     }
 
     @Override

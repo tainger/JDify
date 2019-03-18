@@ -16,28 +16,7 @@
   },
   "processors": [
     {
-      "type": "gson-to-object",
-      "config": {
-        "targetType": "io.terminus.dalaran.example.OrderItem"
-      }
-    },
-    {
-      "type": "message-convert",
-      "config": {
-        "targetModel": "io.terminus.dalaran.example.ExtOrderItem",
-        "mappingFile": "test-mapping.xml",
-        "mapping": {
-          "itemName": "${header.name}",
-          "itemPrice": "${body.price}",
-          "test": "${header.Content-Type}"
-        }
-      }
-    },
-    {
-      "type": "object-to-gson"
-    },
-    {
-      "type": "http-request",
+      "type": "http-client",
       "config": {
         "protocol": "HTTP",
         "method": "POST",
