@@ -13,6 +13,8 @@ import lombok.val;
 import org.apache.camel.CamelContext;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.model.RouteDefinition;
+import org.apache.commons.beanutils.BeanUtilsBean;
+import org.apache.commons.beanutils.ConvertUtilsBean;
 
 import javax.annotation.PostConstruct;
 import java.io.File;
@@ -40,7 +42,6 @@ public class DalaranCamelContext implements DalaranContext {
         val trigger = dalaranFlow.getTrigger();
         val processorList = dalaranFlow.getProcessors();
         val triggerContainer = getTriggerContainer(trigger.getType());
-        // TODO 替换 properties
         // TODO check
 
         // TODO 临时扔一下, 这部分要抽出去, config 也需要 cache
@@ -95,6 +96,7 @@ public class DalaranCamelContext implements DalaranContext {
                 return;
             }
             String componentType = dalaranComponent.value();
+            DalaranPropertyUtils.registerConfigType(dalaranComponent.configType());
             if (component instanceof DalaranTrigger) {
                 addTrigger(componentType, dalaranComponent.configType(), (DalaranTrigger) component);
             } else if (component instanceof DalaranProcessor) {
