@@ -1,4 +1,4 @@
-package io.terminus.dalaran;
+package io.terminus.dalaran.util;
 
 import java.util.Map;
 import java.util.regex.Matcher;

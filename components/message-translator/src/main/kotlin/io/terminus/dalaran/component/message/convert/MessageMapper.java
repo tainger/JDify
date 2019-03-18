@@ -1,10 +1,8 @@
 package io.terminus.dalaran.component.message.convert;
 
 import io.terminus.dalaran.DalaranProcessor;
-import io.terminus.dalaran.DalaranPropertyUtils;
 import io.terminus.dalaran.annotation.DalaranComponent;
 import org.apache.camel.model.ProcessorDefinition;
-import org.apache.camel.model.dataformat.JsonLibrary;
 
 @DalaranComponent(value = "message-mapper", configType = MessageMapperConfig.class)
 public class MessageMapper implements DalaranProcessor<MessageMapperConfig> {

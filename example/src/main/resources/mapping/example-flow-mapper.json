@@ -10,17 +10,11 @@
       "protocol": "HTTP",
       "host": "0.0.0.0",
       "port": 8184,
-      "path": "/orderItems",
+      "path": "/orderItemsMapper",
       "method": "POST"
     }
   },
   "processors": [
-//    {
-//      "type": "gson-to-object",
-//      "config": {
-//        "targetType": "io.terminus.dalaran.example.OrderItem"
-//      }
-//    },
     {
       "type": "custom-convert",
       "config": {
@@ -45,30 +39,39 @@
             {
               "mapping": {
                 "id": "id"
+              },
+              "function": {
+                "fieldsIn": [],
+                "fieldsOut": [],
+                "execution": ""
               }
-//              "function": ""
             },
             {
               "mapping": {
                 "itemName": "name"
               },
-              "function": ""
+              "function": {
+                "fieldsIn": [],
+                "fieldsOut": [],
+                "execution": ""
+              }
             },
             {
               "mapping": {
                 "itemPrice": "price"
+              },
+              "function": {
+                "fieldsIn": [],
+                "fieldsOut": [],
+                "execution": ""
               }
-//              "function": ""
             }
           ]
         }
       }
     },
-//    {
-//      "type": "object-to-gson"
-//    },
     {
-      "type": "http-request",
+      "type": "http-client",
       "config": {
         "protocol": "HTTP",
         "method": "POST",
