@@ -8,6 +8,7 @@ import io.terminus.dalaran.DalaranTrigger;
 import io.terminus.dalaran.annotation.DalaranComponent;
 import io.terminus.dalaran.model.DalaranComponentInstance;
 import io.terminus.dalaran.model.DalaranFlow;
+import io.terminus.dalaran.util.DalaranPropertyUtils;
 import lombok.val;
 import org.apache.camel.CamelContext;
 import org.apache.camel.impl.DefaultCamelContext;
@@ -43,18 +44,14 @@ public class DalaranCamelContext implements DalaranContext {
         // TODO check
 
         try {
-            val config = triggerContainer.getConfigClass().newInstance();
-            BeanUtils.populate(config, trigger.getConfig());
+            Object config = DalaranPropertyUtils.convertConfig(trigger.getConfig(), dalaranFlow.getProperties(), triggerContainer.getConfigClass());
             route.from(triggerContainer.getComponent().buildRouterUri(config));
             for (DalaranComponentInstance processor : processorList) {
-                val dalaranEndpointContainer = getProcessorContainer(processor.getType());
-
-                val processorConfig = dalaranEndpointContainer.getConfigClass().newInstance();
+                val processorContainer = getProcessorContainer(processor.getType());
+                Object processorConfig = DalaranPropertyUtils.convertConfig(processor.getConfig(), dalaranFlow.getProperties(), processorContainer.getConfigClass());
                 BeanUtils.populate(processorConfig, processor.getConfig());
-                dalaranEndpointContainer.getComponent().configure(route, processorConfig);
+                processorContainer.getComponent().configure(route, processorConfig);
             }
-        } catch (InstantiationException e) {
-            e.printStackTrace();
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         } catch (InvocationTargetException e) {

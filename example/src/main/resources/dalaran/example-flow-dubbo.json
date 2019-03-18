@@ -1,12 +1,13 @@
 {
   "properties": {
     "targetHost": "localhost",
-    "targetPort": 8080
+    "targetPort": 8080,
+    "registryAddress": "zookeeper://localhost:2181"
   },
   "trigger": {
     "type": "dubbo-provider",
     "config": {
-      "registryAddress": "zookeeper://localhost:2181",
+      "registryAddress": "{{registryAddress}}",
       "serviceId": "io.terminus.dalaran.example.OrderService",
       "method": "getUserOrders",
       "version": "terminus",

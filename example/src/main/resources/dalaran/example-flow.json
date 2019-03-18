@@ -9,7 +9,7 @@
     "config": {
       "protocol": "HTTP",
       "host": "0.0.0.0",
-      "port": 8184,
+      "port": "{{port}}",
       "path": "/orderItems",
       "method": "POST"
     }
