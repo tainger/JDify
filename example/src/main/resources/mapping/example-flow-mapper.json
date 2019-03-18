@@ -19,55 +19,12 @@
       "type": "custom-convert",
       "config": {
         "messageMapping": {
-          "target": {
-            "fields": [
-              {"id": ""},
-              {"name": ""},
-              {"price": ""}
-            ],
-            "type": "json"
-          },
-          "destination": {
-            "fields": [
-              {"id": ""},
-              {"itemName": ""},
-              {"itemPrice": ""}
-            ],
-            "type": "json"
-          },
-          "singleFieldMappings": [
-            {
-              "mapping": {
-                "id": "id"
-              },
-              "function": {
-                "fieldsIn": [],
-                "fieldsOut": [],
-                "execution": ""
-              }
-            },
-            {
-              "mapping": {
-                "itemName": "name"
-              },
-              "function": {
-                "fieldsIn": [],
-                "fieldsOut": [],
-                "execution": ""
-              }
-            },
-            {
-              "mapping": {
-                "itemPrice": "price"
-              },
-              "function": {
-                "fieldsIn": [],
-                "fieldsOut": [],
-                "execution": ""
-              }
-            }
-          ]
-        }
+          "id": "id",
+          "itemName": "name",
+          "itemPrice": "price"
+        },
+        "target": ["id", "name", "price"],
+        "destination": ["id", "itemName", "itemPrice"]
       }
     },
     {

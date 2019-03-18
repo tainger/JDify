@@ -13,4 +13,3 @@ public class HttpClientConfig {
     private String path;
     private HttpMethod method;
 }
-
