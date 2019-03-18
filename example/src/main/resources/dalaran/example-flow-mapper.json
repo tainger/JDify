@@ -1,0 +1,81 @@
+{
+  "properties": {
+    "port": 8184,
+    "targetHost": "localhost",
+    "targetPort": 8080
+  },
+  "trigger": {
+    "type": "netty-http-listener",
+    "config": {
+      "protocol": "HTTP",
+      "host": "0.0.0.0",
+      "port": 8184,
+      "path": "/orderItems",
+      "method": "POST"
+    }
+  },
+  "processors": [
+//    {
+//      "type": "gson-to-object",
+//      "config": {
+//        "targetType": "io.terminus.dalaran.example.OrderItem"
+//      }
+//    },
+    {
+      "type": "custom-convert",
+      "config": {
+        "messageMapping": {
+          "target": {
+            "fields": [
+              {"id": ""},
+              {"name": ""},
+              {"price": ""}
+            ],
+            "type": "json"
+          },
+          "destination": {
+            "fields": [
+              {"id": ""},
+              {"itemName": ""},
+              {"itemPrice": ""}
+            ],
+            "type": "json"
+          },
+          "singleFieldMappings": [
+            {
+              "mapping": {
+                "id": "id"
+              },
+              "function": ""
+            },
+            {
+              "mapping": {
+                "itemName": "name"
+              },
+              "function": ""
+            },
+            {
+              "mapping": {
+                "itemPrice": "price"
+              },
+              "function": ""
+            }
+          ]
+        }
+      }
+    },
+//    {
+//      "type": "object-to-gson"
+//    },
+    {
+      "type": "http-request",
+      "config": {
+        "protocol": "HTTP",
+        "method": "POST",
+        "host": "{{targetHost}}",
+        "port": "{{targetPort}}",
+        "path": "/orders"
+      }
+    }
+  ]
+}

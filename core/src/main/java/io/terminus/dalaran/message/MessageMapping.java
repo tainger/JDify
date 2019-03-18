@@ -1,39 +1,56 @@
 package io.terminus.dalaran.message;
 
-import io.terminus.dalaran.message.model.MessageModel;
+import java.util.List;
 
 /**
- * Created by jingdi on 2019/3/12
+ * Created by jingdi on 2019/3/13
  */
 public class MessageMapping {
 
-    private MessageModel targetModel;
+    private DalaranMessage target;
 
-    private MessageModel destinationModel;
+    private DalaranMessage destination;
 
-    private MessageProcessFunction function;
+    private List<FieldMapping> mappings;
 
-    public MessageModel getTargetModel() {
-        return targetModel;
+    private List<SingleFieldMapping> singleFieldMappings;
+
+    public MessageMapping(DalaranMessage target, DalaranMessage destination, List<FieldMapping> mappings, List<SingleFieldMapping> singleFieldMappings) {
+        this.target = target;
+        this.destination = destination;
+        this.mappings = mappings;
+        this.singleFieldMappings = singleFieldMappings;
     }
 
-    public void setTargetModel(MessageModel targetModel) {
-        this.targetModel = targetModel;
+    public DalaranMessage getTarget() {
+        return target;
     }
 
-    public MessageModel getDestinationModel() {
-        return destinationModel;
+    public void setTarget(DalaranMessage target) {
+        this.target = target;
     }
 
-    public void setDestinationModel(MessageModel destinationModel) {
-        this.destinationModel = destinationModel;
+    public DalaranMessage getDestination() {
+        return destination;
     }
 
-    public MessageProcessFunction getFunction() {
-        return function;
+    public void setDestination(DalaranMessage destination) {
+        this.destination = destination;
     }
 
-    public void setFunction(MessageProcessFunction function) {
-        this.function = function;
+    public List<FieldMapping> getMappings() {
+        return mappings;
+    }
+
+    public void setMappings(List<FieldMapping> mappings) {
+        this.mappings = mappings;
+    }
+
+    public List<SingleFieldMapping> getSingleFieldMappings() {
+        return singleFieldMappings;
+    }
+
+    public void setSingleFieldMappings(List<SingleFieldMapping> singleFieldMappings) {
+        this.singleFieldMappings = singleFieldMappings;
     }
 }

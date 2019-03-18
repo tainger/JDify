@@ -1,24 +1,26 @@
 package io.terminus.dalaran.message;
 
-import io.terminus.dalaran.message.model.MessageModel;
-import io.terminus.dalaran.message.model.ModelType;
-
-import java.util.List;
+import java.util.Map;
 
 /**
  * Created by jingdi on 2019/3/12
  */
 public class  DalaranMessage {
 
-    private List<MessageModel> fields;
+    private Map<String, Object> fields;
 
     private ModelType type;
 
-    public List<MessageModel> getFields() {
+    public DalaranMessage(Map<String, Object> fields, ModelType type) {
+        this.fields = fields;
+        this.type = type;
+    }
+
+    public Map<String, Object> getFields() {
         return fields;
     }
 
-    public void setFields(List<MessageModel> fields) {
+    public void setFields(Map<String, Object> fields) {
         this.fields = fields;
     }
 
