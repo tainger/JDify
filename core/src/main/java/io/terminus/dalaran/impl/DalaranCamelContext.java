@@ -13,14 +13,12 @@ import lombok.val;
 import org.apache.camel.CamelContext;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.model.RouteDefinition;
-import org.apache.commons.beanutils.BeanUtils;
 
 import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +35,8 @@ public class DalaranCamelContext implements DalaranContext {
     @Override
     public void addFlow(DalaranFlow dalaranFlow) {
         val route = new RouteDefinition();
+        // TODO route need an u id
+//        route.setId(UID);
         val trigger = dalaranFlow.getTrigger();
         val processorList = dalaranFlow.getProcessors();
         val triggerContainer = getTriggerContainer(trigger.getType());
@@ -50,6 +50,11 @@ public class DalaranCamelContext implements DalaranContext {
             val processorContainer = getProcessorContainer(processor.getType());
             Object processorConfig = DalaranPropertyUtils.convertConfig(processor.getConfig(), dalaranFlow.getProperties(), processorContainer.getConfigClass());
             processorContainer.getComponent().configure(route, processorConfig);
+        }
+        try {
+            camelContext.addRouteDefinition(route);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
