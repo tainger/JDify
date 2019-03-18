@@ -9,12 +9,4 @@ import lombok.Data;
 @Data
 public class CustomMapperConfig {
     private MessageMapping messageMapping;
-
-    public MessageMapping getMessageMapping() {
-        return messageMapping;
-    }
-
-    public void setMessageMapping(MessageMapping messageMapping) {
-        this.messageMapping = messageMapping;
-    }
 }
