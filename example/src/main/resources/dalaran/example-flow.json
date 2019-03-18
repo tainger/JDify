@@ -9,35 +9,14 @@
     "config": {
       "protocol": "HTTP",
       "host": "0.0.0.0",
-      "port": 8184,
+      "port": "{{port}}",
       "path": "/orderItems",
       "method": "POST"
     }
   },
   "processors": [
     {
-      "type": "gson-to-object",
-      "config": {
-        "targetType": "io.terminus.dalaran.example.OrderItem"
-      }
-    },
-    {
-      "type": "message-convert",
-      "config": {
-        "targetModel": "io.terminus.dalaran.example.ExtOrderItem",
-        "mappingFile": "test-mapping.xml",
-        "mapping": {
-          "itemName": "${header.name}",
-          "itemPrice": "${body.price}",
-          "test": "${header.Content-Type}"
-        }
-      }
-    },
-    {
-      "type": "object-to-gson"
-    },
-    {
-      "type": "http-request",
+      "type": "http-client",
       "config": {
         "protocol": "HTTP",
         "method": "POST",

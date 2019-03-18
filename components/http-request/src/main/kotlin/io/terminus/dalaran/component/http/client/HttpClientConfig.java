@@ -5,7 +5,7 @@ import io.terminus.dalaran.config.FieldInputType;
 import lombok.Data;
 
 @Data
-class HttpClientConfig {
+public class HttpClientConfig {
     @DalaranConfigField(label = "协议", inputType = FieldInputType.Radio)
     private HttpProtocol protocol;
     private String host;

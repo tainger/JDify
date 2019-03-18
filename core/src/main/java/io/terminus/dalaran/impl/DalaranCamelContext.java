@@ -8,6 +8,7 @@ import io.terminus.dalaran.DalaranTrigger;
 import io.terminus.dalaran.annotation.DalaranComponent;
 import io.terminus.dalaran.model.DalaranComponentInstance;
 import io.terminus.dalaran.model.DalaranFlow;
+import io.terminus.dalaran.util.DalaranPropertyUtils;
 import lombok.val;
 import org.apache.camel.CamelContext;
 import org.apache.camel.impl.DefaultCamelContext;
@@ -42,25 +43,14 @@ public class DalaranCamelContext implements DalaranContext {
         // TODO 替换 properties
         // TODO check
 
-        try {
-            val config = triggerContainer.getConfigClass().newInstance();
-            BeanUtils.populate(config, trigger.getConfig());
-            route.from(triggerContainer.getComponent().buildRouterUri(config));
-            for (DalaranComponentInstance processor : processorList) {
-                val dalaranEndpointContainer = getProcessorContainer(processor.getType());
-
-                val processorConfig = dalaranEndpointContainer.getConfigClass().newInstance();
-                BeanUtils.populate(processorConfig, processor.getConfig());
-                dalaranEndpointContainer.getComponent().configure(route, processorConfig);
-            }
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
+        // TODO 临时扔一下, 这部分要抽出去, config 也需要 cache
+        Object config = DalaranPropertyUtils.convertConfig(trigger.getConfig(), dalaranFlow.getProperties(), triggerContainer.getConfigClass());
+        route.from(triggerContainer.getComponent().buildRouterUri(config));
+        for (DalaranComponentInstance processor : processorList) {
+            val processorContainer = getProcessorContainer(processor.getType());
+            Object processorConfig = DalaranPropertyUtils.convertConfig(processor.getConfig(), dalaranFlow.getProperties(), processorContainer.getConfigClass());
+            processorContainer.getComponent().configure(route, processorConfig);
         }
-
     }
 
     @Override
