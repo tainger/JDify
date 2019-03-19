@@ -10,12 +10,11 @@
     <modelVersion>4.0.0</modelVersion>
     <packaging>pom</packaging>
     <modules>
+        <module>basic</module>
         <module>netty-http-listener</module>
         <module>message-translator</module>
         <module>http-request</module>
         <module>dubbo-provider</module>
-        <module>basic</module>
-        <module>dalaran-dubbo-consumer</module>
         <module>dubbo-consumer</module>
     </modules>
 

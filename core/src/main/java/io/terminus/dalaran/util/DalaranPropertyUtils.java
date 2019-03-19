@@ -58,6 +58,11 @@ public final class DalaranPropertyUtils {
         return null;
     }
 
+    // TODO 这部分理论上是内置的, 因为自定义的嵌套类型配置, 界面也支持不了, 所以没必要都注册
+
+    /**
+     * 用来注册嵌套类型的配置, 目前根据配置类处理其所有的字段, 递归处理多级.
+     */
     public static void registerConfigType(Class configType) {
         if (configType != null) {
             for (Field declaredField : configType.getDeclaredFields()) {
