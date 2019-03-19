@@ -34,6 +34,11 @@ public class FlowManagementServiceImpl implements FlowManagementService, Initial
     private Gson gson = new Gson();
 
     @Override
+    public void saveFlow(FlowEntity flowEntity) {
+        flowRepository.save(flowEntity);
+    }
+
+    @Override
     public void publish() {
         List<DalaranFlow> flowList = new ArrayList<>();
         List<FlowEntity> flowEntities = flowRepository.findAll();
@@ -47,7 +52,7 @@ public class FlowManagementServiceImpl implements FlowManagementService, Initial
             val trigger = buildTrigger(flowEntity.getTrigger(), properties);
             List<DalaranFlow.Processor> processors = flowEntity.getProcessors().stream().
                     map(processorEntity -> buildProcessor(processorEntity, properties)).collect(Collectors.toList());
-            flow.setId(flowEntity.getName() + "-" + flowEntity.getId());
+            flow.setId(flowEntity.getId().toString());
             flow.setTrigger(trigger);
             flow.setProcessors(processors);
 

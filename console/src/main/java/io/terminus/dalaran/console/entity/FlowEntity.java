@@ -17,7 +17,7 @@ public class FlowEntity {
 
     private String description;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private TriggerEntity trigger;
 
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
