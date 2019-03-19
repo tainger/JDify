@@ -3,6 +3,7 @@ package io.terminus.dalaran.console.service.impl;
 import com.google.gson.Gson;
 import com.hubspot.jinjava.Jinjava;
 import io.terminus.dalaran.DalaranContext;
+import io.terminus.dalaran.console.entity.FlowEntity;
 import io.terminus.dalaran.console.entity.ProcessorEntity;
 import io.terminus.dalaran.console.entity.PropertyEntity;
 import io.terminus.dalaran.console.entity.TriggerEntity;
@@ -10,28 +11,33 @@ import io.terminus.dalaran.console.repository.FlowRepository;
 import io.terminus.dalaran.console.service.FlowManagementService;
 import io.terminus.dalaran.model.DalaranFlow;
 import lombok.val;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
-public class FlowManagementServiceImpl implements FlowManagementService {
+public class FlowManagementServiceImpl implements FlowManagementService, InitializingBean {
 
     @Autowired
     private FlowRepository flowRepository;
 
+    @Autowired
     private DalaranContext dalaranContext;
 
     // TODO use jackson
-    private Gson gson;
+    private Gson gson = new Gson();
 
     @Override
     public void publish() {
-        List<DalaranFlow> flowList = flowRepository.findAll().stream().map(flowEntity -> {
+        List<DalaranFlow> flowList = new ArrayList<>();
+        List<FlowEntity> flowEntities = flowRepository.findAll();
+        for (FlowEntity flowEntity : flowEntities) {
             val flow = new DalaranFlow();
             Map<String, String> properties = new HashMap<>();
             // TODO 加载全局变量, 局部覆盖
@@ -41,13 +47,12 @@ public class FlowManagementServiceImpl implements FlowManagementService {
             val trigger = buildTrigger(flowEntity.getTrigger(), properties);
             List<DalaranFlow.Processor> processors = flowEntity.getProcessors().stream().
                     map(processorEntity -> buildProcessor(processorEntity, properties)).collect(Collectors.toList());
-
             flow.setId(flowEntity.getName() + "-" + flowEntity.getId());
             flow.setTrigger(trigger);
             flow.setProcessors(processors);
-            return flow;
-        }).collect(Collectors.toList());
 
+            flowList.add(flow);
+        }
         dalaranContext.addFlows(flowList);
     }
 
@@ -76,5 +81,10 @@ public class FlowManagementServiceImpl implements FlowManagementService {
         // TODO 性能问题...
         Jinjava jinjava = new Jinjava();
         return jinjava.render(configValue, properties);
+    }
+
+    @Override
+    public void afterPropertiesSet() {
+        publish();
     }
 }

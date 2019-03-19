@@ -24,7 +24,7 @@
     </modules>
 
     <properties>
-        <camel.version>2.23.1</camel.version>
+        <camel.version>2.21.5</camel.version>
         <dubbo.version>2.6.5</dubbo.version>
     </properties>
 

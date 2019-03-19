@@ -7,6 +7,7 @@ import io.terminus.dalaran.DalaranTrigger;
 import io.terminus.dalaran.annotation.DalaranComponent;
 import io.terminus.dalaran.util.DalaranPropertyUtils;
 
+import javax.annotation.PostConstruct;
 import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.concurrent.ConcurrentHashMap;
@@ -52,6 +53,7 @@ public class DefaultDalaranComponentContainer implements DalaranComponentContain
         return processorConfigTypeMapping.get(type);
     }
 
+    @PostConstruct
     public void loadComponents() {
         // TODO 可以用 spring 的 annotation, 可以少些一个 service load file
         ServiceLoader.load(Component.class).forEach(component -> {

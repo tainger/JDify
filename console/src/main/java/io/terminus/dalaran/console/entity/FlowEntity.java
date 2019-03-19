@@ -3,7 +3,7 @@ package io.terminus.dalaran.console.entity;
 import lombok.Data;
 
 import javax.persistence.*;
-import java.util.List;
+import java.util.Set;
 
 @Data
 @Entity
@@ -17,12 +17,12 @@ public class FlowEntity {
 
     private String description;
 
-    @OneToMany
-    private List<PropertyEntity> properties;
-
     @OneToOne
     private TriggerEntity trigger;
 
-    @ManyToMany
-    private List<ProcessorEntity> processors;
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private Set<ProcessorEntity> processors;
+
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private Set<PropertyEntity> properties;
 }
