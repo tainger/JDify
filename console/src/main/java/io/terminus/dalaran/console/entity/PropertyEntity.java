@@ -8,13 +8,13 @@ import javax.persistence.Id;
 
 @Data
 @Entity
-public class ProcessorEntity {
+public class PropertyEntity {
 
     @Id
     @GeneratedValue
     private Long id;
 
-    private String type;
+    private String name;
 
-    private String config;
+    private String value;
 }

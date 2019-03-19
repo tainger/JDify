@@ -1,7 +1,7 @@
 package io.terminus.dalaran.impl;
 
-import io.terminus.dalaran.*;
-import io.terminus.dalaran.annotation.DalaranComponent;
+import io.terminus.dalaran.DalaranComponentContainer;
+import io.terminus.dalaran.DalaranContext;
 import io.terminus.dalaran.model.DalaranFlow;
 import io.terminus.dalaran.util.DalaranPropertyUtils;
 import lombok.val;
@@ -10,15 +10,37 @@ import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.model.RouteDefinition;
 
 import java.util.List;
-import java.util.ServiceLoader;
 
-public abstract class AbstractDalaranCamelContext implements DalaranContext {
+public class DefaultDalaranCamelContext implements DalaranContext {
 
     private CamelContext camelContext = new DefaultCamelContext();
 
     private DalaranComponentContainer componentContainer;
 
+    @Override
+    public void removeFlow(String flowId) throws Exception {
+        camelContext.removeRoute(flowId);
+    }
+
+    @Override
+    public void removeFlows(List<String> flowIds) {
+        flowIds.forEach(flowId -> {
+            try {
+                camelContext.removeRoute(flowId);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+
+    }
+
+    @Override
+    public void removeAllFlow() throws Exception {
+        camelContext.removeRouteDefinitions(camelContext.getRouteDefinitions());
+    }
+
     // TODO Flow 可以抽象一个 Builder, 但暂时没有必要
+    @Override
     public void addFlow(DalaranFlow dalaranFlow) {
         val route = new RouteDefinition();
         // TODO route need an u id
@@ -50,42 +72,8 @@ public abstract class AbstractDalaranCamelContext implements DalaranContext {
         flows.forEach(this::addFlow);
     }
 
-    public void addTrigger(String triggerType, Class configType, DalaranTrigger trigger) {
-        componentContainer.addTrigger(triggerType, configType, trigger);
-    }
-
-    public void addProcessor(String processorType, Class configType, DalaranProcessor processor) {
-        componentContainer.addProcessor(processorType, configType, processor);
-    }
-
     @Override
-    public void loadComponents() {
-        // TODO 可以用 spring 的 annotation, 可以少些一个 service load file
-        ServiceLoader.load(Component.class).forEach(component -> {
-            Class componentClass = component.getClass();
-            DalaranComponent dalaranComponent = (DalaranComponent) componentClass.getDeclaredAnnotation(DalaranComponent.class);
-            if (dalaranComponent == null) {
-                return;
-            }
-            String componentType = dalaranComponent.value();
-            DalaranPropertyUtils.registerConfigType(dalaranComponent.configType());
-            if (component instanceof DalaranTrigger) {
-                addTrigger(componentType, dalaranComponent.configType(), (DalaranTrigger) component);
-            } else if (component instanceof DalaranProcessor) {
-                addProcessor(componentType, dalaranComponent.configType(), (DalaranProcessor) component);
-            }
-        });
-    }
-
-    public CamelContext getCamelContext() {
-        return camelContext;
-    }
-
-    public DalaranComponentContainer getComponentContainer() {
+    public DalaranComponentContainer getDalaranComponentContainer() {
         return componentContainer;
-    }
-
-    public void setComponentContainer(DalaranComponentContainer componentContainer) {
-        this.componentContainer = componentContainer;
     }
 }

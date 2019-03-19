@@ -13,18 +13,16 @@ public class DalaranFlow {
     private Map<String, String> properties;
 
     @Data
-    public
-    class Trigger {
+    public static class Trigger<T> {
         private String type;
         private String configInstanceId;
-        private Map<String, Object> config;
+        private T config;
     }
 
     @Data
-    public
-    class Processor {
+    public static class Processor<T> {
         private String type;
         private String configInstanceId;
-        private Map<String, Object> config;
+        private T config;
     }
 }

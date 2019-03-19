@@ -1,7 +1,20 @@
 package io.terminus.dalaran;
 
-public interface DalaranContext {
-    void loadFlows();
+import io.terminus.dalaran.model.DalaranFlow;
 
-    void loadComponents();
+import java.util.List;
+
+public interface DalaranContext {
+
+    void removeFlow(String id) throws Exception;
+
+    void removeFlows(List<String> id);
+
+    void removeAllFlow() throws Exception;
+
+    void addFlow(DalaranFlow flow);
+
+    void addFlows(List<DalaranFlow> flows);
+
+    DalaranComponentContainer getDalaranComponentContainer();
 }
