@@ -65,8 +65,10 @@ public class FlowManagementServiceImpl implements FlowManagementService, Initial
         val trigger = new DalaranFlow.Trigger();
         Class configType = dalaranContext.getDalaranComponentContainer().getTriggerConfigType(triggerEntity.getType());
         String jsonConfig = replaceProperties(triggerEntity.getConfig(), properties);
-        trigger.setType(triggerEntity.getType());
         Object config = gson.fromJson(jsonConfig, configType);
+
+        trigger.setId(triggerEntity.getId());
+        trigger.setType(triggerEntity.getType());
         trigger.setConfig(config);
         return trigger;
     }
@@ -76,8 +78,10 @@ public class FlowManagementServiceImpl implements FlowManagementService, Initial
         val processor = new DalaranFlow.Processor();
         Class configType = dalaranContext.getDalaranComponentContainer().getProcessorConfigType(processorEntity.getType());
         String jsonConfig = replaceProperties(processorEntity.getConfig(), properties);
-        processor.setType(processorEntity.getType());
         Object config = gson.fromJson(jsonConfig, configType);
+
+        processor.setId(processorEntity.getId());
+        processor.setType(processorEntity.getType());
         processor.setConfig(config);
         return processor;
     }

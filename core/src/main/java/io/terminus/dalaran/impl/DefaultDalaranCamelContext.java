@@ -61,10 +61,13 @@ public class DefaultDalaranCamelContext implements DalaranContext {
 
         // TODO 临时扔一下, 这部分要抽出去, config 也需要 cache
         route.from(triggerComponent.buildRouterUri(trigger.getConfig()));
+        route.to("log:trigger[" + trigger.getId() + "]?showAll=true&multiline=true");
         for (DalaranFlow.Processor processor : processorList) {
+            route.to("log:processor[" + processor.getId() + "]?showAll=true&multiline=true");
             val processorComponent = componentContainer.getProcessor(processor.getType());
             processorComponent.configure(route, processor.getConfig());
         }
+
         // TODO on exception...
         try {
             camelContext.addRouteDefinition(route);

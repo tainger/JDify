@@ -5,7 +5,6 @@ import io.terminus.dalaran.DalaranComponentContainer;
 import io.terminus.dalaran.DalaranProcessor;
 import io.terminus.dalaran.DalaranTrigger;
 import io.terminus.dalaran.annotation.DalaranComponent;
-import io.terminus.dalaran.util.DalaranPropertyUtils;
 
 import javax.annotation.PostConstruct;
 import java.util.Map;
@@ -63,7 +62,6 @@ public class DefaultDalaranComponentContainer implements DalaranComponentContain
                 return;
             }
             String componentType = dalaranComponent.value();
-            DalaranPropertyUtils.registerConfigType(dalaranComponent.configType());
             if (component instanceof DalaranTrigger) {
                 addTrigger(componentType, dalaranComponent.configType(), (DalaranTrigger) component);
             } else if (component instanceof DalaranProcessor) {

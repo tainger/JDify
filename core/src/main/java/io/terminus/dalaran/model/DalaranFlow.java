@@ -14,15 +14,15 @@ public class DalaranFlow {
 
     @Data
     public static class Trigger<T> {
+        private Long id;
         private String type;
-        private String configInstanceId;
         private T config;
     }
 
     @Data
     public static class Processor<T> {
+        private Long id;
         private String type;
-        private String configInstanceId;
         private T config;
     }
 }
