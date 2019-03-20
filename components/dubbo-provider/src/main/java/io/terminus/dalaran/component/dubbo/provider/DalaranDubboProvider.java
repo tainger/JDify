@@ -1,7 +1,7 @@
 package io.terminus.dalaran.component.dubbo.provider;
 
-import io.terminus.dalaran.annotation.DalaranComponent;
 import io.terminus.dalaran.DalaranTrigger;
+import io.terminus.dalaran.annotation.DalaranComponent;
 
 @DalaranComponent(value = "dubbo-provider", configType = DubboProviderConfig.class)
 public class DalaranDubboProvider implements DalaranTrigger<DubboProviderConfig> {

@@ -11,5 +11,12 @@
 
     <artifactId>basic-component</artifactId>
 
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.camel</groupId>
+            <artifactId>camel-script</artifactId>
+            <version>${camel.version}</version>
+        </dependency>
+    </dependencies>
 
 </project>

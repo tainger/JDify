@@ -1,9 +1,11 @@
 package io.terminus.dalaran.console.entity;
 
+import io.terminus.dalaran.console.JsonConverter;
 import lombok.Data;
 
 import javax.persistence.*;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @Entity
@@ -20,9 +22,9 @@ public class FlowEntity {
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private TriggerEntity trigger;
 
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    private Set<ProcessorEntity> processors;
+    @Convert(converter = JsonConverter.class)
+    private List<Long> processors = new ArrayList<>();
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    private Set<PropertyEntity> properties;
+    @Convert(converter = JsonConverter.class)
+    private List<Long> properties = new ArrayList<>();
 }

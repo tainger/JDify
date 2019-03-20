@@ -8,6 +8,8 @@ import io.terminus.dalaran.console.entity.ProcessorEntity;
 import io.terminus.dalaran.console.entity.PropertyEntity;
 import io.terminus.dalaran.console.entity.TriggerEntity;
 import io.terminus.dalaran.console.repository.FlowRepository;
+import io.terminus.dalaran.console.repository.ProcessorRepository;
+import io.terminus.dalaran.console.repository.PropertyRepository;
 import io.terminus.dalaran.console.service.FlowManagementService;
 import io.terminus.dalaran.model.DalaranFlow;
 import lombok.val;
@@ -28,6 +30,12 @@ public class FlowManagementServiceImpl implements FlowManagementService, Initial
     private FlowRepository flowRepository;
 
     @Autowired
+    private ProcessorRepository processorRepository;
+
+    @Autowired
+    private PropertyRepository propertyRepository;
+
+    @Autowired
     private DalaranContext dalaranContext;
 
     // TODO use jackson
@@ -46,12 +54,16 @@ public class FlowManagementServiceImpl implements FlowManagementService, Initial
             val flow = new DalaranFlow();
             Map<String, String> properties = new HashMap<>();
             // TODO 加载全局变量, 局部覆盖
-            for (PropertyEntity property : flowEntity.getProperties()) {
+            for (Long propertyId : flowEntity.getProperties()) {
+                PropertyEntity property = propertyRepository.findOne(propertyId);
                 properties.put(property.getName(), property.getValue());
             }
             val trigger = buildTrigger(flowEntity.getTrigger(), properties);
             List<DalaranFlow.Processor> processors = flowEntity.getProcessors().stream().
-                    map(processorEntity -> buildProcessor(processorEntity, properties)).collect(Collectors.toList());
+                    map(processorId -> {
+                        ProcessorEntity processorEntity = processorRepository.findOne(processorId);
+                        return buildProcessor(processorEntity, properties);
+                    }).collect(Collectors.toList());
             flow.setId(flowEntity.getId().toString());
             flow.setTrigger(trigger);
             flow.setProcessors(processors);

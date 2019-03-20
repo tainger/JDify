@@ -1,7 +1,5 @@
 package io.terminus.dalaran.example;
 
-import java.util.List;
-
 public class ExtOrderItem {
 
     private Long id;

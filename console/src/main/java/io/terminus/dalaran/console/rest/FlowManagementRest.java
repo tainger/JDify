@@ -6,16 +6,26 @@ import io.terminus.dalaran.console.entity.ProcessorEntity;
 import io.terminus.dalaran.console.entity.PropertyEntity;
 import io.terminus.dalaran.console.entity.TriggerEntity;
 import io.terminus.dalaran.console.model.FlowModel;
+import io.terminus.dalaran.console.repository.ProcessorRepository;
+import io.terminus.dalaran.console.repository.PropertyRepository;
 import io.terminus.dalaran.console.service.FlowManagementService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/management/flow")
 public class FlowManagementRest {
+
+    // TODO for test
+    @Autowired
+    private ProcessorRepository processorRepository;
+
+    @Autowired
+    private PropertyRepository propertyRepository;
 
     @Autowired
     private FlowManagementService flowManagementService;
@@ -27,19 +37,22 @@ public class FlowManagementRest {
         FlowEntity flowEntity = new FlowEntity();
         TriggerEntity triggerEntity = new TriggerEntity();
 
-        Set<ProcessorEntity> processorEntitySet = flowModel.getProcessors().stream().map(processorModel -> {
+        List<Long> processorEntitySet = flowModel.getProcessors().stream().map(processorModel -> {
             ProcessorEntity processorEntity = new ProcessorEntity();
             processorEntity.setType(processorModel.getType());
             processorEntity.setConfig(gson.toJson(processorModel.getConfig()));
-            return processorEntity;
-        }).collect(Collectors.toSet());
+            processorRepository.save(processorEntity);
+            return processorEntity.getId();
+        }).collect(Collectors.toList());
 
-        Set<PropertyEntity> propertyEntitySet = flowModel.getProperties().entrySet().stream().map(entry -> {
+
+        List<Long> propertyEntitySet = flowModel.getProperties().entrySet().stream().map(entry -> {
             PropertyEntity propertyEntity = new PropertyEntity();
             propertyEntity.setName(entry.getKey());
             propertyEntity.setValue(entry.getValue());
-            return propertyEntity;
-        }).collect(Collectors.toSet());
+            propertyRepository.save(propertyEntity);
+            return propertyEntity.getId();
+        }).collect(Collectors.toList());
 
         flowEntity.setTrigger(triggerEntity);
         flowEntity.setProcessors(processorEntitySet);
