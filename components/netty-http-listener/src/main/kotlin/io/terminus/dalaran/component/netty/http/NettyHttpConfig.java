@@ -9,7 +9,7 @@ public class NettyHttpConfig {
     @DalaranConfigField(label = "协议", inputType = FieldInputType.Radio)
     private HttpProtocol protocol;
     private String host;
-    private String port;
+    private Integer port;
     private String path;
     private HttpMethod method;
 }

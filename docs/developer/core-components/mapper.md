@@ -47,52 +47,59 @@ class MessageConvertProcessor : DalaranProcessor<MessageConvertConfig> {
 
 (1)(3) 这两个流程的关键点在于需要通过前端配置信息获取操作对象的结构，并将其转换成dalaran的内部对象（可能是我们根据其结构生成的class，也可能直接是map结构）
 
-（2）该流程的关键点在于通过前端配置信息获取字段映射的详细内容，并根据该内容生成相应的xml文件 
+（2）该流程的关键点在于通过前端配置信息获取字段映射的详细内容，并根据该内容生成相应的xml文件
+
+####数据映射操作界面
+![](./docs/images/mapper-function.jpg)
+
+![](./docs/images/mapper.jpg)
+
 
 涉及的数据模型：
-
-MessageModel： 用于描述字段信息
-```java
-public class MessageModel {
-
-    private String fieldName;
-
-    private String fieldType;
-}
-```
 
 DalaranMessage: 用于描述具体对象，modelType为输入数据的类型，比如JSON，XML等
 ```java
 public class  DalaranMessage {
 
-    private List<MessageModel> fields;
+    private Map<String, Object> fields;
 
     private ModelType type;
 }
 ```
 
-MessageMapping: 用于描述字段映射
+FieldMapping: 用于描述字段映射
 ```java
-public class MessageMapping {
+public class FieldMapping {
+    
+    private Map<List<String>, List<String>> fieldMapping;
 
-    private List<MessageModel> targetModel;
-
-    private List<MessageModel> destinationModel;
-
-    private MessageProcessFunction function;
+    private FieldProcessFunction function;
 }
 ```
 
-MessageMappingSet: 用于描述一组映射关系
+FieldProcessFunction
 ```java
-public class MessageMappingSet {
+public class FieldProcessFunction {
+    
+    private List<String> fieldsIn;
+    
+    private List<String> fieldsOut;
+    
+    private FunctionExecution execution; //function执行逻辑
+}
+
+```
+
+MessageMapping: 用于描述一组映射关系
+```java
+public class MessageMapping {
     
     private DalaranMessage target;
     
     private DalaranMessage destination;
 
-    private List<MessageMapping> mappings;
+    private List<FieldMapping> mappings;
 }
 ```
 
-我们数据映射中使用的xml文件通过解析MessageMappingSet结构生成
+我们数据映射中使用的xml文件通过解析MessageMapping结构生成

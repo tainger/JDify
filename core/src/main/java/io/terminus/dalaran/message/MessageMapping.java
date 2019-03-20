@@ -1,39 +1,20 @@
 package io.terminus.dalaran.message;
 
-import io.terminus.dalaran.message.model.MessageModel;
+import lombok.Data;
+
+import java.util.List;
 
 /**
- * Created by jingdi on 2019/3/12
+ * Created by jingdi on 2019/3/13
  */
+@Data
 public class MessageMapping {
 
-    private MessageModel targetModel;
+    private DalaranMessage target;
 
-    private MessageModel destinationModel;
+    private DalaranMessage destination;
 
-    private MessageProcessFunction function;
+    private List<FieldMapping> mappings;
 
-    public MessageModel getTargetModel() {
-        return targetModel;
-    }
-
-    public void setTargetModel(MessageModel targetModel) {
-        this.targetModel = targetModel;
-    }
-
-    public MessageModel getDestinationModel() {
-        return destinationModel;
-    }
-
-    public void setDestinationModel(MessageModel destinationModel) {
-        this.destinationModel = destinationModel;
-    }
-
-    public MessageProcessFunction getFunction() {
-        return function;
-    }
-
-    public void setFunction(MessageProcessFunction function) {
-        this.function = function;
-    }
+    private List<SingleFieldMapping> singleFieldMappings;
 }

@@ -1,1 +1,2 @@
 io.terminus.dalaran.component.message.convert.MessageMapper
+io.terminus.dalaran.component.message.convert.custom.CustomMessageMapper
