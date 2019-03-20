@@ -19,12 +19,14 @@
       "type": "custom-convert",
       "config": {
         "messageMapping": {
-          "id": "id",
-          "itemName": "name",
-          "itemPrice": "price"
+          "id": "mappings/mapping/field/id",
+          "itemName": "mappings/mapping/field/name",
+          "itemPrice": "mappings/mapping/field/price"
         },
         "target": ["id", "name", "price"],
-        "destination": ["id", "itemName", "itemPrice"]
+        "targetType": "XML",
+        "destination": ["id", "itemName", "itemPrice"],
+        "destinationType": "JSON"
       }
     },
     {

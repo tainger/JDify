@@ -1,4 +1,4 @@
-package io.terminus.dalaran.utils;
+package io.terminus.dalaran.util;
 
 import io.terminus.dalaran.message.FieldMapping;
 import io.terminus.dalaran.message.MessageMapping;

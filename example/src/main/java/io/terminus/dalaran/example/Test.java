@@ -10,8 +10,6 @@ public class Test {
         context.loadComponents();
         context.loadFlows();
 
-
-
         synchronized (Test.class) {
             Test.class.wait();
         }
