@@ -3,6 +3,9 @@ package io.terminus.dalaran.impl;
 import io.terminus.dalaran.BodyMode;
 import io.terminus.dalaran.DalaranComponentContainer;
 import io.terminus.dalaran.DalaranContext;
+import io.terminus.dalaran.DalaranConverter;
+import io.terminus.dalaran.impl.converter.JsonConverter;
+import io.terminus.dalaran.impl.converter.XMLConverter;
 import io.terminus.dalaran.message.ModelType;
 import io.terminus.dalaran.model.DalaranFlow;
 import lombok.val;
@@ -10,15 +13,20 @@ import org.apache.camel.CamelContext;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.model.RouteDefinition;
 import org.apache.camel.model.dataformat.JsonLibrary;
+import org.springframework.ui.Model;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class DefaultDalaranCamelContext implements DalaranContext {
 
     private final CamelContext camelContext;
 
     private final DalaranComponentContainer componentContainer;
+
+    private final Map<ModelType, DalaranConverter> converterMapping;
 
     public DefaultDalaranCamelContext(DalaranComponentContainer componentContainer) {
         this.camelContext = new DefaultCamelContext();
@@ -28,6 +36,13 @@ public class DefaultDalaranCamelContext implements DalaranContext {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        converterMapping = new HashMap<>();
+
+        // TODO 这个扩展面也很窄, 先写死吧...
+        DalaranConverter jsonConverter = new JsonConverter();
+        DalaranConverter xmlConverter = new XMLConverter();
+        converterMapping.put(ModelType.JSON, jsonConverter);
+        converterMapping.put(ModelType.XML, xmlConverter);
     }
 
     @Override
@@ -121,33 +136,11 @@ public class DefaultDalaranCamelContext implements DalaranContext {
     }
 
     private void unmarshal(RouteDefinition route, ModelType modelType) {
-        route.to("log:parser[" + modelType + "]?showAll=true&multiline=true");
-        switch (modelType) {
-            case JSON:
-                route.marshal().json(JsonLibrary.Gson);
-                break;
-            // TODO 临时用一下
-            case XML:
-                route.marshal().json(JsonLibrary.Gson);
-                route.to("log:converter[json->xml]?showAll=true&multiline=true");
-                route.unmarshal().xmljson();
-                break;
-        }
+        converterMapping.get(modelType).fromObject(route);
     }
 
 
     private void marshal(RouteDefinition route, ModelType modelType) {
-        route.to("log:converter[" + modelType + "]?showAll=true&multiline=true");
-        switch (modelType) {
-            case JSON:
-                route.unmarshal().json(JsonLibrary.Gson, Map.class);
-                break;
-            // TODO 临时用一下
-            case XML:
-                route.marshal().xmljson();
-                route.to("log:converter[xml->json]?showAll=true&multiline=true");
-                route.unmarshal().json(JsonLibrary.Gson, Map.class);
-                break;
-        }
+        converterMapping.get(modelType).toObject(route);
     }
 }

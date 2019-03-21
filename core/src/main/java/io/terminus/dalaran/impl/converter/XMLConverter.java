@@ -6,17 +6,19 @@ import org.apache.camel.model.dataformat.JsonLibrary;
 
 import java.util.Map;
 
-public class JsonConverter implements DalaranConverter {
+public class XMLConverter implements DalaranConverter {
 
     @Override
     public void toObject(ProcessorDefinition route) {
-        route.to("log:parser[json -> object]?showAll=true&multiline=true");
+        route.to("log:parser[xml -> object]?showAll=true&multiline=true");
+        route.marshal().xmljson();
         route.unmarshal().json(JsonLibrary.Gson, Map.class);
     }
 
     @Override
     public void fromObject(ProcessorDefinition route) {
-        route.to("log:parser[object -> json]?showAll=true&multiline=true");
+        route.to("log:parser[object -> xml]?showAll=true&multiline=true");
         route.marshal().json(JsonLibrary.Gson);
+        route.unmarshal().xmljson();
     }
 }
