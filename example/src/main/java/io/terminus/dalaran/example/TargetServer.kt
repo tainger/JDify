@@ -57,8 +57,16 @@ class TestController {
     @PostMapping("/callAll")
     fun all(req: HttpServletRequest) = "all"
 
-    @GetMapping("/list")
-    fun get() = Order("test: Order", 999.98)
+    @PostMapping("/list")
+    fun list(@RequestBody data: Map<String, Double>): Order {
+        return Order("test: Order", data.get("price") ?: 0.00)
+    }
+
+    @GetMapping("/error")
+    fun err(req: HttpServletRequest): Order {
+        println(req.inputStream.reader().readText())
+        throw RuntimeException("just fuck off")
+    }
 }
 
 fun main(args: Array<String>) {

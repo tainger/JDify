@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @RestController
@@ -61,6 +60,9 @@ public class FlowManagementRest {
         flowEntity.setId(flowModel.getId());
         flowEntity.setName(flowModel.getName());
         flowEntity.setDescription(flowModel.getDescription());
+        flowEntity.setRetryable(flowModel.getRetryable());
+        flowEntity.setMaxRetry(flowModel.getMaxRetry());
+        flowEntity.setRetryDelay(flowModel.getRetryDelay());
 
         triggerEntity.setType(flowModel.getTrigger().getType());
         triggerEntity.setConfig(gson.toJson(flowModel.getTrigger().getConfig()));

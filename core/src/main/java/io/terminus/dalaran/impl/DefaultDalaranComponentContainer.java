@@ -16,19 +16,19 @@ public class DefaultDalaranComponentContainer implements DalaranComponentContain
     private final Map<String, DalaranTrigger> triggerMapping = new ConcurrentHashMap<>();
     private final Map<String, DalaranProcessor> processorMapping = new ConcurrentHashMap<>();
 
-    private final Map<String, Class> triggerConfigTypeMapping = new ConcurrentHashMap<>();
-    private final Map<String, Class> processorConfigTypeMapping = new ConcurrentHashMap<>();
+    private final Map<String, DalaranComponent> triggerInfoMapping = new ConcurrentHashMap<>();
+    private final Map<String, DalaranComponent> processorInfoMapping = new ConcurrentHashMap<>();
 
 
     @Override
-    public void addTrigger(String triggerType, Class configType, DalaranTrigger trigger) {
-        triggerConfigTypeMapping.put(triggerType, configType);
+    public void addTrigger(String triggerType, DalaranComponent componentInfo, DalaranTrigger trigger) {
+        triggerInfoMapping.put(triggerType, componentInfo);
         triggerMapping.put(triggerType, trigger);
     }
 
     @Override
-    public void addProcessor(String processorType, Class configType, DalaranProcessor processor) {
-        processorConfigTypeMapping.put(processorType, configType);
+    public void addProcessor(String processorType, DalaranComponent componentInfo, DalaranProcessor processor) {
+        processorInfoMapping.put(processorType, componentInfo);
         processorMapping.put(processorType, processor);
     }
 
@@ -43,13 +43,13 @@ public class DefaultDalaranComponentContainer implements DalaranComponentContain
     }
 
     @Override
-    public Class getTriggerConfigType(String type) {
-        return triggerConfigTypeMapping.get(type);
+    public DalaranComponent getTriggerInfo(String type) {
+        return triggerInfoMapping.get(type);
     }
 
     @Override
-    public Class getProcessorConfigType(String type) {
-        return processorConfigTypeMapping.get(type);
+    public DalaranComponent getProcessorInfo(String type) {
+        return processorInfoMapping.get(type);
     }
 
     @PostConstruct
@@ -63,9 +63,9 @@ public class DefaultDalaranComponentContainer implements DalaranComponentContain
             }
             String componentType = dalaranComponent.value();
             if (component instanceof DalaranTrigger) {
-                addTrigger(componentType, dalaranComponent.configType(), (DalaranTrigger) component);
+                addTrigger(componentType, dalaranComponent, (DalaranTrigger) component);
             } else if (component instanceof DalaranProcessor) {
-                addProcessor(componentType, dalaranComponent.configType(), (DalaranProcessor) component);
+                addProcessor(componentType, dalaranComponent, (DalaranProcessor) component);
             }
         });
     }

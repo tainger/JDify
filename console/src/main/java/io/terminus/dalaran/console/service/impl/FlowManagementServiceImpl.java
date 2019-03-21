@@ -12,6 +12,7 @@ import io.terminus.dalaran.console.repository.ProcessorRepository;
 import io.terminus.dalaran.console.repository.PropertyRepository;
 import io.terminus.dalaran.console.service.FlowManagementService;
 import io.terminus.dalaran.model.DalaranFlow;
+import io.terminus.dalaran.model.MessageModel;
 import lombok.val;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,14 +60,18 @@ public class FlowManagementServiceImpl implements FlowManagementService, Initial
                 properties.put(property.getName(), property.getValue());
             }
             val trigger = buildTrigger(flowEntity.getTrigger(), properties);
-            List<DalaranFlow.Processor> processors = flowEntity.getProcessors().stream().
-                    map(processorId -> {
+            List<DalaranFlow.Processor> processors = flowEntity.getProcessors().stream()
+                    .map(processorId -> {
                         ProcessorEntity processorEntity = processorRepository.findOne(processorId);
                         return buildProcessor(processorEntity, properties);
                     }).collect(Collectors.toList());
+
             flow.setId(flowEntity.getId().toString());
             flow.setTrigger(trigger);
             flow.setProcessors(processors);
+            flow.setMaxRetry(flowEntity.getMaxRetry());
+            flow.setRetryDelay(flowEntity.getRetryDelay());
+            flow.setRetryable(flowEntity.getRetryable());
 
             flowList.add(flow);
         }
@@ -75,9 +80,20 @@ public class FlowManagementServiceImpl implements FlowManagementService, Initial
 
     private DalaranFlow.Trigger buildTrigger(TriggerEntity triggerEntity, Map<String, String> properties) {
         val trigger = new DalaranFlow.Trigger();
-        Class configType = dalaranContext.getDalaranComponentContainer().getTriggerConfigType(triggerEntity.getType());
+        Class configType = dalaranContext.getDalaranComponentContainer().getTriggerInfo(triggerEntity.getType()).configType();
         String jsonConfig = replaceProperties(triggerEntity.getConfig(), properties);
         Object config = gson.fromJson(jsonConfig, configType);
+
+        if (triggerEntity.getInModel() != null) {
+            val inModel = new MessageModel();
+            inModel.setModelType(triggerEntity.getInModel().getModelType());
+            trigger.setInModel(inModel);
+        }
+        if (triggerEntity.getOutModel() != null) {
+            val outModel = new MessageModel();
+            outModel.setModelType(triggerEntity.getOutModel().getModelType());
+            trigger.setOutModel(outModel);
+        }
 
         trigger.setId(triggerEntity.getId());
         trigger.setType(triggerEntity.getType());
@@ -88,9 +104,20 @@ public class FlowManagementServiceImpl implements FlowManagementService, Initial
     // TODO 分开写是为了避免后期差异
     private DalaranFlow.Processor buildProcessor(ProcessorEntity processorEntity, Map<String, String> properties) {
         val processor = new DalaranFlow.Processor();
-        Class configType = dalaranContext.getDalaranComponentContainer().getProcessorConfigType(processorEntity.getType());
+        Class configType = dalaranContext.getDalaranComponentContainer().getProcessorInfo(processorEntity.getType()).configType();
         String jsonConfig = replaceProperties(processorEntity.getConfig(), properties);
         Object config = gson.fromJson(jsonConfig, configType);
+
+        if (processorEntity.getInModel() != null) {
+            val inModel = new MessageModel();
+            inModel.setModelType(processorEntity.getInModel().getModelType());
+            processor.setInModel(inModel);
+        }
+        if (processorEntity.getOutModel() != null) {
+            val outModel = new MessageModel();
+            outModel.setModelType(processorEntity.getOutModel().getModelType());
+            processor.setOutModel(outModel);
+        }
 
         processor.setId(processorEntity.getId());
         processor.setType(processorEntity.getType());
@@ -104,6 +131,9 @@ public class FlowManagementServiceImpl implements FlowManagementService, Initial
         return jinjava.render(configValue, properties);
     }
 
+    /**
+     * startup auto publish
+     */
     @Override
     public void afterPropertiesSet() {
         publish();
