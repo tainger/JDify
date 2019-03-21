@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
 import javax.servlet.http.HttpServletRequest
-import kotlin.random.Random
 
 @SpringBootApplication
 open class Application
@@ -58,13 +57,14 @@ class TestController {
     @PostMapping("/callAll")
     fun all(req: HttpServletRequest) = "all"
 
-    @GetMapping("/list")
-    fun list(): Order {
-        return Order("test: Order", 999.98)
+    @PostMapping("/list")
+    fun list(@RequestBody data: Map<String, Double>): Order {
+        return Order("test: Order", data.get("price") ?: 0.00)
     }
 
     @GetMapping("/error")
-    fun err(): Order {
+    fun err(req: HttpServletRequest): Order {
+        println(req.inputStream.reader().readText())
         throw RuntimeException("just fuck off")
     }
 }

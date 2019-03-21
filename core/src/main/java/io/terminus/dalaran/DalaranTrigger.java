@@ -1,5 +1,7 @@
 package io.terminus.dalaran;
 
-public interface DalaranTrigger<T> extends Component{
-    String buildRouterUri(T config);
+import org.apache.camel.model.RouteDefinition;
+
+public interface DalaranTrigger<T> extends Component {
+    void buildFromRoute(RouteDefinition route, T config);
 }

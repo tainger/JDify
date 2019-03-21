@@ -1,18 +1,12 @@
 package io.terminus.dalaran.component.message.convert.custom;
 
-import com.google.gson.Gson;
 import io.terminus.dalaran.DalaranProcessor;
 import io.terminus.dalaran.annotation.DalaranComponent;
-import io.terminus.dalaran.message.MessageMapping;
 import io.terminus.dalaran.message.ModelType;
-import org.apache.camel.Expression;
 import org.apache.camel.builder.Builder;
 import org.apache.camel.model.ProcessorDefinition;
 import org.apache.camel.model.dataformat.JsonLibrary;
 import org.apache.camel.model.dataformat.XmlJsonDataFormat;
-
-import java.util.Map;
-import java.util.function.Supplier;
 
 /**
  * Created by jingdi on 2019/3/18

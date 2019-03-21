@@ -1,19 +1,22 @@
 package io.terminus.dalaran.component.scheduler;
 
+import io.terminus.dalaran.BodyMode;
 import io.terminus.dalaran.DalaranTrigger;
 import io.terminus.dalaran.annotation.DalaranComponent;
 import io.terminus.dalaran.util.UriUtils;
+import org.apache.camel.model.RouteDefinition;
 
 import java.util.HashMap;
 import java.util.Map;
 
-@DalaranComponent(value = "scheduler", configType = DalaranSchedulerConfig.class)
+@DalaranComponent(value = "scheduler", configType = DalaranSchedulerConfig.class, bodyMode = BodyMode.Object)
 public class DalaranScheduler implements DalaranTrigger<DalaranSchedulerConfig> {
     @Override
-    public String buildRouterUri(DalaranSchedulerConfig config) {
+    public void buildFromRoute(RouteDefinition route, DalaranSchedulerConfig config) {
         Map<String, Object> options = new HashMap<>();
         options.put("cron", config.getCron());
         String optionsString = UriUtils.buildOptionsQueryString(options);
-        return "quartz2://" + config.getName() + optionsString;
+        String uri = "quartz2://" + config.getName() + optionsString;
+        route.from(uri);
     }
 }

@@ -1,16 +1,18 @@
 package io.terminus.dalaran;
 
+import io.terminus.dalaran.annotation.DalaranComponent;
+
 public interface DalaranComponentContainer {
 
-    void addTrigger(String triggerType, Class configType, DalaranTrigger trigger);
+    void addTrigger(String triggerType, DalaranComponent componentInfo, DalaranTrigger trigger);
 
-    void addProcessor(String processorType, Class configType, DalaranProcessor processor);
+    void addProcessor(String processorType, DalaranComponent componentInfo, DalaranProcessor processor);
 
     DalaranTrigger getTrigger(String type);
 
     DalaranProcessor getProcessor(String type);
 
-    Class getTriggerConfigType(String type);
+    DalaranComponent getTriggerInfo(String type);
 
-    Class getProcessorConfigType(String type);
+    DalaranComponent getProcessorInfo(String type);
 }

@@ -1,14 +1,18 @@
 package io.terminus.dalaran.impl;
 
+import io.terminus.dalaran.BodyMode;
 import io.terminus.dalaran.DalaranComponentContainer;
 import io.terminus.dalaran.DalaranContext;
+import io.terminus.dalaran.message.ModelType;
 import io.terminus.dalaran.model.DalaranFlow;
 import lombok.val;
 import org.apache.camel.CamelContext;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.model.RouteDefinition;
+import org.apache.camel.model.dataformat.JsonLibrary;
 
 import java.util.List;
+import java.util.Map;
 
 public class DefaultDalaranCamelContext implements DalaranContext {
 
@@ -56,19 +60,47 @@ public class DefaultDalaranCamelContext implements DalaranContext {
         route.setId(dalaranFlow.getId());
         val trigger = dalaranFlow.getTrigger();
         val processorList = dalaranFlow.getProcessors();
-        val triggerComponent = componentContainer.getTrigger(trigger.getType());
         // TODO check
-
+        val triggerComponent = componentContainer.getTrigger(trigger.getType());
+        val triggerInfo = componentContainer.getTriggerInfo(trigger.getType());
+        BodyMode currentBodyMode = triggerInfo.bodyMode();
+        ModelType currentBodyType = null;
+        if (trigger.getInModel() != null) {
+            currentBodyType = trigger.getInModel().getModelType();
+        }
         if (dalaranFlow.getRetryable() != null && dalaranFlow.getRetryable()) {
             route.onException(Throwable.class).maximumRedeliveries(dalaranFlow.getMaxRetry())
                     .redeliveryDelay(dalaranFlow.getRetryDelay());
         }
-        route.from(triggerComponent.buildRouterUri(trigger.getConfig()));
+        triggerComponent.buildFromRoute(route, trigger.getConfig());
         route.to("log:trigger[" + trigger.getId() + "]?showAll=true&multiline=true");
         for (DalaranFlow.Processor processor : processorList) {
-            route.to("log:processor[" + processor.getId() + "]?showAll=true&multiline=true");
             val processorComponent = componentContainer.getProcessor(processor.getType());
+            val processorInfo = componentContainer.getProcessorInfo(processor.getType());
+            val nextBodyMode = processorInfo.bodyMode();
+            if (currentBodyMode != nextBodyMode) {
+                if (nextBodyMode == BodyMode.Serialized) {
+                    assert processor.getInModel() != null;
+                    unmarshal(route, processor.getInModel().getModelType());
+                } else {
+                    assert currentBodyType != null;
+                    marshal(route, currentBodyType);
+                }
+            }
+            currentBodyMode = processorInfo.bodyMode();
+            // TODO check
+            route.to("log:processor[" + processor.getId() + "]?showAll=true&multiline=true");
             processorComponent.configure(route, processor.getConfig());
+        }
+
+        if (currentBodyMode != triggerInfo.bodyMode()) {
+            if (triggerInfo.bodyMode() == BodyMode.Serialized) {
+                assert trigger.getOutModel() != null;
+                unmarshal(route, trigger.getOutModel().getModelType());
+            } else {
+                assert currentBodyType != null;
+                marshal(route, currentBodyType);
+            }
         }
 
         // TODO on exception...
@@ -86,5 +118,36 @@ public class DefaultDalaranCamelContext implements DalaranContext {
     @Override
     public DalaranComponentContainer getDalaranComponentContainer() {
         return componentContainer;
+    }
+
+    private void unmarshal(RouteDefinition route, ModelType modelType) {
+        route.to("log:parser[" + modelType + "]?showAll=true&multiline=true");
+        switch (modelType) {
+            case JSON:
+                route.marshal().json(JsonLibrary.Gson);
+                break;
+            // TODO 临时用一下
+            case XML:
+                route.marshal().json(JsonLibrary.Gson);
+                route.to("log:converter[json->xml]?showAll=true&multiline=true");
+                route.unmarshal().xmljson();
+                break;
+        }
+    }
+
+
+    private void marshal(RouteDefinition route, ModelType modelType) {
+        route.to("log:converter[" + modelType + "]?showAll=true&multiline=true");
+        switch (modelType) {
+            case JSON:
+                route.unmarshal().json(JsonLibrary.Gson, Map.class);
+                break;
+            // TODO 临时用一下
+            case XML:
+                route.marshal().xmljson();
+                route.to("log:converter[xml->json]?showAll=true&multiline=true");
+                route.unmarshal().json(JsonLibrary.Gson, Map.class);
+                break;
+        }
     }
 }
