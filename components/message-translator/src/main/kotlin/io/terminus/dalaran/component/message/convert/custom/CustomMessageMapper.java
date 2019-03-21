@@ -1,18 +1,12 @@
 package io.terminus.dalaran.component.message.convert.custom;
 
-import com.google.gson.Gson;
 import io.terminus.dalaran.DalaranProcessor;
 import io.terminus.dalaran.annotation.DalaranComponent;
-import io.terminus.dalaran.message.MessageMapping;
-import io.terminus.dalaran.message.ModelType;
-import org.apache.camel.Expression;
+import io.terminus.dalaran.component.message.convert.custom.message.impl.DefaultMessageConvert;
+import io.terminus.dalaran.component.message.convert.custom.message.MessageConvert;
+import io.terminus.dalaran.component.message.convert.custom.model.ConvertType;
 import org.apache.camel.builder.Builder;
 import org.apache.camel.model.ProcessorDefinition;
-import org.apache.camel.model.dataformat.JsonLibrary;
-import org.apache.camel.model.dataformat.XmlJsonDataFormat;
-
-import java.util.Map;
-import java.util.function.Supplier;
 
 /**
  * Created by jingdi on 2019/3/18
@@ -26,25 +20,9 @@ public class CustomMessageMapper implements DalaranProcessor<CustomMapperConfig>
         route.setHeader("MessageMapping", Builder.constant(config.getMessageMapping()));
         route.setHeader("target", Builder.constant(config.getTarget()));
         route.setHeader("destination", Builder.constant(config.getDestination()));
-        convertIn(route, config.getTargetType());
+        MessageConvert messageConvert = new DefaultMessageConvert();
+        messageConvert.convert(route, config.getTargetType(), ConvertType.TARGET);
         route.process(processor);
-        route.marshal().json(JsonLibrary.Gson);
-    }
-
-    private void convertIn(ProcessorDefinition route, ModelType type) {
-        switch (type) {
-            case JSON:
-                route.convertBodyTo(String.class);
-                break;
-            case XML:
-                XmlJsonDataFormat xmlJsonFormat = new XmlJsonDataFormat();
-                xmlJsonFormat.setForceTopLevelObject(true);
-                route.marshal(xmlJsonFormat).convertBodyTo(String.class);
-                break;
-        }
-    }
-
-    private void convertOut(ProcessorDefinition route, ModelType type) {
-
+        messageConvert.convert(route, config.getDestinationType(), ConvertType.DESTINATION);
     }
 }

@@ -1,17 +1,11 @@
 package io.terminus.dalaran.component.message.convert.custom;
 
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-import io.terminus.dalaran.component.message.convert.jxpath.DalaranJXPathFactory;
-import io.terminus.dalaran.message.DalaranMessage;
-import io.terminus.dalaran.message.MessageMapping;
-import io.terminus.dalaran.message.SingleFieldMapping;
+import io.terminus.dalaran.component.message.convert.custom.jxpath.DalaranJXPathFactory;
 import org.apache.camel.Exchange;
-import org.apache.camel.Message;
 import org.apache.camel.Processor;
 import org.apache.commons.jxpath.JXPathContext;
 
-import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

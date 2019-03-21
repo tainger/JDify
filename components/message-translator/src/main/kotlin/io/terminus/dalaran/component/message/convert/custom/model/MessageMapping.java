@@ -1,4 +1,4 @@
-package io.terminus.dalaran.message;
+package io.terminus.dalaran.component.message.convert.custom.model;
 
 import lombok.Data;
 
