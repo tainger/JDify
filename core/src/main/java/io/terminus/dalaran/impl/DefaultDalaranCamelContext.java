@@ -12,13 +12,10 @@ import lombok.val;
 import org.apache.camel.CamelContext;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.model.RouteDefinition;
-import org.apache.camel.model.dataformat.JsonLibrary;
-import org.springframework.ui.Model;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class DefaultDalaranCamelContext implements DalaranContext {
 
