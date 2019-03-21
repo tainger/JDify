@@ -1,12 +1,18 @@
 package io.terminus.dalaran.convert;
 
 import com.google.gson.Gson;
+import io.terminus.dalaran.DalaranContext;
+import io.terminus.dalaran.impl.DefaultDalaranCamelContext;
+import org.apache.camel.CamelContext;
 import org.apache.camel.RoutesBuilder;
 import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.model.dataformat.XmlJsonDataFormat;
 import org.apache.camel.test.junit4.CamelTestSupport;
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -14,32 +20,29 @@ import java.util.Map;
  */
 public class TestConvert extends CamelTestSupport {
 
-    @Test
-    public void convert2XML() {
-        Gson gson = new Gson();
-        String str = "{\"mappings\":{\"@xmlns\":\"http://dozermapper.github.io/schema/bean-mapping\",\"@xmlns:xsi\":\"http://www.w3.org/2001/XMLSchema-instance\",\"@xsi:schemaLocation\":\"http://dozermapper.github.io/schema/bean-mapping http://dozermapper.github.io/schema/bean-mapping.xsd\",\"mapping\":{\"class-a\":\"org.apache.camel.component.dozer.\",\"class-b\":\"io.terminus.dalaran.example.ExtOrderItem\",\"field\":[{\"@custom-converter-id\":\"_expressionMapping\",\"@custom-converter-param\":\"simple:\\\\${header.name}\",\"a\":\"expression\",\"b\":\"itemName\"},{\"@custom-converter-id\":\"_expressionMapping\",\"@custom-converter-param\":\"simple:\\\\${body.price}\",\"a\":\"expression\",\"b\":\"itemPrice\"},{\"@custom-converter-id\":\"_expressionMapping\",\"@custom-converter-param\":\"simple:\\\\${header.Content-Type}\",\"a\":\"expression\",\"b\":\"test\"}]}}}";
-        template.sendBody("direct:start", gson.fromJson(str, Map.class));
-    }
-
-    @Override
-    protected RoutesBuilder createRouteBuilder() throws Exception {
-        return new RouteBuilder() {
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
+        context.addRoutes(new RouteBuilder() {
             @Override
             public void configure() throws Exception {
-                context.setTracing(true);
                 String out = "/Users/jingdi/work/terminus-work/dalaran-2.0/develop/dalaran/example/src/test/resources/out";
-//                XmlJsonDataFormat xmlJsonFormat = new XmlJsonDataFormat();
-//                xmlJsonFormat.setForceTopLevelObject(true);
-//                xmlJsonFormat.setEncoding("UTF-8");
-//                xmlJsonFormat.setForceTopLevelObject(true);
-//                xmlJsonFormat.setTrimSpaces(true);
-//                xmlJsonFormat.setRootName("mappings");
-//                xmlJsonFormat.setSkipNamespaces(true);
-//                xmlJsonFormat.setRemoveNamespacePrefixes(true);
-//                from("direct:start").unmarshal(xmlJsonFormat).to("file:" + out);
-                from("direct:start").unmarshal().xmlBeans().convertBodyTo(String.class).to("file:" + out);
+                String in = "/Users/jingdi/work/terminus-work/dalaran-2.0/develop/dalaran/example/src/test/resources/in";
+                org.apache.camel.dataformat.xmljson.XmlJsonDataFormat xmlJsonFormat = new org.apache.camel.dataformat.xmljson.XmlJsonDataFormat();
 
+                List<org.apache.camel.dataformat.xmljson.XmlJsonDataFormat.NamespacesPerElementMapping> namespaces = new ArrayList<org.apache.camel.dataformat.xmljson.XmlJsonDataFormat.NamespacesPerElementMapping>();
+                namespaces.add(new org.apache.camel.dataformat.xmljson.XmlJsonDataFormat.NamespacesPerElementMapping("mappings",
+                        "|xsi|http://www.w3.org/2001/XMLSchema-instance||http://dozermapper.github.io/schema/bean-mapping|"));
+                xmlJsonFormat.setNamespaceMappings(namespaces);
+                xmlJsonFormat.setRootName("mappings");
+                xmlJsonFormat.setEncoding("UTF-8");
+                xmlJsonFormat.setForceTopLevelObject(true);
+                xmlJsonFormat.setTrimSpaces(true);
+
+                from("file:" + in).unmarshal(xmlJsonFormat).convertBodyTo(String.class).to("file:" + out);
             }
-        };
+        });
+        context.start();
+        Thread.sleep(3000);
+        context.stop();
     }
 }
