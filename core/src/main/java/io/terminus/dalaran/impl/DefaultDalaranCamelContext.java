@@ -36,10 +36,8 @@ public class DefaultDalaranCamelContext implements DalaranContext {
         converterMapping = new HashMap<>();
 
         // TODO 这个扩展面也很窄, 先写死吧...
-        DalaranConverter jsonConverter = new JsonConverter();
-        DalaranConverter xmlConverter = new XMLConverter();
-        converterMapping.put(ModelType.JSON, jsonConverter);
-        converterMapping.put(ModelType.XML, xmlConverter);
+        converterMapping.put(ModelType.JSON, new JsonConverter());
+        converterMapping.put(ModelType.XML, new XMLConverter());
     }
 
     @Override
@@ -132,11 +130,12 @@ public class DefaultDalaranCamelContext implements DalaranContext {
         return componentContainer;
     }
 
+    // TODO 这里还要接 model, 一些特殊转换需要声明如何处理, 比如 XML
     private void unmarshal(RouteDefinition route, ModelType modelType) {
         converterMapping.get(modelType).fromObject(route);
     }
 
-
+    // TODO 这里还要接 model, 一些特殊转换需要声明如何处理, 比如 XML
     private void marshal(RouteDefinition route, ModelType modelType) {
         converterMapping.get(modelType).toObject(route);
     }
