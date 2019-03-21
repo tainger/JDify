@@ -59,14 +59,18 @@ public class FlowManagementServiceImpl implements FlowManagementService, Initial
                 properties.put(property.getName(), property.getValue());
             }
             val trigger = buildTrigger(flowEntity.getTrigger(), properties);
-            List<DalaranFlow.Processor> processors = flowEntity.getProcessors().stream().
-                    map(processorId -> {
+            List<DalaranFlow.Processor> processors = flowEntity.getProcessors().stream()
+                    .map(processorId -> {
                         ProcessorEntity processorEntity = processorRepository.findOne(processorId);
                         return buildProcessor(processorEntity, properties);
                     }).collect(Collectors.toList());
+
             flow.setId(flowEntity.getId().toString());
             flow.setTrigger(trigger);
             flow.setProcessors(processors);
+            flow.setMaxRetry(flowEntity.getMaxRetry());
+            flow.setRetryDelay(flowEntity.getRetryDelay());
+            flow.setRetryable(flowEntity.getRetryable());
 
             flowList.add(flow);
         }
@@ -104,6 +108,9 @@ public class FlowManagementServiceImpl implements FlowManagementService, Initial
         return jinjava.render(configValue, properties);
     }
 
+    /**
+     * startup auto publish
+     */
     @Override
     public void afterPropertiesSet() {
         publish();
