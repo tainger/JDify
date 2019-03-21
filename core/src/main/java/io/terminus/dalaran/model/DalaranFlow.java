@@ -9,6 +9,9 @@ import java.util.Map;
 public class DalaranFlow {
     private String id;
     private Trigger trigger;
+    private Boolean retryable;
+    private Integer maxRetry;
+    private Integer retryDelay;
     private List<Processor> processors;
     private Map<String, String> properties;
 

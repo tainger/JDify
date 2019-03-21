@@ -59,7 +59,10 @@ public class DefaultDalaranCamelContext implements DalaranContext {
         val triggerComponent = componentContainer.getTrigger(trigger.getType());
         // TODO check
 
-        // TODO 临时扔一下, 这部分要抽出去, config 也需要 cache
+        if (dalaranFlow.getRetryable() != null && dalaranFlow.getRetryable()) {
+            route.onException(Throwable.class).maximumRedeliveries(dalaranFlow.getMaxRetry())
+                    .redeliveryDelay(dalaranFlow.getRetryDelay());
+        }
         route.from(triggerComponent.buildRouterUri(trigger.getConfig()));
         route.to("log:trigger[" + trigger.getId() + "]?showAll=true&multiline=true");
         for (DalaranFlow.Processor processor : processorList) {

@@ -19,6 +19,12 @@ public class FlowEntity {
 
     private String description;
 
+    private Boolean retryable;
+
+    private Integer maxRetry;
+
+    private Integer retryDelay;
+
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private TriggerEntity trigger;
 
