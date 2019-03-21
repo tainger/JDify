@@ -1,6 +1,6 @@
 package io.terminus.dalaran.component.message.convert.custom;
 
-import io.terminus.dalaran.component.message.convert.custom.model.ModelType;
+import io.terminus.dalaran.model.ModelType;
 import lombok.Data;
 
 import java.util.List;

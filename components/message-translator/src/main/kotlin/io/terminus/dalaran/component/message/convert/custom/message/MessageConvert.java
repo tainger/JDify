@@ -1,7 +1,7 @@
 package io.terminus.dalaran.component.message.convert.custom.message;
 
 import io.terminus.dalaran.component.message.convert.custom.model.ConvertType;
-import io.terminus.dalaran.component.message.convert.custom.model.ModelType;
+import io.terminus.dalaran.model.ModelType;
 import org.apache.camel.model.ProcessorDefinition;
 
 /**

@@ -2,7 +2,7 @@ package io.terminus.dalaran.component.message.convert.custom.message.impl;
 
 import io.terminus.dalaran.component.message.convert.custom.message.MessageConvert;
 import io.terminus.dalaran.component.message.convert.custom.model.ConvertType;
-import io.terminus.dalaran.component.message.convert.custom.model.ModelType;
+import io.terminus.dalaran.model.ModelType;
 import org.apache.camel.model.ProcessorDefinition;
 import org.apache.camel.model.dataformat.JsonLibrary;
 import org.apache.camel.model.dataformat.XmlJsonDataFormat;
