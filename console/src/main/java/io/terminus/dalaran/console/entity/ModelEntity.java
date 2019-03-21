@@ -1,6 +1,6 @@
 package io.terminus.dalaran.console.entity;
 
-import io.terminus.dalaran.message.ModelType;
+import io.terminus.dalaran.model.ModelType;
 import lombok.Data;
 
 import javax.persistence.Entity;
