@@ -14,9 +14,6 @@ public class DalaranScheduler implements DalaranTrigger<DalaranSchedulerConfig> 
         Map<String, Object> options = new HashMap<>();
         options.put("cron", config.getCron());
         String optionsString = UriUtils.buildOptionsQueryString(options);
-        StringBuffer uri = new StringBuffer("quartz2://");
-        uri.append(config.getName());
-        uri.append(optionsString);
-        return uri.toString();
+        return "quartz2://" + config.getName() + optionsString;
     }
 }
