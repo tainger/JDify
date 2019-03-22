@@ -16,4 +16,6 @@ public class ModelEntity {
     private Long id;
 
     private ModelType modelType;
+
+    private String modelSchema;
 }
