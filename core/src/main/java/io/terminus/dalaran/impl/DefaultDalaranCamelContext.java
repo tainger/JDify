@@ -82,7 +82,6 @@ public class DefaultDalaranCamelContext implements DalaranContext {
             route.onException(Throwable.class).maximumRedeliveries(dalaranFlow.getMaxRetry())
                     .redeliveryDelay(dalaranFlow.getRetryDelay());
         }
-
         triggerComponent.buildFromRoute(route, trigger.getConfig());
         route.to("log:trigger[" + trigger.getId() + "]?showAll=true&multiline=true");
         for (DalaranFlow.Processor processor : processorList) {
@@ -92,8 +91,8 @@ public class DefaultDalaranCamelContext implements DalaranContext {
             if (currentBodyMode != nextBodyMode) {
                 if (nextBodyMode == BodyMode.Serialized) {
                     assert processor.getInModel() != null;
-                    currentBodyType = processor.getInModel().getModelType();
-                    unmarshal(route, currentBodyType);
+                    unmarshal(route, processor.getInModel().getModelType());
+                    currentBodyType = processor.getOutModel().getModelType();
                 } else {
                     assert currentBodyType != null;
                     marshal(route, currentBodyType);
