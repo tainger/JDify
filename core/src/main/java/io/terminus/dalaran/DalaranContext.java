@@ -16,5 +16,7 @@ public interface DalaranContext {
 
     void addFlows(List<DalaranFlow> flows);
 
-    DalaranComponentContainer getDalaranComponentContainer();
+    DalaranComponentContext getDalaranComponentContext();
+
+    DalaranConverterContext getDalaranConverterContext();
 }

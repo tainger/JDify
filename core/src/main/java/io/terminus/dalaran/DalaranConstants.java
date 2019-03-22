@@ -1,11 +1,8 @@
 package io.terminus.dalaran;
 
-import lombok.Data;
+public final class DalaranConstants {
 
-@Data
-public class DalaranConstants {
-
-    private String CURRENT_BODY_TYPE_HEADER = "dalaran_currentBodyType";
-    private String CURRENT_BODY_MODE_HEADER = "dalaran_currentBodyMode";
+    public static final String CURRENT_BODY_TYPE_HEADER = "dalaran_currentBodyType";
+    public static final String CURRENT_BODY_MODE_HEADER = "dalaran_currentBodyMode";
 
 }

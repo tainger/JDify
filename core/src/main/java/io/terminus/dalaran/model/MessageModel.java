@@ -1,10 +1,13 @@
 package io.terminus.dalaran.model;
 
-import io.terminus.dalaran.message.ModelType;
+import io.terminus.dalaran.BodyModelType;
+import io.terminus.dalaran.DalaranModelSchema;
 import lombok.Data;
 
 @Data
-public class MessageModel {
+public class MessageModel<Schema extends DalaranModelSchema> {
 
-    private ModelType modelType;
+    private BodyModelType modelType;
+
+    private Schema modelSchema;
 }

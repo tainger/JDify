@@ -1,6 +1,6 @@
 package io.terminus.dalaran.console.entity;
 
-import io.terminus.dalaran.message.ModelType;
+import io.terminus.dalaran.BodyModelType;
 import lombok.Data;
 
 import javax.persistence.Entity;
@@ -15,7 +15,7 @@ public class ModelEntity {
     @GeneratedValue
     private Long id;
 
-    private ModelType modelType;
+    private BodyModelType modelType;
 
     private String modelSchema;
 }
