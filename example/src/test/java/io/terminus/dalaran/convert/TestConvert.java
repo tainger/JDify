@@ -2,7 +2,6 @@ package io.terminus.dalaran.convert;
 
 import com.google.gson.Gson;
 import io.terminus.dalaran.DalaranContext;
-import io.terminus.dalaran.impl.DefaultDalaranCamelContext;
 import org.apache.camel.CamelContext;
 import org.apache.camel.RoutesBuilder;
 import org.apache.camel.builder.RouteBuilder;
