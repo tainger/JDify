@@ -5,7 +5,6 @@ import io.terminus.dalaran.component.message.convert.custom.jxpath.DalaranJXPath
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.commons.jxpath.JXPathContext;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,7 +20,7 @@ public class CustomMapperProcessor implements Processor {
         Map<String, String> messageMapping = gson.fromJson(gson.toJson(exchange.getIn().getHeader("MessageMapping")), Map.class);
         List<String> target = gson.fromJson(gson.toJson(exchange.getIn().getHeader("target")), List.class);
         List<String> destination = gson.fromJson(gson.toJson(exchange.getIn().getHeader("destination")), List.class);
-        Map<String, Object> targetBody = gson.fromJson((String) exchange.getIn().getBody(), Map.class);
+        Map<String, Object> targetBody = (Map)(exchange.getIn().getBody());
         Map<String, Object> destinationBody = convertWithJXPath(messageMapping, destination, targetBody);
         exchange.getOut().setBody(destinationBody);
     }
