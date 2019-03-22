@@ -1,1 +1,1 @@
-io.terminus.dalaran.support.component.http.client.DalaranHttpClient
+io.terminus.dalaran.component.http.client.DalaranHttpClient
