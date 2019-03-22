@@ -22,7 +22,6 @@ public class CustomMapperProcessor implements Processor {
         List<String> target = gson.fromJson(gson.toJson(exchange.getIn().getHeader("target")), List.class);
         List<String> destination = gson.fromJson(gson.toJson(exchange.getIn().getHeader("destination")), List.class);
         Map<String, Object> targetBody = (Map)(exchange.getIn().getBody());
-
         Map<String, Object> destinationBody = convertWithJXPath(messageMapping, destination, targetBody);
         exchange.getOut().setBody(destinationBody);
     }
