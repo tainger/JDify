@@ -8,7 +8,7 @@ import java.lang.annotation.*;
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE})
-public @interface DalaranComponent {
+public @interface Component {
     String value();
 
     BodyMode bodyMode() default BodyMode.Serialized;

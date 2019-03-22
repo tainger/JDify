@@ -1,8 +1,8 @@
 package io.terminus.dalaran.component.message.convert.custom.message.impl;
 
+import io.terminus.dalaran.BodyModelType;
 import io.terminus.dalaran.component.message.convert.custom.message.MessageConvert;
 import io.terminus.dalaran.component.message.convert.custom.model.ConvertType;
-import io.terminus.dalaran.model.ModelType;
 import org.apache.camel.model.ProcessorDefinition;
 import org.apache.camel.model.dataformat.JsonLibrary;
 import org.apache.camel.model.dataformat.XmlJsonDataFormat;
@@ -13,7 +13,7 @@ import org.apache.camel.model.dataformat.XmlJsonDataFormat;
 public class DefaultMessageConvert implements MessageConvert {
 
     @Override
-    public void convert(ProcessorDefinition route, ModelType modelType, ConvertType convertType) {
+    public void convert(ProcessorDefinition route, BodyModelType modelType, ConvertType convertType) {
         switch (convertType) {
             case TARGET:
                 convertIn(route, modelType);
@@ -23,7 +23,7 @@ public class DefaultMessageConvert implements MessageConvert {
         }
     }
 
-    private void convertIn(ProcessorDefinition route, ModelType type) {
+    private void convertIn(ProcessorDefinition route, BodyModelType type) {
         switch (type) {
             case JSON:
                 route.convertBodyTo(String.class);
@@ -38,7 +38,7 @@ public class DefaultMessageConvert implements MessageConvert {
         }
     }
 
-    private void convertOut(ProcessorDefinition route, ModelType type) {
+    private void convertOut(ProcessorDefinition route, BodyModelType type) {
         switch (type) {
             case JSON:
                 route.marshal().json(JsonLibrary.Gson);

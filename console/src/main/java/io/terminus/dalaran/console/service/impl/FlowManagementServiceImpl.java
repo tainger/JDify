@@ -3,16 +3,14 @@ package io.terminus.dalaran.console.service.impl;
 import com.google.gson.Gson;
 import com.hubspot.jinjava.Jinjava;
 import io.terminus.dalaran.DalaranContext;
-import io.terminus.dalaran.console.entity.FlowEntity;
-import io.terminus.dalaran.console.entity.ProcessorEntity;
-import io.terminus.dalaran.console.entity.PropertyEntity;
-import io.terminus.dalaran.console.entity.TriggerEntity;
+import io.terminus.dalaran.DalaranModelSchema;
+import io.terminus.dalaran.console.entity.*;
 import io.terminus.dalaran.console.repository.FlowRepository;
 import io.terminus.dalaran.console.repository.ProcessorRepository;
 import io.terminus.dalaran.console.repository.PropertyRepository;
 import io.terminus.dalaran.console.service.FlowManagementService;
-import io.terminus.dalaran.model.DalaranFlow;
 import io.terminus.dalaran.model.MessageModel;
+import io.terminus.dalaran.model.DalaranFlow;
 import lombok.val;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -80,18 +78,16 @@ public class FlowManagementServiceImpl implements FlowManagementService, Initial
 
     private DalaranFlow.Trigger buildTrigger(TriggerEntity triggerEntity, Map<String, String> properties) {
         val trigger = new DalaranFlow.Trigger();
-        Class configType = dalaranContext.getDalaranComponentContainer().getTriggerInfo(triggerEntity.getType()).configType();
+        Class configType = dalaranContext.getDalaranComponentContext().getTriggerInfo(triggerEntity.getType()).configType();
         String jsonConfig = replaceProperties(triggerEntity.getConfig(), properties);
         Object config = gson.fromJson(jsonConfig, configType);
 
         if (triggerEntity.getInModel() != null) {
-            val inModel = new MessageModel();
-            inModel.setModelType(triggerEntity.getInModel().getModelType());
+            val inModel = buildMessageModel(triggerEntity.getInModel());
             trigger.setInModel(inModel);
         }
         if (triggerEntity.getOutModel() != null) {
-            val outModel = new MessageModel();
-            outModel.setModelType(triggerEntity.getOutModel().getModelType());
+            val outModel = buildMessageModel(triggerEntity.getInModel());
             trigger.setOutModel(outModel);
         }
 
@@ -104,18 +100,16 @@ public class FlowManagementServiceImpl implements FlowManagementService, Initial
     // TODO 分开写是为了避免后期差异
     private DalaranFlow.Processor buildProcessor(ProcessorEntity processorEntity, Map<String, String> properties) {
         val processor = new DalaranFlow.Processor();
-        Class configType = dalaranContext.getDalaranComponentContainer().getProcessorInfo(processorEntity.getType()).configType();
+        Class configType = dalaranContext.getDalaranComponentContext().getProcessorInfo(processorEntity.getType()).configType();
         String jsonConfig = replaceProperties(processorEntity.getConfig(), properties);
         Object config = gson.fromJson(jsonConfig, configType);
 
         if (processorEntity.getInModel() != null) {
-            val inModel = new MessageModel();
-            inModel.setModelType(processorEntity.getInModel().getModelType());
+            val inModel = buildMessageModel(processorEntity.getInModel());
             processor.setInModel(inModel);
         }
         if (processorEntity.getOutModel() != null) {
-            val outModel = new MessageModel();
-            outModel.setModelType(processorEntity.getOutModel().getModelType());
+            val outModel = buildMessageModel(processorEntity.getOutModel());
             processor.setOutModel(outModel);
         }
 
@@ -129,6 +123,15 @@ public class FlowManagementServiceImpl implements FlowManagementService, Initial
         // TODO 性能问题...
         Jinjava jinjava = new Jinjava();
         return jinjava.render(configValue, properties);
+    }
+
+    private MessageModel buildMessageModel(ModelEntity modelEntity) {
+        val model = new MessageModel();
+        val modelType = modelEntity.getModelType();
+        model.setModelType(modelType);
+        Class<? extends DalaranModelSchema> schemaType = dalaranContext.getDalaranConverterContext().getSchemaType(modelType);
+        model.setModelSchema(gson.fromJson(modelEntity.getModelSchema(), schemaType));
+        return model;
     }
 
     /**

@@ -2,19 +2,35 @@ package io.terminus.dalaran.example
 
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication
+import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 import javax.servlet.http.HttpServletRequest
+import javax.xml.bind.annotation.XmlRootElement
 
 @SpringBootApplication
 open class Application
+
 
 data class Order(
         val orderNumber: String,
         val orderPrice: Double = 666.66
 )
+
+@XmlRootElement(name = "Order")
+class OrderXML {
+    var price: Double = 0.00
+}
+
+@XmlRootElement(name = "OutOrder")
+class ReturnOrderXML {
+    var orderNumber: String = "defaultNumber"
+    var orderPrice: Double = 666.66
+}
 
 class TargetOrderItem {
     var id: Long? = null
@@ -60,6 +76,14 @@ class TestController {
     @PostMapping("/list")
     fun list(@RequestBody data: Map<String, Double>): Order {
         return Order("test: Order", data.get("price") ?: 0.00)
+    }
+
+    @PostMapping("/xml", produces = ["application/xml"], consumes = ["application/xml"])
+    fun xml(@RequestBody data: OrderXML): ReturnOrderXML {
+        return ReturnOrderXML().apply {
+            orderNumber = "test: Order"
+            orderPrice = data.price
+        }
     }
 
     @GetMapping("/error")

@@ -1,11 +1,11 @@
 package io.terminus.dalaran.component.basic;
 
-import io.terminus.dalaran.BodyMode;
 import io.terminus.dalaran.DalaranProcessor;
-import io.terminus.dalaran.annotation.DalaranComponent;
+import io.terminus.dalaran.BodyMode;
+import io.terminus.dalaran.annotation.Component;
 import org.apache.camel.model.ProcessorDefinition;
 
-@DalaranComponent(value = "script", configType = DalaranScriptConfig.class, bodyMode = BodyMode.Object)
+@Component(value = "script", configType = DalaranScriptConfig.class, bodyMode = BodyMode.Object)
 public class DalaranScript implements DalaranProcessor<DalaranScriptConfig> {
 
     @Override

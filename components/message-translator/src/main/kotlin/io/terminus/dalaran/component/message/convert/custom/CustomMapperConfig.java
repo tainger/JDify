@@ -1,6 +1,6 @@
 package io.terminus.dalaran.component.message.convert.custom;
 
-import io.terminus.dalaran.model.ModelType;
+import io.terminus.dalaran.BodyModelType;
 import lombok.Data;
 
 import java.util.List;
@@ -16,9 +16,9 @@ public class CustomMapperConfig {
 
     private List<String> target;
 
-    private ModelType targetType;
+    private BodyModelType targetType;
 
     private List<String> destination;
 
-    private ModelType destinationType;
+    private BodyModelType destinationType;
 }
