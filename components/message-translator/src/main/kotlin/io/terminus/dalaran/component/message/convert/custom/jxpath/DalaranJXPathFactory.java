@@ -1,4 +1,4 @@
-package io.terminus.dalaran.component.message.convert.jxpath;
+package io.terminus.dalaran.component.message.convert.custom.jxpath;
 
 import org.apache.commons.jxpath.AbstractFactory;
 import org.apache.commons.jxpath.JXPathContext;

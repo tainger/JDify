@@ -1,16 +1,15 @@
 package io.terminus.dalaran.support.flow;
 
-import io.terminus.dalaran.DalaranContext;
-import io.terminus.dalaran.model.DalaranFlow;
-import io.terminus.dalaran.DalaranComponentContext;
-import io.terminus.dalaran.DalaranConverterContext;
 import io.terminus.dalaran.BodyMode;
+import io.terminus.dalaran.DalaranComponentContext;
+import io.terminus.dalaran.DalaranContext;
+import io.terminus.dalaran.DalaranConverterContext;
+import io.terminus.dalaran.model.DalaranFlow;
 import io.terminus.dalaran.model.MessageModel;
 import lombok.val;
 import org.apache.camel.CamelContext;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.model.RouteDefinition;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
