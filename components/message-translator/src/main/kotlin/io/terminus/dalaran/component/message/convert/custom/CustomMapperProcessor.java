@@ -1,12 +1,13 @@
 package io.terminus.dalaran.component.message.convert.custom;
 
+import com.github.drapostolos.typeparser.TypeParser;
 import com.google.gson.Gson;
 import io.terminus.dalaran.component.message.convert.custom.jxpath.DalaranJXPathFactory;
+import io.terminus.dalaran.component.message.convert.custom.model.DataType;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.commons.jxpath.JXPathContext;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -18,14 +19,15 @@ public class CustomMapperProcessor implements Processor {
     public void process(Exchange exchange) throws Exception {
         Gson gson = new Gson();
         Map<String, String> messageMapping = gson.fromJson(gson.toJson(exchange.getIn().getHeader("MessageMapping")), Map.class);
-        List<String> target = gson.fromJson(gson.toJson(exchange.getIn().getHeader("target")), List.class);
-        List<String> destination = gson.fromJson(gson.toJson(exchange.getIn().getHeader("destination")), List.class);
+        Map<String, DataType> target = gson.fromJson(gson.toJson(exchange.getIn().getHeader("target")), Map.class);
+        Map<String, String> destination = gson.fromJson(gson.toJson(exchange.getIn().getHeader("destination")), Map.class);
+//        Map<CustomMapperConfig.Field, CustomMapperConfig.Field> mapping = gson.fromJson(gson.toJson(exchange.getIn().getHeader("mapping")), Map.class);
         Map<String, Object> targetBody = (Map)(exchange.getIn().getBody());
         Map<String, Object> destinationBody = convertWithJXPath(messageMapping, destination, targetBody);
         exchange.getOut().setBody(destinationBody);
     }
 
-    private Map<String, Object> convertWithJXPath(Map<String, String> messageMapping, List<String> destination, Map<String, Object> targetBody) {
+    private Map<String, Object> convertWithJXPath(Map<String, String> messageMapping, Map<String, String> destination, Map<String, Object> targetBody) {
         JXPathContext targetContext = JXPathContext.newContext(targetBody);
 
         Map<String, Object> destinationBody = new HashMap<>();
@@ -33,10 +35,34 @@ public class CustomMapperProcessor implements Processor {
         destinationContext.setFactory(new DalaranJXPathFactory());
 
         for (Map.Entry<String, String> entry: messageMapping.entrySet()) {
-            Object ob = targetContext.getValue(entry.getValue());
-            destinationContext.createPathAndSetValue(entry.getKey(), targetContext.getValue(entry.getValue()));
-        }
+            Object origin = targetContext.getValue(entry.getValue());
+            Object ob = parse(origin.toString(), DataType.valueOf(destination.get(entry.getKey())));
 
+            destinationContext.createPathAndSetValue(entry.getKey(),
+                    parse(origin.toString(), DataType.valueOf(destination.get(entry.getKey()))));
+        }
         return ((Map<String, Object>)destinationContext.getContextBean());
+    }
+
+    private Object parse(String value, DataType destination) {
+        TypeParser parser = TypeParser.newBuilder().build();
+        switch (destination) {
+            case INT:
+                return parser.parse(value, Integer.class);
+            case LONG:
+                return parser.parse(value, Long.class);
+            case SHORT:
+                return parser.parse(value, Short.class);
+            case FLOAT:
+                return parser.parse(value, Float.class);
+            case DOUBLE:
+                return parser.parse(value, Double.class);
+            case NUMBER:
+                return parser.parse(value, Number.class);
+            case BOOLEAN:
+                return parser.parse(value, Boolean.class);
+            default:
+                return value;
+        }
     }
 }

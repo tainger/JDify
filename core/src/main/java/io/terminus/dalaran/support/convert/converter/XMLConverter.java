@@ -27,7 +27,7 @@ public class XMLConverter implements DalaranConverter<XMLSchema> {
     // TODO 处理 XML 特殊逻辑, 比如 attr, 应该可以抽象
     private Map<String, String> buildOptions(XMLSchema schema) {
         Map<String, String> options = new HashMap<>();
-        options.put("rootName", schema.getRoot());
+        options.put("rootName", "mappings");
         return options;
     }
 }
