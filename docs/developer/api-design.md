@@ -266,7 +266,6 @@ POST:/__dalaran_management/flow
     "processorIds": [1,2,3],
     "name": "xxx",
     "description": "",
-    "status": "Enable",
     "properties": {
         "password": "anywhere"
     }
@@ -277,6 +276,7 @@ POST:/__dalaran_management/flow
 
 PUT:/__dalaran_management/flow
 
+```json
 {
     "id": 1,
     "moduleId": 1,
@@ -284,11 +284,11 @@ PUT:/__dalaran_management/flow
     "processorIds": [1,2,3],
     "name": "xxx",
     "description": "",
-    "status": "Enable",
     "properties": {
         "password": "anywhere"
     }
 }
+```
 
 ### 删除集成流
 
