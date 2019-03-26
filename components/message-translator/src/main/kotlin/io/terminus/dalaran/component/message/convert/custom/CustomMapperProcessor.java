@@ -3,7 +3,7 @@ package io.terminus.dalaran.component.message.convert.custom;
 import com.github.drapostolos.typeparser.TypeParser;
 import com.google.gson.Gson;
 import io.terminus.dalaran.component.message.convert.custom.jxpath.DalaranJXPathFactory;
-import io.terminus.dalaran.component.message.convert.custom.model.DataType;
+import io.terminus.dalaran.component.message.convert.custom.model.FieldType;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.commons.jxpath.JXPathContext;
@@ -19,7 +19,7 @@ public class CustomMapperProcessor implements Processor {
     public void process(Exchange exchange) throws Exception {
         Gson gson = new Gson();
         Map<String, String> messageMapping = gson.fromJson(gson.toJson(exchange.getIn().getHeader("MessageMapping")), Map.class);
-        Map<String, DataType> target = gson.fromJson(gson.toJson(exchange.getIn().getHeader("target")), Map.class);
+        Map<String, FieldType> target = gson.fromJson(gson.toJson(exchange.getIn().getHeader("target")), Map.class);
         Map<String, String> destination = gson.fromJson(gson.toJson(exchange.getIn().getHeader("destination")), Map.class);
 //        Map<CustomMapperConfig.Field, CustomMapperConfig.Field> mapping = gson.fromJson(gson.toJson(exchange.getIn().getHeader("mapping")), Map.class);
         Map<String, Object> targetBody = (Map)(exchange.getIn().getBody());
@@ -36,15 +36,15 @@ public class CustomMapperProcessor implements Processor {
 
         for (Map.Entry<String, String> entry: messageMapping.entrySet()) {
             Object origin = targetContext.getValue(entry.getValue());
-            Object ob = parse(origin.toString(), DataType.valueOf(destination.get(entry.getKey())));
+            Object ob = parse(origin.toString(), FieldType.valueOf(destination.get(entry.getKey())));
 
             destinationContext.createPathAndSetValue(entry.getKey(),
-                    parse(origin.toString(), DataType.valueOf(destination.get(entry.getKey()))));
+                    parse(origin.toString(), FieldType.valueOf(destination.get(entry.getKey()))));
         }
         return ((Map<String, Object>)destinationContext.getContextBean());
     }
 
-    private Object parse(String value, DataType destination) {
+    private Object parse(String value, FieldType destination) {
         TypeParser parser = TypeParser.newBuilder().build();
         switch (destination) {
             case INT:
