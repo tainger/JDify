@@ -19,9 +19,7 @@ public class CustomMapperProcessor implements Processor {
     public void process(Exchange exchange) throws Exception {
         Gson gson = new Gson();
         Map<String, String> messageMapping = gson.fromJson(gson.toJson(exchange.getIn().getHeader("MessageMapping")), Map.class);
-        Map<String, FieldType> target = gson.fromJson(gson.toJson(exchange.getIn().getHeader("target")), Map.class);
         Map<String, String> destination = gson.fromJson(gson.toJson(exchange.getIn().getHeader("destination")), Map.class);
-//        Map<CustomMapperConfig.Field, CustomMapperConfig.Field> mapping = gson.fromJson(gson.toJson(exchange.getIn().getHeader("mapping")), Map.class);
         Map<String, Object> targetBody = (Map)(exchange.getIn().getBody());
         Map<String, Object> destinationBody = convertWithJXPath(messageMapping, destination, targetBody);
         exchange.getOut().setBody(destinationBody);
@@ -35,34 +33,33 @@ public class CustomMapperProcessor implements Processor {
         destinationContext.setFactory(new DalaranJXPathFactory());
 
         for (Map.Entry<String, String> entry: messageMapping.entrySet()) {
-            Object origin = targetContext.getValue(entry.getValue());
-            Object ob = parse(origin.toString(), FieldType.valueOf(destination.get(entry.getKey())));
-
+            Object target = targetContext.getValue(entry.getValue());
             destinationContext.createPathAndSetValue(entry.getKey(),
-                    parse(origin.toString(), FieldType.valueOf(destination.get(entry.getKey()))));
+                    parse(target, FieldType.valueOf(destination.get(entry.getKey()))));
         }
         return ((Map<String, Object>)destinationContext.getContextBean());
     }
 
-    private Object parse(String value, FieldType destination) {
+    private Object parse(Object target, FieldType destination) {
+        String input = target.toString();
         TypeParser parser = TypeParser.newBuilder().build();
         switch (destination) {
             case INT:
-                return parser.parse(value, Integer.class);
+                return parser.parse(input, Integer.class);
             case LONG:
-                return parser.parse(value, Long.class);
+                return parser.parse(input, Long.class);
             case SHORT:
-                return parser.parse(value, Short.class);
+                return parser.parse(input, Short.class);
             case FLOAT:
-                return parser.parse(value, Float.class);
+                return parser.parse(input, Float.class);
             case DOUBLE:
-                return parser.parse(value, Double.class);
+                return parser.parse(input, Double.class);
             case NUMBER:
-                return parser.parse(value, Number.class);
+                return parser.parse(input, Number.class);
             case BOOLEAN:
-                return parser.parse(value, Boolean.class);
+                return parser.parse(input, Boolean.class);
             default:
-                return value;
+                return target;
         }
     }
 }
