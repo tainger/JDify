@@ -39,6 +39,7 @@
 * [架构介绍](./docs/developer/architecture.md)
 * [集成流程](./docs/developer/flow.md)
 * [流程设计器配置](./docs/developer/flow-design.md)
+* [接口设计](./docs/developer/api-design.md)
 * [触发器开发](./docs/developer/writing-trigger.md)
 * [处理器开发](./docs/developer/writing-processor.md)
 * [模型](./docs/developer/model.md)
