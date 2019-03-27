@@ -1,9 +1,9 @@
 package io.terminus.dalaran.support.component;
 
+import io.terminus.dalaran.DalaranComponent;
 import io.terminus.dalaran.DalaranComponentContext;
 import io.terminus.dalaran.DalaranProcessor;
 import io.terminus.dalaran.DalaranTrigger;
-import io.terminus.dalaran.DalaranComponent;
 import io.terminus.dalaran.annotation.Processor;
 import io.terminus.dalaran.annotation.Trigger;
 

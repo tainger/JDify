@@ -1,7 +1,7 @@
 package io.terminus.dalaran.component.script;
 
-import io.terminus.dalaran.DalaranProcessor;
 import io.terminus.dalaran.BodyMode;
+import io.terminus.dalaran.DalaranProcessor;
 import io.terminus.dalaran.annotation.Processor;
 import org.apache.camel.model.ProcessorDefinition;
 
