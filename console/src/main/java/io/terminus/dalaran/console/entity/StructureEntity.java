@@ -1,5 +1,6 @@
 package io.terminus.dalaran.console.entity;
 
+import io.terminus.dalaran.BodyModelType;
 import lombok.Data;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
@@ -12,10 +13,13 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import java.util.Date;
 
+/**
+ * Created by jingdi on 2019/3/27
+ */
 @Data
 @Entity
-@Table(name = "dalaran_property")
-public class PropertyEntity {
+@Table(name = "dalaran_structure")
+public class StructureEntity {
 
     @Id
     @GeneratedValue
@@ -23,7 +27,9 @@ public class PropertyEntity {
 
     private String name;
 
-    private String value;
+    private BodyModelType structureType;
+
+    private String structureSchema;
 
     private String description;
 

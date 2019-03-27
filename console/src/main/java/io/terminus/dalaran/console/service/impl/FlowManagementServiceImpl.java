@@ -10,7 +10,6 @@ import io.terminus.dalaran.console.repository.ProcessorRepository;
 import io.terminus.dalaran.console.repository.PropertyRepository;
 import io.terminus.dalaran.console.service.FlowManagementService;
 import io.terminus.dalaran.model.MessageModel;
-import io.terminus.dalaran.model.DalaranFlow;
 import lombok.val;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,10 +46,10 @@ public class FlowManagementServiceImpl implements FlowManagementService, Initial
 
     @Override
     public void publish() {
-        List<DalaranFlow> flowList = new ArrayList<>();
+        List<io.terminus.dalaran.model.DalaranFlow> flowList = new ArrayList<>();
         List<FlowEntity> flowEntities = flowRepository.findAll();
         for (FlowEntity flowEntity : flowEntities) {
-            val flow = new DalaranFlow();
+            val flow = new io.terminus.dalaran.model.DalaranFlow();
             Map<String, String> properties = new HashMap<>();
             // TODO 加载全局变量, 局部覆盖
             for (Long propertyId : flowEntity.getProperties()) {
@@ -58,7 +57,7 @@ public class FlowManagementServiceImpl implements FlowManagementService, Initial
                 properties.put(property.getName(), property.getValue());
             }
             val trigger = buildTrigger(flowEntity.getTrigger(), properties);
-            List<DalaranFlow.Processor> processors = flowEntity.getProcessors().stream()
+            List<io.terminus.dalaran.model.DalaranFlow.Processor> processors = flowEntity.getProcessors().stream()
                     .map(processorId -> {
                         ProcessorEntity processorEntity = processorRepository.findOne(processorId);
                         return buildProcessor(processorEntity, properties);
@@ -76,18 +75,18 @@ public class FlowManagementServiceImpl implements FlowManagementService, Initial
         dalaranContext.addFlows(flowList);
     }
 
-    private DalaranFlow.Trigger buildTrigger(TriggerEntity triggerEntity, Map<String, String> properties) {
-        val trigger = new DalaranFlow.Trigger();
+    private io.terminus.dalaran.model.DalaranFlow.Trigger buildTrigger(TriggerEntity triggerEntity, Map<String, String> properties) {
+        val trigger = new io.terminus.dalaran.model.DalaranFlow.Trigger();
         Class configType = dalaranContext.getDalaranComponentContext().getTriggerInfo(triggerEntity.getType()).configType();
         String jsonConfig = replaceProperties(triggerEntity.getConfig(), properties);
         Object config = gson.fromJson(jsonConfig, configType);
 
-        if (triggerEntity.getInModel() != null) {
-            val inModel = buildMessageModel(triggerEntity.getInModel());
+        if (triggerEntity.getInStructure() != null) {
+            val inModel = buildMessageModel(triggerEntity.getInStructure());
             trigger.setInModel(inModel);
         }
-        if (triggerEntity.getOutModel() != null) {
-            val outModel = buildMessageModel(triggerEntity.getInModel());
+        if (triggerEntity.getOutStructure() != null) {
+            val outModel = buildMessageModel(triggerEntity.getOutStructure());
             trigger.setOutModel(outModel);
         }
 
@@ -98,18 +97,18 @@ public class FlowManagementServiceImpl implements FlowManagementService, Initial
     }
 
     // TODO 分开写是为了避免后期差异
-    private DalaranFlow.Processor buildProcessor(ProcessorEntity processorEntity, Map<String, String> properties) {
-        val processor = new DalaranFlow.Processor();
+    private io.terminus.dalaran.model.DalaranFlow.Processor buildProcessor(ProcessorEntity processorEntity, Map<String, String> properties) {
+        val processor = new io.terminus.dalaran.model.DalaranFlow.Processor();
         Class configType = dalaranContext.getDalaranComponentContext().getProcessorInfo(processorEntity.getType()).configType();
         String jsonConfig = replaceProperties(processorEntity.getConfig(), properties);
         Object config = gson.fromJson(jsonConfig, configType);
 
-        if (processorEntity.getInModel() != null) {
-            val inModel = buildMessageModel(processorEntity.getInModel());
+        if (processorEntity.getInStructure() != null) {
+            val inModel = buildMessageModel(processorEntity.getInStructure());
             processor.setInModel(inModel);
         }
-        if (processorEntity.getOutModel() != null) {
-            val outModel = buildMessageModel(processorEntity.getOutModel());
+        if (processorEntity.getOutStructure() != null) {
+            val outModel = buildMessageModel(processorEntity.getOutStructure());
             processor.setOutModel(outModel);
         }
 
@@ -125,12 +124,12 @@ public class FlowManagementServiceImpl implements FlowManagementService, Initial
         return jinjava.render(configValue, properties);
     }
 
-    private MessageModel buildMessageModel(ModelEntity modelEntity) {
+    private MessageModel buildMessageModel(StructureEntity structureEntity) {
         val model = new MessageModel();
-        val modelType = modelEntity.getModelType();
+        val modelType = structureEntity.getStructureType();
         model.setModelType(modelType);
         Class<? extends DalaranModelSchema> schemaType = dalaranContext.getDalaranConverterContext().getSchemaType(modelType);
-        model.setModelSchema(gson.fromJson(modelEntity.getModelSchema(), schemaType));
+        model.setModelSchema(gson.fromJson(structureEntity.getStructureSchema(), schemaType));
         return model;
     }
 
