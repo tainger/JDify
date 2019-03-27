@@ -6,10 +6,19 @@ import lombok.Data;
 
 @Data
 public class NettyHttpConfig {
+    @ConfigFieldInfo(inputType = FieldInputType.Hidden)
+    private String host = "localhost";
+
+    @ConfigFieldInfo(inputType = FieldInputType.Hidden)
+    // TODO load server.port param...
+    private Integer port = 8080;
+
     @ConfigFieldInfo(label = "协议", inputType = FieldInputType.Radio)
     private HttpProtocol protocol;
-    private String host;
-    private Integer port;
+
     private String path;
+
     private HttpMethod method;
+
+    private Long timeout = 3000L;
 }

@@ -9,7 +9,8 @@ public class HttpClientConfig {
     @ConfigFieldInfo(label = "协议", inputType = FieldInputType.Radio)
     private HttpProtocol protocol;
     private String host;
-    private Integer port;
+    private Integer port = 80;
     private String path;
     private HttpMethod method;
+    private Long timeout = 3000L;
 }

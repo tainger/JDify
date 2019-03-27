@@ -1,11 +1,11 @@
 package io.terminus.dalaran.component.netty.http;
 
 import io.terminus.dalaran.DalaranTrigger;
-import io.terminus.dalaran.annotation.Component;
+import io.terminus.dalaran.annotation.Processor;
 import io.terminus.dalaran.BodyMode;
 import org.apache.camel.model.RouteDefinition;
 
-@Component(value = "netty-http-listener", configType = NettyHttpConfig.class, bodyMode = BodyMode.Serialized)
+@Processor(value = "netty-http-listener", configType = NettyHttpConfig.class, bodyMode = BodyMode.Serialized)
 public class NettyHttpListener implements DalaranTrigger<NettyHttpConfig> {
 
     @Override

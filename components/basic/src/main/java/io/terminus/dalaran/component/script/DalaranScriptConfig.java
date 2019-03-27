@@ -1,4 +1,4 @@
-package io.terminus.dalaran.component.basic;
+package io.terminus.dalaran.component.script;
 
 import lombok.Data;
 
