@@ -1,15 +1,16 @@
 package io.terminus.dalaran.support.component;
 
-import io.terminus.dalaran.DalaranComponent;
-import io.terminus.dalaran.DalaranComponentContext;
-import io.terminus.dalaran.DalaranProcessor;
-import io.terminus.dalaran.DalaranTrigger;
+import io.terminus.dalaran.*;
+import io.terminus.dalaran.annotation.ConfigFieldInfo;
 import io.terminus.dalaran.annotation.Processor;
 import io.terminus.dalaran.annotation.Trigger;
+import io.terminus.dalaran.model.config.DalaranConfigField;
+import io.terminus.dalaran.model.config.ProcessorInfo;
+import io.terminus.dalaran.model.config.TriggerInfo;
 
 import javax.annotation.PostConstruct;
-import java.util.Map;
-import java.util.ServiceLoader;
+import java.lang.reflect.Field;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class DefaultDalaranComponentContext implements DalaranComponentContext {
@@ -17,19 +18,65 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext {
     private final Map<String, DalaranTrigger> triggerMapping = new ConcurrentHashMap<>();
     private final Map<String, DalaranProcessor> processorMapping = new ConcurrentHashMap<>();
 
-    private final Map<String, Trigger> triggerInfoMapping = new ConcurrentHashMap<>();
-    private final Map<String, Processor> processorInfoMapping = new ConcurrentHashMap<>();
+    private final Map<String, TriggerInfo> triggerInfoMapping = new ConcurrentHashMap<>();
+    private final Map<String, ProcessorInfo> processorInfoMapping = new ConcurrentHashMap<>();
 
     @Override
-    public void addTrigger(String triggerType, Trigger triggerInfo, DalaranTrigger trigger) {
-        triggerInfoMapping.put(triggerType, triggerInfo);
-        triggerMapping.put(triggerType, trigger);
+    public void addTrigger(Trigger triggerAnnotation, DalaranTrigger trigger) {
+        List<DalaranConfigField> configFields = new ArrayList<>();
+
+        TriggerInfo triggerInfo = new TriggerInfo();
+
+
+        triggerInfo.setType(triggerAnnotation.value());
+        triggerInfo.setConfigFields(configFields);
+        triggerInfo.setIsVoid(triggerAnnotation.isVoid());
+        triggerInfo.setConfigType(triggerAnnotation.configType());
+        triggerInfo.setBodyMode(triggerAnnotation.bodyMode());
+
+        for (Field field : triggerAnnotation.configType().getDeclaredFields()) {
+            ConfigFieldInfo configFieldInfo = field.getDeclaredAnnotation(ConfigFieldInfo.class);
+            if (configFieldInfo != null) {
+                DalaranConfigField configField = new DalaranConfigField();
+                configField.setName(field.getName());
+                configField.setInputType(configFieldInfo.inputType());
+                configField.setExample(configFieldInfo.example());
+                configField.setDefaultValue(configFieldInfo.defaultValue());
+                configField.setLabel(configFieldInfo.label());
+                configFields.add(configField);
+            }
+        }
+
+        triggerInfoMapping.put(triggerAnnotation.value(), triggerInfo);
+        triggerMapping.put(triggerAnnotation.value(), trigger);
     }
 
     @Override
-    public void addProcessor(String processorType, Processor processorInfo, DalaranProcessor processor) {
-        processorInfoMapping.put(processorType, processorInfo);
-        processorMapping.put(processorType, processor);
+    public void addProcessor(Processor processorAnnotation, DalaranProcessor processor) {
+        List<DalaranConfigField> configFields = new ArrayList<>();
+
+        ProcessorInfo processorInfo = new ProcessorInfo();
+
+        processorInfo.setType(processorAnnotation.value());
+        processorInfo.setConfigFields(configFields);
+        processorInfo.setConfigType(processorAnnotation.configType());
+        processorInfo.setBodyMode(processorAnnotation.bodyMode());
+
+        for (Field field : processorAnnotation.configType().getDeclaredFields()) {
+            ConfigFieldInfo configFieldInfo = field.getDeclaredAnnotation(ConfigFieldInfo.class);
+            if (configFieldInfo != null) {
+                DalaranConfigField configField = new DalaranConfigField();
+                configField.setName(field.getName());
+                configField.setInputType(configFieldInfo.inputType());
+                configField.setExample(configFieldInfo.example());
+                configField.setDefaultValue(configFieldInfo.defaultValue());
+                configField.setLabel(configFieldInfo.label());
+                configFields.add(configField);
+            }
+        }
+
+        processorInfoMapping.put(processorAnnotation.value(), processorInfo);
+        processorMapping.put(processorAnnotation.value(), processor);
     }
 
     @Override
@@ -43,13 +90,23 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext {
     }
 
     @Override
-    public Trigger getTriggerInfo(String triggerType) {
+    public TriggerInfo getTriggerInfo(String triggerType) {
         return triggerInfoMapping.get(triggerType);
     }
 
     @Override
-    public Processor getProcessorInfo(String processorType) {
+    public ProcessorInfo getProcessorInfo(String processorType) {
         return processorInfoMapping.get(processorType);
+    }
+
+    @Override
+    public Collection<TriggerInfo> getAllTriggerInfo() {
+        return triggerInfoMapping.values();
+    }
+
+    @Override
+    public Collection<ProcessorInfo> getAllProcessorInfo() {
+        return processorInfoMapping.values();
     }
 
     @PostConstruct
@@ -59,12 +116,10 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext {
             Class componentClass = component.getClass();
             if (component instanceof DalaranTrigger) {
                 Trigger triggerInfo = (Trigger) componentClass.getDeclaredAnnotation(Trigger.class);
-                String triggerType = triggerInfo.value();
-                addTrigger(triggerType, triggerInfo, (DalaranTrigger) component);
+                addTrigger(triggerInfo, (DalaranTrigger) component);
             } else if (component instanceof DalaranProcessor) {
                 Processor processorInfo = (Processor) componentClass.getDeclaredAnnotation(Processor.class);
-                String processorType = processorInfo.value();
-                addProcessor(processorType, processorInfo, (DalaranProcessor) component);
+                addProcessor(processorInfo, (DalaranProcessor) component);
             }
         });
     }

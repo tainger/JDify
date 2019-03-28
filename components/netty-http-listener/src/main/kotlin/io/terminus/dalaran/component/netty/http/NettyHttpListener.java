@@ -11,7 +11,7 @@ public class NettyHttpListener implements DalaranTrigger<NettyHttpConfig> {
     @Override
     public void buildFromRoute(RouteDefinition route, NettyHttpConfig config) {
         String uri = "netty4-http:" + config.getProtocol().name().toLowerCase() +
-                "://" + config.getHost() + ":" + config.getPort() + config.getPath() +
+                "://0.0.0.0:" + config.getPort() + config.getPath() +
                 "?httpMethodRestrict=" + config.getMethod();
         route.from(uri);
     }

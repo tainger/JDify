@@ -78,7 +78,7 @@ public class FlowManagementServiceImpl implements FlowManagementService, Initial
 
     private DalaranFlow.Trigger buildTrigger(TriggerEntity triggerEntity, Map<String, String> properties) {
         val trigger = new DalaranFlow.Trigger();
-        Class configType = dalaranContext.getDalaranComponentContext().getTriggerInfo(triggerEntity.getType()).configType();
+        Class configType = dalaranContext.getDalaranComponentContext().getTriggerInfo(triggerEntity.getType()).getConfigType();
         String jsonConfig = replaceProperties(triggerEntity.getConfig(), properties);
         Object config = gson.fromJson(jsonConfig, configType);
 
@@ -100,7 +100,7 @@ public class FlowManagementServiceImpl implements FlowManagementService, Initial
     // TODO 分开写是为了避免后期差异
     private DalaranFlow.Processor buildProcessor(ProcessorEntity processorEntity, Map<String, String> properties) {
         val processor = new DalaranFlow.Processor();
-        Class configType = dalaranContext.getDalaranComponentContext().getProcessorInfo(processorEntity.getType()).configType();
+        Class configType = dalaranContext.getDalaranComponentContext().getProcessorInfo(processorEntity.getType()).getConfigType();
         String jsonConfig = replaceProperties(processorEntity.getConfig(), properties);
         Object config = gson.fromJson(jsonConfig, configType);
 
