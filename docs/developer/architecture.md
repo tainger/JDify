@@ -67,8 +67,7 @@ CamelRouteBuilder -> DalaranFlowLoader: 注册并生效
     * Delayer
     * Mapper: 提供基本映射, mapping function 下版提供
     * SOAP client: [Camel soap](http://camel.apache.org/soap.html)
-    * Branch: 分支, 可以并行
-    * Aggregator: 配合 Branch 做聚合
+    * Scatter-Gather: 分别执行后聚合, 可以做接口聚合等操作
     * Dubbo consumer ?
 
 > 视东购项目需求调整优先级

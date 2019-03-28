@@ -1,10 +1,11 @@
 package io.terminus.dalaran.component.message.convert;
 
+import io.terminus.dalaran.BodyMode;
 import io.terminus.dalaran.DalaranProcessor;
-import io.terminus.dalaran.annotation.Component;
+import io.terminus.dalaran.annotation.Processor;
 import org.apache.camel.model.ProcessorDefinition;
 
-@Component(value = "message-mapper", configType = MessageMapperConfig.class)
+@Processor(value = "message-mapper", bodyMode = BodyMode.Object, configType = MessageMapperConfig.class)
 public class MessageMapper implements DalaranProcessor<MessageMapperConfig> {
 
     private String DOZER_URI = "dozer?targetModel=%s&mappingFile=%s";

@@ -1,10 +1,11 @@
-package io.terminus.dalaran.component.basic;
+package io.terminus.dalaran.component.route;
 
+import io.terminus.dalaran.BodyMode;
 import io.terminus.dalaran.DalaranProcessor;
-import io.terminus.dalaran.annotation.Component;
+import io.terminus.dalaran.annotation.Processor;
 import org.apache.camel.model.ProcessorDefinition;
 
-@Component(value = "router", configType = DalaranRouterConfig.class)
+@Processor(value = "router", bodyMode = BodyMode.Object, configType = DalaranRouterConfig.class)
 public class DalaranRouter implements DalaranProcessor<DalaranRouterConfig> {
     public void configure(ProcessorDefinition route, DalaranRouterConfig config) {
 //        ChoiceDefinition choice = route.choice();

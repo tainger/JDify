@@ -1,12 +1,12 @@
 package io.terminus.dalaran.component.http.client;
 
-import io.terminus.dalaran.DalaranProcessor;
 import io.terminus.dalaran.BodyMode;
-import io.terminus.dalaran.annotation.Component;
+import io.terminus.dalaran.DalaranProcessor;
+import io.terminus.dalaran.annotation.Processor;
 import org.apache.camel.builder.Builder;
 import org.apache.camel.model.ProcessorDefinition;
 
-@Component(value = "http-client", configType = HttpClientConfig.class, bodyMode = BodyMode.Serialized)
+@Processor(value = "http-client", configType = HttpClientConfig.class, bodyMode = BodyMode.Serialized)
 public class DalaranHttpClient implements DalaranProcessor<HttpClientConfig> {
     private static final String HTTP_URI = "%s4://%s:%s%s?bridgeEndpoint=true";
 

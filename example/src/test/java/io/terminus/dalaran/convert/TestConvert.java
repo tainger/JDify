@@ -1,18 +1,12 @@
 package io.terminus.dalaran.convert;
 
-import com.google.gson.Gson;
-import io.terminus.dalaran.DalaranContext;
 import org.apache.camel.CamelContext;
-import org.apache.camel.RoutesBuilder;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.impl.DefaultCamelContext;
-import org.apache.camel.model.dataformat.XmlJsonDataFormat;
 import org.apache.camel.test.junit4.CamelTestSupport;
-import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by jingdi on 2019/3/21

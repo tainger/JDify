@@ -69,7 +69,7 @@ DELETE:/__dalaran_management/structure/{structure_id}
 
 ## 触发器
 
-### 获取触发器类型(前期前端写死)
+### 获取触发器类型(编译期生成, 无需拉取)
 
 ### 查询触发器
 
@@ -150,7 +150,7 @@ DELETE:/__dalaran_management/trigger/{trigger_id}
 
 ## 处理器
 
-### 获取处理器类型(前期前端写死)
+### 获取处理器类型(编译期生成, 无需拉取)
 ### 查询处理器
 
 GET:/__dalaran_management/processor

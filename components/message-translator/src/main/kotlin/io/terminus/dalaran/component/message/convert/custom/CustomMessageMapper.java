@@ -2,14 +2,14 @@ package io.terminus.dalaran.component.message.convert.custom;
 
 import io.terminus.dalaran.BodyMode;
 import io.terminus.dalaran.DalaranProcessor;
-import io.terminus.dalaran.annotation.Component;
+import io.terminus.dalaran.annotation.Processor;
 import org.apache.camel.builder.Builder;
 import org.apache.camel.model.ProcessorDefinition;
 
 /**
  * Created by jingdi on 2019/3/18
  */
-@Component(value = "custom-convert", configType = CustomMapperConfig.class, bodyMode = BodyMode.Object)
+@Processor(value = "custom-convert", configType = CustomMapperConfig.class, bodyMode = BodyMode.Object)
 public class CustomMessageMapper implements DalaranProcessor<CustomMapperConfig> {
 
     @Override

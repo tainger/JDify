@@ -8,10 +8,10 @@ import java.lang.annotation.*;
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE})
-public @interface Component {
+public @interface Processor {
     String value();
 
-    BodyMode bodyMode() default BodyMode.Serialized;
+    BodyMode bodyMode();
 
     Class configType() default Object.class;
 

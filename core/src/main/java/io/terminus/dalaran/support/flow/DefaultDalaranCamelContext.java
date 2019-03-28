@@ -65,7 +65,7 @@ public class DefaultDalaranCamelContext implements DalaranContext {
         // TODO check
         val triggerComponent = componentContext.getTrigger(trigger.getType());
         val triggerInfo = componentContext.getTriggerInfo(trigger.getType());
-        BodyMode currentBodyMode = triggerInfo.bodyMode();
+        BodyMode currentBodyMode = triggerInfo.getBodyMode();
         MessageModel currentModel = null;
         if (trigger.getInModel() != null) {
             currentModel = trigger.getInModel();
@@ -79,30 +79,30 @@ public class DefaultDalaranCamelContext implements DalaranContext {
         for (DalaranFlow.Processor processor : processorList) {
             val processorComponent = componentContext.getProcessor(processor.getType());
             val processorInfo = componentContext.getProcessorInfo(processor.getType());
-            val nextBodyMode = processorInfo.bodyMode();
+            val nextBodyMode = processorInfo.getBodyMode();
             if (currentBodyMode != nextBodyMode) {
                 if (nextBodyMode == BodyMode.Serialized) {
                     assert processor.getInModel() != null;
-                    converterContext.unmarshal(route, processor.getInModel());
+                    converterContext.marshal(route, processor.getInModel());
                     currentModel = processor.getOutModel();
                 } else {
                     assert currentModel != null;
-                    converterContext.marshal(route, currentModel);
+                    converterContext.unmarshal(route, currentModel);
                 }
             }
-            currentBodyMode = processorInfo.bodyMode();
+            currentBodyMode = processorInfo.getBodyMode();
             // TODO check
             route.to("log:processor[" + processor.getId() + "]?showAll=true&multiline=true");
             processorComponent.configure(route, processor.getConfig());
         }
 
-        if (currentBodyMode != triggerInfo.bodyMode()) {
-            if (triggerInfo.bodyMode() == BodyMode.Serialized) {
+        if (currentBodyMode != triggerInfo.getBodyMode()) {
+            if (triggerInfo.getBodyMode() == BodyMode.Serialized) {
                 assert trigger.getOutModel() != null;
-                converterContext.unmarshal(route, trigger.getOutModel());
+                converterContext.marshal(route, trigger.getOutModel());
             } else {
                 assert currentModel != null;
-                converterContext.marshal(route, currentModel);
+                converterContext.unmarshal(route, currentModel);
             }
         }
 

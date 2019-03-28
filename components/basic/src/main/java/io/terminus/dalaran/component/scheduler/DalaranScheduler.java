@@ -1,15 +1,15 @@
 package io.terminus.dalaran.component.scheduler;
 
-import io.terminus.dalaran.DalaranTrigger;
 import io.terminus.dalaran.BodyMode;
-import io.terminus.dalaran.annotation.Component;
+import io.terminus.dalaran.DalaranTrigger;
+import io.terminus.dalaran.annotation.Trigger;
 import io.terminus.dalaran.util.UriUtils;
 import org.apache.camel.model.RouteDefinition;
 
 import java.util.HashMap;
 import java.util.Map;
 
-@Component(value = "scheduler", configType = DalaranSchedulerConfig.class, bodyMode = BodyMode.Object)
+@Trigger(value = "scheduler", isVoid = true, configType = DalaranSchedulerConfig.class, bodyMode = BodyMode.Object)
 public class DalaranScheduler implements DalaranTrigger<DalaranSchedulerConfig> {
     @Override
     public void buildFromRoute(RouteDefinition route, DalaranSchedulerConfig config) {

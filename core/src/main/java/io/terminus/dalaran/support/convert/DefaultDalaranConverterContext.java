@@ -24,6 +24,7 @@ public class DefaultDalaranConverterContext implements DalaranConverterContext {
         // TODO 这个扩展面也很窄, 先写死吧...
         converterMapping.put(BodyModelType.JSON, new JsonConverter());
         converterSchemaMapping.put(BodyModelType.JSON, JsonSchema.class);
+
         converterMapping.put(BodyModelType.XML, new XMLConverter());
         converterSchemaMapping.put(BodyModelType.XML, XMLSchema.class);
     }
@@ -35,11 +36,11 @@ public class DefaultDalaranConverterContext implements DalaranConverterContext {
 
     @Override
     public void unmarshal(RouteDefinition route, MessageModel model) {
-        converterMapping.get(model.getModelType()).fromObject(route, model.getModelSchema());
+        converterMapping.get(model.getModelType()).toObject(route, model.getModelSchema());
     }
 
     @Override
     public void marshal(RouteDefinition route, MessageModel model) {
-        converterMapping.get(model.getModelType()).toObject(route, model.getModelSchema());
+        converterMapping.get(model.getModelType()).fromObject(route, model.getModelSchema());
     }
 }
