@@ -82,12 +82,12 @@ public class FlowManagementServiceImpl implements FlowManagementService, Initial
         String jsonConfig = replaceProperties(triggerEntity.getConfig(), properties);
         Object config = gson.fromJson(jsonConfig, configType);
 
-        if (triggerEntity.getInModel() != null) {
-            val inModel = buildMessageModel(triggerEntity.getInModel());
+        if (triggerEntity.getInStructure() != null) {
+            val inModel = buildMessageModel(triggerEntity.getInStructure());
             trigger.setInModel(inModel);
         }
-        if (triggerEntity.getOutModel() != null) {
-            val outModel = buildMessageModel(triggerEntity.getInModel());
+        if (triggerEntity.getOutStructure() != null) {
+            val outModel = buildMessageModel(triggerEntity.getOutStructure());
             trigger.setOutModel(outModel);
         }
 
@@ -104,12 +104,12 @@ public class FlowManagementServiceImpl implements FlowManagementService, Initial
         String jsonConfig = replaceProperties(processorEntity.getConfig(), properties);
         Object config = gson.fromJson(jsonConfig, configType);
 
-        if (processorEntity.getInModel() != null) {
-            val inModel = buildMessageModel(processorEntity.getInModel());
+        if (processorEntity.getInStructure() != null) {
+            val inModel = buildMessageModel(processorEntity.getInStructure());
             processor.setInModel(inModel);
         }
-        if (processorEntity.getOutModel() != null) {
-            val outModel = buildMessageModel(processorEntity.getOutModel());
+        if (processorEntity.getOutStructure() != null) {
+            val outModel = buildMessageModel(processorEntity.getOutStructure());
             processor.setOutModel(outModel);
         }
 
@@ -125,12 +125,12 @@ public class FlowManagementServiceImpl implements FlowManagementService, Initial
         return jinjava.render(configValue, properties);
     }
 
-    private MessageModel buildMessageModel(ModelEntity modelEntity) {
+    private MessageModel buildMessageModel(StructureEntity structureEntity) {
         val model = new MessageModel();
-        val modelType = modelEntity.getModelType();
+        val modelType = structureEntity.getStructureType();
         model.setModelType(modelType);
         Class<? extends DalaranModelSchema> schemaType = dalaranContext.getDalaranConverterContext().getSchemaType(modelType);
-        model.setModelSchema(gson.fromJson(modelEntity.getModelSchema(), schemaType));
+        model.setModelSchema(gson.fromJson(structureEntity.getStructureSchema(), schemaType));
         return model;
     }
 
