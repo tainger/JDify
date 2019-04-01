@@ -27,6 +27,8 @@ public class StructureEntity {
 
     private String name;
 
+    private Long moduleId;
+
     private BodyModelType structureType;
 
     private String structureSchema;

@@ -18,6 +18,8 @@ public class TriggerEntity {
     @GeneratedValue
     private Long id;
 
+    private String name;
+
     private String type;
 
     private String config;
@@ -33,6 +35,10 @@ public class TriggerEntity {
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "out_structure")
     private StructureEntity outStructure;
+
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinColumn(name = "flow_id")
+    private FlowEntity flowEntity;
 
     private String description;
 

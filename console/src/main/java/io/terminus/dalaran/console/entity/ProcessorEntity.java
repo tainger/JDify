@@ -22,6 +22,8 @@ public class ProcessorEntity {
 
     private String config;
 
+    private String name;
+
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "module_id")
     private ModuleEntity module;
@@ -33,6 +35,8 @@ public class ProcessorEntity {
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "out_structure")
     private StructureEntity outStructure;
+
+    private String description;
 
     @CreatedDate
     private Date createdAt;

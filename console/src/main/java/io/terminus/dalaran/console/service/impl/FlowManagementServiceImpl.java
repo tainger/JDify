@@ -5,10 +5,13 @@ import com.hubspot.jinjava.Jinjava;
 import io.terminus.dalaran.DalaranContext;
 import io.terminus.dalaran.DalaranModelSchema;
 import io.terminus.dalaran.console.entity.*;
+import io.terminus.dalaran.console.model.query.FlowQuery;
 import io.terminus.dalaran.console.repository.FlowRepository;
 import io.terminus.dalaran.console.repository.ProcessorRepository;
 import io.terminus.dalaran.console.repository.PropertyRepository;
+import io.terminus.dalaran.console.repository.TriggerRepository;
 import io.terminus.dalaran.console.service.FlowManagementService;
+import io.terminus.dalaran.console.service.jpa.FlowQueryService;
 import io.terminus.dalaran.model.DalaranFlow;
 import io.terminus.dalaran.model.MessageModel;
 import lombok.val;
@@ -35,14 +38,40 @@ public class FlowManagementServiceImpl implements FlowManagementService, Initial
     private PropertyRepository propertyRepository;
 
     @Autowired
+    private TriggerRepository triggerRepository;
+
+    @Autowired
     private DalaranContext dalaranContext;
+
+    @Autowired
+    private FlowQueryService flowQueryService;
 
     // TODO use jackson
     private Gson gson = new Gson();
 
     @Override
+    public List<FlowEntity> queryFlows(FlowQuery query) {
+        return flowQueryService.query(query);
+    }
+
+    @Override
     public void saveFlow(FlowEntity flowEntity) {
         flowRepository.save(flowEntity);
+    }
+
+    @Override
+    public void deleteFlow(Long flowId) {
+        flowRepository.delete(flowId);
+    }
+
+    @Override
+    public void updateFlow(FlowEntity flowEntity) {
+        flowRepository.save(flowEntity);
+    }
+
+    @Override
+    public List<FlowEntity> list() {
+        return flowRepository.findAll();
     }
 
     @Override
@@ -57,26 +86,35 @@ public class FlowManagementServiceImpl implements FlowManagementService, Initial
                 PropertyEntity property = propertyRepository.findOne(propertyId);
                 properties.put(property.getName(), property.getValue());
             }
-            val trigger = buildTrigger(flowEntity.getTrigger(), properties);
-            List<DalaranFlow.Processor> processors = flowEntity.getProcessors().stream()
-                    .map(processorId -> {
-                        ProcessorEntity processorEntity = processorRepository.findOne(processorId);
-                        return buildProcessor(processorEntity, properties);
-                    }).collect(Collectors.toList());
+            val triggerEntity = triggerRepository.findByFlowId(flowEntity.getId());
+            try {
+                val trigger = buildTrigger(triggerEntity, properties);
+                List<DalaranFlow.Processor> processors = flowEntity.getProcessors().stream()
+                        .map(processorId -> {
+                            ProcessorEntity processorEntity = processorRepository.findOne(processorId);
+                            return buildProcessor(processorEntity, properties);
+                        }).collect(Collectors.toList());
 
-            flow.setId(flowEntity.getId().toString());
-            flow.setTrigger(trigger);
-            flow.setProcessors(processors);
-            flow.setMaxRetry(flowEntity.getMaxRetry());
-            flow.setRetryDelay(flowEntity.getRetryDelay());
-            flow.setRetryable(flowEntity.getRetryable());
+                flow.setId(flowEntity.getId().toString());
+                flow.setTrigger(trigger);
+                flow.setProcessors(processors);
+                flow.setMaxRetry(flowEntity.getMaxRetry());
+                flow.setRetryDelay(flowEntity.getRetryDelay());
+                flow.setRetryable(flowEntity.getRetryable());
 
-            flowList.add(flow);
+                flowList.add(flow);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
         dalaranContext.addFlows(flowList);
     }
 
-    private DalaranFlow.Trigger buildTrigger(TriggerEntity triggerEntity, Map<String, String> properties) {
+    private DalaranFlow.Trigger buildTrigger(TriggerEntity triggerEntity, Map<String, String> properties) throws Exception {
+        if (triggerEntity == null) {
+            throw new  Exception();
+        }
+
         val trigger = new DalaranFlow.Trigger();
         Class configType = dalaranContext.getDalaranComponentContext().getTriggerInfo(triggerEntity.getType()).getConfigType();
         String jsonConfig = replaceProperties(triggerEntity.getConfig(), properties);

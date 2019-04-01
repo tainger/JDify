@@ -37,9 +37,9 @@ public class FlowEntity {
     @JoinColumn(name = "module_id")
     private ModuleEntity module;
 
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JoinColumn(name = "trigger_id")
-    private TriggerEntity trigger;
+//    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+//    @JoinColumn(name = "trigger_id")
+//    private TriggerEntity trigger;
 
     @Convert(converter = JsonConverter.class)
     @Column(name = "processor_ids")

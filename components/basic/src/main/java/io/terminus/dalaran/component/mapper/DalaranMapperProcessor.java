@@ -1,9 +1,9 @@
-package io.terminus.dalaran.component.message.convert.custom;
+package io.terminus.dalaran.component.mapper;
 
 import com.github.drapostolos.typeparser.TypeParser;
 import com.google.gson.Gson;
-import io.terminus.dalaran.component.message.convert.custom.jxpath.DalaranJXPathFactory;
-import io.terminus.dalaran.component.message.convert.custom.model.FieldType;
+import io.terminus.dalaran.component.mapper.jxpath.DalaranJXPathFactory;
+import io.terminus.dalaran.component.mapper.model.FieldType;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.commons.jxpath.JXPathContext;
@@ -14,7 +14,7 @@ import java.util.Map;
 /**
  * Created by jingdi on 2019/3/18
  */
-public class CustomMapperProcessor implements Processor {
+public class DalaranMapperProcessor implements Processor {
 
     @Override
     public void process(Exchange exchange) throws Exception {

@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/management/flow")
+@RequestMapping("__/dalaran_management/flow")
 public class FlowManagementRest {
 
     // TODO for test
@@ -34,7 +34,7 @@ public class FlowManagementRest {
     @PutMapping
     public void saveFlow(@RequestBody FlowModel flowModel) {
         FlowEntity flowEntity = new FlowEntity();
-        TriggerEntity triggerEntity = new TriggerEntity();
+//        TriggerEntity triggerEntity = new TriggerEntity();
 
         List<Long> processorEntitySet = flowModel.getProcessors().stream().map(processorModel -> {
             ProcessorEntity processorEntity = new ProcessorEntity();
@@ -53,7 +53,7 @@ public class FlowManagementRest {
             return propertyEntity.getId();
         }).collect(Collectors.toList());
 
-        flowEntity.setTrigger(triggerEntity);
+//        flowEntity.setTrigger(triggerEntity);
         flowEntity.setProcessors(processorEntitySet);
         flowEntity.setProperties(propertyEntitySet);
 
@@ -64,8 +64,8 @@ public class FlowManagementRest {
         flowEntity.setMaxRetry(flowModel.getMaxRetry());
         flowEntity.setRetryDelay(flowModel.getRetryDelay());
 
-        triggerEntity.setType(flowModel.getTrigger().getType());
-        triggerEntity.setConfig(gson.toJson(flowModel.getTrigger().getConfig()));
+//        triggerEntity.setType(flowModel.getTrigger().getType());
+//        triggerEntity.setConfig(gson.toJson(flowModel.getTrigger().getConfig()));
 
         flowManagementService.saveFlow(flowEntity);
     }
@@ -80,4 +80,7 @@ public class FlowManagementRest {
         saveFlow(flowModel);
         flowManagementService.publish();
     }
+
+
+
 }
