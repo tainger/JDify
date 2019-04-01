@@ -22,64 +22,6 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext {
     private final Map<String, ProcessorInfo> processorInfoMapping = new ConcurrentHashMap<>();
 
     @Override
-    public void addTrigger(Trigger triggerAnnotation, DalaranTrigger trigger) {
-        List<DalaranConfigField> configFields = new ArrayList<>();
-
-        TriggerInfo triggerInfo = new TriggerInfo();
-
-
-        triggerInfo.setType(triggerAnnotation.value());
-        triggerInfo.setConfigFields(configFields);
-        triggerInfo.setIsVoid(triggerAnnotation.isVoid());
-        triggerInfo.setConfigType(triggerAnnotation.configType());
-        triggerInfo.setBodyMode(triggerAnnotation.bodyMode());
-
-        for (Field field : triggerAnnotation.configType().getDeclaredFields()) {
-            ConfigFieldInfo configFieldInfo = field.getDeclaredAnnotation(ConfigFieldInfo.class);
-            if (configFieldInfo != null) {
-                DalaranConfigField configField = new DalaranConfigField();
-                configField.setName(field.getName());
-                configField.setInputType(configFieldInfo.inputType());
-                configField.setExample(configFieldInfo.example());
-                configField.setDefaultValue(configFieldInfo.defaultValue());
-                configField.setLabel(configFieldInfo.label());
-                configFields.add(configField);
-            }
-        }
-
-        triggerInfoMapping.put(triggerAnnotation.value(), triggerInfo);
-        triggerMapping.put(triggerAnnotation.value(), trigger);
-    }
-
-    @Override
-    public void addProcessor(Processor processorAnnotation, DalaranProcessor processor) {
-        List<DalaranConfigField> configFields = new ArrayList<>();
-
-        ProcessorInfo processorInfo = new ProcessorInfo();
-
-        processorInfo.setType(processorAnnotation.value());
-        processorInfo.setConfigFields(configFields);
-        processorInfo.setConfigType(processorAnnotation.configType());
-        processorInfo.setBodyMode(processorAnnotation.bodyMode());
-
-        for (Field field : processorAnnotation.configType().getDeclaredFields()) {
-            ConfigFieldInfo configFieldInfo = field.getDeclaredAnnotation(ConfigFieldInfo.class);
-            if (configFieldInfo != null) {
-                DalaranConfigField configField = new DalaranConfigField();
-                configField.setName(field.getName());
-                configField.setInputType(configFieldInfo.inputType());
-                configField.setExample(configFieldInfo.example());
-                configField.setDefaultValue(configFieldInfo.defaultValue());
-                configField.setLabel(configFieldInfo.label());
-                configFields.add(configField);
-            }
-        }
-
-        processorInfoMapping.put(processorAnnotation.value(), processorInfo);
-        processorMapping.put(processorAnnotation.value(), processor);
-    }
-
-    @Override
     public DalaranTrigger getTrigger(String triggerType) {
         return triggerMapping.get(triggerType);
     }
@@ -122,5 +64,61 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext {
                 addProcessor(processorInfo, (DalaranProcessor) component);
             }
         });
+    }
+
+    private void addTrigger(Trigger triggerAnnotation, DalaranTrigger trigger) {
+        List<DalaranConfigField> configFields = new ArrayList<>();
+
+        TriggerInfo triggerInfo = new TriggerInfo();
+
+
+        triggerInfo.setType(triggerAnnotation.value());
+        triggerInfo.setConfigFields(configFields);
+        triggerInfo.setIsVoid(triggerAnnotation.isVoid());
+        triggerInfo.setConfigType(triggerAnnotation.configType());
+        triggerInfo.setBodyMode(triggerAnnotation.bodyMode());
+
+        for (Field field : triggerAnnotation.configType().getDeclaredFields()) {
+            ConfigFieldInfo configFieldInfo = field.getDeclaredAnnotation(ConfigFieldInfo.class);
+            if (configFieldInfo != null) {
+                DalaranConfigField configField = new DalaranConfigField();
+                configField.setName(field.getName());
+                configField.setInputType(configFieldInfo.inputType());
+                configField.setExample(configFieldInfo.example());
+                configField.setDefaultValue(configFieldInfo.defaultValue());
+                configField.setLabel(configFieldInfo.label());
+                configFields.add(configField);
+            }
+        }
+
+        triggerInfoMapping.put(triggerAnnotation.value(), triggerInfo);
+        triggerMapping.put(triggerAnnotation.value(), trigger);
+    }
+
+    private void addProcessor(Processor processorAnnotation, DalaranProcessor processor) {
+        List<DalaranConfigField> configFields = new ArrayList<>();
+
+        ProcessorInfo processorInfo = new ProcessorInfo();
+
+        processorInfo.setType(processorAnnotation.value());
+        processorInfo.setConfigFields(configFields);
+        processorInfo.setConfigType(processorAnnotation.configType());
+        processorInfo.setBodyMode(processorAnnotation.bodyMode());
+
+        for (Field field : processorAnnotation.configType().getDeclaredFields()) {
+            ConfigFieldInfo configFieldInfo = field.getDeclaredAnnotation(ConfigFieldInfo.class);
+            if (configFieldInfo != null) {
+                DalaranConfigField configField = new DalaranConfigField();
+                configField.setName(field.getName());
+                configField.setInputType(configFieldInfo.inputType());
+                configField.setExample(configFieldInfo.example());
+                configField.setDefaultValue(configFieldInfo.defaultValue());
+                configField.setLabel(configFieldInfo.label());
+                configFields.add(configField);
+            }
+        }
+
+        processorInfoMapping.put(processorAnnotation.value(), processorInfo);
+        processorMapping.put(processorAnnotation.value(), processor);
     }
 }
