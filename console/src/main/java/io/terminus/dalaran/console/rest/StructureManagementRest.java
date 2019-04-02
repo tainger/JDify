@@ -8,7 +8,6 @@ import io.terminus.dalaran.console.service.StructureManagementService;
 import io.terminus.dalaran.console.service.TriggerManagementService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 /**
@@ -22,7 +21,7 @@ public class StructureManagementRest {
     private StructureManagementService structureManagementService;
 
     @RequestMapping(value = "/query", method = RequestMethod.GET)
-    public List<StructureModel> query(@RequestParam StructureQuery query) {
+    public List<StructureModel> query(StructureQuery query) {
         return structureManagementService.queryStructures(query);
     }
 

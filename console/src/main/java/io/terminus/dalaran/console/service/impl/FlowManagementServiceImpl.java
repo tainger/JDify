@@ -5,6 +5,7 @@ import com.hubspot.jinjava.Jinjava;
 import io.terminus.dalaran.DalaranContext;
 import io.terminus.dalaran.DalaranModelSchema;
 import io.terminus.dalaran.console.entity.*;
+import io.terminus.dalaran.console.model.FlowModel;
 import io.terminus.dalaran.console.model.query.FlowQuery;
 import io.terminus.dalaran.console.repository.FlowRepository;
 import io.terminus.dalaran.console.repository.ProcessorRepository;
@@ -57,6 +58,11 @@ public class FlowManagementServiceImpl implements FlowManagementService, Initial
     @Override
     public void saveFlow(FlowEntity flowEntity) {
         flowRepository.save(flowEntity);
+    }
+
+    @Override
+    public void createFlow(FlowModel flowModel) {
+
     }
 
     @Override

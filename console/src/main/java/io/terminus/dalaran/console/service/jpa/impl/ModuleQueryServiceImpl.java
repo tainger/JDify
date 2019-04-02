@@ -7,6 +7,8 @@ import io.terminus.dalaran.console.service.jpa.ModuleQueryService;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.stereotype.Service;
+
 import javax.persistence.criteria.Predicate;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,6 +16,7 @@ import java.util.List;
 /**
  * Created by jingdi on 2019/4/1
  */
+@Service
 public class ModuleQueryServiceImpl implements ModuleQueryService {
 
     @Autowired

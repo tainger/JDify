@@ -7,10 +7,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.util.Date;
 
 /**
@@ -27,7 +24,9 @@ public class StructureEntity {
 
     private String name;
 
-    private Long moduleId;
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinColumn(name = "module_id")
+    private ModuleEntity module;
 
     private BodyModelType structureType;
 
@@ -36,14 +35,16 @@ public class StructureEntity {
     private String description;
 
     @CreatedDate
+    @Column(columnDefinition = "timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP")
     private Date createdAt;
 
     @LastModifiedDate
+    @Column(columnDefinition = "timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
     private Date updatedAt;
 
     @CreatedBy
-    private Date createdBy;
+    private String createdBy;
 
     @LastModifiedBy
-    private Date updatedBy;
+    private String updatedBy;
 }

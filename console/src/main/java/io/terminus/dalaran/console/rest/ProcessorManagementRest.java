@@ -18,7 +18,7 @@ public class ProcessorManagementRest {
     private ProcessorManagementService processorManagementService;
 
     @RequestMapping(value = "/query", method = RequestMethod.GET)
-    public List<ProcessorModel> query(@RequestParam ProcessorQuery query) {
+    public List<ProcessorModel> query(ProcessorQuery query) {
         return processorManagementService.queryProcessors(query);
     }
 

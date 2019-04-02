@@ -53,7 +53,7 @@ public class FlowManagementRest {
             return propertyEntity.getId();
         }).collect(Collectors.toList());
 
-//        flowEntity.setTrigger(triggerEntity);
+//        flow.setTrigger(triggerEntity);
         flowEntity.setProcessors(processorEntitySet);
         flowEntity.setProperties(propertyEntitySet);
 
@@ -80,7 +80,4 @@ public class FlowManagementRest {
         saveFlow(flowModel);
         flowManagementService.publish();
     }
-
-
-
 }

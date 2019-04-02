@@ -22,7 +22,7 @@ public class TriggerManagementRest {
     private TriggerManagementService triggerManagementService;
 
     @RequestMapping(value = "/query", method = RequestMethod.GET)
-    public List<TriggerModel> query(@RequestParam TriggerQuery query) {
+    public List<TriggerModel> query(TriggerQuery query) {
         return triggerManagementService.queryTriggers(query);
     }
 

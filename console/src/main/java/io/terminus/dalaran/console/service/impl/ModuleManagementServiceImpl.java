@@ -7,12 +7,15 @@ import io.terminus.dalaran.console.repository.ModuleRepository;
 import io.terminus.dalaran.console.service.ModuleManagementService;
 import io.terminus.dalaran.console.service.jpa.ModuleQueryService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import java.util.LinkedList;
 import java.util.List;
 
 /**
  * Created by jingdi on 2019/4/1
  */
+@Service
 public class ModuleManagementServiceImpl implements ModuleManagementService {
 
     @Autowired

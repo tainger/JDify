@@ -1,14 +1,10 @@
 package io.terminus.dalaran.console.rest;
 
 import io.terminus.dalaran.console.model.ModuleModel;
-import io.terminus.dalaran.console.model.TriggerModel;
 import io.terminus.dalaran.console.model.query.ModuleQuery;
-import io.terminus.dalaran.console.model.query.TriggerQuery;
 import io.terminus.dalaran.console.service.ModuleManagementService;
-import io.terminus.dalaran.console.service.TriggerManagementService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 /**
@@ -21,7 +17,7 @@ public class ModuleManagementRest {
     private ModuleManagementService moduleManagementService;
 
     @RequestMapping(value = "/query", method = RequestMethod.GET)
-    public List<ModuleModel> query(@RequestParam ModuleQuery query) {
+    public List<ModuleModel> query(ModuleQuery query) {
         return moduleManagementService.queryModules(query);
     }
 

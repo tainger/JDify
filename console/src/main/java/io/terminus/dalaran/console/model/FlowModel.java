@@ -12,6 +12,8 @@ public class FlowModel {
 
     private String name;
 
+    private Long moduleId;
+
     private String description;
 
     private Boolean retryable;
@@ -20,7 +22,7 @@ public class FlowModel {
 
     private Integer retryDelay = 3000;
 
-    private TriggerModel trigger;
+//    private TriggerModel trigger;
 
     private Set<ProcessorModel> processors;
 
