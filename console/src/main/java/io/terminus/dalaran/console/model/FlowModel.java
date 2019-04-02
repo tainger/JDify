@@ -2,6 +2,7 @@ package io.terminus.dalaran.console.model;
 
 import lombok.Data;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -26,5 +27,9 @@ public class FlowModel {
 
     private Set<ProcessorModel> processors;
 
+    private List<Long> processorIds;
+
     private Map<String, String> properties;
+
+    private List<Long> propertyIds;
 }

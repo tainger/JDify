@@ -16,9 +16,9 @@ public interface FlowManagementService {
 
     void deleteFlow(Long flowId);
 
-    void updateFlow(FlowEntity flowEntity);
+    void updateFlow(FlowModel flowModel);
 
-    List<FlowEntity> queryFlows(FlowQuery query);
+    List<FlowModel> queryFlows(FlowQuery query);
 
-    List<FlowEntity> list();
+    List<FlowModel> list();
 }

@@ -80,4 +80,9 @@ public class FlowManagementRest {
         saveFlow(flowModel);
         flowManagementService.publish();
     }
+
+    @RequestMapping(value = "/create", method = RequestMethod.POST)
+    public void create(@RequestBody FlowModel model) {
+        flowManagementService.createFlow(model);
+    }
 }

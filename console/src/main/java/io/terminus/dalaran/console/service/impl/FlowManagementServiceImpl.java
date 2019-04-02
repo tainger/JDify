@@ -7,10 +7,7 @@ import io.terminus.dalaran.DalaranModelSchema;
 import io.terminus.dalaran.console.entity.*;
 import io.terminus.dalaran.console.model.FlowModel;
 import io.terminus.dalaran.console.model.query.FlowQuery;
-import io.terminus.dalaran.console.repository.FlowRepository;
-import io.terminus.dalaran.console.repository.ProcessorRepository;
-import io.terminus.dalaran.console.repository.PropertyRepository;
-import io.terminus.dalaran.console.repository.TriggerRepository;
+import io.terminus.dalaran.console.repository.*;
 import io.terminus.dalaran.console.service.FlowManagementService;
 import io.terminus.dalaran.console.service.jpa.FlowQueryService;
 import io.terminus.dalaran.model.DalaranFlow;
@@ -19,11 +16,7 @@ import lombok.val;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -47,12 +40,21 @@ public class FlowManagementServiceImpl implements FlowManagementService, Initial
     @Autowired
     private FlowQueryService flowQueryService;
 
+    @Autowired
+    private ModuleRepository moduleRepository;
+
     // TODO use jackson
     private Gson gson = new Gson();
 
     @Override
-    public List<FlowEntity> queryFlows(FlowQuery query) {
-        return flowQueryService.query(query);
+    public List<FlowModel> queryFlows(FlowQuery query) {
+        List<FlowEntity> entities = flowQueryService.query(query);
+        List<FlowModel> models = new LinkedList<>();
+        for (FlowEntity entity: entities) {
+            models.add(buildModel(entity));
+        }
+
+        return models;
     }
 
     @Override
@@ -62,7 +64,7 @@ public class FlowManagementServiceImpl implements FlowManagementService, Initial
 
     @Override
     public void createFlow(FlowModel flowModel) {
-
+        flowRepository.save(buildEntity(flowModel));
     }
 
     @Override
@@ -71,13 +73,19 @@ public class FlowManagementServiceImpl implements FlowManagementService, Initial
     }
 
     @Override
-    public void updateFlow(FlowEntity flowEntity) {
-        flowRepository.save(flowEntity);
+    public void updateFlow(FlowModel flowModel) {
+        flowRepository.save(buildEntity(flowModel));
     }
 
     @Override
-    public List<FlowEntity> list() {
-        return flowRepository.findAll();
+    public List<FlowModel> list() {
+        List<FlowEntity> entities = flowRepository.findAll();
+        List<FlowModel> models = new LinkedList<>();
+        for (FlowEntity entity: entities) {
+            models.add(buildModel(entity));
+        }
+
+        return models;
     }
 
     @Override
@@ -176,6 +184,40 @@ public class FlowManagementServiceImpl implements FlowManagementService, Initial
         Class<? extends DalaranModelSchema> schemaType = dalaranContext.getDalaranConverterContext().getSchemaType(modelType);
         model.setModelSchema(gson.fromJson(structureEntity.getStructureSchema(), schemaType));
         return model;
+    }
+
+    private FlowEntity buildEntity(FlowModel model) {
+        FlowEntity flowEntity = new FlowEntity();
+        ModuleEntity moduleEntity = moduleRepository.findOne(model.getModuleId());
+        List<ProcessorEntity> processors = new LinkedList<>();
+        for (Long id: model.getProcessorIds()) {
+            processors.add(processorRepository.findOne(id));
+        }
+
+        flowEntity.setName(model.getName());
+        flowEntity.setModule(moduleEntity);
+        flowEntity.setProcessors(model.getProcessorIds());
+        flowEntity.setDescription(model.getDescription());
+        flowEntity.setMaxRetry(model.getMaxRetry());
+        flowEntity.setRetryable(model.getRetryable());
+        flowEntity.setRetryDelay(model.getRetryDelay());
+        flowEntity.setProperties(model.getPropertyIds());
+
+        return flowEntity;
+    }
+
+    private FlowModel buildModel(FlowEntity entity) {
+        FlowModel flowModel = new FlowModel();
+        flowModel.setId(entity.getId());
+        flowModel.setName(entity.getName());
+        flowModel.setModuleId(entity.getModule().getId());
+        flowModel.setMaxRetry(entity.getMaxRetry());
+        flowModel.setProcessorIds(entity.getProcessors());
+        flowModel.setPropertyIds(entity.getProperties());
+        flowModel.setRetryable(entity.getRetryable());
+        flowModel.setRetryDelay(entity.getRetryDelay());
+        flowModel.setDescription(entity.getDescription());
+        return flowModel;
     }
 
     /**
