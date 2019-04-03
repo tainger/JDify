@@ -11,4 +11,6 @@ import java.util.List;
 public interface FlowQueryService {
 
     List<FlowEntity> query(FlowQuery query);
+
+    List<FlowEntity> queryByProcessorIds(List<Long> processorIds);
 }
