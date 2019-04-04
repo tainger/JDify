@@ -13,9 +13,6 @@ public class DalaranFlow {
     @NotNull
     private String id;
 
-    @NotNull
-    private Trigger trigger;
-
     @Nullable
     private Boolean retryable;
 
@@ -26,44 +23,10 @@ public class DalaranFlow {
     private Integer retryDelay;
 
     @NotNull
-    private List<Processor> processors;
+    private List<ProcessorModel> processors;
 
     @NotNull
     private Map<String, String> properties;
 
-    @Data
-    public static class Trigger<T> {
-        @NotNull
-        private Long id;
 
-        @NotNull
-        private String type;
-
-        @Nullable
-        private T config;
-
-        @Nullable
-        private MessageModel inModel;
-
-        @Nullable
-        private MessageModel outModel;
-    }
-
-    @Data
-    public static class Processor<T> {
-        @NotNull
-        private Long id;
-
-        @NotNull
-        private String type;
-
-        @Nullable
-        private T config;
-
-        @Nullable
-        private MessageModel inModel;
-
-        @Nullable
-        private MessageModel outModel;
-    }
 }

@@ -23,6 +23,10 @@ public class TriggerEntity {
     private String config;
 
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinColumn(name = "flow_id")
+    private FlowEntity flow;
+
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "module_id")
     private ModuleEntity module;
 

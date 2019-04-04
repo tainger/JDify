@@ -53,7 +53,7 @@ public class FlowManagementRest {
             return propertyEntity.getId();
         }).collect(Collectors.toList());
 
-        flowEntity.setTrigger(triggerEntity);
+//        flowEntity.setTrigger(triggerEntity);
         flowEntity.setProcessors(processorEntitySet);
         flowEntity.setProperties(propertyEntitySet);
 
