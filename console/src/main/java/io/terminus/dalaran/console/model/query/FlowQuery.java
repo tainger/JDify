@@ -13,4 +13,6 @@ public class FlowQuery {
     private List<Long> flowIds;
 
     private String type;
+
+    private String name;
 }

@@ -44,8 +44,13 @@ public class TriggerQueryServiceImpl implements TriggerQueryService {
             }
 
             if (CollectionUtils.isNotEmpty(query.getTriggerIds())) {
-                Predicate triggerIds = criteriaBuilder.equal(root.get("id"), query.getTriggerIds());
+                Predicate triggerIds = criteriaBuilder.and(root.get("id").in(query.getTriggerIds()));
                 predicates.add(triggerIds);
+            }
+
+            if (StringUtils.isNoneBlank(query.getName())) {
+                Predicate name = criteriaBuilder.like(root.get("name"), "%" + query.getName() + "%");
+                predicates.add(name);
             }
 
             return criteriaBuilder.and(predicates.toArray(new Predicate[predicates.size()]));

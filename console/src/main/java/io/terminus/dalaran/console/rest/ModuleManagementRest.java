@@ -5,10 +5,7 @@ import io.terminus.dalaran.console.model.ModuleModel;
 import io.terminus.dalaran.console.model.query.ModuleQuery;
 import io.terminus.dalaran.console.service.ModuleManagementService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -41,7 +38,7 @@ public class ModuleManagementRest {
 
     @ApiOperation(value = "删除模块")
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
-    public void delete(Long id) {
+    public void delete(@RequestParam Long id) {
         moduleManagementService.deleteModule(id);
     }
 

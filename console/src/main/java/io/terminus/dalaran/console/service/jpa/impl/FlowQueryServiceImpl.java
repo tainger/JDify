@@ -9,7 +9,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-
 import javax.persistence.criteria.Predicate;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,15 +27,19 @@ public class FlowQueryServiceImpl implements FlowQueryService {
 
         Specification<FlowEntity> specification = (root, criteriaQuery, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
-
             if (StringUtils.isNoneBlank(query.getType())) {
                 Predicate type = criteriaBuilder.equal(root.get("type"), query.getType());
                 predicates.add(type);
             }
 
             if (CollectionUtils.isNotEmpty(query.getFlowIds())) {
-                Predicate flowIds = criteriaBuilder.equal(root.get("id"), query.getFlowIds());
+                Predicate flowIds = criteriaBuilder.and(root.get("id").in(query.getFlowIds()));
                 predicates.add(flowIds);
+            }
+
+            if (StringUtils.isNoneBlank(query.getName())) {
+                Predicate name = criteriaBuilder.like(root.get("name"), "%" + query.getName() + "%");
+                predicates.add(name);
             }
 
             return criteriaBuilder.and(predicates.toArray(new Predicate[predicates.size()]));
@@ -48,6 +51,11 @@ public class FlowQueryServiceImpl implements FlowQueryService {
 
     @Override
     public List<FlowEntity> queryByProcessorIds(List<Long> processorIds) {
-        return null;
+        Specification<FlowEntity> specification = (root, criteriaQuery, criteriaBuilder) -> {
+            Predicate predicate = criteriaBuilder.isNotEmpty(criteriaBuilder.function("JSON_SEARCH", List.class,
+                    root.get("processors"), criteriaBuilder.literal(processorIds)));
+            return criteriaBuilder.and(predicate);
+        };
+        return flowQueryRepository.findAll(specification);
     }
 }

@@ -92,6 +92,17 @@ public class FlowManagementServiceImpl implements FlowManagementService, Initial
     }
 
     @Override
+    public List<FlowModel> queryByProcessorIds(List<Long> processorIds) {
+        List<FlowEntity> entities = flowQueryService.queryByProcessorIds(processorIds);
+        List<FlowModel> models = new LinkedList<>();
+        for (FlowEntity entity: entities) {
+            models.add(buildModel(entity));
+        }
+
+        return models;
+    }
+
+    @Override
     public void publish() {
         List<DalaranFlow> flowList = new ArrayList<>();
         List<FlowEntity> flowEntities = flowRepository.findAll();
@@ -224,6 +235,6 @@ public class FlowManagementServiceImpl implements FlowManagementService, Initial
      */
     @Override
     public void afterPropertiesSet() {
-        publish();
+//        publish();
     }
 }

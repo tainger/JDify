@@ -10,4 +10,6 @@ import java.util.List;
 @Data
 public class ModuleQuery {
     private List<Long> moduleIds;
+
+    private String name;
 }

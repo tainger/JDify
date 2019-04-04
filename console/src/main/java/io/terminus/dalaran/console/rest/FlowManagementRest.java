@@ -97,8 +97,8 @@ public class FlowManagementRest {
 
     @ApiOperation(value = "删除工作流")
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
-    public void delete(Long flowId) {
-        flowManagementService.deleteFlow(flowId);
+    public void delete(@RequestParam Long id) {
+        flowManagementService.deleteFlow(id);
     }
 
     @ApiOperation(value = "条件查询工作流")
@@ -111,5 +111,10 @@ public class FlowManagementRest {
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     public List<FlowModel> list() {
         return flowManagementService.list();
+    }
+
+    @RequestMapping(value = "/queryByProcessorIds", method = RequestMethod.GET)
+    public List<FlowModel> queryByProcessorIds(@RequestParam List<Long> processorIds) {
+        return flowManagementService.queryByProcessorIds(processorIds);
     }
 }

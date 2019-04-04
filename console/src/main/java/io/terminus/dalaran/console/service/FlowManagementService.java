@@ -21,4 +21,6 @@ public interface FlowManagementService {
     List<FlowModel> queryFlows(FlowQuery query);
 
     List<FlowModel> list();
+
+    List<FlowModel> queryByProcessorIds(List<Long> processorIds);
 }

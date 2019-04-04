@@ -5,6 +5,7 @@ import io.terminus.dalaran.console.model.query.ModuleQuery;
 import io.terminus.dalaran.console.repository.specification.ModuleQueryRepository;
 import io.terminus.dalaran.console.service.jpa.ModuleQueryService;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -27,8 +28,13 @@ public class ModuleQueryServiceImpl implements ModuleQueryService {
         Specification<ModuleEntity> specification = (root, criteriaQuery, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
             if (CollectionUtils.isNotEmpty(query.getModuleIds())) {
-                Predicate processorIds = criteriaBuilder.equal(root.get("id"), query.getModuleIds());
+                Predicate processorIds = criteriaBuilder.and(root.get("id").in(query.getModuleIds()));
                 predicates.add(processorIds);
+            }
+
+            if (StringUtils.isNoneBlank(query.getName())) {
+                Predicate name = criteriaBuilder.like(root.get("name"), "%" + query.getName() + "%");
+                predicates.add(name);
             }
 
             return criteriaBuilder.and(predicates.toArray(new Predicate[predicates.size()]));
