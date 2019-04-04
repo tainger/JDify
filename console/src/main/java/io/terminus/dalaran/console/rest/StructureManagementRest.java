@@ -41,7 +41,7 @@ public class StructureManagementRest {
 
     @ApiOperation(value = "删除数据模型")
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
-    public void delete(Long id) {
+    public void delete(@RequestParam Long id) {
         structureManagementService.deleteStructure(id);
     }
 

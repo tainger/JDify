@@ -9,6 +9,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+
+import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +36,7 @@ public class FlowQueryServiceImpl implements FlowQueryService {
             }
 
             if (CollectionUtils.isNotEmpty(query.getFlowIds())) {
-                Predicate flowIds = criteriaBuilder.equal(root.get("id"), query.getFlowIds());
+                Predicate flowIds = criteriaBuilder.and(root.get("id").in(query.getFlowIds()));
                 predicates.add(flowIds);
             }
 
@@ -47,6 +49,11 @@ public class FlowQueryServiceImpl implements FlowQueryService {
 
     @Override
     public List<FlowEntity> queryByProcessorIds(List<Long> processorIds) {
-        return null;
+        Specification<FlowEntity> specification = (root, criteriaQuery, criteriaBuilder) -> {
+            Predicate predicate = criteriaBuilder.isNotEmpty(criteriaBuilder.function("JSON_SEARCH", List.class,
+                    root.get("processors"), criteriaBuilder.literal(processorIds)));
+            return criteriaBuilder.and(predicate);
+        };
+        return flowQueryRepository.findAll(specification);
     }
 }

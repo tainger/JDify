@@ -42,7 +42,7 @@ public class TriggerManagementRest {
 
     @ApiOperation(value = "删除触发器")
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
-    public void delete(Long id) {
+    public void delete(@RequestParam Long id) {
         triggerManagementService.deleteTrigger(id);
     }
 

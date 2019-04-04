@@ -34,7 +34,7 @@ public class StructQueryServiceImpl implements StructQueryService {
             }
 
             if (CollectionUtils.isNotEmpty(query.getStructureIds())) {
-                Predicate structureIds = criteriaBuilder.equal(root.get("id"), query.getStructureIds());
+                Predicate structureIds = criteriaBuilder.and(root.get("id").in(query.getStructureIds()));
                 predicates.add(structureIds);
             }
 

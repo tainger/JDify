@@ -47,7 +47,7 @@ public class ProcessorQueryServiceImpl implements ProcessorQueryService {
             }
 
             if (CollectionUtils.isNotEmpty(query.getProcessorIds())) {
-                Predicate processorIds = criteriaBuilder.equal(root.get("id"), query.getProcessorIds());
+                Predicate processorIds = criteriaBuilder.and(root.get("id").in(query.getProcessorIds()));
                 predicates.add(processorIds);
             }
 

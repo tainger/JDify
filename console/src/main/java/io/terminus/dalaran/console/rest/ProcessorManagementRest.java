@@ -38,7 +38,7 @@ public class ProcessorManagementRest {
 
     @ApiOperation(value = "删除处理器")
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
-    public void delete(Long id) {
+    public void delete(@RequestParam Long id) {
         processorManagementService.deleteProcessor(id);
     }
 

@@ -37,7 +37,7 @@ public class ModuleManagementRest {
 
     @ApiOperation(value = "删除模块")
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
-    public void delete(Long id) {
+    public void delete(@RequestParam Long id) {
         moduleManagementService.deleteModule(id);
     }
 
