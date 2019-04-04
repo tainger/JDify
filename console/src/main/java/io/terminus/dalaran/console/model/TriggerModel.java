@@ -8,7 +8,19 @@ import java.util.Map;
 public class TriggerModel {
     private Long id;
 
+    private String name;
+
+    private Long moduleId;
+
+    private Long flowId;
+
     private String type;
 
+    private Long inStructure;
+
+    private Long outStructure;
+
     private Map<String, Object> config;
+
+    private String description;
 }

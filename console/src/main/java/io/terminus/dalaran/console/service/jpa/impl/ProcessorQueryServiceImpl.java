@@ -1,0 +1,65 @@
+package io.terminus.dalaran.console.service.jpa.impl;
+
+import io.terminus.dalaran.console.entity.ProcessorEntity;
+import io.terminus.dalaran.console.model.query.ProcessorQuery;
+import io.terminus.dalaran.console.repository.specification.ProcessorQueryRepository;
+import io.terminus.dalaran.console.service.jpa.ProcessorQueryService;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.stereotype.Service;
+
+import javax.persistence.EntityManager;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Created by jingdi on 2019/3/29
+ */
+@Service
+public class ProcessorQueryServiceImpl implements ProcessorQueryService {
+
+    @Autowired
+    private EntityManager entityManager;
+
+    @Autowired
+    private ProcessorQueryRepository processorQueryRepository;
+
+    @Override
+    public List<ProcessorEntity> query(ProcessorQuery query) {
+
+        Specification<ProcessorEntity> specification = (root, criteriaQuery, criteriaBuilder) -> {
+            List<Predicate> predicates = new ArrayList<>();
+
+            if (query.getModuleId() != null) {
+                Predicate moduleId = criteriaBuilder.equal(root.get("moduleId"), query.getModuleId());
+                predicates.add(moduleId);
+            }
+
+            if (StringUtils.isNoneBlank(query.getType())) {
+                Predicate type = criteriaBuilder.equal(root.get("type"), query.getType());
+                predicates.add(type);
+            }
+
+            if (CollectionUtils.isNotEmpty(query.getProcessorIds())) {
+                Predicate processorIds = criteriaBuilder.equal(root.get("id"), query.getProcessorIds());
+                predicates.add(processorIds);
+            }
+
+            return criteriaBuilder.and(predicates.toArray(new Predicate[predicates.size()]));
+        };
+        return processorQueryRepository.findAll(specification);
+    }
+
+    public List<ProcessorEntity> query() {
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<ProcessorEntity> criteriaQuery = criteriaBuilder.createQuery(ProcessorEntity.class);
+        Root<ProcessorEntity> root = criteriaQuery.from(ProcessorEntity.class);
+        return new ArrayList<>();
+    }
+}

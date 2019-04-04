@@ -6,7 +6,6 @@ import io.terminus.dalaran.DalaranContext;
 import io.terminus.dalaran.DalaranConverterContext;
 import io.terminus.dalaran.model.DalaranFlow;
 import io.terminus.dalaran.model.MessageModel;
-import io.terminus.dalaran.model.ProcessorModel;
 import io.terminus.dalaran.model.TriggerModel;
 import lombok.val;
 import org.apache.camel.CamelContext;

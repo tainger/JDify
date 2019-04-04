@@ -22,6 +22,8 @@ public class ProcessorEntity {
 
     private String config;
 
+    private String name;
+
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "module_id")
     private ModuleEntity module;
@@ -34,15 +36,19 @@ public class ProcessorEntity {
     @JoinColumn(name = "out_structure")
     private StructureEntity outStructure;
 
+    private String description;
+
     @CreatedDate
+    @Column(columnDefinition = "timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP")
     private Date createdAt;
 
     @LastModifiedDate
+    @Column(columnDefinition = "timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
     private Date updatedAt;
 
     @CreatedBy
-    private Date createdBy;
+    private String createdBy;
 
     @LastModifiedBy
-    private Date updatedBy;
+    private String updatedBy;
 }

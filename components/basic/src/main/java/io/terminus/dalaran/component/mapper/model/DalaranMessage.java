@@ -1,4 +1,4 @@
-package io.terminus.dalaran.component.message.convert.custom.model;
+package io.terminus.dalaran.component.mapper.model;
 
 import io.terminus.dalaran.BodyModelType;
 import lombok.Data;

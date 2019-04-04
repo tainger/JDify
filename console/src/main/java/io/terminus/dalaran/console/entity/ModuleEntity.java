@@ -2,7 +2,6 @@ package io.terminus.dalaran.console.entity;
 
 import io.terminus.dalaran.console.JsonConverter;
 import lombok.Data;
-import org.springframework.aop.target.LazyInitTargetSource;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
@@ -34,14 +33,16 @@ public class ModuleEntity {
     private List<Long> dependencies = new ArrayList<>();
 
     @CreatedDate
+    @Column(columnDefinition = "timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP")
     private Date createdAt;
 
     @LastModifiedDate
+    @Column(columnDefinition = "timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
     private Date updatedAt;
 
     @CreatedBy
-    private Date createdBy;
+    private String createdBy;
 
     @LastModifiedBy
-    private Date updatedBy;
+    private String updatedBy;
 }

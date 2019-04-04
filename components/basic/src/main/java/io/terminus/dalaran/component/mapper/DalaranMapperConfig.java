@@ -1,15 +1,16 @@
-package io.terminus.dalaran.component.message.convert.custom;
+package io.terminus.dalaran.component.mapper;
 
 import io.terminus.dalaran.BodyModelType;
-import io.terminus.dalaran.component.message.convert.custom.model.FieldType;
+import io.terminus.dalaran.component.mapper.model.FieldType;
 import lombok.Data;
+
 import java.util.Map;
 
 /**
  * Created by jingdi on 2019/3/18
  */
 @Data
-public class CustomMapperConfig {
+public class DalaranMapperConfig {
 
     private Map<String, String> messageMapping;
 

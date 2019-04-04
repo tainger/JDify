@@ -2,6 +2,7 @@ package io.terminus.dalaran.console.model;
 
 import lombok.Data;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -12,6 +13,8 @@ public class FlowModel {
 
     private String name;
 
+    private Long moduleId;
+
     private String description;
 
     private Boolean retryable;
@@ -20,9 +23,13 @@ public class FlowModel {
 
     private Integer retryDelay = 3000;
 
-    private TriggerModel trigger;
+//    private TriggerModel trigger;
 
     private Set<ProcessorModel> processors;
 
+    private List<Long> processorIds;
+
     private Map<String, String> properties;
+
+    private List<Long> propertyIds;
 }
