@@ -15,4 +15,6 @@ public class TriggerQuery {
     private String type;
 
     private Long moduleId;
+
+    private String name;
 }

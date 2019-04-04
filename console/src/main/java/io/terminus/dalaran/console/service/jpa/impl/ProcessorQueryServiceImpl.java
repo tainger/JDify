@@ -51,6 +51,11 @@ public class ProcessorQueryServiceImpl implements ProcessorQueryService {
                 predicates.add(processorIds);
             }
 
+            if (StringUtils.isNoneBlank(query.getName())) {
+                Predicate name = criteriaBuilder.like(root.get("name"), "%" + query.getName() + "%");
+                predicates.add(name);
+            }
+
             return criteriaBuilder.and(predicates.toArray(new Predicate[predicates.size()]));
         };
         return processorQueryRepository.findAll(specification);

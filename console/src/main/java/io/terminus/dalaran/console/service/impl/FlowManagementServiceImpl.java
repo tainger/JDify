@@ -235,6 +235,6 @@ public class FlowManagementServiceImpl implements FlowManagementService, Initial
      */
     @Override
     public void afterPropertiesSet() {
-        publish();
+//        publish();
     }
 }

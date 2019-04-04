@@ -13,4 +13,6 @@ public class StructureQuery {
     private Long moduleId;
 
     private List<Long> structureIds;
+
+    private String name;
 }

@@ -27,7 +27,6 @@ public class FlowQueryServiceImpl implements FlowQueryService {
 
         Specification<FlowEntity> specification = (root, criteriaQuery, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
-
             if (StringUtils.isNoneBlank(query.getType())) {
                 Predicate type = criteriaBuilder.equal(root.get("type"), query.getType());
                 predicates.add(type);
@@ -36,6 +35,11 @@ public class FlowQueryServiceImpl implements FlowQueryService {
             if (CollectionUtils.isNotEmpty(query.getFlowIds())) {
                 Predicate flowIds = criteriaBuilder.and(root.get("id").in(query.getFlowIds()));
                 predicates.add(flowIds);
+            }
+
+            if (StringUtils.isNoneBlank(query.getName())) {
+                Predicate name = criteriaBuilder.like(root.get("name"), "%" + query.getName() + "%");
+                predicates.add(name);
             }
 
             return criteriaBuilder.and(predicates.toArray(new Predicate[predicates.size()]));
