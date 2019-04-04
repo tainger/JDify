@@ -54,7 +54,6 @@ public class FlowManagementRest {
             return propertyEntity.getId();
         }).collect(Collectors.toList());
 
-//        flow.setTrigger(triggerEntity);
         flowEntity.setProcessors(processorEntitySet);
         flowEntity.setProperties(propertyEntitySet);
 

@@ -1,6 +1,5 @@
 package io.terminus.dalaran.console.service;
 
-import io.terminus.dalaran.console.entity.ProcessorEntity;
 import io.terminus.dalaran.console.model.ProcessorModel;
 import io.terminus.dalaran.console.model.query.ProcessorQuery;
 

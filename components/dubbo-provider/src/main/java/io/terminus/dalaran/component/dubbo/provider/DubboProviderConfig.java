@@ -4,8 +4,6 @@ import io.terminus.dalaran.FieldInputType;
 import io.terminus.dalaran.annotation.ConfigFieldInfo;
 import lombok.Data;
 
-import java.util.List;
-
 @Data
 public class DubboProviderConfig {
 

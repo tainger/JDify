@@ -3,6 +3,7 @@ package io.terminus.dalaran.component.mapper;
 import io.terminus.dalaran.BodyModelType;
 import io.terminus.dalaran.component.mapper.model.FieldType;
 import lombok.Data;
+
 import java.util.Map;
 
 /**

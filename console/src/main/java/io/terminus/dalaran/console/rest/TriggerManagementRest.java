@@ -1,14 +1,14 @@
 package io.terminus.dalaran.console.rest;
 
 import io.swagger.annotations.ApiOperation;
-import io.terminus.dalaran.console.model.ProcessorModel;
 import io.terminus.dalaran.console.model.TriggerModel;
-import io.terminus.dalaran.console.model.query.ProcessorQuery;
 import io.terminus.dalaran.console.model.query.TriggerQuery;
-import io.terminus.dalaran.console.service.ProcessorManagementService;
 import io.terminus.dalaran.console.service.TriggerManagementService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 

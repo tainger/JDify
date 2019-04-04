@@ -11,6 +11,7 @@ import io.terminus.dalaran.console.service.StructureManagementService;
 import io.terminus.dalaran.console.service.jpa.StructQueryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;

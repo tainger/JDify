@@ -2,6 +2,7 @@ package io.terminus.dalaran.console.service;
 
 import io.terminus.dalaran.console.model.TriggerModel;
 import io.terminus.dalaran.console.model.query.TriggerQuery;
+
 import java.util.List;
 
 /**

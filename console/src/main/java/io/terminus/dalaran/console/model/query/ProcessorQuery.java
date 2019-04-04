@@ -1,6 +1,7 @@
 package io.terminus.dalaran.console.model.query;
 
 import lombok.Data;
+
 import java.util.List;
 
 /**

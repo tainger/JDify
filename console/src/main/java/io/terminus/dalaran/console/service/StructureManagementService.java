@@ -1,6 +1,5 @@
 package io.terminus.dalaran.console.service;
 
-import io.terminus.dalaran.console.entity.StructureEntity;
 import io.terminus.dalaran.console.model.StructureModel;
 import io.terminus.dalaran.console.model.query.StructureQuery;
 

@@ -12,10 +12,13 @@ import io.terminus.dalaran.console.service.FlowManagementService;
 import io.terminus.dalaran.console.service.jpa.FlowQueryService;
 import io.terminus.dalaran.model.DalaranFlow;
 import io.terminus.dalaran.model.MessageModel;
+import io.terminus.dalaran.model.ProcessorModel;
+import io.terminus.dalaran.model.TriggerModel;
 import lombok.val;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -26,13 +29,13 @@ public class FlowManagementServiceImpl implements FlowManagementService, Initial
     private FlowRepository flowRepository;
 
     @Autowired
+    private TriggerRepository triggerRepository;
+
+    @Autowired
     private ProcessorRepository processorRepository;
 
     @Autowired
     private PropertyRepository propertyRepository;
-
-    @Autowired
-    private TriggerRepository triggerRepository;
 
     @Autowired
     private DalaranContext dalaranContext;
@@ -111,39 +114,34 @@ public class FlowManagementServiceImpl implements FlowManagementService, Initial
                 PropertyEntity property = propertyRepository.findOne(propertyId);
                 properties.put(property.getName(), property.getValue());
             }
-            val triggerEntity = triggerRepository.findByFlowId(flowEntity.getId());
-            try {
-                val trigger = buildTrigger(triggerEntity, properties);
-                List<DalaranFlow.Processor> processors = flowEntity.getProcessors().stream()
-                        .map(processorId -> {
-                            ProcessorEntity processorEntity = processorRepository.findOne(processorId);
-                            return buildProcessor(processorEntity, properties);
-                        }).collect(Collectors.toList());
 
-                flow.setId(flowEntity.getId().toString());
-                flow.setTrigger(trigger);
-                flow.setProcessors(processors);
-                flow.setMaxRetry(flowEntity.getMaxRetry());
-                flow.setRetryDelay(flowEntity.getRetryDelay());
-                flow.setRetryable(flowEntity.getRetryable());
+            List<ProcessorModel> processors = flowEntity.getProcessors().stream()
+                    .map(processorId -> {
+                        ProcessorEntity processorEntity = processorRepository.findOne(processorId);
+                        return buildProcessor(processorEntity, properties);
+                    }).collect(Collectors.toList());
 
-                flowList.add(flow);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            flow.setId(flowEntity.getId().toString());
+            flow.setProcessors(processors);
+            flow.setMaxRetry(flowEntity.getMaxRetry());
+            flow.setRetryDelay(flowEntity.getRetryDelay());
+            flow.setRetryable(flowEntity.getRetryable());
+
+            flowList.add(flow);
+        }
+        val triggerEntities = triggerRepository.findAll();
+        for (TriggerEntity triggerEntity : triggerEntities) {
+            val trigger = buildTrigger(triggerEntity);
+            dalaranContext.addTrigger(trigger);
         }
         dalaranContext.addFlows(flowList);
     }
 
-    private DalaranFlow.Trigger buildTrigger(TriggerEntity triggerEntity, Map<String, String> properties) throws Exception {
-        if (triggerEntity == null) {
-            throw new  Exception();
-        }
-
-        val trigger = new DalaranFlow.Trigger();
+    private TriggerModel buildTrigger(TriggerEntity triggerEntity) {
+        val trigger = new TriggerModel();
         Class configType = dalaranContext.getDalaranComponentContext().getTriggerInfo(triggerEntity.getType()).getConfigType();
-        String jsonConfig = replaceProperties(triggerEntity.getConfig(), properties);
-        Object config = gson.fromJson(jsonConfig, configType);
+//        String jsonConfig = replaceProperties(triggerEntity.getConfig(), properties);
+        Object config = gson.fromJson(triggerEntity.getConfig(), configType);
 
         if (triggerEntity.getInStructure() != null) {
             val inModel = buildMessageModel(triggerEntity.getInStructure());
@@ -155,14 +153,15 @@ public class FlowManagementServiceImpl implements FlowManagementService, Initial
         }
 
         trigger.setId(triggerEntity.getId());
+        trigger.setFlowId(triggerEntity.getFlow().getId());
         trigger.setType(triggerEntity.getType());
         trigger.setConfig(config);
         return trigger;
     }
 
     // TODO 分开写是为了避免后期差异
-    private DalaranFlow.Processor buildProcessor(ProcessorEntity processorEntity, Map<String, String> properties) {
-        val processor = new DalaranFlow.Processor();
+    private ProcessorModel buildProcessor(ProcessorEntity processorEntity, Map<String, String> properties) {
+        val processor = new ProcessorModel();
         Class configType = dalaranContext.getDalaranComponentContext().getProcessorInfo(processorEntity.getType()).getConfigType();
         String jsonConfig = replaceProperties(processorEntity.getConfig(), properties);
         Object config = gson.fromJson(jsonConfig, configType);
