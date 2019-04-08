@@ -1,7 +1,8 @@
 package io.terminus.dalaran.support.flow;
 
 import io.terminus.dalaran.*;
-import io.terminus.dalaran.model.*;
+import io.terminus.dalaran.model.DalaranFlow;
+import io.terminus.dalaran.model.TriggerModel;
 import io.terminus.dalaran.support.trace.DalaranTracer;
 import lombok.val;
 import org.apache.camel.CamelContext;
