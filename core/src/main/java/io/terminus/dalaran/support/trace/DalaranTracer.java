@@ -1,10 +1,13 @@
 package io.terminus.dalaran.support.trace;
 
 import io.terminus.dalaran.BodyModelType;
-import io.terminus.dalaran.model.DalaranTracingInfo;
+import io.terminus.dalaran.DalaranTraceLogger;
+import io.terminus.dalaran.model.DalaranTracingLog;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.camel.Processor;
 import org.apache.camel.util.MessageHelper;
+
+import static io.terminus.dalaran.DalaranConstants.*;
 
 /**
  * 尝试过 InterceptStrategy 和 TraceEventHandler, 最后决定自己写前后 processor 处理
@@ -13,41 +16,68 @@ import org.apache.camel.util.MessageHelper;
 @Slf4j
 public class DalaranTracer {
 
-    private final DalaranTracingInfo tracingInfo;
+    private final DalaranTraceLogger logger;
 
-    public DalaranTracer() {
-        this.tracingInfo = new DalaranTracingInfo();
+    private final TracingType traceType;
+
+    public DalaranTracer(DalaranTraceLogger logger, TracingType traceType) {
+        this.logger = logger;
+        this.traceType = traceType;
     }
 
-    public DalaranTracer(Long processorId) {
-        this();
-        tracingInfo.setProcessorId(processorId);
-    }
-
+    // TODO async
     public Processor buildBeforeProcessor(BodyModelType bodyModelType) {
         return exchange -> {
-            tracingInfo.setTriggerId(exchange.getProperty("trigger_id", Long.class));
-            tracingInfo.setFlowId(exchange.getProperty("flow_id", Long.class));
-            tracingInfo.setTimestamp(System.currentTimeMillis());
-            tracingInfo.setInputBody(MessageHelper.extractBodyForLogging(exchange.getIn(), ""));
-            tracingInfo.setInputBodyType(bodyModelType);
-            tracingInfo.setInputHeaders(exchange.getIn().getHeaders());
-
             // 保持输入输出不变
             exchange.setOut(exchange.getIn());
+
+            DalaranTracingLog tracingLog = new DalaranTracingLog();
+            switch (traceType) {
+                case Flow:
+                    exchange.setProperty(FLOW_TRACING_LOG, tracingLog);
+                    tracingLog.setFlowId(exchange.getProperty(CURRENT_FLOW_ID, Long.class));
+                    tracingLog.setProcessorId(exchange.getProperty(CURRENT_PROCESSOR_ID, Long.class));
+                    break;
+                case Trigger:
+                    exchange.setProperty(TRIGGER_TRACING_LOG, tracingLog);
+                    break;
+            }
+
+            tracingLog.setTriggerId(exchange.getProperty(CURRENT_TRIGGER_ID, Long.class));
+            tracingLog.setTimestamp(System.currentTimeMillis());
+            tracingLog.setInputBody(MessageHelper.extractBodyForLogging(exchange.getIn(), ""));
+            tracingLog.setInputBodyType(bodyModelType);
+
+//            tracingLog.setInputHeaders(exchange.getIn().getHeaders());
+
         };
     }
 
+    // TODO async
     public Processor buildAfterProcessor(BodyModelType bodyModelType) {
         return exchange -> {
-            tracingInfo.setOutputBody(MessageHelper.extractBodyForLogging(exchange.getIn(), ""));
-            tracingInfo.setOutputBodyType(bodyModelType);
-            tracingInfo.setOutputHeaders(exchange.getIn().getHeaders());
-            tracingInfo.setElapsed(System.currentTimeMillis() - tracingInfo.getTimestamp());
-
             // 保持输入输出不变
             exchange.setOut(exchange.getIn());
-            log.info("tracing: " + tracingInfo.toString());
+
+            DalaranTracingLog tracingLog = null;
+            switch (traceType) {
+                case Flow:
+                    tracingLog = exchange.getProperty(FLOW_TRACING_LOG, DalaranTracingLog.class);
+                    break;
+                case Trigger:
+                    tracingLog = exchange.getProperty(TRIGGER_TRACING_LOG, DalaranTracingLog.class);
+                    break;
+            }
+
+            if (tracingLog == null) {
+                return;
+            }
+            tracingLog.setOutputBody(MessageHelper.extractBodyForLogging(exchange.getIn(), ""));
+            tracingLog.setOutputBodyType(bodyModelType);
+            tracingLog.setElapsed(System.currentTimeMillis() - tracingLog.getTimestamp());
+//            tracingLog.setOutputHeaders(exchange.getIn().getHeaders());
+
+            logger.log(tracingLog);
         };
     }
 }

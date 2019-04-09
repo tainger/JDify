@@ -3,10 +3,16 @@ package io.terminus.dalaran.model;
 import io.terminus.dalaran.BodyModelType;
 import lombok.Data;
 
-import java.util.Map;
+import javax.persistence.*;
 
 @Data
-public class DalaranTracingInfo {
+@Entity
+@Table(name = "dalaran_tracing_log")
+public class DalaranTracingLog {
+
+    @Id
+    @GeneratedValue
+    private Long id;
 
     private Long triggerId;
 
@@ -19,10 +25,12 @@ public class DalaranTracingInfo {
     private Long elapsed;
 
     private String inputBody;
+
+    @Enumerated(EnumType.STRING)
     private BodyModelType inputBodyType;
-    private Map<String, Object> inputHeaders;
 
     private String outputBody;
+
+    @Enumerated(EnumType.STRING)
     private BodyModelType outputBodyType;
-    private Map<String, Object> outputHeaders;
 }

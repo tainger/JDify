@@ -1,7 +1,8 @@
 package io.terminus.dalaran.console.entity;
 
 import io.terminus.dalaran.FlowStatus;
-import io.terminus.dalaran.console.JsonConverter;
+import io.terminus.dalaran.support.jpa.ListToJsonConverter;
+import io.terminus.dalaran.support.jpa.MapToJsonConverter;
 import lombok.Data;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
@@ -38,11 +39,11 @@ public class FlowEntity {
     @JoinColumn(name = "module_id")
     private ModuleEntity module;
 
-    @Convert(converter = JsonConverter.class)
+    @Convert(converter = ListToJsonConverter.class)
     @Column(name = "processor_ids")
     private List<Long> processors = new ArrayList<>();
 
-    @Convert(converter = JsonConverter.class)
+    @Convert(converter = ListToJsonConverter.class)
     private List<Long> properties = new ArrayList<>();
 
     @CreatedDate

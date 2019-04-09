@@ -1,6 +1,7 @@
 package io.terminus.dalaran.console.entity;
 
-import io.terminus.dalaran.console.JsonConverter;
+import io.terminus.dalaran.support.jpa.ListToJsonConverter;
+import io.terminus.dalaran.support.jpa.MapToJsonConverter;
 import lombok.Data;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
@@ -28,7 +29,7 @@ public class ModuleEntity {
 
     private String description;
 
-    @Convert(converter = JsonConverter.class)
+    @Convert(converter = ListToJsonConverter.class)
     @Column(name = "dependency_ids")
     private List<Long> dependencies = new ArrayList<>();
 
