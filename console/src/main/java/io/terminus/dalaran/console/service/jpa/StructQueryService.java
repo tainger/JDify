@@ -1,7 +1,7 @@
 package io.terminus.dalaran.console.service.jpa;
 
-import io.terminus.dalaran.entity.StructureEntity;
 import io.terminus.dalaran.console.model.query.StructureQuery;
+import io.terminus.dalaran.entity.StructureEntity;
 
 import java.util.List;
 

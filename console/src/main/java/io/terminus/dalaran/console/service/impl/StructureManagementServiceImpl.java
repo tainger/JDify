@@ -1,14 +1,14 @@
 package io.terminus.dalaran.console.service.impl;
 
 import com.alibaba.fastjson.JSON;
-import io.terminus.dalaran.entity.ModuleEntity;
-import io.terminus.dalaran.entity.StructureEntity;
 import io.terminus.dalaran.console.model.StructureModel;
 import io.terminus.dalaran.console.model.query.StructureQuery;
-import io.terminus.dalaran.repository.ModuleRepository;
-import io.terminus.dalaran.repository.StructureRepository;
 import io.terminus.dalaran.console.service.StructureManagementService;
 import io.terminus.dalaran.console.service.jpa.StructQueryService;
+import io.terminus.dalaran.entity.ModuleEntity;
+import io.terminus.dalaran.entity.StructureEntity;
+import io.terminus.dalaran.repository.ModuleRepository;
+import io.terminus.dalaran.repository.StructureRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

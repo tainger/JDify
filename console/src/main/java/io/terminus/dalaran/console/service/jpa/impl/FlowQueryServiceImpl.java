@@ -1,9 +1,9 @@
 package io.terminus.dalaran.console.service.jpa.impl;
 
-import io.terminus.dalaran.entity.FlowEntity;
 import io.terminus.dalaran.console.model.query.FlowQuery;
-import io.terminus.dalaran.repository.specification.FlowQueryRepository;
 import io.terminus.dalaran.console.service.jpa.FlowQueryService;
+import io.terminus.dalaran.entity.FlowEntity;
+import io.terminus.dalaran.repository.specification.FlowQueryRepository;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;

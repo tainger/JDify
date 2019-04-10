@@ -1,9 +1,9 @@
 package io.terminus.dalaran.console.service.jpa.impl;
 
-import io.terminus.dalaran.entity.StructureEntity;
 import io.terminus.dalaran.console.model.query.StructureQuery;
-import io.terminus.dalaran.repository.specification.StructureQueryRepository;
 import io.terminus.dalaran.console.service.jpa.StructQueryService;
+import io.terminus.dalaran.entity.StructureEntity;
+import io.terminus.dalaran.repository.specification.StructureQueryRepository;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -2,14 +2,14 @@ package io.terminus.dalaran.console.rest;
 
 import com.google.gson.Gson;
 import io.swagger.annotations.ApiOperation;
+import io.terminus.dalaran.console.model.FlowModel;
+import io.terminus.dalaran.console.model.query.FlowQuery;
+import io.terminus.dalaran.console.service.FlowManagementService;
 import io.terminus.dalaran.entity.FlowEntity;
 import io.terminus.dalaran.entity.ProcessorEntity;
 import io.terminus.dalaran.entity.PropertyEntity;
-import io.terminus.dalaran.console.model.FlowModel;
-import io.terminus.dalaran.console.model.query.FlowQuery;
 import io.terminus.dalaran.repository.ProcessorRepository;
 import io.terminus.dalaran.repository.PropertyRepository;
-import io.terminus.dalaran.console.service.FlowManagementService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

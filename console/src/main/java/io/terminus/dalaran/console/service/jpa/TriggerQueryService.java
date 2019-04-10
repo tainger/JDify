@@ -1,7 +1,7 @@
 package io.terminus.dalaran.console.service.jpa;
 
-import io.terminus.dalaran.entity.TriggerEntity;
 import io.terminus.dalaran.console.model.query.TriggerQuery;
+import io.terminus.dalaran.entity.TriggerEntity;
 
 import java.util.List;
 

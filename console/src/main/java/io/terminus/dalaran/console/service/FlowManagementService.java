@@ -1,8 +1,8 @@
 package io.terminus.dalaran.console.service;
 
-import io.terminus.dalaran.entity.FlowEntity;
 import io.terminus.dalaran.console.model.FlowModel;
 import io.terminus.dalaran.console.model.query.FlowQuery;
+import io.terminus.dalaran.entity.FlowEntity;
 
 import java.util.List;
 
