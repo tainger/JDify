@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>dalaran-parent</artifactId>
+        <groupId>io.terminus</groupId>
+        <version>2.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>dalaran-components</artifactId>
+
+    <dependencies>
+        <dependency>
+            <groupId>io.terminus</groupId>
+            <artifactId>dalaran-core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <!-- scheduler trigger -->
+        <dependency>
+            <groupId>org.apache.camel</groupId>
+            <artifactId>camel-quartz2</artifactId>
+            <version>${camel.version}</version>
+        </dependency>
+
+        <!-- dubbo trigger -->
+        <dependency>
+            <groupId>io.terminus</groupId>
+            <artifactId>camel-dubbo</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <!-- http trigger -->
+        <dependency>
+            <groupId>org.apache.camel</groupId>
+            <artifactId>camel-netty4-http</artifactId>
+            <version>${camel.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>javax.servlet</groupId>
+                    <artifactId>javax.servlet-api</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <!-- script processor -->
+        <dependency>
+            <groupId>org.apache.camel</groupId>
+            <artifactId>camel-script</artifactId>
+            <version>${camel.version}</version>
+        </dependency>
+
+        <!-- http processor -->
+        <dependency>
+            <groupId>org.apache.camel</groupId>
+            <artifactId>camel-http4</artifactId>
+            <version>${camel.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>4.0.1</version>
+        </dependency>
+
+    </dependencies>
+
+</project>

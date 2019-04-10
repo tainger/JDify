@@ -9,7 +9,14 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>dalaran-components</artifactId>
+    <artifactId>dalaran-common</artifactId>
 
+    <dependencies>
+        <dependency>
+            <groupId>io.terminus</groupId>
+            <artifactId>dalaran-core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+    </dependencies>
 
 </project>
