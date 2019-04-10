@@ -1,13 +1,13 @@
-package io.terminus.dalaran.console;
+package io.terminus.dalaran.support.jpa;
 
-import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import javax.persistence.AttributeConverter;
 import java.lang.reflect.Type;
 import java.util.List;
 
-public class JsonConverter implements AttributeConverter<List, String> {
+public class ListToJsonConverter implements AttributeConverter<List, String> {
 
     private final Gson gson = new Gson();
 
@@ -18,7 +18,9 @@ public class JsonConverter implements AttributeConverter<List, String> {
 
     @Override
     public List convertToEntityAttribute(String dbData) {
-        Type type = new TypeToken<List<Long>>(){}.getType();
+        Type type = new TypeToken<List<Long>>() {
+        }.getType();
         return gson.fromJson(dbData, type);
     }
 }
+

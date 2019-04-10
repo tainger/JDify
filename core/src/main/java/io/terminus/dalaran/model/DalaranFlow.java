@@ -11,7 +11,7 @@ import java.util.Map;
 public class DalaranFlow {
 
     @NotNull
-    private String id;
+    private Long id;
 
     @Nullable
     private Boolean retryable;
@@ -21,6 +21,10 @@ public class DalaranFlow {
 
     @Nullable
     private Integer retryDelay;
+
+    private MessageModel inModel;
+
+    private MessageModel outModel;
 
     @NotNull
     private List<ProcessorModel> processors;

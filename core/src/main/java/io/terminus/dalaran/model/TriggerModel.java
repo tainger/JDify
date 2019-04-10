@@ -10,7 +10,7 @@ public class TriggerModel<T> {
     private Long id;
 
     @NotNull
-    private Long flowId;
+    private DalaranFlow flow;
 
     @NotNull
     private String type;

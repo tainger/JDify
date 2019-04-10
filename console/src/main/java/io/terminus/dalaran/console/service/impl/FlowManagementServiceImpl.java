@@ -53,7 +53,7 @@ public class FlowManagementServiceImpl implements FlowManagementService, Initial
     public List<FlowModel> queryFlows(FlowQuery query) {
         List<FlowEntity> entities = flowQueryService.query(query);
         List<FlowModel> models = new LinkedList<>();
-        for (FlowEntity entity: entities) {
+        for (FlowEntity entity : entities) {
             models.add(buildModel(entity));
         }
 
@@ -84,7 +84,7 @@ public class FlowManagementServiceImpl implements FlowManagementService, Initial
     public List<FlowModel> list() {
         List<FlowEntity> entities = flowRepository.findAll();
         List<FlowModel> models = new LinkedList<>();
-        for (FlowEntity entity: entities) {
+        for (FlowEntity entity : entities) {
             models.add(buildModel(entity));
         }
 
@@ -95,7 +95,7 @@ public class FlowManagementServiceImpl implements FlowManagementService, Initial
     public List<FlowModel> queryByProcessorIds(List<Long> processorIds) {
         List<FlowEntity> entities = flowQueryService.queryByProcessorIds(processorIds);
         List<FlowModel> models = new LinkedList<>();
-        for (FlowEntity entity: entities) {
+        for (FlowEntity entity : entities) {
             models.add(buildModel(entity));
         }
 
@@ -107,27 +107,7 @@ public class FlowManagementServiceImpl implements FlowManagementService, Initial
         List<DalaranFlow> flowList = new ArrayList<>();
         List<FlowEntity> flowEntities = flowRepository.findAll();
         for (FlowEntity flowEntity : flowEntities) {
-            val flow = new DalaranFlow();
-            Map<String, String> properties = new HashMap<>();
-            // TODO 加载全局变量, 局部覆盖
-            for (Long propertyId : flowEntity.getProperties()) {
-                PropertyEntity property = propertyRepository.findOne(propertyId);
-                properties.put(property.getName(), property.getValue());
-            }
-
-            List<ProcessorModel> processors = flowEntity.getProcessors().stream()
-                    .map(processorId -> {
-                        ProcessorEntity processorEntity = processorRepository.findOne(processorId);
-                        return buildProcessor(processorEntity, properties);
-                    }).collect(Collectors.toList());
-
-            flow.setId(flowEntity.getId().toString());
-            flow.setProcessors(processors);
-            flow.setMaxRetry(flowEntity.getMaxRetry());
-            flow.setRetryDelay(flowEntity.getRetryDelay());
-            flow.setRetryable(flowEntity.getRetryable());
-
-            flowList.add(flow);
+            flowList.add(buildDalaranFlow(flowEntity));
         }
         val triggerEntities = triggerRepository.findAll();
         for (TriggerEntity triggerEntity : triggerEntities) {
@@ -153,7 +133,7 @@ public class FlowManagementServiceImpl implements FlowManagementService, Initial
         }
 
         trigger.setId(triggerEntity.getId());
-        trigger.setFlowId(triggerEntity.getFlow().getId());
+        trigger.setFlow(buildDalaranFlow(triggerEntity.getFlow()));
         trigger.setType(triggerEntity.getType());
         trigger.setConfig(config);
         return trigger;
@@ -196,11 +176,34 @@ public class FlowManagementServiceImpl implements FlowManagementService, Initial
         return model;
     }
 
+    private DalaranFlow buildDalaranFlow(FlowEntity flowEntity) {
+        val flow = new DalaranFlow();
+        Map<String, String> properties = new HashMap<>();
+        // TODO 加载全局变量, 局部覆盖
+        for (Long propertyId : flowEntity.getProperties()) {
+            PropertyEntity property = propertyRepository.findOne(propertyId);
+            properties.put(property.getName(), property.getValue());
+        }
+
+        List<ProcessorModel> processors = flowEntity.getProcessors().stream()
+                .map(processorId -> {
+                    ProcessorEntity processorEntity = processorRepository.findOne(processorId);
+                    return buildProcessor(processorEntity, properties);
+                }).collect(Collectors.toList());
+
+        flow.setId(flowEntity.getId());
+        flow.setProcessors(processors);
+        flow.setMaxRetry(flowEntity.getMaxRetry());
+        flow.setRetryDelay(flowEntity.getRetryDelay());
+        flow.setRetryable(flowEntity.getRetryable());
+        return flow;
+    }
+
     private FlowEntity buildEntity(FlowModel model) {
         FlowEntity flowEntity = new FlowEntity();
         ModuleEntity moduleEntity = moduleRepository.findOne(model.getModuleId());
         List<ProcessorEntity> processors = new LinkedList<>();
-        for (Long id: model.getProcessorIds()) {
+        for (Long id : model.getProcessorIds()) {
             processors.add(processorRepository.findOne(id));
         }
 
@@ -235,6 +238,6 @@ public class FlowManagementServiceImpl implements FlowManagementService, Initial
      */
     @Override
     public void afterPropertiesSet() {
-//        publish();
+        publish();
     }
 }

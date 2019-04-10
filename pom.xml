@@ -21,6 +21,7 @@
         <module>example</module>
         <module>camel-components</module>
         <module>console</module>
+        <module>starter</module>
     </modules>
 
     <properties>
