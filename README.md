@@ -38,6 +38,7 @@
 ## 开发者手册
 
 * [架构介绍](./docs/developer/architecture.md)
+* [模块说明](./docs/developer/module.md)
 * [集成流程](./docs/developer/flow.md)
 * [流程设计器配置](./docs/developer/flow-design.md)
 * [接口设计](./docs/developer/api-design.md)
