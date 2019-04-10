@@ -1,0 +1,43 @@
+{
+  "properties": {
+    "port": 8184,
+    "targetHost": "localhost",
+    "targetPort": 8080
+  },
+  "trigger": {
+    "type": "netty-http-listener",
+    "config": {
+      "protocol": "HTTP",
+      "host": "0.0.0.0",
+      "port": 8184,
+      "path": "/orderItemsMapper",
+      "method": "POST"
+    }
+  },
+  "processors": [
+    {
+      "type": "custom-convert",
+      "config": {
+        "messageMapping": {
+          "id": "mapping/field/id",
+          "itemName": "mapping/field/name",
+          "itemPrice": "mapping/field/price"
+        },
+        "target": {"id": "INT", "name": "STRING", "price": "INT"},
+        "targetType": "XML",
+        "destination": {"id": "INT", "itemName": "STRING", "itemPrice": "FLOAT"},
+        "destinationType": "JSON"
+      }
+    },
+    {
+      "type": "http-client",
+      "config": {
+        "protocol": "HTTP",
+        "method": "POST",
+        "host": "{{targetHost}}",
+        "port": "{{targetPort}}",
+        "path": "/orders"
+      }
+    }
+  ]
+}

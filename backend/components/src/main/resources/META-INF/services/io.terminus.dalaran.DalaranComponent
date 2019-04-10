@@ -1,0 +1,8 @@
+io.terminus.dalaran.component.processor.route.DalaranRouter
+io.terminus.dalaran.component.processor.script.DalaranScript
+io.terminus.dalaran.component.processor.http.DalaranHttpClient
+io.terminus.dalaran.component.processor.mapper.DalaranMessageMapper
+
+io.terminus.dalaran.component.trigger.dubbo.DalaranDubboProvider
+io.terminus.dalaran.component.trigger.http.NettyHttpListener
+io.terminus.dalaran.component.trigger.scheduler.DalaranScheduler

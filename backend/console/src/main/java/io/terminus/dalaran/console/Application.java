@@ -1,4 +1,4 @@
-package io.terminus.dalaran;
+package io.terminus.dalaran.console;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
