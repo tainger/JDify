@@ -1,4 +1,4 @@
-package io.terminus.dalaran.trigger.http;
+package io.terminus.dalaran.component.trigger.http;
 
 import io.terminus.dalaran.FieldInputType;
 import io.terminus.dalaran.annotation.ConfigFieldInfo;

@@ -1,4 +1,4 @@
-package io.terminus.dalaran.processor.mapper.model;
+package io.terminus.dalaran.component.processor.mapper.model;
 
 import io.terminus.dalaran.BodyModelType;
 import lombok.Data;

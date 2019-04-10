@@ -1,4 +1,4 @@
-package io.terminus.dalaran.processor.http;
+package io.terminus.dalaran.component.processor.http;
 
 import io.terminus.dalaran.BodyMode;
 import io.terminus.dalaran.DalaranProcessor;

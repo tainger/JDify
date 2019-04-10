@@ -1,9 +1,9 @@
-package io.terminus.dalaran.processor.mapper;
+package io.terminus.dalaran.component.processor.mapper;
 
 import com.github.drapostolos.typeparser.TypeParser;
 import com.google.gson.Gson;
-import io.terminus.dalaran.processor.mapper.jxpath.DalaranJXPathFactory;
-import io.terminus.dalaran.processor.mapper.model.FieldType;
+import io.terminus.dalaran.component.processor.mapper.jxpath.DalaranJXPathFactory;
+import io.terminus.dalaran.component.processor.mapper.model.FieldType;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.commons.jxpath.JXPathContext;

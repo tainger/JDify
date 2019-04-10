@@ -1,4 +1,4 @@
-package io.terminus.dalaran.processor.script;
+package io.terminus.dalaran.component.processor.script;
 
 public enum DalaranScriptType {
 

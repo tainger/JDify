@@ -1,6 +1,6 @@
-package io.terminus.dalaran.console.repository;
+package io.terminus.dalaran.repository;
 
-import io.terminus.dalaran.console.entity.FlowEntity;
+import io.terminus.dalaran.entity.FlowEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface FlowRepository extends JpaRepository<FlowEntity, Long> {

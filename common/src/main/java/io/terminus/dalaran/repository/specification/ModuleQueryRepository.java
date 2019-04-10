@@ -1,6 +1,6 @@
-package io.terminus.dalaran.console.repository.specification;
+package io.terminus.dalaran.repository.specification;
 
-import io.terminus.dalaran.console.entity.ModuleEntity;
+import io.terminus.dalaran.entity.ModuleEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 

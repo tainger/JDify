@@ -1,4 +1,4 @@
-package io.terminus.dalaran.trigger.dubbo;
+package io.terminus.dalaran.component.trigger.dubbo;
 
 import io.terminus.dalaran.BodyMode;
 import io.terminus.dalaran.DalaranTrigger;

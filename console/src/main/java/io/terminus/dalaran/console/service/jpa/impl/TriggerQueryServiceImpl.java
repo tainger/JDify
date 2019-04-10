@@ -1,8 +1,8 @@
 package io.terminus.dalaran.console.service.jpa.impl;
 
-import io.terminus.dalaran.console.entity.TriggerEntity;
+import io.terminus.dalaran.entity.TriggerEntity;
 import io.terminus.dalaran.console.model.query.TriggerQuery;
-import io.terminus.dalaran.console.repository.specification.TriggerQueryRepository;
+import io.terminus.dalaran.repository.specification.TriggerQueryRepository;
 import io.terminus.dalaran.console.service.jpa.TriggerQueryService;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;

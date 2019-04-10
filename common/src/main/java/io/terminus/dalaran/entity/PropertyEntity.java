@@ -1,4 +1,4 @@
-package io.terminus.dalaran.console.entity;
+package io.terminus.dalaran.entity;
 
 import lombok.Data;
 import org.springframework.data.annotation.CreatedBy;

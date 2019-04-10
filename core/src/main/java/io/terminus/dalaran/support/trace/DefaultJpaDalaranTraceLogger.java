@@ -30,7 +30,7 @@ public class DefaultJpaDalaranTraceLogger implements DalaranTraceLogger {
                 try {
                     DalaranTracingLog tracingLog = logQueue.take();
                     tracingLogRepository.save(tracingLog);
-                } catch (InterruptedException e) {
+                } catch (Throwable e) {
                     e.printStackTrace();
                 }
             }

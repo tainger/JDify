@@ -1,4 +1,4 @@
-package io.terminus.dalaran.processor.mapper.jxpath;
+package io.terminus.dalaran.component.processor.mapper.jxpath;
 
 import org.apache.commons.jxpath.AbstractFactory;
 import org.apache.commons.jxpath.JXPathContext;

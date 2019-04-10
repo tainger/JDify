@@ -1,4 +1,4 @@
-package io.terminus.dalaran.trigger.http;
+package io.terminus.dalaran.component.trigger.http;
 
 public enum HttpProtocol {
     HTTP, HTTPS

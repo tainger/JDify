@@ -1,8 +1,8 @@
 package io.terminus.dalaran.console.service.jpa.impl;
 
-import io.terminus.dalaran.console.entity.ProcessorEntity;
+import io.terminus.dalaran.entity.ProcessorEntity;
 import io.terminus.dalaran.console.model.query.ProcessorQuery;
-import io.terminus.dalaran.console.repository.specification.ProcessorQueryRepository;
+import io.terminus.dalaran.repository.specification.ProcessorQueryRepository;
 import io.terminus.dalaran.console.service.jpa.ProcessorQueryService;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;

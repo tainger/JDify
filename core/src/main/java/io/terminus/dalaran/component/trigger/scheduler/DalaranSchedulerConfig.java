@@ -1,4 +1,4 @@
-package io.terminus.dalaran.trigger.scheduler;
+package io.terminus.dalaran.component.trigger.scheduler;
 
 import io.terminus.dalaran.FieldInputType;
 import io.terminus.dalaran.annotation.ConfigFieldInfo;

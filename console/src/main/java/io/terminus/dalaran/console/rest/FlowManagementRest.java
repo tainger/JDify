@@ -2,13 +2,13 @@ package io.terminus.dalaran.console.rest;
 
 import com.google.gson.Gson;
 import io.swagger.annotations.ApiOperation;
-import io.terminus.dalaran.console.entity.FlowEntity;
-import io.terminus.dalaran.console.entity.ProcessorEntity;
-import io.terminus.dalaran.console.entity.PropertyEntity;
+import io.terminus.dalaran.entity.FlowEntity;
+import io.terminus.dalaran.entity.ProcessorEntity;
+import io.terminus.dalaran.entity.PropertyEntity;
 import io.terminus.dalaran.console.model.FlowModel;
 import io.terminus.dalaran.console.model.query.FlowQuery;
-import io.terminus.dalaran.console.repository.ProcessorRepository;
-import io.terminus.dalaran.console.repository.PropertyRepository;
+import io.terminus.dalaran.repository.ProcessorRepository;
+import io.terminus.dalaran.repository.PropertyRepository;
 import io.terminus.dalaran.console.service.FlowManagementService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -70,18 +70,18 @@ public class FlowManagementRest {
         flowManagementService.saveFlow(flowEntity);
     }
 
-    @ApiOperation(value="流程发布", notes="后边应该会改动，目前的发布流程是trigger跟processors一起的")
-    @PostMapping("/publish")
-    void publish() {
-        flowManagementService.publish();
-    }
-
-    @ApiOperation(value = "模型保存并发布")
-    @PostMapping("/saveAndPublish")
-    void publish(@RequestBody FlowModel flowModel) {
-        saveFlow(flowModel);
-        flowManagementService.publish();
-    }
+//    @ApiOperation(value="流程发布", notes="后边应该会改动，目前的发布流程是trigger跟processors一起的")
+//    @PostMapping("/publish")
+//    void publish() {
+//        flowManagementService.publish();
+//    }
+//
+//    @ApiOperation(value = "模型保存并发布")
+//    @PostMapping("/saveAndPublish")
+//    void publish(@RequestBody FlowModel flowModel) {
+//        saveFlow(flowModel);
+//        flowManagementService.publish();
+//    }
 
     @ApiOperation(value = "创建工作流")
     @RequestMapping(value = "/create", method = RequestMethod.POST)

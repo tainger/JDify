@@ -1,4 +1,4 @@
-package io.terminus.dalaran.console.entity;
+package io.terminus.dalaran.entity;
 
 import io.terminus.dalaran.BodyModelType;
 import lombok.Data;

@@ -1,4 +1,4 @@
-package io.terminus.dalaran.processor.script;
+package io.terminus.dalaran.component.processor.script;
 
 import io.terminus.dalaran.BodyMode;
 import io.terminus.dalaran.DalaranProcessor;

@@ -1,7 +1,7 @@
-package io.terminus.dalaran.processor.mapper;
+package io.terminus.dalaran.component.processor.mapper;
 
 import io.terminus.dalaran.BodyModelType;
-import io.terminus.dalaran.processor.mapper.model.FieldType;
+import io.terminus.dalaran.component.processor.mapper.model.FieldType;
 import lombok.Data;
 
 import java.util.Map;

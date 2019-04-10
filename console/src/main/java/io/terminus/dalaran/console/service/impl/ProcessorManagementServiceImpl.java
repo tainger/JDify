@@ -1,14 +1,14 @@
 package io.terminus.dalaran.console.service.impl;
 
 import com.alibaba.fastjson.JSON;
-import io.terminus.dalaran.console.entity.ModuleEntity;
-import io.terminus.dalaran.console.entity.ProcessorEntity;
-import io.terminus.dalaran.console.entity.StructureEntity;
+import io.terminus.dalaran.entity.ModuleEntity;
+import io.terminus.dalaran.entity.ProcessorEntity;
+import io.terminus.dalaran.entity.StructureEntity;
 import io.terminus.dalaran.console.model.ProcessorModel;
 import io.terminus.dalaran.console.model.query.ProcessorQuery;
-import io.terminus.dalaran.console.repository.ModuleRepository;
-import io.terminus.dalaran.console.repository.ProcessorRepository;
-import io.terminus.dalaran.console.repository.StructureRepository;
+import io.terminus.dalaran.repository.ModuleRepository;
+import io.terminus.dalaran.repository.ProcessorRepository;
+import io.terminus.dalaran.repository.StructureRepository;
 import io.terminus.dalaran.console.service.ProcessorManagementService;
 import io.terminus.dalaran.console.service.jpa.ProcessorQueryService;
 import org.springframework.beans.factory.annotation.Autowired;
