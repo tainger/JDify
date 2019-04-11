@@ -9,6 +9,7 @@ public final class DalaranConstants {
     public static final String FLOW_TRACING_LOG = "dalaran_flow_tracing_log";
 
     public static final String FLOW_PREFIX = "flow-";
+    public static final String TRIGGER_PREFIX = "trigger-";
     public static final String FLOW_CAMEL_URI_PREFIX = "direct:flow-";
 
 
