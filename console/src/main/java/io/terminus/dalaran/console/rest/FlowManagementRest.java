@@ -2,6 +2,7 @@ package io.terminus.dalaran.console.rest;
 
 import com.google.gson.Gson;
 import io.swagger.annotations.ApiOperation;
+import io.terminus.dalaran.DalaranContext;
 import io.terminus.dalaran.console.model.FlowModel;
 import io.terminus.dalaran.console.model.query.FlowQuery;
 import io.terminus.dalaran.console.service.FlowManagementService;
@@ -29,6 +30,9 @@ public class FlowManagementRest {
 
     @Autowired
     private FlowManagementService flowManagementService;
+
+    @Autowired
+    private DalaranContext dalaranContext;
 
     private Gson gson = new Gson();
 
@@ -116,5 +120,13 @@ public class FlowManagementRest {
     @RequestMapping(value = "/queryByProcessorIds", method = RequestMethod.GET)
     public List<FlowModel> queryByProcessorIds(@RequestParam List<Long> processorIds) {
         return flowManagementService.queryByProcessorIds(processorIds);
+    }
+
+    @PostMapping("/{flowId}")
+    public Object testFlow(@PathVariable Long flowId, @RequestBody String body) {
+//        FlowModel flowModel = flowManagementService.getById(flowId);
+
+
+        return dalaranContext.testFlow(flowId, body);
     }
 }
