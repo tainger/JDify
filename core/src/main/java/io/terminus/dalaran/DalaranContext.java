@@ -7,9 +7,9 @@ import java.util.List;
 
 public interface DalaranContext {
 
-    void removeFlow(String id) throws Exception;
+    void removeFlow(Long id);
 
-    void removeFlows(List<String> id);
+    void removeFlows(List<Long> id);
 
     void removeAllFlow() throws Exception;
 
@@ -20,6 +20,8 @@ public interface DalaranContext {
     void addTrigger(TriggerModel trigger);
 
     void addTriggers(List<TriggerModel> triggers);
+
+    Object testFlow(Long id, Object body);
 
     DalaranComponentContext getDalaranComponentContext();
 

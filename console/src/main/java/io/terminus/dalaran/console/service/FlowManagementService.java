@@ -7,6 +7,7 @@ import io.terminus.dalaran.model.config.ProcessorInfo;
 import io.terminus.dalaran.model.config.TriggerInfo;
 import io.terminus.dalaran.entity.FlowEntity;
 import java.util.Collection;
+import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 public interface FlowManagementService {
@@ -30,4 +31,7 @@ public interface FlowManagementService {
     Collection<TriggerInfo> listTriggers();
 
     List<ModuleComponent> getComponents(Long moduleId);
+
+    @Nullable
+    FlowModel getById(Long flowId);
 }

@@ -12,6 +12,7 @@ import io.terminus.dalaran.entity.ProcessorEntity;
 import io.terminus.dalaran.model.config.ProcessorInfo;
 import io.terminus.dalaran.model.config.TriggerInfo;
 import io.terminus.dalaran.repository.*;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.ArrayList;
@@ -118,6 +119,16 @@ public class FlowManagementServiceImpl implements FlowManagementService {
         component.setComponents(componentInfos);
         components.add(component);
         return components;
+    }
+
+    @Nullable
+    @Override
+    public FlowModel getById(Long flowId) {
+        FlowEntity flowEntity = flowRepository.findOne(flowId);
+        if (flowEntity == null) {
+            return null;
+        }
+        return buildModel(flowEntity);
     }
 
     private FlowEntity buildEntity(FlowModel model) {

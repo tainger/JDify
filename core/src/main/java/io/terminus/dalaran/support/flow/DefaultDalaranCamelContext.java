@@ -7,6 +7,7 @@ import io.terminus.dalaran.support.trace.DalaranTracer;
 import io.terminus.dalaran.support.trace.TracingType;
 import lombok.val;
 import org.apache.camel.CamelContext;
+import org.apache.camel.ProducerTemplate;
 import org.apache.camel.builder.Builder;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.model.RouteDefinition;
@@ -29,6 +30,7 @@ public class DefaultDalaranCamelContext implements DalaranContext {
         this.traceLogger = traceLogger;
         this.camelContext = new DefaultCamelContext();
         try {
+            camelContext.setTracing(true);
             camelContext.start();
         } catch (Exception e) {
             e.printStackTrace();
@@ -36,20 +38,17 @@ public class DefaultDalaranCamelContext implements DalaranContext {
     }
 
     @Override
-    public void removeFlow(String flowId) throws Exception {
-        camelContext.removeRoute(flowId);
+    public void removeFlow(Long flowId) {
+        try {
+            camelContext.removeRoute(FLOW_CAMEL_URI_PREFIX + flowId);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
-    public void removeFlows(List<String> flowIds) {
-        flowIds.forEach(flowId -> {
-            try {
-                camelContext.removeRoute(flowId);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
-
+    public void removeFlows(List<Long> flowIds) {
+        flowIds.forEach(this::removeFlow);
     }
 
     @Override
@@ -60,6 +59,12 @@ public class DefaultDalaranCamelContext implements DalaranContext {
     // TODO Flow 可以抽象一个 Builder, 但暂时没有必要
     @Override
     public void addFlow(DalaranFlow dalaranFlow) {
+        try {
+            camelContext.removeRoute(FLOW_PREFIX + dalaranFlow.getId());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         val route = new RouteDefinition();
         // TODO route need an u id
         route.setId(FLOW_PREFIX + dalaranFlow.getId());
@@ -133,19 +138,28 @@ public class DefaultDalaranCamelContext implements DalaranContext {
 
     @Override
     public void addTrigger(TriggerModel trigger) {
-        val route = new RouteDefinition();
+        try {
+            camelContext.removeRoute(TRIGGER_PREFIX + trigger.getId());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         val triggerComponent = componentContext.getTrigger(trigger.getType());
         val triggerInfo = componentContext.getTriggerInfo(trigger.getType());
-        route.setProperty(CURRENT_TRIGGER_ID, Builder.constant(trigger.getId()));
-        triggerComponent.buildFromRoute(route, trigger.getConfig());
         val tracer = new DalaranTracer(traceLogger, TracingType.Trigger);
 
+        val route = new RouteDefinition();
+        route.setId(TRIGGER_PREFIX + trigger.getId());
+        route.setProperty(CURRENT_TRIGGER_ID, Builder.constant(trigger.getId()));
+
+
+        triggerComponent.buildFromRoute(route, trigger.getConfig());
         // TODO 这里要判断的是流和触发器的 body 类型
         if (triggerInfo.getBodyMode() == BodyMode.Serialized && trigger.getInModel() != null) {
             converterContext.unmarshal(route, trigger.getInModel());
         }
         route.process(tracer.buildBeforeProcessor(trigger.getInModel().getModelType()));
-        route.to("direct:flow-" + trigger.getFlow().getId());
+        route.to(FLOW_CAMEL_URI_PREFIX + trigger.getFlow().getId());
         if (triggerInfo.getBodyMode() == BodyMode.Serialized && trigger.getOutModel() != null) {
             converterContext.marshal(route, trigger.getOutModel());
         }
@@ -160,7 +174,18 @@ public class DefaultDalaranCamelContext implements DalaranContext {
 
     @Override
     public void addTriggers(List<TriggerModel> triggers) {
+        triggers.forEach(this::addTrigger);
+    }
 
+
+    // TODO 这里要处理数据的序列化等问题
+    @Override
+    public Object testFlow(Long id, Object body) {
+        ProducerTemplate template = camelContext.createProducerTemplate();
+//        template.sendBody(, body);
+        template.setDefaultEndpointUri(FLOW_CAMEL_URI_PREFIX + id);
+
+        return template.requestBody(body);
     }
 
     @Override

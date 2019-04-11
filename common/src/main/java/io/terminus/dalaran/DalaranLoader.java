@@ -1,15 +1,18 @@
-package io.terminus.dalaran.starter;
+package io.terminus.dalaran;
 
 import com.google.gson.Gson;
 import com.hubspot.jinjava.Jinjava;
-import io.terminus.dalaran.DalaranContext;
-import io.terminus.dalaran.DalaranModelSchema;
 import io.terminus.dalaran.entity.*;
 import io.terminus.dalaran.model.DalaranFlow;
 import io.terminus.dalaran.model.MessageModel;
 import io.terminus.dalaran.model.ProcessorModel;
 import io.terminus.dalaran.model.TriggerModel;
 import io.terminus.dalaran.repository.*;
+import io.terminus.dalaran.repository.FlowRepository;
+import io.terminus.dalaran.repository.ProcessorRepository;
+import io.terminus.dalaran.repository.PropertyRepository;
+import io.terminus.dalaran.repository.TriggerRepository;
+import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
 import javax.annotation.PostConstruct;
@@ -19,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+@Slf4j
 public class DalaranLoader {
     // TODO use jackson
     private final Gson gson = new Gson();
@@ -42,19 +46,38 @@ public class DalaranLoader {
     private StructureRepository structureRepository;
 
     // TODO init...
+    private final boolean enableTrigger;
+
+    public DalaranLoader(boolean enableTrigger) {
+        this.enableTrigger = enableTrigger;
+    }
+
+    // TODO 临时用入参处理一下 trigger 加载的开关
     @PostConstruct
-    public void load() {
+    private void init() {
+        loadFlow();
+        if (enableTrigger) {
+            loadTrigger();
+        }
+    }
+
+    public void loadFlow() {
         List<DalaranFlow> flowList = new ArrayList<>();
         List<FlowEntity> flowEntities = flowRepository.findAll();
         for (FlowEntity flowEntity : flowEntities) {
             flowList.add(buildDalaranFlow(flowEntity));
+            log.info("load flow[{}]", flowEntity.getId());
         }
+        dalaranContext.addFlows(flowList);
+    }
+
+    public void loadTrigger() {
         val triggerEntities = triggerRepository.findAll();
         for (TriggerEntity triggerEntity : triggerEntities) {
             val trigger = buildTrigger(triggerEntity);
             dalaranContext.addTrigger(trigger);
+            log.info("load trigger[{}]{type={},flowId={}}", trigger.getId(), trigger.getType(), trigger.getFlow().getId());
         }
-        dalaranContext.addFlows(flowList);
     }
 
     private TriggerModel buildTrigger(TriggerEntity triggerEntity) {
