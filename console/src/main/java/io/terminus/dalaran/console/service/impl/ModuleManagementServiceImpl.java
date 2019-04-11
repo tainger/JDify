@@ -3,12 +3,14 @@ package io.terminus.dalaran.console.service.impl;
 import io.terminus.dalaran.console.entity.ModuleEntity;
 import io.terminus.dalaran.console.model.ModuleModel;
 import io.terminus.dalaran.console.model.query.ModuleQuery;
+import io.terminus.dalaran.console.model.query.rst.ModuleComponent;
 import io.terminus.dalaran.console.repository.ModuleRepository;
-import io.terminus.dalaran.console.service.ModuleManagementService;
+import io.terminus.dalaran.console.service.*;
 import io.terminus.dalaran.console.service.jpa.ModuleQueryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -23,6 +25,18 @@ public class ModuleManagementServiceImpl implements ModuleManagementService {
 
     @Autowired
     private ModuleQueryService moduleQueryService;
+
+    @Autowired
+    private FlowManagementService flowManagementService;
+
+    @Autowired
+    private ProcessorManagementService processorManagementService;
+
+    @Autowired
+    private TriggerManagementService triggerManagementService;
+
+    @Autowired
+    private StructureManagementService structureManagementService;
 
     @Override
     public void createModule(ModuleModel moduleModel) {
@@ -61,6 +75,16 @@ public class ModuleManagementServiceImpl implements ModuleManagementService {
         }
 
         return models;
+    }
+
+    @Override
+    public List<ModuleComponent> listModuleComponents(Long moduleId) {
+        List<ModuleComponent> components = new LinkedList<>();
+        components.addAll(flowManagementService.getComponents(moduleId));
+        components.addAll(processorManagementService.getComponents(moduleId));
+        components.addAll(triggerManagementService.getComponents(moduleId));
+        components.addAll(structureManagementService.getComponents(moduleId));
+        return components;
     }
 
     private ModuleEntity buildEntity(ModuleModel model) {

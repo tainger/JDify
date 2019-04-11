@@ -1,7 +1,11 @@
 package io.terminus.dalaran.console.service.jpa.impl;
 
+import io.terminus.dalaran.BodyModelType;
 import io.terminus.dalaran.console.entity.StructureEntity;
 import io.terminus.dalaran.console.model.query.StructureQuery;
+import io.terminus.dalaran.console.model.query.rst.ComponentInfo;
+import io.terminus.dalaran.console.model.query.rst.ComponentType;
+import io.terminus.dalaran.console.model.query.rst.type.StructureType;
 import io.terminus.dalaran.console.repository.specification.StructureQueryRepository;
 import io.terminus.dalaran.console.service.jpa.StructQueryService;
 import org.apache.commons.collections.CollectionUtils;
@@ -10,7 +14,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityManager;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,6 +30,10 @@ public class StructQueryServiceImpl implements StructQueryService {
 
     @Autowired
     private StructureQueryRepository structureQueryRepository;
+
+    @Autowired
+    private EntityManager entityManager;
+
 
     @Override
     public List<StructureEntity> query(StructureQuery query) {
@@ -48,5 +60,25 @@ public class StructQueryServiceImpl implements StructQueryService {
         };
 
         return structureQueryRepository.findAll(specification);
+    }
+
+    @Override
+    public List<StructureType> getTypes(Long moduleId) {
+        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<StructureType> criteriaQuery = builder.createQuery(StructureType.class);
+        Root<StructureEntity> root = criteriaQuery.from(StructureEntity.class);
+        criteriaQuery.multiselect(root.get("type")).where(builder.equal(root.get("moduleId"), moduleId)).groupBy(root.get("type"));
+
+        return entityManager.createQuery(criteriaQuery).getResultList();
+    }
+
+    @Override
+    public List<ComponentInfo> getBasicInfo(BodyModelType type) {
+        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<ComponentInfo> criteriaQuery = builder.createQuery(ComponentInfo.class);
+        Root<StructureEntity> root = criteriaQuery.from(StructureEntity.class);
+        criteriaQuery.multiselect(root.get("name"), root.get("status")).where(builder.equal(root.get("type"), type));
+
+        return entityManager.createQuery(criteriaQuery).getResultList();
     }
 }

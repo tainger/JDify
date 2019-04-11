@@ -7,6 +7,8 @@ import io.terminus.dalaran.DalaranModelSchema;
 import io.terminus.dalaran.console.entity.*;
 import io.terminus.dalaran.console.model.FlowModel;
 import io.terminus.dalaran.console.model.query.FlowQuery;
+import io.terminus.dalaran.console.model.query.rst.ComponentInfo;
+import io.terminus.dalaran.console.model.query.rst.ModuleComponent;
 import io.terminus.dalaran.console.repository.*;
 import io.terminus.dalaran.console.service.FlowManagementService;
 import io.terminus.dalaran.console.service.jpa.FlowQueryService;
@@ -14,6 +16,8 @@ import io.terminus.dalaran.model.DalaranFlow;
 import io.terminus.dalaran.model.MessageModel;
 import io.terminus.dalaran.model.ProcessorModel;
 import io.terminus.dalaran.model.TriggerModel;
+import io.terminus.dalaran.model.config.ProcessorInfo;
+import io.terminus.dalaran.model.config.TriggerInfo;
 import lombok.val;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +49,9 @@ public class FlowManagementServiceImpl implements FlowManagementService, Initial
 
     @Autowired
     private ModuleRepository moduleRepository;
+
+    @Autowired
+    private StructureRepository structureRepository;
 
     // TODO use jackson
     private Gson gson = new Gson();
@@ -103,6 +110,16 @@ public class FlowManagementServiceImpl implements FlowManagementService, Initial
     }
 
     @Override
+    public Collection<ProcessorInfo> listProcessors() {
+        return dalaranContext.getDalaranComponentContext().getAllProcessorInfo();
+    }
+
+    @Override
+    public Collection<TriggerInfo> listTriggers() {
+        return dalaranContext.getDalaranComponentContext().getAllTriggerInfo();
+    }
+
+    @Override
     public void publish() {
         List<DalaranFlow> flowList = new ArrayList<>();
         List<FlowEntity> flowEntities = flowRepository.findAll();
@@ -137,6 +154,17 @@ public class FlowManagementServiceImpl implements FlowManagementService, Initial
         dalaranContext.addFlows(flowList);
     }
 
+    @Override
+    public List<ModuleComponent> getComponents(Long moduleId) {
+        List<ModuleComponent> components = new ArrayList<>();
+        ModuleComponent component = new ModuleComponent();
+        List<ComponentInfo> componentInfos = flowQueryService.getBasicInfo(moduleId);
+        component.setType("dalaran-flow");
+        component.setComponents(componentInfos);
+        components.add(component);
+        return components;
+    }
+
     private TriggerModel buildTrigger(TriggerEntity triggerEntity) {
         val trigger = new TriggerModel();
         Class configType = dalaranContext.getDalaranComponentContext().getTriggerInfo(triggerEntity.getType()).getConfigType();
@@ -144,16 +172,18 @@ public class FlowManagementServiceImpl implements FlowManagementService, Initial
         Object config = gson.fromJson(triggerEntity.getConfig(), configType);
 
         if (triggerEntity.getInStructure() != null) {
-            val inModel = buildMessageModel(triggerEntity.getInStructure());
+            StructureEntity structureEntity = structureRepository.findOne(triggerEntity.getInStructure());
+            val inModel = buildMessageModel(structureEntity);
             trigger.setInModel(inModel);
         }
         if (triggerEntity.getOutStructure() != null) {
-            val outModel = buildMessageModel(triggerEntity.getOutStructure());
+            StructureEntity structureEntity = structureRepository.findOne(triggerEntity.getOutStructure());
+            val outModel = buildMessageModel(structureEntity);
             trigger.setOutModel(outModel);
         }
 
         trigger.setId(triggerEntity.getId());
-        trigger.setFlowId(triggerEntity.getFlow().getId());
+        trigger.setFlowId(triggerEntity.getFlowId());
         trigger.setType(triggerEntity.getType());
         trigger.setConfig(config);
         return trigger;
@@ -167,11 +197,13 @@ public class FlowManagementServiceImpl implements FlowManagementService, Initial
         Object config = gson.fromJson(jsonConfig, configType);
 
         if (processorEntity.getInStructure() != null) {
-            val inModel = buildMessageModel(processorEntity.getInStructure());
+            StructureEntity structureEntity = structureRepository.findOne(processorEntity.getInStructure());
+            val inModel = buildMessageModel(structureEntity);
             processor.setInModel(inModel);
         }
         if (processorEntity.getOutStructure() != null) {
-            val outModel = buildMessageModel(processorEntity.getOutStructure());
+            StructureEntity structureEntity = structureRepository.findOne(processorEntity.getOutStructure());
+            val outModel = buildMessageModel(structureEntity);
             processor.setOutModel(outModel);
         }
 
@@ -189,7 +221,7 @@ public class FlowManagementServiceImpl implements FlowManagementService, Initial
 
     private MessageModel buildMessageModel(StructureEntity structureEntity) {
         val model = new MessageModel();
-        val modelType = structureEntity.getStructureType();
+        val modelType = structureEntity.getType();
         model.setModelType(modelType);
         Class<? extends DalaranModelSchema> schemaType = dalaranContext.getDalaranConverterContext().getSchemaType(modelType);
         model.setModelSchema(gson.fromJson(structureEntity.getStructureSchema(), schemaType));
@@ -198,14 +230,13 @@ public class FlowManagementServiceImpl implements FlowManagementService, Initial
 
     private FlowEntity buildEntity(FlowModel model) {
         FlowEntity flowEntity = new FlowEntity();
-        ModuleEntity moduleEntity = moduleRepository.findOne(model.getModuleId());
         List<ProcessorEntity> processors = new LinkedList<>();
         for (Long id: model.getProcessorIds()) {
             processors.add(processorRepository.findOne(id));
         }
 
         flowEntity.setName(model.getName());
-        flowEntity.setModule(moduleEntity);
+        flowEntity.setModuleId(model.getModuleId());
         flowEntity.setProcessors(model.getProcessorIds());
         flowEntity.setDescription(model.getDescription());
         flowEntity.setMaxRetry(model.getMaxRetry());
@@ -220,7 +251,7 @@ public class FlowManagementServiceImpl implements FlowManagementService, Initial
         FlowModel flowModel = new FlowModel();
         flowModel.setId(entity.getId());
         flowModel.setName(entity.getName());
-        flowModel.setModuleId(entity.getModule().getId());
+        flowModel.setModuleId(entity.getModuleId());
         flowModel.setMaxRetry(entity.getMaxRetry());
         flowModel.setProcessorIds(entity.getProcessors());
         flowModel.setPropertyIds(entity.getProperties());

@@ -2,6 +2,8 @@ package io.terminus.dalaran.console.service.jpa.impl;
 
 import io.terminus.dalaran.console.entity.ProcessorEntity;
 import io.terminus.dalaran.console.model.query.ProcessorQuery;
+import io.terminus.dalaran.console.model.query.rst.ComponentInfo;
+import io.terminus.dalaran.console.model.query.rst.ComponentType;
 import io.terminus.dalaran.console.repository.specification.ProcessorQueryRepository;
 import io.terminus.dalaran.console.service.jpa.ProcessorQueryService;
 import org.apache.commons.collections.CollectionUtils;
@@ -66,5 +68,25 @@ public class ProcessorQueryServiceImpl implements ProcessorQueryService {
         CriteriaQuery<ProcessorEntity> criteriaQuery = criteriaBuilder.createQuery(ProcessorEntity.class);
         Root<ProcessorEntity> root = criteriaQuery.from(ProcessorEntity.class);
         return new ArrayList<>();
+    }
+
+    @Override
+    public List<ComponentType> getTypes(Long moduleId) {
+        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<ComponentType> criteriaQuery = builder.createQuery(ComponentType.class);
+        Root<ProcessorEntity> root = criteriaQuery.from(ProcessorEntity.class);
+        criteriaQuery.multiselect(root.get("type")).where(builder.equal(root.get("moduleId"), moduleId)).groupBy(root.get("type"));
+
+        return entityManager.createQuery(criteriaQuery).getResultList();
+    }
+
+    @Override
+    public List<ComponentInfo> getBasicInfo(String type) {
+        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<ComponentInfo> criteriaQuery = builder.createQuery(ComponentInfo.class);
+        Root<ProcessorEntity> root = criteriaQuery.from(ProcessorEntity.class);
+        criteriaQuery.multiselect(root.get("name"), root.get("status")).where(builder.equal(root.get("type"), type));
+
+        return entityManager.createQuery(criteriaQuery).getResultList();
     }
 }

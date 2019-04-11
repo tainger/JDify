@@ -24,17 +24,19 @@ public class ProcessorEntity {
 
     private String name;
 
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private String status;
+
+//    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "module_id")
-    private ModuleEntity module;
+    private Long moduleId;
 
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+//    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "in_structure")
-    private StructureEntity inStructure;
+    private Long inStructure;
 
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+//    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "out_structure")
-    private StructureEntity outStructure;
+    private Long outStructure;
 
     private String description;
 

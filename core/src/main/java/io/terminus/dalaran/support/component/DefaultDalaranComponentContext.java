@@ -10,7 +10,6 @@ import io.terminus.dalaran.annotation.Trigger;
 import io.terminus.dalaran.model.config.DalaranConfigField;
 import io.terminus.dalaran.model.config.ProcessorInfo;
 import io.terminus.dalaran.model.config.TriggerInfo;
-
 import javax.annotation.PostConstruct;
 import java.lang.reflect.Field;
 import java.util.*;

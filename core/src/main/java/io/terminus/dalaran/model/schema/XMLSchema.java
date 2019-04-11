@@ -5,5 +5,8 @@ import lombok.Data;
 
 @Data
 public class XMLSchema implements DalaranModelSchema {
+
     private String root;
+
+
 }

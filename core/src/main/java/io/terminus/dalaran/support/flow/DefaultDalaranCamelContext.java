@@ -62,7 +62,7 @@ public class DefaultDalaranCamelContext implements DalaranContext {
         // TODO route need an u id
         route.setId(dalaranFlow.getId());
         val processorList = dalaranFlow.getProcessors();
-        route.from("direct:flow-" + dalaranFlow.getId());
+        route.from("direct:flowId-" + dalaranFlow.getId());
 
         // TODO 这里一定会先转成 Object, 如果是两端都是序列化类型, 则会有无用的转换
         // TODO 最好的方式是, 在 Flow 上声明出入格式, 由 Trigger 端做处理
@@ -124,7 +124,7 @@ public class DefaultDalaranCamelContext implements DalaranContext {
         if (triggerInfo.getBodyMode() == BodyMode.Serialized && trigger.getInModel() != null) {
             converterContext.unmarshal(route, trigger.getInModel());
         }
-        route.to("direct:flow-" + trigger.getFlowId());
+        route.to("direct:flowId-" + trigger.getFlowId());
         if (triggerInfo.getBodyMode() == BodyMode.Serialized && trigger.getOutModel() != null) {
             converterContext.marshal(route, trigger.getOutModel());
         }

@@ -2,6 +2,7 @@ package io.terminus.dalaran.console.service;
 
 import io.terminus.dalaran.console.model.ModuleModel;
 import io.terminus.dalaran.console.model.query.ModuleQuery;
+import io.terminus.dalaran.console.model.query.rst.ModuleComponent;
 
 import java.util.List;
 
@@ -19,4 +20,6 @@ public interface ModuleManagementService {
     List<ModuleModel> list();
 
     List<ModuleModel> queryModules(ModuleQuery query);
+
+    List<ModuleComponent> listModuleComponents(Long moduleId);
 }

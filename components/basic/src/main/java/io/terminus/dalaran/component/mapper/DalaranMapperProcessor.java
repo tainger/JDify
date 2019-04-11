@@ -3,7 +3,7 @@ package io.terminus.dalaran.component.mapper;
 import com.github.drapostolos.typeparser.TypeParser;
 import com.google.gson.Gson;
 import io.terminus.dalaran.component.mapper.jxpath.DalaranJXPathFactory;
-import io.terminus.dalaran.component.mapper.model.FieldType;
+import io.terminus.dalaran.model.schema.structure.FieldType;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.commons.jxpath.JXPathContext;

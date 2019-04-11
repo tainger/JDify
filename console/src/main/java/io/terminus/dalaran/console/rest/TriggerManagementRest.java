@@ -3,10 +3,13 @@ package io.terminus.dalaran.console.rest;
 import io.swagger.annotations.ApiOperation;
 import io.terminus.dalaran.console.model.TriggerModel;
 import io.terminus.dalaran.console.model.query.TriggerQuery;
+import io.terminus.dalaran.console.service.FlowManagementService;
 import io.terminus.dalaran.console.service.TriggerManagementService;
+import io.terminus.dalaran.model.config.TriggerInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -18,6 +21,9 @@ public class TriggerManagementRest {
 
     @Autowired
     private TriggerManagementService triggerManagementService;
+
+    @Autowired
+    private FlowManagementService flowManagementService;
 
     @ApiOperation(value = "条件查询触发器")
     @RequestMapping(value = "/query", method = RequestMethod.GET)
@@ -47,5 +53,11 @@ public class TriggerManagementRest {
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     public List<TriggerModel> list() {
         return triggerManagementService.list();
+    }
+
+    @ApiOperation(value = "获取所有可用的触发器")
+    @RequestMapping(value = "list/triggers", method = RequestMethod.GET)
+    public Collection<TriggerInfo> listTriggers() {
+        return flowManagementService.listTriggers();
     }
 }

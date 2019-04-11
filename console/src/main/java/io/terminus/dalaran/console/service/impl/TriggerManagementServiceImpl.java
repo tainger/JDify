@@ -2,11 +2,12 @@ package io.terminus.dalaran.console.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import io.terminus.dalaran.console.entity.FlowEntity;
-import io.terminus.dalaran.console.entity.ModuleEntity;
-import io.terminus.dalaran.console.entity.StructureEntity;
 import io.terminus.dalaran.console.entity.TriggerEntity;
 import io.terminus.dalaran.console.model.TriggerModel;
 import io.terminus.dalaran.console.model.query.TriggerQuery;
+import io.terminus.dalaran.console.model.query.rst.ComponentInfo;
+import io.terminus.dalaran.console.model.query.rst.ComponentType;
+import io.terminus.dalaran.console.model.query.rst.ModuleComponent;
 import io.terminus.dalaran.console.repository.FlowRepository;
 import io.terminus.dalaran.console.repository.ModuleRepository;
 import io.terminus.dalaran.console.repository.StructureRepository;
@@ -16,6 +17,7 @@ import io.terminus.dalaran.console.service.jpa.TriggerQueryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -80,17 +82,28 @@ public class TriggerManagementServiceImpl implements TriggerManagementService {
         return models;
     }
 
+    @Override
+    public List<ModuleComponent> getComponents(Long moduleId) {
+        List<ModuleComponent> components = new ArrayList<>();
+        List<ComponentType> types = triggerQueryService.getTypes(moduleId);
+        for (ComponentType componentType: types) {
+            String type = componentType.getType();
+            List<ComponentInfo> componentInfos = triggerQueryService.getBasicInfo(type);
+            ModuleComponent moduleComponent = new ModuleComponent();
+            moduleComponent.setType(type);
+            moduleComponent.setComponents(componentInfos);
+            components.add(moduleComponent);
+        }
+        return components;
+    }
+
     private TriggerEntity buildEntity(TriggerModel model) {
         TriggerEntity triggerEntity = new TriggerEntity();
-        ModuleEntity moduleEntity = moduleRepository.findOne(model.getModuleId());
-        StructureEntity inStructure = structureRepository.findOne(model.getInStructure());
-        StructureEntity outStructure = structureRepository.findOne(model.getOutStructure());
-        FlowEntity flowEntity = flowRepository.findOne(model.getFlowId());
 
-        triggerEntity.setFlow(flowEntity);
-        triggerEntity.setModule(moduleEntity);
-        triggerEntity.setInStructure(inStructure);
-        triggerEntity.setOutStructure(outStructure);
+        triggerEntity.setFlowId(model.getFlowId());
+        triggerEntity.setModuleId(model.getModuleId());
+        triggerEntity.setInStructure(model.getInStructure());
+        triggerEntity.setOutStructure(model.getOutStructure());
         triggerEntity.setConfig(JSON.toJSONString(model.getConfig()));
         triggerEntity.setDescription(model.getDescription());
         triggerEntity.setName(model.getName());
@@ -102,12 +115,12 @@ public class TriggerManagementServiceImpl implements TriggerManagementService {
 
     private TriggerModel buildModel(TriggerEntity entity) {
         TriggerModel triggerModel = new TriggerModel();
-        triggerModel.setFlowId(entity.getFlow().getId());
-        triggerModel.setModuleId(entity.getModule().getId());
+        triggerModel.setFlowId(entity.getFlowId());
+        triggerModel.setModuleId(entity.getModuleId());
         triggerModel.setName(entity.getName());
         triggerModel.setType(entity.getType());
-        triggerModel.setInStructure(entity.getInStructure().getId());
-        triggerModel.setOutStructure(entity.getOutStructure().getId());
+        triggerModel.setInStructure(entity.getInStructure());
+        triggerModel.setOutStructure(entity.getOutStructure());
         triggerModel.setConfig(JSON.parseObject(entity.getConfig(), Map.class));
         return triggerModel;
     }

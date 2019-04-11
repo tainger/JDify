@@ -231,7 +231,7 @@ DELETE:/__dalaran_management/processor/{processor_id}
 
 ### 查询集成流
 
-GET:/__dalaran_management/flow
+GET:/__dalaran_management/flowId
 
 params:
 
@@ -257,7 +257,7 @@ params:
 
 ### 创建集成流
 
-POST:/__dalaran_management/flow
+POST:/__dalaran_management/flowId
 
 ```json
 {
@@ -274,7 +274,7 @@ POST:/__dalaran_management/flow
 
 ### 修改集成流
 
-PUT:/__dalaran_management/flow
+PUT:/__dalaran_management/flowId
 
 ```json
 {
@@ -292,12 +292,12 @@ PUT:/__dalaran_management/flow
 
 ### 删除集成流
 
-DELETE:/__dalaran_management/flow/{flow_id}
+DELETE:/__dalaran_management/flowId/{flow_id}
 
 ### 启用集成流
 
-POST:/__dalaran_management/flow/{flow_id}/enable
+POST:/__dalaran_management/flowId/{flow_id}/enable
 
 ### 禁用集成流
 
-POST:/__dalaran_management/flow/{flow_id}/disable
+POST:/__dalaran_management/flowId/{flow_id}/disable
