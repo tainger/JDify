@@ -26,10 +26,6 @@ public interface FlowManagementService {
 
     List<FlowModel> queryByProcessorIds(List<Long> processorIds);
 
-    Collection<ProcessorInfo> listProcessors();
-
-    Collection<TriggerInfo> listTriggers();
-
     List<ModuleComponent> getComponents(Long moduleId);
 
     @Nullable

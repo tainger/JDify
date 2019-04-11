@@ -3,7 +3,9 @@ package io.terminus.dalaran.console.service;
 import io.terminus.dalaran.console.model.TriggerModel;
 import io.terminus.dalaran.console.model.query.TriggerQuery;
 import io.terminus.dalaran.console.model.query.rst.ModuleComponent;
+import io.terminus.dalaran.model.config.TriggerInfo;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -22,4 +24,8 @@ public interface TriggerManagementService {
     List<TriggerModel> list();
 
     List<ModuleComponent> getComponents(Long moduleId);
+
+    Collection<TriggerInfo> listTriggers();
+
+    TriggerInfo getTriggerInfo(String triggerType);
 }

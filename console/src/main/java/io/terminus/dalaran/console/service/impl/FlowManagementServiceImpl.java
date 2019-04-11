@@ -101,16 +101,6 @@ public class FlowManagementServiceImpl implements FlowManagementService {
     }
 
     @Override
-    public Collection<ProcessorInfo> listProcessors() {
-        return dalaranContext.getDalaranComponentContext().getAllProcessorInfo();
-    }
-
-    @Override
-    public Collection<TriggerInfo> listTriggers() {
-        return dalaranContext.getDalaranComponentContext().getAllTriggerInfo();
-    }
-
-    @Override
     public List<ModuleComponent> getComponents(Long moduleId) {
         List<ModuleComponent> components = new ArrayList<>();
         ModuleComponent component = new ModuleComponent();

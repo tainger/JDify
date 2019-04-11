@@ -1,6 +1,7 @@
 package io.terminus.dalaran.console.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import io.terminus.dalaran.DalaranContext;
 import io.terminus.dalaran.console.model.ProcessorModel;
 import io.terminus.dalaran.console.model.query.ProcessorQuery;
 import io.terminus.dalaran.console.model.query.rst.ComponentInfo;
@@ -9,16 +10,14 @@ import io.terminus.dalaran.console.model.query.rst.ModuleComponent;
 import io.terminus.dalaran.console.service.ProcessorManagementService;
 import io.terminus.dalaran.console.service.jpa.ProcessorQueryService;
 import io.terminus.dalaran.entity.ProcessorEntity;
+import io.terminus.dalaran.model.config.ProcessorInfo;
 import io.terminus.dalaran.repository.ModuleRepository;
 import io.terminus.dalaran.repository.ProcessorRepository;
 import io.terminus.dalaran.repository.StructureRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by jingdi on 2019/3/28
@@ -37,6 +36,9 @@ public class ProcessorManagementServiceImpl implements ProcessorManagementServic
 
     @Autowired
     private StructureRepository structureRepository;
+
+    @Autowired
+    private DalaranContext dalaranContext;
 
     @Override
     public void createProcessor(ProcessorModel processorModel) {
@@ -90,6 +92,17 @@ public class ProcessorManagementServiceImpl implements ProcessorManagementServic
             components.add(moduleComponent);
         }
         return components;
+    }
+
+    @Override
+    public Collection<ProcessorInfo> listProcessors() {
+        return dalaranContext.getDalaranComponentContext().getAllProcessorInfo();
+    }
+
+
+    @Override
+    public ProcessorInfo getProcessorInfo(String processorType) {
+        return dalaranContext.getDalaranComponentContext().getProcessorInfo(processorType);
     }
 
     private ProcessorEntity buildEntity(ProcessorModel model) {

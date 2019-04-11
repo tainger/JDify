@@ -57,6 +57,12 @@ public class ProcessorManagementRest {
     @ApiOperation(value = "获取所有可用的处理器")
     @RequestMapping(value = "/list/processors", method = RequestMethod.GET)
     public Collection<ProcessorInfo> listProcessors() {
-        return flowManagementService.listProcessors();
+        return processorManagementService.listProcessors();
+    }
+
+    @ApiOperation(value = "获取处理器初始化结构")
+    @RequestMapping(value = "/get/config", method = RequestMethod.GET)
+    public ProcessorInfo getProcessorInfo(String type) {
+        return processorManagementService.getProcessorInfo(type);
     }
 }

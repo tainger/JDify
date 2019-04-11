@@ -58,6 +58,12 @@ public class TriggerManagementRest {
     @ApiOperation(value = "获取所有可用的触发器")
     @RequestMapping(value = "list/triggers", method = RequestMethod.GET)
     public Collection<TriggerInfo> listTriggers() {
-        return flowManagementService.listTriggers();
+        return triggerManagementService.listTriggers();
+    }
+
+    @ApiOperation(value = "获取触发器初始化结构")
+    @RequestMapping(value = "/get/config", method = RequestMethod.GET)
+    public TriggerInfo getTriggerInfo(String type) {
+        return triggerManagementService.getTriggerInfo(type);
     }
 }

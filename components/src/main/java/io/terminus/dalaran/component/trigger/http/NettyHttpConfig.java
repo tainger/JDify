@@ -6,6 +6,8 @@ import lombok.Data;
 
 @Data
 public class NettyHttpConfig {
+
+    @ConfigFieldInfo(label = "端口", inputType = FieldInputType.Auto, defaultValue = "8080")
     private Integer port = 8080;
 
     @ConfigFieldInfo(label = "协议", inputType = FieldInputType.Radio)

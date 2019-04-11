@@ -3,7 +3,9 @@ package io.terminus.dalaran.console.service;
 import io.terminus.dalaran.console.model.ProcessorModel;
 import io.terminus.dalaran.console.model.query.ProcessorQuery;
 import io.terminus.dalaran.console.model.query.rst.ModuleComponent;
+import io.terminus.dalaran.model.config.ProcessorInfo;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -22,4 +24,8 @@ public interface ProcessorManagementService {
     List<ProcessorModel> list();
 
     List<ModuleComponent> getComponents(Long moduleId);
+
+    Collection<ProcessorInfo> listProcessors();
+
+    ProcessorInfo getProcessorInfo(String processorType);
 }
