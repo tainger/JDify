@@ -1,10 +1,9 @@
 package io.terminus.dalaran.console.service.jpa;
 
-import io.terminus.dalaran.console.entity.ProcessorEntity;
 import io.terminus.dalaran.console.model.query.ProcessorQuery;
 import io.terminus.dalaran.console.model.query.rst.ComponentInfo;
 import io.terminus.dalaran.console.model.query.rst.ComponentType;
-
+import io.terminus.dalaran.entity.ProcessorEntity;
 import java.util.List;
 
 /**

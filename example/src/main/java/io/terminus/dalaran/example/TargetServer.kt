@@ -68,7 +68,7 @@ class TestController {
     }
 
     @PostMapping("/callAll")
-    fun all(req: HttpServletRequest) = "all"
+    fun all(@RequestBody body: String) = body
 
     @PostMapping("/list")
     fun list(@RequestBody data: Map<String, Double>): Order {

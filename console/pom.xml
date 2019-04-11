@@ -17,15 +17,9 @@
             <artifactId>mysql-connector-java</artifactId>
             <version>5.1.47</version>
         </dependency>
-
-        <dependency>
-            <groupId>com.hubspot.jinjava</groupId>
-            <artifactId>jinjava</artifactId>
-            <version>2.5.0</version>
-        </dependency>
         <dependency>
             <groupId>io.terminus</groupId>
-            <artifactId>dalaran-core</artifactId>
+            <artifactId>dalaran-common</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -36,36 +30,16 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-jpa</artifactId>
-        </dependency>
 
+        <!-- TODO 奇怪, 为什么需要显式声明-->
         <dependency>
-            <groupId>io.terminus</groupId>
-            <artifactId>dalaran-http-request</artifactId>
-            <version>${project.version}</version>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.8</version>
         </dependency>
         <dependency>
             <groupId>io.terminus</groupId>
-            <artifactId>dalaran-netty-http-listener</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.terminus</groupId>
-            <artifactId>dalaran-message-translator</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>io.terminus</groupId>
-            <artifactId>dalaran-dubbo-provider</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>io.terminus</groupId>
-            <artifactId>basic-component</artifactId>
+            <artifactId>dalaran-components</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -97,5 +71,4 @@
             <version>2.7.0</version>
         </dependency>
     </dependencies>
-
 </project>

@@ -1,17 +1,16 @@
 package io.terminus.dalaran.console.service.jpa.impl;
 
-import io.terminus.dalaran.console.entity.ProcessorEntity;
 import io.terminus.dalaran.console.model.query.ProcessorQuery;
 import io.terminus.dalaran.console.model.query.rst.ComponentInfo;
 import io.terminus.dalaran.console.model.query.rst.ComponentType;
-import io.terminus.dalaran.console.repository.specification.ProcessorQueryRepository;
+import io.terminus.dalaran.repository.specification.ProcessorQueryRepository;
 import io.terminus.dalaran.console.service.jpa.ProcessorQueryService;
+import io.terminus.dalaran.entity.ProcessorEntity;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-
 import javax.persistence.EntityManager;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;

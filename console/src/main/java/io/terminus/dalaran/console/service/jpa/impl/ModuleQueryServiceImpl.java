@@ -1,9 +1,9 @@
 package io.terminus.dalaran.console.service.jpa.impl;
 
-import io.terminus.dalaran.console.entity.ModuleEntity;
 import io.terminus.dalaran.console.model.query.ModuleQuery;
-import io.terminus.dalaran.console.repository.specification.ModuleQueryRepository;
 import io.terminus.dalaran.console.service.jpa.ModuleQueryService;
+import io.terminus.dalaran.entity.ModuleEntity;
+import io.terminus.dalaran.repository.specification.ModuleQueryRepository;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;

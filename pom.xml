@@ -6,9 +6,9 @@
 
 
     <parent>
-            <groupId>io.terminus</groupId>
-            <artifactId>parent-pom</artifactId>
-            <version>1.5.14.2.RELEASE</version>
+        <groupId>io.terminus</groupId>
+        <artifactId>parent-pom</artifactId>
+        <version>1.5.14.2.RELEASE</version>
     </parent>
 
     <artifactId>dalaran-parent</artifactId>
@@ -21,11 +21,26 @@
         <module>example</module>
         <module>camel-components</module>
         <module>console</module>
+        <module>starter</module>
+        <module>common</module>
     </modules>
 
     <properties>
         <camel.version>2.21.5</camel.version>
         <dubbo.version>2.6.5</dubbo.version>
+
+        <!--camel property-->
+        <javax.servlet-api-version>3.1.0</javax.servlet-api-version>
     </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>1.18.2</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
 </project>
