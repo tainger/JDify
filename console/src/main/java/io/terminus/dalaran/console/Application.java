@@ -40,7 +40,7 @@ public class Application {
 
     @Bean
     public DalaranLoader dalaranLoader() {
-        return new DalaranLoader(false);
+        return new DalaranLoader(true);
     }
 
     public static void main(String[] args) {

@@ -1,6 +1,7 @@
 package io.terminus.dalaran.model;
 
 import io.terminus.dalaran.BodyModelType;
+import io.terminus.dalaran.support.trace.TracingType;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -25,6 +26,9 @@ public class DalaranTracingLog {
     private Long elapsed;
 
     private String inputBody;
+
+    @Enumerated(EnumType.STRING)
+    private TracingType tracingType;
 
     @Enumerated(EnumType.STRING)
     private BodyModelType inputBodyType;

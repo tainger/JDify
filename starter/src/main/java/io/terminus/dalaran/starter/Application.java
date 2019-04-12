@@ -38,7 +38,7 @@ public class Application {
 
     @Bean
     public DalaranLoader dalaranLoader() {
-        return new DalaranLoader(true);
+        return new DalaranLoader(false);
     }
 
     public static void main(String[] args) {

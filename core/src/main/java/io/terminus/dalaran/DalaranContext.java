@@ -21,9 +21,14 @@ public interface DalaranContext {
 
     void addTriggers(List<TriggerModel> triggers);
 
+    void addTestFlow(DalaranFlow dalaranFlow);
+
+    void addTestFlows(List<DalaranFlow> flows);
+
     Object testFlow(Long id, Object body);
 
     DalaranComponentContext getDalaranComponentContext();
 
     DalaranConverterContext getDalaranConverterContext();
+
 }

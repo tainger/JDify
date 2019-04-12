@@ -28,6 +28,7 @@ public class StructureEntity {
     @JoinColumn(name = "module_id")
     private ModuleEntity module;
 
+    @Enumerated(EnumType.STRING)
     private BodyModelType structureType;
 
     private String structureSchema;

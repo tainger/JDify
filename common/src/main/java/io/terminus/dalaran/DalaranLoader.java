@@ -7,10 +7,7 @@ import io.terminus.dalaran.model.DalaranFlow;
 import io.terminus.dalaran.model.MessageModel;
 import io.terminus.dalaran.model.ProcessorModel;
 import io.terminus.dalaran.model.TriggerModel;
-import io.terminus.dalaran.repository.FlowRepository;
-import io.terminus.dalaran.repository.ProcessorRepository;
-import io.terminus.dalaran.repository.PropertyRepository;
-import io.terminus.dalaran.repository.TriggerRepository;
+import io.terminus.dalaran.repository.*;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,24 +37,41 @@ public class DalaranLoader {
     private PropertyRepository propertyRepository;
 
     @Autowired
+    private StructureRepository structureRepository;
+
+    @Autowired
     private DalaranContext dalaranContext;
 
-    private final boolean enableTrigger;
 
-    public DalaranLoader(boolean enableTrigger) {
-        this.enableTrigger = enableTrigger;
+    // TODO test mode
+    private final boolean enableTest;
+
+    public DalaranLoader(boolean enableTest) {
+        this.enableTest = enableTest;
     }
 
     // TODO 临时用入参处理一下 trigger 加载的开关
     @PostConstruct
     private void init() {
-        loadFlow();
-        if (enableTrigger) {
+//        loadFlow();
+        if (enableTest) {
+            loadTestFlow();
+        } else {
             loadTrigger();
         }
     }
 
-    public void loadFlow() {
+    private void loadTestFlow() {
+        List<DalaranFlow> flowList = new ArrayList<>();
+        List<FlowEntity> flowEntities = flowRepository.findAll();
+        for (FlowEntity flowEntity : flowEntities) {
+            flowList.add(buildDalaranFlow(flowEntity));
+            log.info("load test flow[{}]", flowEntity.getId());
+        }
+        dalaranContext.addTestFlows(flowList);
+    }
+
+    private void loadFlow() {
         List<DalaranFlow> flowList = new ArrayList<>();
         List<FlowEntity> flowEntities = flowRepository.findAll();
         for (FlowEntity flowEntity : flowEntities) {
@@ -67,7 +81,7 @@ public class DalaranLoader {
         dalaranContext.addFlows(flowList);
     }
 
-    public void loadTrigger() {
+    private void loadTrigger() {
         val triggerEntities = triggerRepository.findAll();
         for (TriggerEntity triggerEntity : triggerEntities) {
             val trigger = buildTrigger(triggerEntity);
@@ -90,9 +104,10 @@ public class DalaranLoader {
             val outModel = buildMessageModel(triggerEntity.getOutStructure());
             trigger.setOutModel(outModel);
         }
-
+        val flow = buildDalaranFlow(triggerEntity.getFlow());
         trigger.setId(triggerEntity.getId());
-        trigger.setFlow(buildDalaranFlow(triggerEntity.getFlow()));
+        flow.setTriggerId(triggerEntity.getId());
+        trigger.setFlow(flow);
         trigger.setType(triggerEntity.getType());
         trigger.setConfig(config);
         return trigger;
@@ -151,6 +166,9 @@ public class DalaranLoader {
                     return buildProcessor(processorEntity, properties);
                 }).collect(Collectors.toList());
 
+        // TODO for test...
+        flow.setInModel(buildMessageModel(flowEntity.getInStructure()));
+        flow.setOutModel(buildMessageModel(flowEntity.getOutStructure()));
         flow.setId(flowEntity.getId());
         flow.setProcessors(processors);
         flow.setMaxRetry(flowEntity.getMaxRetry());

@@ -125,8 +125,11 @@ public class FlowManagementRest {
     @PostMapping("/{flowId}")
     public Object testFlow(@PathVariable Long flowId, @RequestBody String body) {
 //        FlowModel flowModel = flowManagementService.getById(flowId);
-
-
-        return dalaranContext.testFlow(flowId, body);
+        Object data = dalaranContext.testFlow(flowId, body);
+        // TODO 如果最后一步是序列化的情况, 会被序列化成 byte[], 先 toString 一下
+        if (data instanceof byte[]) {
+            return new String((byte[]) data);
+        }
+        return data;
     }
 }

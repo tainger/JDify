@@ -22,6 +22,9 @@ public class DalaranFlow {
     @Nullable
     private Integer retryDelay;
 
+    @Nullable
+    private Long triggerId;
+
     private MessageModel inModel;
 
     private MessageModel outModel;
