@@ -121,13 +121,20 @@ public class DalaranLoader {
         String jsonConfig = replaceProperties(processorEntity.getConfig(), properties);
         Object config = gson.fromJson(jsonConfig, configType);
 
-        if (processorEntity.getInStructure() != null) {
-            val inModel = buildMessageModel(processorEntity.getInStructure());
-            processor.setInModel(inModel);
-        }
-        if (processorEntity.getOutStructure() != null) {
-            val outModel = buildMessageModel(processorEntity.getOutStructure());
-            processor.setOutModel(outModel);
+        if (config instanceof ModelableConfig) {
+            ModelableConfig modelConfig = (ModelableConfig) config;
+            if (modelConfig.getInModelId() != null) {
+                val inStructureEntity = structureRepository.findOne(modelConfig.getInModelId());
+                // TODO null check
+                val inModel = buildMessageModel(inStructureEntity);
+                processor.setInModel(inModel);
+            }
+            if (modelConfig.getOutModelId() != null) {
+                val inStructureEntity = structureRepository.findOne(modelConfig.getOutModelId());
+                // TODO null check
+                val outModel = buildMessageModel(inStructureEntity);
+                processor.setOutModel(outModel);
+            }
         }
 
         processor.setId(processorEntity.getId());

@@ -182,6 +182,7 @@ public class DefaultDalaranCamelContext implements DalaranContext {
         if (processors.isEmpty()) {
             return;
         }
+        // TODO 这种流的入口类型可以被抽象出去, 出口也一样
         ProcessorModel firstProcessor = processors.get(0);
         ProcessorInfo firstProcessorInfo = componentContext.getProcessorInfo(firstProcessor.getType());
 

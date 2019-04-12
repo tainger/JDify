@@ -56,7 +56,7 @@ public class ProcessorManagementServiceImpl implements ProcessorManagementServic
         List<ProcessorEntity> entities = processorQueryService.query(query);
         List<ProcessorModel> models = new LinkedList<>();
 
-        for (ProcessorEntity entity: entities) {
+        for (ProcessorEntity entity : entities) {
             models.add(buildModel(entity));
         }
 
@@ -68,7 +68,7 @@ public class ProcessorManagementServiceImpl implements ProcessorManagementServic
         List<ProcessorEntity> entities = processorRepository.findAll();
         List<ProcessorModel> models = new LinkedList<>();
 
-        for (ProcessorEntity entity: entities) {
+        for (ProcessorEntity entity : entities) {
             models.add(buildModel(entity));
         }
 
@@ -79,11 +79,7 @@ public class ProcessorManagementServiceImpl implements ProcessorManagementServic
     private ProcessorEntity buildEntity(ProcessorModel model) {
         ProcessorEntity processorEntity = new ProcessorEntity();
         ModuleEntity moduleEntity = moduleRepository.findOne(model.getModuleId());
-        StructureEntity inStructure = structureRepository.findOne(model.getInStructure());
-        StructureEntity outStructure = structureRepository.findOne(model.getOutStructure());
         processorEntity.setModule(moduleEntity);
-        processorEntity.setInStructure(inStructure);
-        processorEntity.setOutStructure(outStructure);
         processorEntity.setType(model.getType());
         processorEntity.setName(model.getName());
         processorEntity.setDescription(model.getDescription());
@@ -96,8 +92,6 @@ public class ProcessorManagementServiceImpl implements ProcessorManagementServic
         ProcessorModel processorModel = new ProcessorModel();
         processorModel.setId(entity.getId());
         processorModel.setModuleId(entity.getModule().getId());
-        processorModel.setInStructure(entity.getInStructure().getId());
-        processorModel.setOutStructure(entity.getOutStructure().getId());
         processorModel.setName(entity.getName());
         processorModel.setDescription(entity.getDescription());
         processorModel.setType(entity.getType());

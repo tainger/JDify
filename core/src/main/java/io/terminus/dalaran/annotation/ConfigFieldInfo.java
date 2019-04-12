@@ -17,5 +17,7 @@ public @interface ConfigFieldInfo {
 
     String label() default "";
 
+    boolean required() default true;
+
     FieldInputType inputType() default FieldInputType.Auto;
 }
