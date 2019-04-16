@@ -7,6 +7,7 @@ import io.terminus.dalaran.model.DalaranFlow;
 import io.terminus.dalaran.model.MessageModel;
 import io.terminus.dalaran.model.ProcessorModel;
 import io.terminus.dalaran.model.TriggerModel;
+import io.terminus.dalaran.repository.*;
 import io.terminus.dalaran.repository.FlowRepository;
 import io.terminus.dalaran.repository.ProcessorRepository;
 import io.terminus.dalaran.repository.PropertyRepository;
@@ -14,7 +15,6 @@ import io.terminus.dalaran.repository.TriggerRepository;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
-
 import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -42,6 +42,10 @@ public class DalaranLoader {
     @Autowired
     private DalaranContext dalaranContext;
 
+    @Autowired
+    private StructureRepository structureRepository;
+
+    // TODO init...
     private final boolean enableTrigger;
 
     public DalaranLoader(boolean enableTrigger) {
@@ -83,18 +87,22 @@ public class DalaranLoader {
         Object config = gson.fromJson(triggerEntity.getConfig(), configType);
 
         if (triggerEntity.getInStructure() != null) {
-            val inModel = buildMessageModel(triggerEntity.getInStructure());
+            StructureEntity structureEntity = structureRepository.findOne(triggerEntity.getInStructure());
+            val inModel = buildMessageModel(structureEntity);
             trigger.setInModel(inModel);
         }
         if (triggerEntity.getOutStructure() != null) {
-            val outModel = buildMessageModel(triggerEntity.getOutStructure());
+            StructureEntity structureEntity = structureRepository.findOne(triggerEntity.getOutStructure());
+            val outModel = buildMessageModel(structureEntity);
             trigger.setOutModel(outModel);
         }
 
         trigger.setId(triggerEntity.getId());
-        trigger.setFlow(buildDalaranFlow(triggerEntity.getFlow()));
         trigger.setType(triggerEntity.getType());
         trigger.setConfig(config);
+
+        FlowEntity flowEntity = flowRepository.findOne(triggerEntity.getFlowId());
+        trigger.setFlow(buildDalaranFlow(flowEntity));
         return trigger;
     }
 
@@ -107,11 +115,13 @@ public class DalaranLoader {
         Object config = gson.fromJson(jsonConfig, configType);
 
         if (processorEntity.getInStructure() != null) {
-            val inModel = buildMessageModel(processorEntity.getInStructure());
+            StructureEntity structureEntity = structureRepository.findOne(processorEntity.getInStructure());
+            val inModel = buildMessageModel(structureEntity);
             processor.setInModel(inModel);
         }
         if (processorEntity.getOutStructure() != null) {
-            val outModel = buildMessageModel(processorEntity.getOutStructure());
+            StructureEntity structureEntity = structureRepository.findOne(processorEntity.getOutStructure());
+            val outModel = buildMessageModel(structureEntity);
             processor.setOutModel(outModel);
         }
 
@@ -129,7 +139,7 @@ public class DalaranLoader {
 
     private MessageModel buildMessageModel(StructureEntity structureEntity) {
         val model = new MessageModel();
-        val modelType = structureEntity.getStructureType();
+        val modelType = structureEntity.getType();
         model.setModelType(modelType);
         Class<? extends DalaranModelSchema> schemaType = dalaranContext.getDalaranConverterContext().getSchemaType(modelType);
         model.setModelSchema(gson.fromJson(structureEntity.getStructureSchema(), schemaType));

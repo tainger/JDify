@@ -12,6 +12,8 @@ public class FlowQuery {
 
     private List<Long> flowIds;
 
+    private Long moduleId;
+
     private String type;
 
     private String name;

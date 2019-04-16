@@ -24,13 +24,15 @@ public class StructureEntity {
 
     private String name;
 
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+//    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "module_id")
-    private ModuleEntity module;
+    private Long moduleId;
 
-    private BodyModelType structureType;
+    private BodyModelType type;
 
     private String structureSchema;
+
+    private String status;
 
     private String description;
 

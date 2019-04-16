@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("dalaran_management/flow")
+@RequestMapping("dalaran_management/flowId")
 public class FlowManagementRest {
 
     // TODO for test

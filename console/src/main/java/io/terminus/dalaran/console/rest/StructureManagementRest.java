@@ -4,10 +4,14 @@ import io.swagger.annotations.ApiOperation;
 import io.terminus.dalaran.console.model.StructureModel;
 import io.terminus.dalaran.console.model.query.StructureQuery;
 import io.terminus.dalaran.console.service.StructureManagementService;
+import io.terminus.dalaran.console.util.ExcelUtils;
+import io.terminus.dalaran.model.schema.structure.ModelField;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
+import org.springframework.web.multipart.MultipartFile;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by jingdi on 2019/4/1
@@ -47,5 +51,17 @@ public class StructureManagementRest {
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     public List<StructureModel> list() {
         return structureManagementService.list();
+    }
+
+    @ApiOperation(value = "excel文件解析")
+    @RequestMapping(value = "/parse/excel", method = RequestMethod.POST)
+    public Map<String, Map<String, ModelField>> parseExcel(@RequestParam MultipartFile file) {
+        ExcelUtils excelUtils = new ExcelUtils();
+        try {
+            return excelUtils.parse(file.getInputStream());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return new HashMap<>();
     }
 }

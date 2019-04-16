@@ -1,13 +1,11 @@
 package io.terminus.dalaran.entity;
 
-import io.terminus.dalaran.FlowStatus;
 import io.terminus.dalaran.support.jpa.ListToJsonConverter;
 import lombok.Data;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
-
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.Date;
@@ -24,7 +22,7 @@ public class FlowEntity {
 
     private String name;
 
-    private FlowStatus status;
+    private String status;
 
     private String description;
 
@@ -34,9 +32,9 @@ public class FlowEntity {
 
     private Integer retryDelay;
 
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+//    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "module_id")
-    private ModuleEntity module;
+    private Long moduleId;
 
     @Convert(converter = ListToJsonConverter.class)
     @Column(name = "processor_ids")
