@@ -45,7 +45,7 @@ public class DalaranMapperProcessor implements Processor {
         String input = target.toString();
         TypeParser parser = TypeParser.newBuilder().build();
         switch (destination) {
-            case INT:
+            case INTEGER:
                 return parser.parse(input, Integer.class);
             case LONG:
                 return parser.parse(input, Long.class);

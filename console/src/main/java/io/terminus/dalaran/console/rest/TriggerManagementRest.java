@@ -8,7 +8,6 @@ import io.terminus.dalaran.console.service.TriggerManagementService;
 import io.terminus.dalaran.model.config.TriggerInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.Collection;
 import java.util.List;
 
@@ -63,7 +62,7 @@ public class TriggerManagementRest {
 
     @ApiOperation(value = "获取触发器初始化结构")
     @RequestMapping(value = "/get/config", method = RequestMethod.GET)
-    public TriggerInfo getTriggerInfo(String type) {
+    public TriggerInfo getTriggerInfo(@RequestParam String type) {
         return triggerManagementService.getTriggerInfo(type);
     }
 }

@@ -10,6 +10,9 @@ import io.terminus.dalaran.annotation.Trigger;
 import io.terminus.dalaran.model.config.DalaranConfigField;
 import io.terminus.dalaran.model.config.ProcessorInfo;
 import io.terminus.dalaran.model.config.TriggerInfo;
+import javafx.util.Pair;
+import lombok.val;
+
 import javax.annotation.PostConstruct;
 import java.lang.reflect.Field;
 import java.util.*;
@@ -73,7 +76,6 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext {
 
         TriggerInfo triggerInfo = new TriggerInfo();
 
-
         triggerInfo.setType(triggerAnnotation.value());
         triggerInfo.setConfigFields(configFields);
         triggerInfo.setIsVoid(triggerAnnotation.isVoid());
@@ -89,6 +91,24 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext {
                 configField.setExample(configFieldInfo.example());
                 configField.setDefaultValue(configFieldInfo.defaultValue());
                 configField.setLabel(configFieldInfo.label());
+                configField.setEnum(configFieldInfo.isEnum());
+
+                try {
+                    if (configFieldInfo.isEnum()) {
+                        List<Map<String, String>> enumValues = new ArrayList<>();
+                        val type = Class.forName(field.getType().getName());
+                        val fields = type.getFields();
+                        for (Field field1 : fields) {
+                            val name = field1.getName();
+                            val map = new HashMap();
+                            map.put(name, name);
+                            enumValues.add(map);
+                        }
+                        configField.setEnumValues(enumValues);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
                 configFields.add(configField);
             }
         }
@@ -116,6 +136,25 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext {
                 configField.setExample(configFieldInfo.example());
                 configField.setDefaultValue(configFieldInfo.defaultValue());
                 configField.setLabel(configFieldInfo.label());
+                configField.setEnum(configFieldInfo.isEnum());
+
+                try {
+                    if (configFieldInfo.isEnum()) {
+                        List<Map<String, String>> enumValues = new ArrayList<>();
+                        val type = Class.forName(field.getType().getName());
+                        val fields = type.getFields();
+                        for (Field field1 : fields) {
+                            val name = field1.getName();
+                            val map = new HashMap();
+                            map.put(name, name);
+                            enumValues.add(map);
+                        }
+                        configField.setEnumValues(enumValues);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
                 configFields.add(configField);
             }
         }

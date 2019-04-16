@@ -13,6 +13,8 @@ public class ModelField {
 
     private FieldType subType;
 
+    private boolean nullable;
+
     private String description;
 
     Map<String, ModelField> fields;

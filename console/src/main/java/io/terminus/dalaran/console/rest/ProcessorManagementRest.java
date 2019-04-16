@@ -62,7 +62,7 @@ public class ProcessorManagementRest {
 
     @ApiOperation(value = "获取处理器初始化结构")
     @RequestMapping(value = "/get/config", method = RequestMethod.GET)
-    public ProcessorInfo getProcessorInfo(String type) {
+    public ProcessorInfo getProcessorInfo(@RequestParam String type) {
         return processorManagementService.getProcessorInfo(type);
     }
 }
