@@ -1,8 +1,9 @@
 package io.terminus.dalaran.model;
 
 import io.terminus.dalaran.BodyModelType;
-import io.terminus.dalaran.support.trace.TracingType;
+import io.terminus.dalaran.TracingType;
 import lombok.Data;
+import org.hibernate.annotations.ColumnDefault;
 
 import javax.persistence.*;
 
@@ -26,6 +27,10 @@ public class DalaranTracingLog {
     private Long elapsed;
 
     private String inputBody;
+
+    @Column(nullable = false)
+    @ColumnDefault("false")
+    private Boolean testFlow;
 
     @Enumerated(EnumType.STRING)
     private TracingType tracingType;

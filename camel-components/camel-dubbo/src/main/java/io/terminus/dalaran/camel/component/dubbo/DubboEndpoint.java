@@ -29,8 +29,8 @@ public class DubboEndpoint extends ProcessorEndpoint {
     private String method;
     @UriParam(defaultValue = "1.0.0", description = "Dubbo service version", javaType = "java.lang.String")
     private String version;
-    @UriParam(label = "parameterType", description = "Dubbo service parameter types", javaType = "java.lang.String")
-    private List<String> parameterTypes = Lists.newArrayList();
+    @UriParam(label = "parameterType", description = "Dubbo service parameter type", javaType = "java.lang.String")
+    private String parameterType;
 
     private GenericService genericService;
 
@@ -102,12 +102,12 @@ public class DubboEndpoint extends ProcessorEndpoint {
         this.version = version;
     }
 
-    public List<String> getParameterTypes() {
-        return parameterTypes;
+    public String getParameterType() {
+        return parameterType;
     }
 
-    public void setParameterTypes(List<String> parameterTypes) {
-        this.parameterTypes = parameterTypes;
+    public void setParameterType(String parameterType) {
+        this.parameterType = parameterType;
     }
 
     public GenericService getGenericService() {

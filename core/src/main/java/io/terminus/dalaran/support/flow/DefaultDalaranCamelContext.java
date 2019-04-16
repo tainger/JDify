@@ -7,7 +7,6 @@ import io.terminus.dalaran.model.ProcessorModel;
 import io.terminus.dalaran.model.TriggerModel;
 import io.terminus.dalaran.model.config.ProcessorInfo;
 import io.terminus.dalaran.support.trace.DalaranTracer;
-import io.terminus.dalaran.support.trace.TracingType;
 import lombok.val;
 import org.apache.camel.CamelContext;
 import org.apache.camel.ProducerTemplate;
@@ -116,22 +115,6 @@ public class DefaultDalaranCamelContext implements DalaranContext {
                     }
                 }
             }
-//            if (i < processorList.size() - 1) {
-//                val nextProcessor = processorList.get(i + 1);
-//                val nextProcessorInfo = componentContext.getProcessorInfo(nextProcessor.getType());
-//                if (processorInfo.getBodyMode() != nextProcessorInfo.getBodyMode()) {
-//                    if (nextProcessorInfo.getBodyMode() == BodyMode.Serialized) {
-//                        if (nextProcessor.getInModel() != null) {
-//                            converterContext.marshal(route, nextProcessor.getInModel());
-//                        }
-//                    } else if (processor.getOutModel() != null) {
-//                        converterContext.unmarshal(route, processor.getOutModel());
-//                    }
-//                }
-//            } else if (processorInfo.getBodyMode() == BodyMode.Serialized && processor.getOutModel() != null) {
-//                converterContext.unmarshal(route, processor.getOutModel());
-//            }
-
 
             // TODO equals
             if (processor.getOutModel() != null && currentMessageModel != processor.getOutModel()) {
@@ -235,9 +218,10 @@ public class DefaultDalaranCamelContext implements DalaranContext {
         val tracer = new DalaranTracer(traceLogger, dalaranFlow.getId());
 
         val route = new RouteDefinition();
+        route.setProperty(TEST_FLOW, Builder.constant(Boolean.TRUE));
         route.setId(routeId);
         route.from(TEST_FLOW_CAMEL_URI_PREFIX + dalaranFlow.getId());
-        // TODO 这里要判断的是流和触发器的 body 类型
+        // TODO 这里要判断的是流和触发器的 body 类型, 默认测试进来一定是 Serialized
         if (!dalaranFlow.getProcessors().isEmpty()) {
             ProcessorModel firstProcessor = dalaranFlow.getProcessors().get(0);
             ProcessorInfo firstProcessorInfo = componentContext.getProcessorInfo(firstProcessor.getType());

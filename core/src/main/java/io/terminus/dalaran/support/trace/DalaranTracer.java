@@ -2,6 +2,7 @@ package io.terminus.dalaran.support.trace;
 
 import io.terminus.dalaran.BodyModelType;
 import io.terminus.dalaran.DalaranTraceLogger;
+import io.terminus.dalaran.TracingType;
 import io.terminus.dalaran.model.DalaranTracingLog;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.camel.Exchange;
@@ -76,7 +77,7 @@ public class DalaranTracer {
         @Override
         public void process(Exchange exchange) {
             // 保持输入输出不变
-            exchange.setOut(exchange.getIn());
+            exchange.getOut().copyFrom(exchange.getIn());
 
             DalaranTracingLog tracingLog = new DalaranTracingLog();
             switch (tracingType) {
@@ -127,7 +128,7 @@ public class DalaranTracer {
         @Override
         public void process(Exchange exchange) {
             // 保持输入输出不变
-            exchange.setOut(exchange.getIn());
+            exchange.getOut().copyFrom(exchange.getIn());
 
             DalaranTracingLog tracingLog = null;
             switch (tracingType) {
@@ -144,6 +145,13 @@ public class DalaranTracer {
             tracingLog.setOutputBody(MessageHelper.extractBodyForLogging(exchange.getIn(), ""));
             tracingLog.setOutputBodyType(bodyModelType);
             tracingLog.setElapsed(System.currentTimeMillis() - tracingLog.getTimestamp());
+
+            Boolean isTestFlow = exchange.getProperty(TEST_FLOW, Boolean.class);
+            if (isTestFlow != null) {
+                tracingLog.setTestFlow(isTestFlow);
+            } else {
+                tracingLog.setTestFlow(false);
+            }
 //            tracingLog.setOutputHeaders(exchange.getIn().getHeaders());
 
             logger.log(tracingLog);
