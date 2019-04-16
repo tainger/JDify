@@ -89,6 +89,7 @@ public class DalaranTracer {
                     break;
             }
 
+            tracingLog.setRecordId(exchange.getExchangeId());
             tracingLog.setTracingType(tracingType);
             tracingLog.setTriggerId(triggerId);
             tracingLog.setFlowId(flowId);

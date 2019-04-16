@@ -86,6 +86,7 @@ public class DefaultDalaranCamelContext implements DalaranContext {
             val processorInfo = componentContext.getProcessorInfo(processor.getType());
             val tracer = new DalaranTracer(traceLogger, dalaranFlow.getTriggerId(), dalaranFlow.getId(), processor.getId());
 
+
             if (processor.getInModel() != null && currentMessageModel != processor.getInModel()) {
                 currentMessageModel = processor.getInModel();
             }

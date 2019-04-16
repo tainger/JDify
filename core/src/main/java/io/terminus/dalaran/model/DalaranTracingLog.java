@@ -7,6 +7,8 @@ import org.hibernate.annotations.ColumnDefault;
 
 import javax.persistence.*;
 
+
+// TODO 应该跟 jpa 无关
 @Data
 @Entity
 @Table(name = "dalaran_tracing_log")
@@ -25,6 +27,8 @@ public class DalaranTracingLog {
     private Long timestamp;
 
     private Long elapsed;
+
+    private String recordId;
 
     private String inputBody;
 
