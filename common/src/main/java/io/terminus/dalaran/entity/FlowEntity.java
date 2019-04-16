@@ -40,6 +40,14 @@ public class FlowEntity {
     @Column(name = "processor_ids")
     private List<Long> processors = new ArrayList<>();
 
+    //    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinColumn(name = "in_structure")
+    private Long inStructure;
+
+    //    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinColumn(name = "out_structure")
+    private Long outStructure;
+
     @Convert(converter = ListToJsonConverter.class)
     private List<Long> properties = new ArrayList<>();
 

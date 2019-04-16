@@ -130,6 +130,8 @@ public class FlowManagementServiceImpl implements FlowManagementService {
 
         flowEntity.setName(model.getName());
         flowEntity.setModuleId(model.getModuleId());
+        flowEntity.setInStructure(model.getInStructure());
+        flowEntity.setOutStructure(model.getOutStructure());
         flowEntity.setProcessors(model.getProcessorIds());
         flowEntity.setDescription(model.getDescription());
         flowEntity.setMaxRetry(model.getMaxRetry());
@@ -146,6 +148,8 @@ public class FlowManagementServiceImpl implements FlowManagementService {
         flowModel.setName(entity.getName());
         flowModel.setModuleId(entity.getModuleId());
         flowModel.setMaxRetry(entity.getMaxRetry());
+        flowModel.setInStructure(entity.getInStructure());
+        flowModel.setOutStructure(entity.getOutStructure());
         flowModel.setProcessorIds(entity.getProcessors());
         flowModel.setPropertyIds(entity.getProperties());
         flowModel.setRetryable(entity.getRetryable());
