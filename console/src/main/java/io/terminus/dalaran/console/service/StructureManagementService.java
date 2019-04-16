@@ -2,6 +2,7 @@ package io.terminus.dalaran.console.service;
 
 import io.terminus.dalaran.console.model.StructureModel;
 import io.terminus.dalaran.console.model.query.StructureQuery;
+import io.terminus.dalaran.console.model.query.rst.ModuleComponent;
 
 import java.util.List;
 
@@ -19,4 +20,6 @@ public interface StructureManagementService {
     List<StructureModel> queryStructures(StructureQuery query);
 
     List<StructureModel> list();
+
+    List<ModuleComponent> getComponents(Long moduleId);
 }

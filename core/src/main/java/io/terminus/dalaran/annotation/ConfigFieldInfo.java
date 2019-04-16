@@ -1,7 +1,6 @@
 package io.terminus.dalaran.annotation;
 
 import io.terminus.dalaran.FieldInputType;
-
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -20,4 +19,6 @@ public @interface ConfigFieldInfo {
     boolean required() default true;
 
     FieldInputType inputType() default FieldInputType.Auto;
+
+    boolean isEnum() default false;
 }

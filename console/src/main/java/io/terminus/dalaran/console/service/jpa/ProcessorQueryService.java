@@ -1,8 +1,9 @@
 package io.terminus.dalaran.console.service.jpa;
 
 import io.terminus.dalaran.console.model.query.ProcessorQuery;
+import io.terminus.dalaran.console.model.query.rst.ComponentInfo;
+import io.terminus.dalaran.console.model.query.rst.ComponentType;
 import io.terminus.dalaran.entity.ProcessorEntity;
-
 import java.util.List;
 
 /**
@@ -11,4 +12,8 @@ import java.util.List;
 public interface ProcessorQueryService {
 
     List<ProcessorEntity> query(ProcessorQuery query);
+
+    List<ComponentType> getTypes(Long moduleId);
+
+    List<ComponentInfo> getBasicInfo(String type);
 }

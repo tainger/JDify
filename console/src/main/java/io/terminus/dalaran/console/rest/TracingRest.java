@@ -14,7 +14,7 @@ public class TracingRest {
     @Autowired
     private DalaranContext dalaranContext;
 
-    @PostMapping("/{flow}/test")
+    @PostMapping("/{flowId}/test")
     private Object doTest(@PathVariable Long flowId, @RequestBody String body) {
 
         // TODO test flow 什么时候 load 是个问题, 主要是修改后的 flow
@@ -26,10 +26,8 @@ public class TracingRest {
         return data;
     }
 
-    @GetMapping("/{flow}")
+    @GetMapping("/{flowId}")
     private List<DalaranTracingLog> queryFlow() {
-
-
         return null;
     }
 }

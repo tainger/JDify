@@ -42,7 +42,6 @@ public class DalaranLoader {
     @Autowired
     private DalaranContext dalaranContext;
 
-
     // TODO test mode
     private final boolean enableTest;
 
@@ -97,19 +96,21 @@ public class DalaranLoader {
         Object config = gson.fromJson(triggerEntity.getConfig(), configType);
 
         if (triggerEntity.getInStructure() != null) {
-            val inModel = buildMessageModel(triggerEntity.getInStructure());
+            StructureEntity structureEntity = structureRepository.findOne(triggerEntity.getInStructure());
+            val inModel = buildMessageModel(structureEntity);
             trigger.setInModel(inModel);
         }
         if (triggerEntity.getOutStructure() != null) {
-            val outModel = buildMessageModel(triggerEntity.getOutStructure());
+            StructureEntity structureEntity = structureRepository.findOne(triggerEntity.getOutStructure());
+            val outModel = buildMessageModel(structureEntity);
             trigger.setOutModel(outModel);
         }
-        val flow = buildDalaranFlow(triggerEntity.getFlow());
         trigger.setId(triggerEntity.getId());
-        flow.setTriggerId(triggerEntity.getId());
-        trigger.setFlow(flow);
         trigger.setType(triggerEntity.getType());
         trigger.setConfig(config);
+
+        FlowEntity flowEntity = flowRepository.findOne(triggerEntity.getFlowId());
+        trigger.setFlow(buildDalaranFlow(flowEntity));
         return trigger;
     }
 
@@ -151,7 +152,7 @@ public class DalaranLoader {
 
     private MessageModel buildMessageModel(StructureEntity structureEntity) {
         val model = new MessageModel();
-        val modelType = structureEntity.getStructureType();
+        val modelType = structureEntity.getType();
         model.setModelType(modelType);
         Class<? extends DalaranModelSchema> schemaType = dalaranContext.getDalaranConverterContext().getSchemaType(modelType);
         model.setModelSchema(gson.fromJson(structureEntity.getStructureSchema(), schemaType));

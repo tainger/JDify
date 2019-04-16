@@ -4,6 +4,7 @@ import io.terminus.dalaran.*;
 import io.terminus.dalaran.support.component.DefaultDalaranComponentContext;
 import io.terminus.dalaran.support.convert.DefaultDalaranConverterContext;
 import io.terminus.dalaran.support.flow.DefaultDalaranCamelContext;
+import io.terminus.dalaran.trace.DefaultJpaDalaranTraceLogger;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
@@ -30,6 +31,11 @@ public class Application {
     @Bean
     public DalaranConverterContext dalaranConverterContext() {
         return new DefaultDalaranConverterContext();
+    }
+
+    @Bean
+    public DalaranTraceLogger dalaranTraceLogger() {
+        return new DefaultJpaDalaranTraceLogger();
     }
 
     @Bean

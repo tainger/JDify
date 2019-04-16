@@ -1,7 +1,11 @@
 package io.terminus.dalaran.model.config;
 
 import io.terminus.dalaran.FieldInputType;
+import javafx.util.Pair;
 import lombok.Data;
+
+import java.util.List;
+import java.util.Map;
 
 @Data
 public class DalaranConfigField {
@@ -16,4 +20,7 @@ public class DalaranConfigField {
 
     private String label;
 
+    private boolean isEnum;
+
+    List<Map<String, String>> enumValues;
 }

@@ -2,8 +2,8 @@ package io.terminus.dalaran.component.processor.mapper;
 
 import com.github.drapostolos.typeparser.TypeParser;
 import com.google.gson.Gson;
+import io.terminus.dalaran.model.schema.structure.FieldType;
 import io.terminus.dalaran.component.processor.mapper.jxpath.DalaranJXPathFactory;
-import io.terminus.dalaran.component.processor.mapper.model.FieldType;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.commons.jxpath.JXPathContext;
@@ -45,7 +45,7 @@ public class DalaranMapperProcessor implements Processor {
         String input = target.toString();
         TypeParser parser = TypeParser.newBuilder().build();
         switch (destination) {
-            case INT:
+            case INTEGER:
                 return parser.parse(input, Integer.class);
             case LONG:
                 return parser.parse(input, Long.class);
