@@ -2,9 +2,11 @@ package io.terminus.dalaran.support.flow;
 
 import io.terminus.dalaran.*;
 import io.terminus.dalaran.model.DalaranFlow;
+import io.terminus.dalaran.model.MessageModel;
+import io.terminus.dalaran.model.ProcessorModel;
 import io.terminus.dalaran.model.TriggerModel;
+import io.terminus.dalaran.model.config.ProcessorInfo;
 import io.terminus.dalaran.support.trace.DalaranTracer;
-import io.terminus.dalaran.support.trace.TracingType;
 import lombok.val;
 import org.apache.camel.CamelContext;
 import org.apache.camel.ProducerTemplate;
@@ -70,53 +72,54 @@ public class DefaultDalaranCamelContext implements DalaranContext {
         route.setId(FLOW_PREFIX + dalaranFlow.getId());
         val processorList = dalaranFlow.getProcessors();
         route.from(FLOW_CAMEL_URI_PREFIX + dalaranFlow.getId());
-        // TODO use const
-        route.setProperty(CURRENT_FLOW_ID, Builder.constant(dalaranFlow.getId()));
+
+        MessageModel nextMessageModel = null;
+        MessageModel currentMessageModel = dalaranFlow.getInModel();
 
         // TODO 这里一定会先转成 Object, 如果是两端都是序列化类型, 则会有无用的转换
         // TODO 最好的方式是, 在 Flow 上声明出入格式, 由 Trigger 端做处理
         for (int i = 0; i < processorList.size(); i++) {
             val processor = processorList.get(i);
-
-            val processorComponent = componentContext.getProcessor(processor.getType());
-            val processorInfo = componentContext.getProcessorInfo(processor.getType());
             // TODO check
-            val tracer = new DalaranTracer(traceLogger, TracingType.Flow);
-            BodyModelType inputType;
-            if (processor.getInModel() != null) {
-                inputType = processor.getInModel().getModelType();
-            } else {
-                inputType = BodyModelType.OBJECT;
+            val processorComponent = componentContext.getProcessor(processor.getType());
+            // TODO check
+            val processorInfo = componentContext.getProcessorInfo(processor.getType());
+            val tracer = new DalaranTracer(traceLogger, dalaranFlow.getTriggerId(), dalaranFlow.getId(), processor.getId());
+
+            if (processor.getInModel() != null && currentMessageModel != processor.getInModel()) {
+                currentMessageModel = processor.getInModel();
             }
-            route.setProperty(CURRENT_PROCESSOR_ID, Builder.constant(processor.getId()));
+
             // log
-            route.process(tracer.buildBeforeProcessor(inputType));
+            tracer.before(route, currentMessageModel.getModelType());
 
             processorComponent.configure(route, processor.getConfig());
+
             if (i < processorList.size() - 1) {
                 val nextProcessor = processorList.get(i + 1);
                 val nextProcessorInfo = componentContext.getProcessorInfo(nextProcessor.getType());
+                // TODO equals
+                if (nextProcessor.getInModel() != null && nextMessageModel != nextProcessor.getInModel()) {
+                    nextMessageModel = nextProcessor.getInModel();
+                } else {
+                    // TODO 下一个节点没有配置出入参, 则以最后一个配置出参类型作为下一个入参类型
+                    nextMessageModel = currentMessageModel;
+                }
                 if (processorInfo.getBodyMode() != nextProcessorInfo.getBodyMode()) {
                     if (nextProcessorInfo.getBodyMode() == BodyMode.Serialized) {
-                        if (nextProcessor.getInModel() != null) {
-                            converterContext.marshal(route, nextProcessor.getInModel());
-                        }
-                    } else if (processor.getOutModel() != null) {
-                        converterContext.unmarshal(route, processor.getOutModel());
+                        converterContext.marshal(route, nextMessageModel);
+                    } else {
+                        converterContext.unmarshal(route, nextMessageModel);
                     }
                 }
-            } else if (processorInfo.getBodyMode() == BodyMode.Serialized && processor.getOutModel() != null) {
-                converterContext.unmarshal(route, processor.getOutModel());
             }
 
-            BodyModelType outputType;
-            if (processor.getInModel() != null) {
-                outputType = processor.getOutModel().getModelType();
-            } else {
-                outputType = BodyModelType.OBJECT;
+            // TODO equals
+            if (processor.getOutModel() != null && currentMessageModel != processor.getOutModel()) {
+                currentMessageModel = processor.getOutModel();
             }
             // log
-            route.process(tracer.buildAfterProcessor(outputType));
+            tracer.after(route, currentMessageModel.getModelType());
         }
         // TODO 流程最后不可得知触发器的出模型, 所以无法判断做格式转换, 最保险的方式是固定转为 Object, 在 trigger 端在根据要求做一次序列化, 但是会有性能损耗
         // TODO 另外这里也不好判断是否是最后的节点, 因为存在分支, 暂时将最后节点作为流输出节点
@@ -138,6 +141,8 @@ public class DefaultDalaranCamelContext implements DalaranContext {
 
     @Override
     public void addTrigger(TriggerModel trigger) {
+        addFlow(trigger.getFlow());
+
         try {
             camelContext.removeRoute(TRIGGER_PREFIX + trigger.getId());
         } catch (Exception e) {
@@ -146,25 +151,45 @@ public class DefaultDalaranCamelContext implements DalaranContext {
 
         val triggerComponent = componentContext.getTrigger(trigger.getType());
         val triggerInfo = componentContext.getTriggerInfo(trigger.getType());
-        val tracer = new DalaranTracer(traceLogger, TracingType.Trigger);
+        val tracer = new DalaranTracer(traceLogger, trigger.getId());
 
         val route = new RouteDefinition();
         route.setId(TRIGGER_PREFIX + trigger.getId());
-        route.setProperty(CURRENT_TRIGGER_ID, Builder.constant(trigger.getId()));
-
 
         triggerComponent.buildFromRoute(route, trigger.getConfig());
         // TODO 这里要判断的是流和触发器的 body 类型
-        if (triggerInfo.getBodyMode() == BodyMode.Serialized && trigger.getInModel() != null) {
-            converterContext.unmarshal(route, trigger.getInModel());
+        val flow = trigger.getFlow();
+        val processors = flow.getProcessors();
+        if (processors.isEmpty()) {
+            return;
         }
-        route.process(tracer.buildBeforeProcessor(trigger.getInModel().getModelType()));
+        // TODO 这种流的入口类型可以被抽象出去, 出口也一样
+        ProcessorModel firstProcessor = processors.get(0);
+        ProcessorInfo firstProcessorInfo = componentContext.getProcessorInfo(firstProcessor.getType());
+
+        ProcessorModel lastProcessor = processors.get(processors.size() - 1);
+        ProcessorInfo lastProcessorInfo = componentContext.getProcessorInfo(lastProcessor.getType());
+
+        if (triggerInfo.getBodyMode() != firstProcessorInfo.getBodyMode()) {
+            if (firstProcessorInfo.getBodyMode() == BodyMode.Serialized) {
+                converterContext.marshal(route, trigger.getInModel());
+            } else {
+                converterContext.unmarshal(route, trigger.getInModel());
+            }
+        }
+        tracer.before(route, trigger.getInModel().getModelType());
+
         route.to(FLOW_CAMEL_URI_PREFIX + trigger.getFlow().getId());
-        if (triggerInfo.getBodyMode() == BodyMode.Serialized && trigger.getOutModel() != null) {
-            converterContext.marshal(route, trigger.getOutModel());
+
+        if (triggerInfo.getBodyMode() != lastProcessorInfo.getBodyMode()) {
+            if (lastProcessorInfo.getBodyMode() == BodyMode.Serialized) {
+                converterContext.unmarshal(route, trigger.getOutModel());
+            } else {
+                converterContext.marshal(route, trigger.getOutModel());
+            }
         }
 
-        route.process(tracer.buildAfterProcessor(trigger.getOutModel().getModelType()));
+        tracer.after(route, trigger.getOutModel().getModelType());
         try {
             camelContext.addRouteDefinition(route);
         } catch (Exception e) {
@@ -177,13 +202,64 @@ public class DefaultDalaranCamelContext implements DalaranContext {
         triggers.forEach(this::addTrigger);
     }
 
+    @Override
+    public void addTestFlow(DalaranFlow dalaranFlow) {
+        addFlow(dalaranFlow);
+
+        String routeId = TEST_FLOW_PREFIX + dalaranFlow.getId();
+        try {
+            camelContext.removeRoute(routeId);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        val tracer = new DalaranTracer(traceLogger, dalaranFlow.getId());
+
+        val route = new RouteDefinition();
+        route.setProperty(TEST_FLOW, Builder.constant(Boolean.TRUE));
+        route.setId(routeId);
+        route.from(TEST_FLOW_CAMEL_URI_PREFIX + dalaranFlow.getId());
+        // TODO 这里要判断的是流和触发器的 body 类型, 默认测试进来一定是 Serialized
+        if (!dalaranFlow.getProcessors().isEmpty()) {
+            ProcessorModel firstProcessor = dalaranFlow.getProcessors().get(0);
+            ProcessorInfo firstProcessorInfo = componentContext.getProcessorInfo(firstProcessor.getType());
+            if (firstProcessorInfo.getBodyMode() == BodyMode.Object && dalaranFlow.getInModel() != null) {
+                converterContext.unmarshal(route, dalaranFlow.getInModel());
+            }
+        }
+        // TODO flow in model check null
+
+        tracer.before(route, dalaranFlow.getInModel().getModelType());
+        route.to(FLOW_CAMEL_URI_PREFIX + dalaranFlow.getId());
+        if (!dalaranFlow.getProcessors().isEmpty()) {
+            ProcessorModel lastProcessor = dalaranFlow.getProcessors().get(dalaranFlow.getProcessors().size() - 1);
+            ProcessorInfo lastProcessorInfo = componentContext.getProcessorInfo(lastProcessor.getType());
+            if (lastProcessorInfo.getBodyMode() == BodyMode.Object && dalaranFlow.getOutModel() != null) {
+                converterContext.marshal(route, dalaranFlow.getOutModel());
+            }
+        }
+
+        // TODO flow out model check null
+        tracer.after(route, dalaranFlow.getOutModel().getModelType());
+        try {
+            camelContext.addRouteDefinition(route);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void addTestFlows(List<DalaranFlow> flows) {
+        flows.forEach(this::addTestFlow);
+    }
+
 
     // TODO 这里要处理数据的序列化等问题
     @Override
     public Object testFlow(Long id, Object body) {
         ProducerTemplate template = camelContext.createProducerTemplate();
 //        template.sendBody(, body);
-        template.setDefaultEndpointUri(FLOW_CAMEL_URI_PREFIX + id);
+        template.setDefaultEndpointUri(TEST_FLOW_CAMEL_URI_PREFIX + id);
 
         return template.requestBody(body);
     }

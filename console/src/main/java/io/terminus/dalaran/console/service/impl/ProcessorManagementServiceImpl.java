@@ -9,6 +9,7 @@ import io.terminus.dalaran.console.model.query.rst.ComponentType;
 import io.terminus.dalaran.console.model.query.rst.ModuleComponent;
 import io.terminus.dalaran.console.service.ProcessorManagementService;
 import io.terminus.dalaran.console.service.jpa.ProcessorQueryService;
+import io.terminus.dalaran.entity.ModuleEntity;
 import io.terminus.dalaran.entity.ProcessorEntity;
 import io.terminus.dalaran.model.config.ProcessorInfo;
 import io.terminus.dalaran.repository.ModuleRepository;
@@ -60,7 +61,7 @@ public class ProcessorManagementServiceImpl implements ProcessorManagementServic
         List<ProcessorEntity> entities = processorQueryService.query(query);
         List<ProcessorModel> models = new LinkedList<>();
 
-        for (ProcessorEntity entity: entities) {
+        for (ProcessorEntity entity : entities) {
             models.add(buildModel(entity));
         }
 
@@ -72,7 +73,7 @@ public class ProcessorManagementServiceImpl implements ProcessorManagementServic
         List<ProcessorEntity> entities = processorRepository.findAll();
         List<ProcessorModel> models = new LinkedList<>();
 
-        for (ProcessorEntity entity: entities) {
+        for (ProcessorEntity entity : entities) {
             models.add(buildModel(entity));
         }
 
@@ -83,7 +84,7 @@ public class ProcessorManagementServiceImpl implements ProcessorManagementServic
     public List<ModuleComponent> getComponents(Long moduleId) {
         List<ModuleComponent> components = new ArrayList<>();
         List<ComponentType> types = processorQueryService.getTypes(moduleId);
-        for (ComponentType componentType: types) {
+        for (ComponentType componentType : types) {
             String type = componentType.getType();
             List<ComponentInfo> componentInfos = processorQueryService.getBasicInfo(type);
             ModuleComponent moduleComponent = new ModuleComponent();
@@ -108,8 +109,6 @@ public class ProcessorManagementServiceImpl implements ProcessorManagementServic
     private ProcessorEntity buildEntity(ProcessorModel model) {
         ProcessorEntity processorEntity = new ProcessorEntity();
         processorEntity.setModuleId(model.getModuleId());
-        processorEntity.setInStructure(model.getInStructure());
-        processorEntity.setOutStructure(model.getOutStructure());
         processorEntity.setType(model.getType());
         processorEntity.setName(model.getName());
         processorEntity.setDescription(model.getDescription());
@@ -122,8 +121,6 @@ public class ProcessorManagementServiceImpl implements ProcessorManagementServic
         ProcessorModel processorModel = new ProcessorModel();
         processorModel.setId(entity.getId());
         processorModel.setModuleId(entity.getModuleId());
-        processorModel.setInStructure(entity.getInStructure());
-        processorModel.setOutStructure(entity.getOutStructure());
         processorModel.setName(entity.getName());
         processorModel.setDescription(entity.getDescription());
         processorModel.setType(entity.getType());

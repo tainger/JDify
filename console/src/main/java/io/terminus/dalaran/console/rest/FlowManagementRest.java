@@ -31,9 +31,6 @@ public class FlowManagementRest {
     @Autowired
     private FlowManagementService flowManagementService;
 
-    @Autowired
-    private DalaranContext dalaranContext;
-
     private Gson gson = new Gson();
 
     @PutMapping
@@ -120,13 +117,5 @@ public class FlowManagementRest {
     @RequestMapping(value = "/queryByProcessorIds", method = RequestMethod.GET)
     public List<FlowModel> queryByProcessorIds(@RequestParam List<Long> processorIds) {
         return flowManagementService.queryByProcessorIds(processorIds);
-    }
-
-    @PostMapping("/{flowId}")
-    public Object testFlow(@PathVariable Long flowId, @RequestBody String body) {
-//        FlowModel flowModel = flowManagementService.getById(flowId);
-
-
-        return dalaranContext.testFlow(flowId, body);
     }
 }

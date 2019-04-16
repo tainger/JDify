@@ -1,4 +1,4 @@
-package io.terminus.dalaran.support.trace;
+package io.terminus.dalaran;
 
 public enum TracingType {
     Trigger,

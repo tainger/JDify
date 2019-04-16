@@ -22,7 +22,7 @@ public class DubboConfiguration {
     @UriParam(defaultValue = "1.0.0", description = "Dubbo service version", javaType = "java.lang.String")
     private String version;
     @UriParam(label = "parameterType", description = "Dubbo service parameter types", javaType = "java.lang.String")
-    private List<String> parameterTypes;
+    private String parameterType;
 
     public String getRegistryAddress() {
         return registryAddress;
@@ -56,11 +56,11 @@ public class DubboConfiguration {
         this.version = version;
     }
 
-    public List<String> getParameterTypes() {
-        return parameterTypes;
+    public String getParameterType() {
+        return parameterType;
     }
 
-    public void setParameterTypes(List<String> parameterTypes) {
-        this.parameterTypes = parameterTypes;
+    public void setParameterType(String parameterType) {
+        this.parameterType = parameterType;
     }
 }

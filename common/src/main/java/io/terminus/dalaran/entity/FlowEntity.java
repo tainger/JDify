@@ -36,6 +36,14 @@ public class FlowEntity {
     @JoinColumn(name = "module_id")
     private Long moduleId;
 
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinColumn(name = "in_structure")
+    private StructureEntity inStructure;
+
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinColumn(name = "out_structure")
+    private StructureEntity outStructure;
+
     @Convert(converter = ListToJsonConverter.class)
     @Column(name = "processor_ids")
     private List<Long> processors = new ArrayList<>();
