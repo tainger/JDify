@@ -2,6 +2,7 @@ package io.terminus.dalaran.console.rest;
 
 import io.terminus.dalaran.console.model.TracingLog;
 import io.terminus.dalaran.console.model.TriggerLog;
+import io.terminus.dalaran.console.model.query.TracingLogQuery;
 import io.terminus.dalaran.console.service.TracingLogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,8 +21,8 @@ public class TracingRest {
     private TracingLogService tracingLogService;
 
     @GetMapping
-    private List<TriggerLog> queryFlow(@PathVariable Long flowId) {
-        return tracingLogService.triggerLogs(flowId);
+    private List<TriggerLog> queryFlow(TracingLogQuery query) {
+        return tracingLogService.triggerLogs(query);
     }
 
     @GetMapping("/{logId}/tracingLog")

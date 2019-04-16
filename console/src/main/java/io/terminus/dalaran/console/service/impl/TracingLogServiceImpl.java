@@ -3,6 +3,7 @@ package io.terminus.dalaran.console.service.impl;
 import io.terminus.dalaran.TracingType;
 import io.terminus.dalaran.console.model.TracingLog;
 import io.terminus.dalaran.console.model.TriggerLog;
+import io.terminus.dalaran.console.model.query.TracingLogQuery;
 import io.terminus.dalaran.console.service.TracingLogService;
 import io.terminus.dalaran.entity.FlowEntity;
 import io.terminus.dalaran.entity.ProcessorEntity;
@@ -35,8 +36,11 @@ public class TracingLogServiceImpl implements TracingLogService {
     private TriggerRepository triggerRepository;
 
     @Override
-    public List<TriggerLog> triggerLogs(Long triggerId) {
-        List<DalaranTracingLog> logs = tracingLogRepository.findByTriggerIdAndTracingType(triggerId, TracingType.Trigger);
+    public List<TriggerLog> triggerLogs(TracingLogQuery query) {
+        // TODO query...
+        List<DalaranTracingLog> logs = tracingLogRepository.findByTriggerIdAndTracingType(query.getTriggerId(), TracingType.Trigger);
+
+
         return logs.stream().map(log -> {
             TriggerLog triggerLog = new TriggerLog();
             triggerLog.setId(log.getId());
@@ -57,8 +61,8 @@ public class TracingLogServiceImpl implements TracingLogService {
     }
 
     @Override
-    public List<TracingLog> triggerTracingLogs(Long triggerLogId) {
-        DalaranTracingLog triggerLog = tracingLogRepository.findOne(triggerLogId);
+    public List<TracingLog> triggerTracingLogs(Long logId) {
+        DalaranTracingLog triggerLog = tracingLogRepository.findOne(logId);
         List<DalaranTracingLog> tracingLogs = tracingLogRepository.findByRecordIdAndTracingType(triggerLog.getRecordId(), TracingType.Flow);
         return tracingLogs.stream().map(log -> {
             TracingLog tracingLog = new TracingLog();
