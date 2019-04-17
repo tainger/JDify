@@ -5,15 +5,12 @@ import com.alibaba.dubbo.config.ReferenceConfig;
 import com.alibaba.dubbo.config.RegistryConfig;
 import com.alibaba.dubbo.config.utils.ReferenceConfigCache;
 import com.alibaba.dubbo.rpc.service.GenericService;
-import com.google.common.collect.Lists;
 import org.apache.camel.Consumer;
 import org.apache.camel.Processor;
 import org.apache.camel.impl.ProcessorEndpoint;
 import org.apache.camel.spi.Metadata;
 import org.apache.camel.spi.UriEndpoint;
 import org.apache.camel.spi.UriParam;
-
-import java.util.List;
 
 @UriEndpoint(firstVersion = "1.0.0", scheme = "dubbo", title = "DUBBO", syntax = "dubbo:registryAddress", label = "rpc")
 public class DubboEndpoint extends ProcessorEndpoint {

@@ -31,6 +31,9 @@ public class FlowManagementRest {
     @Autowired
     private FlowManagementService flowManagementService;
 
+    @Autowired
+    private DalaranContext dalaranContext;
+
     private Gson gson = new Gson();
 
     @PutMapping
@@ -117,5 +120,17 @@ public class FlowManagementRest {
     @RequestMapping(value = "/queryByProcessorIds", method = RequestMethod.GET)
     public List<FlowModel> queryByProcessorIds(@RequestParam List<Long> processorIds) {
         return flowManagementService.queryByProcessorIds(processorIds);
+    }
+
+    @PostMapping("/flow/{flowId}/test")
+    private Object doTest(@PathVariable Long flowId, @RequestBody String body) {
+
+        // TODO test flow 什么时候 load 是个问题, 主要是修改后的 flow
+        Object data = dalaranContext.testFlow(flowId, body);
+        // TODO 如果最后一步是序列化的情况, 会被序列化成 byte[], 先 toString 一下
+        if (data instanceof byte[]) {
+            return new String((byte[]) data);
+        }
+        return data;
     }
 }

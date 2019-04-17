@@ -1,25 +1,15 @@
 package io.terminus.dalaran.camel.component.dubbo;
 
-import com.alibaba.dubbo.common.bytecode.ClassGenerator;
 import com.alibaba.dubbo.common.utils.PojoUtils;
 import com.alibaba.dubbo.config.ApplicationConfig;
 import com.alibaba.dubbo.config.RegistryConfig;
 import com.alibaba.dubbo.config.ServiceConfig;
-import com.alibaba.dubbo.rpc.service.GenericException;
 import com.alibaba.dubbo.rpc.service.GenericService;
-import javassist.*;
-import javassist.util.proxy.ProxyFactory;
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.apache.camel.Processor;
 import org.apache.camel.impl.DefaultConsumer;
 import org.apache.camel.impl.DefaultMessage;
-
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.List;
-
-import static io.terminus.dalaran.camel.component.dubbo.DubboCamelConstants.*;
 
 public class DubboCamelConsumer extends DefaultConsumer {
 

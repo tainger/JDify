@@ -9,7 +9,6 @@ import io.terminus.dalaran.console.model.query.rst.ComponentType;
 import io.terminus.dalaran.console.model.query.rst.ModuleComponent;
 import io.terminus.dalaran.console.service.ProcessorManagementService;
 import io.terminus.dalaran.console.service.jpa.ProcessorQueryService;
-import io.terminus.dalaran.entity.ModuleEntity;
 import io.terminus.dalaran.entity.ProcessorEntity;
 import io.terminus.dalaran.model.config.ProcessorInfo;
 import io.terminus.dalaran.repository.ModuleRepository;

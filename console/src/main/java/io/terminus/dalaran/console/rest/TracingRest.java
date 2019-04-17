@@ -1,33 +1,31 @@
 package io.terminus.dalaran.console.rest;
 
-import io.terminus.dalaran.DalaranContext;
-import io.terminus.dalaran.model.DalaranTracingLog;
+import io.terminus.dalaran.console.model.TriggerLog;
+import io.terminus.dalaran.console.model.query.TracingLogQuery;
+import io.terminus.dalaran.console.service.TracingLogService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/tracing")
+@RequestMapping("/log")
 public class TracingRest {
 
+
     @Autowired
-    private DalaranContext dalaranContext;
+    private TracingLogService tracingLogService;
 
-    @PostMapping("/{flowId}/test")
-    private Object doTest(@PathVariable Long flowId, @RequestBody String body) {
-
-        // TODO test flow 什么时候 load 是个问题, 主要是修改后的 flow
-        Object data = dalaranContext.testFlow(flowId, body);
-        // TODO 如果最后一步是序列化的情况, 会被序列化成 byte[], 先 toString 一下
-        if (data instanceof byte[]) {
-            return new String((byte[]) data);
-        }
-        return data;
+    @GetMapping
+    private List<TriggerLog> queryFlow(TracingLogQuery query) {
+        return tracingLogService.triggerLogs(query);
     }
 
-    @GetMapping("/{flowId}")
-    private List<DalaranTracingLog> queryFlow() {
-        return null;
+    @GetMapping("/{logId}")
+    private TriggerLog tracingLog(@PathVariable Long logId) {
+        return tracingLogService.getTriggerLogDetail(logId);
     }
 }

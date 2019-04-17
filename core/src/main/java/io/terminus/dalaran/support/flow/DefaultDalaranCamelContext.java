@@ -13,7 +13,9 @@ import org.apache.camel.ProducerTemplate;
 import org.apache.camel.builder.Builder;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.model.RouteDefinition;
+
 import java.util.List;
+
 import static io.terminus.dalaran.DalaranConstants.*;
 
 public class DefaultDalaranCamelContext implements DalaranContext {
@@ -85,6 +87,7 @@ public class DefaultDalaranCamelContext implements DalaranContext {
             // TODO check
             val processorInfo = componentContext.getProcessorInfo(processor.getType());
             val tracer = new DalaranTracer(traceLogger, dalaranFlow.getTriggerId(), dalaranFlow.getId(), processor.getId());
+
 
             if (processor.getInModel() != null && currentMessageModel != processor.getInModel()) {
                 currentMessageModel = processor.getInModel();
