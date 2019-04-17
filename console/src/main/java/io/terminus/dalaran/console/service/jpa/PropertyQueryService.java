@@ -7,6 +7,7 @@ import java.util.List;
 /**
  * Created by jingdi on 2019/4/16
  */
+
 public interface PropertyQueryService {
 
     List<PropertyEntity> query(PropertyQuery query);

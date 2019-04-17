@@ -180,8 +180,8 @@ public class DalaranLoader {
                 }).collect(Collectors.toList());
 
         // TODO for test...
-        flow.setInModel(buildMessageModel(flowEntity.getInStructure()));
-        flow.setOutModel(buildMessageModel(flowEntity.getOutStructure()));
+        flow.setInModel(buildMessageModel(structureRepository.findOne(flowEntity.getInStructure())));
+        flow.setOutModel(buildMessageModel(structureRepository.findOne(flowEntity.getOutStructure())));
         flow.setId(flowEntity.getId());
         flow.setProcessors(processors);
         flow.setMaxRetry(flowEntity.getMaxRetry());

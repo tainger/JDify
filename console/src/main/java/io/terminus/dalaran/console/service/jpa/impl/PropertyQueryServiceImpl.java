@@ -10,6 +10,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.stereotype.Service;
 
 import javax.persistence.criteria.Predicate;
 import java.util.ArrayList;
@@ -18,6 +19,7 @@ import java.util.List;
 /**
  * Created by jingdi on 2019/4/16
  */
+@Service
 public class PropertyQueryServiceImpl implements PropertyQueryService {
 
     @Autowired

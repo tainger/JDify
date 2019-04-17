@@ -7,6 +7,7 @@ import io.terminus.dalaran.console.service.jpa.PropertyQueryService;
 import io.terminus.dalaran.entity.PropertyEntity;
 import io.terminus.dalaran.repository.PropertyRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -15,13 +16,14 @@ import java.util.List;
 /**
  * Created by jingdi on 2019/4/16
  */
+@Service
 public class PropertyManagementServiceImpl implements PropertyManagementService {
 
     @Autowired
     private PropertyRepository propertyRepository;
 
     @Autowired
-    protected PropertyQueryService propertyQueryService;
+    private PropertyQueryService propertyQueryService;
 
     @Override
     public void createProperty(PropertyModel propertyModel) {
