@@ -28,6 +28,7 @@
     <properties>
         <camel.version>2.21.5</camel.version>
         <dubbo.version>2.6.5</dubbo.version>
+        <spring.version>4.3.18.RELEASE</spring.version>
 
         <!--camel property-->
         <javax.servlet-api-version>3.1.0</javax.servlet-api-version>
