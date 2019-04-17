@@ -121,11 +121,15 @@ public class FlowManagementRest {
         return flowManagementService.queryByProcessorIds(processorIds);
     }
 
-    @PostMapping("/{flowId}")
-    public Object testFlow(@PathVariable Long flowId, @RequestBody String body) {
-//        FlowModel flowModel = flowManagementService.getById(flowId);
+    @PostMapping("/flow/{flowId}/test")
+    private Object doTest(@PathVariable Long flowId, @RequestBody String body) {
 
-
-        return dalaranContext.testFlow(flowId, body);
+        // TODO test flow 什么时候 load 是个问题, 主要是修改后的 flow
+        Object data = dalaranContext.testFlow(flowId, body);
+        // TODO 如果最后一步是序列化的情况, 会被序列化成 byte[], 先 toString 一下
+        if (data instanceof byte[]) {
+            return new String((byte[]) data);
+        }
+        return data;
     }
 }

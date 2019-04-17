@@ -9,24 +9,19 @@ public class DubboCamelProcessor extends DefaultProducer {
     private final GenericService genericService;
 
     private final String method;
-    private final String[] parameterTypes;
+    private final String parameterType;
 
     public DubboCamelProcessor(DubboEndpoint endpoint) {
         super(endpoint);
         this.genericService = endpoint.getGenericService();
         this.method = endpoint.getMethod();
-        this.parameterTypes = endpoint.getParameterTypes().toArray(new String[0]);
+        this.parameterType = endpoint.getParameterType();
     }
 
     @Override
     public void process(Exchange exchange) {
-        Object[] args = null;
-        try {
-            args = exchange.getIn().getBody(Object[].class);
-        } catch (ClassCastException e) {
-            // TODO no args
-        }
-        Object result = genericService.$invoke(method, parameterTypes, args);
+        Object arg = exchange.getIn().getBody();
+        Object result = genericService.$invoke(method, new String[]{parameterType}, new Object[]{arg});
         exchange.getOut().setBody(result);
     }
 }

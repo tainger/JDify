@@ -60,7 +60,7 @@ public class ProcessorManagementServiceImpl implements ProcessorManagementServic
         List<ProcessorEntity> entities = processorQueryService.query(query);
         List<ProcessorModel> models = new LinkedList<>();
 
-        for (ProcessorEntity entity: entities) {
+        for (ProcessorEntity entity : entities) {
             models.add(buildModel(entity));
         }
 
@@ -72,7 +72,7 @@ public class ProcessorManagementServiceImpl implements ProcessorManagementServic
         List<ProcessorEntity> entities = processorRepository.findAll();
         List<ProcessorModel> models = new LinkedList<>();
 
-        for (ProcessorEntity entity: entities) {
+        for (ProcessorEntity entity : entities) {
             models.add(buildModel(entity));
         }
 
@@ -83,7 +83,7 @@ public class ProcessorManagementServiceImpl implements ProcessorManagementServic
     public List<ModuleComponent> getComponents(Long moduleId) {
         List<ModuleComponent> components = new ArrayList<>();
         List<ComponentType> types = processorQueryService.getTypes(moduleId);
-        for (ComponentType componentType: types) {
+        for (ComponentType componentType : types) {
             String type = componentType.getType();
             List<ComponentInfo> componentInfos = processorQueryService.getBasicInfo(type);
             ModuleComponent moduleComponent = new ModuleComponent();

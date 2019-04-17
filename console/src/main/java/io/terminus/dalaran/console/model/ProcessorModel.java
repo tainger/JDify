@@ -1,7 +1,6 @@
 package io.terminus.dalaran.console.model;
 
 import lombok.Data;
-
 import java.util.Map;
 
 @Data

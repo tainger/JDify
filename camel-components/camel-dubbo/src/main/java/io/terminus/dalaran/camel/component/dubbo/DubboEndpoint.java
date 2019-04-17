@@ -5,15 +5,12 @@ import com.alibaba.dubbo.config.ReferenceConfig;
 import com.alibaba.dubbo.config.RegistryConfig;
 import com.alibaba.dubbo.config.utils.ReferenceConfigCache;
 import com.alibaba.dubbo.rpc.service.GenericService;
-import com.google.common.collect.Lists;
 import org.apache.camel.Consumer;
 import org.apache.camel.Processor;
 import org.apache.camel.impl.ProcessorEndpoint;
 import org.apache.camel.spi.Metadata;
 import org.apache.camel.spi.UriEndpoint;
 import org.apache.camel.spi.UriParam;
-
-import java.util.List;
 
 @UriEndpoint(firstVersion = "1.0.0", scheme = "dubbo", title = "DUBBO", syntax = "dubbo:registryAddress", label = "rpc")
 public class DubboEndpoint extends ProcessorEndpoint {
@@ -29,8 +26,8 @@ public class DubboEndpoint extends ProcessorEndpoint {
     private String method;
     @UriParam(defaultValue = "1.0.0", description = "Dubbo service version", javaType = "java.lang.String")
     private String version;
-    @UriParam(label = "parameterType", description = "Dubbo service parameter types", javaType = "java.lang.String")
-    private List<String> parameterTypes = Lists.newArrayList();
+    @UriParam(label = "parameterType", description = "Dubbo service parameter type", javaType = "java.lang.String")
+    private String parameterType;
 
     private GenericService genericService;
 
@@ -45,10 +42,12 @@ public class DubboEndpoint extends ProcessorEndpoint {
         return new DubboCamelConsumer(this, processor);
     }
 
-    public GenericService getDubboConsumerService() {
+    public GenericService getGenericService() {
         if (genericService == null) {
             ReferenceConfig<GenericService> reference = new ReferenceConfig<>();
-            reference.setApplication(new ApplicationConfig("test"));
+            ApplicationConfig applicationConfig = new ApplicationConfig("test");
+            applicationConfig.setQosPort(22221);
+            reference.setApplication(applicationConfig);
             reference.setRegistry(new RegistryConfig(registryAddress));
             reference.setVersion(version);
             reference.setInterface(serviceId); // 接口名
@@ -102,16 +101,12 @@ public class DubboEndpoint extends ProcessorEndpoint {
         this.version = version;
     }
 
-    public List<String> getParameterTypes() {
-        return parameterTypes;
+    public String getParameterType() {
+        return parameterType;
     }
 
-    public void setParameterTypes(List<String> parameterTypes) {
-        this.parameterTypes = parameterTypes;
-    }
-
-    public GenericService getGenericService() {
-        return genericService;
+    public void setParameterType(String parameterType) {
+        this.parameterType = parameterType;
     }
 
 }

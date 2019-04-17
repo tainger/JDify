@@ -1,11 +1,12 @@
 package io.terminus.dalaran.component.processor.script;
 
 import io.terminus.dalaran.FieldInputType;
+import io.terminus.dalaran.ModelOptionalConfig;
 import io.terminus.dalaran.annotation.ConfigFieldInfo;
 import lombok.Data;
 
 @Data
-public class DalaranScriptConfig {
+public class DalaranScriptConfig extends ModelOptionalConfig {
 
     @ConfigFieldInfo(label = "脚本语言", inputType = FieldInputType.Radio, isEnum = true)
     private DalaranScriptType type;

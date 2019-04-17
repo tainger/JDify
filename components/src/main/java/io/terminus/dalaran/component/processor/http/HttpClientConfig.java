@@ -1,11 +1,12 @@
 package io.terminus.dalaran.component.processor.http;
 
 import io.terminus.dalaran.FieldInputType;
+import io.terminus.dalaran.ModelRequiredConfig;
 import io.terminus.dalaran.annotation.ConfigFieldInfo;
 import lombok.Data;
 
 @Data
-public class HttpClientConfig {
+public class HttpClientConfig extends ModelRequiredConfig {
 
     @ConfigFieldInfo(label = "协议", inputType = FieldInputType.Radio, isEnum = true)
     private HttpProtocol protocol;

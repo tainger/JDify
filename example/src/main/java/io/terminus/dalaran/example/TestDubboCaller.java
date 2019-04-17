@@ -12,6 +12,7 @@ public class TestDubboCaller {
         reference.setApplication(new ApplicationConfig("test"));
         reference.setRegistry(new RegistryConfig("zookeeper://localhost:2181"));
         reference.setVersion("terminus");
+//        reference.setInterface("io.terminus.dalaran.example.OrderService"); // 接口名
         reference.setInterface("io.terminus.dalaran.example.OrderService"); // 接口名
         ReferenceConfigCache cache = ReferenceConfigCache.getCache();
         OrderService genericService = cache.get(reference);

@@ -1,7 +1,6 @@
 package io.terminus.dalaran.model.config;
 
 import io.terminus.dalaran.FieldInputType;
-import javafx.util.Pair;
 import lombok.Data;
 
 import java.util.List;
