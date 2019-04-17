@@ -1,19 +1,25 @@
 package io.terminus.dalaran.console.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import io.terminus.dalaran.DalaranContext;
 import io.terminus.dalaran.console.model.FlowModel;
+import io.terminus.dalaran.console.model.ProcessorModel;
+import io.terminus.dalaran.console.model.StructureModel;
 import io.terminus.dalaran.console.model.query.FlowQuery;
+import io.terminus.dalaran.console.model.query.ProcessorQuery;
 import io.terminus.dalaran.console.model.query.rst.ComponentInfo;
 import io.terminus.dalaran.console.model.query.rst.ModuleComponent;
 import io.terminus.dalaran.console.service.FlowManagementService;
 import io.terminus.dalaran.console.service.jpa.FlowQueryService;
+import io.terminus.dalaran.console.service.jpa.ProcessorQueryService;
 import io.terminus.dalaran.entity.FlowEntity;
 import io.terminus.dalaran.entity.ProcessorEntity;
+import io.terminus.dalaran.entity.StructureEntity;
 import io.terminus.dalaran.repository.*;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
+import java.util.*;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -31,6 +37,9 @@ public class FlowManagementServiceImpl implements FlowManagementService {
     private ProcessorRepository processorRepository;
 
     @Autowired
+    private ProcessorQueryService processorQueryService;
+
+    @Autowired
     private PropertyRepository propertyRepository;
 
     @Autowired
@@ -44,6 +53,8 @@ public class FlowManagementServiceImpl implements FlowManagementService {
 
     @Autowired
     private StructureRepository structureRepository;
+
+    private String DALARAN_FLOW = "dalaran-flow";
 
     @Override
     public List<FlowModel> queryFlows(FlowQuery query) {
@@ -103,7 +114,7 @@ public class FlowManagementServiceImpl implements FlowManagementService {
         List<ModuleComponent> components = new ArrayList<>();
         ModuleComponent component = new ModuleComponent();
         List<ComponentInfo> componentInfos = flowQueryService.getBasicInfo(moduleId);
-        component.setType("dalaran-flow");
+        component.setType(DALARAN_FLOW);
         component.setComponents(componentInfos);
         components.add(component);
         return components;
@@ -126,8 +137,11 @@ public class FlowManagementServiceImpl implements FlowManagementService {
             processors.add(processorRepository.findOne(id));
         }
 
+        flowEntity.setId(model.getId());
         flowEntity.setName(model.getName());
         flowEntity.setModuleId(model.getModuleId());
+        flowEntity.setInStructure(model.getInStructure().getId());
+        flowEntity.setOutStructure(model.getOutStructure().getId());
         flowEntity.setProcessors(model.getProcessorIds());
         flowEntity.setDescription(model.getDescription());
         flowEntity.setMaxRetry(model.getMaxRetry());
@@ -144,11 +158,48 @@ public class FlowManagementServiceImpl implements FlowManagementService {
         flowModel.setName(entity.getName());
         flowModel.setModuleId(entity.getModuleId());
         flowModel.setMaxRetry(entity.getMaxRetry());
+        flowModel.setInStructure(buildStructureEntity(structureRepository.findOne(entity.getInStructure())));
+        flowModel.setOutStructure(buildStructureEntity(structureRepository.findOne(entity.getOutStructure())));
         flowModel.setProcessorIds(entity.getProcessors());
         flowModel.setPropertyIds(entity.getProperties());
         flowModel.setRetryable(entity.getRetryable());
         flowModel.setRetryDelay(entity.getRetryDelay());
         flowModel.setDescription(entity.getDescription());
+
+        Set<ProcessorModel> processors = new HashSet<>();
+        ProcessorQuery processorQuery = new ProcessorQuery();
+        processorQuery.setProcessorIds(entity.getProcessors());
+        for (ProcessorEntity processorEntity : processorQueryService.query(processorQuery)) {
+            ProcessorModel processorModel = new ProcessorModel();
+            processorModel.setId(processorEntity.getId());
+            processorModel.setModuleId(processorEntity.getModuleId());
+
+            StructureEntity inStructure = structureRepository.findOne(processorEntity.getInStructure());
+            processorModel.setInStructure(buildStructureEntity(inStructure));
+            processorModel.setInStructureId(processorEntity.getInStructure());
+
+            StructureEntity outStructure = structureRepository.findOne(processorEntity.getOutStructure());
+            processorModel.setInStructure(buildStructureEntity(outStructure));
+
+            processorModel.setOutStructureId(processorEntity.getOutStructure());
+            processorModel.setName(processorEntity.getName());
+            processorModel.setDescription(processorEntity.getDescription());
+            processorModel.setType(processorEntity.getType());
+            processorModel.setConfig(JSON.parseObject(processorEntity.getConfig(), Map.class));
+            processors.add(processorModel);
+        }
+        flowModel.setProcessors(processors);
         return flowModel;
+    }
+
+    private StructureModel buildStructureEntity(StructureEntity entity) {
+        StructureModel model = new StructureModel();
+        model.setId(entity.getId());
+        model.setStructureType(entity.getType());
+        model.setStructureSchema(JSON.parseObject(entity.getStructureSchema(), Map.class));
+        model.setName(entity.getName());
+        model.setModuleId(entity.getModuleId());
+        model.setDescription(entity.getDescription());
+        return model;
     }
 }

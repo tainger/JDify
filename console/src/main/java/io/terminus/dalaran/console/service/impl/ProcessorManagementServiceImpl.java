@@ -105,9 +105,11 @@ public class ProcessorManagementServiceImpl implements ProcessorManagementServic
         return dalaranContext.getDalaranComponentContext().getProcessorInfo(processorType);
     }
 
-    private ProcessorEntity buildEntity(ProcessorModel model) {
+    public ProcessorEntity buildEntity(ProcessorModel model) {
         ProcessorEntity processorEntity = new ProcessorEntity();
         processorEntity.setModuleId(model.getModuleId());
+        processorEntity.setInStructure(model.getInStructureId());
+        processorEntity.setOutStructure(model.getOutStructureId());
         processorEntity.setType(model.getType());
         processorEntity.setName(model.getName());
         processorEntity.setDescription(model.getDescription());
@@ -116,10 +118,12 @@ public class ProcessorManagementServiceImpl implements ProcessorManagementServic
         return processorEntity;
     }
 
-    private ProcessorModel buildModel(ProcessorEntity entity) {
+    public ProcessorModel buildModel(ProcessorEntity entity) {
         ProcessorModel processorModel = new ProcessorModel();
         processorModel.setId(entity.getId());
         processorModel.setModuleId(entity.getModuleId());
+        processorModel.setInStructureId(entity.getInStructure());
+        processorModel.setOutStructureId(entity.getOutStructure());
         processorModel.setName(entity.getName());
         processorModel.setDescription(entity.getDescription());
         processorModel.setType(entity.getType());

@@ -20,7 +20,7 @@ public class HttpClientConfig extends ModelRequiredConfig {
     @ConfigFieldInfo(label = "路径", inputType = FieldInputType.String)
     private String path;
 
-    @ConfigFieldInfo(label = "类型", inputType = FieldInputType.Radio, isEnum = true)
+    @ConfigFieldInfo(label = "类型", inputType = FieldInputType.Select, isEnum = true)
     private HttpMethod method;
 
     @ConfigFieldInfo(label = "超时时间", inputType = FieldInputType.Integer, defaultValue = "3000L")

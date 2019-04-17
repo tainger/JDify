@@ -10,11 +10,14 @@ import java.io.Serializable;
 @Data
 public class ComponentInfo implements Serializable {
 
+    private Long id;
+
     private String name;
 
     private String status;
 
-    public ComponentInfo(String name, String status) {
+    public ComponentInfo(Long id, String name, String status) {
+        this.id = id;
         this.name = name;
         this.status = status;
     }
