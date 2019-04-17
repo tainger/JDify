@@ -20,13 +20,8 @@ public class DubboCamelProcessor extends DefaultProducer {
 
     @Override
     public void process(Exchange exchange) {
-        Object[] args = null;
-        try {
-            args = exchange.getIn().getBody(Object[].class);
-        } catch (ClassCastException e) {
-            // TODO no args
-        }
-        Object result = genericService.$invoke(method, new String[]{parameterType}, args);
+        Object arg = exchange.getIn().getBody();
+        Object result = genericService.$invoke(method, new String[]{parameterType}, new Object[]{arg});
         exchange.getOut().setBody(result);
     }
 }

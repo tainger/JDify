@@ -42,10 +42,12 @@ public class DubboEndpoint extends ProcessorEndpoint {
         return new DubboCamelConsumer(this, processor);
     }
 
-    public GenericService getDubboConsumerService() {
+    public GenericService getGenericService() {
         if (genericService == null) {
             ReferenceConfig<GenericService> reference = new ReferenceConfig<>();
-            reference.setApplication(new ApplicationConfig("test"));
+            ApplicationConfig applicationConfig = new ApplicationConfig("test");
+            applicationConfig.setQosPort(22221);
+            reference.setApplication(applicationConfig);
             reference.setRegistry(new RegistryConfig(registryAddress));
             reference.setVersion(version);
             reference.setInterface(serviceId); // 接口名
@@ -105,10 +107,6 @@ public class DubboEndpoint extends ProcessorEndpoint {
 
     public void setParameterType(String parameterType) {
         this.parameterType = parameterType;
-    }
-
-    public GenericService getGenericService() {
-        return genericService;
     }
 
 }
