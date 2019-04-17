@@ -13,12 +13,11 @@ import io.terminus.dalaran.repository.ProcessorRepository;
 import io.terminus.dalaran.repository.PropertyRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("dalaran_management/flowId")
+@RequestMapping("dalaran_management/flow")
 public class FlowManagementRest {
 
     // TODO for test

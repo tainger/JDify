@@ -78,7 +78,7 @@ public class TriggerQueryServiceImpl implements TriggerQueryService {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<ComponentInfo> criteriaQuery = builder.createQuery(ComponentInfo.class);
         Root<TriggerEntity> root = criteriaQuery.from(TriggerEntity.class);
-        criteriaQuery.multiselect(root.get("name"), root.get("status")).where(builder.equal(root.get("type"), type));
+        criteriaQuery.multiselect(root.get("id"), root.get("name"), root.get("status")).where(builder.equal(root.get("type"), type));
 
         return entityManager.createQuery(criteriaQuery).getResultList();
     }

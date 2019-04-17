@@ -76,7 +76,7 @@ public class StructQueryServiceImpl implements StructQueryService {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<ComponentInfo> criteriaQuery = builder.createQuery(ComponentInfo.class);
         Root<StructureEntity> root = criteriaQuery.from(StructureEntity.class);
-        criteriaQuery.multiselect(root.get("name"), root.get("status")).where(builder.equal(root.get("type"), type));
+        criteriaQuery.multiselect(root.get("id"), root.get("name"), root.get("status")).where(builder.equal(root.get("type"), type));
 
         return entityManager.createQuery(criteriaQuery).getResultList();
     }

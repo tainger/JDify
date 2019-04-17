@@ -14,9 +14,13 @@ public class ProcessorModel {
 
     private Long moduleId;
 
-    private Long inStructure;
+    private Long inStructureId;
 
-    private Long outStructure;
+    private StructureModel inStructure;
+
+    private Long outStructureId;
+
+    private StructureModel outStructure;
 
     private Map<String, Object> config;
 

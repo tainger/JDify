@@ -5,12 +5,12 @@ import lombok.Data;
 import java.util.List;
 
 /**
- * Created by jingdi on 2019/4/1
+ * Created by jingdi on 2019/4/16
  */
 @Data
-public class ModuleQuery {
+public class PropertyQuery {
 
-    private List<Long> moduleIds;
+    private List<Long> propertyIds;
 
     private String name;
 }

@@ -23,9 +23,9 @@ public class FlowModel {
 
     private Integer retryDelay = 3000;
 
-    private Long inStructure;
+    private StructureModel inStructure;
 
-    private Long outStructure;
+    private StructureModel outStructure;
 
     private Set<ProcessorModel> processors;
 
