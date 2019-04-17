@@ -7,6 +7,7 @@ import io.terminus.dalaran.model.DalaranFlow;
 import io.terminus.dalaran.model.MessageModel;
 import io.terminus.dalaran.model.ProcessorModel;
 import io.terminus.dalaran.model.TriggerModel;
+import io.terminus.dalaran.model.config.ProcessorInfo;
 import io.terminus.dalaran.repository.*;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -118,7 +119,11 @@ public class DalaranLoader {
     private ProcessorModel buildProcessor(ProcessorEntity processorEntity, Map<String, String> properties) {
         val processor = new ProcessorModel();
         // TODO check processor
-        Class configType = dalaranContext.getDalaranComponentContext().getProcessorInfo(processorEntity.getType()).getConfigType();
+        ProcessorInfo processorInfo = dalaranContext.getDalaranComponentContext().getProcessorInfo(processorEntity.getType());
+        if (processorInfo == null) {
+            // TODO throw
+        }
+        Class configType = processorInfo.getConfigType();
         String jsonConfig = replaceProperties(processorEntity.getConfig(), properties);
         Object config = gson.fromJson(jsonConfig, configType);
 
