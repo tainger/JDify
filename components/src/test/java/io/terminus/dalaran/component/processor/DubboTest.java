@@ -30,7 +30,6 @@ import java.io.InputStream;
 public class DubboTest extends BasicProcessorTest {
 
     private TestingServer zkTestServer;
-    private CuratorFramework cli;
 
     private ApplicationConfig applicationConfig = new ApplicationConfig("dalaran-unit-test");
     private ServiceConfig provider = new ServiceConfig();
