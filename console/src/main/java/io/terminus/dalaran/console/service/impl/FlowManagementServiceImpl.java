@@ -9,14 +9,12 @@ import io.terminus.dalaran.console.service.FlowManagementService;
 import io.terminus.dalaran.console.service.jpa.FlowQueryService;
 import io.terminus.dalaran.entity.FlowEntity;
 import io.terminus.dalaran.entity.ProcessorEntity;
-import io.terminus.dalaran.model.config.ProcessorInfo;
-import io.terminus.dalaran.model.config.TriggerInfo;
 import io.terminus.dalaran.repository.*;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 

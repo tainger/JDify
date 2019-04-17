@@ -1,6 +1,5 @@
 package io.terminus.dalaran.console.rest;
 
-import io.terminus.dalaran.console.model.TracingLog;
 import io.terminus.dalaran.console.model.TriggerLog;
 import io.terminus.dalaran.console.model.query.TracingLogQuery;
 import io.terminus.dalaran.console.service.TracingLogService;
@@ -25,8 +24,8 @@ public class TracingRest {
         return tracingLogService.triggerLogs(query);
     }
 
-    @GetMapping("/{logId}/tracingLog")
-    private List<TracingLog> tracingLog(@PathVariable Long logId) {
-        return tracingLogService.triggerTracingLogs(logId);
+    @GetMapping("/{logId}")
+    private TriggerLog tracingLog(@PathVariable Long logId) {
+        return tracingLogService.getTriggerLogDetail(logId);
     }
 }

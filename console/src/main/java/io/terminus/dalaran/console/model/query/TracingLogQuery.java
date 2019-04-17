@@ -14,6 +14,8 @@ public class TracingLogQuery {
     private Date startTime;
     private Date endTime;
 
+    private boolean testFlow = false;
+
     // TODO successful
 
 }

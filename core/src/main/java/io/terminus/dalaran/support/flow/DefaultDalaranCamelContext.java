@@ -13,7 +13,9 @@ import org.apache.camel.ProducerTemplate;
 import org.apache.camel.builder.Builder;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.model.RouteDefinition;
+
 import java.util.List;
+
 import static io.terminus.dalaran.DalaranConstants.*;
 
 public class DefaultDalaranCamelContext implements DalaranContext {

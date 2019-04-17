@@ -4,6 +4,7 @@ import io.terminus.dalaran.BodyModelType;
 import lombok.Data;
 
 import java.util.Date;
+import java.util.List;
 
 @Data
 public class TriggerLog {
@@ -27,4 +28,6 @@ public class TriggerLog {
     private String inputBody;
 
     private String outputBody;
+
+    private List<TracingLog> tracingLogList;
 }
