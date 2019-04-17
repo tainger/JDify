@@ -3,13 +3,11 @@ package io.terminus.dalaran.component.trigger;
 import com.alibaba.dubbo.config.ApplicationConfig;
 import com.alibaba.dubbo.config.ReferenceConfig;
 import com.alibaba.dubbo.config.RegistryConfig;
-import com.alibaba.dubbo.config.ServiceConfig;
 import com.alibaba.dubbo.config.utils.ReferenceConfigCache;
 import com.alibaba.dubbo.rpc.service.GenericService;
 import io.terminus.dalaran.component.BasicTriggerTest;
 import io.terminus.dalaran.component.trigger.dubbo.DalaranDubboProvider;
 import io.terminus.dalaran.component.trigger.dubbo.DubboProviderConfig;
-import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.test.TestingServer;
 import org.junit.After;
 import org.junit.Assert;
@@ -19,18 +17,16 @@ import org.junit.Test;
 public class DubboTest extends BasicTriggerTest {
 
     private TestingServer zkTestServer;
-    private CuratorFramework cli;
 
     private ApplicationConfig applicationConfig = new ApplicationConfig("dalaran-unit-test");
-    private ServiceConfig provider = new ServiceConfig();
 
     private static final String REGISTRY_ADDRESS = "zookeeper://localhost:52181";
     private static final String DUBBO_VERSION = "1.0.0";
     private static final String DUBBO_METHOD = "execute";
     private static final String DUBBO_SERVICE_ID = "io.terminus.dalaran.TestDubboService";
 
-    public static final String INPUT_STRING = "terminus";
-    public static final String SUCCESSFUL_MESSAGE = "call is successful:";
+    private static final String INPUT_STRING = "terminus";
+    private static final String SUCCESSFUL_MESSAGE = "call is successful:";
 
     @Test
     public void test() {

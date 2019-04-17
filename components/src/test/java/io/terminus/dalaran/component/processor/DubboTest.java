@@ -1,8 +1,5 @@
 package io.terminus.dalaran.component.processor;
 
-import com.alibaba.dubbo.common.utils.IOUtils;
-import com.alibaba.dubbo.common.utils.PojoUtils;
-import com.alibaba.dubbo.common.utils.StringUtils;
 import com.alibaba.dubbo.config.ApplicationConfig;
 import com.alibaba.dubbo.config.RegistryConfig;
 import com.alibaba.dubbo.config.ServiceConfig;
@@ -10,14 +7,7 @@ import com.alibaba.dubbo.rpc.service.GenericService;
 import io.terminus.dalaran.component.BasicProcessorTest;
 import io.terminus.dalaran.component.processor.dubbo.DalaranDubboConsumer;
 import io.terminus.dalaran.component.processor.dubbo.DalaranDubboConsumerConfig;
-import io.terminus.dalaran.component.processor.http.HttpMethod;
-import org.apache.camel.Exchange;
-import org.apache.camel.Message;
 import org.apache.camel.ProducerTemplate;
-import org.apache.camel.impl.DefaultMessage;
-import org.apache.curator.framework.CuratorFramework;
-import org.apache.curator.framework.CuratorFrameworkFactory;
-import org.apache.curator.retry.RetryOneTime;
 import org.apache.curator.test.TestingServer;
 import org.junit.After;
 import org.junit.Assert;
@@ -25,7 +15,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.io.InputStream;
 
 public class DubboTest extends BasicProcessorTest {
 

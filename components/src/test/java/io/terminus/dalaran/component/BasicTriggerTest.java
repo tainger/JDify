@@ -2,11 +2,8 @@ package io.terminus.dalaran.component;
 
 import io.terminus.dalaran.DalaranTrigger;
 import org.apache.camel.CamelContext;
-import org.apache.camel.builder.Builder;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.model.RouteDefinition;
-
-import java.io.IOException;
 
 public abstract class BasicTriggerTest {
 

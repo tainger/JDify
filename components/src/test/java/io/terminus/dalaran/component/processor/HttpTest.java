@@ -2,8 +2,6 @@ package io.terminus.dalaran.component.processor;
 
 import com.alibaba.dubbo.common.utils.IOUtils;
 import com.alibaba.dubbo.common.utils.StringUtils;
-import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 import io.terminus.dalaran.component.BasicProcessorTest;
 import io.terminus.dalaran.component.processor.http.DalaranHttpClient;
@@ -15,9 +13,6 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.test.web.client.MockRestServiceServer;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.io.IOException;
 import java.io.InputStream;
