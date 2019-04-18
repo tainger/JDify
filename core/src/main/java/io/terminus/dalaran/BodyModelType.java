@@ -5,5 +5,5 @@ package io.terminus.dalaran;
  */
 public enum BodyModelType {
 
-    JSON, XML, OBJECT
+    JSON, XML, OBJECT, EXCEPTION
 }

@@ -1,5 +1,6 @@
 package io.terminus.dalaran.support.trace;
 
+import io.terminus.dalaran.BodyModelType;
 import io.terminus.dalaran.DalaranTraceLogger;
 import io.terminus.dalaran.model.DalaranTracingLog;
 import org.apache.camel.ErrorHandlerFactory;
@@ -24,7 +25,6 @@ public class TracingErrorHandlerFactory implements ErrorHandlerFactory {
 
     @Override
     public Processor createErrorHandler(RouteContext routeContext, Processor processor) throws Exception {
-        System.out.println("createErrorHandler:" + processor);
         return new DalaranErrorHandler(processor);
     }
 
@@ -41,14 +41,10 @@ public class TracingErrorHandlerFactory implements ErrorHandlerFactory {
         @Override
         public void process(Exchange exchange) throws Exception {
             // TODO 理论上可以在这里做 tracing, 这样就不需要包前后的 processor 了, 回头可以看一下可行性
-            System.out.println("before" + exchange.getIn().getBody() + "!!" + output);
             output.process(exchange);
-            System.out.println("after" + exchange.getException() + "!!" + output);
             // TODO 当执行发成异常时, 记录未持久化的日志
             if (exchange.getException() != null) {
-                exchange.getOut().copyFrom(exchange.getIn());
-
-                String body = MessageHelper.extractBodyForLogging(exchange.getIn(), "");
+                String body = exchange.getException().getMessage();
                 Boolean isTestFlow = exchange.getProperty(TEST_FLOW, Boolean.class);
                 DalaranTracingLog flowTracingLog = exchange.getProperty(FLOW_TRACING_LOG, DalaranTracingLog.class);
                 if (flowTracingLog != null) {
@@ -66,6 +62,7 @@ public class TracingErrorHandlerFactory implements ErrorHandlerFactory {
                 return;
             }
             tracingLog.setSuccessful(false);
+            tracingLog.setOutputBodyType(BodyModelType.EXCEPTION);
             tracingLog.setOutputBody(body);
             tracingLog.setElapsed(System.currentTimeMillis() - tracingLog.getTimestamp());
 
