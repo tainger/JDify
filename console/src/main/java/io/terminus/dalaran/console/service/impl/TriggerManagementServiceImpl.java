@@ -109,8 +109,7 @@ public class TriggerManagementServiceImpl implements TriggerManagementService {
     }
 
     private TriggerEntity buildEntity(TriggerModel model) {
-        TriggerEntity triggerEntity = new TriggerEntity();
-
+        TriggerEntity triggerEntity = triggerRepository.findOne(model.getId());
         triggerEntity.setFlowId(model.getFlowId());
         triggerEntity.setModuleId(model.getModuleId());
         triggerEntity.setInStructure(model.getInStructure());

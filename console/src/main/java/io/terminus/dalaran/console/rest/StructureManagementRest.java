@@ -1,16 +1,21 @@
 package io.terminus.dalaran.console.rest;
 
+import com.alibaba.fastjson.JSON;
 import io.swagger.annotations.ApiOperation;
 import io.terminus.dalaran.console.model.StructureModel;
 import io.terminus.dalaran.console.model.query.StructureQuery;
 import io.terminus.dalaran.console.service.StructureManagementService;
 import io.terminus.dalaran.console.util.ExcelUtils;
+import io.terminus.dalaran.entity.StructureEntity;
 import io.terminus.dalaran.model.schema.structure.ModelField;
+import io.terminus.dalaran.repository.StructureRepository;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -23,6 +28,9 @@ public class StructureManagementRest {
 
     @Autowired
     private StructureManagementService structureManagementService;
+
+    @Autowired
+    private StructureRepository structureRepository;
 
     @ApiOperation(value = "条件查询数据模型")
     @RequestMapping(value = "/query", method = RequestMethod.GET)
@@ -54,12 +62,36 @@ public class StructureManagementRest {
         return structureManagementService.list();
     }
 
-    @ApiOperation(value = "excel文件解析")
-    @RequestMapping(value = "/parse/excel", method = RequestMethod.POST)
-    public Map<String, Map<String, ModelField>> parseExcel(@RequestParam MultipartFile file) {
+    @ApiOperation(value = "excel文件解析--更新")
+    @RequestMapping(value = "/import/excel/update", method = RequestMethod.POST)
+    public Map<Long, Map<String, Map<String, ModelField>>> importExcel(@RequestParam MultipartFile file, @RequestParam long id) {
         ExcelUtils excelUtils = new ExcelUtils();
         try {
-            return excelUtils.parse(file.getInputStream());
+            Map<String, Map<String, ModelField>> schema = excelUtils.parse(file.getInputStream());
+            Map<Long, Map<String, Map<String, ModelField>>> structureSchema = new HashMap<>();
+            StructureEntity structure = structureRepository.findOne(id);
+            structure.setStructureSchema(JSON.toJSONString(schema));
+            structureRepository.save(structure);
+            structureSchema.put(id, schema);
+            return structureSchema;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return new HashMap<>();
+    }
+
+    @ApiOperation(value = "excel文件解析--新建")
+    @RequestMapping(value = "/import/excel/create", method = RequestMethod.POST)
+    public Map<Long, Map<String, Map<String, ModelField>>> importExcel(@RequestParam MultipartFile file) {
+        ExcelUtils excelUtils = new ExcelUtils();
+        try {
+            Map<String, Map<String, ModelField>> schema = excelUtils.parse(file.getInputStream());
+            Map<Long, Map<String, Map<String, ModelField>>> structureSchema = new HashMap<>();
+            StructureEntity structure = new StructureEntity();
+            structure.setStructureSchema(JSON.toJSONString(schema));
+            structureRepository.save(structure);
+            structureSchema.put(structure.getId(), schema);
+            return structureSchema;
         } catch (Exception e) {
             e.printStackTrace();
         }

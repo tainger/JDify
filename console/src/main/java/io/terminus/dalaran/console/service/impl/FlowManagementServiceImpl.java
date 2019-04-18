@@ -131,7 +131,7 @@ public class FlowManagementServiceImpl implements FlowManagementService {
     }
 
     private FlowEntity buildEntity(FlowModel model) {
-        FlowEntity flowEntity = new FlowEntity();
+        FlowEntity flowEntity = flowRepository.findOne(model.getId());
         List<ProcessorEntity> processors = new LinkedList<>();
         for (Long id : model.getProcessorIds()) {
             processors.add(processorRepository.findOne(id));

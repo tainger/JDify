@@ -87,7 +87,7 @@ public class ModuleManagementServiceImpl implements ModuleManagementService {
     }
 
     private ModuleEntity buildEntity(ModuleModel model) {
-        ModuleEntity moduleEntity = new ModuleEntity();
+        ModuleEntity moduleEntity = moduleRepository.findOne(model.getId());
         moduleEntity.setId(model.getId());
         moduleEntity.setName(model.getName());
         moduleEntity.setDependencies(model.getDependencies());

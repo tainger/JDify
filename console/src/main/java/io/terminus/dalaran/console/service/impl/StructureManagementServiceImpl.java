@@ -90,7 +90,7 @@ public class StructureManagementServiceImpl implements StructureManagementServic
     }
 
     private StructureEntity buildEntity(StructureModel model) {
-        StructureEntity structureEntity = new StructureEntity();
+        StructureEntity structureEntity = structureRepository.findOne(model.getId());
         structureEntity.setName(model.getName());
         structureEntity.setStructureSchema(JSON.toJSONString(model.getStructureSchema()));
         structureEntity.setType(model.getStructureType());
