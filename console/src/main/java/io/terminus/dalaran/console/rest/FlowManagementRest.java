@@ -49,16 +49,18 @@ public class FlowManagementRest {
         }).collect(Collectors.toList());
 
 
-        List<Long> propertyEntitySet = flowModel.getProperties().entrySet().stream().map(entry -> {
-            PropertyEntity propertyEntity = new PropertyEntity();
-            propertyEntity.setName(entry.getKey());
-            propertyEntity.setValue(entry.getValue());
-            propertyRepository.save(propertyEntity);
-            return propertyEntity.getId();
-        }).collect(Collectors.toList());
+        if (flowModel.getProperties() != null) {
+            List<Long> propertyEntitySet = flowModel.getProperties().entrySet().stream().map(entry -> {
+                PropertyEntity propertyEntity = new PropertyEntity();
+                propertyEntity.setName(entry.getKey());
+                propertyEntity.setValue(entry.getValue());
+                propertyRepository.save(propertyEntity);
+                return propertyEntity.getId();
+            }).collect(Collectors.toList());
+            flowEntity.setProperties(propertyEntitySet);
+        }
 
         flowEntity.setProcessors(processorEntitySet);
-        flowEntity.setProperties(propertyEntitySet);
 
         flowEntity.setId(flowModel.getId());
         flowEntity.setName(flowModel.getName());

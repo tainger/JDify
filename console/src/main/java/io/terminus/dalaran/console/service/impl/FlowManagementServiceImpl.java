@@ -131,13 +131,20 @@ public class FlowManagementServiceImpl implements FlowManagementService {
     }
 
     private FlowEntity buildEntity(FlowModel model) {
-        FlowEntity flowEntity = flowRepository.findOne(model.getId());
+        FlowEntity flowEntity;
+
+        if (flowRepository.exists(model.getId())) {
+            flowEntity = flowRepository.findOne(model.getId());
+            flowEntity.setId(model.getId());
+        } else {
+            flowEntity = new FlowEntity();
+        }
+
         List<ProcessorEntity> processors = new LinkedList<>();
         for (Long id : model.getProcessorIds()) {
             processors.add(processorRepository.findOne(id));
         }
 
-        flowEntity.setId(model.getId());
         flowEntity.setName(model.getName());
         flowEntity.setModuleId(model.getModuleId());
         flowEntity.setInStructure(model.getInStructure().getId());
