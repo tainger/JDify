@@ -109,7 +109,14 @@ public class TriggerManagementServiceImpl implements TriggerManagementService {
     }
 
     private TriggerEntity buildEntity(TriggerModel model) {
-        TriggerEntity triggerEntity = triggerRepository.findOne(model.getId());
+        TriggerEntity triggerEntity;
+        Long id = model.getId();
+        if (id == null) {
+            triggerEntity = new TriggerEntity();
+        } else {
+            triggerEntity = triggerRepository.findOne(id);
+        }
+
         triggerEntity.setFlowId(model.getFlowId());
         triggerEntity.setModuleId(model.getModuleId());
         triggerEntity.setInStructure(model.getInStructure());
@@ -118,7 +125,7 @@ public class TriggerManagementServiceImpl implements TriggerManagementService {
         triggerEntity.setDescription(model.getDescription());
         triggerEntity.setName(model.getName());
         triggerEntity.setType(model.getType());
-        triggerEntity.setId(model.getId());
+        triggerEntity.setUpdatedAt(new Date());
 
         return triggerEntity;
     }

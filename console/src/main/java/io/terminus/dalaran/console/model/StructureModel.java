@@ -2,6 +2,7 @@ package io.terminus.dalaran.console.model;
 
 import io.terminus.dalaran.BodyModelType;
 import lombok.Data;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
 
@@ -11,6 +12,7 @@ import java.util.Map;
 @Data
 public class StructureModel {
 
+    @Nullable
     private Long id;
 
     private Long moduleId;

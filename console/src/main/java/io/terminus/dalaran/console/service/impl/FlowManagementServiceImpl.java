@@ -132,18 +132,17 @@ public class FlowManagementServiceImpl implements FlowManagementService {
 
     private FlowEntity buildEntity(FlowModel model) {
         FlowEntity flowEntity;
-
-        if (flowRepository.exists(model.getId())) {
-            flowEntity = flowRepository.findOne(model.getId());
-            flowEntity.setId(model.getId());
+        Long id = model.getId();
+        if (id != null) {
+            flowEntity = flowRepository.findOne(id);
         } else {
             flowEntity = new FlowEntity();
         }
 
-        List<ProcessorEntity> processors = new LinkedList<>();
-        for (Long id : model.getProcessorIds()) {
-            processors.add(processorRepository.findOne(id));
-        }
+//        List<ProcessorEntity> processors = new LinkedList<>();
+//        for (Long processorId : model.getProcessorIds()) {
+//            processors.add(processorRepository.findOne(processorId));
+//        }
 
         flowEntity.setName(model.getName());
         flowEntity.setModuleId(model.getModuleId());
@@ -155,6 +154,7 @@ public class FlowManagementServiceImpl implements FlowManagementService {
         flowEntity.setRetryable(model.getRetryable());
         flowEntity.setRetryDelay(model.getRetryDelay());
         flowEntity.setProperties(model.getPropertyIds());
+        flowEntity.setUpdatedAt(new Date());
 
         return flowEntity;
     }

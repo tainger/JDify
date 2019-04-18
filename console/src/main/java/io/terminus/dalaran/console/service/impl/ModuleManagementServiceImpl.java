@@ -10,6 +10,7 @@ import io.terminus.dalaran.repository.ModuleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -87,11 +88,17 @@ public class ModuleManagementServiceImpl implements ModuleManagementService {
     }
 
     private ModuleEntity buildEntity(ModuleModel model) {
-        ModuleEntity moduleEntity = moduleRepository.findOne(model.getId());
-        moduleEntity.setId(model.getId());
+        ModuleEntity moduleEntity;
+        Long id = model.getId();
+        if (id == null) {
+            moduleEntity = new ModuleEntity();
+        } else {
+            moduleEntity = moduleRepository.findOne(id);
+        }
         moduleEntity.setName(model.getName());
         moduleEntity.setDependencies(model.getDependencies());
         moduleEntity.setDescription(model.getDescription());
+        moduleEntity.setUpdatedAt(new Date());
         return moduleEntity;
     }
 

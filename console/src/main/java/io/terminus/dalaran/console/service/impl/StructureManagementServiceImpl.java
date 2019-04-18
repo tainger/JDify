@@ -15,10 +15,7 @@ import io.terminus.dalaran.repository.StructureRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by jingdi on 2019/3/29
@@ -90,13 +87,19 @@ public class StructureManagementServiceImpl implements StructureManagementServic
     }
 
     private StructureEntity buildEntity(StructureModel model) {
-        StructureEntity structureEntity = structureRepository.findOne(model.getId());
+        StructureEntity structureEntity;
+        Long id = model.getId();
+        if (id == null) {
+            structureEntity = new StructureEntity();
+        } else {
+            structureEntity = structureRepository.findOne(id);
+        }
         structureEntity.setName(model.getName());
         structureEntity.setStructureSchema(JSON.toJSONString(model.getStructureSchema()));
         structureEntity.setType(model.getStructureType());
         structureEntity.setDescription(model.getDescription());
         structureEntity.setModuleId(model.getModuleId());
-        structureEntity.setId(model.getId());
+        structureEntity.setUpdatedAt(new Date());
         return structureEntity;
     }
 

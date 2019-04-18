@@ -70,12 +70,17 @@ public class PropertyManagementServiceImpl implements PropertyManagementService 
     }
 
     private PropertyEntity buildEntity(PropertyModel model) {
-        PropertyEntity entity = propertyRepository.findOne(model.getId());
-        entity.setId(model.getId());
-        entity.setName(model.getName());
-        entity.setValue(model.getValue());
-        entity.setDescription(model.getDescription());
-        entity.setUpdatedAt(new Date());
-        return entity;
+        PropertyEntity propertyEntity;
+        Long id = model.getId();
+        if (id == null) {
+            propertyEntity = new PropertyEntity();
+        } else {
+            propertyEntity = propertyRepository.findOne(id);
+        }
+        propertyEntity.setName(model.getName());
+        propertyEntity.setValue(model.getValue());
+        propertyEntity.setDescription(model.getDescription());
+        propertyEntity.setUpdatedAt(new Date());
+        return propertyEntity;
     }
 }

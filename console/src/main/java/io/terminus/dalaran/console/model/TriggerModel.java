@@ -1,11 +1,14 @@
 package io.terminus.dalaran.console.model;
 
 import lombok.Data;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
 
 @Data
 public class TriggerModel {
+
+    @Nullable
     private Long id;
 
     private String name;

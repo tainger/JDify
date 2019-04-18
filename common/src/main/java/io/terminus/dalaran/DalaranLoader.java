@@ -11,6 +11,8 @@ import io.terminus.dalaran.model.config.ProcessorInfo;
 import io.terminus.dalaran.repository.*;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.PostConstruct;
@@ -168,9 +170,11 @@ public class DalaranLoader {
         val flow = new DalaranFlow();
         Map<String, String> properties = new HashMap<>();
         // TODO 加载全局变量, 局部覆盖
-        for (Long propertyId : flowEntity.getProperties()) {
-            PropertyEntity property = propertyRepository.findOne(propertyId);
-            properties.put(property.getName(), property.getValue());
+        if (CollectionUtils.isNotEmpty(flowEntity.getProperties())) {
+            for (Long propertyId : flowEntity.getProperties()) {
+                PropertyEntity property = propertyRepository.findOne(propertyId);
+                properties.put(property.getName(), property.getValue());
+            }
         }
 
         List<ProcessorModel> processors = flowEntity.getProcessors().stream()
@@ -189,5 +193,4 @@ public class DalaranLoader {
         flow.setRetryable(flowEntity.getRetryable());
         return flow;
     }
-
 }

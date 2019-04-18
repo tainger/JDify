@@ -1,6 +1,7 @@
 package io.terminus.dalaran.console.model;
 
 import lombok.Data;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Map;
@@ -9,6 +10,7 @@ import java.util.Set;
 @Data
 public class FlowModel {
 
+    @Nullable
     private Long id;
 
     private String name;
