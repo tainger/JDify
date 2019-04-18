@@ -18,14 +18,13 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 
 public class HttpTest extends BasicTriggerTest {
 
     private static final Integer MOCK_PORT = 8765;
     private static final String MOCK_PATH = "/api/test";
     private static final String MOCK_REQUEST_BODY = "Lok'Tar O'gar";
-    public static final String SUCCESSFUL_MESSAGE = "call is successful:";
+    private static final String SUCCESSFUL_MESSAGE = "call is successful:";
 
     @Test
     public void test() throws IOException {
