@@ -7,6 +7,7 @@ import io.terminus.dalaran.model.ProcessorModel;
 import io.terminus.dalaran.model.TriggerModel;
 import io.terminus.dalaran.model.config.ProcessorInfo;
 import io.terminus.dalaran.support.trace.DalaranTracer;
+import io.terminus.dalaran.support.trace.TracingErrorHandlerFactory;
 import lombok.val;
 import org.apache.camel.CamelContext;
 import org.apache.camel.ProducerTemplate;
@@ -26,9 +27,11 @@ public class DefaultDalaranCamelContext implements DalaranContext {
 
     private final DalaranComponentContext componentContext;
 
+    private final TracingErrorHandlerFactory errorHandlerFactory;
+
     private final DalaranTraceLogger traceLogger;
 
-    public DefaultDalaranCamelContext(DalaranConverterContext converterContext, DalaranComponentContext componentContext, DalaranTraceLogger traceLogger) {
+    public DefaultDalaranCamelContext(DalaranConverterContext converterContext, DalaranComponentContext componentContext, DalaranTraceLogger traceLogger, TracingErrorHandlerFactory errorHandlerFactory) {
         this.converterContext = converterContext;
         this.componentContext = componentContext;
         this.traceLogger = traceLogger;
@@ -39,6 +42,7 @@ public class DefaultDalaranCamelContext implements DalaranContext {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        this.errorHandlerFactory = errorHandlerFactory;
     }
 
     @Override
@@ -70,6 +74,7 @@ public class DefaultDalaranCamelContext implements DalaranContext {
         }
 
         val route = new RouteDefinition();
+        route.errorHandler(errorHandlerFactory);
         // TODO route need an u id
         route.setId(FLOW_PREFIX + dalaranFlow.getId());
         val processorList = dalaranFlow.getProcessors();
@@ -157,8 +162,8 @@ public class DefaultDalaranCamelContext implements DalaranContext {
         val tracer = new DalaranTracer(traceLogger, trigger.getId());
 
         val route = new RouteDefinition();
+        route.errorHandler(errorHandlerFactory);
         route.setId(TRIGGER_PREFIX + trigger.getId());
-
         triggerComponent.buildFromRoute(route, trigger.getConfig());
         // TODO 这里要判断的是流和触发器的 body 类型
         val flow = trigger.getFlow();
@@ -219,6 +224,7 @@ public class DefaultDalaranCamelContext implements DalaranContext {
         val tracer = new DalaranTracer(traceLogger, dalaranFlow.getId());
 
         val route = new RouteDefinition();
+        route.errorHandler(errorHandlerFactory);
         route.setProperty(TEST_FLOW, Builder.constant(Boolean.TRUE));
         route.setId(routeId);
         route.from(TEST_FLOW_CAMEL_URI_PREFIX + dalaranFlow.getId());
