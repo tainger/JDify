@@ -2,6 +2,7 @@ package io.terminus.dalaran.console.rest;
 
 import com.alibaba.fastjson.JSON;
 import io.swagger.annotations.ApiOperation;
+import io.terminus.dalaran.BodyModelType;
 import io.terminus.dalaran.console.model.StructureModel;
 import io.terminus.dalaran.console.model.query.StructureQuery;
 import io.terminus.dalaran.console.service.StructureManagementService;
@@ -84,7 +85,8 @@ public class StructureManagementRest {
 
     @ApiOperation(value = "excel文件解析--新建")
     @RequestMapping(value = "/import/excel/create", method = RequestMethod.POST)
-    public Map<Long, Map<String, Map<String, ModelField>>> importExcel(@RequestParam MultipartFile file) {
+    public Map<Long, Map<String, Map<String, ModelField>>> importExcel(@RequestParam MultipartFile file,
+                                                                       @RequestParam String name, @RequestParam String type) {
         ExcelUtils excelUtils = new ExcelUtils();
         try {
             Map<String, Map<String, ModelField>> schema = excelUtils.parse(file.getInputStream());
@@ -92,7 +94,8 @@ public class StructureManagementRest {
             for (Map.Entry<String, Map<String, ModelField>> entry : schema.entrySet()) {
                 StructureEntity structure = new StructureEntity();
                 structure.setStructureSchema(JSON.toJSONString(entry.getValue()));
-                structure.setName("Dalaran Model " + entry.getKey());
+                structure.setName(name);
+                structure.setType(BodyModelType.valueOf(type));
                 structureRepository.save(structure);
                 structureSchema.put(structure.getId(), schema);
             }
