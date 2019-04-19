@@ -32,6 +32,8 @@ public class DalaranTracingLog {
 
     private String inputBody;
 
+    private Boolean successful;
+
     @Column(nullable = false)
     @ColumnDefault("false")
     private Boolean testFlow;
