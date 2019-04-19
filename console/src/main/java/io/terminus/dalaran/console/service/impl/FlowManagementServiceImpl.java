@@ -2,6 +2,7 @@ package io.terminus.dalaran.console.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import io.terminus.dalaran.DalaranContext;
+import io.terminus.dalaran.DalaranLoader;
 import io.terminus.dalaran.console.model.FlowModel;
 import io.terminus.dalaran.console.model.ProcessorModel;
 import io.terminus.dalaran.console.model.StructureModel;
@@ -52,6 +53,9 @@ public class FlowManagementServiceImpl implements FlowManagementService {
     @Autowired
     private StructureRepository structureRepository;
 
+    @Autowired
+    private DalaranLoader dalaranLoader;
+
     private String DALARAN_FLOW = "dalaran-flow";
 
     @Override
@@ -61,18 +65,22 @@ public class FlowManagementServiceImpl implements FlowManagementService {
         for (FlowEntity entity : entities) {
             models.add(buildModel(entity));
         }
-
         return models;
     }
 
     @Override
     public void saveFlow(FlowEntity flowEntity) {
         flowRepository.save(flowEntity);
+        // TODO 这里依赖 loader 有点怪 而且可以异步
+        dalaranLoader.loadTestFlow(flowEntity);
     }
 
     @Override
     public void createFlow(FlowModel flowModel) {
-        flowRepository.save(buildEntity(flowModel));
+        FlowEntity flowEntity = buildEntity(flowModel);
+        flowRepository.save(flowEntity);
+        // TODO 这里依赖 loader 有点怪 而且可以异步
+        dalaranLoader.loadTestFlow(flowEntity);
     }
 
     @Override
@@ -82,7 +90,10 @@ public class FlowManagementServiceImpl implements FlowManagementService {
 
     @Override
     public void updateFlow(FlowModel flowModel) {
-        flowRepository.save(buildEntity(flowModel));
+        FlowEntity flowEntity = buildEntity(flowModel);
+        flowRepository.save(flowEntity);
+        // TODO 这里依赖 loader 有点怪 而且可以异步
+        dalaranLoader.loadTestFlow(flowEntity);
     }
 
     @Override
