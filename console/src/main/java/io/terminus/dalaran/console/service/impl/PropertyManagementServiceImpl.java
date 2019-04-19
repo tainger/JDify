@@ -82,7 +82,7 @@ public class PropertyManagementServiceImpl implements PropertyManagementService 
         if (StringUtils.isNoneBlank(name)) {
             propertyEntity.setName(name);
         } else {
-            propertyEntity.setName("new property");
+            propertyEntity.setName("Dalaran Property");
         }
         propertyEntity.setValue(model.getValue());
         propertyEntity.setDescription(model.getDescription());

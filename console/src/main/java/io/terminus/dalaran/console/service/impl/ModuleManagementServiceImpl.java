@@ -100,7 +100,7 @@ public class ModuleManagementServiceImpl implements ModuleManagementService {
         if (StringUtils.isNoneBlank(name)) {
             moduleEntity.setName(name);
         } else {
-            moduleEntity.setName("new module");
+            moduleEntity.setName("Dalaran Module");
         }
         moduleEntity.setDependencies(model.getDependencies());
         moduleEntity.setDescription(model.getDescription());

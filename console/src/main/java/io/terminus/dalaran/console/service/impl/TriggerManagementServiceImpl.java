@@ -121,7 +121,7 @@ public class TriggerManagementServiceImpl implements TriggerManagementService {
         if (StringUtils.isNoneBlank(name)) {
             triggerEntity.setName(name);
         } else {
-            triggerEntity.setName("new trigger");
+            triggerEntity.setName("Dalaran Trigger");
         }
 
         triggerEntity.setFlowId(model.getFlowId());

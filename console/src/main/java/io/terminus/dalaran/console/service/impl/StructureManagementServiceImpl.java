@@ -99,7 +99,7 @@ public class StructureManagementServiceImpl implements StructureManagementServic
         if (StringUtils.isNoneBlank(name)) {
             structureEntity.setName(name);
         } else {
-            structureEntity.setName("new model");
+            structureEntity.setName("Dalaran Model");
         }
         structureEntity.setStructureSchema(JSON.toJSONString(model.getStructureSchema()));
         structureEntity.setType(model.getStructureType());

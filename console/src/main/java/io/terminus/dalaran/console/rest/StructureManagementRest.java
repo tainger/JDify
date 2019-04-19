@@ -92,7 +92,7 @@ public class StructureManagementRest {
             for (Map.Entry<String, Map<String, ModelField>> entry : schema.entrySet()) {
                 StructureEntity structure = new StructureEntity();
                 structure.setStructureSchema(JSON.toJSONString(entry.getValue()));
-                structure.setName("new model " + entry.getKey());
+                structure.setName("Dalaran Model " + entry.getKey());
                 structureRepository.save(structure);
                 structureSchema.put(structure.getId(), schema);
             }

@@ -149,7 +149,7 @@ public class FlowManagementServiceImpl implements FlowManagementService {
         if (StringUtils.isNoneBlank(name)) {
             flowEntity.setName(name);
         } else {
-            flowEntity.setName("new flow");
+            flowEntity.setName("Dalaran Flow");
         }
         flowEntity.setModuleId(model.getModuleId());
         flowEntity.setInStructure(model.getInStructure().getId());

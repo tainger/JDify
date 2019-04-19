@@ -119,7 +119,7 @@ public class ProcessorManagementServiceImpl implements ProcessorManagementServic
         if (StringUtils.isNoneBlank(name)) {
             processorEntity.setName(name);
         } else {
-            processorEntity.setName("new processor");
+            processorEntity.setName("Dalaran Processor");
         }
 
         processorEntity.setModuleId(model.getModuleId());
