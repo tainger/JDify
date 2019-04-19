@@ -12,6 +12,7 @@ import io.terminus.dalaran.console.service.jpa.StructQueryService;
 import io.terminus.dalaran.entity.StructureEntity;
 import io.terminus.dalaran.repository.ModuleRepository;
 import io.terminus.dalaran.repository.StructureRepository;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -94,7 +95,12 @@ public class StructureManagementServiceImpl implements StructureManagementServic
         } else {
             structureEntity = structureRepository.findOne(id);
         }
-        structureEntity.setName(model.getName());
+        String name = model.getName();
+        if (StringUtils.isNoneBlank(name)) {
+            structureEntity.setName(name);
+        } else {
+            structureEntity.setName("new model");
+        }
         structureEntity.setStructureSchema(JSON.toJSONString(model.getStructureSchema()));
         structureEntity.setType(model.getStructureType());
         structureEntity.setDescription(model.getDescription());

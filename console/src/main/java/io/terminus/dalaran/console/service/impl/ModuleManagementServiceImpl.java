@@ -7,6 +7,7 @@ import io.terminus.dalaran.console.service.*;
 import io.terminus.dalaran.console.service.jpa.ModuleQueryService;
 import io.terminus.dalaran.entity.ModuleEntity;
 import io.terminus.dalaran.repository.ModuleRepository;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -95,7 +96,12 @@ public class ModuleManagementServiceImpl implements ModuleManagementService {
         } else {
             moduleEntity = moduleRepository.findOne(id);
         }
-        moduleEntity.setName(model.getName());
+        String name = model.getName();
+        if (StringUtils.isNoneBlank(name)) {
+            moduleEntity.setName(name);
+        } else {
+            moduleEntity.setName("new module");
+        }
         moduleEntity.setDependencies(model.getDependencies());
         moduleEntity.setDescription(model.getDescription());
         moduleEntity.setUpdatedAt(new Date());

@@ -6,6 +6,7 @@ import io.terminus.dalaran.console.service.PropertyManagementService;
 import io.terminus.dalaran.console.service.jpa.PropertyQueryService;
 import io.terminus.dalaran.entity.PropertyEntity;
 import io.terminus.dalaran.repository.PropertyRepository;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -77,7 +78,12 @@ public class PropertyManagementServiceImpl implements PropertyManagementService 
         } else {
             propertyEntity = propertyRepository.findOne(id);
         }
-        propertyEntity.setName(model.getName());
+        String name = model.getName();
+        if (StringUtils.isNoneBlank(name)) {
+            propertyEntity.setName(name);
+        } else {
+            propertyEntity.setName("new property");
+        }
         propertyEntity.setValue(model.getValue());
         propertyEntity.setDescription(model.getDescription());
         propertyEntity.setUpdatedAt(new Date());

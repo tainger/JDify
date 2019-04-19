@@ -14,6 +14,7 @@ import io.terminus.dalaran.model.config.ProcessorInfo;
 import io.terminus.dalaran.repository.ModuleRepository;
 import io.terminus.dalaran.repository.ProcessorRepository;
 import io.terminus.dalaran.repository.StructureRepository;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -114,11 +115,17 @@ public class ProcessorManagementServiceImpl implements ProcessorManagementServic
             processorEntity = processorRepository.findOne(id);
         }
 
+        String name = model.getName();
+        if (StringUtils.isNoneBlank(name)) {
+            processorEntity.setName(name);
+        } else {
+            processorEntity.setName("new processor");
+        }
+
         processorEntity.setModuleId(model.getModuleId());
         processorEntity.setInStructure(model.getInStructureId());
         processorEntity.setOutStructure(model.getOutStructureId());
         processorEntity.setType(model.getType());
-        processorEntity.setName(model.getName());
         processorEntity.setDescription(model.getDescription());
         processorEntity.setConfig(JSON.toJSONString(model.getConfig()));
         processorEntity.setUpdatedAt(new Date());

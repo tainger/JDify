@@ -15,6 +15,7 @@ import io.terminus.dalaran.repository.FlowRepository;
 import io.terminus.dalaran.repository.ModuleRepository;
 import io.terminus.dalaran.repository.StructureRepository;
 import io.terminus.dalaran.repository.TriggerRepository;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -116,6 +117,12 @@ public class TriggerManagementServiceImpl implements TriggerManagementService {
         } else {
             triggerEntity = triggerRepository.findOne(id);
         }
+        String name = model.getName();
+        if (StringUtils.isNoneBlank(name)) {
+            triggerEntity.setName(name);
+        } else {
+            triggerEntity.setName("new trigger");
+        }
 
         triggerEntity.setFlowId(model.getFlowId());
         triggerEntity.setModuleId(model.getModuleId());
@@ -123,7 +130,6 @@ public class TriggerManagementServiceImpl implements TriggerManagementService {
         triggerEntity.setOutStructure(model.getOutStructure());
         triggerEntity.setConfig(JSON.toJSONString(model.getConfig()));
         triggerEntity.setDescription(model.getDescription());
-        triggerEntity.setName(model.getName());
         triggerEntity.setType(model.getType());
         triggerEntity.setUpdatedAt(new Date());
 
