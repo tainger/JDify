@@ -37,6 +37,7 @@ resources:
     modules:
     - name: starter
       path: starter
+  type: buildpack
 stages:
 - name: dalaran
   tasks:
