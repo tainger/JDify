@@ -69,10 +69,12 @@ public class StructureManagementRest {
         try {
             Map<String, Map<String, ModelField>> schema = excelUtils.parse(file.getInputStream());
             Map<Long, Map<String, Map<String, ModelField>>> structureSchema = new HashMap<>();
-            StructureEntity structure = structureRepository.findOne(id);
-            structure.setStructureSchema(JSON.toJSONString(schema));
-            structureRepository.save(structure);
-            structureSchema.put(id, schema);
+            for (Map.Entry<String, Map<String, ModelField>> entry : schema.entrySet()) {
+                StructureEntity structure = structureRepository.findOne(id);
+                structure.setStructureSchema(JSON.toJSONString(entry.getValue()));
+                structureRepository.save(structure);
+                structureSchema.put(id, schema);
+            }
             return structureSchema;
         } catch (Exception e) {
             e.printStackTrace();
@@ -87,10 +89,13 @@ public class StructureManagementRest {
         try {
             Map<String, Map<String, ModelField>> schema = excelUtils.parse(file.getInputStream());
             Map<Long, Map<String, Map<String, ModelField>>> structureSchema = new HashMap<>();
-            StructureEntity structure = new StructureEntity();
-            structure.setStructureSchema(JSON.toJSONString(schema));
-            structureRepository.save(structure);
-            structureSchema.put(structure.getId(), schema);
+            for (Map.Entry<String, Map<String, ModelField>> entry : schema.entrySet()) {
+                StructureEntity structure = new StructureEntity();
+                structure.setStructureSchema(JSON.toJSONString(entry.getValue()));
+                structure.setName("new model " + entry.getKey());
+                structureRepository.save(structure);
+                structureSchema.put(structure.getId(), schema);
+            }
             return structureSchema;
         } catch (Exception e) {
             e.printStackTrace();
