@@ -97,7 +97,9 @@ public class StructureManagementRest {
                 structure.setName(name);
                 structure.setType(BodyModelType.valueOf(type));
                 structureRepository.save(structure);
-                structureSchema.put(structure.getId(), schema);
+                Map<String, Map<String, ModelField>> singleSchema = new HashMap<>();
+                singleSchema.put(entry.getKey(), entry.getValue());
+                structureSchema.put(structure.getId(), singleSchema);
             }
             return structureSchema;
         } catch (Exception e) {
