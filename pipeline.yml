@@ -27,6 +27,16 @@ resources:
     - name: console
       path: console
   type: buildpack
+- name: dalaran-starter
+  source:
+    bp_args:
+      USE_AGENT: "true"
+    bp_repo: http://git.terminus.io/buildpacks/dice-bpack-termjava.git
+    bp_ver: master
+    context: dalaran/
+    modules:
+    - name: starter
+      path: starter
 stages:
 - name: dalaran
   tasks:
@@ -37,6 +47,7 @@ stages:
   tasks:
   - aggregate:
     - put: dalaran-console
+    - put: dalaran-starter
 - name: deploy
   tasks:
   - params:
@@ -46,4 +57,5 @@ stages:
       dice_test_yml: dalaran/dice_test.yml
       replacement_images:
       - dalaran-console/pack-result
+      - dalaran-starter/pack-result
     put: deploy

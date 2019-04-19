@@ -188,9 +188,6 @@ public class DalaranLoader {
         flow.setOutModel(buildMessageModel(structureRepository.findOne(flowEntity.getOutStructure())));
         flow.setId(flowEntity.getId());
         flow.setProcessors(processors);
-        flow.setMaxRetry(flowEntity.getMaxRetry());
-        flow.setRetryDelay(flowEntity.getRetryDelay());
-        flow.setRetryable(flowEntity.getRetryable());
         return flow;
     }
 }

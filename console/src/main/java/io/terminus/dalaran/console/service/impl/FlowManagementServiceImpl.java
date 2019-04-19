@@ -156,9 +156,6 @@ public class FlowManagementServiceImpl implements FlowManagementService {
         flowEntity.setOutStructure(model.getOutStructure().getId());
         flowEntity.setProcessors(model.getProcessorIds());
         flowEntity.setDescription(model.getDescription());
-        flowEntity.setMaxRetry(model.getMaxRetry());
-        flowEntity.setRetryable(model.getRetryable());
-        flowEntity.setRetryDelay(model.getRetryDelay());
         flowEntity.setProperties(model.getPropertyIds());
         flowEntity.setUpdatedAt(new Date());
 
@@ -170,13 +167,10 @@ public class FlowManagementServiceImpl implements FlowManagementService {
         flowModel.setId(entity.getId());
         flowModel.setName(entity.getName());
         flowModel.setModuleId(entity.getModuleId());
-        flowModel.setMaxRetry(entity.getMaxRetry());
         flowModel.setInStructure(buildStructureEntity(structureRepository.findOne(entity.getInStructure())));
         flowModel.setOutStructure(buildStructureEntity(structureRepository.findOne(entity.getOutStructure())));
         flowModel.setProcessorIds(entity.getProcessors());
         flowModel.setPropertyIds(entity.getProperties());
-        flowModel.setRetryable(entity.getRetryable());
-        flowModel.setRetryDelay(entity.getRetryDelay());
         flowModel.setDescription(entity.getDescription());
 
         Set<ProcessorModel> processors = new HashSet<>();
