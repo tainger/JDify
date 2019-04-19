@@ -9,7 +9,20 @@ services:
     expose:
       - 80
     resources:
-      cpu: 0.1
+      cpu: 0.2
+      mem: 1024
+    health_check:
+      exec:
+       cmd: echo 1
+  starter:
+    deployments:
+      replicas: 1
+    ports:
+      - 8080
+    expose:
+      - 80
+    resources:
+      cpu: 0.2
       mem: 1024
     health_check:
       exec:

@@ -9,7 +9,7 @@ services:
     expose:
       - 80
     resources:
-      cpu: 0.1
+      cpu: 0.2
       mem: 1024
     health_check:
       exec:
@@ -22,7 +22,7 @@ services:
     expose:
       - 80
     resources:
-      cpu: 0.1
+      cpu: 0.2
       mem: 1024
     health_check:
       exec:
