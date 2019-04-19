@@ -16,6 +16,7 @@ import io.terminus.dalaran.entity.FlowEntity;
 import io.terminus.dalaran.entity.ProcessorEntity;
 import io.terminus.dalaran.entity.StructureEntity;
 import io.terminus.dalaran.repository.*;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -154,7 +155,12 @@ public class FlowManagementServiceImpl implements FlowManagementService {
         flowEntity.setOutStructure(model.getOutStructure().getId());
         flowEntity.setProcessors(model.getProcessorIds());
         flowEntity.setDescription(model.getDescription());
-        flowEntity.setProperties(model.getPropertyIds());
+
+        if (CollectionUtils.isNotEmpty(model.getPropertyIds())) {
+            flowEntity.setProperties(model.getPropertyIds());
+        } else {
+            flowEntity.setProperties(new ArrayList<>());
+        }
         flowEntity.setUpdatedAt(new Date());
 
         return flowEntity;
