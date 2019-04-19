@@ -15,4 +15,6 @@ public class DubboProviderConfig {
     private String method;
     @ConfigFieldInfo(label = "服务版本", inputType = FieldInputType.String)
     private String version;
+    @ConfigFieldInfo(label = "服务版本", inputType = FieldInputType.String)
+    private String parameterType;
 }

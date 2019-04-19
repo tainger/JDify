@@ -1,6 +1,7 @@
 package io.terminus.dalaran.camel.component.dubbo;
 
 import com.alibaba.dubbo.common.utils.PojoUtils;
+import com.alibaba.dubbo.common.utils.StringUtils;
 import com.alibaba.dubbo.config.ApplicationConfig;
 import com.alibaba.dubbo.config.RegistryConfig;
 import com.alibaba.dubbo.config.ServiceConfig;
@@ -50,13 +51,24 @@ public class DubboCamelConsumer extends DefaultConsumer {
     }
 
     private Object createProxyBean() throws ClassNotFoundException {
-        Class parameterClass = Class.forName(endpoint.getParameterType());
+        Class parameterClass;
+        // TODO 这里还有问题
+        if (StringUtils.isNotEmpty(endpoint.getParameterType())) {
+            parameterClass = Class.forName(endpoint.getParameterType());
+        } else {
+            parameterClass = null;
+        }
         return (GenericService) (method, parameterTypes, args) -> {
             Exchange exchange = endpoint.createExchange();
             if (args.length == 1) {
-                Object pojo = PojoUtils.realize(args[0], parameterClass);
+                Object param;
+                if (parameterClass != null) {
+                    param = PojoUtils.realize(args[0], parameterClass);
+                } else {
+                    param = args[0];
+                }
                 Message message = new DefaultMessage(endpoint.getCamelContext());
-                message.setBody(pojo);
+                message.setBody(param);
                 exchange.setMessage(message);
             }
             exchange.getOut().copyFrom(exchange.getIn());
