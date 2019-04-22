@@ -11,8 +11,14 @@ import io.terminus.dalaran.entity.ProcessorEntity;
 import io.terminus.dalaran.entity.PropertyEntity;
 import io.terminus.dalaran.repository.ProcessorRepository;
 import io.terminus.dalaran.repository.PropertyRepository;
+import org.apache.http.HttpResponse;
+import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.ServletResponse;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -122,13 +128,19 @@ public class FlowManagementRest {
     }
 
     @PostMapping("/{flowId}/test")
-    private Object doTest(@PathVariable Long flowId, @RequestBody String body) {
+    private Object doTest(@PathVariable Long flowId, @RequestBody String body, ServletResponse res) throws IOException {
 
         // TODO test flow 什么时候 load 是个问题, 主要是修改后的 flow
         Object data = dalaranContext.testFlow(flowId, body);
         // TODO 如果最后一步是序列化的情况, 会被序列化成 byte[], 先 toString 一下
         if (data instanceof byte[]) {
             return new String((byte[]) data);
+        }
+        // TODO 这里的输出还是要考虑抽象一下....
+        if (data instanceof InputStream) {
+            InputStream input = (InputStream) data;
+            IOUtils.copy(input, res.getOutputStream());
+            return null;
         }
         return data;
     }
