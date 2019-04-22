@@ -55,7 +55,6 @@ public class DalaranTracer {
         route.process(this.buildAfterProcessor(modelType));
     }
 
-
     // TODO async
     private Processor buildBeforeProcessor(BodyModelType bodyModelType) {
         return new TraceBeforeProcessor(bodyModelType);
@@ -65,6 +64,8 @@ public class DalaranTracer {
     private Processor buildAfterProcessor(BodyModelType bodyModelType) {
         return new TraceAfterProcessor(bodyModelType);
     }
+
+
 
     private class TraceBeforeProcessor implements Processor, Traceable {
 
@@ -143,6 +144,7 @@ public class DalaranTracer {
             if (tracingLog == null) {
                 return;
             }
+            tracingLog.setSuccessful(true);
             tracingLog.setOutputBody(MessageHelper.extractBodyForLogging(exchange.getIn(), ""));
             tracingLog.setOutputBodyType(bodyModelType);
             tracingLog.setElapsed(System.currentTimeMillis() - tracingLog.getTimestamp());

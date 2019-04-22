@@ -52,18 +52,23 @@ public class DalaranLoader {
         this.enableTest = enableTest;
     }
 
+    public void loadTestFlow(FlowEntity flowEntity) {
+        DalaranFlow testFlow = buildDalaranFlow(flowEntity);
+        dalaranContext.addTestFlow(testFlow);
+    }
+
     // TODO 临时用入参处理一下 trigger 加载的开关
     @PostConstruct
     private void init() {
 //        loadFlow();
         if (enableTest) {
-            loadTestFlow();
+            loadAllTestFlow();
         } else {
-            loadTrigger();
+            loadAllTrigger();
         }
     }
 
-    private void loadTestFlow() {
+    private void loadAllTestFlow() {
         List<DalaranFlow> flowList = new ArrayList<>();
         List<FlowEntity> flowEntities = flowRepository.findAll();
         for (FlowEntity flowEntity : flowEntities) {
@@ -73,17 +78,7 @@ public class DalaranLoader {
         dalaranContext.addTestFlows(flowList);
     }
 
-    private void loadFlow() {
-        List<DalaranFlow> flowList = new ArrayList<>();
-        List<FlowEntity> flowEntities = flowRepository.findAll();
-        for (FlowEntity flowEntity : flowEntities) {
-            flowList.add(buildDalaranFlow(flowEntity));
-            log.info("load flow[{}]", flowEntity.getId());
-        }
-        dalaranContext.addFlows(flowList);
-    }
-
-    private void loadTrigger() {
+    private void loadAllTrigger() {
         val triggerEntities = triggerRepository.findAll();
         for (TriggerEntity triggerEntity : triggerEntities) {
             val trigger = buildTrigger(triggerEntity);
