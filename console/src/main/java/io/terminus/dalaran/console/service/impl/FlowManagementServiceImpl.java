@@ -182,15 +182,6 @@ public class FlowManagementServiceImpl implements FlowManagementService {
             ProcessorModel processorModel = new ProcessorModel();
             processorModel.setId(processorEntity.getId());
             processorModel.setModuleId(processorEntity.getModuleId());
-
-            StructureEntity inStructure = structureRepository.findOne(processorEntity.getInStructure());
-            processorModel.setInStructure(buildStructureEntity(inStructure));
-            processorModel.setInStructureId(processorEntity.getInStructure());
-
-            StructureEntity outStructure = structureRepository.findOne(processorEntity.getOutStructure());
-            processorModel.setInStructure(buildStructureEntity(outStructure));
-
-            processorModel.setOutStructureId(processorEntity.getOutStructure());
             processorModel.setName(processorEntity.getName());
             processorModel.setDescription(processorEntity.getDescription());
             processorModel.setType(processorEntity.getType());

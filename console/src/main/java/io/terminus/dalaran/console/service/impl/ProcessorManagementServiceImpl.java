@@ -108,8 +108,6 @@ public class ProcessorManagementServiceImpl implements ProcessorManagementServic
     public ProcessorEntity buildEntity(ProcessorModel model) {
         ProcessorEntity processorEntity = new ProcessorEntity();
         processorEntity.setModuleId(model.getModuleId());
-        processorEntity.setInStructure(model.getInStructureId());
-        processorEntity.setOutStructure(model.getOutStructureId());
         processorEntity.setType(model.getType());
         processorEntity.setName(model.getName());
         processorEntity.setDescription(model.getDescription());
@@ -122,8 +120,6 @@ public class ProcessorManagementServiceImpl implements ProcessorManagementServic
         ProcessorModel processorModel = new ProcessorModel();
         processorModel.setId(entity.getId());
         processorModel.setModuleId(entity.getModuleId());
-        processorModel.setInStructureId(entity.getInStructure());
-        processorModel.setOutStructureId(entity.getOutStructure());
         processorModel.setName(entity.getName());
         processorModel.setDescription(entity.getDescription());
         processorModel.setType(entity.getType());

@@ -26,17 +26,8 @@ public class ProcessorEntity {
 
     private String status;
 
-//    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "module_id")
     private Long moduleId;
-
-//    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JoinColumn(name = "in_structure")
-    private Long inStructure;
-
-//    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JoinColumn(name = "out_structure")
-    private Long outStructure;
 
     private String description;
 
