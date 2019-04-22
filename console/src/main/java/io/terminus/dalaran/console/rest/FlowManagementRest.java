@@ -13,7 +13,6 @@ import io.terminus.dalaran.repository.ProcessorRepository;
 import io.terminus.dalaran.repository.PropertyRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -122,7 +121,7 @@ public class FlowManagementRest {
         return flowManagementService.queryByProcessorIds(processorIds);
     }
 
-    @PostMapping("/flow/{flowId}/test")
+    @PostMapping("/{flowId}/test")
     private Object doTest(@PathVariable Long flowId, @RequestBody String body) {
 
         // TODO test flow 什么时候 load 是个问题, 主要是修改后的 flow

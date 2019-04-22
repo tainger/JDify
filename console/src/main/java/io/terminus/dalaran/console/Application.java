@@ -4,6 +4,7 @@ import io.terminus.dalaran.*;
 import io.terminus.dalaran.support.component.DefaultDalaranComponentContext;
 import io.terminus.dalaran.support.convert.DefaultDalaranConverterContext;
 import io.terminus.dalaran.support.flow.DefaultDalaranCamelContext;
+import io.terminus.dalaran.support.trace.TracingErrorHandlerFactory;
 import io.terminus.dalaran.trace.DefaultJpaDalaranTraceLogger;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -19,8 +20,14 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 public class Application {
 
     @Bean
-    public DalaranContext dalaranContext(DalaranConverterContext converterContext, DalaranComponentContext componentContext, DalaranTraceLogger traceLogger) {
-        return new DefaultDalaranCamelContext(converterContext, componentContext, traceLogger);
+    public DalaranContext dalaranContext(DalaranConverterContext converterContext, DalaranComponentContext componentContext,
+                                         DalaranTraceLogger traceLogger, TracingErrorHandlerFactory errorHandlerFactory) {
+        return new DefaultDalaranCamelContext(converterContext, componentContext, traceLogger, errorHandlerFactory);
+    }
+
+    @Bean
+    public TracingErrorHandlerFactory tracingErrorHandlerFactory(DalaranTraceLogger traceLogger) {
+        return new TracingErrorHandlerFactory(traceLogger);
     }
 
     @Bean
