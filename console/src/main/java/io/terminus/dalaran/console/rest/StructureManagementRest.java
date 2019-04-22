@@ -10,13 +10,10 @@ import io.terminus.dalaran.console.util.ExcelUtils;
 import io.terminus.dalaran.entity.StructureEntity;
 import io.terminus.dalaran.model.schema.structure.ModelField;
 import io.terminus.dalaran.repository.StructureRepository;
-import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -95,7 +92,7 @@ public class StructureManagementRest {
                 StructureEntity structure = new StructureEntity();
                 structure.setStructureSchema(JSON.toJSONString(entry.getValue()));
                 structure.setName(name);
-                structure.setType(BodyModelType.valueOf(type));
+                structure.setType(BodyModelType.valueOf(type.toUpperCase()));
                 structureRepository.save(structure);
                 Map<String, Map<String, ModelField>> singleSchema = new HashMap<>();
                 singleSchema.put(entry.getKey(), entry.getValue());
