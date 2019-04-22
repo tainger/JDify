@@ -1,9 +1,12 @@
 package io.terminus.dalaran.console.rest;
 
+import com.alibaba.dubbo.common.utils.IOUtils;
 import com.google.gson.Gson;
 import io.swagger.annotations.ApiOperation;
+import io.terminus.dalaran.BodyModelType;
 import io.terminus.dalaran.DalaranContext;
 import io.terminus.dalaran.console.model.FlowModel;
+import io.terminus.dalaran.console.model.TestResult;
 import io.terminus.dalaran.console.model.query.FlowQuery;
 import io.terminus.dalaran.console.service.FlowManagementService;
 import io.terminus.dalaran.entity.FlowEntity;
@@ -11,8 +14,8 @@ import io.terminus.dalaran.entity.ProcessorEntity;
 import io.terminus.dalaran.entity.PropertyEntity;
 import io.terminus.dalaran.repository.ProcessorRepository;
 import io.terminus.dalaran.repository.PropertyRepository;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
-import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -128,20 +131,27 @@ public class FlowManagementRest {
     }
 
     @PostMapping("/{flowId}/test")
-    private Object doTest(@PathVariable Long flowId, @RequestBody String body, ServletResponse res) throws IOException {
-
-        // TODO test flow 什么时候 load 是个问题, 主要是修改后的 flow
+    private TestResult doTest(@PathVariable Long flowId, @RequestBody String body) throws IOException {
+        FlowModel flow = flowManagementService.getById(flowId);
         Object data = dalaranContext.testFlow(flowId, body);
+        BodyModelType bodyType = flow.getOutStructure().getStructureType();
+        TestResult result = new TestResult();
+        result.setBodyType(bodyType);
+        // TODO on error
+        result.setSuccessful(true);
         // TODO 如果最后一步是序列化的情况, 会被序列化成 byte[], 先 toString 一下
+        if (data instanceof String) {
+            result.setBody((String) data);
+        }
         if (data instanceof byte[]) {
-            return new String((byte[]) data);
+            result.setBody(new String((byte[]) data));
         }
         // TODO 这里的输出还是要考虑抽象一下....
         if (data instanceof InputStream) {
             InputStream input = (InputStream) data;
-            IOUtils.copy(input, res.getOutputStream());
-            return null;
+            String resultBody = StringUtils.join(IOUtils.readLines(input), "\n");
+            result.setBody(resultBody);
         }
-        return data;
+        return result;
     }
 }
