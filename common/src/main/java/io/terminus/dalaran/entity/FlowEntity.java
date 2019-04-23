@@ -27,12 +27,6 @@ public class FlowEntity {
 
     private String description;
 
-    private Boolean retryable;
-
-    private Integer maxRetry;
-
-    private Integer retryDelay;
-
 //    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "module_id")
     private Long moduleId;

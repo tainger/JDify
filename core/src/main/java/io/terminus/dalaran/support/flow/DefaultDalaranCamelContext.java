@@ -100,9 +100,24 @@ public class DefaultDalaranCamelContext implements DalaranContext {
             }
 
             // log
-            tracer.before(route, currentMessageModel.getModelType());
+            if (BodyMode.Object == processorInfo.getBodyMode()) {
+                tracer.before(route, BodyModelType.OBJECT);
+            } else {
+                tracer.before(route, currentMessageModel.getModelType());
+            }
 
             processorComponent.configure(route, processor.getConfig());
+
+            // TODO equals
+            if (processor.getOutModel() != null && currentMessageModel != processor.getOutModel()) {
+                currentMessageModel = processor.getOutModel();
+            }
+            // log
+            if (BodyMode.Object == processorInfo.getBodyMode()) {
+                tracer.after(route, BodyModelType.OBJECT);
+            } else {
+                tracer.after(route, currentMessageModel.getModelType());
+            }
 
             if (i < processorList.size() - 1) {
                 val nextProcessor = processorList.get(i + 1);
@@ -115,20 +130,18 @@ public class DefaultDalaranCamelContext implements DalaranContext {
                     nextMessageModel = currentMessageModel;
                 }
                 if (processorInfo.getBodyMode() != nextProcessorInfo.getBodyMode()) {
+                    // TODO 类型转化日志, 有必要时可以开启
+//                    val convertTracer = DalaranTracer.buildConvertTracer(traceLogger, dalaranFlow.getTriggerId(),
+//                            dalaranFlow.getId(), processor.getId());
+//                    convertTracer.before(route, currentMessageModel.getModelType());
                     if (nextProcessorInfo.getBodyMode() == BodyMode.Serialized) {
                         converterContext.marshal(route, nextMessageModel);
                     } else {
                         converterContext.unmarshal(route, nextMessageModel);
                     }
+//                    convertTracer.after(route, nextMessageModel.getModelType());
                 }
             }
-
-            // TODO equals
-            if (processor.getOutModel() != null && currentMessageModel != processor.getOutModel()) {
-                currentMessageModel = processor.getOutModel();
-            }
-            // log
-            tracer.after(route, currentMessageModel.getModelType());
         }
         // TODO 流程最后不可得知触发器的出模型, 所以无法判断做格式转换, 最保险的方式是固定转为 Object, 在 trigger 端在根据要求做一次序列化, 但是会有性能损耗
         // TODO 另外这里也不好判断是否是最后的节点, 因为存在分支, 暂时将最后节点作为流输出节点

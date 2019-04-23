@@ -1,5 +1,6 @@
 package io.terminus.dalaran.support.trace;
 
+import com.google.gson.Gson;
 import io.terminus.dalaran.BodyModelType;
 import io.terminus.dalaran.DalaranTraceLogger;
 import io.terminus.dalaran.TracingType;
@@ -11,6 +12,10 @@ import org.apache.camel.Traceable;
 import org.apache.camel.model.RouteDefinition;
 import org.apache.camel.util.MessageHelper;
 
+import java.io.Serializable;
+import java.util.Collection;
+import java.util.Map;
+
 import static io.terminus.dalaran.DalaranConstants.*;
 
 /**
@@ -19,6 +24,8 @@ import static io.terminus.dalaran.DalaranConstants.*;
  */
 @Slf4j
 public class DalaranTracer {
+
+    private final Gson gson = new Gson();
 
     private final DalaranTraceLogger logger;
 
@@ -51,6 +58,10 @@ public class DalaranTracer {
         return new DalaranTracer(logger, TracingType.Flow, triggerId, flowId, processorId);
     }
 
+    public static DalaranTracer buildConvertTracer(DalaranTraceLogger logger, Long triggerId, Long flowId, Long processorId) {
+        return new DalaranTracer(logger, TracingType.Convert, triggerId, flowId, processorId);
+    }
+
     public void before(RouteDefinition route, BodyModelType modelType) {
         route.process(this.buildBeforeProcessor(modelType));
     }
@@ -77,11 +88,25 @@ public class DalaranTracer {
                 return TRIGGER_TRACING_LOG;
             case TestFlow:
                 return TEST_FLOW_TRACING_LOG;
+            case Convert:
+                return CONVERT_TRACING_LOG;
             default:
                 throw new RuntimeException("not support tracing type[" + tracingType + "]");
         }
     }
 
+    private String extractBody(Object body) {
+        if (body == null) {
+            return null;
+        }
+        if (body instanceof String) {
+            return (String) body;
+        }
+        if (body instanceof Map || body instanceof Iterable || body instanceof Serializable) {
+            return gson.toJson(body);
+        }
+        return body.toString();
+    }
 
     private class TraceBeforeProcessor implements Processor, Traceable {
 
@@ -98,7 +123,7 @@ public class DalaranTracer {
 
             DalaranTracingLog tracingLog = new DalaranTracingLog();
 
-            if (TracingType.Flow.equals(tracingType)) {
+            if (TracingType.Flow == tracingType || TracingType.Convert == tracingType) {
                 tracingLog.setMain(false);
             } else {
                 tracingLog.setMain(true);
@@ -115,7 +140,7 @@ public class DalaranTracer {
             tracingLog.setFlowId(flowId);
             tracingLog.setProcessorId(processorId);
             tracingLog.setTimestamp(System.currentTimeMillis());
-            tracingLog.setInputBody(MessageHelper.extractBodyForLogging(exchange.getIn(), ""));
+            tracingLog.setInputBody(extractBody(exchange.getIn().getBody()));
             tracingLog.setInputBodyType(bodyModelType);
         }
 
@@ -158,7 +183,7 @@ public class DalaranTracer {
             }
             exchange.removeProperty(propertyKey);
             tracingLog.setSuccessful(true);
-            tracingLog.setOutputBody(MessageHelper.extractBodyForLogging(exchange.getIn(), ""));
+            tracingLog.setOutputBody(extractBody(exchange.getIn().getBody()));
             tracingLog.setOutputBodyType(bodyModelType);
             tracingLog.setElapsed(System.currentTimeMillis() - tracingLog.getTimestamp());
 //            tracingLog.setOutputHeaders(exchange.getIn().getHeaders());

@@ -17,12 +17,6 @@ public class FlowModel {
 
     private String description;
 
-    private Boolean retryable;
-
-    private Integer maxRetry = 1;
-
-    private Integer retryDelay = 3000;
-
     private StructureModel inStructure;
 
     private StructureModel outStructure;
