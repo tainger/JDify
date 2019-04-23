@@ -1,6 +1,6 @@
 package io.terminus.dalaran.entity;
 
-import io.terminus.dalaran.support.jpa.ListToJsonConverter;
+import io.terminus.dalaran.converter.ListToJsonConverter;
 import lombok.Data;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;

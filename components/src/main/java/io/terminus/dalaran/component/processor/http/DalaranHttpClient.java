@@ -14,5 +14,7 @@ public class DalaranHttpClient implements DalaranProcessor<HttpClientConfig> {
     public void configure(ProcessorDefinition route, HttpClientConfig config) {
         String uri = String.format(HTTP_URI, config.getProtocol().name().toLowerCase(), config.getHost(), config.getPort(), config.getPath());
         route.setHeader("CamelHttpMethod", Builder.constant(config.getMethod().name())).to(uri);
+        // TODO Stream to string
+        route.convertBodyTo(String.class);
     }
 }

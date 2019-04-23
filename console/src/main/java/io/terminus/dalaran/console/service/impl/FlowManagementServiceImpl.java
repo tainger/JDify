@@ -176,7 +176,6 @@ public class FlowManagementServiceImpl implements FlowManagementService {
             flowEntity.setProperties(new ArrayList<>());
         }
         flowEntity.setUpdatedAt(new Date());
-
         return flowEntity;
     }
 

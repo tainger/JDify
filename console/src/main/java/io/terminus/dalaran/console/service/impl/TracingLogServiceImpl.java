@@ -2,17 +2,17 @@ package io.terminus.dalaran.console.service.impl;
 
 import io.terminus.dalaran.TracingType;
 import io.terminus.dalaran.console.model.TracingLog;
-import io.terminus.dalaran.console.model.TriggerLog;
+import io.terminus.dalaran.console.model.TracingMainLog;
 import io.terminus.dalaran.console.model.query.TracingLogQuery;
 import io.terminus.dalaran.console.service.TracingLogService;
 import io.terminus.dalaran.entity.FlowEntity;
 import io.terminus.dalaran.entity.ProcessorEntity;
+import io.terminus.dalaran.entity.TracingLogEntity;
 import io.terminus.dalaran.entity.TriggerEntity;
-import io.terminus.dalaran.model.DalaranTracingLog;
 import io.terminus.dalaran.repository.FlowRepository;
 import io.terminus.dalaran.repository.ProcessorRepository;
+import io.terminus.dalaran.repository.TracingLogRepository;
 import io.terminus.dalaran.repository.TriggerRepository;
-import io.terminus.dalaran.trace.DalaranTracingLogRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 public class TracingLogServiceImpl implements TracingLogService {
 
     @Autowired
-    private DalaranTracingLogRepository tracingLogRepository;
+    private TracingLogRepository tracingLogRepository;
 
     @Autowired
     private FlowRepository flowRepository;
@@ -39,38 +39,37 @@ public class TracingLogServiceImpl implements TracingLogService {
     private TriggerRepository triggerRepository;
 
     @Override
-    public List<TriggerLog> triggerLogs(TracingLogQuery query) {
-        List<DalaranTracingLog> logs = tracingLogRepository.findAll(buildSpecification(query));
-        return logs.stream().map(this::buildTriggerLog).collect(Collectors.toList());
+    public List<TracingMainLog> triggerLogs(TracingLogQuery query) {
+        List<TracingLogEntity> logs = tracingLogRepository.findAll(buildSpecification(query));
+        return logs.stream().map(this::buildTracingMainLog).collect(Collectors.toList());
     }
 
     @Override
-    public TriggerLog getTriggerLogDetail(Long logId) {
-        DalaranTracingLog triggerLog = tracingLogRepository.findOne(logId);
-        TriggerLog triggerLogDetail = buildTriggerLog(triggerLog);
-        List<DalaranTracingLog> tracingLogEntityList = tracingLogRepository.findByRecordIdAndTracingType(triggerLog.getRecordId(), TracingType.Flow);
+    public TracingMainLog getRecordDetail(String recordId) {
+        TracingLogEntity testMainLog = tracingLogRepository.findByRecordIdAndMainTrue(recordId);
+        if (testMainLog == null) {
+            return null;
+        }
+        TracingMainLog triggerMainLogDetail = buildTracingMainLog(testMainLog);
+
+        List<TracingLogEntity> tracingLogEntityList = tracingLogRepository.findByRecordIdAndTracingType(recordId, TracingType.Flow);
         List<TracingLog> tracingLogs = tracingLogEntityList.stream().map(this::buildTracingLog).collect(Collectors.toList());
-        triggerLogDetail.setTracingLogList(tracingLogs);
-        return triggerLogDetail;
+        triggerMainLogDetail.setTracingLogList(tracingLogs);
+        return triggerMainLogDetail;
     }
 
-    @Override
-    public List<TriggerLog> failedLog() {
-        // TODO failed log
-        return null;
-    }
-
-    @Override
-    public List<TriggerLog> successfulLog() {
-        // TODO successful log
-        return null;
-    }
-
-    private Specification<DalaranTracingLog> buildSpecification(TracingLogQuery query) {
+    private Specification<TracingLogEntity> buildSpecification(TracingLogQuery query) {
         return (root, query1, builder) -> {
             List<Predicate> predicates = new ArrayList<>();
-            predicates.add(builder.equal(root.get("tracingType"), TracingType.Trigger));
-            predicates.add(builder.equal(root.get("testFlow"), query.isTestFlow()));
+            predicates.add(builder.equal(root.get("main"), Boolean.TRUE));
+            if (query.isTestFlow()) {
+                predicates.add(builder.equal(root.get("tracingType"), TracingType.TestFlow));
+            } else {
+                predicates.add(builder.equal(root.get("tracingType"), TracingType.Trigger));
+            }
+            if (query.getSuccessful() != null) {
+                predicates.add(builder.equal(root.get("successful"), query.getSuccessful()));
+            }
             if (query.getFlowId() != null) {
                 predicates.add(builder.equal(root.get("flowId"), query.getFlowId()));
             }
@@ -90,30 +89,41 @@ public class TracingLogServiceImpl implements TracingLogService {
         };
     }
 
-    private TriggerLog buildTriggerLog(DalaranTracingLog log) {
-        TriggerLog triggerLog = new TriggerLog();
-        triggerLog.setId(log.getId());
-        triggerLog.setRecordId(log.getRecordId());
-        triggerLog.setTimestamp(new Date(log.getTimestamp()));
-        triggerLog.setElapsed(log.getElapsed());
-        triggerLog.setTriggerId(log.getTriggerId());
-        TriggerEntity triggerEntity = triggerRepository.findOne(log.getTriggerId());
-        if (triggerEntity != null) {
-            triggerLog.setTriggerName(triggerEntity.getName());
+    private TracingMainLog buildTracingMainLog(TracingLogEntity log) {
+        TracingMainLog mainLog = new TracingMainLog();
+        mainLog.setId(log.getId());
+        mainLog.setRecordId(log.getRecordId());
+        mainLog.setTimestamp(new Date(log.getTimestamp()));
+        mainLog.setElapsed(log.getElapsed());
+        mainLog.setTriggerId(log.getTriggerId());
+        mainLog.setInputBody(log.getInputBody());
+        mainLog.setInputBodyType(log.getInputBodyType());
+        mainLog.setOutputBody(log.getOutputBody());
+        mainLog.setOutputBodyType(log.getOutputBodyType());
+        mainLog.setSuccessful(log.getSuccessful());
+
+        if (log.getTriggerId() != null) {
+            TriggerEntity triggerEntity = triggerRepository.findOne(log.getTriggerId());
+            if (triggerEntity != null) {
+                mainLog.setTriggerName(triggerEntity.getName());
+            }
         }
-        triggerLog.setInputBody(log.getInputBody());
-        triggerLog.setInputBodyType(log.getInputBodyType());
-        triggerLog.setOutputBody(log.getOutputBody());
-        triggerLog.setOutputBodyType(log.getOutputBodyType());
-        return triggerLog;
+
+        return mainLog;
     }
 
-    private TracingLog buildTracingLog(DalaranTracingLog log) {
+    private TracingLog buildTracingLog(TracingLogEntity log) {
         TracingLog tracingLog = new TracingLog();
         tracingLog.setId(log.getId());
         tracingLog.setRecordId(log.getRecordId());
         tracingLog.setTimestamp(new Date(log.getTimestamp()));
         tracingLog.setElapsed(log.getElapsed());
+        tracingLog.setInputBody(log.getInputBody());
+        tracingLog.setInputBodyType(log.getInputBodyType());
+        tracingLog.setOutputBody(log.getOutputBody());
+        tracingLog.setOutputBodyType(log.getOutputBodyType());
+        tracingLog.setSuccessful(log.getSuccessful());
+
         tracingLog.setProcessorId(log.getProcessorId());
         ProcessorEntity processorEntity = processorRepository.findOne(log.getProcessorId());
         if (processorEntity != null) {
@@ -124,10 +134,6 @@ public class TracingLogServiceImpl implements TracingLogService {
         if (flowEntity != null) {
             tracingLog.setFlowName(flowEntity.getName());
         }
-        tracingLog.setInputBody(log.getInputBody());
-        tracingLog.setInputBodyType(log.getInputBodyType());
-        tracingLog.setOutputBody(log.getOutputBody());
-        tracingLog.setOutputBodyType(log.getOutputBodyType());
         return tracingLog;
     }
 }

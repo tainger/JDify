@@ -9,11 +9,8 @@ import org.apache.camel.Processor;
 import org.apache.camel.Traceable;
 import org.apache.camel.processor.ErrorHandler;
 import org.apache.camel.spi.RouteContext;
-import org.apache.camel.util.MessageHelper;
 
-import static io.terminus.dalaran.DalaranConstants.FLOW_TRACING_LOG;
-import static io.terminus.dalaran.DalaranConstants.TEST_FLOW;
-import static io.terminus.dalaran.DalaranConstants.TRIGGER_TRACING_LOG;
+import static io.terminus.dalaran.DalaranConstants.*;
 
 public class TracingErrorHandlerFactory implements ErrorHandlerFactory {
 
@@ -34,7 +31,7 @@ public class TracingErrorHandlerFactory implements ErrorHandlerFactory {
 
         private Processor output;
 
-        public DalaranErrorHandler(Processor output) {
+        DalaranErrorHandler(Processor output) {
             this.output = output;
         }
 
@@ -45,19 +42,25 @@ public class TracingErrorHandlerFactory implements ErrorHandlerFactory {
             // TODO 当执行发成异常时, 记录未持久化的日志
             if (exchange.getException() != null) {
                 String body = exchange.getException().getMessage();
-                Boolean isTestFlow = exchange.getProperty(TEST_FLOW, Boolean.class);
                 DalaranTracingLog flowTracingLog = exchange.getProperty(FLOW_TRACING_LOG, DalaranTracingLog.class);
                 if (flowTracingLog != null) {
-                    log(flowTracingLog, body, isTestFlow);
+                    exchange.removeProperty(FLOW_TRACING_LOG);
+                    log(flowTracingLog, body);
                 }
                 DalaranTracingLog triggerTracingLog = exchange.getProperty(TRIGGER_TRACING_LOG, DalaranTracingLog.class);
                 if (triggerTracingLog != null) {
-                    log(triggerTracingLog, body, isTestFlow);
+                    exchange.removeProperty(TRIGGER_TRACING_LOG);
+                    log(triggerTracingLog, body);
+                }
+                DalaranTracingLog testFlowTracingLog = exchange.getProperty(TEST_FLOW_TRACING_LOG, DalaranTracingLog.class);
+                if (testFlowTracingLog != null) {
+                    exchange.removeProperty(TEST_FLOW_TRACING_LOG);
+                    log(testFlowTracingLog, body);
                 }
             }
         }
 
-        private void log(DalaranTracingLog tracingLog, String body, Boolean isTestFlow) {
+        private void log(DalaranTracingLog tracingLog, String body) {
             if (tracingLog == null) {
                 return;
             }
@@ -65,12 +68,6 @@ public class TracingErrorHandlerFactory implements ErrorHandlerFactory {
             tracingLog.setOutputBodyType(BodyModelType.EXCEPTION);
             tracingLog.setOutputBody(body);
             tracingLog.setElapsed(System.currentTimeMillis() - tracingLog.getTimestamp());
-
-            if (isTestFlow != null) {
-                tracingLog.setTestFlow(isTestFlow);
-            } else {
-                tracingLog.setTestFlow(false);
-            }
 //            tracingLog.setOutputHeaders(exchange.getIn().getHeaders());
 
             logger.log(tracingLog);

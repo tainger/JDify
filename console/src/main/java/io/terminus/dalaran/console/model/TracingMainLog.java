@@ -7,15 +7,12 @@ import java.util.Date;
 import java.util.List;
 
 @Data
-public class TriggerLog {
-
+public class TracingMainLog {
     private Long id;
 
     private String recordId;
 
-    private Long triggerId;
-
-    private String triggerName;
+    private boolean successful;
 
     private Date timestamp;
 
@@ -30,4 +27,8 @@ public class TriggerLog {
     private String outputBody;
 
     private List<TracingLog> tracingLogList;
+
+    private Long triggerId;
+
+    private String triggerName;
 }

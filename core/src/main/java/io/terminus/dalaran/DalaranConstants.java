@@ -4,7 +4,10 @@ public final class DalaranConstants {
 
     public static final String TEST_FLOW = "dalaran_test_flow";
     public static final String TRIGGER_TRACING_LOG = "dalaran_trigger_tracing_log";
+    public static final String CONVERT_TRACING_LOG = "dalaran_trigger_convert_log";
+    public static final String TEST_FLOW_TRACING_LOG = "dalaran_test_flow_tracing_log";
     public static final String FLOW_TRACING_LOG = "dalaran_flow_tracing_log";
+    public static final String TEST_FLOW_RECORD_ID_HEADER = "dalaran_test_flow_record_id";
 
     public static final String FLOW_PREFIX = "flow-";
     public static final String TEST_FLOW_PREFIX = "test-flow-";

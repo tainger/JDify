@@ -1,8 +1,11 @@
 package io.terminus.dalaran.trace;
 
 import io.terminus.dalaran.DalaranTraceLogger;
+import io.terminus.dalaran.entity.TracingLogEntity;
 import io.terminus.dalaran.model.DalaranTracingLog;
+import io.terminus.dalaran.repository.TracingLogRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.PostConstruct;
@@ -13,7 +16,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class DefaultJpaDalaranTraceLogger implements DalaranTraceLogger {
 
     @Autowired
-    private DalaranTracingLogRepository tracingLogRepository;
+    private TracingLogRepository tracingLogRepository;
 
     private BlockingQueue<DalaranTracingLog> logQueue = new LinkedBlockingQueue<>();
 
@@ -29,7 +32,7 @@ public class DefaultJpaDalaranTraceLogger implements DalaranTraceLogger {
             for (; ; ) {
                 try {
                     DalaranTracingLog tracingLog = logQueue.take();
-                    tracingLogRepository.save(tracingLog);
+                    tracingLogRepository.save(toEntity(tracingLog));
                 } catch (Throwable e) {
                     e.printStackTrace();
                 }
@@ -37,4 +40,9 @@ public class DefaultJpaDalaranTraceLogger implements DalaranTraceLogger {
         }).start();
     }
 
+    private TracingLogEntity toEntity(DalaranTracingLog tracingLog) {
+        TracingLogEntity logEntity = new TracingLogEntity();
+        BeanUtils.copyProperties(tracingLog, logEntity);
+        return logEntity;
+    }
 }
