@@ -149,7 +149,9 @@ public class DefaultDalaranCamelContext implements DalaranContext {
 
     @Override
     public void addTrigger(TriggerModel trigger) {
-        addFlow(trigger.getFlow());
+        if (trigger.getFlow() != null) {
+            addFlow(trigger.getFlow());
+        }
 
         try {
             camelContext.removeRoute(TRIGGER_PREFIX + trigger.getId());
@@ -167,6 +169,9 @@ public class DefaultDalaranCamelContext implements DalaranContext {
         triggerComponent.buildFromRoute(route, trigger.getConfig());
         // TODO 这里要判断的是流和触发器的 body 类型
         val flow = trigger.getFlow();
+        if (flow == null) {
+            return;
+        }
         val processors = flow.getProcessors();
         if (processors.isEmpty()) {
             return;

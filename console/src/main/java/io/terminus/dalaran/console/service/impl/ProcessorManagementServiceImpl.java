@@ -42,8 +42,8 @@ public class ProcessorManagementServiceImpl implements ProcessorManagementServic
     private DalaranContext dalaranContext;
 
     @Override
-    public void createProcessor(ProcessorModel processorModel) {
-        processorRepository.save(buildEntity(processorModel));
+    public Long createProcessor(ProcessorModel processorModel) {
+        return processorRepository.save(buildEntity(processorModel)).getId();
     }
 
     @Override
@@ -52,8 +52,9 @@ public class ProcessorManagementServiceImpl implements ProcessorManagementServic
     }
 
     @Override
-    public void updateProcessor(ProcessorModel processorModel) {
+    public ProcessorModel updateProcessor(ProcessorModel processorModel) {
         processorRepository.save(buildEntity(processorModel));
+        return processorModel;
     }
 
     @Override
@@ -122,6 +123,13 @@ public class ProcessorManagementServiceImpl implements ProcessorManagementServic
             processorEntity.setName("Dalaran Processor");
         }
 
+        if (model.getInStructure() != null) {
+            processorEntity.setInStructure(model.getInStructure());
+        }
+        if (model.getOutStructure() != null) {
+            processorEntity.setOutStructure(model.getOutStructure());
+        }
+
         processorEntity.setModuleId(model.getModuleId());
         processorEntity.setType(model.getType());
         processorEntity.setDescription(model.getDescription());
@@ -137,6 +145,8 @@ public class ProcessorManagementServiceImpl implements ProcessorManagementServic
         processorModel.setName(entity.getName());
         processorModel.setDescription(entity.getDescription());
         processorModel.setType(entity.getType());
+        processorModel.setInStructure(entity.getInStructure());
+        processorModel.setOutStructure(entity.getOutStructure());
         processorModel.setConfig(JSON.parseObject(entity.getConfig(), Map.class));
         return processorModel;
     }

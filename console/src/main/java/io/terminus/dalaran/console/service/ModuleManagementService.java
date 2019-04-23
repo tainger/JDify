@@ -11,11 +11,11 @@ import java.util.List;
  */
 public interface ModuleManagementService {
 
-    void createModule(ModuleModel moduleModel);
+    Long createModule(ModuleModel moduleModel);
 
     void deleteModule(Long moduleId);
 
-    void updateModule(ModuleModel moduleModel);
+    ModuleModel updateModule(ModuleModel moduleModel);
 
     List<ModuleModel> list();
 

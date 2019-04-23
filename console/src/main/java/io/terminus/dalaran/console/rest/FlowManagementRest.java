@@ -36,7 +36,7 @@ public class FlowManagementRest {
     private Gson gson = new Gson();
 
     @PutMapping
-    public void saveFlow(@RequestBody FlowModel flowModel) {
+    public Long saveFlow(@RequestBody FlowModel flowModel) {
         FlowEntity flowEntity = new FlowEntity();
 //        TriggerEntity triggerEntity = new TriggerEntity();
 
@@ -69,7 +69,7 @@ public class FlowManagementRest {
 //        triggerEntity.setType(flowModel.getTrigger().getType());
 //        triggerEntity.setConfig(gson.toJson(flowModel.getTrigger().getConfig()));
 
-        flowManagementService.saveFlow(flowEntity);
+        return flowManagementService.saveFlow(flowEntity);
     }
 
 //    @ApiOperation(value="流程发布", notes="后边应该会改动，目前的发布流程是trigger跟processors一起的")
@@ -87,14 +87,14 @@ public class FlowManagementRest {
 
     @ApiOperation(value = "创建工作流")
     @RequestMapping(value = "/create", method = RequestMethod.POST)
-    public void create(@RequestBody FlowModel model) {
-        flowManagementService.createFlow(model);
+    public Long create(@RequestBody FlowModel model) {
+        return flowManagementService.createFlow(model);
     }
 
     @ApiOperation(value = "更新工作流")
     @RequestMapping(value = "/update", method = RequestMethod.POST)
-    public void update(@RequestBody FlowModel model) {
-        flowManagementService.updateFlow(model);
+    public FlowModel update(@RequestBody FlowModel model) {
+        return flowManagementService.updateFlow(model);
     }
 
     @ApiOperation(value = "删除工作流")

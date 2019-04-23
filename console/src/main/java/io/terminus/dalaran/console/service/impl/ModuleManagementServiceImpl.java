@@ -40,8 +40,8 @@ public class ModuleManagementServiceImpl implements ModuleManagementService {
     private StructureManagementService structureManagementService;
 
     @Override
-    public void createModule(ModuleModel moduleModel) {
-        moduleRepository.save(buildEntity(moduleModel));
+    public Long createModule(ModuleModel moduleModel) {
+        return moduleRepository.save(buildEntity(moduleModel)).getId();
     }
 
     @Override
@@ -50,8 +50,9 @@ public class ModuleManagementServiceImpl implements ModuleManagementService {
     }
 
     @Override
-    public void updateModule(ModuleModel moduleModel) {
+    public ModuleModel updateModule(ModuleModel moduleModel) {
         moduleRepository.save(buildEntity(moduleModel));
+        return moduleModel;
     }
 
     @Override

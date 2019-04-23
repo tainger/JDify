@@ -107,8 +107,10 @@ public class DalaranLoader {
         trigger.setType(triggerEntity.getType());
         trigger.setConfig(config);
 
-        FlowEntity flowEntity = flowRepository.findOne(triggerEntity.getFlowId());
-        trigger.setFlow(buildDalaranFlow(flowEntity));
+        if (triggerEntity.getFlowId() != null) {
+            FlowEntity flowEntity = flowRepository.findOne(triggerEntity.getFlowId());
+            trigger.setFlow(buildDalaranFlow(flowEntity));
+        }
         return trigger;
     }
 

@@ -24,14 +24,14 @@ public class PropertyManagementRest {
 
     @ApiOperation(value = "创建环境变量")
     @RequestMapping(value = "/create", method = RequestMethod.POST)
-    public void create(@RequestBody PropertyModel model) {
-        propertyManagementService.createProperty(model);
+    public Long create(@RequestBody PropertyModel model) {
+        return propertyManagementService.createProperty(model);
     }
 
     @ApiOperation(value = "更新环境变量")
     @RequestMapping(value = "/update", method = RequestMethod.POST)
-    public void update(@RequestBody PropertyModel model) {
-        propertyManagementService.updateProperty(model);
+    public PropertyModel update(@RequestBody PropertyModel model) {
+        return propertyManagementService.updateProperty(model);
     }
 
     @ApiOperation(value = "删除环境变量")

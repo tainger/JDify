@@ -34,8 +34,8 @@ public class StructureManagementServiceImpl implements StructureManagementServic
     private ModuleRepository moduleRepository;
 
     @Override
-    public void createStructure(StructureModel structureModel) {
-        structureRepository.save(buildEntity(structureModel));
+    public Long createStructure(StructureModel structureModel) {
+        return structureRepository.save(buildEntity(structureModel)).getId();
     }
 
     @Override
@@ -44,8 +44,9 @@ public class StructureManagementServiceImpl implements StructureManagementServic
     }
 
     @Override
-    public void updateStructure(StructureModel structureModel) {
+    public StructureModel updateStructure(StructureModel structureModel) {
         structureRepository.save(buildEntity(structureModel));
+        return structureModel;
     }
 
     @Override

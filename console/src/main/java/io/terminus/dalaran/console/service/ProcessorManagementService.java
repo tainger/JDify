@@ -13,11 +13,11 @@ import java.util.List;
  */
 public interface ProcessorManagementService {
 
-    void createProcessor(ProcessorModel processorModel);
+    Long createProcessor(ProcessorModel processorModel);
 
     void deleteProcessor(Long processorId);
 
-    void updateProcessor(ProcessorModel processorModel);
+    ProcessorModel updateProcessor(ProcessorModel processorModel);
 
     List<ProcessorModel> queryProcessors(ProcessorQuery query);
 

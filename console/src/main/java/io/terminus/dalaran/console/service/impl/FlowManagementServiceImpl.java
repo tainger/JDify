@@ -71,18 +71,20 @@ public class FlowManagementServiceImpl implements FlowManagementService {
     }
 
     @Override
-    public void saveFlow(FlowEntity flowEntity) {
-        flowRepository.save(flowEntity);
+    public Long saveFlow(FlowEntity flowEntity) {
+        Long id = flowRepository.save(flowEntity).getId();
         // TODO 这里依赖 loader 有点怪 而且可以异步
         dalaranLoader.loadTestFlow(flowEntity);
+        return id;
     }
 
     @Override
-    public void createFlow(FlowModel flowModel) {
+    public Long createFlow(FlowModel flowModel) {
         FlowEntity flowEntity = buildEntity(flowModel);
-        flowRepository.save(flowEntity);
+        Long id = flowRepository.save(flowEntity).getId();
         // TODO 这里依赖 loader 有点怪 而且可以异步
         dalaranLoader.loadTestFlow(flowEntity);
+        return id;
     }
 
     @Override
@@ -91,11 +93,12 @@ public class FlowManagementServiceImpl implements FlowManagementService {
     }
 
     @Override
-    public void updateFlow(FlowModel flowModel) {
+    public FlowModel updateFlow(FlowModel flowModel) {
         FlowEntity flowEntity = buildEntity(flowModel);
         flowRepository.save(flowEntity);
         // TODO 这里依赖 loader 有点怪 而且可以异步
         dalaranLoader.loadTestFlow(flowEntity);
+        return flowModel;
     }
 
     @Override

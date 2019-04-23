@@ -46,8 +46,8 @@ public class TriggerManagementServiceImpl implements TriggerManagementService {
     private DalaranContext dalaranContext;
 
     @Override
-    public void createTrigger(TriggerModel triggerModel) {
-        triggerRepository.save(buildEntity(triggerModel));
+    public Long createTrigger(TriggerModel triggerModel) {
+        return triggerRepository.save(buildEntity(triggerModel)).getId();
     }
 
     @Override
@@ -56,8 +56,9 @@ public class TriggerManagementServiceImpl implements TriggerManagementService {
     }
 
     @Override
-    public void updateTrigger(TriggerModel triggerModel) {
+    public TriggerModel updateTrigger(TriggerModel triggerModel) {
         triggerRepository.save(buildEntity(triggerModel));
+        return triggerModel;
     }
 
     @Override

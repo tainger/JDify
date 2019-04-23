@@ -2,13 +2,20 @@ package io.terminus.dalaran.component.processor.mapper;
 
 import com.github.drapostolos.typeparser.TypeParser;
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import io.terminus.dalaran.component.processor.mapper.jxpath.DalaranJXPathFactory;
+import io.terminus.dalaran.component.processor.mapper.model.MapperConstants;
+import io.terminus.dalaran.component.processor.mapper.model.MappingField;
+import io.terminus.dalaran.component.processor.mapper.model.MappingFieldType;
 import io.terminus.dalaran.model.schema.structure.FieldType;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.commons.jxpath.JXPathContext;
+import org.apache.commons.lang.StringUtils;
 
+import java.lang.reflect.Type;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -19,14 +26,14 @@ public class DalaranMapperProcessor implements Processor {
     @Override
     public void process(Exchange exchange) throws Exception {
         Gson gson = new Gson();
-        Map<String, String> messageMapping = gson.fromJson(gson.toJson(exchange.getIn().getHeader("MessageMapping")), Map.class);
-        Map<String, String> destination = gson.fromJson(gson.toJson(exchange.getIn().getHeader("destination")), Map.class);
-        Map<String, Object> targetBody = (Map)(exchange.getIn().getBody());
-        Map<String, Object> destinationBody = convertWithJXPath(messageMapping, destination, targetBody);
+        Type type = new TypeToken<Map<String, MappingField>>(){}.getType();
+        Map<String, MappingField> messageMapping = gson.fromJson(gson.toJson(exchange.getIn().getHeader(MapperConstants.MESSAGE_MAPPING)), type);
+        Map<String, Object> targetBody = exchange.getIn().getBody(Map.class);
+        Object destinationBody = convert(messageMapping, targetBody);
         exchange.getOut().setBody(destinationBody);
     }
 
-    private Map<String, Object> convertWithJXPath(Map<String, String> messageMapping, Map<String, String> destination, Map<String, Object> targetBody) {
+    private Object convertWithJXPath(Map<String, String> messageMapping, Map<String, String> destination, Map<String, Object> targetBody) {
         JXPathContext targetContext = JXPathContext.newContext(targetBody);
 
         Map<String, Object> destinationBody = new HashMap<>();
@@ -36,9 +43,49 @@ public class DalaranMapperProcessor implements Processor {
         for (Map.Entry<String, String> entry: messageMapping.entrySet()) {
             Object target = targetContext.getValue(entry.getValue());
             destinationContext.createPathAndSetValue(entry.getKey(),
-                    parse(target, FieldType.valueOf(destination.get(entry.getKey()))));
+                    parse(target, FieldType.valueOf(destination.get(entry.getKey()).toUpperCase())));
         }
-        return ((Map<String, Object>)destinationContext.getContextBean());
+        return destinationContext.getContextBean();
+    }
+
+    private Object convert(Map<String, MappingField> messageMapping, Map<String, Object> targetBody) {
+        JXPathContext targetContext = JXPathContext.newContext(targetBody);
+        Map<String, Object> destinationBody = new HashMap<>();
+        JXPathContext destinationContext = JXPathContext.newContext(destinationBody);
+        destinationContext.setFactory(new DalaranJXPathFactory());
+        subConvert(destinationContext, targetContext, messageMapping, "");
+        return destinationContext.getContextBean();
+    }
+
+    private void subConvert(JXPathContext destinationContext, JXPathContext targetContext, Map<String, MappingField> mapping, String parentPath) {
+        for (Map.Entry<String, MappingField> entry : mapping.entrySet()) {
+            MappingField mappingField = entry.getValue();
+            FieldType type = mappingField.getType();
+
+            String path;
+            if (StringUtils.isNotBlank(parentPath)) {
+                path = parentPath + "/" + entry.getKey();
+            } else {
+                path = entry.getKey();
+            }
+            if (type == FieldType.ARRAY) {
+                List<Object> target = (List<Object>) targetContext.getValue(entry.getKey(), List.class);
+                for (Object ob : target) {
+                    JXPathContext subContext = JXPathContext.newContext(ob);
+                    subConvert(destinationContext, subContext, mappingField.getMapping(), path);
+                }
+            } else if (type == FieldType.OBJECT) {
+                subConvert(destinationContext, targetContext, mappingField.getMapping(), path);
+            } else {
+                Object target;
+                if (mappingField.getMappingType() == MappingFieldType.MAPPING) {
+                    target = targetContext.getValue(entry.getValue().getValue());
+                } else {
+                    target = mappingField.getValue();
+                }
+                destinationContext.createPathAndSetValue(path, parse(target, mappingField.getMappingFieldType()));
+            }
+        }
     }
 
     private Object parse(Object target, FieldType destination) {

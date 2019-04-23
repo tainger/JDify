@@ -38,14 +38,14 @@ public class StructureManagementRest {
 
     @ApiOperation(value = "创建数据模型")
     @RequestMapping(value = "/create", method = RequestMethod.POST)
-    public void create(@RequestBody StructureModel model) {
-        structureManagementService.createStructure(model);
+    public Long create(@RequestBody StructureModel model) {
+        return structureManagementService.createStructure(model);
     }
 
     @ApiOperation(value = "更新数据模型")
     @RequestMapping(value = "/update", method = RequestMethod.POST)
-    public void update(@RequestBody StructureModel model) {
-        structureManagementService.updateStructure(model);
+    public StructureModel update(@RequestBody StructureModel model) {
+        return structureManagementService.updateStructure(model);
     }
 
     @ApiOperation(value = "删除数据模型")

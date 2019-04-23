@@ -3,6 +3,7 @@ package io.terminus.dalaran.component.processor.mapper;
 import io.terminus.dalaran.BodyMode;
 import io.terminus.dalaran.DalaranProcessor;
 import io.terminus.dalaran.annotation.Processor;
+import io.terminus.dalaran.component.processor.mapper.model.MapperConstants;
 import org.apache.camel.builder.Builder;
 import org.apache.camel.model.ProcessorDefinition;
 
@@ -15,9 +16,7 @@ public class DalaranMessageMapper implements DalaranProcessor<DalaranMapperConfi
     @Override
     public void configure(ProcessorDefinition route, DalaranMapperConfig config) {
         DalaranMapperProcessor processor = new DalaranMapperProcessor();
-        route.setHeader("MessageMapping", Builder.constant(config.getMessageMapping()));
-        route.setHeader("target", Builder.constant(config.getTarget()));
-        route.setHeader("destination", Builder.constant(config.getDestination()));
+        route.setHeader(MapperConstants.MESSAGE_MAPPING, Builder.constant(config.getMessageMapping()));
         route.process(processor);
     }
 }

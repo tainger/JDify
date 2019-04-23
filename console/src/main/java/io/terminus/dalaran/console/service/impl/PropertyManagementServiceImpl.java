@@ -27,13 +27,14 @@ public class PropertyManagementServiceImpl implements PropertyManagementService 
     private PropertyQueryService propertyQueryService;
 
     @Override
-    public void createProperty(PropertyModel propertyModel) {
-        propertyRepository.save(buildEntity(propertyModel));
+    public Long createProperty(PropertyModel propertyModel) {
+        return propertyRepository.save(buildEntity(propertyModel)).getId();
     }
 
     @Override
-    public void updateProperty(PropertyModel propertyModel) {
+    public PropertyModel updateProperty(PropertyModel propertyModel) {
         propertyRepository.save(buildEntity(propertyModel));
+        return propertyModel;
     }
 
     @Override

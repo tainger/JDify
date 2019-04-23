@@ -33,14 +33,14 @@ public class TriggerManagementRest {
 
     @ApiOperation(value = "创建触发器")
     @RequestMapping(value = "/create", method = RequestMethod.POST)
-    public void create(@RequestBody TriggerModel model) {
-        triggerManagementService.createTrigger(model);
+    public Long create(@RequestBody TriggerModel model) {
+        return triggerManagementService.createTrigger(model);
     }
 
     @ApiOperation(value = "更新触发器")
     @RequestMapping(value = "/update", method = RequestMethod.POST)
-    public void update(@RequestBody TriggerModel model) {
-        triggerManagementService.updateTrigger(model);
+    public TriggerModel update(@RequestBody TriggerModel model) {
+        return triggerManagementService.updateTrigger(model);
     }
 
     @ApiOperation(value = "删除触发器")
