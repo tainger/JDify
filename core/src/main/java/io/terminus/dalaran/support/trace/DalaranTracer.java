@@ -10,10 +10,8 @@ import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.Traceable;
 import org.apache.camel.model.RouteDefinition;
-import org.apache.camel.util.MessageHelper;
 
 import java.io.Serializable;
-import java.util.Collection;
 import java.util.Map;
 
 import static io.terminus.dalaran.DalaranConstants.*;
