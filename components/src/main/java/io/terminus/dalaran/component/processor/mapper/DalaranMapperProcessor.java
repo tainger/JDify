@@ -14,6 +14,7 @@ import org.apache.commons.jxpath.JXPathContext;
 import org.apache.commons.lang.StringUtils;
 
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -62,18 +63,26 @@ public class DalaranMapperProcessor implements Processor {
             MappingField mappingField = entry.getValue();
             FieldType type = mappingField.getType();
 
-            String path;
-            if (StringUtils.isNotBlank(parentPath)) {
-                path = parentPath + "/" + entry.getKey();
-            } else {
+            String path = entry.getKey();
+            if (parentPath.equalsIgnoreCase( "root")) {
                 path = entry.getKey();
+            } else if (StringUtils.isNotBlank(parentPath)) {
+                path = parentPath + "/" + entry.getKey();
             }
+
             if (type == FieldType.ARRAY) {
                 List<Object> target = (List<Object>) targetContext.getValue(entry.getKey(), List.class);
+                List<Object> subList = new ArrayList<>();
                 for (Object ob : target) {
                     JXPathContext subContext = JXPathContext.newContext(ob);
-                    subConvert(destinationContext, subContext, mappingField.getMapping(), path);
+
+                    Map<String, Object> subBody = new HashMap<>();
+                    JXPathContext subDestinationContext = JXPathContext.newContext(subBody);
+                    subDestinationContext.setFactory(new DalaranJXPathFactory());
+                    subConvert(subDestinationContext, subContext, mappingField.getMapping(), path);
+                    subList.add(subDestinationContext.getContextBean());
                 }
+                destinationContext.createPathAndSetValue(path, subList);
             } else if (type == FieldType.OBJECT) {
                 subConvert(destinationContext, targetContext, mappingField.getMapping(), path);
             } else {

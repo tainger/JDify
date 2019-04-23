@@ -4,13 +4,12 @@ import io.terminus.dalaran.console.model.query.FlowQuery;
 import io.terminus.dalaran.console.model.query.rst.ComponentInfo;
 import io.terminus.dalaran.console.service.jpa.FlowQueryService;
 import io.terminus.dalaran.entity.FlowEntity;
-import io.terminus.dalaran.repository.specification.FlowQueryRepository;
+import io.terminus.dalaran.repository.FlowRepository;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-
 import javax.persistence.EntityManager;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -26,7 +25,7 @@ import java.util.List;
 public class FlowQueryServiceImpl implements FlowQueryService {
 
     @Autowired
-    private FlowQueryRepository flowQueryRepository;
+    private FlowRepository flowQueryRepository;
 
     @Autowired
     private EntityManager entityManager;

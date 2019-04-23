@@ -3,13 +3,12 @@ package io.terminus.dalaran.console.service.jpa.impl;
 import io.terminus.dalaran.console.model.query.ModuleQuery;
 import io.terminus.dalaran.console.service.jpa.ModuleQueryService;
 import io.terminus.dalaran.entity.ModuleEntity;
-import io.terminus.dalaran.repository.specification.ModuleQueryRepository;
+import io.terminus.dalaran.repository.ModuleRepository;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-
 import javax.persistence.criteria.Predicate;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +20,7 @@ import java.util.List;
 public class ModuleQueryServiceImpl implements ModuleQueryService {
 
     @Autowired
-    private ModuleQueryRepository moduleQueryRepository;
+    private ModuleRepository moduleQueryRepository;
 
     @Override
     public List<ModuleEntity> query(ModuleQuery query) {

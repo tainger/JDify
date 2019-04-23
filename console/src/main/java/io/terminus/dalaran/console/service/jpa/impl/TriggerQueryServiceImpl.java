@@ -5,13 +5,12 @@ import io.terminus.dalaran.console.model.query.rst.ComponentInfo;
 import io.terminus.dalaran.console.model.query.rst.ComponentType;
 import io.terminus.dalaran.console.service.jpa.TriggerQueryService;
 import io.terminus.dalaran.entity.TriggerEntity;
-import io.terminus.dalaran.repository.specification.TriggerQueryRepository;
+import io.terminus.dalaran.repository.TriggerRepository;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-
 import javax.persistence.EntityManager;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -30,7 +29,7 @@ public class TriggerQueryServiceImpl implements TriggerQueryService {
     private EntityManager entityManager;
 
     @Autowired
-    private TriggerQueryRepository triggerQueryRepository;
+    private TriggerRepository triggerQueryRepository;
 
     @Override
     public List<TriggerEntity> query(TriggerQuery query) {

@@ -6,13 +6,12 @@ import io.terminus.dalaran.console.model.query.rst.ComponentInfo;
 import io.terminus.dalaran.console.model.query.rst.type.StructureType;
 import io.terminus.dalaran.console.service.jpa.StructQueryService;
 import io.terminus.dalaran.entity.StructureEntity;
-import io.terminus.dalaran.repository.specification.StructureQueryRepository;
+import io.terminus.dalaran.repository.StructureRepository;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-
 import javax.persistence.EntityManager;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -28,7 +27,7 @@ import java.util.List;
 public class StructQueryServiceImpl implements StructQueryService {
 
     @Autowired
-    private StructureQueryRepository structureQueryRepository;
+    private StructureRepository structureQueryRepository;
 
     @Autowired
     private EntityManager entityManager;
