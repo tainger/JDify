@@ -86,7 +86,7 @@ public class BasicFlowTest {
 
         InputStream input = new ByteArrayInputStream(body.getBytes());
 
-        byte[] result = (byte[]) dalaranContext.testFlow(1L, input);
+        byte[] result = (byte[]) dalaranContext.testFlow(1L, input, "TEST_RECORD_ID");
         String json = new String(result);
 
         Map data = gson.fromJson(json, Map.class);

@@ -1,6 +1,6 @@
 package io.terminus.dalaran.entity;
 
-import io.terminus.dalaran.support.jpa.ListToJsonConverter;
+import io.terminus.dalaran.converter.ListToJsonConverter;
 import lombok.Data;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
@@ -26,12 +26,6 @@ public class FlowEntity {
     private String status;
 
     private String description;
-
-    private Boolean retryable;
-
-    private Integer maxRetry;
-
-    private Integer retryDelay;
 
 //    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "module_id")

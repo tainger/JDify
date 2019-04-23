@@ -1,4 +1,4 @@
-package io.terminus.dalaran.support.jpa;
+package io.terminus.dalaran.converter;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
