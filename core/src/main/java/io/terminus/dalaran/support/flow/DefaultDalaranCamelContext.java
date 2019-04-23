@@ -10,9 +10,10 @@ import io.terminus.dalaran.support.trace.DalaranTracer;
 import io.terminus.dalaran.support.trace.TracingErrorHandlerFactory;
 import lombok.val;
 import org.apache.camel.CamelContext;
-import org.apache.camel.ProducerTemplate;
+import org.apache.camel.ExchangePattern;
 import org.apache.camel.builder.Builder;
 import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.impl.DefaultProducerTemplate;
 import org.apache.camel.model.RouteDefinition;
 
 import java.util.List;
@@ -91,7 +92,7 @@ public class DefaultDalaranCamelContext implements DalaranContext {
             val processorComponent = componentContext.getProcessor(processor.getType());
             // TODO check
             val processorInfo = componentContext.getProcessorInfo(processor.getType());
-            val tracer = new DalaranTracer(traceLogger, dalaranFlow.getTriggerId(), dalaranFlow.getId(), processor.getId());
+            val tracer = DalaranTracer.buildFlowTracer(traceLogger, dalaranFlow.getTriggerId(), dalaranFlow.getId(), processor.getId());
 
 
             if (processor.getInModel() != null && currentMessageModel != processor.getInModel()) {
@@ -159,12 +160,13 @@ public class DefaultDalaranCamelContext implements DalaranContext {
 
         val triggerComponent = componentContext.getTrigger(trigger.getType());
         val triggerInfo = componentContext.getTriggerInfo(trigger.getType());
-        val tracer = new DalaranTracer(traceLogger, trigger.getId());
+        val tracer = DalaranTracer.buildTriggerTracer(traceLogger, trigger.getId());
 
         val route = new RouteDefinition();
         route.errorHandler(errorHandlerFactory);
         route.setId(TRIGGER_PREFIX + trigger.getId());
         triggerComponent.buildFromRoute(route, trigger.getConfig());
+        tracer.before(route, trigger.getInModel().getModelType());
         // TODO 这里要判断的是流和触发器的 body 类型
         val flow = trigger.getFlow();
         val processors = flow.getProcessors();
@@ -185,7 +187,6 @@ public class DefaultDalaranCamelContext implements DalaranContext {
                 converterContext.unmarshal(route, trigger.getInModel());
             }
         }
-        tracer.before(route, trigger.getInModel().getModelType());
 
         route.to(FLOW_CAMEL_URI_PREFIX + trigger.getFlow().getId());
 
@@ -221,13 +222,14 @@ public class DefaultDalaranCamelContext implements DalaranContext {
             e.printStackTrace();
         }
 
-        val tracer = new DalaranTracer(traceLogger, dalaranFlow.getId());
+        val tracer = DalaranTracer.buildTestFlowTracer(traceLogger, dalaranFlow.getId());
 
         val route = new RouteDefinition();
         route.errorHandler(errorHandlerFactory);
         route.setProperty(TEST_FLOW, Builder.constant(Boolean.TRUE));
         route.setId(routeId);
         route.from(TEST_FLOW_CAMEL_URI_PREFIX + dalaranFlow.getId());
+        tracer.before(route, dalaranFlow.getInModel().getModelType());
         // TODO 这里要判断的是流和触发器的 body 类型, 默认测试进来一定是 Serialized
         if (!dalaranFlow.getProcessors().isEmpty()) {
             ProcessorModel firstProcessor = dalaranFlow.getProcessors().get(0);
@@ -237,8 +239,6 @@ public class DefaultDalaranCamelContext implements DalaranContext {
             }
         }
         // TODO flow in model check null
-
-        tracer.before(route, dalaranFlow.getInModel().getModelType());
         route.to(FLOW_CAMEL_URI_PREFIX + dalaranFlow.getId());
         if (!dalaranFlow.getProcessors().isEmpty()) {
             ProcessorModel lastProcessor = dalaranFlow.getProcessors().get(dalaranFlow.getProcessors().size() - 1);
@@ -265,12 +265,9 @@ public class DefaultDalaranCamelContext implements DalaranContext {
 
     // TODO 这里要处理数据的序列化等问题
     @Override
-    public Object testFlow(Long id, Object body) {
-        ProducerTemplate template = camelContext.createProducerTemplate();
-//        template.sendBody(, body);
-        template.setDefaultEndpointUri(TEST_FLOW_CAMEL_URI_PREFIX + id);
-
-        return template.requestBody(body);
+    public Object testFlow(Long flowId, Object body, String recordId) {
+        DefaultProducerTemplate template = (DefaultProducerTemplate) camelContext.createProducerTemplate();
+        return template.sendBodyAndProperty(TEST_FLOW_CAMEL_URI_PREFIX + flowId, ExchangePattern.InOut, body, TEST_FLOW_RECORD_ID_HEADER, recordId);
     }
 
     @Override

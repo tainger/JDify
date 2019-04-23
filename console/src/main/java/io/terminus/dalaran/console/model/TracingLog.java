@@ -7,7 +7,6 @@ import java.util.Date;
 
 @Data
 public class TracingLog {
-
     private Long id;
 
     private String recordId;
@@ -19,6 +18,8 @@ public class TracingLog {
     private Long processorId;
 
     private String processorName;
+
+    private boolean successful;
 
     private Date timestamp;
 

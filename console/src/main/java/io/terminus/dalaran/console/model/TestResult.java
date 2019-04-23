@@ -12,6 +12,6 @@ public class TestResult {
 
     private boolean successful;
 
-    private Long logId;
+    private String logRecordId;
 
 }

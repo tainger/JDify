@@ -1,12 +1,19 @@
-package io.terminus.dalaran.model;
+package io.terminus.dalaran.entity;
 
 import io.terminus.dalaran.BodyModelType;
 import io.terminus.dalaran.TracingType;
 import lombok.Data;
 
-// TODO 应该跟 jpa 无关
+import javax.persistence.*;
+
 @Data
-public class DalaranTracingLog {
+@Entity
+@Table(name = "dalaran_tracing_log")
+public class TracingLogEntity {
+    @Id
+    @GeneratedValue
+    private Long id;
+
     private Long triggerId;
 
     private Long flowId;
@@ -19,17 +26,22 @@ public class DalaranTracingLog {
 
     private String recordId;
 
-    private boolean successful;
+    @Column(nullable = false)
+    private Boolean successful;
 
+    @Column(nullable = false)
     private boolean main;
 
+    @Enumerated(EnumType.STRING)
     private TracingType tracingType;
 
     private String inputBody;
 
+    @Enumerated(EnumType.STRING)
     private BodyModelType inputBodyType;
 
     private String outputBody;
 
+    @Enumerated(EnumType.STRING)
     private BodyModelType outputBodyType;
 }

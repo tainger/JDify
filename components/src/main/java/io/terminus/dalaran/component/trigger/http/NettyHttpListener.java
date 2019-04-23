@@ -14,5 +14,6 @@ public class NettyHttpListener implements DalaranTrigger<NettyHttpConfig> {
                 "://0.0.0.0:" + config.getPort() + config.getPath() +
                 "?httpMethodRestrict=" + config.getMethod();
         route.from(uri);
+        route.convertBodyTo(String.class);
     }
 }
