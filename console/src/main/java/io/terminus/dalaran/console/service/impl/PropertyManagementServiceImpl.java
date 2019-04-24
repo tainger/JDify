@@ -87,7 +87,6 @@ public class PropertyManagementServiceImpl implements PropertyManagementService 
         }
         propertyEntity.setValue(model.getValue());
         propertyEntity.setDescription(model.getDescription());
-        propertyEntity.setUpdatedAt(new Date());
         return propertyEntity;
     }
 }

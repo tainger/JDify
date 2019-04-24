@@ -105,7 +105,6 @@ public class ModuleManagementServiceImpl implements ModuleManagementService {
         }
         moduleEntity.setDependencies(model.getDependencies());
         moduleEntity.setDescription(model.getDescription());
-        moduleEntity.setUpdatedAt(new Date());
         return moduleEntity;
     }
 

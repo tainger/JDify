@@ -132,7 +132,6 @@ public class TriggerManagementServiceImpl implements TriggerManagementService {
         triggerEntity.setConfig(JSON.toJSONString(model.getConfig()));
         triggerEntity.setDescription(model.getDescription());
         triggerEntity.setType(model.getType());
-        triggerEntity.setUpdatedAt(new Date());
 
         return triggerEntity;
     }

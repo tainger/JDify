@@ -106,7 +106,6 @@ public class StructureManagementServiceImpl implements StructureManagementServic
         structureEntity.setType(model.getStructureType());
         structureEntity.setDescription(model.getDescription());
         structureEntity.setModuleId(model.getModuleId());
-        structureEntity.setUpdatedAt(new Date());
         return structureEntity;
     }
 

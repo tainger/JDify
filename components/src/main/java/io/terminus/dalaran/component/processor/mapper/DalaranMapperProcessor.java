@@ -1,8 +1,6 @@
 package io.terminus.dalaran.component.processor.mapper;
 
 import com.github.drapostolos.typeparser.TypeParser;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import io.terminus.dalaran.component.processor.mapper.jxpath.DalaranJXPathFactory;
 import io.terminus.dalaran.component.processor.mapper.model.MapperConstants;
 import io.terminus.dalaran.component.processor.mapper.model.MappingField;
@@ -12,9 +10,7 @@ import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.commons.jxpath.JXPathContext;
 import org.apache.commons.lang.StringUtils;
-
 import java.lang.reflect.Field;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -27,9 +23,7 @@ public class DalaranMapperProcessor implements Processor {
 
     @Override
     public void process(Exchange exchange) throws Exception {
-        Gson gson = new Gson();
-        Type type = new TypeToken<Map<String, MappingField>>(){}.getType();
-        Map<String, MappingField> messageMapping = gson.fromJson(gson.toJson(exchange.getIn().getHeader(MapperConstants.MESSAGE_MAPPING)), type);
+        Map<String, MappingField> messageMapping = exchange.getIn().getHeader(MapperConstants.MESSAGE_MAPPING, Map.class);
         Object targetBody = exchange.getIn().getBody();
         Object destinationBody = convert(messageMapping, targetBody);
         exchange.getOut().setBody(destinationBody);
@@ -113,7 +107,7 @@ public class DalaranMapperProcessor implements Processor {
             } else {
                 Object target;
                 if (mappingField.getMappingType() == MappingFieldType.MAPPING) {
-                    target = targetContext.getValue(entry.getValue().getValue());
+                    target = targetContext.getValue(mappingField.getValue());
                 } else {
                     target = mappingField.getValue();
                 }

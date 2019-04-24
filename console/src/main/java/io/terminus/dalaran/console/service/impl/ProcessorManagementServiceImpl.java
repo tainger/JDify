@@ -134,7 +134,6 @@ public class ProcessorManagementServiceImpl implements ProcessorManagementServic
         processorEntity.setType(model.getType());
         processorEntity.setDescription(model.getDescription());
         processorEntity.setConfig(JSON.toJSONString(model.getConfig()));
-        processorEntity.setUpdatedAt(new Date());
         return processorEntity;
     }
 
