@@ -16,7 +16,7 @@ import java.util.List;
  * Created by jingdi on 2019/4/17
  */
 @RestController
-@RequestMapping("/property")
+@RequestMapping("/api/property")
 public class PropertyManagementRest {
 
     @Autowired

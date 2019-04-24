@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/flow")
+@RequestMapping("/api/flow")
 public class FlowManagementRest {
 
     // TODO for test

@@ -16,7 +16,7 @@ import java.util.List;
  * Created by jingdi on 2019/4/1
  */
 @RestController
-@RequestMapping("/trigger")
+@RequestMapping("/api/trigger")
 public class TriggerManagementRest {
 
     @Autowired

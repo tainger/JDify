@@ -21,7 +21,7 @@ import java.util.Map;
  * Created by jingdi on 2019/4/1
  */
 @RestController
-@RequestMapping("/structure")
+@RequestMapping("/api/structure")
 public class StructureManagementRest {
 
     @Autowired
