@@ -108,7 +108,12 @@ public class TracingLogServiceImpl implements TracingLogService {
                 mainLog.setTriggerName(triggerEntity.getName());
             }
         }
-
+        if (log.getFlowId() != null) {
+            FlowEntity flowEntity = flowRepository.findOne(log.getFlowId());
+            if (flowEntity != null) {
+                mainLog.setFlowName(flowEntity.getName());
+            }
+        }
         return mainLog;
     }
 

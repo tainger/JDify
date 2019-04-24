@@ -173,7 +173,7 @@ public class DefaultDalaranCamelContext implements DalaranContext {
 
         val triggerComponent = componentContext.getTrigger(trigger.getType());
         val triggerInfo = componentContext.getTriggerInfo(trigger.getType());
-        val tracer = DalaranTracer.buildTriggerTracer(traceLogger, trigger.getId());
+        val tracer = DalaranTracer.buildTriggerTracer(traceLogger, trigger.getId(), trigger.getFlow().getId());
 
         val route = new RouteDefinition();
         route.errorHandler(errorHandlerFactory);
