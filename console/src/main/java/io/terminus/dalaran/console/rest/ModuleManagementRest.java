@@ -14,7 +14,7 @@ import java.util.List;
  * Created by jingdi on 2019/4/1
  */
 @RestController
-@RequestMapping("dalaran_management/module")
+@RequestMapping("/module")
 public class ModuleManagementRest {
     @Autowired
     private ModuleManagementService moduleManagementService;

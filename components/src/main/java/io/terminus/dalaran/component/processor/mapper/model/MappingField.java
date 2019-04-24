@@ -13,6 +13,8 @@ public class MappingField {
 
     private FieldType type;
 
+    private FieldType subType;
+
     private MappingFieldType mappingType;
 
     private String value;

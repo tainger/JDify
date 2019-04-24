@@ -64,6 +64,7 @@ public class DalaranMapperProcessor implements Processor {
         for (Map.Entry<String, MappingField> entry : mapping.entrySet()) {
             MappingField mappingField = entry.getValue();
             FieldType type = mappingField.getType();
+            FieldType subType = mappingField.getSubType();
 
             String path = entry.getKey();
             if (parentPath.equalsIgnoreCase( MapperConstants.MODEL_ROOT)) {
@@ -73,34 +74,39 @@ public class DalaranMapperProcessor implements Processor {
             }
 
             if (type == FieldType.ARRAY) {
-                List<Object> target;
-                if (path.equalsIgnoreCase(MapperConstants.MODEL_ROOT)) {
-                    target = (List<Object>) targetContext.getContextBean();
-                } else {
-                    target = (List<Object>) targetContext.getValue(entry.getKey(), List.class);
-                }
-
-                List<Object> subList = new ArrayList<>();
-                for (Object ob : target) {
-                    JXPathContext subContext = JXPathContext.newContext(ob);
-
-                    Map<String, Object> subBody = new HashMap<>();
-                    JXPathContext subDestinationContext = JXPathContext.newContext(subBody);
-                    subDestinationContext.setFactory(new DalaranJXPathFactory());
-                    subConvert(subDestinationContext, subContext, mappingField.getMapping(), path, flag);
-                    subList.add(subDestinationContext.getContextBean());
-                }
-
-                destinationContext.createPathAndSetValue(path, subList);
-
-                if (path.equalsIgnoreCase(MapperConstants.MODEL_ROOT)) {
-                    try {
-                        Field field= flag.getClass().getDeclaredField("value");
-                        field.setAccessible(true);
-                        field.set(flag, true);
-                    } catch (Exception e) {
-                        e.printStackTrace();
+                if (subType == FieldType.OBJECT) {
+                    List<Object> target;
+                    if (path.equalsIgnoreCase(MapperConstants.MODEL_ROOT)) {
+                        target = (List<Object>) targetContext.getContextBean();
+                    } else {
+                        target = (List<Object>) targetContext.getValue(entry.getKey(), List.class);
                     }
+
+                    List<Object> subList = new ArrayList<>();
+                    for (Object ob : target) {
+                        JXPathContext subContext = JXPathContext.newContext(ob);
+
+                        Map<String, Object> subBody = new HashMap<>();
+                        JXPathContext subDestinationContext = JXPathContext.newContext(subBody);
+                        subDestinationContext.setFactory(new DalaranJXPathFactory());
+                        subConvert(subDestinationContext, subContext, mappingField.getMapping(), path, flag);
+                        subList.add(subDestinationContext.getContextBean());
+                    }
+
+                    destinationContext.createPathAndSetValue(path, subList);
+
+                    if (path.equalsIgnoreCase(MapperConstants.MODEL_ROOT)) {
+                        try {
+                            Field field= flag.getClass().getDeclaredField("value");
+                            field.setAccessible(true);
+                            field.set(flag, true);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                } else {
+                    List<Object> target = (List<Object>) targetContext.getValue(entry.getValue().getValue(), List.class);
+                    destinationContext.createPathAndSetValue(path, target);
                 }
             } else if (type == FieldType.OBJECT) {
                 subConvert(destinationContext, targetContext, mappingField.getMapping(), path, flag);
