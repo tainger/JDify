@@ -13,7 +13,7 @@ public class XMLConverter implements DalaranConverter<XMLSchema> {
     @Override
     public void toObject(ProcessorDefinition route, XMLSchema schema) {
         route.marshal().xmljson(buildOptions(schema));
-        route.unmarshal().json(JsonLibrary.Gson, Map.class);
+        route.unmarshal().json(JsonLibrary.Gson);
     }
 
     @Override

@@ -11,7 +11,7 @@ public class JsonConverter implements DalaranConverter<JsonSchema> {
 
     @Override
     public void toObject(ProcessorDefinition route, JsonSchema schema) {
-        route.unmarshal().json(JsonLibrary.Gson, Map.class);
+        route.unmarshal().json(JsonLibrary.Gson);
     }
 
     @Override
