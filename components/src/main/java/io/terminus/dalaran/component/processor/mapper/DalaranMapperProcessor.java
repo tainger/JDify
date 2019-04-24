@@ -13,6 +13,7 @@ import org.apache.camel.Processor;
 import org.apache.commons.jxpath.JXPathContext;
 import org.apache.commons.lang.StringUtils;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,7 +30,7 @@ public class DalaranMapperProcessor implements Processor {
         Gson gson = new Gson();
         Type type = new TypeToken<Map<String, MappingField>>(){}.getType();
         Map<String, MappingField> messageMapping = gson.fromJson(gson.toJson(exchange.getIn().getHeader(MapperConstants.MESSAGE_MAPPING)), type);
-        Map<String, Object> targetBody = exchange.getIn().getBody(Map.class);
+        Object targetBody = exchange.getIn().getBody();
         Object destinationBody = convert(messageMapping, targetBody);
         exchange.getOut().setBody(destinationBody);
     }
@@ -37,7 +38,7 @@ public class DalaranMapperProcessor implements Processor {
     private Object convertWithJXPath(Map<String, String> messageMapping, Map<String, String> destination, Map<String, Object> targetBody) {
         JXPathContext targetContext = JXPathContext.newContext(targetBody);
 
-        Map<String, Object> destinationBody = new HashMap<>();
+        Object destinationBody = new Object();
         JXPathContext destinationContext = JXPathContext.newContext(destinationBody);
         destinationContext.setFactory(new DalaranJXPathFactory());
 
@@ -49,29 +50,36 @@ public class DalaranMapperProcessor implements Processor {
         return destinationContext.getContextBean();
     }
 
-    private Object convert(Map<String, MappingField> messageMapping, Map<String, Object> targetBody) {
+    private Object convert(Map<String, MappingField> messageMapping, Object targetBody) {
         JXPathContext targetContext = JXPathContext.newContext(targetBody);
         Map<String, Object> destinationBody = new HashMap<>();
         JXPathContext destinationContext = JXPathContext.newContext(destinationBody);
         destinationContext.setFactory(new DalaranJXPathFactory());
-        subConvert(destinationContext, targetContext, messageMapping, "");
-        return destinationContext.getContextBean();
+        Boolean flag = false;
+        subConvert(destinationContext, targetContext, messageMapping, "", flag);
+        return handleContext(destinationContext, flag);
     }
 
-    private void subConvert(JXPathContext destinationContext, JXPathContext targetContext, Map<String, MappingField> mapping, String parentPath) {
+    private void subConvert(JXPathContext destinationContext, JXPathContext targetContext, Map<String, MappingField> mapping, String parentPath, Boolean flag) {
         for (Map.Entry<String, MappingField> entry : mapping.entrySet()) {
             MappingField mappingField = entry.getValue();
             FieldType type = mappingField.getType();
 
             String path = entry.getKey();
-            if (parentPath.equalsIgnoreCase( "root")) {
+            if (parentPath.equalsIgnoreCase( MapperConstants.MODEL_ROOT)) {
                 path = entry.getKey();
             } else if (StringUtils.isNotBlank(parentPath)) {
                 path = parentPath + "/" + entry.getKey();
             }
 
             if (type == FieldType.ARRAY) {
-                List<Object> target = (List<Object>) targetContext.getValue(entry.getKey(), List.class);
+                List<Object> target;
+                if (path.equalsIgnoreCase(MapperConstants.MODEL_ROOT)) {
+                    target = (List<Object>) targetContext.getContextBean();
+                } else {
+                    target = (List<Object>) targetContext.getValue(entry.getKey(), List.class);
+                }
+
                 List<Object> subList = new ArrayList<>();
                 for (Object ob : target) {
                     JXPathContext subContext = JXPathContext.newContext(ob);
@@ -79,12 +87,23 @@ public class DalaranMapperProcessor implements Processor {
                     Map<String, Object> subBody = new HashMap<>();
                     JXPathContext subDestinationContext = JXPathContext.newContext(subBody);
                     subDestinationContext.setFactory(new DalaranJXPathFactory());
-                    subConvert(subDestinationContext, subContext, mappingField.getMapping(), path);
+                    subConvert(subDestinationContext, subContext, mappingField.getMapping(), path, flag);
                     subList.add(subDestinationContext.getContextBean());
                 }
+
                 destinationContext.createPathAndSetValue(path, subList);
+
+                if (path.equalsIgnoreCase(MapperConstants.MODEL_ROOT)) {
+                    try {
+                        Field field= flag.getClass().getDeclaredField("value");
+                        field.setAccessible(true);
+                        field.set(flag, true);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
             } else if (type == FieldType.OBJECT) {
-                subConvert(destinationContext, targetContext, mappingField.getMapping(), path);
+                subConvert(destinationContext, targetContext, mappingField.getMapping(), path, flag);
             } else {
                 Object target;
                 if (mappingField.getMappingType() == MappingFieldType.MAPPING) {
@@ -95,6 +114,14 @@ public class DalaranMapperProcessor implements Processor {
                 destinationContext.createPathAndSetValue(path, parse(target, mappingField.getMappingFieldType()));
             }
         }
+    }
+
+    private Object handleContext(JXPathContext context, Boolean flag) {
+        if (flag) {
+            Map<String, Object> body = (Map<String, Object>)context.getContextBean();
+            return body.get(MapperConstants.MODEL_ROOT);
+        }
+        return context.getContextBean();
     }
 
     private Object parse(Object target, FieldType destination) {
