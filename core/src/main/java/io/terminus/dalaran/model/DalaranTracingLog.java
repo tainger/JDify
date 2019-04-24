@@ -4,7 +4,6 @@ import io.terminus.dalaran.BodyModelType;
 import io.terminus.dalaran.TracingType;
 import lombok.Data;
 
-// TODO 应该跟 jpa 无关
 @Data
 public class DalaranTracingLog {
     private Long triggerId;

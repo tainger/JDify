@@ -31,4 +31,8 @@ public class TracingMainLog {
     private Long triggerId;
 
     private String triggerName;
+
+    private Long flowId;
+
+    private String flowName;
 }

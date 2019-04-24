@@ -44,8 +44,8 @@ public class DalaranTracer {
     }
 
 
-    public static DalaranTracer buildTriggerTracer(DalaranTraceLogger logger, Long triggerId) {
-        return new DalaranTracer(logger, TracingType.Trigger, triggerId, null, null);
+    public static DalaranTracer buildTriggerTracer(DalaranTraceLogger logger, Long triggerId, Long flowId) {
+        return new DalaranTracer(logger, TracingType.Trigger, triggerId, flowId, null);
     }
 
     public static DalaranTracer buildTestFlowTracer(DalaranTraceLogger logger, Long flowId) {
