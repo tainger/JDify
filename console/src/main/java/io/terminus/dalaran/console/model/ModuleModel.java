@@ -1,6 +1,7 @@
 package io.terminus.dalaran.console.model;
 
 import lombok.Data;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -9,6 +10,8 @@ import java.util.List;
  */
 @Data
 public class ModuleModel {
+
+    @Nullable
     private Long id;
 
     private String name;

@@ -11,11 +11,11 @@ import java.util.List;
  */
 public interface StructureManagementService {
 
-    void createStructure(StructureModel structureModel);
+    Long createStructure(StructureModel structureModel);
 
     void deleteStructure(Long structureId);
 
-    void updateStructure(StructureModel structureModel);
+    StructureModel updateStructure(StructureModel structureModel);
 
     List<StructureModel> queryStructures(StructureQuery query);
 

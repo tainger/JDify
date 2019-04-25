@@ -14,7 +14,7 @@ import java.util.List;
  * Created by jingdi on 2019/4/1
  */
 @RestController
-@RequestMapping("dalaran_management/module")
+@RequestMapping("/api/module")
 public class ModuleManagementRest {
     @Autowired
     private ModuleManagementService moduleManagementService;
@@ -27,14 +27,14 @@ public class ModuleManagementRest {
 
     @ApiOperation(value = "创建模块")
     @RequestMapping(value = "/create", method = RequestMethod.POST)
-    public void create(@RequestBody ModuleModel model) {
-        moduleManagementService.createModule(model);
+    public Long create(@RequestBody ModuleModel model) {
+        return moduleManagementService.createModule(model);
     }
 
     @ApiOperation(value = "更新模块")
     @RequestMapping(value = "/update", method = RequestMethod.POST)
-    public void update(@RequestBody ModuleModel model) {
-        moduleManagementService.updateModule(model);
+    public ModuleModel update(@RequestBody ModuleModel model) {
+        return moduleManagementService.updateModule(model);
     }
 
     @ApiOperation(value = "删除模块")

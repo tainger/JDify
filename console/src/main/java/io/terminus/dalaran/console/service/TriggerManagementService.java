@@ -13,11 +13,11 @@ import java.util.List;
  */
 public interface TriggerManagementService {
 
-    void createTrigger(TriggerModel triggerModel);
+    Long createTrigger(TriggerModel triggerModel);
 
     void deleteTrigger(Long triggerId);
 
-    void updateTrigger(TriggerModel triggerModel);
+    TriggerModel updateTrigger(TriggerModel triggerModel);
 
     List<TriggerModel> queryTriggers(TriggerQuery query);
 

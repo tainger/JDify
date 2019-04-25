@@ -17,6 +17,8 @@ import io.terminus.dalaran.entity.FlowEntity;
 import io.terminus.dalaran.entity.ProcessorEntity;
 import io.terminus.dalaran.entity.StructureEntity;
 import io.terminus.dalaran.repository.*;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -69,18 +71,20 @@ public class FlowManagementServiceImpl implements FlowManagementService {
     }
 
     @Override
-    public void saveFlow(FlowEntity flowEntity) {
-        flowRepository.save(flowEntity);
+    public Long saveFlow(FlowEntity flowEntity) {
+        Long id = flowRepository.save(flowEntity).getId();
         // TODO 这里依赖 loader 有点怪 而且可以异步
         dalaranLoader.loadTestFlow(flowEntity);
+        return id;
     }
 
     @Override
-    public void createFlow(FlowModel flowModel) {
+    public Long createFlow(FlowModel flowModel) {
         FlowEntity flowEntity = buildEntity(flowModel);
-        flowRepository.save(flowEntity);
+        Long id = flowRepository.save(flowEntity).getId();
         // TODO 这里依赖 loader 有点怪 而且可以异步
         dalaranLoader.loadTestFlow(flowEntity);
+        return id;
     }
 
     @Override
@@ -89,11 +93,12 @@ public class FlowManagementServiceImpl implements FlowManagementService {
     }
 
     @Override
-    public void updateFlow(FlowModel flowModel) {
+    public FlowModel updateFlow(FlowModel flowModel) {
         FlowEntity flowEntity = buildEntity(flowModel);
         flowRepository.save(flowEntity);
         // TODO 这里依赖 loader 有点怪 而且可以异步
         dalaranLoader.loadTestFlow(flowEntity);
+        return flowModel;
     }
 
     @Override
@@ -140,21 +145,36 @@ public class FlowManagementServiceImpl implements FlowManagementService {
     }
 
     private FlowEntity buildEntity(FlowModel model) {
-        FlowEntity flowEntity = new FlowEntity();
-        List<ProcessorEntity> processors = new LinkedList<>();
-        for (Long id : model.getProcessorIds()) {
-            processors.add(processorRepository.findOne(id));
+        FlowEntity flowEntity;
+        Long id = model.getId();
+        if (id != null) {
+            flowEntity = flowRepository.findOne(id);
+        } else {
+            flowEntity = new FlowEntity();
         }
 
-        flowEntity.setId(model.getId());
-        flowEntity.setName(model.getName());
+//        List<ProcessorEntity> processors = new LinkedList<>();
+//        for (Long processorId : model.getProcessorIds()) {
+//            processors.add(processorRepository.findOne(processorId));
+//        }
+
+        String name = model.getName();
+        if (StringUtils.isNoneBlank(name)) {
+            flowEntity.setName(name);
+        } else {
+            flowEntity.setName("Dalaran Flow");
+        }
         flowEntity.setModuleId(model.getModuleId());
         flowEntity.setInStructure(model.getInStructure().getId());
         flowEntity.setOutStructure(model.getOutStructure().getId());
         flowEntity.setProcessors(model.getProcessorIds());
         flowEntity.setDescription(model.getDescription());
-        flowEntity.setProperties(model.getPropertyIds());
 
+        if (CollectionUtils.isNotEmpty(model.getPropertyIds())) {
+            flowEntity.setProperties(model.getPropertyIds());
+        } else {
+            flowEntity.setProperties(new ArrayList<>());
+        }
         return flowEntity;
     }
 

@@ -16,7 +16,7 @@ import java.util.List;
  * Created by jingdi on 2019/4/1
  */
 @RestController
-@RequestMapping("dalaran_management/processor")
+@RequestMapping("/api/processor")
 public class ProcessorManagementRest {
 
     @Autowired
@@ -33,14 +33,14 @@ public class ProcessorManagementRest {
 
     @ApiOperation(value = "创建处理器")
     @RequestMapping(value = "/create", method = RequestMethod.POST)
-    public void create(@RequestBody ProcessorModel model) {
-        processorManagementService.createProcessor(model);
+    public Long create(@RequestBody ProcessorModel model) {
+        return processorManagementService.createProcessor(model);
     }
 
     @ApiOperation(value = "更新处理器")
     @RequestMapping(value = "/update", method = RequestMethod.POST)
-    public void update(@RequestBody ProcessorModel model) {
-        processorManagementService.updateProcessor(model);
+    public ProcessorModel update(@RequestBody ProcessorModel model) {
+        return processorManagementService.updateProcessor(model);
     }
 
     @ApiOperation(value = "删除处理器")

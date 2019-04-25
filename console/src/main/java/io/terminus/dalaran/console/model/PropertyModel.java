@@ -1,6 +1,7 @@
 package io.terminus.dalaran.console.model;
 
 import lombok.Data;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Created by jingdi on 2019/4/16
@@ -8,6 +9,7 @@ import lombok.Data;
 @Data
 public class PropertyModel {
 
+    @Nullable
     private Long id;
 
     private String name;

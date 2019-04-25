@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("dalaran_management/flow")
+@RequestMapping("/api/flow")
 public class FlowManagementRest {
 
     // TODO for test
@@ -44,7 +44,7 @@ public class FlowManagementRest {
     private Gson gson = new Gson();
 
     @PutMapping
-    public void saveFlow(@RequestBody FlowModel flowModel) {
+    public Long saveFlow(@RequestBody FlowModel flowModel) {
         FlowEntity flowEntity = new FlowEntity();
 //        TriggerEntity triggerEntity = new TriggerEntity();
 
@@ -57,16 +57,18 @@ public class FlowManagementRest {
         }).collect(Collectors.toList());
 
 
-        List<Long> propertyEntitySet = flowModel.getProperties().entrySet().stream().map(entry -> {
-            PropertyEntity propertyEntity = new PropertyEntity();
-            propertyEntity.setName(entry.getKey());
-            propertyEntity.setValue(entry.getValue());
-            propertyRepository.save(propertyEntity);
-            return propertyEntity.getId();
-        }).collect(Collectors.toList());
+        if (flowModel.getProperties() != null) {
+            List<Long> propertyEntitySet = flowModel.getProperties().entrySet().stream().map(entry -> {
+                PropertyEntity propertyEntity = new PropertyEntity();
+                propertyEntity.setName(entry.getKey());
+                propertyEntity.setValue(entry.getValue());
+                propertyRepository.save(propertyEntity);
+                return propertyEntity.getId();
+            }).collect(Collectors.toList());
+            flowEntity.setProperties(propertyEntitySet);
+        }
 
         flowEntity.setProcessors(processorEntitySet);
-        flowEntity.setProperties(propertyEntitySet);
 
         flowEntity.setId(flowModel.getId());
         flowEntity.setName(flowModel.getName());
@@ -75,7 +77,7 @@ public class FlowManagementRest {
 //        triggerEntity.setType(flowModel.getTrigger().getType());
 //        triggerEntity.setConfig(gson.toJson(flowModel.getTrigger().getConfig()));
 
-        flowManagementService.saveFlow(flowEntity);
+        return flowManagementService.saveFlow(flowEntity);
     }
 
 //    @ApiOperation(value="流程发布", notes="后边应该会改动，目前的发布流程是trigger跟processors一起的")
@@ -93,14 +95,14 @@ public class FlowManagementRest {
 
     @ApiOperation(value = "创建工作流")
     @RequestMapping(value = "/create", method = RequestMethod.POST)
-    public void create(@RequestBody FlowModel model) {
-        flowManagementService.createFlow(model);
+    public Long create(@RequestBody FlowModel model) {
+        return flowManagementService.createFlow(model);
     }
 
     @ApiOperation(value = "更新工作流")
     @RequestMapping(value = "/update", method = RequestMethod.POST)
-    public void update(@RequestBody FlowModel model) {
-        flowManagementService.updateFlow(model);
+    public FlowModel update(@RequestBody FlowModel model) {
+        return flowManagementService.updateFlow(model);
     }
 
     @ApiOperation(value = "删除工作流")

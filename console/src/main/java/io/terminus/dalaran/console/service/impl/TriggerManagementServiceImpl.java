@@ -15,6 +15,7 @@ import io.terminus.dalaran.repository.FlowRepository;
 import io.terminus.dalaran.repository.ModuleRepository;
 import io.terminus.dalaran.repository.StructureRepository;
 import io.terminus.dalaran.repository.TriggerRepository;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -45,8 +46,8 @@ public class TriggerManagementServiceImpl implements TriggerManagementService {
     private DalaranContext dalaranContext;
 
     @Override
-    public void createTrigger(TriggerModel triggerModel) {
-        triggerRepository.save(buildEntity(triggerModel));
+    public Long createTrigger(TriggerModel triggerModel) {
+        return triggerRepository.save(buildEntity(triggerModel)).getId();
     }
 
     @Override
@@ -55,8 +56,9 @@ public class TriggerManagementServiceImpl implements TriggerManagementService {
     }
 
     @Override
-    public void updateTrigger(TriggerModel triggerModel) {
+    public TriggerModel updateTrigger(TriggerModel triggerModel) {
         triggerRepository.save(buildEntity(triggerModel));
+        return triggerModel;
     }
 
     @Override
@@ -109,7 +111,19 @@ public class TriggerManagementServiceImpl implements TriggerManagementService {
     }
 
     private TriggerEntity buildEntity(TriggerModel model) {
-        TriggerEntity triggerEntity = new TriggerEntity();
+        TriggerEntity triggerEntity;
+        Long id = model.getId();
+        if (id == null) {
+            triggerEntity = new TriggerEntity();
+        } else {
+            triggerEntity = triggerRepository.findOne(id);
+        }
+        String name = model.getName();
+        if (StringUtils.isNoneBlank(name)) {
+            triggerEntity.setName(name);
+        } else {
+            triggerEntity.setName("Dalaran Trigger");
+        }
 
         triggerEntity.setFlowId(model.getFlowId());
         triggerEntity.setModuleId(model.getModuleId());
@@ -117,9 +131,7 @@ public class TriggerManagementServiceImpl implements TriggerManagementService {
         triggerEntity.setOutStructure(model.getOutStructure());
         triggerEntity.setConfig(JSON.toJSONString(model.getConfig()));
         triggerEntity.setDescription(model.getDescription());
-        triggerEntity.setName(model.getName());
         triggerEntity.setType(model.getType());
-        triggerEntity.setId(model.getId());
 
         return triggerEntity;
     }

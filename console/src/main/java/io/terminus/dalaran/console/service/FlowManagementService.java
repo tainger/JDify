@@ -10,13 +10,13 @@ import java.util.List;
 
 public interface FlowManagementService {
 
-    void saveFlow(FlowEntity flowEntity);
+    Long saveFlow(FlowEntity flowEntity);
 
-    void createFlow(FlowModel flowModel);
+    Long createFlow(FlowModel flowModel);
 
     void deleteFlow(Long flowId);
 
-    void updateFlow(FlowModel flowModel);
+    FlowModel updateFlow(FlowModel flowModel);
 
     List<FlowModel> queryFlows(FlowQuery query);
 

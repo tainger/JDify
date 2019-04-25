@@ -3,13 +3,12 @@ package io.terminus.dalaran.console.service.jpa.impl;
 import io.terminus.dalaran.console.model.query.PropertyQuery;
 import io.terminus.dalaran.console.service.jpa.PropertyQueryService;
 import io.terminus.dalaran.entity.PropertyEntity;
-import io.terminus.dalaran.repository.specification.PropertyQueryRepository;
+import io.terminus.dalaran.repository.PropertyRepository;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-
 import javax.persistence.criteria.Predicate;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +20,7 @@ import java.util.List;
 public class PropertyQueryServiceImpl implements PropertyQueryService {
 
     @Autowired
-    private PropertyQueryRepository propertyQueryRepository;
+    private PropertyRepository propertyQueryRepository;
 
     @Override
     public List<PropertyEntity> query(PropertyQuery query) {

@@ -6,6 +6,7 @@ import io.terminus.dalaran.console.service.PropertyManagementService;
 import io.terminus.dalaran.console.service.jpa.PropertyQueryService;
 import io.terminus.dalaran.entity.PropertyEntity;
 import io.terminus.dalaran.repository.PropertyRepository;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,13 +27,14 @@ public class PropertyManagementServiceImpl implements PropertyManagementService 
     private PropertyQueryService propertyQueryService;
 
     @Override
-    public void createProperty(PropertyModel propertyModel) {
-        propertyRepository.save(buildEntity(propertyModel));
+    public Long createProperty(PropertyModel propertyModel) {
+        return propertyRepository.save(buildEntity(propertyModel)).getId();
     }
 
     @Override
-    public void updateProperty(PropertyModel propertyModel) {
+    public PropertyModel updateProperty(PropertyModel propertyModel) {
         propertyRepository.save(buildEntity(propertyModel));
+        return propertyModel;
     }
 
     @Override
@@ -70,12 +72,21 @@ public class PropertyManagementServiceImpl implements PropertyManagementService 
     }
 
     private PropertyEntity buildEntity(PropertyModel model) {
-        PropertyEntity entity = new PropertyEntity();
-        entity.setId(model.getId());
-        entity.setName(model.getName());
-        entity.setValue(model.getValue());
-        entity.setDescription(model.getDescription());
-        entity.setUpdatedAt(new Date());
-        return entity;
+        PropertyEntity propertyEntity;
+        Long id = model.getId();
+        if (id == null) {
+            propertyEntity = new PropertyEntity();
+        } else {
+            propertyEntity = propertyRepository.findOne(id);
+        }
+        String name = model.getName();
+        if (StringUtils.isNoneBlank(name)) {
+            propertyEntity.setName(name);
+        } else {
+            propertyEntity.setName("Dalaran Property");
+        }
+        propertyEntity.setValue(model.getValue());
+        propertyEntity.setDescription(model.getDescription());
+        return propertyEntity;
     }
 }

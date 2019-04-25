@@ -29,6 +29,12 @@ public class ProcessorEntity {
     @JoinColumn(name = "module_id")
     private Long moduleId;
 
+    @JoinColumn(name = "in_structure")
+    private Long inStructure;
+
+    @JoinColumn(name = "out_structure")
+    private Long outStructure;
+
     private String description;
 
     @CreatedDate

@@ -1,0 +1,62 @@
+version: "1.0"
+
+resources:
+- name: dalaran
+  source:
+    branch: ((gittar.branch))
+    password: ((gittar.password))
+    uri: ((gittar.repo))
+    username: ((gittar.username))
+  type: git
+- name: deploy
+  source:
+    app_id: ((dice.id))
+    branch: ((gittar.branch))
+    operator_id: ((dice.operator.id))
+    uri: ((dice.url))
+    workspace: ((dice.env))
+  type: dice
+- name: dalaran-console
+  source:
+    bp_args:
+      USE_AGENT: "true"
+    bp_repo: http://git.terminus.io/buildpacks/dice-bpack-termjava.git
+    bp_ver: master
+    context: dalaran/
+    modules:
+    - name: console
+      path: console
+  type: buildpack
+- name: dalaran-starter
+  source:
+    bp_args:
+      USE_AGENT: "true"
+    bp_repo: http://git.terminus.io/buildpacks/dice-bpack-termjava.git
+    bp_ver: master
+    context: dalaran/
+    modules:
+    - name: starter
+      path: starter
+  type: buildpack
+stages:
+- name: dalaran
+  tasks:
+  - get: dalaran
+    params:
+      depth: 1
+- name: buildpack
+  tasks:
+  - aggregate:
+    - put: dalaran-console
+    - put: dalaran-starter
+- name: deploy
+  tasks:
+  - params:
+      dice_yml: dalaran/dice.yml
+      dice_production_yml: dalaran/dice_production.yml
+      dice_development_yml: dalaran/dice_development.yml
+      dice_test_yml: dalaran/dice_test.yml
+      replacement_images:
+      - dalaran-console/pack-result
+      - dalaran-starter/pack-result
+    put: deploy

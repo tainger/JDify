@@ -12,13 +12,11 @@ import io.terminus.dalaran.console.service.jpa.StructQueryService;
 import io.terminus.dalaran.entity.StructureEntity;
 import io.terminus.dalaran.repository.ModuleRepository;
 import io.terminus.dalaran.repository.StructureRepository;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by jingdi on 2019/3/29
@@ -36,8 +34,8 @@ public class StructureManagementServiceImpl implements StructureManagementServic
     private ModuleRepository moduleRepository;
 
     @Override
-    public void createStructure(StructureModel structureModel) {
-        structureRepository.save(buildEntity(structureModel));
+    public Long createStructure(StructureModel structureModel) {
+        return structureRepository.save(buildEntity(structureModel)).getId();
     }
 
     @Override
@@ -46,8 +44,9 @@ public class StructureManagementServiceImpl implements StructureManagementServic
     }
 
     @Override
-    public void updateStructure(StructureModel structureModel) {
+    public StructureModel updateStructure(StructureModel structureModel) {
         structureRepository.save(buildEntity(structureModel));
+        return structureModel;
     }
 
     @Override
@@ -90,13 +89,23 @@ public class StructureManagementServiceImpl implements StructureManagementServic
     }
 
     private StructureEntity buildEntity(StructureModel model) {
-        StructureEntity structureEntity = new StructureEntity();
-        structureEntity.setName(model.getName());
+        StructureEntity structureEntity;
+        Long id = model.getId();
+        if (id == null) {
+            structureEntity = new StructureEntity();
+        } else {
+            structureEntity = structureRepository.findOne(id);
+        }
+        String name = model.getName();
+        if (StringUtils.isNoneBlank(name)) {
+            structureEntity.setName(name);
+        } else {
+            structureEntity.setName("Dalaran Model");
+        }
         structureEntity.setStructureSchema(JSON.toJSONString(model.getStructureSchema()));
         structureEntity.setType(model.getStructureType());
         structureEntity.setDescription(model.getDescription());
         structureEntity.setModuleId(model.getModuleId());
-        structureEntity.setId(model.getId());
         return structureEntity;
     }
 

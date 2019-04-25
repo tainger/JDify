@@ -7,9 +7,11 @@ import io.terminus.dalaran.console.service.*;
 import io.terminus.dalaran.console.service.jpa.ModuleQueryService;
 import io.terminus.dalaran.entity.ModuleEntity;
 import io.terminus.dalaran.repository.ModuleRepository;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -38,8 +40,8 @@ public class ModuleManagementServiceImpl implements ModuleManagementService {
     private StructureManagementService structureManagementService;
 
     @Override
-    public void createModule(ModuleModel moduleModel) {
-        moduleRepository.save(buildEntity(moduleModel));
+    public Long createModule(ModuleModel moduleModel) {
+        return moduleRepository.save(buildEntity(moduleModel)).getId();
     }
 
     @Override
@@ -48,8 +50,9 @@ public class ModuleManagementServiceImpl implements ModuleManagementService {
     }
 
     @Override
-    public void updateModule(ModuleModel moduleModel) {
+    public ModuleModel updateModule(ModuleModel moduleModel) {
         moduleRepository.save(buildEntity(moduleModel));
+        return moduleModel;
     }
 
     @Override
@@ -87,9 +90,19 @@ public class ModuleManagementServiceImpl implements ModuleManagementService {
     }
 
     private ModuleEntity buildEntity(ModuleModel model) {
-        ModuleEntity moduleEntity = new ModuleEntity();
-        moduleEntity.setId(model.getId());
-        moduleEntity.setName(model.getName());
+        ModuleEntity moduleEntity;
+        Long id = model.getId();
+        if (id == null) {
+            moduleEntity = new ModuleEntity();
+        } else {
+            moduleEntity = moduleRepository.findOne(id);
+        }
+        String name = model.getName();
+        if (StringUtils.isNoneBlank(name)) {
+            moduleEntity.setName(name);
+        } else {
+            moduleEntity.setName("Dalaran Module");
+        }
         moduleEntity.setDependencies(model.getDependencies());
         moduleEntity.setDescription(model.getDescription());
         return moduleEntity;

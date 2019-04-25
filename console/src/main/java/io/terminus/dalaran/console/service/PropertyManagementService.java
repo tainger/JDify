@@ -10,9 +10,9 @@ import java.util.List;
  */
 public interface PropertyManagementService {
 
-    void createProperty(PropertyModel propertyModel);
+    Long createProperty(PropertyModel propertyModel);
 
-    void updateProperty(PropertyModel propertyModel);
+    PropertyModel updateProperty(PropertyModel propertyModel);
 
     void deleteProperty(Long id);
 

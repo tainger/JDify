@@ -14,6 +14,7 @@ import io.terminus.dalaran.model.config.ProcessorInfo;
 import io.terminus.dalaran.repository.ModuleRepository;
 import io.terminus.dalaran.repository.ProcessorRepository;
 import io.terminus.dalaran.repository.StructureRepository;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -41,8 +42,8 @@ public class ProcessorManagementServiceImpl implements ProcessorManagementServic
     private DalaranContext dalaranContext;
 
     @Override
-    public void createProcessor(ProcessorModel processorModel) {
-        processorRepository.save(buildEntity(processorModel));
+    public Long createProcessor(ProcessorModel processorModel) {
+        return processorRepository.save(buildEntity(processorModel)).getId();
     }
 
     @Override
@@ -51,8 +52,9 @@ public class ProcessorManagementServiceImpl implements ProcessorManagementServic
     }
 
     @Override
-    public void updateProcessor(ProcessorModel processorModel) {
+    public ProcessorModel updateProcessor(ProcessorModel processorModel) {
         processorRepository.save(buildEntity(processorModel));
+        return processorModel;
     }
 
     @Override
@@ -106,13 +108,32 @@ public class ProcessorManagementServiceImpl implements ProcessorManagementServic
     }
 
     public ProcessorEntity buildEntity(ProcessorModel model) {
-        ProcessorEntity processorEntity = new ProcessorEntity();
+        ProcessorEntity processorEntity;
+        Long id = model.getId();
+        if (id == null) {
+            processorEntity = new ProcessorEntity();
+        } else {
+            processorEntity = processorRepository.findOne(id);
+        }
+
+        String name = model.getName();
+        if (StringUtils.isNoneBlank(name)) {
+            processorEntity.setName(name);
+        } else {
+            processorEntity.setName("Dalaran Processor");
+        }
+
+        if (model.getInStructure() != null) {
+            processorEntity.setInStructure(model.getInStructure());
+        }
+        if (model.getOutStructure() != null) {
+            processorEntity.setOutStructure(model.getOutStructure());
+        }
+
         processorEntity.setModuleId(model.getModuleId());
         processorEntity.setType(model.getType());
-        processorEntity.setName(model.getName());
         processorEntity.setDescription(model.getDescription());
         processorEntity.setConfig(JSON.toJSONString(model.getConfig()));
-        processorEntity.setId(model.getId());
         return processorEntity;
     }
 
@@ -123,6 +144,8 @@ public class ProcessorManagementServiceImpl implements ProcessorManagementServic
         processorModel.setName(entity.getName());
         processorModel.setDescription(entity.getDescription());
         processorModel.setType(entity.getType());
+        processorModel.setInStructure(entity.getInStructure());
+        processorModel.setOutStructure(entity.getOutStructure());
         processorModel.setConfig(JSON.parseObject(entity.getConfig(), Map.class));
         return processorModel;
     }
