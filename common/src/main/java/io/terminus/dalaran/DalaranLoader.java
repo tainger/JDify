@@ -2,17 +2,20 @@ package io.terminus.dalaran;
 
 import com.google.gson.Gson;
 import com.hubspot.jinjava.Jinjava;
-import io.terminus.dalaran.entity.*;
+import io.terminus.dalaran.entity.FlowEntity;
+import io.terminus.dalaran.entity.ProcessorEntity;
+import io.terminus.dalaran.entity.StructureEntity;
 import io.terminus.dalaran.model.DalaranFlow;
 import io.terminus.dalaran.model.MessageModel;
 import io.terminus.dalaran.model.ProcessorModel;
 import io.terminus.dalaran.model.TriggerModel;
 import io.terminus.dalaran.model.config.ProcessorInfo;
-import io.terminus.dalaran.repository.*;
+import io.terminus.dalaran.repository.FlowRepository;
+import io.terminus.dalaran.repository.ProcessorRepository;
+import io.terminus.dalaran.repository.PropertyRepository;
+import io.terminus.dalaran.repository.StructureRepository;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.PostConstruct;
@@ -20,7 +23,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Slf4j
 public class DalaranLoader {
@@ -29,9 +31,6 @@ public class DalaranLoader {
 
     @Autowired
     private FlowRepository flowRepository;
-
-    @Autowired
-    private TriggerRepository triggerRepository;
 
     @Autowired
     private ProcessorRepository processorRepository;
@@ -60,58 +59,45 @@ public class DalaranLoader {
     // TODO 临时用入参处理一下 trigger 加载的开关
     @PostConstruct
     private void init() {
-//        loadFlow();
-        if (enableTest) {
-            loadAllTestFlow();
-        } else {
-            loadAllTrigger();
-        }
+        // TODO load mock flow?
+        loadAllFlow();
     }
 
-    private void loadAllTestFlow() {
+    private void loadAllFlow() {
         List<DalaranFlow> flowList = new ArrayList<>();
         List<FlowEntity> flowEntities = flowRepository.findAll();
         for (FlowEntity flowEntity : flowEntities) {
             flowList.add(buildDalaranFlow(flowEntity));
-            log.info("load test flow[{}]", flowEntity.getId());
+            log.info("load flow[{}]", flowEntity.getId());
         }
-        dalaranContext.addTestFlows(flowList);
+        dalaranContext.addFlows(flowList);
     }
 
-    private void loadAllTrigger() {
-        val triggerEntities = triggerRepository.findAll();
-        for (TriggerEntity triggerEntity : triggerEntities) {
-            val trigger = buildTrigger(triggerEntity);
-            dalaranContext.addTrigger(trigger);
-            log.info("load trigger[{}]{type={},flowId={}}", trigger.getId(), trigger.getType(), trigger.getFlow().getId());
-        }
-    }
+    private DalaranFlow buildDalaranFlow(FlowEntity flowEntity) {
+        val flow = new DalaranFlow();
+        Map<String, String> properties = new HashMap<>();
+        Map<Long, ProcessorModel> processorMap = new HashMap<>();
+        // TODO load env
+        flowEntity.getProcessorIds().forEach(processorId -> {
+            ProcessorEntity processorEntity = processorRepository.findOne(processorId);
+            ProcessorModel processor = buildProcessor(processorEntity, properties);
+            processorMap.put(processorId, processor);
+        });
 
-    private TriggerModel buildTrigger(TriggerEntity triggerEntity) {
-        val trigger = new TriggerModel();
-        Class configType = dalaranContext.getDalaranComponentContext().getTriggerInfo(triggerEntity.getType()).getConfigType();
+        Class configType = dalaranContext.getDalaranComponentContext().getTriggerInfo(flowEntity.getTriggerType()).getConfigType();
 //        String jsonConfig = replaceProperties(triggerEntity.getConfig(), properties);
-        Object config = gson.fromJson(triggerEntity.getConfig(), configType);
+        Object triggerConfig = gson.fromJson(flowEntity.getTriggerConfig(), configType);
 
-        if (triggerEntity.getInStructure() != null) {
-            StructureEntity structureEntity = structureRepository.findOne(triggerEntity.getInStructure());
-            val inModel = buildMessageModel(structureEntity);
-            trigger.setInModel(inModel);
-        }
-        if (triggerEntity.getOutStructure() != null) {
-            StructureEntity structureEntity = structureRepository.findOne(triggerEntity.getOutStructure());
-            val outModel = buildMessageModel(structureEntity);
-            trigger.setOutModel(outModel);
-        }
-        trigger.setId(triggerEntity.getId());
-        trigger.setType(triggerEntity.getType());
-        trigger.setConfig(config);
+        flow.setTriggerType(flowEntity.getTriggerType());
+        flow.setTriggerConfig(triggerConfig);
 
-        if (triggerEntity.getFlowId() != null) {
-            FlowEntity flowEntity = flowRepository.findOne(triggerEntity.getFlowId());
-            trigger.setFlow(buildDalaranFlow(flowEntity));
-        }
-        return trigger;
+        // TODO for test...
+        flow.setInModel(buildMessageModel(structureRepository.findOne(flowEntity.getInStructure())));
+        flow.setOutModel(buildMessageModel(structureRepository.findOne(flowEntity.getOutStructure())));
+        flow.setId(flowEntity.getId());
+        flow.setProcessorMap(processorMap);
+        flow.setProcessingPipeline(flowEntity.getProcessingPipeline());
+        return flow;
     }
 
     // TODO 分开写是为了避免后期差异
@@ -163,28 +149,24 @@ public class DalaranLoader {
         return model;
     }
 
-    private DalaranFlow buildDalaranFlow(FlowEntity flowEntity) {
-        val flow = new DalaranFlow();
-        Map<String, String> properties = new HashMap<>();
-        // TODO 加载全局变量, 局部覆盖
-        if (CollectionUtils.isNotEmpty(flowEntity.getProperties())) {
-            for (Long propertyId : flowEntity.getProperties()) {
-                PropertyEntity property = propertyRepository.findOne(propertyId);
-                properties.put(property.getName(), property.getValue());
+    private TriggerModel buildTrigger(String type, String configJson) {
+        val trigger = new TriggerModel();
+        Class configType = dalaranContext.getDalaranComponentContext().getTriggerInfo(type).getConfigType();
+//        String jsonConfig = replaceProperties(triggerEntity.getConfig(), properties);
+        Object config = gson.fromJson(configJson, configType);
+        if (config instanceof ModelableConfig) {
+            ModelableConfig modelConfig = (ModelableConfig) config;
+            if (modelConfig.getInModelId() != null) {
+                StructureEntity structureEntity = structureRepository.findOne(modelConfig.getInModelId());
+                val inModel = buildMessageModel(structureEntity);
+                trigger.setInModel(inModel);
+            }
+            if (modelConfig.getOutModelId() != null) {
+                StructureEntity structureEntity = structureRepository.findOne(modelConfig.getOutModelId());
+                val outModel = buildMessageModel(structureEntity);
+                trigger.setOutModel(outModel);
             }
         }
-
-        List<ProcessorModel> processors = flowEntity.getProcessors().stream()
-                .map(processorId -> {
-                    ProcessorEntity processorEntity = processorRepository.findOne(processorId);
-                    return buildProcessor(processorEntity, properties);
-                }).collect(Collectors.toList());
-
-        // TODO for test...
-        flow.setInModel(buildMessageModel(structureRepository.findOne(flowEntity.getInStructure())));
-        flow.setOutModel(buildMessageModel(structureRepository.findOne(flowEntity.getOutStructure())));
-        flow.setId(flowEntity.getId());
-        flow.setProcessors(processors);
-        return flow;
+        return trigger;
     }
 }

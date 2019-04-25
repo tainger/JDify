@@ -14,8 +14,6 @@ public class TracingLogEntity {
     @GeneratedValue
     private Long id;
 
-    private Long triggerId;
-
     private Long flowId;
 
     private Long processorId;

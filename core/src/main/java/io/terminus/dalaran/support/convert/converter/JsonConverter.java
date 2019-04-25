@@ -5,8 +5,6 @@ import io.terminus.dalaran.model.schema.JsonSchema;
 import org.apache.camel.model.ProcessorDefinition;
 import org.apache.camel.model.dataformat.JsonLibrary;
 
-import java.util.Map;
-
 public class JsonConverter implements DalaranConverter<JsonSchema> {
 
     @Override

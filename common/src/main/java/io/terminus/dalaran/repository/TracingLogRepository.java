@@ -12,8 +12,6 @@ public interface TracingLogRepository extends JpaRepository<TracingLogEntity, Lo
 
     List<TracingLogEntity> findByFlowIdAndTracingType(Long flowId, TracingType tracingType);
 
-    List<TracingLogEntity> findByTriggerIdAndTracingType(Long triggerId, TracingType tracingType);
-
     List<TracingLogEntity> findByRecordIdAndTracingType(String recordId, TracingType tracingType);
 
     TracingLogEntity findOneByRecordIdAndTracingType(String recordId, TracingType tracingType);

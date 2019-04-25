@@ -1,7 +1,6 @@
 package io.terminus.dalaran;
 
 import io.terminus.dalaran.model.DalaranFlow;
-import io.terminus.dalaran.model.TriggerModel;
 
 import java.util.List;
 
@@ -16,10 +15,6 @@ public interface DalaranContext {
     void addFlow(DalaranFlow flow);
 
     void addFlows(List<DalaranFlow> flows);
-
-    void addTrigger(TriggerModel trigger);
-
-    void addTriggers(List<TriggerModel> triggers);
 
     void addTestFlow(DalaranFlow dalaranFlow);
 

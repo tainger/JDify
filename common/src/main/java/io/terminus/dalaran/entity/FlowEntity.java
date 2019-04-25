@@ -1,5 +1,6 @@
 package io.terminus.dalaran.entity;
 
+import io.terminus.dalaran.FlowStatus;
 import io.terminus.dalaran.converter.ListToJsonConverter;
 import lombok.Data;
 import org.springframework.data.annotation.CreatedBy;
@@ -23,28 +24,37 @@ public class FlowEntity {
 
     private String name;
 
-    private String status;
-
-    private String description;
-
-//    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "module_id")
     private Long moduleId;
 
+    @Enumerated(EnumType.STRING)
+    private FlowStatus status;
+
+    private String description;
+
+    private String triggerType;
+
+    private String triggerConfig;
+
+    /**
+     * 依赖的所有 processor id list
+     */
     @Convert(converter = ListToJsonConverter.class)
     @Column(name = "processor_ids")
-    private List<Long> processors = new ArrayList<>();
+    private List<Long> processorIds = new ArrayList<>();
 
-    //    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    /**
+     * processor 组成的 pipeline
+     */
+    @Convert(converter = ListToJsonConverter.class)
+    @Column(name = "processing_pipeline")
+    private List<Long> processingPipeline = new ArrayList<>();
+
     @JoinColumn(name = "in_structure")
     private Long inStructure;
 
-    //    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "out_structure")
     private Long outStructure;
-
-    @Convert(converter = ListToJsonConverter.class)
-    private List<Long> properties = new ArrayList<>();
 
     @CreatedDate
     @Column(columnDefinition = "timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP")

@@ -13,27 +13,24 @@ public class DalaranFlow {
     @NotNull
     private Long id;
 
-    @Nullable
-    private Boolean retryable;
+    private String version;
+
+    @NotNull
+    private String triggerType;
 
     @Nullable
-    private Integer maxRetry;
-
-    @Nullable
-    private Integer retryDelay;
-
-    @Nullable
-    private Long triggerId;
+    private Object triggerConfig;
 
     private MessageModel inModel;
 
     private MessageModel outModel;
 
     @NotNull
-    private List<ProcessorModel> processors;
+    private Map<Long, ProcessorModel> processorMap;
+
+    @NotNull
+    private List<Long> processingPipeline;
 
     @NotNull
     private Map<String, String> properties;
-
-
 }

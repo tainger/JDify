@@ -28,10 +28,6 @@ public class TracingMainLog {
 
     private List<TracingLog> tracingLogList;
 
-    private Long triggerId;
-
-    private String triggerName;
-
     private Long flowId;
 
     private String flowName;

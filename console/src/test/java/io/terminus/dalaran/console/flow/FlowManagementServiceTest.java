@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.junit4.SpringRunner;
+
 import java.util.*;
 
 /**
@@ -69,7 +70,7 @@ public class FlowManagementServiceTest {
 
         List<Long> processorIds = new LinkedList<>();
         processorIds.add(1L);
-        flow.setProcessorIds(processorIds);
+        flow.setProcessingPipeline(processorIds);
 
         Long id = flowManagementService.createFlow(flow);
 
@@ -80,8 +81,6 @@ public class FlowManagementServiceTest {
         flowManagementService.deleteFlow(12L);
         Assert.assertTrue("", true);
     }
-
-
 
 
 }

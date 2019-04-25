@@ -8,11 +8,9 @@ import io.terminus.dalaran.console.service.TracingLogService;
 import io.terminus.dalaran.entity.FlowEntity;
 import io.terminus.dalaran.entity.ProcessorEntity;
 import io.terminus.dalaran.entity.TracingLogEntity;
-import io.terminus.dalaran.entity.TriggerEntity;
 import io.terminus.dalaran.repository.FlowRepository;
 import io.terminus.dalaran.repository.ProcessorRepository;
 import io.terminus.dalaran.repository.TracingLogRepository;
-import io.terminus.dalaran.repository.TriggerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -34,9 +32,6 @@ public class TracingLogServiceImpl implements TracingLogService {
 
     @Autowired
     private ProcessorRepository processorRepository;
-
-    @Autowired
-    private TriggerRepository triggerRepository;
 
     @Override
     public List<TracingMainLog> triggerLogs(TracingLogQuery query) {
@@ -65,7 +60,7 @@ public class TracingLogServiceImpl implements TracingLogService {
             if (query.isTestFlow()) {
                 predicates.add(builder.equal(root.get("tracingType"), TracingType.TestFlow));
             } else {
-                predicates.add(builder.equal(root.get("tracingType"), TracingType.Trigger));
+                predicates.add(builder.equal(root.get("tracingType"), TracingType.Flow));
             }
             if (query.getSuccessful() != null) {
                 predicates.add(builder.equal(root.get("successful"), query.getSuccessful()));
@@ -75,9 +70,6 @@ public class TracingLogServiceImpl implements TracingLogService {
             }
             if (query.getModuleId() != null) {
                 predicates.add(builder.equal(root.get("moduleId"), query.getModuleId()));
-            }
-            if (query.getTriggerId() != null) {
-                predicates.add(builder.equal(root.get("triggerId"), query.getTriggerId()));
             }
             if (query.getStartTime() != null) {
                 predicates.add(builder.ge(root.get("timestamp"), query.getStartTime().getTime()));
@@ -95,19 +87,11 @@ public class TracingLogServiceImpl implements TracingLogService {
         mainLog.setRecordId(log.getRecordId());
         mainLog.setTimestamp(new Date(log.getTimestamp()));
         mainLog.setElapsed(log.getElapsed());
-        mainLog.setTriggerId(log.getTriggerId());
         mainLog.setInputBody(log.getInputBody());
         mainLog.setInputBodyType(log.getInputBodyType());
         mainLog.setOutputBody(log.getOutputBody());
         mainLog.setOutputBodyType(log.getOutputBodyType());
         mainLog.setSuccessful(log.getSuccessful());
-
-        if (log.getTriggerId() != null) {
-            TriggerEntity triggerEntity = triggerRepository.findOne(log.getTriggerId());
-            if (triggerEntity != null) {
-                mainLog.setTriggerName(triggerEntity.getName());
-            }
-        }
         if (log.getFlowId() != null) {
             FlowEntity flowEntity = flowRepository.findOne(log.getFlowId());
             if (flowEntity != null) {

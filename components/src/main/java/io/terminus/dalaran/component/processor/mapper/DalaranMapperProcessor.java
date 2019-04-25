@@ -10,6 +10,7 @@ import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.commons.jxpath.JXPathContext;
 import org.apache.commons.lang.StringUtils;
+
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;

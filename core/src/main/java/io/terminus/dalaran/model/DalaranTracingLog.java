@@ -6,8 +6,6 @@ import lombok.Data;
 
 @Data
 public class DalaranTracingLog {
-    private Long triggerId;
-
     private Long flowId;
 
     private Long processorId;

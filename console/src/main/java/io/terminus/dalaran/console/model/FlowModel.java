@@ -13,9 +13,9 @@ public class FlowModel {
     @Nullable
     private Long id;
 
-    private String name;
-
     private Long moduleId;
+
+    private String name;
 
     private String description;
 
@@ -23,11 +23,13 @@ public class FlowModel {
 
     private StructureModel outStructure;
 
+    private String triggerType;
+
+    private Map<String, Object> triggerConfig;
+
     private Set<ProcessorModel> processors;
 
-    private List<Long> processorIds;
+    // TODO processor 有一个流内的唯一 ID, pipeline 就是由这个 ID 编排的, 该 ID 可以由前端生成, 因为一把保存的情况下, 前端无法知道  processor 保存的 ID 是什么
+    private List<Long> processingPipeline;
 
-    private Map<String, String> properties;
-
-    private List<Long> propertyIds;
 }

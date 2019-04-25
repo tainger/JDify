@@ -11,7 +11,6 @@ import io.terminus.dalaran.console.model.query.FlowQuery;
 import io.terminus.dalaran.console.service.FlowManagementService;
 import io.terminus.dalaran.entity.FlowEntity;
 import io.terminus.dalaran.entity.ProcessorEntity;
-import io.terminus.dalaran.entity.PropertyEntity;
 import io.terminus.dalaran.repository.ProcessorRepository;
 import io.terminus.dalaran.repository.PropertyRepository;
 import org.apache.commons.lang.RandomStringUtils;
@@ -56,19 +55,7 @@ public class FlowManagementRest {
             return processorEntity.getId();
         }).collect(Collectors.toList());
 
-
-        if (flowModel.getProperties() != null) {
-            List<Long> propertyEntitySet = flowModel.getProperties().entrySet().stream().map(entry -> {
-                PropertyEntity propertyEntity = new PropertyEntity();
-                propertyEntity.setName(entry.getKey());
-                propertyEntity.setValue(entry.getValue());
-                propertyRepository.save(propertyEntity);
-                return propertyEntity.getId();
-            }).collect(Collectors.toList());
-            flowEntity.setProperties(propertyEntitySet);
-        }
-
-        flowEntity.setProcessors(processorEntitySet);
+        flowEntity.setProcessorIds(processorEntitySet);
 
         flowEntity.setId(flowModel.getId());
         flowEntity.setName(flowModel.getName());

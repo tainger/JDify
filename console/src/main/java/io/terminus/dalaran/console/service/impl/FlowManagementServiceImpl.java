@@ -11,13 +11,16 @@ import io.terminus.dalaran.console.model.query.ProcessorQuery;
 import io.terminus.dalaran.console.model.query.rst.ComponentInfo;
 import io.terminus.dalaran.console.model.query.rst.ModuleComponent;
 import io.terminus.dalaran.console.service.FlowManagementService;
+import io.terminus.dalaran.console.service.ProcessorManagementService;
 import io.terminus.dalaran.console.service.jpa.FlowQueryService;
 import io.terminus.dalaran.console.service.jpa.ProcessorQueryService;
 import io.terminus.dalaran.entity.FlowEntity;
 import io.terminus.dalaran.entity.ProcessorEntity;
 import io.terminus.dalaran.entity.StructureEntity;
-import io.terminus.dalaran.repository.*;
-import org.apache.commons.collections.CollectionUtils;
+import io.terminus.dalaran.repository.FlowRepository;
+import io.terminus.dalaran.repository.ModuleRepository;
+import io.terminus.dalaran.repository.PropertyRepository;
+import io.terminus.dalaran.repository.StructureRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,11 +34,9 @@ public class FlowManagementServiceImpl implements FlowManagementService {
     @Autowired
     private FlowRepository flowRepository;
 
+    // TODO 这里不应该引入其他 repository 的
     @Autowired
-    private TriggerRepository triggerRepository;
-
-    @Autowired
-    private ProcessorRepository processorRepository;
+    private ProcessorManagementService processorManagementService;
 
     @Autowired
     private ProcessorQueryService processorQueryService;
@@ -157,6 +158,16 @@ public class FlowManagementServiceImpl implements FlowManagementService {
 //        for (Long processorId : model.getProcessorIds()) {
 //            processors.add(processorRepository.findOne(processorId));
 //        }
+        List<Long> processorIds = new ArrayList<>();
+        for (ProcessorModel processor : model.getProcessors()) {
+            if (processor.getId() == null) {
+                Long processorId = processorManagementService.createProcessor(processor);
+                processorIds.add(processorId);
+            } else {
+                processorManagementService.updateProcessor(processor);
+                processorIds.add(processor.getId());
+            }
+        }
 
         String name = model.getName();
         if (StringUtils.isNoneBlank(name)) {
@@ -167,14 +178,10 @@ public class FlowManagementServiceImpl implements FlowManagementService {
         flowEntity.setModuleId(model.getModuleId());
         flowEntity.setInStructure(model.getInStructure().getId());
         flowEntity.setOutStructure(model.getOutStructure().getId());
-        flowEntity.setProcessors(model.getProcessorIds());
+        flowEntity.setProcessingPipeline(model.getProcessingPipeline());
+        flowEntity.setProcessorIds(processorIds);
         flowEntity.setDescription(model.getDescription());
 
-        if (CollectionUtils.isNotEmpty(model.getPropertyIds())) {
-            flowEntity.setProperties(model.getPropertyIds());
-        } else {
-            flowEntity.setProperties(new ArrayList<>());
-        }
         return flowEntity;
     }
 
@@ -185,13 +192,12 @@ public class FlowManagementServiceImpl implements FlowManagementService {
         flowModel.setModuleId(entity.getModuleId());
         flowModel.setInStructure(buildStructureEntity(structureRepository.findOne(entity.getInStructure())));
         flowModel.setOutStructure(buildStructureEntity(structureRepository.findOne(entity.getOutStructure())));
-        flowModel.setProcessorIds(entity.getProcessors());
-        flowModel.setPropertyIds(entity.getProperties());
         flowModel.setDescription(entity.getDescription());
+        flowModel.setProcessingPipeline(entity.getProcessingPipeline());
 
         Set<ProcessorModel> processors = new HashSet<>();
         ProcessorQuery processorQuery = new ProcessorQuery();
-        processorQuery.setProcessorIds(entity.getProcessors());
+        processorQuery.setProcessorIds(entity.getProcessorIds());
         for (ProcessorEntity processorEntity : processorQueryService.query(processorQuery)) {
             ProcessorModel processorModel = new ProcessorModel();
             processorModel.setId(processorEntity.getId());

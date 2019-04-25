@@ -1,5 +1,6 @@
 package io.terminus.dalaran.entity;
 
+import io.terminus.dalaran.converter.ListToJsonConverter;
 import lombok.Data;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
@@ -7,12 +8,14 @@ import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Data
 @Entity
-@Table(name = "dalaran_trigger")
-public class TriggerEntity {
+@Table(name = "dalaran_sub_flow")
+public class SubFlowEntity {
 
     @Id
     @GeneratedValue
@@ -20,29 +23,30 @@ public class TriggerEntity {
 
     private String name;
 
-    private String type;
-
-    private String config;
-
-    private String status;
-
-//    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JoinColumn(name = "flow_id")
-    private Long flowId;
-
-//    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "module_id")
     private Long moduleId;
 
-//    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private String description;
+
+    /**
+     * 依赖的所有 processor id list
+     */
+    @Convert(converter = ListToJsonConverter.class)
+    @Column(name = "processor_ids")
+    private List<Long> processors = new ArrayList<>();
+
+    /**
+     * processor 组成的 pipeline
+     */
+    @Convert(converter = ListToJsonConverter.class)
+    @Column(name = "processing_pipeline")
+    private List<Long> processingPipeline = new ArrayList<>();
+
     @JoinColumn(name = "in_structure")
     private Long inStructure;
 
-//    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "out_structure")
     private Long outStructure;
-
-    private String description;
 
     @CreatedDate
     @Column(columnDefinition = "timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP")
