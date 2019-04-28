@@ -1,12 +1,11 @@
 package io.terminus.dalaran.console.service.impl;
 
-import io.terminus.dalaran.console.model.ModuleModel;
+import io.terminus.dalaran.console.model.dto.ModuleDTO;
 import io.terminus.dalaran.console.model.query.ModuleQuery;
 import io.terminus.dalaran.console.model.query.rst.ModuleComponent;
 import io.terminus.dalaran.console.service.FlowManagementService;
+import io.terminus.dalaran.console.service.ModelManagementService;
 import io.terminus.dalaran.console.service.ModuleManagementService;
-import io.terminus.dalaran.console.service.ProcessorManagementService;
-import io.terminus.dalaran.console.service.StructureManagementService;
 import io.terminus.dalaran.console.service.jpa.ModuleQueryService;
 import io.terminus.dalaran.entity.ModuleEntity;
 import io.terminus.dalaran.repository.ModuleRepository;
@@ -33,13 +32,10 @@ public class ModuleManagementServiceImpl implements ModuleManagementService {
     private FlowManagementService flowManagementService;
 
     @Autowired
-    private ProcessorManagementService processorManagementService;
-
-    @Autowired
-    private StructureManagementService structureManagementService;
+    private ModelManagementService modelManagementService;
 
     @Override
-    public Long createModule(ModuleModel moduleModel) {
+    public Long createModule(ModuleDTO moduleModel) {
         return moduleRepository.save(buildEntity(moduleModel)).getId();
     }
 
@@ -49,15 +45,15 @@ public class ModuleManagementServiceImpl implements ModuleManagementService {
     }
 
     @Override
-    public ModuleModel updateModule(ModuleModel moduleModel) {
+    public ModuleDTO updateModule(ModuleDTO moduleModel) {
         moduleRepository.save(buildEntity(moduleModel));
         return moduleModel;
     }
 
     @Override
-    public List<ModuleModel> list() {
+    public List<ModuleDTO> list() {
         List<ModuleEntity> entities = moduleRepository.findAll();
-        List<ModuleModel> models = new LinkedList<>();
+        List<ModuleDTO> models = new LinkedList<>();
 
         for (ModuleEntity entity: entities) {
             models.add(buildModel(entity));
@@ -67,9 +63,9 @@ public class ModuleManagementServiceImpl implements ModuleManagementService {
     }
 
     @Override
-    public List<ModuleModel> queryModules(ModuleQuery query) {
+    public List<ModuleDTO> queryModules(ModuleQuery query) {
         List<ModuleEntity> entities = moduleQueryService.query(query);
-        List<ModuleModel> models = new LinkedList<>();
+        List<ModuleDTO> models = new LinkedList<>();
 
         for (ModuleEntity entity: entities) {
             models.add(buildModel(entity));
@@ -82,12 +78,11 @@ public class ModuleManagementServiceImpl implements ModuleManagementService {
     public List<ModuleComponent> listModuleComponents(Long moduleId) {
         List<ModuleComponent> components = new LinkedList<>();
         components.addAll(flowManagementService.getComponents(moduleId));
-        components.addAll(processorManagementService.getComponents(moduleId));
-        components.addAll(structureManagementService.getComponents(moduleId));
+        components.addAll(modelManagementService.getComponents(moduleId));
         return components;
     }
 
-    private ModuleEntity buildEntity(ModuleModel model) {
+    private ModuleEntity buildEntity(ModuleDTO model) {
         ModuleEntity moduleEntity;
         Long id = model.getId();
         if (id == null) {
@@ -106,8 +101,8 @@ public class ModuleManagementServiceImpl implements ModuleManagementService {
         return moduleEntity;
     }
 
-    private ModuleModel buildModel(ModuleEntity entity) {
-        ModuleModel moduleModel = new ModuleModel();
+    private ModuleDTO buildModel(ModuleEntity entity) {
+        ModuleDTO moduleModel = new ModuleDTO();
         moduleModel.setId(entity.getId());
         moduleModel.setName(entity.getName());
         moduleModel.setDependencies(entity.getDependencies());

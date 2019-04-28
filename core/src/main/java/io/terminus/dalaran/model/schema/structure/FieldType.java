@@ -1,4 +1,4 @@
-package io.terminus.dalaran.model.schema.structure;
+package io.terminus.dalaran.model.schema.model;
 
 /**
  * Created by jingdi on 2019/3/25

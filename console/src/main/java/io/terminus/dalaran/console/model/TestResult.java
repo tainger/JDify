@@ -1,12 +1,12 @@
 package io.terminus.dalaran.console.model;
 
-import io.terminus.dalaran.BodyModelType;
+import io.terminus.dalaran.BodyType;
 import lombok.Data;
 
 @Data
 public class TestResult {
 
-    private BodyModelType bodyType;
+    private BodyType bodyType;
 
     private String body;
 

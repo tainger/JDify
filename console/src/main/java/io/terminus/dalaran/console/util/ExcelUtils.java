@@ -1,7 +1,7 @@
 package io.terminus.dalaran.console.util;
 
-import io.terminus.dalaran.model.schema.structure.FieldType;
-import io.terminus.dalaran.model.schema.structure.ModelField;
+import io.terminus.dalaran.model.schema.model.FieldType;
+import io.terminus.dalaran.model.schema.model.ModelField;
 import lombok.val;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;

@@ -1,4 +1,4 @@
-package io.terminus.dalaran.model.schema.structure;
+package io.terminus.dalaran.model.schema.model;
 
 import lombok.Data;
 

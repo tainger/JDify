@@ -1,6 +1,6 @@
 package io.terminus.dalaran.console.rest;
 
-import io.terminus.dalaran.console.model.TracingMainLog;
+import io.terminus.dalaran.console.model.dto.log.MainLogDTO;
 import io.terminus.dalaran.console.model.query.TracingLogQuery;
 import io.terminus.dalaran.console.service.TracingLogService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,12 +19,12 @@ public class TracingRest {
     private TracingLogService tracingLogService;
 
     @GetMapping
-    private List<TracingMainLog> query(TracingLogQuery query) {
+    private List<MainLogDTO> query(TracingLogQuery query) {
         return tracingLogService.triggerLogs(query);
     }
 
     @GetMapping("/{recordId}")
-    private TracingMainLog logDetail(@PathVariable String recordId) {
+    private MainLogDTO logDetail(@PathVariable String recordId) {
         return tracingLogService.getRecordDetail(recordId);
     }
 }

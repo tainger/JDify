@@ -1,6 +1,6 @@
 package io.terminus.dalaran.annotation;
 
-import io.terminus.dalaran.BodyMode;
+import io.terminus.dalaran.BodyType;
 import org.springframework.stereotype.Component;
 
 import java.lang.annotation.*;
@@ -13,7 +13,9 @@ import java.lang.annotation.*;
 public @interface Trigger {
     String value();
 
-    BodyMode bodyMode();
+    boolean serializedBody() default true;
+
+    BodyType[] allowBodyTypes();
 
     boolean isVoid() default false;
 

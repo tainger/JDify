@@ -20,7 +20,15 @@ public class PublishFlowEntity {
     @GeneratedValue
     private Long id;
 
+    private String version;
+
     private Long recordId;
+
+    @NotNull
+    private String triggerType;
+
+    @Nullable
+    private Object triggerConfig;
 
     @Nullable
     private Long name;
@@ -28,11 +36,10 @@ public class PublishFlowEntity {
     private MessageModel inModel;
 
     private MessageModel outModel;
+    @NotNull
+    private Map<Long, ProcessorModel> processorMap;
 
     @NotNull
-    private List<ProcessorModel> processors;
-
-    @NotNull
-    private Map<String, String> properties;
+    private List<Long> processingPipeline;
 
 }

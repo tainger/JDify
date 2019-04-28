@@ -1,9 +1,7 @@
 package io.terminus.dalaran.model.config;
 
-import io.terminus.dalaran.BodyMode;
+import io.terminus.dalaran.BodyType;
 import lombok.Data;
-
-import java.util.List;
 
 @Data
 public class TriggerInfo {
@@ -12,9 +10,11 @@ public class TriggerInfo {
 
     private Boolean isVoid;
 
-    private List<DalaranConfigField> configFields;
+    private DalaranConfigField[] configFields;
 
-    private transient BodyMode bodyMode;
+    private BodyType[] allowBodyTypes;
+
+    private transient boolean serializedBody;
 
     private transient Class configType;
 }

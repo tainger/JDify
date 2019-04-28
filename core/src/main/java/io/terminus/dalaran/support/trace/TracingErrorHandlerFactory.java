@@ -1,6 +1,6 @@
 package io.terminus.dalaran.support.trace;
 
-import io.terminus.dalaran.BodyModelType;
+import io.terminus.dalaran.BodyType;
 import io.terminus.dalaran.DalaranTraceLogger;
 import io.terminus.dalaran.model.DalaranTracingLog;
 import org.apache.camel.ErrorHandlerFactory;
@@ -66,7 +66,7 @@ public class TracingErrorHandlerFactory implements ErrorHandlerFactory {
                 return;
             }
             tracingLog.setSuccessful(false);
-            tracingLog.setOutputBodyType(BodyModelType.EXCEPTION);
+            tracingLog.setOutputBodyType(BodyType.EXCEPTION);
             tracingLog.setOutputBody(body);
             tracingLog.setElapsed(System.currentTimeMillis() - tracingLog.getTimestamp());
 //            tracingLog.setOutputHeaders(exchange.getIn().getHeaders());

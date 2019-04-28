@@ -1,7 +1,7 @@
 package io.terminus.dalaran.console.rest;
 
 import io.swagger.annotations.ApiOperation;
-import io.terminus.dalaran.console.model.ModuleModel;
+import io.terminus.dalaran.console.model.dto.ModuleDTO;
 import io.terminus.dalaran.console.model.query.ModuleQuery;
 import io.terminus.dalaran.console.model.query.rst.ModuleComponent;
 import io.terminus.dalaran.console.service.ModuleManagementService;
@@ -21,19 +21,19 @@ public class ModuleManagementRest {
 
     @ApiOperation(value = "条件查询模块")
     @RequestMapping(value = "/query", method = RequestMethod.GET)
-    public List<ModuleModel> query(ModuleQuery query) {
+    public List<ModuleDTO> query(ModuleQuery query) {
         return moduleManagementService.queryModules(query);
     }
 
     @ApiOperation(value = "创建模块")
     @RequestMapping(value = "/create", method = RequestMethod.POST)
-    public Long create(@RequestBody ModuleModel model) {
+    public Long create(@RequestBody ModuleDTO model) {
         return moduleManagementService.createModule(model);
     }
 
     @ApiOperation(value = "更新模块")
     @RequestMapping(value = "/update", method = RequestMethod.POST)
-    public ModuleModel update(@RequestBody ModuleModel model) {
+    public ModuleDTO update(@RequestBody ModuleDTO model) {
         return moduleManagementService.updateModule(model);
     }
 
@@ -45,7 +45,7 @@ public class ModuleManagementRest {
 
     @ApiOperation(value = "全量查询模块")
     @RequestMapping(value = "/list", method = RequestMethod.GET)
-    public List<ModuleModel> list() {
+    public List<ModuleDTO> list() {
         return moduleManagementService.list();
     }
 

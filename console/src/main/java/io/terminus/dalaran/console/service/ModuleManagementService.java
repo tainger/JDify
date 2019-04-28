@@ -1,6 +1,6 @@
 package io.terminus.dalaran.console.service;
 
-import io.terminus.dalaran.console.model.ModuleModel;
+import io.terminus.dalaran.console.model.dto.ModuleDTO;
 import io.terminus.dalaran.console.model.query.ModuleQuery;
 import io.terminus.dalaran.console.model.query.rst.ModuleComponent;
 
@@ -11,15 +11,15 @@ import java.util.List;
  */
 public interface ModuleManagementService {
 
-    Long createModule(ModuleModel moduleModel);
+    Long createModule(ModuleDTO moduleModel);
 
     void deleteModule(Long moduleId);
 
-    ModuleModel updateModule(ModuleModel moduleModel);
+    ModuleDTO updateModule(ModuleDTO moduleModel);
 
-    List<ModuleModel> list();
+    List<ModuleDTO> list();
 
-    List<ModuleModel> queryModules(ModuleQuery query);
+    List<ModuleDTO> queryModules(ModuleQuery query);
 
     List<ModuleComponent> listModuleComponents(Long moduleId);
 }

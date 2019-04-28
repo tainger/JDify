@@ -3,8 +3,8 @@ package io.terminus.dalaran.console.service.jpa.impl;
 import io.terminus.dalaran.console.model.query.FlowQuery;
 import io.terminus.dalaran.console.model.query.rst.ComponentInfo;
 import io.terminus.dalaran.console.service.jpa.FlowQueryService;
-import io.terminus.dalaran.entity.FlowEntity;
-import io.terminus.dalaran.repository.FlowRepository;
+import io.terminus.dalaran.entity.flow.TriggerFlowEntity;
+import io.terminus.dalaran.repository.TriggerFlowRepository;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,15 +26,15 @@ import java.util.List;
 public class FlowQueryServiceImpl implements FlowQueryService {
 
     @Autowired
-    private FlowRepository flowQueryRepository;
+    private TriggerFlowRepository flowQueryRepository;
 
     @Autowired
     private EntityManager entityManager;
 
     @Override
-    public List<FlowEntity> query(FlowQuery query) {
+    public List<TriggerFlowEntity> query(FlowQuery query) {
 
-        Specification<FlowEntity> specification = (root, criteriaQuery, criteriaBuilder) -> {
+        Specification<TriggerFlowEntity> specification = (root, criteriaQuery, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
             if (StringUtils.isNoneBlank(query.getType())) {
                 Predicate type = criteriaBuilder.equal(root.get("type"), query.getType());
@@ -64,8 +64,8 @@ public class FlowQueryServiceImpl implements FlowQueryService {
     }
 
     @Override
-    public List<FlowEntity> queryByProcessorIds(List<Long> processorIds) {
-        Specification<FlowEntity> specification = (root, criteriaQuery, criteriaBuilder) -> {
+    public List<TriggerFlowEntity> queryByProcessorIds(List<Long> processorIds) {
+        Specification<TriggerFlowEntity> specification = (root, criteriaQuery, criteriaBuilder) -> {
             Predicate predicate = criteriaBuilder.isNotEmpty(criteriaBuilder.function("JSON_SEARCH", List.class,
                     root.get("processors"), criteriaBuilder.literal(processorIds)));
             return criteriaBuilder.and(predicate);
@@ -77,7 +77,7 @@ public class FlowQueryServiceImpl implements FlowQueryService {
     public List<ComponentInfo> getBasicInfo(Long moduleId) {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<ComponentInfo> criteriaQuery = builder.createQuery(ComponentInfo.class);
-        Root<FlowEntity> root = criteriaQuery.from(FlowEntity.class);
+        Root<TriggerFlowEntity> root = criteriaQuery.from(TriggerFlowEntity.class);
         criteriaQuery.multiselect(root.get("id"), root.get("name"), root.get("status")).where(builder.equal(root.get("moduleId"), moduleId));
         return entityManager.createQuery(criteriaQuery).getResultList();
     }

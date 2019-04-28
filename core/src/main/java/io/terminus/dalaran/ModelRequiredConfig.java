@@ -8,13 +8,13 @@ import lombok.Data;
 public class ModelRequiredConfig implements ModelableConfig {
 
     @ConfigFieldInfo(inputType = FieldInputType.Hidden)
-    private MessageModel inModel;
+    private transient MessageModel inModel;
 
     @ConfigFieldInfo(label = "输入结构", inputType = FieldInputType.Model)
     private Long inModelId;
 
     @ConfigFieldInfo(inputType = FieldInputType.Hidden)
-    private MessageModel outModel;
+    private transient MessageModel outModel;
 
     @ConfigFieldInfo(label = "输出结构", inputType = FieldInputType.Model)
     private Long outModelId;

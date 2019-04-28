@@ -1,12 +1,12 @@
 package io.terminus.dalaran.component.trigger.dubbo;
 
-import io.terminus.dalaran.BodyMode;
+import io.terminus.dalaran.BodyType;
 import io.terminus.dalaran.DalaranTrigger;
 import io.terminus.dalaran.annotation.Trigger;
 import org.apache.camel.model.RouteDefinition;
 import org.apache.commons.lang.StringUtils;
 
-@Trigger(value = "dubbo-provider", configType = DubboProviderConfig.class, bodyMode = BodyMode.Object)
+@Trigger(value = "dubbo-provider", configType = DubboProviderConfig.class, allowBodyTypes = {BodyType.OBJECT})
 public class DalaranDubboProvider implements DalaranTrigger<DubboProviderConfig> {
 
     private static final String DUBBO_PROVIDER_URI = "dubbo:?registryAddress=%s&serviceId=%s&method=%s&version=%s";

@@ -31,21 +31,26 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext, 
 
     @Override
     public DalaranTrigger getTrigger(String triggerType) {
+        // TODO check null
         return triggerMapping.get(triggerType);
     }
 
     @Override
     public DalaranProcessor getProcessor(String processorType) {
+
+        // TODO check null
         return processorMapping.get(processorType);
     }
 
     @Override
     public TriggerInfo getTriggerInfo(String triggerType) {
+        // TODO check null
         return triggerInfoMapping.get(triggerType);
     }
 
     @Override
     public ProcessorInfo getProcessorInfo(String processorType) {
+        // TODO check null
         return processorInfoMapping.get(processorType);
     }
 
@@ -75,14 +80,16 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext, 
 
     private void addTrigger(DalaranTrigger trigger) {
         Trigger triggerAnnotation = trigger.getClass().getDeclaredAnnotation(Trigger.class);
-        List<DalaranConfigField> configFields = buildConfigFields(triggerAnnotation.configType());
+        DalaranConfigField[] configFields = buildConfigFields(triggerAnnotation.configType());
 
         TriggerInfo triggerInfo = new TriggerInfo();
         triggerInfo.setType(triggerAnnotation.value());
         triggerInfo.setConfigFields(configFields);
-        triggerInfo.setIsVoid(triggerAnnotation.isVoid());
         triggerInfo.setConfigType(triggerAnnotation.configType());
-        triggerInfo.setBodyMode(triggerAnnotation.bodyMode());
+        triggerInfo.setAllowBodyTypes(triggerAnnotation.allowBodyTypes());
+        triggerInfo.setSerializedBody(triggerAnnotation.serializedBody());
+
+        triggerInfo.setIsVoid(triggerAnnotation.isVoid());
 
         triggerInfoMapping.put(triggerAnnotation.value(), triggerInfo);
         triggerMapping.put(triggerAnnotation.value(), trigger);
@@ -90,19 +97,20 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext, 
 
     private void addProcessor(DalaranProcessor processor) {
         Processor processorAnnotation = processor.getClass().getDeclaredAnnotation(Processor.class);
-        List<DalaranConfigField> configFields = buildConfigFields(processorAnnotation.configType());
+        DalaranConfigField[] configFields = buildConfigFields(processorAnnotation.configType());
 
         ProcessorInfo processorInfo = new ProcessorInfo();
         processorInfo.setType(processorAnnotation.value());
         processorInfo.setConfigFields(configFields);
         processorInfo.setConfigType(processorAnnotation.configType());
-        processorInfo.setBodyMode(processorAnnotation.bodyMode());
+        processorInfo.setSerializedBody(processorAnnotation.serializedBody());
+        processorInfo.setAllowedBodyTypes(processorAnnotation.allowBodyTypes());
 
         processorInfoMapping.put(processorAnnotation.value(), processorInfo);
         processorMapping.put(processorAnnotation.value(), processor);
     }
 
-    private List<DalaranConfigField> buildConfigFields(Class configClass) {
+    private DalaranConfigField[] buildConfigFields(Class configClass) {
         List<DalaranConfigField> configFields = new ArrayList<>();
         for (Field field : configClass.getDeclaredFields()) {
             ConfigFieldInfo configFieldInfo = field.getDeclaredAnnotation(ConfigFieldInfo.class);
@@ -134,6 +142,6 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext, 
                 configFields.add(configField);
             }
         }
-        return configFields;
+        return configFields.toArray(new DalaranConfigField[]{});
     }
 }

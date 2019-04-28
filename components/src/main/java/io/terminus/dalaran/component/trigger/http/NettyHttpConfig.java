@@ -1,11 +1,12 @@
 package io.terminus.dalaran.component.trigger.http;
 
 import io.terminus.dalaran.FieldInputType;
+import io.terminus.dalaran.ModelRequiredConfig;
 import io.terminus.dalaran.annotation.ConfigFieldInfo;
 import lombok.Data;
 
 @Data
-public class NettyHttpConfig {
+public class NettyHttpConfig extends ModelRequiredConfig {
 
     @ConfigFieldInfo(label = "端口", inputType = FieldInputType.Integer, defaultValue = "8080")
     private Integer port = 8080;

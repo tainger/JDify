@@ -1,6 +1,6 @@
 package io.terminus.dalaran.entity;
 
-import io.terminus.dalaran.BodyModelType;
+import io.terminus.dalaran.BodyType;
 import io.terminus.dalaran.TracingType;
 import lombok.Data;
 
@@ -14,32 +14,41 @@ public class TracingLogEntity {
     @GeneratedValue
     private Long id;
 
+    @Column(nullable = false)
     private Long flowId;
 
     private Long processorId;
 
+    @Column(nullable = false)
     private Long timestamp;
 
+    @Column(nullable = false)
     private Long elapsed;
 
+    @Column(nullable = false, length = 64)
     private String recordId;
 
     @Column(nullable = false)
-    private Boolean successful;
+    private boolean successful;
 
     @Column(nullable = false)
     private boolean main;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private TracingType tracingType;
 
+    @Column(columnDefinition = "LONGTEXT")
     private String inputBody;
 
     @Enumerated(EnumType.STRING)
-    private BodyModelType inputBodyType;
+    @Column(nullable = false)
+    private BodyType inputBodyType;
 
+    @Column(columnDefinition = "LONGTEXT")
     private String outputBody;
 
     @Enumerated(EnumType.STRING)
-    private BodyModelType outputBodyType;
+    @Column(nullable = false)
+    private BodyType outputBodyType;
 }

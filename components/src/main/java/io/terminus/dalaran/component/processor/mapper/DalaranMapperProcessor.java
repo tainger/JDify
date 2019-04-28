@@ -5,7 +5,7 @@ import io.terminus.dalaran.component.processor.mapper.jxpath.DalaranJXPathFactor
 import io.terminus.dalaran.component.processor.mapper.model.MapperConstants;
 import io.terminus.dalaran.component.processor.mapper.model.MappingField;
 import io.terminus.dalaran.component.processor.mapper.model.MappingFieldType;
-import io.terminus.dalaran.model.schema.structure.FieldType;
+import io.terminus.dalaran.model.schema.model.FieldType;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.commons.jxpath.JXPathContext;

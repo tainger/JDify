@@ -1,53 +1,17 @@
 package io.terminus.dalaran.entity;
 
 import lombok.Data;
-import org.springframework.data.annotation.CreatedBy;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedBy;
-import org.springframework.data.annotation.LastModifiedDate;
-
-import javax.persistence.*;
-import java.util.Date;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 @Data
-@Entity
-@Table(name = "dalaran_processor")
 public class ProcessorEntity {
 
-    @Id
-    @GeneratedValue
-    private Long id;
+    private String id;
 
+    @NotNull
     private String type;
 
+    @Nullable
     private String config;
-
-    private String name;
-
-    private String status;
-
-    @JoinColumn(name = "module_id")
-    private Long moduleId;
-
-    @JoinColumn(name = "in_structure")
-    private Long inStructure;
-
-    @JoinColumn(name = "out_structure")
-    private Long outStructure;
-
-    private String description;
-
-    @CreatedDate
-    @Column(columnDefinition = "timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP")
-    private Date createdAt;
-
-    @LastModifiedDate
-    @Column(columnDefinition = "timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
-    private Date updatedAt;
-
-    @CreatedBy
-    private String createdBy;
-
-    @LastModifiedBy
-    private String updatedBy;
 }

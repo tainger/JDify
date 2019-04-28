@@ -1,6 +1,6 @@
 package io.terminus.dalaran;
 
-import io.terminus.dalaran.model.DalaranFlow;
+import io.terminus.dalaran.model.flow.TriggerFlow;
 
 import java.util.List;
 
@@ -12,13 +12,9 @@ public interface DalaranContext {
 
     void removeAllFlow() throws Exception;
 
-    void addFlow(DalaranFlow flow);
+    void addTriggerFlow(TriggerFlow flow);
 
-    void addFlows(List<DalaranFlow> flows);
-
-    void addTestFlow(DalaranFlow dalaranFlow);
-
-    void addTestFlows(List<DalaranFlow> flows);
+    void addTriggerFlows(List<TriggerFlow> flows);
 
     // TODO 这里要处理数据的序列化等问题
     Object testFlow(Long flowId, Object body, String recordId);
