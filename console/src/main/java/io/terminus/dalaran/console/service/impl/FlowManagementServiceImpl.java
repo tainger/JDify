@@ -2,11 +2,9 @@ package io.terminus.dalaran.console.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import io.terminus.dalaran.DalaranContext;
-import io.terminus.dalaran.DalaranLoader;
+import io.terminus.dalaran.console.convertor.FlowConvertor;
 import io.terminus.dalaran.console.model.dto.ModelDTO;
-import io.terminus.dalaran.console.model.dto.ProcessorDTO;
 import io.terminus.dalaran.console.model.dto.flow.TriggerFlowDTO;
 import io.terminus.dalaran.console.model.query.FlowQuery;
 import io.terminus.dalaran.console.model.query.rst.ComponentInfo;
@@ -14,9 +12,8 @@ import io.terminus.dalaran.console.model.query.rst.ModuleComponent;
 import io.terminus.dalaran.console.service.FlowManagementService;
 import io.terminus.dalaran.console.service.jpa.FlowQueryService;
 import io.terminus.dalaran.entity.ModelEntity;
-import io.terminus.dalaran.entity.flow.TriggerFlowEntity;
 import io.terminus.dalaran.entity.ProcessorEntity;
-import io.terminus.dalaran.model.ProcessorModel;
+import io.terminus.dalaran.entity.flow.TriggerFlowEntity;
 import io.terminus.dalaran.repository.ModelRepository;
 import io.terminus.dalaran.repository.ModuleRepository;
 import io.terminus.dalaran.repository.PropertyRepository;
@@ -26,6 +23,7 @@ import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -33,6 +31,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional
 public class FlowManagementServiceImpl implements FlowManagementService {
 
     @Autowired
@@ -53,19 +52,17 @@ public class FlowManagementServiceImpl implements FlowManagementService {
     @Autowired
     private ModelRepository modelRepository;
 
-    @Autowired
-    private DalaranLoader dalaranLoader;
-
     private String DALARAN_FLOW = "dalaran-flow";
 
     private final Gson gson = new Gson();
+    private final FlowConvertor flowConvertor = new FlowConvertor();
 
     @Override
     public List<TriggerFlowDTO> queryFlows(FlowQuery query) {
         List<TriggerFlowEntity> entities = flowQueryService.query(query);
         List<TriggerFlowDTO> models = new LinkedList<>();
         for (TriggerFlowEntity entity : entities) {
-            models.add(buildModel(entity));
+            models.add(flowConvertor.toDTO(entity));
         }
         return models;
     }
@@ -106,7 +103,7 @@ public class FlowManagementServiceImpl implements FlowManagementService {
         List<TriggerFlowEntity> entities = flowRepository.findAll();
         List<TriggerFlowDTO> models = new LinkedList<>();
         for (TriggerFlowEntity entity : entities) {
-            models.add(buildModel(entity));
+            models.add(flowConvertor.toDTO(entity));
         }
 
         return models;
@@ -117,7 +114,7 @@ public class FlowManagementServiceImpl implements FlowManagementService {
         List<TriggerFlowEntity> entities = flowQueryService.queryByProcessorIds(processorIds);
         List<TriggerFlowDTO> models = new LinkedList<>();
         for (TriggerFlowEntity entity : entities) {
-            models.add(buildModel(entity));
+            models.add(flowConvertor.toDTO(entity));
         }
 
         return models;
@@ -141,7 +138,7 @@ public class FlowManagementServiceImpl implements FlowManagementService {
         if (flowEntity == null) {
             return null;
         }
-        return buildModel(flowEntity);
+        return flowConvertor.toDTO(flowEntity);
     }
 
     private TriggerFlowEntity buildEntity(TriggerFlowDTO model) {
@@ -176,29 +173,6 @@ public class FlowManagementServiceImpl implements FlowManagementService {
         flowEntity.setDescription(model.getDescription());
 
         return flowEntity;
-    }
-
-    private TriggerFlowDTO buildModel(TriggerFlowEntity entity) {
-        List<ProcessorDTO> pipeline = new ArrayList<>();
-        for (ProcessorEntity processorEntity : entity.getPipeline()) {
-            ProcessorDTO processor = new ProcessorDTO();
-            processor.setId(processorEntity.getId());
-            processor.setType(processorEntity.getType());
-            processor.setConfig(gson.fromJson(processorEntity.getConfig(), Map.class));
-            pipeline.add(processor);
-        }
-
-        TriggerFlowDTO flowModel = new TriggerFlowDTO();
-        flowModel.setId(entity.getId());
-        flowModel.setModuleId(entity.getModuleId());
-        flowModel.setName(entity.getName());
-        flowModel.setDescription(entity.getDescription());
-        flowModel.setInModelId(entity.getInModel());
-        flowModel.setOutModelId(entity.getInModel());
-        flowModel.setPipeline(pipeline);
-        flowModel.setTriggerType(entity.getTriggerType());
-        flowModel.setTriggerConfig(gson.fromJson(entity.getTriggerConfig(), Map.class));
-        return flowModel;
     }
 
     private ModelDTO buildModelEntity(ModelEntity entity) {

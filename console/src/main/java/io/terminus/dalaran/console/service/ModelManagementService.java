@@ -1,7 +1,6 @@
 package io.terminus.dalaran.console.service;
 
 import io.terminus.dalaran.console.model.dto.ModelDTO;
-import io.terminus.dalaran.console.model.dto.flow.TriggerFlowDTO;
 import io.terminus.dalaran.console.model.query.ModelQuery;
 import io.terminus.dalaran.console.model.query.rst.ModuleComponent;
 import io.terminus.dalaran.entity.ModelEntity;

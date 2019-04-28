@@ -1,7 +1,6 @@
 package io.terminus.dalaran.entity.flow;
 
 import io.terminus.dalaran.FlowStatus;
-import io.terminus.dalaran.converter.ListToJsonConverter;
 import io.terminus.dalaran.converter.PipelineJsonConverter;
 import io.terminus.dalaran.entity.BasicEntity;
 import io.terminus.dalaran.entity.ProcessorEntity;

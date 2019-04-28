@@ -1,7 +1,6 @@
 package io.terminus.dalaran.console.model.dto.flow;
 
 import io.terminus.dalaran.console.model.dto.ProcessorDTO;
-import io.terminus.dalaran.model.ProcessorModel;
 import lombok.Data;
 import org.jetbrains.annotations.Nullable;
 

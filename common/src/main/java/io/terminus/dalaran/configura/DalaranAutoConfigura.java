@@ -1,6 +1,9 @@
 package io.terminus.dalaran.configura;
 
-import io.terminus.dalaran.*;
+import io.terminus.dalaran.DalaranComponentContext;
+import io.terminus.dalaran.DalaranContext;
+import io.terminus.dalaran.DalaranConverterContext;
+import io.terminus.dalaran.DalaranTraceLogger;
 import io.terminus.dalaran.support.component.DefaultDalaranComponentContext;
 import io.terminus.dalaran.support.convert.DefaultDalaranConverterContext;
 import io.terminus.dalaran.support.flow.DefaultDalaranCamelContext;
@@ -39,11 +42,6 @@ public class DalaranAutoConfigura {
     @Bean
     public DalaranTraceLogger dalaranTraceLogger() {
         return new DefaultJpaDalaranTraceLogger();
-    }
-
-    @Bean
-    public DalaranLoader dalaranLoader() {
-        return new DalaranLoader(false);
     }
 
     @Bean

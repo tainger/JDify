@@ -15,6 +15,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -24,6 +25,7 @@ import java.util.Map;
  * Created by jingdi on 2019/3/29
  */
 @Service
+@Transactional
 public class ModelManagementServiceImpl implements ModelManagementService {
 
     @Autowired

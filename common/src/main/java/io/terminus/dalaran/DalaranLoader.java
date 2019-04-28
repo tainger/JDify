@@ -1,25 +1,25 @@
 package io.terminus.dalaran;
 
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import com.hubspot.jinjava.Jinjava;
-import io.terminus.dalaran.entity.ModelEntity;
-import io.terminus.dalaran.entity.flow.TriggerFlowEntity;
-import io.terminus.dalaran.model.MessageModel;
 import io.terminus.dalaran.entity.ProcessorEntity;
+import io.terminus.dalaran.entity.release.ReleaseRecordEntity;
+import io.terminus.dalaran.entity.release.ReleasedModelEntity;
+import io.terminus.dalaran.entity.release.ReleasedTriggerFlowEntity;
+import io.terminus.dalaran.model.MessageModel;
 import io.terminus.dalaran.model.ProcessorModel;
-import io.terminus.dalaran.model.TriggerModel;
 import io.terminus.dalaran.model.flow.TriggerFlow;
-import io.terminus.dalaran.repository.ModelRepository;
 import io.terminus.dalaran.repository.PropertyRepository;
-import io.terminus.dalaran.repository.TriggerFlowRepository;
+import io.terminus.dalaran.repository.ReleaseRecordRepository;
+import io.terminus.dalaran.repository.ReleasedModelRepository;
+import io.terminus.dalaran.repository.ReleasedTriggerFlowRepository;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 
 import javax.annotation.PostConstruct;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -29,42 +29,52 @@ public class DalaranLoader {
     private final Gson gson = new Gson();
 
     @Autowired
-    private TriggerFlowRepository flowRepository;
+    private ReleasedTriggerFlowRepository flowRepository;
 
     @Autowired
     private PropertyRepository propertyRepository;
 
     @Autowired
-    private ModelRepository modelRepository;
+    private ReleasedModelRepository modelRepository;
+
+    @Autowired
+    private ReleaseRecordRepository releaseRecordRepository;
 
     @Autowired
     private DalaranContext dalaranContext;
 
-    // TODO test mode
-    private final boolean enableTest;
+    private String version;
 
     public DalaranLoader(boolean enableTest) {
-        this.enableTest = enableTest;
     }
 
-    // TODO 临时用入参处理一下 trigger 加载的开关
+    // TODO 临时每分钟 load 一下...
     @PostConstruct
+    @Scheduled(cron = "0 * * * * *")
     private void init() {
-        // TODO load mock flow?
-        loadAllFlow();
+        ReleaseRecordEntity recordEntity = releaseRecordRepository.findByEnabledTrue();
+        synchronized (this) {
+            if (recordEntity != null && !recordEntity.getVersion().equals(version)) {
+                log.info("load version {}", recordEntity.getVersion());
+                version = recordEntity.getVersion();
+                loadAllFlow();
+            } else {
+                log.info("version not change");
+            }
+        }
     }
 
     private void loadAllFlow() {
         List<TriggerFlow> flowList = new ArrayList<>();
-        List<TriggerFlowEntity> flowEntities = flowRepository.findAll();
-        for (TriggerFlowEntity flowEntity : flowEntities) {
+        List<ReleasedTriggerFlowEntity> flowEntities = flowRepository.findByVersion(version);
+        for (ReleasedTriggerFlowEntity flowEntity : flowEntities) {
             flowList.add(buildDalaranFlow(flowEntity));
             log.info("load flow[{}]", flowEntity.getId());
         }
         dalaranContext.addTriggerFlows(flowList);
     }
 
-    private TriggerFlow buildDalaranFlow(TriggerFlowEntity flowEntity) {
+    private TriggerFlow buildDalaranFlow(ReleasedTriggerFlowEntity flowEntity) {
         val flow = new TriggerFlow();
         List<ProcessorModel> pipeline = new ArrayList<>();
         for (ProcessorEntity processorEntity : flowEntity.getPipeline()) {
@@ -83,13 +93,12 @@ public class DalaranLoader {
         flow.setTriggerConfig(triggerConfig);
 
         // TODO for test...
-        flow.setInModel(buildMessageModel(modelRepository.findOne(flowEntity.getInModel())));
-        flow.setOutModel(buildMessageModel(modelRepository.findOne(flowEntity.getOutModel())));
-        flow.setId(flowEntity.getId());
+        flow.setInModel(buildMessageModel(modelRepository.findByVersionAndOriginId(version, flowEntity.getInModel())));
+        flow.setOutModel(buildMessageModel(modelRepository.findByVersionAndOriginId(version, flowEntity.getOutModel())));
         flow.setPipeline(pipeline);
+        flow.setId(flowEntity.getOriginId());
         return flow;
     }
-
 
     private static String replaceProperties(String configValue, Map<String, String> properties) {
         // TODO 性能问题...
@@ -97,33 +106,12 @@ public class DalaranLoader {
         return jinjava.render(configValue, properties);
     }
 
-    private MessageModel buildMessageModel(ModelEntity modelEntity) {
+    private MessageModel buildMessageModel(ReleasedModelEntity modelEntity) {
         val model = new MessageModel();
         val modelType = modelEntity.getType();
         model.setModelType(modelType);
         Class<? extends DalaranModelSchema> schemaType = dalaranContext.getDalaranConverterContext().getSchemaType(modelType);
         model.setModelSchema(gson.fromJson(modelEntity.getModelSchema(), schemaType));
         return model;
-    }
-
-    private TriggerModel buildTrigger(String type, String configJson) {
-        val trigger = new TriggerModel();
-        Class configType = dalaranContext.getDalaranComponentContext().getTriggerInfo(type).getConfigType();
-//        String jsonConfig = replaceProperties(triggerEntity.getConfig(), properties);
-        Object config = gson.fromJson(configJson, configType);
-        if (config instanceof ModelableConfig) {
-            ModelableConfig modelConfig = (ModelableConfig) config;
-            if (modelConfig.getInModelId() != null) {
-                ModelEntity modelEntity = modelRepository.findOne(modelConfig.getInModelId());
-                val inModel = buildMessageModel(modelEntity);
-                trigger.setInModel(inModel);
-            }
-            if (modelConfig.getOutModelId() != null) {
-                ModelEntity modelEntity = modelRepository.findOne(modelConfig.getOutModelId());
-                val outModel = buildMessageModel(modelEntity);
-                trigger.setOutModel(outModel);
-            }
-        }
-        return trigger;
     }
 }
