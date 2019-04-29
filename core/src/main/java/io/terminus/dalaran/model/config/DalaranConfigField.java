@@ -13,11 +13,13 @@ public class DalaranConfigField {
 
     private FieldInputType inputType;
 
+    private String reusableConfig;
+
     private String defaultValue;
 
     private String example;
 
     private String label;
 
-    List<Map<String, String>> enumValues;
+    Map<String, String> enumValues;
 }

@@ -17,4 +17,6 @@ public class TriggerInfo {
     private transient boolean serializedBody;
 
     private transient Class configType;
+
+    private transient Class connectorType;
 }

@@ -15,4 +15,6 @@ public class ModuleDetailDTO extends ModuleDTO {
 
     private List<BasicModelInfo> models;
 
+    private List<BasicConnectorInfo> connectors;
+
 }

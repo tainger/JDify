@@ -13,7 +13,8 @@ public class DalaranHttpClient implements DalaranProcessor<HttpClientConfig> {
     // TODO form && queryString
     @Override
     public void configure(ProcessorDefinition route, HttpClientConfig config) {
-        String uri = String.format(HTTP_URI, config.getProtocol().name().toLowerCase(), config.getHost(), config.getPort(), config.getPath());
+        HttpClientConnector connector = config.getConnector();
+        String uri = String.format(HTTP_URI, connector.getProtocol().name().toLowerCase(), connector.getHost(), connector.getPort(), config.getPath());
         route.setHeader("CamelHttpMethod", Builder.constant(config.getMethod().name()));
 //        route.setHeader(Exchange.HTTP_QUERY, simple("?b=${in.header.b}"));
         route.to(uri);

@@ -1,8 +1,6 @@
 package io.terminus.dalaran.support.component;
 
-import io.terminus.dalaran.DalaranComponentContext;
-import io.terminus.dalaran.DalaranProcessor;
-import io.terminus.dalaran.DalaranTrigger;
+import io.terminus.dalaran.*;
 import io.terminus.dalaran.annotation.ConfigFieldInfo;
 import io.terminus.dalaran.annotation.Processor;
 import io.terminus.dalaran.annotation.Trigger;
@@ -16,6 +14,8 @@ import org.springframework.context.ApplicationContextAware;
 
 import javax.annotation.PostConstruct;
 import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -28,6 +28,8 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext, 
 
     private final Map<String, TriggerInfo> triggerInfoMapping = new ConcurrentHashMap<>();
     private final Map<String, ProcessorInfo> processorInfoMapping = new ConcurrentHashMap<>();
+
+    private final List<String> reusableConfigList = new ArrayList<>();
 
     @Override
     public DalaranTrigger getTrigger(String triggerType) {
@@ -91,6 +93,8 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext, 
 
         triggerInfo.setIsVoid(triggerAnnotation.isVoid());
 
+        triggerInfo.setConnectorType(getConnectorType(triggerAnnotation.configType()));
+
         triggerInfoMapping.put(triggerAnnotation.value(), triggerInfo);
         triggerMapping.put(triggerAnnotation.value(), trigger);
     }
@@ -106,8 +110,25 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext, 
         processorInfo.setSerializedBody(processorAnnotation.serializedBody());
         processorInfo.setAllowedBodyTypes(processorAnnotation.allowBodyTypes());
 
+        processorInfo.setConnectorType(getConnectorType(processorAnnotation.configType()));
+
         processorInfoMapping.put(processorAnnotation.value(), processorInfo);
         processorMapping.put(processorAnnotation.value(), processor);
+    }
+
+    private Class getConnectorType(Class configType) {
+        for (Type genericInterface : configType.getGenericInterfaces()) {
+            if (genericInterface instanceof ParameterizedType) {
+                Class rawType = (Class) ((ParameterizedType) genericInterface).getRawType();
+                if (rawType == ConnectorConfig.class) {
+                    Type[] parameterizedType = ((ParameterizedType) genericInterface).getActualTypeArguments();
+                    if (parameterizedType.length == 1) {
+                        return (Class) parameterizedType[0];
+                    }
+                }
+            }
+        }
+        return null;
     }
 
     private DalaranConfigField[] buildConfigFields(Class configClass) {
@@ -122,22 +143,27 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext, 
                 configField.setDefaultValue(configFieldInfo.defaultValue());
                 configField.setLabel(configFieldInfo.label());
 
-                try {
-                    if (field.getType().isEnum()) {
-                        List<Map<String, String>> enumValues = new ArrayList<>();
-                        val type = Class.forName(field.getType().getName());
-                        val fields = type.getFields();
-                        for (Field field1 : fields) {
-                            val name = field1.getName();
-                            val map = new HashMap();
-                            map.put(name, name);
-                            enumValues.add(map);
-                        }
-                        configField.setEnumValues(enumValues);
+                if (field.getType().isEnum()) {
+                    val enumValueMap = new HashMap<String, String>();
+                    for (Field element : field.getType().getFields()) {
+                        val name = element.getName();
+                        enumValueMap.put(name, name);
                     }
-                } catch (Exception e) {
-                    e.printStackTrace();
+                    configField.setEnumValues(enumValueMap);
                 }
+
+                if (configFieldInfo.inputType() == FieldInputType.Connector) {
+                    Class reusableConfigClass = configFieldInfo.connectorType();
+                    if (reusableConfigClass != Object.class) {
+                        String reusableConfigName = reusableConfigClass.getCanonicalName();
+                        reusableConfigList.add(reusableConfigName);
+                        configField.setReusableConfig(reusableConfigName);
+                    } else {
+                        // TODO else throw...
+                        throw new RuntimeException("config " + configClass + " field[" + field.getName() + "] reusable config can't be null");
+                    }
+                }
+
                 configFields.add(configField);
             }
         }

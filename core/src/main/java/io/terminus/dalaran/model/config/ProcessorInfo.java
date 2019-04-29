@@ -18,6 +18,8 @@ public class ProcessorInfo {
 
     private transient Class configType;
 
+    private transient Class connectorType;
+
     public boolean allowedBodyType(BodyType bodyType) {
         for (BodyType allowedBodyType : allowedBodyTypes) {
             if (allowedBodyType == bodyType) {

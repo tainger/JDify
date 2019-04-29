@@ -20,4 +20,6 @@ public @interface ConfigFieldInfo {
     boolean required() default true;
 
     FieldInputType inputType() default FieldInputType.Auto;
+
+    Class connectorType() default Object.class;
 }

@@ -89,8 +89,8 @@ public class FlowBuilder {
              * 如果没有, 尝试查看最后一次有效的数据模型是否允许, 允许则使用最后一次模型进行转换
              * 如果都没有, 选择下一个节点第一个可接受类型进行转换
              */
+            // TODO 这里还是比较奇怪, 有点绕, 而且有些特殊场景没有考虑到
             if (!processorInfo.allowedBodyType(currentBodyType)) {
-                // 如果
                 if (inModel != null) {
                     converterContext.convert(route, currentBodyType, inModel);
                     lastedMessageModel = inModel;
@@ -106,7 +106,6 @@ public class FlowBuilder {
             }
 
             processorComponent.configure(route, processor.getConfig());
-
 
             MessageModel outModel = getProcessorOutModel(processor);
 

@@ -4,15 +4,19 @@ import com.google.gson.Gson;
 import com.hubspot.jinjava.Jinjava;
 import io.terminus.dalaran.entity.ProcessorEntity;
 import io.terminus.dalaran.entity.release.ReleaseRecordEntity;
+import io.terminus.dalaran.entity.release.ReleasedConnectorEntity;
 import io.terminus.dalaran.entity.release.ReleasedModelEntity;
 import io.terminus.dalaran.entity.release.ReleasedTriggerFlowEntity;
 import io.terminus.dalaran.model.MessageModel;
 import io.terminus.dalaran.model.ProcessorModel;
+import io.terminus.dalaran.model.config.ProcessorInfo;
+import io.terminus.dalaran.model.config.TriggerInfo;
 import io.terminus.dalaran.model.flow.TriggerFlow;
 import io.terminus.dalaran.repository.PropertyRepository;
-import io.terminus.dalaran.repository.ReleaseRecordRepository;
-import io.terminus.dalaran.repository.ReleasedModelRepository;
-import io.terminus.dalaran.repository.ReleasedTriggerFlowRepository;
+import io.terminus.dalaran.repository.release.ReleaseRecordRepository;
+import io.terminus.dalaran.repository.release.ReleasedConnectorRepository;
+import io.terminus.dalaran.repository.release.ReleasedModelRepository;
+import io.terminus.dalaran.repository.release.ReleasedTriggerFlowRepository;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +43,9 @@ public class DalaranLoader {
 
     @Autowired
     private ReleaseRecordRepository releaseRecordRepository;
+
+    @Autowired
+    private ReleasedConnectorRepository connectorRepository;
 
     @Autowired
     private DalaranContext dalaranContext;
@@ -81,20 +88,63 @@ public class DalaranLoader {
             ProcessorModel processor = new ProcessorModel();
             processor.setId(processorEntity.getId());
             processor.setType(processorEntity.getType());
-            Class processorConfigType = dalaranContext.getDalaranComponentContext().getProcessorInfo(processorEntity.getType()).getConfigType();
-            processor.setConfig(gson.fromJson(processorEntity.getConfig(), processorConfigType));
+
+            // TODO 重复的, 需要被抽象的
+            ProcessorInfo processorInfo = dalaranContext.getDalaranComponentContext().getProcessorInfo(processorEntity.getType());
+            Class processorConfigType = processorInfo.getConfigType();
+            Class connectorType = processorInfo.getConnectorType();
+            Object config = gson.fromJson(processorEntity.getConfig(), processorConfigType);
+            if (config instanceof ModelableConfig) {
+                ModelableConfig modelableConfig = (ModelableConfig) config;
+                if (modelableConfig.getInModelId() != null) {
+                    modelableConfig.setInModel(getMessageModel(modelableConfig.getInModelId()));
+                }
+                if (modelableConfig.getOutModelId() != null) {
+                    modelableConfig.setOutModel(getMessageModel(modelableConfig.getOutModelId()));
+                }
+            }
+            if (config instanceof ConnectorConfig) {
+                Long connectorId = ((ConnectorConfig) config).getConnectorId();
+                if (connectorId != null) {
+                    ReleasedConnectorEntity connectorEntity = connectorRepository.findByVersionAndOriginId(version, connectorId);
+                    Object connector = gson.fromJson(connectorEntity.getConfig(), connectorType);
+                    ((ConnectorConfig) config).setConnector(connector);
+                }
+            }
+            processor.setConfig(config);
             pipeline.add(processor);
         }
 
-        Class configType = dalaranContext.getDalaranComponentContext().getTriggerInfo(flowEntity.getTriggerType()).getConfigType();
-        Object triggerConfig = gson.fromJson(flowEntity.getTriggerConfig(), configType);
+        // TODO 重复的, 需要被抽象的
+        TriggerInfo triggerInfo = dalaranContext.getDalaranComponentContext().getTriggerInfo(flowEntity.getTriggerType());
+        Class triggerConfigType = triggerInfo.getConfigType();
+        Class connectorType = triggerInfo.getConnectorType();
+        Object triggerConfig = gson.fromJson(flowEntity.getTriggerConfig(), triggerConfigType);
 
         flow.setTriggerType(flowEntity.getTriggerType());
         flow.setTriggerConfig(triggerConfig);
 
+        if (triggerConfig instanceof ModelableConfig) {
+            ModelableConfig modelableConfig = (ModelableConfig) triggerConfig;
+            if (modelableConfig.getInModelId() != null) {
+                modelableConfig.setInModel(getMessageModel(modelableConfig.getInModelId()));
+            }
+            if (modelableConfig.getOutModelId() != null) {
+                modelableConfig.setOutModel(getMessageModel(modelableConfig.getOutModelId()));
+            }
+        }
+        if (triggerConfig instanceof ConnectorConfig) {
+            Long connectorId = ((ConnectorConfig) triggerConfig).getConnectorId();
+            if (connectorId != null) {
+                ReleasedConnectorEntity connectorEntity = connectorRepository.findByVersionAndOriginId(version, connectorId);
+                Object connector = gson.fromJson(connectorEntity.getConfig(), connectorType);
+                ((ConnectorConfig) triggerConfig).setConnector(connector);
+            }
+        }
+
         // TODO for test...
-        flow.setInModel(buildMessageModel(modelRepository.findByVersionAndOriginId(version, flowEntity.getInModel())));
-        flow.setOutModel(buildMessageModel(modelRepository.findByVersionAndOriginId(version, flowEntity.getOutModel())));
+        flow.setInModel(getMessageModel(flowEntity.getInModel()));
+        flow.setOutModel(getMessageModel(flowEntity.getOutModel()));
         flow.setPipeline(pipeline);
         flow.setId(flowEntity.getOriginId());
         return flow;
@@ -106,7 +156,8 @@ public class DalaranLoader {
         return jinjava.render(configValue, properties);
     }
 
-    private MessageModel buildMessageModel(ReleasedModelEntity modelEntity) {
+    private MessageModel getMessageModel(Long modelId) {
+        ReleasedModelEntity modelEntity = modelRepository.findByVersionAndOriginId(version, modelId);
         val model = new MessageModel();
         val modelType = modelEntity.getType();
         model.setModelType(modelType);

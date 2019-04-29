@@ -1,4 +1,4 @@
-package io.terminus.dalaran.repository;
+package io.terminus.dalaran.repository.release;
 
 import io.terminus.dalaran.entity.release.ReleaseRecordEntity;
 import org.springframework.data.jpa.repository.JpaRepository;

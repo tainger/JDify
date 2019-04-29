@@ -3,6 +3,7 @@ package io.terminus.dalaran.console.service.impl;
 import io.terminus.dalaran.console.model.dto.ModuleDTO;
 import io.terminus.dalaran.console.model.dto.ModuleDetailDTO;
 import io.terminus.dalaran.console.model.query.ModuleQuery;
+import io.terminus.dalaran.console.service.ConnectorService;
 import io.terminus.dalaran.console.service.FlowManagementService;
 import io.terminus.dalaran.console.service.ModelManagementService;
 import io.terminus.dalaran.console.service.ModuleManagementService;
@@ -35,6 +36,9 @@ public class ModuleManagementServiceImpl implements ModuleManagementService {
 
     @Autowired
     private ModelManagementService modelManagementService;
+
+    @Autowired
+    private ConnectorService connectorService;
 
     @Override
     public Long createModule(ModuleDTO moduleModel) {
@@ -90,6 +94,7 @@ public class ModuleManagementServiceImpl implements ModuleManagementService {
         moduleDetail.setDependencies(moduleEntity.getDependencies());
         moduleDetail.setFlows(flowManagementService.listBasicFlowInfoByModuleId(moduleId));
         moduleDetail.setModels(modelManagementService.listBasicInfoByModuleId(moduleId));
+        moduleDetail.setConnectors(connectorService.listBasicInfoByModuleId(moduleId));
         return moduleDetail;
     }
 
