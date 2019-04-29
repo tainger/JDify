@@ -2,8 +2,8 @@ package io.terminus.dalaran.console.rest;
 
 import io.swagger.annotations.ApiOperation;
 import io.terminus.dalaran.console.model.dto.ModuleDTO;
+import io.terminus.dalaran.console.model.dto.ModuleDetailDTO;
 import io.terminus.dalaran.console.model.query.ModuleQuery;
-import io.terminus.dalaran.console.model.query.rst.ModuleComponent;
 import io.terminus.dalaran.console.service.ModuleManagementService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -49,9 +49,9 @@ public class ModuleManagementRest {
         return moduleManagementService.list();
     }
 
-    @ApiOperation(value = "获取模块的所有组件信息")
-    @RequestMapping(value = "/list/components", method = RequestMethod.GET)
-    public List<ModuleComponent> listComponent(@RequestParam Long id) {
-        return moduleManagementService.listModuleComponents(id);
+    @ApiOperation(value = "获取模块的详情, 包括所有组件的基本信息")
+    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
+    public ModuleDetailDTO listComponent(@PathVariable Long id) {
+        return moduleManagementService.getModuleDetail(id);
     }
 }

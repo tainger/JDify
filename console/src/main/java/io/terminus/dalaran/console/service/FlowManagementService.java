@@ -1,8 +1,8 @@
 package io.terminus.dalaran.console.service;
 
+import io.terminus.dalaran.console.model.dto.flow.BasicFlowInfo;
 import io.terminus.dalaran.console.model.dto.flow.TriggerFlowDTO;
 import io.terminus.dalaran.console.model.query.FlowQuery;
-import io.terminus.dalaran.console.model.query.rst.ModuleComponent;
 import io.terminus.dalaran.entity.flow.TriggerFlowEntity;
 import org.jetbrains.annotations.Nullable;
 
@@ -24,7 +24,7 @@ public interface FlowManagementService {
 
     List<TriggerFlowDTO> queryByProcessorIds(List<Long> processorIds);
 
-    List<ModuleComponent> getComponents(Long moduleId);
+    List<BasicFlowInfo> listBasicFlowInfoByModuleId(Long moduleId);
 
     @Nullable
     TriggerFlowDTO getById(Long flowId);

@@ -1,11 +1,9 @@
 package io.terminus.dalaran.console.service.impl;
 
 import com.alibaba.fastjson.JSON;
-import io.terminus.dalaran.BodyType;
+import io.terminus.dalaran.console.model.dto.BasicModelInfo;
 import io.terminus.dalaran.console.model.dto.ModelDTO;
 import io.terminus.dalaran.console.model.query.ModelQuery;
-import io.terminus.dalaran.console.model.query.rst.ComponentInfo;
-import io.terminus.dalaran.console.model.query.rst.ModuleComponent;
 import io.terminus.dalaran.console.service.ModelManagementService;
 import io.terminus.dalaran.console.service.jpa.ModelQueryService;
 import io.terminus.dalaran.entity.ModelEntity;
@@ -16,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -78,17 +75,8 @@ public class ModelManagementServiceImpl implements ModelManagementService {
     }
 
     @Override
-    public List<ModuleComponent> getComponents(Long moduleId) {
-        List<ModuleComponent> components = new ArrayList<>();
-        List<BodyType> types = modelQueryService.getTypes(moduleId);
-        for (BodyType type : types) {
-            List<ComponentInfo> componentInfos = modelQueryService.getBasicInfo(type);
-            ModuleComponent moduleComponent = new ModuleComponent();
-            moduleComponent.setType(type.name());
-            moduleComponent.setComponents(componentInfos);
-            components.add(moduleComponent);
-        }
-        return components;
+    public List<BasicModelInfo> listBasicInfoByModuleId(Long moduleId) {
+        return modelQueryService.listBasicInfoByModuleId(moduleId);
     }
 
     @Override

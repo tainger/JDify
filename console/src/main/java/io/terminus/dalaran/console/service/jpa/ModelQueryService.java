@@ -1,8 +1,8 @@
 package io.terminus.dalaran.console.service.jpa;
 
 import io.terminus.dalaran.BodyType;
+import io.terminus.dalaran.console.model.dto.BasicModelInfo;
 import io.terminus.dalaran.console.model.query.ModelQuery;
-import io.terminus.dalaran.console.model.query.rst.ComponentInfo;
 import io.terminus.dalaran.entity.ModelEntity;
 
 import java.util.List;
@@ -16,5 +16,5 @@ public interface ModelQueryService {
 
     List<BodyType> getTypes(Long moduleId);
 
-    List<ComponentInfo> getBasicInfo(BodyType type);
+    List<BasicModelInfo> listBasicInfoByModuleId(Long moduleId);
 }

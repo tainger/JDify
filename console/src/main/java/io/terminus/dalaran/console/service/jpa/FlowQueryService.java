@@ -1,7 +1,7 @@
 package io.terminus.dalaran.console.service.jpa;
 
+import io.terminus.dalaran.console.model.dto.flow.BasicFlowInfo;
 import io.terminus.dalaran.console.model.query.FlowQuery;
-import io.terminus.dalaran.console.model.query.rst.ComponentInfo;
 import io.terminus.dalaran.entity.flow.TriggerFlowEntity;
 
 import java.util.List;
@@ -15,5 +15,5 @@ public interface FlowQueryService {
 
     List<TriggerFlowEntity> queryByProcessorIds(List<Long> processorIds);
 
-    List<ComponentInfo> getBasicInfo(Long moduleId);
+    List<BasicFlowInfo> listBasicInfoByModuleId(Long moduleId);
 }

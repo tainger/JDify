@@ -5,10 +5,9 @@ import com.google.gson.Gson;
 import io.terminus.dalaran.DalaranContext;
 import io.terminus.dalaran.console.convertor.FlowConvertor;
 import io.terminus.dalaran.console.model.dto.ModelDTO;
+import io.terminus.dalaran.console.model.dto.flow.BasicFlowInfo;
 import io.terminus.dalaran.console.model.dto.flow.TriggerFlowDTO;
 import io.terminus.dalaran.console.model.query.FlowQuery;
-import io.terminus.dalaran.console.model.query.rst.ComponentInfo;
-import io.terminus.dalaran.console.model.query.rst.ModuleComponent;
 import io.terminus.dalaran.console.service.FlowManagementService;
 import io.terminus.dalaran.console.service.jpa.FlowQueryService;
 import io.terminus.dalaran.entity.ModelEntity;
@@ -24,7 +23,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -121,14 +119,8 @@ public class FlowManagementServiceImpl implements FlowManagementService {
     }
 
     @Override
-    public List<ModuleComponent> getComponents(Long moduleId) {
-        List<ModuleComponent> components = new ArrayList<>();
-        ModuleComponent component = new ModuleComponent();
-        List<ComponentInfo> componentInfos = flowQueryService.getBasicInfo(moduleId);
-        component.setType(DALARAN_FLOW);
-        component.setComponents(componentInfos);
-        components.add(component);
-        return components;
+    public List<BasicFlowInfo> listBasicFlowInfoByModuleId(Long moduleId) {
+        return flowQueryService.listBasicInfoByModuleId(moduleId);
     }
 
     @Nullable

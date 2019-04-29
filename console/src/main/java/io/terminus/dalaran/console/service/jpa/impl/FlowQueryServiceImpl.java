@@ -1,7 +1,7 @@
 package io.terminus.dalaran.console.service.jpa.impl;
 
+import io.terminus.dalaran.console.model.dto.flow.BasicFlowInfo;
 import io.terminus.dalaran.console.model.query.FlowQuery;
-import io.terminus.dalaran.console.model.query.rst.ComponentInfo;
 import io.terminus.dalaran.console.service.jpa.FlowQueryService;
 import io.terminus.dalaran.entity.flow.TriggerFlowEntity;
 import io.terminus.dalaran.repository.TriggerFlowRepository;
@@ -74,11 +74,11 @@ public class FlowQueryServiceImpl implements FlowQueryService {
     }
 
     @Override
-    public List<ComponentInfo> getBasicInfo(Long moduleId) {
+    public List<BasicFlowInfo> listBasicInfoByModuleId(Long moduleId) {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<ComponentInfo> criteriaQuery = builder.createQuery(ComponentInfo.class);
+        CriteriaQuery<BasicFlowInfo> criteriaQuery = builder.createQuery(BasicFlowInfo.class);
         Root<TriggerFlowEntity> root = criteriaQuery.from(TriggerFlowEntity.class);
-        criteriaQuery.multiselect(root.get("id"), root.get("name"), root.get("status")).where(builder.equal(root.get("moduleId"), moduleId));
+        criteriaQuery.multiselect(root.get("id"), root.get("moduleId"), root.get("name"), root.get("status")).where(builder.equal(root.get("moduleId"), moduleId));
         return entityManager.createQuery(criteriaQuery).getResultList();
     }
 }

@@ -1,8 +1,8 @@
 package io.terminus.dalaran.console.service.impl;
 
 import io.terminus.dalaran.console.model.dto.ModuleDTO;
+import io.terminus.dalaran.console.model.dto.ModuleDetailDTO;
 import io.terminus.dalaran.console.model.query.ModuleQuery;
-import io.terminus.dalaran.console.model.query.rst.ModuleComponent;
 import io.terminus.dalaran.console.service.FlowManagementService;
 import io.terminus.dalaran.console.service.ModelManagementService;
 import io.terminus.dalaran.console.service.ModuleManagementService;
@@ -57,7 +57,7 @@ public class ModuleManagementServiceImpl implements ModuleManagementService {
         List<ModuleEntity> entities = moduleRepository.findAll();
         List<ModuleDTO> models = new LinkedList<>();
 
-        for (ModuleEntity entity: entities) {
+        for (ModuleEntity entity : entities) {
             models.add(buildModel(entity));
         }
 
@@ -69,7 +69,7 @@ public class ModuleManagementServiceImpl implements ModuleManagementService {
         List<ModuleEntity> entities = moduleQueryService.query(query);
         List<ModuleDTO> models = new LinkedList<>();
 
-        for (ModuleEntity entity: entities) {
+        for (ModuleEntity entity : entities) {
             models.add(buildModel(entity));
         }
 
@@ -77,11 +77,20 @@ public class ModuleManagementServiceImpl implements ModuleManagementService {
     }
 
     @Override
-    public List<ModuleComponent> listModuleComponents(Long moduleId) {
-        List<ModuleComponent> components = new LinkedList<>();
-        components.addAll(flowManagementService.getComponents(moduleId));
-        components.addAll(modelManagementService.getComponents(moduleId));
-        return components;
+    public ModuleDetailDTO getModuleDetail(Long moduleId) {
+        ModuleEntity moduleEntity = moduleRepository.findOne(moduleId);
+        if (moduleEntity == null) {
+            return null;
+        }
+        ModuleDetailDTO moduleDetail = new ModuleDetailDTO();
+        moduleDetail.setId(moduleEntity.getId());
+        moduleDetail.setName(moduleEntity.getName());
+        moduleDetail.setDescription(moduleEntity.getDescription());
+        // TODO to DTO
+        moduleDetail.setDependencies(moduleEntity.getDependencies());
+        moduleDetail.setFlows(flowManagementService.listBasicFlowInfoByModuleId(moduleId));
+        moduleDetail.setModels(modelManagementService.listBasicInfoByModuleId(moduleId));
+        return moduleDetail;
     }
 
     private ModuleEntity buildEntity(ModuleDTO model) {

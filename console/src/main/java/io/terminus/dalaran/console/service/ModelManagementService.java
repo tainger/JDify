@@ -1,8 +1,8 @@
 package io.terminus.dalaran.console.service;
 
+import io.terminus.dalaran.console.model.dto.BasicModelInfo;
 import io.terminus.dalaran.console.model.dto.ModelDTO;
 import io.terminus.dalaran.console.model.query.ModelQuery;
-import io.terminus.dalaran.console.model.query.rst.ModuleComponent;
 import io.terminus.dalaran.entity.ModelEntity;
 
 import java.util.List;
@@ -22,7 +22,7 @@ public interface ModelManagementService {
 
     List<ModelDTO> list();
 
-    List<ModuleComponent> getComponents(Long moduleId);
+    List<BasicModelInfo> listBasicInfoByModuleId(Long moduleId);
 
     ModelEntity getById(Long modelId);
 }

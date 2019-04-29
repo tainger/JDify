@@ -2,19 +2,11 @@ package io.terminus.dalaran.console.model.dto.flow;
 
 import io.terminus.dalaran.console.model.dto.ProcessorDTO;
 import lombok.Data;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
 @Data
-public class BasicFlowDTO {
-
-    @Nullable
-    private Long id;
-
-    private Long moduleId;
-
-    private String name;
+public class BasicFlowDTO extends BasicFlowInfo {
 
     private String description;
 

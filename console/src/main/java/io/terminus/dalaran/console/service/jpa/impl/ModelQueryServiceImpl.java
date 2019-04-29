@@ -1,8 +1,8 @@
 package io.terminus.dalaran.console.service.jpa.impl;
 
 import io.terminus.dalaran.BodyType;
+import io.terminus.dalaran.console.model.dto.BasicModelInfo;
 import io.terminus.dalaran.console.model.query.ModelQuery;
-import io.terminus.dalaran.console.model.query.rst.ComponentInfo;
 import io.terminus.dalaran.console.service.jpa.ModelQueryService;
 import io.terminus.dalaran.entity.ModelEntity;
 import io.terminus.dalaran.repository.ModelRepository;
@@ -70,12 +70,11 @@ public class ModelQueryServiceImpl implements ModelQueryService {
     }
 
     @Override
-    public List<ComponentInfo> getBasicInfo(BodyType type) {
+    public List<BasicModelInfo> listBasicInfoByModuleId(Long moduleId) {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<ComponentInfo> criteriaQuery = builder.createQuery(ComponentInfo.class);
+        CriteriaQuery<BasicModelInfo> criteriaQuery = builder.createQuery(BasicModelInfo.class);
         Root<ModelEntity> root = criteriaQuery.from(ModelEntity.class);
-        criteriaQuery.multiselect(root.get("id"), root.get("name"), root.get("status")).where(builder.equal(root.get("type"), type));
-
+        criteriaQuery.multiselect(root.get("id"), root.get("moduleId"), root.get("name"), root.get("type")).where(builder.equal(root.get("moduleId"), moduleId));
         return entityManager.createQuery(criteriaQuery).getResultList();
     }
 }
