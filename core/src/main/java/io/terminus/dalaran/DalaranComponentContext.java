@@ -1,5 +1,6 @@
 package io.terminus.dalaran;
 
+import io.terminus.dalaran.model.config.ConnectorInfo;
 import io.terminus.dalaran.model.config.ProcessorInfo;
 import io.terminus.dalaran.model.config.TriggerInfo;
 
@@ -16,6 +17,8 @@ public interface DalaranComponentContext {
     ProcessorInfo getProcessorInfo(String processorType);
 
     Collection<TriggerInfo> getAllTriggerInfo();
+
+    Collection<ConnectorInfo> getAllConnectorInfo();
 
     Collection<ProcessorInfo> getAllProcessorInfo();
 }

@@ -4,6 +4,7 @@ import io.terminus.dalaran.*;
 import io.terminus.dalaran.annotation.ConfigFieldInfo;
 import io.terminus.dalaran.annotation.Processor;
 import io.terminus.dalaran.annotation.Trigger;
+import io.terminus.dalaran.model.config.ConnectorInfo;
 import io.terminus.dalaran.model.config.DalaranConfigField;
 import io.terminus.dalaran.model.config.ProcessorInfo;
 import io.terminus.dalaran.model.config.TriggerInfo;
@@ -29,7 +30,7 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext, 
     private final Map<String, TriggerInfo> triggerInfoMapping = new ConcurrentHashMap<>();
     private final Map<String, ProcessorInfo> processorInfoMapping = new ConcurrentHashMap<>();
 
-    private final List<String> reusableConfigList = new ArrayList<>();
+    private final List<ConnectorInfo> connectorInfoList = new ArrayList<>();
 
     @Override
     public DalaranTrigger getTrigger(String triggerType) {
@@ -62,6 +63,11 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext, 
     }
 
     @Override
+    public Collection<ConnectorInfo> getAllConnectorInfo() {
+        return connectorInfoList;
+    }
+
+    @Override
     public Collection<ProcessorInfo> getAllProcessorInfo() {
         return processorInfoMapping.values();
     }
@@ -80,6 +86,7 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext, 
         this.applicationContext = applicationContext;
     }
 
+    // TODO 很多重复性的代码
     private void addTrigger(DalaranTrigger trigger) {
         Trigger triggerAnnotation = trigger.getClass().getDeclaredAnnotation(Trigger.class);
         DalaranConfigField[] configFields = buildConfigFields(triggerAnnotation.configType());
@@ -93,12 +100,22 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext, 
 
         triggerInfo.setIsVoid(triggerAnnotation.isVoid());
 
-        triggerInfo.setConnectorType(getConnectorType(triggerAnnotation.configType()));
+        Class connectorType = getConnectorType(triggerAnnotation.configType());
+        if (connectorType != null) {
+            DalaranConfigField[] connectorConfigFields = buildConfigFields(connectorType);
+            ConnectorInfo connectorInfo = new ConnectorInfo();
+            connectorInfo.setComponentType(ComponentType.Trigger);
+            connectorInfo.setComponent(triggerAnnotation.value());
+            connectorInfo.setConfigFields(connectorConfigFields);
+            triggerInfo.setConnectorInfo(connectorInfo);
+            connectorInfoList.add(connectorInfo);
+        }
 
         triggerInfoMapping.put(triggerAnnotation.value(), triggerInfo);
         triggerMapping.put(triggerAnnotation.value(), trigger);
     }
 
+    // TODO 很多重复性的代码
     private void addProcessor(DalaranProcessor processor) {
         Processor processorAnnotation = processor.getClass().getDeclaredAnnotation(Processor.class);
         DalaranConfigField[] configFields = buildConfigFields(processorAnnotation.configType());
@@ -110,7 +127,16 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext, 
         processorInfo.setSerializedBody(processorAnnotation.serializedBody());
         processorInfo.setAllowedBodyTypes(processorAnnotation.allowBodyTypes());
 
-        processorInfo.setConnectorType(getConnectorType(processorAnnotation.configType()));
+        Class connectorType = getConnectorType(processorAnnotation.configType());
+        if (connectorType != null) {
+            DalaranConfigField[] connectorConfigFields = buildConfigFields(connectorType);
+            ConnectorInfo connectorInfo = new ConnectorInfo();
+            connectorInfo.setComponentType(ComponentType.Processor);
+            connectorInfo.setComponent(processorAnnotation.value());
+            connectorInfo.setConfigFields(connectorConfigFields);
+            processorInfo.setConnectorInfo(connectorInfo);
+            connectorInfoList.add(connectorInfo);
+        }
 
         processorInfoMapping.put(processorAnnotation.value(), processorInfo);
         processorMapping.put(processorAnnotation.value(), processor);
@@ -131,11 +157,14 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext, 
         return null;
     }
 
-    private DalaranConfigField[] buildConfigFields(Class configClass) {
-        List<DalaranConfigField> configFields = new ArrayList<>();
+    private void getConfigFields(List<DalaranConfigField> configFields, Class configClass) {
+        if (configClass.getSuperclass() != null) {
+            getConfigFields(configFields, configClass.getSuperclass());
+        }
+
         for (Field field : configClass.getDeclaredFields()) {
             ConfigFieldInfo configFieldInfo = field.getDeclaredAnnotation(ConfigFieldInfo.class);
-            if (configFieldInfo != null) {
+            if (configFieldInfo != null && configFieldInfo.inputType() != FieldInputType.Hidden) {
                 DalaranConfigField configField = new DalaranConfigField();
                 configField.setName(field.getName());
                 configField.setInputType(configFieldInfo.inputType());
@@ -152,21 +181,14 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext, 
                     configField.setEnumValues(enumValueMap);
                 }
 
-                if (configFieldInfo.inputType() == FieldInputType.Connector) {
-                    Class reusableConfigClass = configFieldInfo.connectorType();
-                    if (reusableConfigClass != Object.class) {
-                        String reusableConfigName = reusableConfigClass.getCanonicalName();
-                        reusableConfigList.add(reusableConfigName);
-                        configField.setReusableConfig(reusableConfigName);
-                    } else {
-                        // TODO else throw...
-                        throw new RuntimeException("config " + configClass + " field[" + field.getName() + "] reusable config can't be null");
-                    }
-                }
-
                 configFields.add(configField);
             }
         }
+    }
+
+    private DalaranConfigField[] buildConfigFields(Class configClass) {
+        List<DalaranConfigField> configFields = new ArrayList<>();
+        getConfigFields(configFields, configClass);
         return configFields.toArray(new DalaranConfigField[]{});
     }
 }

@@ -9,6 +9,7 @@ import io.terminus.dalaran.entity.release.ReleasedModelEntity;
 import io.terminus.dalaran.entity.release.ReleasedTriggerFlowEntity;
 import io.terminus.dalaran.model.MessageModel;
 import io.terminus.dalaran.model.ProcessorModel;
+import io.terminus.dalaran.model.config.ConnectorInfo;
 import io.terminus.dalaran.model.config.ProcessorInfo;
 import io.terminus.dalaran.model.config.TriggerInfo;
 import io.terminus.dalaran.model.flow.TriggerFlow;
@@ -92,7 +93,7 @@ public class DalaranLoader {
             // TODO 重复的, 需要被抽象的
             ProcessorInfo processorInfo = dalaranContext.getDalaranComponentContext().getProcessorInfo(processorEntity.getType());
             Class processorConfigType = processorInfo.getConfigType();
-            Class connectorType = processorInfo.getConnectorType();
+            ConnectorInfo connectorInfo = processorInfo.getConnectorInfo();
             Object config = gson.fromJson(processorEntity.getConfig(), processorConfigType);
             if (config instanceof ModelableConfig) {
                 ModelableConfig modelableConfig = (ModelableConfig) config;
@@ -107,7 +108,7 @@ public class DalaranLoader {
                 Long connectorId = ((ConnectorConfig) config).getConnectorId();
                 if (connectorId != null) {
                     ReleasedConnectorEntity connectorEntity = connectorRepository.findByVersionAndOriginId(version, connectorId);
-                    Object connector = gson.fromJson(connectorEntity.getConfig(), connectorType);
+                    Object connector = gson.fromJson(connectorEntity.getConfig(), connectorInfo.getConnectorType());
                     ((ConnectorConfig) config).setConnector(connector);
                 }
             }
@@ -118,7 +119,7 @@ public class DalaranLoader {
         // TODO 重复的, 需要被抽象的
         TriggerInfo triggerInfo = dalaranContext.getDalaranComponentContext().getTriggerInfo(flowEntity.getTriggerType());
         Class triggerConfigType = triggerInfo.getConfigType();
-        Class connectorType = triggerInfo.getConnectorType();
+        ConnectorInfo connectorInfo = triggerInfo.getConnectorInfo();
         Object triggerConfig = gson.fromJson(flowEntity.getTriggerConfig(), triggerConfigType);
 
         flow.setTriggerType(flowEntity.getTriggerType());
@@ -137,7 +138,7 @@ public class DalaranLoader {
             Long connectorId = ((ConnectorConfig) triggerConfig).getConnectorId();
             if (connectorId != null) {
                 ReleasedConnectorEntity connectorEntity = connectorRepository.findByVersionAndOriginId(version, connectorId);
-                Object connector = gson.fromJson(connectorEntity.getConfig(), connectorType);
+                Object connector = gson.fromJson(connectorEntity.getConfig(), connectorInfo.getConnectorType());
                 ((ConnectorConfig) triggerConfig).setConnector(connector);
             }
         }

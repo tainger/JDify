@@ -6,11 +6,13 @@ import io.terminus.dalaran.console.model.ReleaseRequestDTO;
 import io.terminus.dalaran.console.model.dto.ReleaseRecordDTO;
 import io.terminus.dalaran.console.model.dto.flow.TriggerFlowDTO;
 import io.terminus.dalaran.console.service.ReleaseService;
+import io.terminus.dalaran.model.config.ConnectorInfo;
 import io.terminus.dalaran.model.config.ProcessorInfo;
 import io.terminus.dalaran.model.config.TriggerInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collection;
 import java.util.List;
 
 @RestController
@@ -47,15 +49,21 @@ public class PlatformRest {
         return releaseService.rollback(version);
     }
 
-    @ApiOperation(value = "获取处理器初始化结构")
-    @GetMapping(value = "/processor/{type}/config")
-    private ProcessorInfo getProcessorInfo(@PathVariable String type) {
-        return dalaranContext.getDalaranComponentContext().getProcessorInfo(type);
+    @ApiOperation(value = "获取处理器配置结构")
+    @GetMapping(value = "/processor")
+    private Collection<ProcessorInfo> listProcessorInfo() {
+        return dalaranContext.getDalaranComponentContext().getAllProcessorInfo();
     }
 
-    @ApiOperation(value = "获取触发器初始化结构")
-    @GetMapping(value = "/trigger/{type}/config")
-    private TriggerInfo getTriggerInfo(@PathVariable String type) {
-        return dalaranContext.getDalaranComponentContext().getTriggerInfo(type);
+    @ApiOperation(value = "获取触发器配置结构")
+    @GetMapping(value = "/trigger")
+    private Collection<TriggerInfo> listTriggerInfo() {
+        return dalaranContext.getDalaranComponentContext().getAllTriggerInfo();
+    }
+
+    @ApiOperation(value = "获取连接器配置结构")
+    @GetMapping(value = "/connector")
+    private Collection<ConnectorInfo> listConnectorInfo() {
+        return dalaranContext.getDalaranComponentContext().getAllConnectorInfo();
     }
 }
