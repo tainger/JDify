@@ -121,10 +121,9 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext, 
                 configField.setExample(configFieldInfo.example());
                 configField.setDefaultValue(configFieldInfo.defaultValue());
                 configField.setLabel(configFieldInfo.label());
-                configField.setEnum(configFieldInfo.isEnum());
 
                 try {
-                    if (configFieldInfo.isEnum()) {
+                    if (field.getType().isEnum()) {
                         List<Map<String, String>> enumValues = new ArrayList<>();
                         val type = Class.forName(field.getType().getName());
                         val fields = type.getFields();

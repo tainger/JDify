@@ -11,10 +11,10 @@ public class NettyHttpConfig extends ModelRequiredConfig {
     @ConfigFieldInfo(label = "端口", inputType = FieldInputType.Integer, defaultValue = "8080")
     private Integer port = 8080;
 
-    @ConfigFieldInfo(label = "协议", inputType = FieldInputType.Radio, isEnum = true)
+    @ConfigFieldInfo(label = "协议", inputType = FieldInputType.Radio)
     private HttpProtocol protocol;
 
-    @ConfigFieldInfo(label = "方法", inputType = FieldInputType.Select, isEnum = true)
+    @ConfigFieldInfo(label = "方法", inputType = FieldInputType.Select)
     private HttpMethod method;
 
     @ConfigFieldInfo(label = "路径", inputType = FieldInputType.String)

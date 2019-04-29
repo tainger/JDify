@@ -11,15 +11,15 @@ public class HttpClientConfig extends ModelRequiredConfig {
     @ConfigFieldInfo(label = "路径", inputType = FieldInputType.String)
     private String path;
 
-    @ConfigFieldInfo(label = "类型", inputType = FieldInputType.Select, isEnum = true)
+    @ConfigFieldInfo(label = "类型", inputType = FieldInputType.Select)
     private HttpMethod method;
 
-    // TODO reusable
-    @ConfigFieldInfo(label = "协议", inputType = FieldInputType.Radio, isEnum = true)
-    private HttpProtocol protocol;
 
     @ConfigFieldInfo(label = "服务地址", inputType = FieldInputType.String)
     private String host;
+
+    @ConfigFieldInfo(label = "协议", inputType = FieldInputType.Radio, defaultValue = "HTTP")
+    private HttpProtocol protocol;
 
     @ConfigFieldInfo(label = "端口", inputType = FieldInputType.Integer, defaultValue = "80")
     private Integer port = 80;

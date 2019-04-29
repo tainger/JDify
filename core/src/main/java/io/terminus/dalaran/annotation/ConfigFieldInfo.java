@@ -20,6 +20,4 @@ public @interface ConfigFieldInfo {
     boolean required() default true;
 
     FieldInputType inputType() default FieldInputType.Auto;
-
-    boolean isEnum() default false;
 }

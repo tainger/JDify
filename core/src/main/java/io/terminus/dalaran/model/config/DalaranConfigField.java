@@ -19,7 +19,5 @@ public class DalaranConfigField {
 
     private String label;
 
-    private boolean isEnum;
-
     List<Map<String, String>> enumValues;
 }

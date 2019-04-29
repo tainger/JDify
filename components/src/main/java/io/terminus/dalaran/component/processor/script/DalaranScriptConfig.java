@@ -8,7 +8,7 @@ import lombok.Data;
 @Data
 public class DalaranScriptConfig extends ModelOptionalConfig {
 
-    @ConfigFieldInfo(label = "脚本语言", inputType = FieldInputType.Radio, isEnum = true)
+    @ConfigFieldInfo(label = "脚本语言", inputType = FieldInputType.Radio)
     private DalaranScriptType type;
 
     @ConfigFieldInfo(label = "脚本代码", inputType = FieldInputType.String)
