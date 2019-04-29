@@ -32,7 +32,7 @@ public class ConnectorRest {
     }
 
     @GetMapping("/{id}")
-    @ApiOperation("删除连接器")
+    @ApiOperation("获取连接器详情")
     private ConnectorDTO detail(@PathVariable Long id) {
         return connectorService.detail(id);
     }

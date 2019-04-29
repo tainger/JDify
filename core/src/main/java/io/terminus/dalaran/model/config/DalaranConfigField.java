@@ -3,7 +3,6 @@ package io.terminus.dalaran.model.config;
 import io.terminus.dalaran.FieldInputType;
 import lombok.Data;
 
-import java.util.List;
 import java.util.Map;
 
 @Data

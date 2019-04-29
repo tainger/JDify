@@ -6,7 +6,6 @@ import io.terminus.dalaran.console.model.dto.ConnectorDTO;
 import io.terminus.dalaran.console.service.ConnectorService;
 import io.terminus.dalaran.entity.ConnectorEntity;
 import io.terminus.dalaran.repository.ConnectorRepository;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
