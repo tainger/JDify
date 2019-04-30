@@ -96,6 +96,9 @@ public class DalaranTracer {
         if (body instanceof String) {
             return (String) body;
         }
+        if (body instanceof byte[]) {
+            return new String((byte[]) body);
+        }
         if (body instanceof Map || body instanceof Iterable || body instanceof Serializable) {
             return gson.toJson(body);
         }

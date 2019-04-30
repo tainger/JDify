@@ -17,7 +17,8 @@ public class TracingLogEntity {
     @Column(nullable = false)
     private Long flowId;
 
-    private Long processorId;
+    @Column(nullable = false, length = 64)
+    private String processorId;
 
     @Column(nullable = false)
     private Long timestamp;

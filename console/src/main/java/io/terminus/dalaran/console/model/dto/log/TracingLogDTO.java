@@ -5,5 +5,5 @@ import lombok.Data;
 @Data
 public class TracingLogDTO extends BasicLogDTO {
 
-    private Long processorId;
+    private String processorId;
 }
