@@ -38,7 +38,7 @@ public class FlowBuilder {
         this.errorHandlerFactory = errorHandlerFactory;
     }
 
-    public RouteDefinition buildTriggerFlow(TriggerFlow flow) {
+    RouteDefinition buildTriggerFlow(TriggerFlow flow) {
         val triggerComponent = componentContext.getTrigger(flow.getTriggerType());
         val flowTracer = DalaranTracer.buildFlowTracer(traceLogger, flow.getId());
         val route = new RouteDefinition();
@@ -55,11 +55,11 @@ public class FlowBuilder {
         return route;
     }
 
-    public RouteDefinition buildSubFLow(SubFlow flow) {
+    RouteDefinition buildSubFLow(SubFlow flow) {
         return null;
     }
 
-    public RouteDefinition buildTestFLow(BasicFlow flow) {
+    RouteDefinition buildTestFLow(BasicFlow flow) {
         val flowTracer = DalaranTracer.buildTestFlowTracer(traceLogger, flow.getId());
         val route = new RouteDefinition();
         route.setId(TEST_FLOW_PREFIX + flow.getId());

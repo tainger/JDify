@@ -43,15 +43,20 @@ public class TestFlowLoader extends AbstractDalaranLoader<TriggerFlowEntity, Sub
     }
 
     @Override
-    public void afterBuildTriggerFlow(TriggerFlow flow, TriggerFlowEntity flowEntity) {
+    public TriggerFlow loadTriggerFlow(TriggerFlowEntity flowEntity) {
+        TriggerFlow flow = super.loadTriggerFlow(flowEntity);
         flow.setId(flowEntity.getId());
         dalaranContext.addTestFlow(flow);
+        return flow;
     }
 
+
     @Override
-    public void afterBuildSubFlow(SubFlow flow, SubFlowEntity flowEntity) {
+    public SubFlow loadSubFlow(SubFlowEntity flowEntity) {
+        SubFlow flow = super.loadSubFlow(flowEntity);
         flow.setId(flowEntity.getId());
         dalaranContext.addTestFlow(flow);
+        return flow;
     }
 
     @Override

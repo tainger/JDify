@@ -12,11 +12,7 @@ public interface DalaranLoader<TriggerFlowEntity extends TriggerFlowSuperEntity,
 
     ModelSuperEntity getModelEntity(Long modelId);
 
-    void afterBuildTriggerFlow(TriggerFlow flow, TriggerFlowEntity flowEntity);
+    TriggerFlow loadTriggerFlow(TriggerFlowEntity flowEntity);
 
-    void afterBuildSubFlow(SubFlow flow, SubFlowEntity flowEntity);
-
-    void loadTriggerFlow(TriggerFlowEntity flowEntity);
-
-    void loadSubFlow(SubFlowEntity flowEntity);
+    SubFlow loadSubFlow(SubFlowEntity flowEntity);
 }

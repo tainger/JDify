@@ -56,19 +56,22 @@ public class ReleasedFlowLoader extends AbstractDalaranLoader<ReleasedTriggerFlo
     }
 
     @Override
-    public void afterBuildTriggerFlow(TriggerFlow flow, ReleasedTriggerFlowEntity flowEntity) {
+    public TriggerFlow loadTriggerFlow(ReleasedTriggerFlowEntity flowEntity) {
+        TriggerFlow flow = super.loadTriggerFlow(flowEntity);
         TriggerInfo triggerInfo = dalaranContext.getDalaranComponentContext().getTriggerInfo(flowEntity.getTriggerType());
         Object triggerConfig = buildConfig(triggerInfo, flowEntity.getTriggerConfig());
         flow.setTriggerType(flowEntity.getTriggerType());
         flow.setTriggerConfig(triggerConfig);
         flow.setId(flowEntity.getOriginId());
         dalaranContext.addTriggerFlow(flow);
+        return flow;
     }
 
     @Override
-    public void afterBuildSubFlow(SubFlow flow, ReleasedSubFlowEntity flowEntity) {
+    public SubFlow loadSubFlow(ReleasedSubFlowEntity flowEntity) {
+        SubFlow flow = super.loadSubFlow(flowEntity);
         flow.setId(flowEntity.getOriginId());
-        // TODO add sub flow to context
+        return flow;
     }
 
     @Override

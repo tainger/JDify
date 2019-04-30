@@ -35,17 +35,17 @@ public abstract class AbstractDalaranLoader<TriggerFlowEntity extends TriggerFlo
     private DalaranContext dalaranContext;
 
     @Override
-    public void loadTriggerFlow(TriggerFlowEntity flowEntity) {
+    public TriggerFlow loadTriggerFlow(TriggerFlowEntity flowEntity) {
         TriggerFlow flow = new TriggerFlow();
         buildFlow(flow, flowEntity);
-        afterBuildTriggerFlow(flow, flowEntity);
+        return flow;
     }
 
     @Override
-    public void loadSubFlow(SubFlowEntity flowEntity) {
+    public SubFlow loadSubFlow(SubFlowEntity flowEntity) {
         SubFlow flow = new SubFlow();
         buildFlow(flow, flowEntity);
-        afterBuildSubFlow(flow, flowEntity);
+        return flow;
     }
 
     protected Object buildConfig(ComponentInfo componentInfo, String configJson) {
