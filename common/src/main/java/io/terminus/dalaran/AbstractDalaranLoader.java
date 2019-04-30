@@ -48,16 +48,6 @@ public abstract class AbstractDalaranLoader<TriggerFlowEntity extends TriggerFlo
         afterBuildSubFlow(flow, flowEntity);
     }
 
-    protected MessageModel getMessageModel(Long modelId) {
-        ModelSuperEntity modelEntity = getModelEntity(modelId);
-        val model = new MessageModel();
-        val modelType = modelEntity.getType();
-        model.setModelType(modelType);
-        Class<? extends DalaranModelSchema> schemaType = dalaranContext.getDalaranConverterContext().getSchemaType(modelType);
-        model.setModelSchema(gson.fromJson(modelEntity.getModelSchema(), schemaType));
-        return model;
-    }
-
     protected Object buildConfig(ComponentInfo componentInfo, String configJson) {
         Object triggerConfig = gson.fromJson(configJson, componentInfo.getConfigType());
         if (triggerConfig instanceof ModelableConfig) {
@@ -67,6 +57,16 @@ public abstract class AbstractDalaranLoader<TriggerFlowEntity extends TriggerFlo
             injectConnector((ConnectorConfig) triggerConfig, componentInfo.getConnectorInfo());
         }
         return triggerConfig;
+    }
+
+    private MessageModel getMessageModel(Long modelId) {
+        ModelSuperEntity modelEntity = getModelEntity(modelId);
+        val model = new MessageModel();
+        val modelType = modelEntity.getType();
+        model.setModelType(modelType);
+        Class<? extends DalaranModelSchema> schemaType = dalaranContext.getDalaranConverterContext().getSchemaType(modelType);
+        model.setModelSchema(gson.fromJson(modelEntity.getModelSchema(), schemaType));
+        return model;
     }
 
     private void buildFlow(BasicFlow flow, BasicFlowEntity flowEntity) {

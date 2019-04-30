@@ -1,5 +1,6 @@
 package io.terminus.dalaran.component.processor.http;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.terminus.dalaran.ConnectorConfig;
 import io.terminus.dalaran.FieldInputType;
 import io.terminus.dalaran.ModelRequiredConfig;
@@ -10,16 +11,17 @@ import lombok.Data;
 public class HttpClientConfig extends ModelRequiredConfig implements ConnectorConfig<HttpClientConnector> {
 
 
-    @ConfigFieldInfo(label = "连接器", inputType = FieldInputType.Hidden)
+    @ConfigFieldInfo(inputType = FieldInputType.Hidden)
+    @JsonIgnore
     private HttpClientConnector connector;
-    
-    @ConfigFieldInfo(label = "连接器", inputType = FieldInputType.Connector, connectorType = HttpClientConnector.class)
-    private Long connectorId;
 
-    @ConfigFieldInfo(label = "路径", inputType = FieldInputType.String)
-    private String path;
+    @ConfigFieldInfo(label = "Http 连接器", inputType = FieldInputType.Connector, connectorType = HttpClientConnector.class)
+    private Long connectorId;
 
     @ConfigFieldInfo(label = "Http Method", inputType = FieldInputType.Select)
     private HttpMethod method;
+
+    @ConfigFieldInfo(label = "路径", inputType = FieldInputType.String)
+    private String path;
 
 }
