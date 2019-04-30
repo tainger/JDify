@@ -14,7 +14,7 @@ import org.apache.camel.model.RouteDefinition;
 
 import java.util.List;
 
-import static io.terminus.dalaran.DalaranConstants.FLOW_PREFIX;
+import static io.terminus.dalaran.DalaranConstants.*;
 
 public class FlowBuilder {
 
@@ -57,6 +57,19 @@ public class FlowBuilder {
 
     public RouteDefinition buildSubFLow(SubFlow flow) {
         return null;
+    }
+
+    public RouteDefinition buildTestFLow(BasicFlow flow) {
+        val flowTracer = DalaranTracer.buildTestFlowTracer(traceLogger, flow.getId());
+        val route = new RouteDefinition();
+        route.setId(TEST_FLOW_PREFIX + flow.getId());
+        route.errorHandler(errorHandlerFactory);
+        route.from(TEST_FLOW_CAMEL_URI_PREFIX + flow.getId());
+        // TODO
+        flowTracer.before(route, flow.getInModel().getModelType());
+        buildFlowRoute(route, flow);
+        flowTracer.after(route, flow.getOutModel().getModelType());
+        return route;
     }
 
     private void buildFlowRoute(RouteDefinition route, BasicFlow flow) {

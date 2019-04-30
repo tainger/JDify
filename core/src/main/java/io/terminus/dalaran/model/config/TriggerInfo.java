@@ -5,7 +5,7 @@ import io.terminus.dalaran.BodyType;
 import lombok.Data;
 
 @Data
-public class TriggerInfo {
+public class TriggerInfo implements ComponentInfo {
 
     private String type;
 
@@ -13,7 +13,7 @@ public class TriggerInfo {
 
     private DalaranConfigField[] configFields;
 
-    private BodyType[] allowBodyTypes;
+    private BodyType[] allowedBodyTypes;
 
     @JsonIgnore
     private ConnectorInfo connectorInfo;

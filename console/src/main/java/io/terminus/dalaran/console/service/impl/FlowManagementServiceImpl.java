@@ -3,6 +3,7 @@ package io.terminus.dalaran.console.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.google.gson.Gson;
 import io.terminus.dalaran.DalaranContext;
+import io.terminus.dalaran.console.TestFlowLoader;
 import io.terminus.dalaran.console.convertor.FlowConvertor;
 import io.terminus.dalaran.console.model.dto.ModelDTO;
 import io.terminus.dalaran.console.model.dto.flow.BasicFlowInfo;
@@ -50,7 +51,8 @@ public class FlowManagementServiceImpl implements FlowManagementService {
     @Autowired
     private ModelRepository modelRepository;
 
-    private String DALARAN_FLOW = "dalaran-flow";
+    @Autowired
+    private TestFlowLoader testFlowLoader;
 
     private final Gson gson = new Gson();
     private final FlowConvertor flowConvertor = new FlowConvertor();
@@ -69,7 +71,7 @@ public class FlowManagementServiceImpl implements FlowManagementService {
     public Long saveFlow(TriggerFlowEntity flowEntity) {
         Long id = flowRepository.save(flowEntity).getId();
         // TODO 这里依赖 loader 有点怪 而且可以异步
-//        dalaranLoader.loadTestFlow(flowEntity);
+        testFlowLoader.loadTriggerFlow(flowEntity);
         return id;
     }
 
@@ -78,7 +80,7 @@ public class FlowManagementServiceImpl implements FlowManagementService {
         TriggerFlowEntity flowEntity = buildEntity(flowModel);
         Long id = flowRepository.save(flowEntity).getId();
         // TODO 这里依赖 loader 有点怪 而且可以异步
-//        dalaranLoader.loadTestFlow(flowEntity);
+        testFlowLoader.loadTriggerFlow(flowEntity);
         return id;
     }
 
@@ -92,7 +94,7 @@ public class FlowManagementServiceImpl implements FlowManagementService {
         TriggerFlowEntity flowEntity = buildEntity(flowModel);
         flowRepository.save(flowEntity);
         // TODO 这里依赖 loader 有点怪 而且可以异步
-//        dalaranLoader.loadTestFlow(flowEntity);
+        testFlowLoader.loadTriggerFlow(flowEntity);
         return flowModel;
     }
 

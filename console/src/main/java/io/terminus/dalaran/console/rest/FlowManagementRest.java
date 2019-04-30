@@ -17,7 +17,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
@@ -75,7 +74,7 @@ public class FlowManagementRest {
     }
 
     @PostMapping("/{flowId}/test")
-    private TestResult doTest(@PathVariable Long flowId, @RequestBody String body) throws IOException {
+    private TestResult doTest(@PathVariable Long flowId, @RequestBody String body) {
         String recordId = nextRecordId();
 
         TriggerFlowDTO flow = flowManagementService.getById(flowId);

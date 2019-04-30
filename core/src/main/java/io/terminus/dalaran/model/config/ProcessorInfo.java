@@ -6,7 +6,7 @@ import lombok.Data;
 import org.jetbrains.annotations.NotNull;
 
 @Data
-public class ProcessorInfo {
+public class ProcessorInfo implements ComponentInfo {
 
     private String type;
 
@@ -19,10 +19,10 @@ public class ProcessorInfo {
     private ConnectorInfo connectorInfo;
 
     @JsonIgnore
-    private transient boolean serializedBody;
+    private transient Class configType;
 
     @JsonIgnore
-    private transient Class configType;
+    private transient boolean serializedBody;
 
     public boolean allowedBodyType(BodyType bodyType) {
         for (BodyType allowedBodyType : allowedBodyTypes) {

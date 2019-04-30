@@ -3,6 +3,7 @@ package io.terminus.dalaran.support.flow;
 import io.terminus.dalaran.DalaranComponentContext;
 import io.terminus.dalaran.DalaranContext;
 import io.terminus.dalaran.DalaranConverterContext;
+import io.terminus.dalaran.model.flow.BasicFlow;
 import io.terminus.dalaran.model.flow.TriggerFlow;
 import org.apache.camel.CamelContext;
 import org.apache.camel.ExchangePattern;
@@ -68,6 +69,22 @@ public class DefaultDalaranCamelContext implements DalaranContext {
     @Override
     public void addTriggerFlows(List<TriggerFlow> flows) {
         flows.forEach(this::addTriggerFlow);
+    }
+
+    @Override
+    public void addTestFlow(BasicFlow flow) {
+        try {
+            camelContext.removeRoute(TEST_FLOW_PREFIX + flow.getId());
+            RouteDefinition route = flowBuilder.buildTestFLow(flow);
+            camelContext.addRouteDefinition(route);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void addTestFlows(List<BasicFlow> flows) {
+        flows.forEach(this::addTestFlow);
     }
 
     // TODO 这里要处理数据的序列化等问题
