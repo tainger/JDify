@@ -20,6 +20,7 @@ public class FlowConvertor {
             ProcessorDTO processor = new ProcessorDTO();
             processor.setId(processorEntity.getId());
             processor.setType(processorEntity.getType());
+            processor.setName(processorEntity.getName());
             processor.setConfig(gson.fromJson(processorEntity.getConfig(), Map.class));
             pipeline.add(processor);
         }
