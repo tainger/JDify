@@ -8,7 +8,7 @@ import io.terminus.dalaran.console.model.query.ModelQuery;
 import io.terminus.dalaran.console.service.ModelManagementService;
 import io.terminus.dalaran.console.util.ExcelUtils;
 import io.terminus.dalaran.entity.ModelEntity;
-import io.terminus.dalaran.model.schema.model.ModelField;
+import io.terminus.dalaran.model.ModelField;
 import io.terminus.dalaran.repository.ModelRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -61,48 +61,48 @@ public class ModelManagementRest {
         return modelManagementService.list();
     }
 
-    @ApiOperation(value = "excel文件解析--更新")
-    @RequestMapping(value = "/import/excel/update", method = RequestMethod.POST)
-    public Map<Long, Map<String, Map<String, ModelField>>> importExcel(@RequestParam MultipartFile file, @RequestParam long id) {
-        ExcelUtils excelUtils = new ExcelUtils();
-        try {
-            Map<String, Map<String, ModelField>> schema = excelUtils.parse(file.getInputStream());
-            Map<Long, Map<String, Map<String, ModelField>>> modelSchema = new HashMap<>();
-            for (Map.Entry<String, Map<String, ModelField>> entry : schema.entrySet()) {
-                ModelEntity model = modelRepository.findOne(id);
-                model.setModelSchema(JSON.toJSONString(entry.getValue()));
-                modelRepository.save(model);
-                modelSchema.put(id, schema);
-            }
-            return modelSchema;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    @ApiOperation(value = "导入 Excel 更新模型结构")
+    @RequestMapping(value = "/{id}/import/excel", method = RequestMethod.POST)
+    public Map<String, ModelField> importExcel(@RequestParam MultipartFile file, @RequestParam long id) throws Exception {
+        Map<String, ModelField> schema = ExcelUtils.parseFirstSheet(file.getInputStream());
+        // TODO 这些应该扔到 service 里
+        ModelEntity model = modelRepository.findOne(id);
+        model.setModelSchema(JSON.toJSONString(schema));
+        modelRepository.save(model);
+        return schema;
+    }
+
+    // TODO 待开发
+    @ApiOperation(value = "导入数据模板更新模型结构")
+    @RequestMapping(value = "/{id}/import/data-template", method = RequestMethod.POST)
+    public Map<String, ModelField> importDataTemplate(@RequestBody String dataTemplate, @RequestParam long id) {
         return new HashMap<>();
     }
 
-    @ApiOperation(value = "excel文件解析--新建")
-    @RequestMapping(value = "/import/excel/create", method = RequestMethod.POST)
-    public Map<Long, Map<String, Map<String, ModelField>>> importExcel(@RequestParam MultipartFile file,
-                                                                       @RequestParam String name, @RequestParam String type) {
-        ExcelUtils excelUtils = new ExcelUtils();
-        try {
-            Map<String, Map<String, ModelField>> schema = excelUtils.parse(file.getInputStream());
-            Map<Long, Map<String, Map<String, ModelField>>> modelSchema = new HashMap<>();
-            for (Map.Entry<String, Map<String, ModelField>> entry : schema.entrySet()) {
-                ModelEntity model = new ModelEntity();
-                model.setModelSchema(JSON.toJSONString(entry.getValue()));
-                model.setName(name);
-                model.setType(BodyType.valueOf(type.toUpperCase()));
-                modelRepository.save(model);
-                Map<String, Map<String, ModelField>> singleSchema = new HashMap<>();
-                singleSchema.put(entry.getKey(), entry.getValue());
-                modelSchema.put(model.getId(), singleSchema);
-            }
-            return modelSchema;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    // TODO 待开发
+    @ApiOperation(value = "导入数据模板更新模型结构")
+    @RequestMapping(value = "/{id}/import/code-template", method = RequestMethod.POST)
+    public Map<String, ModelField> importCodeTemplate(@RequestBody String codeTemplate, @RequestParam long id) {
         return new HashMap<>();
+    }
+
+    // TODO 其实意义不大
+    @ApiOperation(value = "批量导入 Excel 创建模型结构")
+    @RequestMapping(value = "/multi-import/excel", method = RequestMethod.POST)
+    public Map<Long, Map<String, Map<String, ModelField>>> multiImportExcel(@RequestParam MultipartFile file, @RequestParam BodyType type) throws Exception {
+        Map<Long, Map<String, Map<String, ModelField>>> modelSchema = new HashMap<>();
+        Map<String, Map<String, ModelField>> schema = ExcelUtils.parseAllSheet(file.getInputStream());
+        // TODO 这些应该扔到 service 里
+        for (Map.Entry<String, Map<String, ModelField>> entry : schema.entrySet()) {
+            ModelEntity model = new ModelEntity();
+            model.setModelSchema(JSON.toJSONString(entry.getValue()));
+            model.setName(entry.getKey());
+            model.setType(type);
+            modelRepository.save(model);
+            Map<String, Map<String, ModelField>> singleSchema = new HashMap<>();
+            singleSchema.put(entry.getKey(), entry.getValue());
+            modelSchema.put(model.getId(), singleSchema);
+        }
+        return modelSchema;
     }
 }

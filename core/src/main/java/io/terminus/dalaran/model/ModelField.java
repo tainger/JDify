@@ -1,5 +1,6 @@
-package io.terminus.dalaran.model.schema.model;
+package io.terminus.dalaran.model;
 
+import io.terminus.dalaran.FieldType;
 import lombok.Data;
 
 import java.util.Map;
