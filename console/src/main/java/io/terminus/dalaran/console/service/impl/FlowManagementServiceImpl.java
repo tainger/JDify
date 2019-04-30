@@ -148,6 +148,7 @@ public class FlowManagementServiceImpl implements FlowManagementService {
             ProcessorEntity processorEntity = new ProcessorEntity();
             processorEntity.setId(processor.getId());
             processorEntity.setType(processor.getType());
+            processorEntity.setName(processor.getName());
             processorEntity.setConfig(gson.toJson(processor.getConfig()));
             return processorEntity;
         }).collect(Collectors.toList());

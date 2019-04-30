@@ -1,7 +1,6 @@
 package io.terminus.dalaran.console.rest;
 
 import com.alibaba.dubbo.common.utils.IOUtils;
-import com.google.gson.Gson;
 import io.swagger.annotations.ApiOperation;
 import io.terminus.dalaran.BodyType;
 import io.terminus.dalaran.DalaranContext;
@@ -35,8 +34,6 @@ public class FlowManagementRest {
 
     @Autowired
     private DalaranContext dalaranContext;
-
-    private Gson gson = new Gson();
 
     @ApiOperation(value = "创建工作流")
     @RequestMapping(value = "/create", method = RequestMethod.POST)
