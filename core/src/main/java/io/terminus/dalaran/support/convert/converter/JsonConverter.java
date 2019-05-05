@@ -9,11 +9,11 @@ public class JsonConverter implements DalaranConverter<JsonSchema> {
 
     @Override
     public void toObject(ProcessorDefinition route, JsonSchema schema) {
-        route.unmarshal().json(JsonLibrary.Gson);
+        route.unmarshal().json(JsonLibrary.Fastjson);
     }
 
     @Override
     public void fromObject(ProcessorDefinition route, JsonSchema schema) {
-        route.marshal().json(JsonLibrary.Gson);
+        route.marshal().json(JsonLibrary.Fastjson);
     }
 }

@@ -1,7 +1,7 @@
 package io.terminus.dalaran.converter;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
 import io.terminus.dalaran.entity.ProcessorEntity;
 
 import javax.persistence.AttributeConverter;
@@ -10,18 +10,16 @@ import java.util.List;
 
 public class PipelineJsonConverter implements AttributeConverter<List<ProcessorEntity>, String> {
 
-    private final Gson gson = new Gson();
-
     @Override
     public String convertToDatabaseColumn(List attribute) {
-        return gson.toJson(attribute);
+        return JSON.toJSONString(attribute);
     }
 
     @Override
     public List<ProcessorEntity> convertToEntityAttribute(String dbData) {
-        Type type = new TypeToken<List<ProcessorEntity>>() {
+        Type type = new TypeReference<List<ProcessorEntity>>() {
         }.getType();
-        return gson.fromJson(dbData, type);
+        return JSON.parseObject(dbData, type);
     }
 }
 

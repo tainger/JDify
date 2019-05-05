@@ -1,6 +1,5 @@
 package io.terminus.dalaran.test;
 
-import com.google.gson.Gson;
 import io.terminus.dalaran.BodyType;
 import io.terminus.dalaran.DalaranContext;
 import io.terminus.dalaran.component.processor.script.DalaranScriptConfig;
@@ -28,8 +27,6 @@ public class BasicFlowTest {
 
     @Autowired
     private DalaranContext dalaranContext;
-
-    private Gson gson = new Gson();
 
     private static final String TEST_ORDER_PREFIX = "terminus-";
 

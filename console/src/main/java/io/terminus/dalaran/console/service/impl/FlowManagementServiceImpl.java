@@ -1,7 +1,6 @@
 package io.terminus.dalaran.console.service.impl;
 
 import com.alibaba.fastjson.JSON;
-import com.google.gson.Gson;
 import io.terminus.dalaran.DalaranContext;
 import io.terminus.dalaran.console.TestFlowLoader;
 import io.terminus.dalaran.console.convertor.FlowConvertor;
@@ -54,7 +53,6 @@ public class FlowManagementServiceImpl implements FlowManagementService {
     @Autowired
     private TestFlowLoader testFlowLoader;
 
-    private final Gson gson = new Gson();
     private final FlowConvertor flowConvertor = new FlowConvertor();
 
     @Override
@@ -149,7 +147,7 @@ public class FlowManagementServiceImpl implements FlowManagementService {
             processorEntity.setId(processor.getId());
             processorEntity.setType(processor.getType());
             processorEntity.setName(processor.getName());
-            processorEntity.setConfig(gson.toJson(processor.getConfig()));
+            processorEntity.setConfig(JSON.toJSONString(processor.getConfig()));
             return processorEntity;
         }).collect(Collectors.toList());
 
@@ -160,7 +158,7 @@ public class FlowManagementServiceImpl implements FlowManagementService {
             flowEntity.setName("Dalaran Flow");
         }
         flowEntity.setTriggerType(model.getTriggerType());
-        flowEntity.setTriggerConfig(gson.toJson(model.getTriggerConfig()));
+        flowEntity.setTriggerConfig(JSON.toJSONString(model.getTriggerConfig()));
         flowEntity.setModuleId(model.getModuleId());
         flowEntity.setInModel(model.getInModelId());
         flowEntity.setOutModel(model.getOutModelId());

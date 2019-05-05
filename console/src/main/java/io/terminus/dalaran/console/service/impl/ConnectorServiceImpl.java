@@ -1,6 +1,6 @@
 package io.terminus.dalaran.console.service.impl;
 
-import com.google.gson.Gson;
+import com.alibaba.fastjson.JSON;
 import io.terminus.dalaran.console.model.dto.BasicConnectorInfo;
 import io.terminus.dalaran.console.model.dto.ConnectorDTO;
 import io.terminus.dalaran.console.service.ConnectorService;
@@ -24,8 +24,6 @@ public class ConnectorServiceImpl implements ConnectorService {
 
     @Autowired
     private EntityManager entityManager;
-
-    private final Gson gson = new Gson();
 
     @Override
     public Long create(ConnectorDTO connectorDTO) {
@@ -70,7 +68,7 @@ public class ConnectorServiceImpl implements ConnectorService {
         dto.setName(entity.getName());
         dto.setDescription(entity.getDescription());
         dto.setModuleId(entity.getModuleId());
-        dto.setConfig(gson.fromJson(entity.getConfig(), Map.class));
+        dto.setConfig(JSON.parseObject(entity.getConfig(), Map.class));
         return dto;
     }
 
@@ -80,7 +78,7 @@ public class ConnectorServiceImpl implements ConnectorService {
         entity.setName(dto.getName());
         entity.setDescription(dto.getDescription());
         entity.setModuleId(dto.getModuleId());
-        entity.setConfig(gson.toJson(dto.getConfig()));
+        entity.setConfig(JSON.toJSONString(dto.getConfig()));
         return entity;
     }
 

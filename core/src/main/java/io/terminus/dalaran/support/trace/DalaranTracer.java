@@ -1,6 +1,6 @@
 package io.terminus.dalaran.support.trace;
 
-import com.google.gson.Gson;
+import com.alibaba.fastjson.JSON;
 import io.terminus.dalaran.BodyType;
 import io.terminus.dalaran.DalaranTraceLogger;
 import io.terminus.dalaran.TracingType;
@@ -22,8 +22,6 @@ import static io.terminus.dalaran.DalaranConstants.*;
  */
 @Slf4j
 public class DalaranTracer {
-
-    private final Gson gson = new Gson();
 
     private final DalaranTraceLogger logger;
 
@@ -100,7 +98,7 @@ public class DalaranTracer {
             return new String((byte[]) body);
         }
         if (body instanceof Map || body instanceof Iterable || body instanceof Serializable) {
-            return gson.toJson(body);
+            return JSON.toJSONString(body);
         }
         return body.toString();
     }

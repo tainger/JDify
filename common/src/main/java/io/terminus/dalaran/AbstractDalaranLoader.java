@@ -1,7 +1,6 @@
 package io.terminus.dalaran;
 
-import com.google.gson.Gson;
-import com.hubspot.jinjava.Jinjava;
+import com.alibaba.fastjson.JSON;
 import io.terminus.dalaran.entity.ConnectorSuperEntity;
 import io.terminus.dalaran.entity.ModelSuperEntity;
 import io.terminus.dalaran.entity.ProcessorEntity;
@@ -18,6 +17,7 @@ import io.terminus.dalaran.model.flow.SubFlow;
 import io.terminus.dalaran.model.flow.TriggerFlow;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import org.apache.commons.lang.text.StrSubstitutor;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
@@ -28,11 +28,13 @@ import java.util.Map;
 @Slf4j
 public abstract class AbstractDalaranLoader<TriggerFlowEntity extends TriggerFlowSuperEntity, SubFlowEntity extends SubFlowSuperEntity>
         implements DalaranLoader<TriggerFlowEntity, SubFlowEntity> {
-    // TODO use jackson
-    private final Gson gson = new Gson();
 
     @Autowired
     private DalaranContext dalaranContext;
+
+    protected abstract ConnectorSuperEntity getConnector(Long connectorId);
+
+    protected abstract ModelSuperEntity getModelEntity(Long modelId);
 
     @Override
     public TriggerFlow loadTriggerFlow(TriggerFlowEntity flowEntity) {
@@ -49,7 +51,7 @@ public abstract class AbstractDalaranLoader<TriggerFlowEntity extends TriggerFlo
     }
 
     protected Object buildConfig(ComponentInfo componentInfo, String configJson) {
-        Object triggerConfig = gson.fromJson(configJson, componentInfo.getConfigType());
+        Object triggerConfig = JSON.parseObject(configJson, componentInfo.getConfigType());
         if (triggerConfig instanceof ModelableConfig) {
             injectModel((ModelableConfig) triggerConfig);
         }
@@ -65,7 +67,7 @@ public abstract class AbstractDalaranLoader<TriggerFlowEntity extends TriggerFlo
         val modelType = modelEntity.getType();
         model.setModelType(modelType);
         Class<? extends DalaranModelSchema> schemaType = dalaranContext.getDalaranConverterContext().getSchemaType(modelType);
-        model.setModelSchema(gson.fromJson(modelEntity.getModelSchema(), schemaType));
+        model.setModelSchema(JSON.parseObject(modelEntity.getModelSchema(), schemaType));
         return model;
     }
 
@@ -104,15 +106,13 @@ public abstract class AbstractDalaranLoader<TriggerFlowEntity extends TriggerFlo
         Long connectorId = connectorConfig.getConnectorId();
         if (connectorId != null) {
             ConnectorSuperEntity connectorEntity = getConnector(connectorId);
-            Object connector = gson.fromJson(connectorEntity.getConfig(), connectorInfo.getConnectorType());
+            Object connector = JSON.parseObject(connectorEntity.getConfig(), connectorInfo.getConnectorType());
             connectorConfig.setConnector(connector);
         }
     }
 
     private String replaceProperties(String configValue, Map<String, String> properties) {
-        // TODO 性能问题...
-        Jinjava jinjava = new Jinjava();
-        return jinjava.render(configValue, properties);
+        return StrSubstitutor.replace(configValue, properties);
     }
 
 }

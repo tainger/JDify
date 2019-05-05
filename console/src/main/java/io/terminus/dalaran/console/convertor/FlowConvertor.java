@@ -1,6 +1,6 @@
 package io.terminus.dalaran.console.convertor;
 
-import com.google.gson.Gson;
+import com.alibaba.fastjson.JSON;
 import io.terminus.dalaran.console.model.dto.ProcessorDTO;
 import io.terminus.dalaran.console.model.dto.flow.TriggerFlowDTO;
 import io.terminus.dalaran.entity.ProcessorEntity;
@@ -12,8 +12,6 @@ import java.util.Map;
 
 public class FlowConvertor {
 
-    private final Gson gson = new Gson();
-
     public TriggerFlowDTO toDTO(TriggerFlowSuperEntity entity) {
         List<ProcessorDTO> pipeline = new ArrayList<>();
         for (ProcessorEntity processorEntity : entity.getPipeline()) {
@@ -21,7 +19,7 @@ public class FlowConvertor {
             processor.setId(processorEntity.getId());
             processor.setType(processorEntity.getType());
             processor.setName(processorEntity.getName());
-            processor.setConfig(gson.fromJson(processorEntity.getConfig(), Map.class));
+            processor.setConfig(JSON.parseObject(processorEntity.getConfig(), Map.class));
             pipeline.add(processor);
         }
 
@@ -34,7 +32,7 @@ public class FlowConvertor {
         flowModel.setOutModelId(entity.getInModel());
         flowModel.setPipeline(pipeline);
         flowModel.setTriggerType(entity.getTriggerType());
-        flowModel.setTriggerConfig(gson.fromJson(entity.getTriggerConfig(), Map.class));
+        flowModel.setTriggerConfig(JSON.parseObject(entity.getTriggerConfig(), Map.class));
         return flowModel;
     }
 }
