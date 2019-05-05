@@ -1,6 +1,7 @@
 package io.terminus.dalaran.component.processor.http;
 
 import com.alibaba.fastjson.annotation.JSONField;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.terminus.dalaran.ConnectorConfig;
 import io.terminus.dalaran.FieldInputType;
 import io.terminus.dalaran.ModelRequiredConfig;
@@ -13,6 +14,7 @@ public class HttpClientConfig extends ModelRequiredConfig implements ConnectorCo
 
     @ConfigFieldInfo(inputType = FieldInputType.Hidden)
     @JSONField(serialize = false)
+    @JsonIgnore
     private HttpClientConnector connector;
 
     @ConfigFieldInfo(label = "Http 连接器", inputType = FieldInputType.Connector, connectorType = HttpClientConnector.class)

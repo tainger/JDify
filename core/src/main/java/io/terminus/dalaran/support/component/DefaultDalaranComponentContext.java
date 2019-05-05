@@ -102,7 +102,7 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext, 
 
         Class connectorType = getConnectorType(triggerAnnotation.configType());
         if (connectorType != null) {
-            ConnectorInfo connectorInfo = buildConnectorInfo(connectorType, triggerAnnotation.value());
+            ConnectorInfo connectorInfo = buildConnectorInfo(ComponentType.Trigger, connectorType, triggerAnnotation.value());
             triggerInfo.setConnectorInfo(connectorInfo);
         }
 
@@ -124,7 +124,7 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext, 
 
         Class connectorType = getConnectorType(processorAnnotation.configType());
         if (connectorType != null) {
-            ConnectorInfo connectorInfo = buildConnectorInfo(connectorType, processorAnnotation.value());
+            ConnectorInfo connectorInfo = buildConnectorInfo(ComponentType.Processor, connectorType, processorAnnotation.value());
             processorInfo.setConnectorInfo(connectorInfo);
         }
 
@@ -132,10 +132,10 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext, 
         processorMapping.put(processorAnnotation.value(), processor);
     }
 
-    private ConnectorInfo buildConnectorInfo(Class connectorType, String componentName) {
+    private ConnectorInfo buildConnectorInfo(ComponentType component, Class connectorType, String componentName) {
         DalaranConfigField[] connectorConfigFields = buildConfigFields(connectorType);
         ConnectorInfo connectorInfo = new ConnectorInfo();
-        connectorInfo.setComponentType(ComponentType.Trigger);
+        connectorInfo.setComponentType(component);
         connectorInfo.setConnectorType(connectorType);
         connectorInfo.setComponent(componentName);
         connectorInfo.setConfigFields(connectorConfigFields);

@@ -1,6 +1,7 @@
 package io.terminus.dalaran.component.trigger.dubbo;
 
 import com.alibaba.fastjson.annotation.JSONField;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.terminus.dalaran.ConnectorConfig;
 import io.terminus.dalaran.FieldInputType;
 import io.terminus.dalaran.annotation.ConfigFieldInfo;
@@ -15,6 +16,7 @@ public class DubboProviderConfig implements ConnectorConfig<DubboRegistryConnect
 
     @ConfigFieldInfo(inputType = FieldInputType.Hidden)
     @JSONField(serialize = false)
+    @JsonIgnore
     private DubboRegistryConnector connector;
 
     @ConfigFieldInfo(label = "服务 ID", inputType = FieldInputType.String)

@@ -1,8 +1,11 @@
 package io.terminus.dalaran.entity;
 
+import io.terminus.dalaran.ComponentType;
 import lombok.Data;
 
 import javax.persistence.Column;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.MappedSuperclass;
 
 @Data
@@ -14,6 +17,13 @@ public class ConnectorSuperEntity extends BasicEntity {
 
     @Column(nullable = false)
     private String name;
+
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private ComponentType componentType;
+
+    @Column(nullable = false)
+    private String componentName;
 
     @Column(columnDefinition = "TEXT")
     private String description;

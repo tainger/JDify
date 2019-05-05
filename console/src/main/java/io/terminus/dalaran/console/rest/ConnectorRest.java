@@ -1,10 +1,14 @@
 package io.terminus.dalaran.console.rest;
 
 import io.swagger.annotations.ApiOperation;
+import io.terminus.dalaran.ComponentType;
+import io.terminus.dalaran.console.model.dto.BasicConnectorInfo;
 import io.terminus.dalaran.console.model.dto.ConnectorDTO;
 import io.terminus.dalaran.console.service.ConnectorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/connector")
@@ -35,5 +39,11 @@ public class ConnectorRest {
     @ApiOperation("获取连接器详情")
     private ConnectorDTO detail(@PathVariable Long id) {
         return connectorService.detail(id);
+    }
+
+    @GetMapping("/option")
+    @ApiOperation("获取连接器可选项")
+    private List<BasicConnectorInfo> selectOptions(@RequestParam ComponentType componentType, @RequestParam String componentName) {
+        return connectorService.listBasicInfoByComponent(componentType, componentName);
     }
 }

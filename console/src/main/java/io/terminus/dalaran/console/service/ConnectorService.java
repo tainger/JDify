@@ -1,5 +1,6 @@
 package io.terminus.dalaran.console.service;
 
+import io.terminus.dalaran.ComponentType;
 import io.terminus.dalaran.console.model.dto.BasicConnectorInfo;
 import io.terminus.dalaran.console.model.dto.ConnectorDTO;
 
@@ -16,4 +17,6 @@ public interface ConnectorService {
     ConnectorDTO detail(Long connectorId);
 
     List<BasicConnectorInfo> listBasicInfoByModuleId(Long moduleId);
+
+    List<BasicConnectorInfo> listBasicInfoByComponent(ComponentType componentType, String componentName);
 }
