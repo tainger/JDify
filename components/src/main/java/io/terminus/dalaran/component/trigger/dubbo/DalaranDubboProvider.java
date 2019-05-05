@@ -6,7 +6,7 @@ import io.terminus.dalaran.annotation.Trigger;
 import org.apache.camel.model.RouteDefinition;
 import org.apache.commons.lang.StringUtils;
 
-@Trigger(value = "dubbo-provider", configType = DubboProviderConfig.class, allowBodyTypes = {BodyType.OBJECT})
+@Trigger(value = "dubbo-provider", configType = DubboProviderConfig.class, allowBodyTypes = {BodyType.OBJECT}, serializedBody = false)
 public class DalaranDubboProvider implements DalaranTrigger<DubboProviderConfig> {
 
     private static final String DUBBO_PROVIDER_URI = "dubbo:?registryAddress=%s&serviceId=%s&method=%s&version=%s";

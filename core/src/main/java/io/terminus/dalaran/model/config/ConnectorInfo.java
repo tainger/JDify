@@ -1,6 +1,6 @@
 package io.terminus.dalaran.model.config;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.alibaba.fastjson.annotation.JSONField;
 import io.terminus.dalaran.ComponentType;
 import lombok.Data;
 
@@ -13,6 +13,6 @@ public class ConnectorInfo {
 
     private DalaranConfigField[] configFields;
 
-    @JsonIgnore
+    @JSONField(serialize=false)
     private transient Class connectorType;
 }

@@ -13,9 +13,9 @@ import java.lang.annotation.*;
 public @interface Processor {
     String value();
 
-    boolean serializedBody() default false;
+    boolean serializedBody();
 
-    BodyType[] allowBodyTypes() default BodyType.OBJECT;
+    BodyType[] allowBodyTypes() default {};
 
     Class configType() default Object.class;
 

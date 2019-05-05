@@ -38,27 +38,12 @@ public class DefaultDalaranConverterContext implements DalaranConverterContext {
     }
 
     @Override
-    public void convert(RouteDefinition route, BodyType currentBodyType, BodyType nextBodyType) {
-        convert(route, currentBodyType, nextBodyType, null);
+    public void fromObject(RouteDefinition route, MessageModel model) {
+        converterMapping.get(model.getModelType()).fromObject(route, model.getModelSchema());
     }
 
     @Override
-    public void convert(RouteDefinition route, BodyType currentBodyType, MessageModel model) {
-        convert(route, currentBodyType, model.getModelType(), model.getModelSchema());
-    }
-
-    // TODO 这里还是比较奇怪的, 主要是想屏蔽不同类型的处理
-    private void convert(RouteDefinition route, BodyType currentBodyType, BodyType targetBodyType, DalaranModelSchema modelSchema) {
-        if (targetBodyType.isSerialized()) {
-            if (!currentBodyType.isSerialized()) {
-                converterMapping.get(targetBodyType).fromObject(route, modelSchema);
-            }
-            // TODO else... 理论上这里只会出现序列化和反序列化的场景, 不会出现类似 Json -> XML 的场景, 后续如果有需求, 可以处理 A->B
-        } else {
-            // 根据当前类型转为 Object
-            if (currentBodyType != BodyType.OBJECT) {
-                converterMapping.get(currentBodyType).toObject(route, modelSchema);
-            }
-        }
+    public void toObject(RouteDefinition route, MessageModel model) {
+        converterMapping.get(model.getModelType()).toObject(route, model.getModelSchema());
     }
 }

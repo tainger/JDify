@@ -7,7 +7,7 @@ public interface DalaranConverterContext {
 
     Class<? extends DalaranModelSchema> getSchemaType(BodyType modelType);
 
-    void convert(RouteDefinition route, BodyType currentBodyType, BodyType nextBodyType);
+    void fromObject(RouteDefinition route, MessageModel model);
 
-    void convert(RouteDefinition route, BodyType currentBodyType, MessageModel model);
+    void toObject(RouteDefinition route, MessageModel model);
 }

@@ -9,7 +9,7 @@ import org.apache.camel.model.RouteDefinition;
 import java.util.HashMap;
 import java.util.Map;
 
-@Trigger(value = "scheduler", allowBodyTypes = {BodyType.OBJECT}, isVoid = true, configType = DalaranSchedulerConfig.class)
+@Trigger(value = "scheduler", serializedBody = false, allowBodyTypes = {BodyType.OBJECT}, isVoid = true, configType = DalaranSchedulerConfig.class)
 public class DalaranScheduler implements DalaranTrigger<DalaranSchedulerConfig> {
     @Override
     public void buildFromRoute(RouteDefinition route, DalaranSchedulerConfig config) {

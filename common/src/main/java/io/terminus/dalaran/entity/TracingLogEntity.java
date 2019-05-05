@@ -17,7 +17,7 @@ public class TracingLogEntity {
     @Column(nullable = false)
     private Long flowId;
 
-    @Column(nullable = false, length = 64)
+    @Column(length = 64)
     private String processorId;
 
     @Column(nullable = false)

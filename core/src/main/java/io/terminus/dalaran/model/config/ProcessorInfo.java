@@ -1,6 +1,6 @@
 package io.terminus.dalaran.model.config;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.alibaba.fastjson.annotation.JSONField;
 import io.terminus.dalaran.BodyType;
 import lombok.Data;
 import org.jetbrains.annotations.NotNull;
@@ -15,14 +15,14 @@ public class ProcessorInfo implements ComponentInfo {
     @NotNull
     private BodyType[] allowedBodyTypes;
 
-    @JsonIgnore
+    @JSONField(serialize = false)
     private ConnectorInfo connectorInfo;
 
-    @JsonIgnore
-    private transient Class configType;
+    @JSONField(serialize = false)
+    private Class configType;
 
-    @JsonIgnore
-    private transient boolean serializedBody;
+    @JSONField(serialize = false)
+    private boolean serializedBody;
 
     public boolean allowedBodyType(BodyType bodyType) {
         for (BodyType allowedBodyType : allowedBodyTypes) {

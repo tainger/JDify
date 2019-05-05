@@ -6,7 +6,7 @@ import io.terminus.dalaran.annotation.Processor;
 import org.apache.camel.builder.Builder;
 import org.apache.camel.model.ProcessorDefinition;
 
-@Processor(value = "http-client", configType = HttpClientConfig.class, allowBodyTypes = {BodyType.JSON, BodyType.XML})
+@Processor(value = "http-client", configType = HttpClientConfig.class, serializedBody = true, allowBodyTypes = {BodyType.JSON, BodyType.XML})
 public class DalaranHttpClient implements DalaranProcessor<HttpClientConfig> {
     private static final String HTTP_URI = "%s4://%s:%s%s?bridgeEndpoint=true";
 

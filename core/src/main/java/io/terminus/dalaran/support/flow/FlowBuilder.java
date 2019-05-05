@@ -73,49 +73,41 @@ public class FlowBuilder {
     }
 
     private void buildFlowRoute(RouteDefinition route, BasicFlow flow) {
-        // TODO route need an u id
         List<ProcessorModel> processorList = flow.getPipeline();
-        MessageModel lastedMessageModel = flow.getInModel();
-        BodyType currentBodyType;
-        if (flow.getInModel() == null) {
-            currentBodyType = BodyType.OBJECT;
-        } else {
-            currentBodyType = flow.getInModel().getModelType();
-        }
+        // TODO in model maybe null
+        MessageModel currentModel = flow.getInModel();
 
-        // TODO 这里一定会先转成 Object, 如果是两端都是序列化类型, 则会有无用的转换
-        // TODO 最好的方式是, 在 Flow 上声明出入格式, 由 Trigger 端做处理
-        for (int i = 0; i < processorList.size(); i++) {
-            ProcessorModel processor = processorList.get(i);
+        boolean currentBodyIsSerialized = currentModel.getModelType().isSerialized();
+
+        for (ProcessorModel processor : processorList) {
 
             DalaranTracer spanTracer = DalaranTracer.buildFlowSpanTracer(traceLogger, flow.getId(), processor.getId());
             DalaranProcessor processorComponent = componentContext.getProcessor(processor.getType());
             ProcessorInfo processorInfo = componentContext.getProcessorInfo(processor.getType());
 
+            spanTracer.before(route, currentModel.getModelType());
+
             MessageModel inModel = getProcessorInModel(processor);
+            if (inModel != null) {
+                currentModel = inModel;
+            }
 
-            spanTracer.before(route, currentBodyType);
-
-            /*
-             * 如果下一个节点不允许当前的数据类型, 则进行数据格式转换
-             * 如果下个节点有明确入参, 则按照入参声明转换
-             * 如果没有, 尝试查看最后一次有效的数据模型是否允许, 允许则使用最后一次模型进行转换
-             * 如果都没有, 选择下一个节点第一个可接受类型进行转换
-             */
             // TODO 这里还是比较奇怪, 有点绕, 而且有些特殊场景没有考虑到
-            if (!processorInfo.allowedBodyType(currentBodyType)) {
-                if (inModel != null) {
-                    converterContext.convert(route, currentBodyType, inModel);
-                    lastedMessageModel = inModel;
-                    currentBodyType = inModel.getModelType();
-                } else if (lastedMessageModel != null && processorInfo.allowedBodyType(lastedMessageModel.getModelType())) {
-                    converterContext.convert(route, currentBodyType, lastedMessageModel);
-                    currentBodyType = lastedMessageModel.getModelType();
+            if (processorInfo.isSerializedBody() != currentBodyIsSerialized) {
+
+                // TODO convert tracing, 暂时没必要, 先注掉吧, 影响性能
+//                DalaranTracer convertTracer = DalaranTracer.buildConvertTracer(traceLogger, flow.getId(), processor.getId());
+                if (processorInfo.isSerializedBody()) {
+//                    convertTracer.before(route, BodyType.OBJECT);
+                    converterContext.fromObject(route, currentModel);
+//                    convertTracer.after(route, currentModel.getModelType());
                 } else {
-                    BodyType nextBodyType = processorInfo.firstAllowedBodyType();
-                    converterContext.convert(route, currentBodyType, nextBodyType);
-                    currentBodyType = nextBodyType;
+//                    convertTracer.before(route, currentModel.getModelType());
+                    converterContext.toObject(route, currentModel);
+//                    convertTracer.after(route, BodyType.OBJECT);
                 }
+                // TODO processor 的输入和输出一定是一种类型
+                currentBodyIsSerialized = processorInfo.isSerializedBody();
             }
 
             processorComponent.configure(route, processor.getConfig());
@@ -123,13 +115,21 @@ public class FlowBuilder {
             MessageModel outModel = getProcessorOutModel(processor);
 
             if (outModel != null) {
-                currentBodyType = outModel.getModelType();
+                currentModel = outModel;
             }
-            spanTracer.after(route, currentBodyType);
+            spanTracer.after(route, currentModel.getModelType());
+        }
 
-            // last processor
-            if (i == processorList.size() - 1 && flow.getOutModel() != null && flow.getOutModel().getModelType() != currentBodyType) {
-                converterContext.convert(route, currentBodyType, flow.getOutModel());
+        if (currentModel.getModelType().isSerialized() != currentBodyIsSerialized) {
+//            DalaranTracer convertTracer = DalaranTracer.buildConvertTracer(traceLogger, flow.getId(), lastProcessor.getId());
+            if (currentModel.getModelType().isSerialized()) {
+//                convertTracer.before(route, BodyType.OBJECT);
+                converterContext.fromObject(route, currentModel);
+//                convertTracer.after(route, currentModel.getModelType());
+            } else {
+//                convertTracer.before(route, currentModel.getModelType());
+                converterContext.toObject(route, currentModel);
+//                convertTracer.after(route, BodyType.OBJECT);
             }
         }
     }

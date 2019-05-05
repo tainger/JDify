@@ -9,7 +9,7 @@ import org.apache.camel.model.ProcessorDefinition;
 /**
  * Created by jingdi on 2019/3/18
  */
-@Processor(value = "mapper-convert", configType = DalaranMapperConfig.class)
+@Processor(value = "mapper-convert", serializedBody = false, configType = DalaranMapperConfig.class)
 public class DalaranMessageMapper implements DalaranProcessor<DalaranMapperConfig> {
 
     @Override

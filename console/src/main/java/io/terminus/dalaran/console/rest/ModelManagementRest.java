@@ -63,7 +63,7 @@ public class ModelManagementRest {
 
     @ApiOperation(value = "导入 Excel 更新模型结构")
     @RequestMapping(value = "/{id}/import/excel", method = RequestMethod.POST)
-    public Map<String, ModelField> importExcel(@RequestParam MultipartFile file, @RequestParam long id) throws Exception {
+    public Map<String, ModelField> importExcel(@RequestParam MultipartFile file, @PathVariable long id) throws Exception {
         Map<String, ModelField> schema = ExcelUtils.parseFirstSheet(file.getInputStream());
         // TODO 这些应该扔到 service 里
         ModelEntity model = modelRepository.findOne(id);
@@ -75,14 +75,14 @@ public class ModelManagementRest {
     // TODO 待开发
     @ApiOperation(value = "导入数据模板更新模型结构")
     @RequestMapping(value = "/{id}/import/data-template", method = RequestMethod.POST)
-    public Map<String, ModelField> importDataTemplate(@RequestBody String dataTemplate, @RequestParam long id) {
+    public Map<String, ModelField> importDataTemplate(@RequestBody String dataTemplate, @PathVariable long id) {
         return new HashMap<>();
     }
 
     // TODO 待开发
     @ApiOperation(value = "导入数据模板更新模型结构")
     @RequestMapping(value = "/{id}/import/code-template", method = RequestMethod.POST)
-    public Map<String, ModelField> importCodeTemplate(@RequestBody String codeTemplate, @RequestParam long id) {
+    public Map<String, ModelField> importCodeTemplate(@RequestBody String codeTemplate, @PathVariable long id) {
         return new HashMap<>();
     }
 

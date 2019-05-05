@@ -13,9 +13,9 @@ import java.lang.annotation.*;
 public @interface Trigger {
     String value();
 
-    boolean serializedBody() default true;
+    boolean serializedBody();
 
-    BodyType[] allowBodyTypes();
+    BodyType[] allowBodyTypes() default {};
 
     boolean isVoid() default false;
 

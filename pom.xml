@@ -27,7 +27,7 @@
 
     <properties>
         <camel.version>2.21.5</camel.version>
-        <dubbo.version>2.6.5</dubbo.version>
+        <dubbo.version>2.6.2</dubbo.version>
         <spring.version>4.3.18.RELEASE</spring.version>
 
         <!--camel property-->

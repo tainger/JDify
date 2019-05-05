@@ -4,7 +4,7 @@ import io.terminus.dalaran.DalaranProcessor;
 import io.terminus.dalaran.annotation.Processor;
 import org.apache.camel.model.ProcessorDefinition;
 
-@Processor(value = "dubbo-consumer", configType = DalaranDubboConsumerConfig.class)
+@Processor(value = "dubbo-consumer", serializedBody = false, configType = DalaranDubboConsumerConfig.class)
 public class DalaranDubboConsumer implements DalaranProcessor<DalaranDubboConsumerConfig> {
 
     private static final String DUBBO_PROVIDER_URI = "dubbo:?registryAddress=%s&serviceId=%s&method=%s&version=%s";
