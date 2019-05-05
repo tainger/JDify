@@ -1,6 +1,5 @@
-package io.terminus.dalaran.starter;
+package io.terminus.dalaran;
 
-import io.terminus.dalaran.AbstractDalaranLoader;
 import io.terminus.dalaran.configura.DalaranAutoConfigura;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

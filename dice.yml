@@ -14,7 +14,7 @@ services:
     health_check:
       exec:
        cmd: echo 1
-  starter:
+  runtime:
     deployments:
       replicas: 1
     ports:

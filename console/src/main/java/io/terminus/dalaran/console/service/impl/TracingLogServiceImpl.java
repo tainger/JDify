@@ -44,7 +44,7 @@ public class TracingLogServiceImpl implements TracingLogService {
         }
         MainLogDTO triggerMainLogDetail = buildTracingMainLog(testMainLog);
 
-        List<TracingLogEntity> tracingLogEntityList = tracingLogRepository.findByRecordIdAndTracingType(recordId, TracingType.Flow);
+        List<TracingLogEntity> tracingLogEntityList = tracingLogRepository.findByRecordIdAndTracingType(recordId, TracingType.Processor);
         List<TracingLogDTO> tracingLogs = tracingLogEntityList.stream().map(this::buildTracingLog).collect(Collectors.toList());
         triggerMainLogDetail.setTracingLogList(tracingLogs);
         return triggerMainLogDetail;

@@ -17,10 +17,10 @@ public class HttpClientConfig extends ModelRequiredConfig implements ConnectorCo
     @ConfigFieldInfo(label = "Http 连接器", inputType = FieldInputType.Connector, connectorType = HttpClientConnector.class)
     private Long connectorId;
 
-    @ConfigFieldInfo(label = "Http Method", inputType = FieldInputType.Select)
+    @ConfigFieldInfo(label = "Http Method", inputType = FieldInputType.Select, defaultValue = "GET")
     private HttpMethod method;
 
-    @ConfigFieldInfo(label = "路径", inputType = FieldInputType.String)
+    @ConfigFieldInfo(label = "路径", inputType = FieldInputType.String, defaultValue = "/")
     private String path;
 
 }
