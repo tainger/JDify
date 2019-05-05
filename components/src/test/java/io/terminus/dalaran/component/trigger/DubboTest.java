@@ -6,6 +6,7 @@ import com.alibaba.dubbo.config.RegistryConfig;
 import com.alibaba.dubbo.config.utils.ReferenceConfigCache;
 import com.alibaba.dubbo.rpc.service.GenericService;
 import io.terminus.dalaran.component.BasicTriggerTest;
+import io.terminus.dalaran.component.common.DubboRegistryConnector;
 import io.terminus.dalaran.component.trigger.dubbo.DalaranDubboProvider;
 import io.terminus.dalaran.component.trigger.dubbo.DubboProviderConfig;
 import org.apache.curator.test.TestingServer;
@@ -20,7 +21,8 @@ public class DubboTest extends BasicTriggerTest {
 
     private ApplicationConfig applicationConfig = new ApplicationConfig("dalaran-unit-test");
 
-    private static final String REGISTRY_ADDRESS = "zookeeper://localhost:52181";
+    private static final int REGISTRY_PORT = 52182;
+    private static final String REGISTRY_ADDRESS = "zookeeper://localhost:" + REGISTRY_PORT;
     private static final String DUBBO_VERSION = "1.0.0";
     private static final String DUBBO_METHOD = "execute";
     private static final String DUBBO_SERVICE_ID = "io.terminus.dalaran.TestDubboService";
@@ -53,12 +55,14 @@ public class DubboTest extends BasicTriggerTest {
 
     @Before
     public void before() throws Exception {
-        zkTestServer = new TestingServer(52181);
+        zkTestServer = new TestingServer(REGISTRY_PORT);
         zkTestServer.start();
         DalaranDubboProvider trigger = new DalaranDubboProvider();
         DubboProviderConfig config = new DubboProviderConfig();
+        DubboRegistryConnector registryConnector = new DubboRegistryConnector();
+        registryConnector.setAddress(REGISTRY_ADDRESS);
 
-        config.setRegistryAddress(REGISTRY_ADDRESS);
+        config.setConnector(registryConnector);
         config.setServiceId(DUBBO_SERVICE_ID);
         config.setMethod(DUBBO_METHOD);
         config.setVersion(DUBBO_VERSION);

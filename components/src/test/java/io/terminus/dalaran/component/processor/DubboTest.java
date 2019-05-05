@@ -5,6 +5,7 @@ import com.alibaba.dubbo.config.RegistryConfig;
 import com.alibaba.dubbo.config.ServiceConfig;
 import com.alibaba.dubbo.rpc.service.GenericService;
 import io.terminus.dalaran.component.BasicProcessorTest;
+import io.terminus.dalaran.component.common.DubboRegistryConnector;
 import io.terminus.dalaran.component.processor.dubbo.DalaranDubboConsumer;
 import io.terminus.dalaran.component.processor.dubbo.DalaranDubboConsumerConfig;
 import org.apache.camel.ProducerTemplate;
@@ -23,18 +24,22 @@ public class DubboTest extends BasicProcessorTest {
     private ApplicationConfig applicationConfig = new ApplicationConfig("dalaran-unit-test");
     private ServiceConfig provider = new ServiceConfig();
 
-    private static final String REGISTRY_ADDRESS = "zookeeper://localhost:52181";
+    private static final int REGISTRY_PORT = 52181;
+    private static final String REGISTRY_ADDRESS = "zookeeper://localhost:" + REGISTRY_PORT;
     private static final String DUBBO_VERSION = "1.0.0";
     private static final String DUBBO_METHOD = "execute";
     private static final String DUBBO_SERVICE_ID = "io.terminus.dalaran.TestDubboService";
-
     private static final Integer INPUT_NUMBER = 998;
+
 
     @Test
     public void test() {
         DalaranDubboConsumer processor = new DalaranDubboConsumer();
         DalaranDubboConsumerConfig config = new DalaranDubboConsumerConfig();
-        config.setRegistryAddress(REGISTRY_ADDRESS);
+        DubboRegistryConnector registryConnector = new DubboRegistryConnector();
+        registryConnector.setAddress(REGISTRY_ADDRESS);
+
+        config.setConnector(registryConnector);
         config.setServiceId(DUBBO_SERVICE_ID);
         config.setMethod(DUBBO_METHOD);
         config.setVersion(DUBBO_VERSION);
@@ -49,7 +54,7 @@ public class DubboTest extends BasicProcessorTest {
 
     @Before
     public void startZookeeper() throws Exception {
-        zkTestServer = new TestingServer(52181);
+        zkTestServer = new TestingServer(REGISTRY_PORT);
         zkTestServer.start();
         provider.setApplication(applicationConfig);
         provider.setRegistry(new RegistryConfig(REGISTRY_ADDRESS));

@@ -11,7 +11,7 @@ public class DalaranDubboConsumer implements DalaranProcessor<DalaranDubboConsum
 
     @Override
     public void configure(ProcessorDefinition route, DalaranDubboConsumerConfig config) {
-        String uri = String.format(DUBBO_PROVIDER_URI, config.getRegistryAddress(),
+        String uri = String.format(DUBBO_PROVIDER_URI, config.getConnector().getAddress(),
                 config.getServiceId(), config.getMethod(), config.getVersion());
         route.to(uri);
     }

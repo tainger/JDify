@@ -112,6 +112,8 @@ public abstract class AbstractDalaranLoader<TriggerFlowEntity extends TriggerFlo
     }
 
     private String replaceProperties(String configValue, Map<String, String> properties) {
+        System.getenv();
+
         return StrSubstitutor.replace(configValue, properties);
     }
 

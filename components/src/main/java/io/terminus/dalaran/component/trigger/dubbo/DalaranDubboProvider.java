@@ -13,7 +13,7 @@ public class DalaranDubboProvider implements DalaranTrigger<DubboProviderConfig>
 
     @Override
     public void buildFromRoute(RouteDefinition route, DubboProviderConfig config) {
-        String uri = String.format(DUBBO_PROVIDER_URI, config.getRegistryAddress(),
+        String uri = String.format(DUBBO_PROVIDER_URI, config.getConnector().getAddress(),
                 config.getServiceId(), config.getMethod(), config.getVersion());
         if (StringUtils.isNotEmpty(config.getParameterType())) {
             uri += "&parameterType=" + config.getParameterType();

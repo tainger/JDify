@@ -5,6 +5,7 @@ import io.terminus.dalaran.ConnectorConfig;
 import io.terminus.dalaran.FieldInputType;
 import io.terminus.dalaran.ModelRequiredConfig;
 import io.terminus.dalaran.annotation.ConfigFieldInfo;
+import io.terminus.dalaran.component.common.HttpMethod;
 import lombok.Data;
 
 @Data
