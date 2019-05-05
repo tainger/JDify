@@ -29,7 +29,6 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
-            <!-- TODO spring fox depend this...-->
             <!--<exclusions>-->
             <!--<exclusion>-->
             <!--<groupId>com.fasterxml.jackson.core</groupId>-->
