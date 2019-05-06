@@ -3,7 +3,7 @@ package io.terminus.dalaran.console.service;
 import io.terminus.dalaran.console.model.dto.flow.BasicFlowInfo;
 import io.terminus.dalaran.console.model.dto.flow.TriggerFlowDTO;
 import io.terminus.dalaran.console.model.query.FlowQuery;
-import io.terminus.dalaran.entity.flow.TriggerFlowEntity;
+import io.terminus.dalaran.entity.manage.TriggerFlowEntity;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;

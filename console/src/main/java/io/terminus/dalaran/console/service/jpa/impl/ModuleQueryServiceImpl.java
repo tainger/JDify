@@ -2,7 +2,7 @@ package io.terminus.dalaran.console.service.jpa.impl;
 
 import io.terminus.dalaran.console.model.query.ModuleQuery;
 import io.terminus.dalaran.console.service.jpa.ModuleQueryService;
-import io.terminus.dalaran.entity.ModuleEntity;
+import io.terminus.dalaran.entity.manage.ModuleEntity;
 import io.terminus.dalaran.repository.ModuleRepository;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;

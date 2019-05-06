@@ -2,7 +2,7 @@ package io.terminus.dalaran.converter;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
-import io.terminus.dalaran.entity.ProcessorEntity;
+import io.terminus.dalaran.entity.manage.ProcessorEntity;
 
 import javax.persistence.AttributeConverter;
 import java.lang.reflect.Type;

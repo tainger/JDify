@@ -7,7 +7,7 @@ import io.terminus.dalaran.console.model.dto.ModelDTO;
 import io.terminus.dalaran.console.model.query.ModelQuery;
 import io.terminus.dalaran.console.service.ModelManagementService;
 import io.terminus.dalaran.console.util.ExcelUtils;
-import io.terminus.dalaran.entity.ModelEntity;
+import io.terminus.dalaran.entity.manage.ModelEntity;
 import io.terminus.dalaran.model.ModelField;
 import io.terminus.dalaran.repository.ModelRepository;
 import org.springframework.beans.factory.annotation.Autowired;

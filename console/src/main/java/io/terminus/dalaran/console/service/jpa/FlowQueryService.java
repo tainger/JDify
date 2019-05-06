@@ -2,7 +2,7 @@ package io.terminus.dalaran.console.service.jpa;
 
 import io.terminus.dalaran.console.model.dto.flow.BasicFlowInfo;
 import io.terminus.dalaran.console.model.query.FlowQuery;
-import io.terminus.dalaran.entity.flow.TriggerFlowEntity;
+import io.terminus.dalaran.entity.manage.TriggerFlowEntity;
 
 import java.util.List;
 

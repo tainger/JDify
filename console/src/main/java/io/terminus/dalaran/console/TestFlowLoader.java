@@ -2,16 +2,10 @@ package io.terminus.dalaran.console;
 
 import io.terminus.dalaran.AbstractDalaranLoader;
 import io.terminus.dalaran.DalaranContext;
-import io.terminus.dalaran.entity.ConnectorEntity;
-import io.terminus.dalaran.entity.ModelEntity;
-import io.terminus.dalaran.entity.flow.SubFlowEntity;
-import io.terminus.dalaran.entity.flow.TriggerFlowEntity;
+import io.terminus.dalaran.entity.manage.*;
 import io.terminus.dalaran.model.flow.SubFlow;
 import io.terminus.dalaran.model.flow.TriggerFlow;
-import io.terminus.dalaran.repository.ConnectorRepository;
-import io.terminus.dalaran.repository.ModelRepository;
-import io.terminus.dalaran.repository.SubFlowRepository;
-import io.terminus.dalaran.repository.TriggerFlowRepository;
+import io.terminus.dalaran.repository.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -30,6 +24,9 @@ public class TestFlowLoader extends AbstractDalaranLoader<TriggerFlowEntity, Sub
 
     @Autowired
     private ConnectorRepository connectorRepository;
+
+    @Autowired
+    private PropertyRepository propertyRepository;
 
     @Autowired
     private DalaranContext dalaranContext;
@@ -67,5 +64,10 @@ public class TestFlowLoader extends AbstractDalaranLoader<TriggerFlowEntity, Sub
     @Override
     public ModelEntity getModelEntity(Long modelId) {
         return modelRepository.findOne(modelId);
+    }
+
+    @Override
+    protected PropertyEntity[] getPropertyEntities() {
+        return propertyRepository.findAll().toArray(new PropertyEntity[0]);
     }
 }

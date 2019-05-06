@@ -1,6 +1,7 @@
-package io.terminus.dalaran.entity;
+package io.terminus.dalaran.entity.basic;
 
 import io.terminus.dalaran.BodyType;
+import io.terminus.dalaran.entity.BasicEntity;
 import lombok.Data;
 
 import javax.persistence.Column;
@@ -13,7 +14,7 @@ import javax.persistence.MappedSuperclass;
  */
 @Data
 @MappedSuperclass
-public class ModelSuperEntity extends BasicEntity {
+public abstract class ModelAbstractEntity extends BasicEntity {
 
     @Column(nullable = false)
     private Long moduleId;

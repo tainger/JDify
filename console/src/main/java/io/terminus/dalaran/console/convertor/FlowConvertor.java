@@ -3,8 +3,8 @@ package io.terminus.dalaran.console.convertor;
 import com.alibaba.fastjson.JSON;
 import io.terminus.dalaran.console.model.dto.ProcessorDTO;
 import io.terminus.dalaran.console.model.dto.flow.TriggerFlowDTO;
-import io.terminus.dalaran.entity.ProcessorEntity;
-import io.terminus.dalaran.entity.flow.TriggerFlowSuperEntity;
+import io.terminus.dalaran.entity.basic.TriggerFlowAbstractEntity;
+import io.terminus.dalaran.entity.manage.ProcessorEntity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,7 +12,7 @@ import java.util.Map;
 
 public class FlowConvertor {
 
-    public TriggerFlowDTO toDTO(TriggerFlowSuperEntity entity) {
+    public TriggerFlowDTO toDTO(TriggerFlowAbstractEntity entity) {
         List<ProcessorDTO> pipeline = new ArrayList<>();
         for (ProcessorEntity processorEntity : entity.getPipeline()) {
             ProcessorDTO processor = new ProcessorDTO();

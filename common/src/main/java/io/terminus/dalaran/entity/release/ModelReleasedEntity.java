@@ -1,6 +1,7 @@
 package io.terminus.dalaran.entity.release;
 
-import io.terminus.dalaran.entity.ConnectorSuperEntity;
+import io.terminus.dalaran.entity.ReleasedEntity;
+import io.terminus.dalaran.entity.basic.ModelAbstractEntity;
 import lombok.Data;
 
 import javax.persistence.Column;
@@ -9,8 +10,8 @@ import javax.persistence.Table;
 
 @Data
 @Entity
-@Table(name = "dalaran_released_connector")
-public class ReleasedConnectorEntity extends ConnectorSuperEntity implements ReleasedEntity {
+@Table(name = "dalaran_released_model")
+public class ModelReleasedEntity extends ModelAbstractEntity implements ReleasedEntity {
 
     @Column(nullable = false)
     private Long originId;

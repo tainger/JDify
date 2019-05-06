@@ -1,4 +1,4 @@
-package io.terminus.dalaran.entity;
+package io.terminus.dalaran.entity.manage;
 
 import io.terminus.dalaran.BodyType;
 import io.terminus.dalaran.TracingType;

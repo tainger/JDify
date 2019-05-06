@@ -9,7 +9,7 @@ import io.terminus.dalaran.console.model.dto.flow.TriggerFlowDTO;
 import io.terminus.dalaran.console.model.query.FlowQuery;
 import io.terminus.dalaran.console.service.FlowManagementService;
 import io.terminus.dalaran.console.service.ModelManagementService;
-import io.terminus.dalaran.entity.ModelEntity;
+import io.terminus.dalaran.entity.manage.ModelEntity;
 import io.terminus.dalaran.repository.PropertyRepository;
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;

@@ -5,7 +5,7 @@ import io.terminus.dalaran.ComponentType;
 import io.terminus.dalaran.console.model.dto.BasicConnectorInfo;
 import io.terminus.dalaran.console.model.dto.ConnectorDTO;
 import io.terminus.dalaran.console.service.ConnectorService;
-import io.terminus.dalaran.entity.ConnectorEntity;
+import io.terminus.dalaran.entity.manage.ConnectorEntity;
 import io.terminus.dalaran.repository.ConnectorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

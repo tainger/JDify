@@ -4,7 +4,7 @@ import io.terminus.dalaran.console.model.dto.PropertyDTO;
 import io.terminus.dalaran.console.model.query.PropertyQuery;
 import io.terminus.dalaran.console.service.PropertyManagementService;
 import io.terminus.dalaran.console.service.jpa.PropertyQueryService;
-import io.terminus.dalaran.entity.PropertyEntity;
+import io.terminus.dalaran.entity.manage.PropertyEntity;
 import io.terminus.dalaran.repository.PropertyRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,7 +45,7 @@ public class PropertyManagementServiceImpl implements PropertyManagementService 
 
     @Override
     public List<PropertyDTO> list() {
-        List<PropertyEntity> entities =  propertyRepository.findAll();
+        List<PropertyEntity> entities = propertyRepository.findAll();
         List<PropertyDTO> models = new ArrayList<>();
         for (PropertyEntity entity : entities) {
             models.add(buildModel(entity));

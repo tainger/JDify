@@ -6,7 +6,7 @@ import io.terminus.dalaran.console.model.dto.ModelDTO;
 import io.terminus.dalaran.console.model.query.ModelQuery;
 import io.terminus.dalaran.console.service.ModelManagementService;
 import io.terminus.dalaran.console.service.jpa.ModelQueryService;
-import io.terminus.dalaran.entity.ModelEntity;
+import io.terminus.dalaran.entity.manage.ModelEntity;
 import io.terminus.dalaran.repository.ModelRepository;
 import io.terminus.dalaran.repository.ModuleRepository;
 import org.apache.commons.lang3.StringUtils;

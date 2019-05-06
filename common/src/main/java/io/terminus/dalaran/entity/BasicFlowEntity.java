@@ -1,9 +1,8 @@
-package io.terminus.dalaran.entity.flow;
+package io.terminus.dalaran.entity;
 
 import io.terminus.dalaran.FlowStatus;
 import io.terminus.dalaran.converter.PipelineJsonConverter;
-import io.terminus.dalaran.entity.BasicEntity;
-import io.terminus.dalaran.entity.ProcessorEntity;
+import io.terminus.dalaran.entity.manage.ProcessorEntity;
 import lombok.Data;
 
 import javax.persistence.*;

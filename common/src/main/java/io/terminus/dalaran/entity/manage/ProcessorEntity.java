@@ -1,4 +1,4 @@
-package io.terminus.dalaran.entity;
+package io.terminus.dalaran.entity.manage;
 
 import lombok.Data;
 import org.jetbrains.annotations.NotNull;

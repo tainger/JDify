@@ -1,6 +1,6 @@
 package io.terminus.dalaran.repository;
 
-import io.terminus.dalaran.entity.ModelEntity;
+import io.terminus.dalaran.entity.manage.ModelEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 

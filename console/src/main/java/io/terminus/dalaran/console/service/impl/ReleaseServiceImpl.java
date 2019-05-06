@@ -6,11 +6,10 @@ import io.terminus.dalaran.console.model.dto.ReleaseRecordDTO;
 import io.terminus.dalaran.console.model.dto.flow.TriggerFlowDTO;
 import io.terminus.dalaran.console.service.ReleaseService;
 import io.terminus.dalaran.entity.BasicEntity;
+import io.terminus.dalaran.entity.ReleasedEntity;
+import io.terminus.dalaran.entity.manage.ReleaseRecordEntity;
 import io.terminus.dalaran.entity.release.*;
-import io.terminus.dalaran.repository.ConnectorRepository;
-import io.terminus.dalaran.repository.ModelRepository;
-import io.terminus.dalaran.repository.SubFlowRepository;
-import io.terminus.dalaran.repository.TriggerFlowRepository;
+import io.terminus.dalaran.repository.*;
 import io.terminus.dalaran.repository.release.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -37,21 +36,26 @@ public class ReleaseServiceImpl implements ReleaseService {
     @Autowired
     private ModelRepository modelRepository;
 
-
     @Autowired
     private ConnectorRepository connectorRepository;
 
     @Autowired
-    private ReleasedTriggerFlowRepository releasedTriggerFlowRepository;
+    private PropertyRepository propertyRepository;
 
     @Autowired
-    private ReleasedSubFlowRepository releasedSubFlowRepository;
+    private TriggerFlowReleasedRepository triggerFlowReleasedRepository;
 
     @Autowired
-    private ReleasedModelRepository releasedModelRepository;
+    private SubFlowReleasedRepository subFlowReleasedRepository;
 
     @Autowired
-    private ReleasedConnectorRepository releasedConnectorRepository;
+    private ModelReleasedRepository modelReleasedRepository;
+
+    @Autowired
+    private ConnectorReleasedRepository connectorReleasedRepository;
+
+    @Autowired
+    private PropertyReleasedRepository propertyReleasedRepository;
 
     @Autowired
     private ReleaseRecordRepository releaseRecordRepository;
@@ -75,17 +79,20 @@ public class ReleaseServiceImpl implements ReleaseService {
         recordEntity.setSuccessful(true);
         releaseRecordRepository.save(recordEntity);
 
-        List<ReleasedTriggerFlowEntity> releasedTriggerFlowEntities = toReleasedData(triggerFlowRepository.findAll(), ReleasedTriggerFlowEntity.class, requestDTO.getVersion());
-        releasedTriggerFlowRepository.save(releasedTriggerFlowEntities);
+        List<TriggerFlowReleasedEntity> releasedTriggerFlowEntities = toReleasedData(triggerFlowRepository.findAll(), TriggerFlowReleasedEntity.class, requestDTO.getVersion());
+        triggerFlowReleasedRepository.save(releasedTriggerFlowEntities);
 
-        List<ReleasedSubFlowEntity> releasedSubFlowEntities = toReleasedData(subFlowRepository.findAll(), ReleasedSubFlowEntity.class, requestDTO.getVersion());
-        releasedSubFlowRepository.save(releasedSubFlowEntities);
+        List<SubFlowReleasedEntity> releasedSubFlowEntities = toReleasedData(subFlowRepository.findAll(), SubFlowReleasedEntity.class, requestDTO.getVersion());
+        subFlowReleasedRepository.save(releasedSubFlowEntities);
 
-        List<ReleasedModelEntity> releasedModelEntities = toReleasedData(modelRepository.findAll(), ReleasedModelEntity.class, requestDTO.getVersion());
-        releasedModelRepository.save(releasedModelEntities);
+        List<ModelReleasedEntity> releasedModelEntities = toReleasedData(modelRepository.findAll(), ModelReleasedEntity.class, requestDTO.getVersion());
+        modelReleasedRepository.save(releasedModelEntities);
 
-        List<ReleasedConnectorEntity> releasedConnectorEntities = toReleasedData(connectorRepository.findAll(), ReleasedConnectorEntity.class, requestDTO.getVersion());
-        releasedConnectorRepository.save(releasedConnectorEntities);
+        List<ConnectorReleasedEntity> releasedConnectorEntities = toReleasedData(connectorRepository.findAll(), ConnectorReleasedEntity.class, requestDTO.getVersion());
+        connectorReleasedRepository.save(releasedConnectorEntities);
+
+        List<PropertyReleasedEntity> releasedPropertyEntities = toReleasedData(propertyRepository.findAll(), PropertyReleasedEntity.class, requestDTO.getVersion());
+        propertyReleasedRepository.save(releasedPropertyEntities);
 
         return toDTO(recordEntity);
     }
@@ -107,22 +114,27 @@ public class ReleaseServiceImpl implements ReleaseService {
 
     @Override
     public List<TriggerFlowDTO> listReleasedTriggerFlowDTO(String version) {
-        return releasedTriggerFlowRepository.findByVersion(version).stream().map(flowConvertor::toDTO).collect(Collectors.toList());
+        return triggerFlowReleasedRepository.findByVersion(version).stream().map(flowConvertor::toDTO).collect(Collectors.toList());
     }
 
     @Override
-    public List<ReleasedTriggerFlowEntity> listReleasedTriggerFlow(String version) {
-        return releasedTriggerFlowRepository.findByVersion(version);
+    public List<TriggerFlowReleasedEntity> listReleasedTriggerFlow(String version) {
+        return triggerFlowReleasedRepository.findByVersion(version);
     }
 
     @Override
-    public List<ReleasedSubFlowEntity> listReleasedSubFlow(String version) {
-        return releasedSubFlowRepository.findByVersion(version);
+    public List<SubFlowReleasedEntity> listReleasedSubFlow(String version) {
+        return subFlowReleasedRepository.findByVersion(version);
     }
 
     @Override
-    public ReleasedModelEntity getReleasedModel(String version, Long modelId) {
-        return releasedModelRepository.findByVersionAndOriginId(version, modelId);
+    public ModelReleasedEntity getReleasedModel(String version, Long modelId) {
+        return modelReleasedRepository.findByVersionAndOriginId(version, modelId);
+    }
+
+    @Override
+    public List<PropertyReleasedEntity> getReleasedProperty(String version) {
+        return propertyReleasedRepository.findByVersion(version);
     }
 
     @Override

@@ -1,4 +1,4 @@
-package io.terminus.dalaran.entity.release;
+package io.terminus.dalaran.entity;
 
 public interface ReleasedEntity {
 

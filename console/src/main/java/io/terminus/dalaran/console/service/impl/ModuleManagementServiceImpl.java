@@ -8,7 +8,7 @@ import io.terminus.dalaran.console.service.FlowManagementService;
 import io.terminus.dalaran.console.service.ModelManagementService;
 import io.terminus.dalaran.console.service.ModuleManagementService;
 import io.terminus.dalaran.console.service.jpa.ModuleQueryService;
-import io.terminus.dalaran.entity.ModuleEntity;
+import io.terminus.dalaran.entity.manage.ModuleEntity;
 import io.terminus.dalaran.repository.ModuleRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;

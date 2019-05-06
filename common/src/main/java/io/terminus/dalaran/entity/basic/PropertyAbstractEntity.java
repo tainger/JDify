@@ -1,15 +1,14 @@
-package io.terminus.dalaran.entity;
+package io.terminus.dalaran.entity.basic;
 
+import io.terminus.dalaran.entity.BasicEntity;
 import lombok.Data;
 
 import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.MappedSuperclass;
 
 @Data
-@Entity
-@Table(name = "dalaran_property")
-public class PropertyEntity extends BasicEntity {
+@MappedSuperclass
+public abstract class PropertyAbstractEntity extends BasicEntity {
 
     @Column(nullable = false, length = 64)
     private String name;

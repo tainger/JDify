@@ -1,6 +1,7 @@
 package io.terminus.dalaran.entity.release;
 
-import io.terminus.dalaran.entity.flow.TriggerFlowSuperEntity;
+import io.terminus.dalaran.entity.ReleasedEntity;
+import io.terminus.dalaran.entity.basic.ConnectorAbstractEntity;
 import lombok.Data;
 
 import javax.persistence.Column;
@@ -9,8 +10,8 @@ import javax.persistence.Table;
 
 @Data
 @Entity
-@Table(name = "dalaran_released_trigger_flow")
-public class ReleasedTriggerFlowEntity extends TriggerFlowSuperEntity implements ReleasedEntity {
+@Table(name = "dalaran_released_connector")
+public class ConnectorReleasedEntity extends ConnectorAbstractEntity implements ReleasedEntity {
 
     @Column(nullable = false)
     private Long originId;

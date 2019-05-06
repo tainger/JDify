@@ -1,12 +1,9 @@
 package io.terminus.dalaran;
 
 import com.alibaba.fastjson.JSON;
-import io.terminus.dalaran.entity.ConnectorSuperEntity;
-import io.terminus.dalaran.entity.ModelSuperEntity;
-import io.terminus.dalaran.entity.ProcessorEntity;
-import io.terminus.dalaran.entity.flow.BasicFlowEntity;
-import io.terminus.dalaran.entity.flow.SubFlowSuperEntity;
-import io.terminus.dalaran.entity.flow.TriggerFlowSuperEntity;
+import io.terminus.dalaran.entity.BasicFlowEntity;
+import io.terminus.dalaran.entity.basic.*;
+import io.terminus.dalaran.entity.manage.ProcessorEntity;
 import io.terminus.dalaran.model.MessageModel;
 import io.terminus.dalaran.model.ProcessorModel;
 import io.terminus.dalaran.model.config.ComponentInfo;
@@ -21,20 +18,25 @@ import org.apache.commons.lang.text.StrSubstitutor;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 // TODO 这里整体还是有点乱
 @Slf4j
-public abstract class AbstractDalaranLoader<TriggerFlowEntity extends TriggerFlowSuperEntity, SubFlowEntity extends SubFlowSuperEntity>
+public abstract class AbstractDalaranLoader<TriggerFlowEntity extends TriggerFlowAbstractEntity, SubFlowEntity extends SubFlowAbstractEntity>
         implements DalaranLoader<TriggerFlowEntity, SubFlowEntity> {
 
     @Autowired
     private DalaranContext dalaranContext;
 
-    protected abstract ConnectorSuperEntity getConnector(Long connectorId);
+    private Map<String, String> properties;
 
-    protected abstract ModelSuperEntity getModelEntity(Long modelId);
+    protected abstract ConnectorAbstractEntity getConnector(Long connectorId);
+
+    protected abstract ModelAbstractEntity getModelEntity(Long modelId);
+
+    protected abstract PropertyAbstractEntity[] getPropertyEntities();
 
     @Override
     public TriggerFlow loadTriggerFlow(TriggerFlowEntity flowEntity) {
@@ -50,8 +52,8 @@ public abstract class AbstractDalaranLoader<TriggerFlowEntity extends TriggerFlo
         return flow;
     }
 
-    protected Object buildConfig(ComponentInfo componentInfo, String configJson) {
-        Object triggerConfig = JSON.parseObject(configJson, componentInfo.getConfigType());
+    Object buildConfig(ComponentInfo componentInfo, String configJson) {
+        Object triggerConfig = buildConfig(configJson, componentInfo.getConfigType());
         if (triggerConfig instanceof ModelableConfig) {
             injectModel((ModelableConfig) triggerConfig);
         }
@@ -62,12 +64,16 @@ public abstract class AbstractDalaranLoader<TriggerFlowEntity extends TriggerFlo
     }
 
     private MessageModel getMessageModel(Long modelId) {
-        ModelSuperEntity modelEntity = getModelEntity(modelId);
+        if (modelId == null) {
+            return null;
+        }
+        ModelAbstractEntity modelEntity = getModelEntity(modelId);
         val model = new MessageModel();
         val modelType = modelEntity.getType();
         model.setModelType(modelType);
         Class<? extends DalaranModelSchema> schemaType = dalaranContext.getDalaranConverterContext().getSchemaType(modelType);
-        model.setModelSchema(JSON.parseObject(modelEntity.getModelSchema(), schemaType));
+        DalaranModelSchema modelSchema = buildConfig(modelEntity.getModelSchema(), schemaType);
+        model.setModelSchema(modelSchema);
         return model;
     }
 
@@ -105,16 +111,30 @@ public abstract class AbstractDalaranLoader<TriggerFlowEntity extends TriggerFlo
     private void injectConnector(ConnectorConfig connectorConfig, ConnectorInfo connectorInfo) {
         Long connectorId = connectorConfig.getConnectorId();
         if (connectorId != null) {
-            ConnectorSuperEntity connectorEntity = getConnector(connectorId);
-            Object connector = JSON.parseObject(connectorEntity.getConfig(), connectorInfo.getConnectorType());
+            ConnectorAbstractEntity connectorEntity = getConnector(connectorId);
+            Object connector = buildConfig(connectorEntity.getConfig(), connectorInfo.getConnectorType());
             connectorConfig.setConnector(connector);
         }
     }
 
-    private String replaceProperties(String configValue, Map<String, String> properties) {
-        System.getenv();
-
-        return StrSubstitutor.replace(configValue, properties);
+    private <T> T buildConfig(String configValue, Class<T> configType) {
+        String replacedConfig = replaceProperties(configValue, getProperties());
+        return JSON.parseObject(replacedConfig, configType);
     }
 
+    private String replaceProperties(String configValue, Map<String, String> properties) {
+        properties.putAll(System.getenv());
+        StrSubstitutor strSubstitutor = new StrSubstitutor(properties, "${{", "}}");
+        return strSubstitutor.replace(configValue);
+    }
+
+    private Map<String, String> getProperties() {
+        if (properties == null) {
+            properties = new HashMap<>(System.getenv());
+            for (PropertyAbstractEntity propertyEntity : getPropertyEntities()) {
+                properties.put(propertyEntity.getName(), propertyEntity.getValue());
+            }
+        }
+        return properties;
+    }
 }

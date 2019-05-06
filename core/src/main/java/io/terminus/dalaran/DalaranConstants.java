@@ -2,7 +2,6 @@ package io.terminus.dalaran;
 
 public final class DalaranConstants {
 
-    public static final String TEST_FLOW = "dalaran_test_flow";
     public static final String CONVERT_TRACING_LOG = "dalaran_trigger_convert_log";
     public static final String TEST_FLOW_TRACING_LOG = "dalaran_test_flow_tracing_log";
     public static final String FLOW_TRACING_LOG = "dalaran_flow_tracing_log";

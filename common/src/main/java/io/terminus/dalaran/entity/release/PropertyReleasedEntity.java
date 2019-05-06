@@ -1,6 +1,7 @@
 package io.terminus.dalaran.entity.release;
 
-import io.terminus.dalaran.entity.ModelSuperEntity;
+import io.terminus.dalaran.entity.ReleasedEntity;
+import io.terminus.dalaran.entity.basic.PropertyAbstractEntity;
 import lombok.Data;
 
 import javax.persistence.Column;
@@ -9,8 +10,8 @@ import javax.persistence.Table;
 
 @Data
 @Entity
-@Table(name = "dalaran_released_model")
-public class ReleasedModelEntity extends ModelSuperEntity implements ReleasedEntity {
+@Table(name = "dalaran_released_property")
+public class PropertyReleasedEntity extends PropertyAbstractEntity implements ReleasedEntity {
 
     @Column(nullable = false)
     private Long originId;

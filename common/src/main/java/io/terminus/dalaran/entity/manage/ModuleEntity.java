@@ -1,6 +1,7 @@
-package io.terminus.dalaran.entity;
+package io.terminus.dalaran.entity.manage;
 
 import io.terminus.dalaran.converter.ListToJsonConverter;
+import io.terminus.dalaran.entity.BasicEntity;
 import lombok.Data;
 
 import javax.persistence.Column;

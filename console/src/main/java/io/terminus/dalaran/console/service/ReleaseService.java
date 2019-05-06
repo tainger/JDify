@@ -3,9 +3,10 @@ package io.terminus.dalaran.console.service;
 import io.terminus.dalaran.console.model.ReleaseRequestDTO;
 import io.terminus.dalaran.console.model.dto.ReleaseRecordDTO;
 import io.terminus.dalaran.console.model.dto.flow.TriggerFlowDTO;
-import io.terminus.dalaran.entity.release.ReleasedModelEntity;
-import io.terminus.dalaran.entity.release.ReleasedSubFlowEntity;
-import io.terminus.dalaran.entity.release.ReleasedTriggerFlowEntity;
+import io.terminus.dalaran.entity.release.ModelReleasedEntity;
+import io.terminus.dalaran.entity.release.PropertyReleasedEntity;
+import io.terminus.dalaran.entity.release.SubFlowReleasedEntity;
+import io.terminus.dalaran.entity.release.TriggerFlowReleasedEntity;
 
 import java.util.List;
 
@@ -17,11 +18,13 @@ public interface ReleaseService {
 
     List<TriggerFlowDTO> listReleasedTriggerFlowDTO(String version);
 
-    List<ReleasedTriggerFlowEntity> listReleasedTriggerFlow(String version);
+    List<TriggerFlowReleasedEntity> listReleasedTriggerFlow(String version);
 
-    List<ReleasedSubFlowEntity> listReleasedSubFlow(String version);
+    List<SubFlowReleasedEntity> listReleasedSubFlow(String version);
 
-    ReleasedModelEntity getReleasedModel(String version, Long modelId);
+    ModelReleasedEntity getReleasedModel(String version, Long modelId);
+
+    List<PropertyReleasedEntity> getReleasedProperty(String version);
 
     List<ReleaseRecordDTO> listReleaseRecordDTO();
 }

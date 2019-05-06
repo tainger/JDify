@@ -1,7 +1,7 @@
 package io.terminus.dalaran.trace;
 
 import io.terminus.dalaran.DalaranTraceLogger;
-import io.terminus.dalaran.entity.TracingLogEntity;
+import io.terminus.dalaran.entity.manage.TracingLogEntity;
 import io.terminus.dalaran.model.DalaranTracingLog;
 import io.terminus.dalaran.repository.TracingLogRepository;
 import lombok.extern.slf4j.Slf4j;
