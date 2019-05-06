@@ -18,6 +18,7 @@ import java.util.Map;
  * Created by jingdi on 2019/4/12
  */
 public class ExcelUtils {
+    private static Map<Integer, Boolean> booleanMap = new HashMap<>();
 
     public static Map<String, ModelField> parseFirstSheet(InputStream file) throws Exception {
         val workbook = new XSSFWorkbook(file);
@@ -38,6 +39,9 @@ public class ExcelUtils {
 
     private static Map<String, ModelField> buildModel(Sheet sheet) {
         Map<String, ModelField> modelFieldMap = new HashMap<>();
+        for (int i = 0; i < sheet.getPhysicalNumberOfRows(); i++) {
+            booleanMap.put(i, false);
+        }
         for (Row row : sheet) {
             int currentRowNum = row.getRowNum();
             if (currentRowNum == 0) {
@@ -100,21 +104,30 @@ public class ExcelUtils {
             return fieldMap;
         }
 
-
         for (int rowNum = nextRowNum; rowNum < sheet.getPhysicalNumberOfRows(); rowNum++) {
             int level = getRowLevel(rowNum, sheet);
-            if (level <= currentRowLevel || level - currentRowLevel > 1) {
+            if ((nextRowNum >= rowNum && level <= currentRowLevel) || level - currentRowLevel > 1) {
                 break;
             }
 
             Map<String, ModelField> children = buildFields(currentRowLevel, level, rowNum, sheet);
-            if (currentField.getFields() != null) {
-                currentField.getFields().putAll(children);
-            } else {
-                currentField.setFields(children);
+            if (!booleanMap.get(rowNum)) {
+                booleanMap.put(rowNum, true);
+                if (currentField.getFields() != null) {
+                    if (level == currentRowLevel) {
+                        fieldMap.putAll(children);
+                    } else {
+                        currentField.getFields().putAll(children);
+                    }
+                } else {
+                    if (level == currentRowLevel) {
+                        fieldMap.putAll(children);
+                    } else {
+                        currentField.setFields(children);
+                    }
+                }
             }
         }
-
         return fieldMap;
     }
 
