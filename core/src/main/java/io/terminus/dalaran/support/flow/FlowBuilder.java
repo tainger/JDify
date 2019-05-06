@@ -1,6 +1,10 @@
 package io.terminus.dalaran.support.flow;
 
-import io.terminus.dalaran.*;
+import io.terminus.dalaran.DalaranComponentContext;
+import io.terminus.dalaran.DalaranConverterContext;
+import io.terminus.dalaran.DalaranProcessor;
+import io.terminus.dalaran.DalaranTraceLogger;
+import io.terminus.dalaran.config.OutModelConfig;
 import io.terminus.dalaran.model.MessageModel;
 import io.terminus.dalaran.model.ProcessorModel;
 import io.terminus.dalaran.model.config.ProcessorInfo;
@@ -76,38 +80,33 @@ public class FlowBuilder {
         List<ProcessorModel> processorList = flow.getPipeline();
         // TODO in model maybe null
         MessageModel currentModel = flow.getInModel();
-
-        boolean currentBodyIsSerialized = currentModel.getModelType().isSerialized();
+        boolean currentBodyIsSerialized = false;
 
         for (ProcessorModel processor : processorList) {
-
             DalaranTracer spanTracer = DalaranTracer.buildFlowSpanTracer(traceLogger, flow.getId(), processor.getId());
             DalaranProcessor processorComponent = componentContext.getProcessor(processor.getType());
             ProcessorInfo processorInfo = componentContext.getProcessorInfo(processor.getType());
 
+            // TODO no model
             spanTracer.before(route, currentModel.getModelType());
-
-            MessageModel inModel = getProcessorInModel(processor);
-            if (inModel != null) {
-                currentModel = inModel;
-            }
-
             // TODO 这里还是比较奇怪, 有点绕, 而且有些特殊场景没有考虑到
-            if (processorInfo.isSerializedBody() != currentBodyIsSerialized) {
-
-                // TODO convert tracing, 暂时没必要, 先注掉吧, 影响性能
+            if (currentModel != null) {
+                currentBodyIsSerialized = currentModel.getModelType().isSerialized();
+                if (processorInfo.isSerializedBody() != currentBodyIsSerialized) {
+                    // TODO convert tracing, 暂时没必要, 先注掉吧, 影响性能
 //                DalaranTracer convertTracer = DalaranTracer.buildConvertTracer(traceLogger, flow.getId(), processor.getId());
-                if (processorInfo.isSerializedBody()) {
+                    if (processorInfo.isSerializedBody()) {
 //                    convertTracer.before(route, BodyType.OBJECT);
-                    converterContext.fromObject(route, currentModel);
+                        converterContext.fromObject(route, currentModel);
 //                    convertTracer.after(route, currentModel.getModelType());
-                } else {
+                    } else {
 //                    convertTracer.before(route, currentModel.getModelType());
-                    converterContext.toObject(route, currentModel);
+                        converterContext.toObject(route, currentModel);
 //                    convertTracer.after(route, BodyType.OBJECT);
+                    }
+                    // TODO processor 的输入和输出一定是一种类型
+                    currentBodyIsSerialized = processorInfo.isSerializedBody();
                 }
-                // TODO processor 的输入和输出一定是一种类型
-                currentBodyIsSerialized = processorInfo.isSerializedBody();
             }
 
             processorComponent.configure(route, processor.getConfig());
@@ -134,16 +133,9 @@ public class FlowBuilder {
         }
     }
 
-    private MessageModel getProcessorInModel(ProcessorModel processor) {
-        if (processor.getConfig() instanceof ModelableConfig) {
-            return ((ModelableConfig) processor.getConfig()).getInModel();
-        }
-        return null;
-    }
-
     private MessageModel getProcessorOutModel(ProcessorModel processor) {
-        if (processor.getConfig() instanceof ModelableConfig) {
-            return ((ModelableConfig) processor.getConfig()).getOutModel();
+        if (processor.getConfig() instanceof OutModelConfig) {
+            return ((OutModelConfig) processor.getConfig()).getOutModel();
         }
         return null;
     }

@@ -63,6 +63,7 @@ public class DubboTest extends BasicTriggerTest {
         registryConnector.setAddress(REGISTRY_ADDRESS);
 
         config.setConnector(registryConnector);
+        config.setApplication("test-terminus");
         config.setServiceId(DUBBO_SERVICE_ID);
         config.setMethod(DUBBO_METHOD);
         config.setVersion(DUBBO_VERSION);

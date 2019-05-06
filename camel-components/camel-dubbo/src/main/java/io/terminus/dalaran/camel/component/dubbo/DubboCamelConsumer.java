@@ -2,7 +2,6 @@ package io.terminus.dalaran.camel.component.dubbo;
 
 import com.alibaba.dubbo.common.utils.PojoUtils;
 import com.alibaba.dubbo.common.utils.StringUtils;
-import com.alibaba.dubbo.config.ApplicationConfig;
 import com.alibaba.dubbo.config.RegistryConfig;
 import com.alibaba.dubbo.config.ServiceConfig;
 import com.alibaba.dubbo.rpc.service.GenericService;
@@ -38,7 +37,7 @@ public class DubboCamelConsumer extends DefaultConsumer {
 
     private ServiceConfig createProvider() {
         ServiceConfig provider = new ServiceConfig();
-        provider.setApplication(new ApplicationConfig("test"));
+        provider.setApplication(endpoint.getApplicationConfig());
         provider.setRegistry(new RegistryConfig(endpoint.getRegistryAddress()));
         provider.setVersion(endpoint.getVersion());
         provider.setInterface(endpoint.getServiceId());
