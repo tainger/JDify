@@ -1,6 +1,8 @@
 package io.terminus.dalaran;
 
 import com.alibaba.fastjson.JSON;
+import io.terminus.dalaran.config.AllModelConfig;
+import io.terminus.dalaran.config.OutModelConfig;
 import io.terminus.dalaran.entity.BasicFlowEntity;
 import io.terminus.dalaran.entity.basic.*;
 import io.terminus.dalaran.entity.manage.ProcessorEntity;
@@ -54,8 +56,11 @@ public abstract class AbstractDalaranLoader<TriggerFlowEntity extends TriggerFlo
 
     Object buildConfig(ComponentInfo componentInfo, String configJson) {
         Object triggerConfig = buildConfig(configJson, componentInfo.getConfigType());
-        if (triggerConfig instanceof ModelableConfig) {
-            injectModel((ModelableConfig) triggerConfig);
+        if (triggerConfig instanceof OutModelConfig) {
+            injectOutModel((OutModelConfig) triggerConfig);
+        }
+        if (triggerConfig instanceof AllModelConfig) {
+            injectInModel((AllModelConfig) triggerConfig);
         }
         if (triggerConfig instanceof ConnectorConfig && componentInfo.getConnectorInfo() != null) {
             injectConnector((ConnectorConfig) triggerConfig, componentInfo.getConnectorInfo());
@@ -68,6 +73,9 @@ public abstract class AbstractDalaranLoader<TriggerFlowEntity extends TriggerFlo
             return null;
         }
         ModelAbstractEntity modelEntity = getModelEntity(modelId);
+        if (modelEntity == null) {
+            return null;
+        }
         val model = new MessageModel();
         val modelType = modelEntity.getType();
         model.setModelType(modelType);
@@ -97,14 +105,17 @@ public abstract class AbstractDalaranLoader<TriggerFlowEntity extends TriggerFlo
         flow.setPipeline(pipeline);
     }
 
-    private void injectModel(ModelableConfig modelableConfig) {
-        if (modelableConfig.getInModelId() != null) {
-            MessageModel inModel = getMessageModel(modelableConfig.getInModelId());
-            modelableConfig.setInModel(inModel);
-        }
+    private void injectOutModel(OutModelConfig modelableConfig) {
         if (modelableConfig.getOutModelId() != null) {
             MessageModel outModel = getMessageModel(modelableConfig.getOutModelId());
             modelableConfig.setOutModel(outModel);
+        }
+    }
+
+    private void injectInModel(AllModelConfig modelableConfig) {
+        if (modelableConfig.getInModelId() != null) {
+            MessageModel inModel = getMessageModel(modelableConfig.getInModelId());
+            modelableConfig.setInModel(inModel);
         }
     }
 
