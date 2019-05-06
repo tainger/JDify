@@ -21,5 +21,5 @@ public @interface ConfigFieldInfo {
 
     FieldInputType inputType() default FieldInputType.Auto;
 
-    boolean isEnum() default false;
+    Class connectorType() default Object.class;
 }

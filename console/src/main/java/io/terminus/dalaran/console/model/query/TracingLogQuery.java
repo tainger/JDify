@@ -8,7 +8,6 @@ import java.util.Date;
 public class TracingLogQuery {
 
     private Long moduleId;
-    private Long triggerId;
     private Long flowId;
 
     private Date startTime;

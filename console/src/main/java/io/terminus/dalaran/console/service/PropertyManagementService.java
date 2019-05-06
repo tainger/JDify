@@ -1,6 +1,6 @@
 package io.terminus.dalaran.console.service;
 
-import io.terminus.dalaran.console.model.PropertyModel;
+import io.terminus.dalaran.console.model.dto.PropertyDTO;
 import io.terminus.dalaran.console.model.query.PropertyQuery;
 
 import java.util.List;
@@ -10,13 +10,13 @@ import java.util.List;
  */
 public interface PropertyManagementService {
 
-    Long createProperty(PropertyModel propertyModel);
+    Long createProperty(PropertyDTO propertyModel);
 
-    PropertyModel updateProperty(PropertyModel propertyModel);
+    PropertyDTO updateProperty(PropertyDTO propertyModel);
 
     void deleteProperty(Long id);
 
-    List<PropertyModel> list();
+    List<PropertyDTO> list();
 
-    List<PropertyModel> queryProperties(PropertyQuery query);
+    List<PropertyDTO> queryProperties(PropertyQuery query);
 }

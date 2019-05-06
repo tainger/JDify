@@ -1,6 +1,6 @@
 package io.terminus.dalaran.support.trace;
 
-import io.terminus.dalaran.BodyModelType;
+import io.terminus.dalaran.BodyType;
 import io.terminus.dalaran.DalaranTraceLogger;
 import io.terminus.dalaran.model.DalaranTracingLog;
 import org.apache.camel.ErrorHandlerFactory;
@@ -10,7 +10,8 @@ import org.apache.camel.Traceable;
 import org.apache.camel.processor.ErrorHandler;
 import org.apache.camel.spi.RouteContext;
 
-import static io.terminus.dalaran.DalaranConstants.*;
+import static io.terminus.dalaran.DalaranConstants.FLOW_TRACING_LOG;
+import static io.terminus.dalaran.DalaranConstants.TEST_FLOW_TRACING_LOG;
 
 public class TracingErrorHandlerFactory implements ErrorHandlerFactory {
 
@@ -47,11 +48,11 @@ public class TracingErrorHandlerFactory implements ErrorHandlerFactory {
                     exchange.removeProperty(FLOW_TRACING_LOG);
                     log(flowTracingLog, body);
                 }
-                DalaranTracingLog triggerTracingLog = exchange.getProperty(TRIGGER_TRACING_LOG, DalaranTracingLog.class);
-                if (triggerTracingLog != null) {
-                    exchange.removeProperty(TRIGGER_TRACING_LOG);
-                    log(triggerTracingLog, body);
-                }
+//                DalaranTracingLog triggerTracingLog = exchange.getProperty(TRIGGER_TRACING_LOG, DalaranTracingLog.class);
+//                if (triggerTracingLog != null) {
+//                    exchange.removeProperty(TRIGGER_TRACING_LOG);
+//                    log(triggerTracingLog, body);
+//                }
                 DalaranTracingLog testFlowTracingLog = exchange.getProperty(TEST_FLOW_TRACING_LOG, DalaranTracingLog.class);
                 if (testFlowTracingLog != null) {
                     exchange.removeProperty(TEST_FLOW_TRACING_LOG);
@@ -65,7 +66,7 @@ public class TracingErrorHandlerFactory implements ErrorHandlerFactory {
                 return;
             }
             tracingLog.setSuccessful(false);
-            tracingLog.setOutputBodyType(BodyModelType.EXCEPTION);
+            tracingLog.setOutputBodyType(BodyType.EXCEPTION);
             tracingLog.setOutputBody(body);
             tracingLog.setElapsed(System.currentTimeMillis() - tracingLog.getTimestamp());
 //            tracingLog.setOutputHeaders(exchange.getIn().getHeaders());

@@ -1,0 +1,150 @@
+package io.terminus.dalaran.support.flow;
+
+import io.terminus.dalaran.*;
+import io.terminus.dalaran.model.MessageModel;
+import io.terminus.dalaran.model.ProcessorModel;
+import io.terminus.dalaran.model.config.ProcessorInfo;
+import io.terminus.dalaran.model.flow.BasicFlow;
+import io.terminus.dalaran.model.flow.SubFlow;
+import io.terminus.dalaran.model.flow.TriggerFlow;
+import io.terminus.dalaran.support.trace.DalaranTracer;
+import io.terminus.dalaran.support.trace.TracingErrorHandlerFactory;
+import lombok.val;
+import org.apache.camel.model.RouteDefinition;
+
+import java.util.List;
+
+import static io.terminus.dalaran.DalaranConstants.*;
+
+public class FlowBuilder {
+
+    private final DalaranConverterContext converterContext;
+
+    private final DalaranComponentContext componentContext;
+
+    private final DalaranTraceLogger traceLogger;
+
+    private final TracingErrorHandlerFactory errorHandlerFactory;
+
+    public FlowBuilder(
+            DalaranConverterContext converterContext,
+            DalaranComponentContext componentContext,
+            DalaranTraceLogger traceLogger,
+            TracingErrorHandlerFactory errorHandlerFactory
+    ) {
+        this.converterContext = converterContext;
+        this.componentContext = componentContext;
+        this.traceLogger = traceLogger;
+        this.errorHandlerFactory = errorHandlerFactory;
+    }
+
+    RouteDefinition buildTriggerFlow(TriggerFlow flow) {
+        val triggerComponent = componentContext.getTrigger(flow.getTriggerType());
+        val flowTracer = DalaranTracer.buildFlowTracer(traceLogger, flow.getId());
+        val route = new RouteDefinition();
+        route.setId(FLOW_PREFIX + flow.getId());
+        route.errorHandler(errorHandlerFactory);
+        triggerComponent.buildFromRoute(route, flow.getTriggerConfig());
+        flowTracer.before(route, flow.getInModel().getModelType());
+
+        buildFlowRoute(route, flow);
+        // TODO 流程最后不可得知触发器的出模型, 所以无法判断做格式转换, 最保险的方式是固定转为 Object, 在 trigger 端在根据要求做一次序列化, 但是会有性能损耗
+        // TODO 另外这里也不好判断是否是最后的节点, 因为存在分支, 暂时将最后节点作为流输出节点
+        // TODO 也可以考虑加一个动态节点, 根据上下文判断如何做处理, 这样就没办法用 camel DSL 了
+        flowTracer.after(route, flow.getOutModel().getModelType());
+        return route;
+    }
+
+    RouteDefinition buildSubFLow(SubFlow flow) {
+        return null;
+    }
+
+    RouteDefinition buildTestFLow(BasicFlow flow) {
+        val flowTracer = DalaranTracer.buildTestFlowTracer(traceLogger, flow.getId());
+        val route = new RouteDefinition();
+        route.setId(TEST_FLOW_PREFIX + flow.getId());
+        route.errorHandler(errorHandlerFactory);
+        route.from(TEST_FLOW_CAMEL_URI_PREFIX + flow.getId());
+        // TODO
+        flowTracer.before(route, flow.getInModel().getModelType());
+        buildFlowRoute(route, flow);
+        flowTracer.after(route, flow.getOutModel().getModelType());
+        return route;
+    }
+
+    private void buildFlowRoute(RouteDefinition route, BasicFlow flow) {
+        List<ProcessorModel> processorList = flow.getPipeline();
+        // TODO in model maybe null
+        MessageModel currentModel = flow.getInModel();
+
+        boolean currentBodyIsSerialized = currentModel.getModelType().isSerialized();
+
+        for (ProcessorModel processor : processorList) {
+
+            DalaranTracer spanTracer = DalaranTracer.buildFlowSpanTracer(traceLogger, flow.getId(), processor.getId());
+            DalaranProcessor processorComponent = componentContext.getProcessor(processor.getType());
+            ProcessorInfo processorInfo = componentContext.getProcessorInfo(processor.getType());
+
+            spanTracer.before(route, currentModel.getModelType());
+
+            MessageModel inModel = getProcessorInModel(processor);
+            if (inModel != null) {
+                currentModel = inModel;
+            }
+
+            // TODO 这里还是比较奇怪, 有点绕, 而且有些特殊场景没有考虑到
+            if (processorInfo.isSerializedBody() != currentBodyIsSerialized) {
+
+                // TODO convert tracing, 暂时没必要, 先注掉吧, 影响性能
+//                DalaranTracer convertTracer = DalaranTracer.buildConvertTracer(traceLogger, flow.getId(), processor.getId());
+                if (processorInfo.isSerializedBody()) {
+//                    convertTracer.before(route, BodyType.OBJECT);
+                    converterContext.fromObject(route, currentModel);
+//                    convertTracer.after(route, currentModel.getModelType());
+                } else {
+//                    convertTracer.before(route, currentModel.getModelType());
+                    converterContext.toObject(route, currentModel);
+//                    convertTracer.after(route, BodyType.OBJECT);
+                }
+                // TODO processor 的输入和输出一定是一种类型
+                currentBodyIsSerialized = processorInfo.isSerializedBody();
+            }
+
+            processorComponent.configure(route, processor.getConfig());
+
+            MessageModel outModel = getProcessorOutModel(processor);
+
+            if (outModel != null) {
+                currentModel = outModel;
+            }
+            spanTracer.after(route, currentModel.getModelType());
+        }
+
+        if (currentModel.getModelType().isSerialized() != currentBodyIsSerialized) {
+//            DalaranTracer convertTracer = DalaranTracer.buildConvertTracer(traceLogger, flow.getId(), lastProcessor.getId());
+            if (currentModel.getModelType().isSerialized()) {
+//                convertTracer.before(route, BodyType.OBJECT);
+                converterContext.fromObject(route, currentModel);
+//                convertTracer.after(route, currentModel.getModelType());
+            } else {
+//                convertTracer.before(route, currentModel.getModelType());
+                converterContext.toObject(route, currentModel);
+//                convertTracer.after(route, BodyType.OBJECT);
+            }
+        }
+    }
+
+    private MessageModel getProcessorInModel(ProcessorModel processor) {
+        if (processor.getConfig() instanceof ModelableConfig) {
+            return ((ModelableConfig) processor.getConfig()).getInModel();
+        }
+        return null;
+    }
+
+    private MessageModel getProcessorOutModel(ProcessorModel processor) {
+        if (processor.getConfig() instanceof ModelableConfig) {
+            return ((ModelableConfig) processor.getConfig()).getOutModel();
+        }
+        return null;
+    }
+}

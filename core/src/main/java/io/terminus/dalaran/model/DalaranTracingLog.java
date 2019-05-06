@@ -1,16 +1,14 @@
 package io.terminus.dalaran.model;
 
-import io.terminus.dalaran.BodyModelType;
+import io.terminus.dalaran.BodyType;
 import io.terminus.dalaran.TracingType;
 import lombok.Data;
 
 @Data
 public class DalaranTracingLog {
-    private Long triggerId;
-
     private Long flowId;
 
-    private Long processorId;
+    private String processorId;
 
     private Long timestamp;
 
@@ -26,9 +24,9 @@ public class DalaranTracingLog {
 
     private String inputBody;
 
-    private BodyModelType inputBodyType;
+    private BodyType inputBodyType;
 
     private String outputBody;
 
-    private BodyModelType outputBodyType;
+    private BodyType outputBodyType;
 }

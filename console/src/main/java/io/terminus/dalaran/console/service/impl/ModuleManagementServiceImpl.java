@@ -1,9 +1,12 @@
 package io.terminus.dalaran.console.service.impl;
 
-import io.terminus.dalaran.console.model.ModuleModel;
+import io.terminus.dalaran.console.model.dto.ModuleDTO;
+import io.terminus.dalaran.console.model.dto.ModuleDetailDTO;
 import io.terminus.dalaran.console.model.query.ModuleQuery;
-import io.terminus.dalaran.console.model.query.rst.ModuleComponent;
-import io.terminus.dalaran.console.service.*;
+import io.terminus.dalaran.console.service.ConnectorService;
+import io.terminus.dalaran.console.service.FlowManagementService;
+import io.terminus.dalaran.console.service.ModelManagementService;
+import io.terminus.dalaran.console.service.ModuleManagementService;
 import io.terminus.dalaran.console.service.jpa.ModuleQueryService;
 import io.terminus.dalaran.entity.ModuleEntity;
 import io.terminus.dalaran.repository.ModuleRepository;
@@ -11,7 +14,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
+import javax.transaction.Transactional;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -19,6 +22,7 @@ import java.util.List;
  * Created by jingdi on 2019/4/1
  */
 @Service
+@Transactional
 public class ModuleManagementServiceImpl implements ModuleManagementService {
 
     @Autowired
@@ -31,16 +35,13 @@ public class ModuleManagementServiceImpl implements ModuleManagementService {
     private FlowManagementService flowManagementService;
 
     @Autowired
-    private ProcessorManagementService processorManagementService;
+    private ModelManagementService modelManagementService;
 
     @Autowired
-    private TriggerManagementService triggerManagementService;
-
-    @Autowired
-    private StructureManagementService structureManagementService;
+    private ConnectorService connectorService;
 
     @Override
-    public Long createModule(ModuleModel moduleModel) {
+    public Long createModule(ModuleDTO moduleModel) {
         return moduleRepository.save(buildEntity(moduleModel)).getId();
     }
 
@@ -50,17 +51,17 @@ public class ModuleManagementServiceImpl implements ModuleManagementService {
     }
 
     @Override
-    public ModuleModel updateModule(ModuleModel moduleModel) {
+    public ModuleDTO updateModule(ModuleDTO moduleModel) {
         moduleRepository.save(buildEntity(moduleModel));
         return moduleModel;
     }
 
     @Override
-    public List<ModuleModel> list() {
+    public List<ModuleDTO> list() {
         List<ModuleEntity> entities = moduleRepository.findAll();
-        List<ModuleModel> models = new LinkedList<>();
+        List<ModuleDTO> models = new LinkedList<>();
 
-        for (ModuleEntity entity: entities) {
+        for (ModuleEntity entity : entities) {
             models.add(buildModel(entity));
         }
 
@@ -68,11 +69,11 @@ public class ModuleManagementServiceImpl implements ModuleManagementService {
     }
 
     @Override
-    public List<ModuleModel> queryModules(ModuleQuery query) {
+    public List<ModuleDTO> queryModules(ModuleQuery query) {
         List<ModuleEntity> entities = moduleQueryService.query(query);
-        List<ModuleModel> models = new LinkedList<>();
+        List<ModuleDTO> models = new LinkedList<>();
 
-        for (ModuleEntity entity: entities) {
+        for (ModuleEntity entity : entities) {
             models.add(buildModel(entity));
         }
 
@@ -80,16 +81,24 @@ public class ModuleManagementServiceImpl implements ModuleManagementService {
     }
 
     @Override
-    public List<ModuleComponent> listModuleComponents(Long moduleId) {
-        List<ModuleComponent> components = new LinkedList<>();
-        components.addAll(flowManagementService.getComponents(moduleId));
-        components.addAll(processorManagementService.getComponents(moduleId));
-        components.addAll(triggerManagementService.getComponents(moduleId));
-        components.addAll(structureManagementService.getComponents(moduleId));
-        return components;
+    public ModuleDetailDTO getModuleDetail(Long moduleId) {
+        ModuleEntity moduleEntity = moduleRepository.findOne(moduleId);
+        if (moduleEntity == null) {
+            return null;
+        }
+        ModuleDetailDTO moduleDetail = new ModuleDetailDTO();
+        moduleDetail.setId(moduleEntity.getId());
+        moduleDetail.setName(moduleEntity.getName());
+        moduleDetail.setDescription(moduleEntity.getDescription());
+        // TODO to DTO
+        moduleDetail.setDependencies(moduleEntity.getDependencies());
+        moduleDetail.setFlows(flowManagementService.listBasicFlowInfoByModuleId(moduleId));
+        moduleDetail.setModels(modelManagementService.listBasicInfoByModuleId(moduleId));
+        moduleDetail.setConnectors(connectorService.listBasicInfoByModuleId(moduleId));
+        return moduleDetail;
     }
 
-    private ModuleEntity buildEntity(ModuleModel model) {
+    private ModuleEntity buildEntity(ModuleDTO model) {
         ModuleEntity moduleEntity;
         Long id = model.getId();
         if (id == null) {
@@ -108,8 +117,8 @@ public class ModuleManagementServiceImpl implements ModuleManagementService {
         return moduleEntity;
     }
 
-    private ModuleModel buildModel(ModuleEntity entity) {
-        ModuleModel moduleModel = new ModuleModel();
+    private ModuleDTO buildModel(ModuleEntity entity) {
+        ModuleDTO moduleModel = new ModuleDTO();
         moduleModel.setId(entity.getId());
         moduleModel.setName(entity.getName());
         moduleModel.setDependencies(entity.getDependencies());

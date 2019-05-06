@@ -5,9 +5,9 @@ import org.apache.camel.model.RouteDefinition;
 
 public interface DalaranConverterContext {
 
-    Class<? extends DalaranModelSchema> getSchemaType(BodyModelType modelType);
+    Class<? extends DalaranModelSchema> getSchemaType(BodyType modelType);
 
-    void unmarshal(RouteDefinition route, MessageModel model);
+    void fromObject(RouteDefinition route, MessageModel model);
 
-    void marshal(RouteDefinition route, MessageModel model);
+    void toObject(RouteDefinition route, MessageModel model);
 }

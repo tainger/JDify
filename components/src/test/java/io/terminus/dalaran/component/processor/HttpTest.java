@@ -4,10 +4,11 @@ import com.alibaba.dubbo.common.utils.IOUtils;
 import com.alibaba.dubbo.common.utils.StringUtils;
 import com.sun.net.httpserver.HttpServer;
 import io.terminus.dalaran.component.BasicProcessorTest;
+import io.terminus.dalaran.component.common.HttpMethod;
+import io.terminus.dalaran.component.common.HttpProtocol;
 import io.terminus.dalaran.component.processor.http.DalaranHttpClient;
 import io.terminus.dalaran.component.processor.http.HttpClientConfig;
-import io.terminus.dalaran.component.processor.http.HttpMethod;
-import io.terminus.dalaran.component.processor.http.HttpProtocol;
+import io.terminus.dalaran.component.processor.http.HttpClientConnector;
 import org.apache.camel.ProducerTemplate;
 import org.junit.After;
 import org.junit.Assert;
@@ -15,7 +16,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
 
@@ -32,31 +32,33 @@ public class HttpTest extends BasicProcessorTest {
     public void test() throws IOException {
         DalaranHttpClient processor = new DalaranHttpClient();
         HttpClientConfig config = new HttpClientConfig();
-        config.setProtocol(HttpProtocol.HTTP);
-        config.setHost("localhost");
-        config.setPort(MOCK_PORT);
+        HttpClientConnector connector = new HttpClientConnector();
+        connector.setProtocol(HttpProtocol.HTTP);
+        connector.setHost("localhost");
+        connector.setPort(MOCK_PORT);
+        config.setConnector(connector);
         config.setPath(MOCK_PATH);
         config.setMethod(HttpMethod.GET);
 
         ProducerTemplate httpGetTemplate = getProcessorTemplate(processor, config);
 
         Assert.assertNotNull(httpGetTemplate);
-        InputStream resultInput = (InputStream) httpGetTemplate.requestBody(MOCK_REQUEST_BODY);
-        String result = StringUtils.join(IOUtils.readLines(resultInput));
+        String result = (String) httpGetTemplate.requestBody(MOCK_REQUEST_BODY);
         Assert.assertEquals(result, METHOD_NOT_SUPPORTED);
 
         HttpClientConfig config2 = new HttpClientConfig();
-        config2.setProtocol(HttpProtocol.HTTP);
-        config2.setHost("localhost");
-        config2.setPort(MOCK_PORT);
+        HttpClientConnector connector2 = new HttpClientConnector();
+        connector2.setProtocol(HttpProtocol.HTTP);
+        connector2.setHost("localhost");
+        connector2.setPort(MOCK_PORT);
+        config2.setConnector(connector2);
         config2.setPath(MOCK_PATH);
         config2.setMethod(HttpMethod.POST);
 
         ProducerTemplate template = getProcessorTemplate(processor, config2);
 
         Assert.assertNotNull(template);
-        InputStream resultInput2 = (InputStream) template.requestBody(MOCK_REQUEST_BODY);
-        String result2 = StringUtils.join(IOUtils.readLines(resultInput2));
+        String result2 = (String) template.requestBody(MOCK_REQUEST_BODY);
         Assert.assertEquals(result2, "result: " + MOCK_REQUEST_BODY);
     }
 

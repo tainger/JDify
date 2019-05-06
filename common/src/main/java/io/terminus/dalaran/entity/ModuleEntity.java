@@ -2,14 +2,12 @@ package io.terminus.dalaran.entity;
 
 import io.terminus.dalaran.converter.ListToJsonConverter;
 import lombok.Data;
-import org.springframework.data.annotation.CreatedBy;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedBy;
-import org.springframework.data.annotation.LastModifiedDate;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Convert;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -18,31 +16,15 @@ import java.util.List;
 @Data
 @Entity
 @Table(name = "dalaran_module")
-public class ModuleEntity {
+public class ModuleEntity extends BasicEntity {
 
-    @Id
-    @GeneratedValue
-    private Long id;
-
+    @Column(nullable = false)
     private String name;
 
+    @Column(columnDefinition = "TEXT")
     private String description;
 
     @Convert(converter = ListToJsonConverter.class)
     @Column(name = "dependency_ids")
     private List<Long> dependencies = new ArrayList<>();
-
-    @CreatedDate
-    @Column(columnDefinition = "timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP")
-    private Date createdAt;
-
-    @LastModifiedDate
-    @Column(columnDefinition = "timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
-    private Date updatedAt;
-
-    @CreatedBy
-    private String createdBy;
-
-    @LastModifiedBy
-    private String updatedBy;
 }

@@ -27,7 +27,7 @@ resources:
     - name: console
       path: console
   type: buildpack
-- name: dalaran-starter
+- name: dalaran-runtime
   source:
     bp_args:
       USE_AGENT: "true"
@@ -35,8 +35,8 @@ resources:
     bp_ver: master
     context: dalaran/
     modules:
-    - name: starter
-      path: starter
+    - name: runtime
+      path: runtime
   type: buildpack
 stages:
 - name: dalaran
@@ -48,7 +48,7 @@ stages:
   tasks:
   - aggregate:
     - put: dalaran-console
-    - put: dalaran-starter
+    - put: dalaran-runtime
 - name: deploy
   tasks:
   - params:
@@ -58,5 +58,5 @@ stages:
       dice_test_yml: dalaran/dice_test.yml
       replacement_images:
       - dalaran-console/pack-result
-      - dalaran-starter/pack-result
+      - dalaran-runtime/pack-result
     put: deploy

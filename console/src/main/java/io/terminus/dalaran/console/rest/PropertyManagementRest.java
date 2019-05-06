@@ -1,7 +1,7 @@
 package io.terminus.dalaran.console.rest;
 
 import io.swagger.annotations.ApiOperation;
-import io.terminus.dalaran.console.model.PropertyModel;
+import io.terminus.dalaran.console.model.dto.PropertyDTO;
 import io.terminus.dalaran.console.model.query.PropertyQuery;
 import io.terminus.dalaran.console.service.PropertyManagementService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,13 +24,13 @@ public class PropertyManagementRest {
 
     @ApiOperation(value = "创建环境变量")
     @RequestMapping(value = "/create", method = RequestMethod.POST)
-    public Long create(@RequestBody PropertyModel model) {
+    public Long create(@RequestBody PropertyDTO model) {
         return propertyManagementService.createProperty(model);
     }
 
     @ApiOperation(value = "更新环境变量")
     @RequestMapping(value = "/update", method = RequestMethod.POST)
-    public PropertyModel update(@RequestBody PropertyModel model) {
+    public PropertyDTO update(@RequestBody PropertyDTO model) {
         return propertyManagementService.updateProperty(model);
     }
 
@@ -42,13 +42,13 @@ public class PropertyManagementRest {
 
     @ApiOperation(value = "条件查询环境变量")
     @RequestMapping(value = "/query", method = RequestMethod.GET)
-    public List<PropertyModel> query(PropertyQuery query) {
+    public List<PropertyDTO> query(PropertyQuery query) {
         return propertyManagementService.queryProperties(query);
     }
 
     @ApiOperation(value = "全量查询环境变量")
     @RequestMapping(value = "/list", method = RequestMethod.GET)
-    public List<PropertyModel> list() {
+    public List<PropertyDTO> list() {
         return propertyManagementService.list();
     }
 }

@@ -10,7 +10,7 @@
 
 ### 查询结构体
 
-GET:/__dalaran_management/structure
+GET:/__dalaran_management/model
 
 ``` json
 {
@@ -19,8 +19,8 @@ GET:/__dalaran_management/structure
         "moduleId": 1,
         "name": "xxx",
         "description": "",
-        "structure_type": "XML",
-        "structure_schema": {
+        "model_type": "XML",
+        "model_schema": {
             "root": "Order"
         }
     }],
@@ -32,15 +32,15 @@ GET:/__dalaran_management/structure
 
 ### 创建结构体
 
-POST:/__dalaran_management/structure
+POST:/__dalaran_management/model
 
 ```json
 {
     "moduleId": 1,
     "name": "xxx",
     "description": "",
-    "structure_type": "XML",
-    "structure_schema": {
+    "model_type": "XML",
+    "model_schema": {
         "root": "Order"
     }
 }
@@ -48,7 +48,7 @@ POST:/__dalaran_management/structure
 
 ### 修改结构体
 
-PUT:/__dalaran_management/structure
+PUT:/__dalaran_management/model
 
 ```json
 {
@@ -56,8 +56,8 @@ PUT:/__dalaran_management/structure
     "moduleId": 1,
     "name": "xxx",
     "description": "",
-    "structure_type": "XML",
-    "structure_schema": {
+    "model_type": "XML",
+    "model_schema": {
         "root": "Order"
     }
 }
@@ -65,7 +65,7 @@ PUT:/__dalaran_management/structure
 
 ### 删除结构体
 
-DELETE:/__dalaran_management/structure/{structure_id}
+DELETE:/__dalaran_management/model/{model_id}
 
 ## 触发器
 
@@ -80,8 +80,8 @@ GET:/__dalaran_management/trigger
     "list": [{
         "id": 1,
         "moduleId": 1,
-        "inStructure": 1,
-        "outStructure": 1,
+        "inModel": 1,
+        "outModel": 1,
         "name": "xxx",
         "description": "",
         "type": "netty-http-listener",
@@ -106,8 +106,8 @@ POST:/__dalaran_management/trigger
 ```json
 {
     "moduleId": 1,
-    "inStructure": 1,
-    "outStructure": 1,
+    "inModel": 1,
+    "outModel": 1,
     "name": "xxx",
     "description": "",
     "type": "netty-http-client",
@@ -129,8 +129,8 @@ PUT:/__dalaran_management/trigger
 {
     "id": 1,
     "moduleId": 1,
-    "inStructure": 1,
-    "outStructure": 1,
+    "inModel": 1,
+    "outModel": 1,
     "name": "xxx",
     "description": "",
     "type": "netty-http-listener",
@@ -160,8 +160,8 @@ GET:/__dalaran_management/processor
     "list": [{
         "id": 1,
         "moduleId": 1,
-        "inStructure": 1,
-        "outStructure": 1,
+        "inModel": 1,
+        "outModel": 1,
         "name": "xxx",
         "description": "",
         "type": "netty-http-listener",
@@ -185,8 +185,8 @@ POST:/__dalaran_management/processor
 ```json
 {
     "moduleId": 1,
-    "inStructure": 1,
-    "outStructure": 1,
+    "inModel": 1,
+    "outModel": 1,
     "name": "xxx",
     "description": "",
     "type": "netty-http-listener",
@@ -208,8 +208,8 @@ PUT:/__dalaran_management/processor
 {
     "id": 1,
     "moduleId": 1,
-    "inStructure": 1,
-    "outStructure": 1,
+    "inModel": 1,
+    "outModel": 1,
     "name": "xxx",
     "description": "",
     "type": "netty-http-listener",

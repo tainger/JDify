@@ -1,7 +1,7 @@
 package io.terminus.dalaran.model.schema;
 
 import io.terminus.dalaran.DalaranModelSchema;
-import io.terminus.dalaran.model.schema.structure.ModelField;
+import io.terminus.dalaran.model.ModelField;
 import lombok.Data;
 
 import java.util.Map;

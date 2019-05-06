@@ -1,6 +1,6 @@
 package io.terminus.dalaran.support.convert;
 
-import io.terminus.dalaran.BodyModelType;
+import io.terminus.dalaran.BodyType;
 import io.terminus.dalaran.DalaranConverter;
 import io.terminus.dalaran.DalaranConverterContext;
 import io.terminus.dalaran.DalaranModelSchema;
@@ -16,40 +16,34 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class DefaultDalaranConverterContext implements DalaranConverterContext {
-    private final Map<BodyModelType, DalaranConverter> converterMapping;
-    private final Map<BodyModelType, Class<? extends DalaranModelSchema>> converterSchemaMapping;
+    private final Map<BodyType, DalaranConverter> converterMapping;
+    private final Map<BodyType, Class<? extends DalaranModelSchema>> converterSchemaMapping;
 
     public DefaultDalaranConverterContext() {
         converterMapping = new HashMap<>();
         converterSchemaMapping = new HashMap<>();
         // TODO 这个扩展面也很窄, 先写死吧...
-        converterMapping.put(BodyModelType.JSON, new JsonConverter());
-        converterSchemaMapping.put(BodyModelType.JSON, JsonSchema.class);
+        converterMapping.put(BodyType.JSON, new JsonConverter());
+        converterSchemaMapping.put(BodyType.JSON, JsonSchema.class);
 
-        converterMapping.put(BodyModelType.XML, new XMLConverter());
-        converterSchemaMapping.put(BodyModelType.XML, XMLSchema.class);
+        converterMapping.put(BodyType.XML, new XMLConverter());
+        converterSchemaMapping.put(BodyType.XML, XMLSchema.class);
 
-        converterSchemaMapping.put(BodyModelType.OBJECT, ObjectSchema.class);
+        converterSchemaMapping.put(BodyType.OBJECT, ObjectSchema.class);
     }
 
     @Override
-    public Class<? extends DalaranModelSchema> getSchemaType(BodyModelType modelType) {
+    public Class<? extends DalaranModelSchema> getSchemaType(BodyType modelType) {
         return converterSchemaMapping.get(modelType);
     }
 
     @Override
-    public void unmarshal(RouteDefinition route, MessageModel model) {
-        // TODO Object 类型不需要处理, 因为序列化反序列化本身都是转 Object, 这样写很奇怪
-        if (!BodyModelType.OBJECT.equals(model.getModelType())) {
-            converterMapping.get(model.getModelType()).toObject(route, model.getModelSchema());
-        }
+    public void fromObject(RouteDefinition route, MessageModel model) {
+        converterMapping.get(model.getModelType()).fromObject(route, model.getModelSchema());
     }
 
     @Override
-    public void marshal(RouteDefinition route, MessageModel model) {
-        // TODO Object 类型不需要处理, 因为序列化反序列化本身都是转 Object, 这样写很奇怪
-        if (!BodyModelType.OBJECT.equals(model.getModelType())) {
-            converterMapping.get(model.getModelType()).fromObject(route, model.getModelSchema());
-        }
+    public void toObject(RouteDefinition route, MessageModel model) {
+        converterMapping.get(model.getModelType()).toObject(route, model.getModelSchema());
     }
 }

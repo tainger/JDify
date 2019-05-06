@@ -3,8 +3,8 @@ package io.terminus.dalaran.component.trigger;
 import com.alibaba.dubbo.common.utils.IOUtils;
 import com.alibaba.dubbo.common.utils.StringUtils;
 import io.terminus.dalaran.component.BasicTriggerTest;
-import io.terminus.dalaran.component.trigger.http.HttpMethod;
-import io.terminus.dalaran.component.trigger.http.HttpProtocol;
+import io.terminus.dalaran.component.common.HttpMethod;
+import io.terminus.dalaran.component.common.HttpProtocol;
 import io.terminus.dalaran.component.trigger.http.NettyHttpConfig;
 import io.terminus.dalaran.component.trigger.http.NettyHttpListener;
 import org.apache.http.HttpResponse;
@@ -17,7 +17,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.io.InputStream;
 
 public class HttpTest extends BasicTriggerTest {
 
@@ -51,9 +50,8 @@ public class HttpTest extends BasicTriggerTest {
 
 
     @Override
-    public Object process(Object param) throws Exception {
-        InputStream requestInput = (InputStream) param;
-        String requestBody = StringUtils.join(IOUtils.readLines(requestInput));
+    public Object process(Object param) {
+        String requestBody = (String) param;
         return SUCCESSFUL_MESSAGE + requestBody;
     }
 }

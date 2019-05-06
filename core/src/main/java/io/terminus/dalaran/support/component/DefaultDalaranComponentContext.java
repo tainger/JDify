@@ -1,11 +1,10 @@
 package io.terminus.dalaran.support.component;
 
-import io.terminus.dalaran.DalaranComponentContext;
-import io.terminus.dalaran.DalaranProcessor;
-import io.terminus.dalaran.DalaranTrigger;
+import io.terminus.dalaran.*;
 import io.terminus.dalaran.annotation.ConfigFieldInfo;
 import io.terminus.dalaran.annotation.Processor;
 import io.terminus.dalaran.annotation.Trigger;
+import io.terminus.dalaran.model.config.ConnectorInfo;
 import io.terminus.dalaran.model.config.DalaranConfigField;
 import io.terminus.dalaran.model.config.ProcessorInfo;
 import io.terminus.dalaran.model.config.TriggerInfo;
@@ -16,6 +15,8 @@ import org.springframework.context.ApplicationContextAware;
 
 import javax.annotation.PostConstruct;
 import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -29,29 +30,41 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext, 
     private final Map<String, TriggerInfo> triggerInfoMapping = new ConcurrentHashMap<>();
     private final Map<String, ProcessorInfo> processorInfoMapping = new ConcurrentHashMap<>();
 
+    private final List<ConnectorInfo> connectorInfoList = new ArrayList<>();
+
     @Override
     public DalaranTrigger getTrigger(String triggerType) {
+        // TODO check null
         return triggerMapping.get(triggerType);
     }
 
     @Override
     public DalaranProcessor getProcessor(String processorType) {
+
+        // TODO check null
         return processorMapping.get(processorType);
     }
 
     @Override
     public TriggerInfo getTriggerInfo(String triggerType) {
+        // TODO check null
         return triggerInfoMapping.get(triggerType);
     }
 
     @Override
     public ProcessorInfo getProcessorInfo(String processorType) {
+        // TODO check null
         return processorInfoMapping.get(processorType);
     }
 
     @Override
     public Collection<TriggerInfo> getAllTriggerInfo() {
         return triggerInfoMapping.values();
+    }
+
+    @Override
+    public Collection<ConnectorInfo> getAllConnectorInfo() {
+        return connectorInfoList;
     }
 
     @Override
@@ -73,67 +86,110 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext, 
         this.applicationContext = applicationContext;
     }
 
+    // TODO 很多重复性的代码
     private void addTrigger(DalaranTrigger trigger) {
         Trigger triggerAnnotation = trigger.getClass().getDeclaredAnnotation(Trigger.class);
-        List<DalaranConfigField> configFields = buildConfigFields(triggerAnnotation.configType());
+        DalaranConfigField[] configFields = buildConfigFields(triggerAnnotation.configType());
 
         TriggerInfo triggerInfo = new TriggerInfo();
         triggerInfo.setType(triggerAnnotation.value());
         triggerInfo.setConfigFields(configFields);
-        triggerInfo.setIsVoid(triggerAnnotation.isVoid());
         triggerInfo.setConfigType(triggerAnnotation.configType());
-        triggerInfo.setBodyMode(triggerAnnotation.bodyMode());
+        triggerInfo.setAllowedBodyTypes(triggerAnnotation.allowBodyTypes());
+        triggerInfo.setSerializedBody(triggerAnnotation.serializedBody());
+
+        triggerInfo.setIsVoid(triggerAnnotation.isVoid());
+
+        Class connectorType = getConnectorType(triggerAnnotation.configType());
+        if (connectorType != null) {
+            ConnectorInfo connectorInfo = buildConnectorInfo(ComponentType.Trigger, connectorType, triggerAnnotation.value());
+            triggerInfo.setConnectorInfo(connectorInfo);
+        }
 
         triggerInfoMapping.put(triggerAnnotation.value(), triggerInfo);
         triggerMapping.put(triggerAnnotation.value(), trigger);
     }
 
+    // TODO 很多重复性的代码
     private void addProcessor(DalaranProcessor processor) {
         Processor processorAnnotation = processor.getClass().getDeclaredAnnotation(Processor.class);
-        List<DalaranConfigField> configFields = buildConfigFields(processorAnnotation.configType());
+        DalaranConfigField[] configFields = buildConfigFields(processorAnnotation.configType());
 
         ProcessorInfo processorInfo = new ProcessorInfo();
         processorInfo.setType(processorAnnotation.value());
         processorInfo.setConfigFields(configFields);
         processorInfo.setConfigType(processorAnnotation.configType());
-        processorInfo.setBodyMode(processorAnnotation.bodyMode());
+        processorInfo.setSerializedBody(processorAnnotation.serializedBody());
+        processorInfo.setAllowedBodyTypes(processorAnnotation.allowBodyTypes());
+
+        Class connectorType = getConnectorType(processorAnnotation.configType());
+        if (connectorType != null) {
+            ConnectorInfo connectorInfo = buildConnectorInfo(ComponentType.Processor, connectorType, processorAnnotation.value());
+            processorInfo.setConnectorInfo(connectorInfo);
+        }
 
         processorInfoMapping.put(processorAnnotation.value(), processorInfo);
         processorMapping.put(processorAnnotation.value(), processor);
     }
 
-    private List<DalaranConfigField> buildConfigFields(Class configClass) {
-        List<DalaranConfigField> configFields = new ArrayList<>();
+    private ConnectorInfo buildConnectorInfo(ComponentType component, Class connectorType, String componentName) {
+        DalaranConfigField[] connectorConfigFields = buildConfigFields(connectorType);
+        ConnectorInfo connectorInfo = new ConnectorInfo();
+        connectorInfo.setComponentType(component);
+        connectorInfo.setConnectorType(connectorType);
+        connectorInfo.setComponent(componentName);
+        connectorInfo.setConfigFields(connectorConfigFields);
+        connectorInfoList.add(connectorInfo);
+        return connectorInfo;
+    }
+
+    private Class getConnectorType(Class configType) {
+        for (Type genericInterface : configType.getGenericInterfaces()) {
+            if (genericInterface instanceof ParameterizedType) {
+                Class rawType = (Class) ((ParameterizedType) genericInterface).getRawType();
+                if (rawType == ConnectorConfig.class) {
+                    Type[] parameterizedType = ((ParameterizedType) genericInterface).getActualTypeArguments();
+                    if (parameterizedType.length == 1) {
+                        return (Class) parameterizedType[0];
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    private void getConfigFields(List<DalaranConfigField> configFields, Class configClass) {
+        if (configClass.getSuperclass() != null) {
+            getConfigFields(configFields, configClass.getSuperclass());
+        }
+
         for (Field field : configClass.getDeclaredFields()) {
             ConfigFieldInfo configFieldInfo = field.getDeclaredAnnotation(ConfigFieldInfo.class);
-            if (configFieldInfo != null) {
+            if (configFieldInfo != null && configFieldInfo.inputType() != FieldInputType.Hidden) {
                 DalaranConfigField configField = new DalaranConfigField();
                 configField.setName(field.getName());
                 configField.setInputType(configFieldInfo.inputType());
                 configField.setExample(configFieldInfo.example());
                 configField.setDefaultValue(configFieldInfo.defaultValue());
                 configField.setLabel(configFieldInfo.label());
-                configField.setEnum(configFieldInfo.isEnum());
 
-                try {
-                    if (configFieldInfo.isEnum()) {
-                        List<Map<String, String>> enumValues = new ArrayList<>();
-                        val type = Class.forName(field.getType().getName());
-                        val fields = type.getFields();
-                        for (Field field1 : fields) {
-                            val name = field1.getName();
-                            val map = new HashMap();
-                            map.put(name, name);
-                            enumValues.add(map);
-                        }
-                        configField.setEnumValues(enumValues);
+                if (field.getType().isEnum()) {
+                    val enumValueMap = new HashMap<String, String>();
+                    for (Field element : field.getType().getFields()) {
+                        val name = element.getName();
+                        enumValueMap.put(name, name);
                     }
-                } catch (Exception e) {
-                    e.printStackTrace();
+                    configField.setEnumValues(enumValueMap);
                 }
+
                 configFields.add(configField);
             }
         }
-        return configFields;
+    }
+
+    private DalaranConfigField[] buildConfigFields(Class configClass) {
+        List<DalaranConfigField> configFields = new ArrayList<>();
+        getConfigFields(configFields, configClass);
+        return configFields.toArray(new DalaranConfigField[]{});
     }
 }

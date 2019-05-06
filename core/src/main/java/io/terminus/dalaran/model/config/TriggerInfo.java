@@ -1,20 +1,31 @@
 package io.terminus.dalaran.model.config;
 
-import io.terminus.dalaran.BodyMode;
+import com.alibaba.fastjson.annotation.JSONField;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.terminus.dalaran.BodyType;
 import lombok.Data;
 
-import java.util.List;
-
 @Data
-public class TriggerInfo {
+public class TriggerInfo implements ComponentInfo {
 
     private String type;
 
     private Boolean isVoid;
 
-    private List<DalaranConfigField> configFields;
+    private DalaranConfigField[] configFields;
 
-    private transient BodyMode bodyMode;
+    private BodyType[] allowedBodyTypes;
 
-    private transient Class configType;
+    @JSONField(serialize = false)
+    @JsonIgnore
+    private ConnectorInfo connectorInfo;
+
+    @JSONField(serialize = false)
+    @JsonIgnore
+    private boolean serializedBody;
+
+    @JSONField(serialize = false)
+    @JsonIgnore
+    private Class configType;
+
 }

@@ -1,18 +1,17 @@
 package io.terminus.dalaran.component.processor.dubbo;
 
-import io.terminus.dalaran.BodyMode;
 import io.terminus.dalaran.DalaranProcessor;
 import io.terminus.dalaran.annotation.Processor;
 import org.apache.camel.model.ProcessorDefinition;
 
-@Processor(value = "dubbo-consumer", bodyMode = BodyMode.Object, configType = DalaranDubboConsumerConfig.class)
+@Processor(value = "dubbo-consumer", serializedBody = false, configType = DalaranDubboConsumerConfig.class)
 public class DalaranDubboConsumer implements DalaranProcessor<DalaranDubboConsumerConfig> {
 
     private static final String DUBBO_PROVIDER_URI = "dubbo:?registryAddress=%s&serviceId=%s&method=%s&version=%s";
 
     @Override
     public void configure(ProcessorDefinition route, DalaranDubboConsumerConfig config) {
-        String uri = String.format(DUBBO_PROVIDER_URI, config.getRegistryAddress(),
+        String uri = String.format(DUBBO_PROVIDER_URI, config.getConnector().getAddress(),
                 config.getServiceId(), config.getMethod(), config.getVersion());
         route.to(uri);
     }

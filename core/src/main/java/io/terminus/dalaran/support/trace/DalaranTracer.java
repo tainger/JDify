@@ -1,7 +1,7 @@
 package io.terminus.dalaran.support.trace;
 
-import com.google.gson.Gson;
-import io.terminus.dalaran.BodyModelType;
+import com.alibaba.fastjson.JSON;
+import io.terminus.dalaran.BodyType;
 import io.terminus.dalaran.DalaranTraceLogger;
 import io.terminus.dalaran.TracingType;
 import io.terminus.dalaran.model.DalaranTracingLog;
@@ -23,58 +23,52 @@ import static io.terminus.dalaran.DalaranConstants.*;
 @Slf4j
 public class DalaranTracer {
 
-    private final Gson gson = new Gson();
-
     private final DalaranTraceLogger logger;
 
     private final TracingType tracingType;
 
-    private final Long triggerId;
-
     private final Long flowId;
 
-    private final Long processorId;
+    private final String processorId;
 
-    private DalaranTracer(DalaranTraceLogger logger, TracingType tracingType, Long triggerId, Long flowId, Long processorId) {
+    private DalaranTracer(DalaranTraceLogger logger, TracingType tracingType, Long flowId, String processorId) {
         this.logger = logger;
         this.tracingType = tracingType;
-        this.triggerId = triggerId;
         this.flowId = flowId;
         this.processorId = processorId;
     }
 
-
-    public static DalaranTracer buildTriggerTracer(DalaranTraceLogger logger, Long triggerId, Long flowId) {
-        return new DalaranTracer(logger, TracingType.Trigger, triggerId, flowId, null);
-    }
-
     public static DalaranTracer buildTestFlowTracer(DalaranTraceLogger logger, Long flowId) {
-        return new DalaranTracer(logger, TracingType.TestFlow, null, flowId, null);
+        return new DalaranTracer(logger, TracingType.TestFlow, flowId, null);
     }
 
-    public static DalaranTracer buildFlowTracer(DalaranTraceLogger logger, Long triggerId, Long flowId, Long processorId) {
-        return new DalaranTracer(logger, TracingType.Flow, triggerId, flowId, processorId);
+    public static DalaranTracer buildFlowTracer(DalaranTraceLogger logger, Long flowId) {
+        return new DalaranTracer(logger, TracingType.Flow, flowId, null);
     }
 
-    public static DalaranTracer buildConvertTracer(DalaranTraceLogger logger, Long triggerId, Long flowId, Long processorId) {
-        return new DalaranTracer(logger, TracingType.Convert, triggerId, flowId, processorId);
+    public static DalaranTracer buildFlowSpanTracer(DalaranTraceLogger logger, Long flowId, String processorId) {
+        return new DalaranTracer(logger, TracingType.Processor, flowId, processorId);
     }
 
-    public void before(RouteDefinition route, BodyModelType modelType) {
+    public static DalaranTracer buildConvertTracer(DalaranTraceLogger logger, Long flowId, String processorId) {
+        return new DalaranTracer(logger, TracingType.Convert, flowId, processorId);
+    }
+
+    public void before(RouteDefinition route, BodyType modelType) {
         route.process(this.buildBeforeProcessor(modelType));
     }
 
-    public void after(RouteDefinition route, BodyModelType modelType) {
+    public void after(RouteDefinition route, BodyType modelType) {
         route.process(this.buildAfterProcessor(modelType));
     }
 
     // TODO async
-    private Processor buildBeforeProcessor(BodyModelType bodyModelType) {
+    private Processor buildBeforeProcessor(BodyType bodyModelType) {
         return new TraceBeforeProcessor(bodyModelType);
     }
 
     // TODO async
-    private Processor buildAfterProcessor(BodyModelType bodyModelType) {
+    private Processor buildAfterProcessor(BodyType bodyModelType) {
         return new TraceAfterProcessor(bodyModelType);
     }
 
@@ -82,10 +76,10 @@ public class DalaranTracer {
         switch (tracingType) {
             case Flow:
                 return FLOW_TRACING_LOG;
-            case Trigger:
-                return TRIGGER_TRACING_LOG;
             case TestFlow:
                 return TEST_FLOW_TRACING_LOG;
+            case Processor:
+                return PROCESSOR_TRACING_LOG;
             case Convert:
                 return CONVERT_TRACING_LOG;
             default:
@@ -100,17 +94,20 @@ public class DalaranTracer {
         if (body instanceof String) {
             return (String) body;
         }
+        if (body instanceof byte[]) {
+            return new String((byte[]) body);
+        }
         if (body instanceof Map || body instanceof Iterable || body instanceof Serializable) {
-            return gson.toJson(body);
+            return JSON.toJSONString(body);
         }
         return body.toString();
     }
 
     private class TraceBeforeProcessor implements Processor, Traceable {
 
-        private final BodyModelType bodyModelType;
+        private final BodyType bodyModelType;
 
-        private TraceBeforeProcessor(BodyModelType bodyModelType) {
+        private TraceBeforeProcessor(BodyType bodyModelType) {
             this.bodyModelType = bodyModelType;
         }
 
@@ -120,12 +117,8 @@ public class DalaranTracer {
             exchange.getOut().copyFrom(exchange.getIn());
 
             DalaranTracingLog tracingLog = new DalaranTracingLog();
-
-            if (TracingType.Flow == tracingType || TracingType.Convert == tracingType) {
-                tracingLog.setMain(false);
-            } else {
-                tracingLog.setMain(true);
-            }
+            Boolean isMainFlow = TracingType.Flow == tracingType || TracingType.TestFlow == tracingType;
+            tracingLog.setMain(isMainFlow);
             exchange.setProperty(getTracingLogPropertyKey(), tracingLog);
             String testRecordId = exchange.getProperty(TEST_FLOW_RECORD_ID_HEADER, String.class);
             if (testRecordId != null) {
@@ -134,7 +127,6 @@ public class DalaranTracer {
                 tracingLog.setRecordId(exchange.getExchangeId());
             }
             tracingLog.setTracingType(tracingType);
-            tracingLog.setTriggerId(triggerId);
             tracingLog.setFlowId(flowId);
             tracingLog.setProcessorId(processorId);
             tracingLog.setTimestamp(System.currentTimeMillis());
@@ -147,8 +139,6 @@ public class DalaranTracer {
             switch (tracingType) {
                 case Flow:
                     return "flow tracing before[flow(" + flowId + ") -> processor(" + processorId + ")]";
-                case Trigger:
-                    return "trigger tracing before[trigger(" + triggerId + ")]";
                 case TestFlow:
                     return "test flow tracing before[testFlow(" + flowId + ")]";
                 default:
@@ -164,9 +154,9 @@ public class DalaranTracer {
 
     private class TraceAfterProcessor implements Processor, Traceable {
 
-        private final BodyModelType bodyModelType;
+        private final BodyType bodyModelType;
 
-        private TraceAfterProcessor(BodyModelType bodyModelType) {
+        private TraceAfterProcessor(BodyType bodyModelType) {
             this.bodyModelType = bodyModelType;
         }
 
@@ -194,8 +184,6 @@ public class DalaranTracer {
             switch (tracingType) {
                 case Flow:
                     return "flow tracing after[flow(" + flowId + ") -> processor(" + processorId + ")]";
-                case Trigger:
-                    return "trigger tracing after[trigger(" + triggerId + ")]";
                 case TestFlow:
                     return "test flow tracing after[testFlow(" + flowId + ")]";
                 default:

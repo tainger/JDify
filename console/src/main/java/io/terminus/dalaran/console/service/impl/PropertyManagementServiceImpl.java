@@ -1,6 +1,6 @@
 package io.terminus.dalaran.console.service.impl;
 
-import io.terminus.dalaran.console.model.PropertyModel;
+import io.terminus.dalaran.console.model.dto.PropertyDTO;
 import io.terminus.dalaran.console.model.query.PropertyQuery;
 import io.terminus.dalaran.console.service.PropertyManagementService;
 import io.terminus.dalaran.console.service.jpa.PropertyQueryService;
@@ -10,14 +10,15 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 /**
  * Created by jingdi on 2019/4/16
  */
 @Service
+@Transactional
 public class PropertyManagementServiceImpl implements PropertyManagementService {
 
     @Autowired
@@ -27,12 +28,12 @@ public class PropertyManagementServiceImpl implements PropertyManagementService 
     private PropertyQueryService propertyQueryService;
 
     @Override
-    public Long createProperty(PropertyModel propertyModel) {
+    public Long createProperty(PropertyDTO propertyModel) {
         return propertyRepository.save(buildEntity(propertyModel)).getId();
     }
 
     @Override
-    public PropertyModel updateProperty(PropertyModel propertyModel) {
+    public PropertyDTO updateProperty(PropertyDTO propertyModel) {
         propertyRepository.save(buildEntity(propertyModel));
         return propertyModel;
     }
@@ -43,9 +44,9 @@ public class PropertyManagementServiceImpl implements PropertyManagementService 
     }
 
     @Override
-    public List<PropertyModel> list() {
+    public List<PropertyDTO> list() {
         List<PropertyEntity> entities =  propertyRepository.findAll();
-        List<PropertyModel> models = new ArrayList<>();
+        List<PropertyDTO> models = new ArrayList<>();
         for (PropertyEntity entity : entities) {
             models.add(buildModel(entity));
         }
@@ -53,17 +54,17 @@ public class PropertyManagementServiceImpl implements PropertyManagementService 
     }
 
     @Override
-    public List<PropertyModel> queryProperties(PropertyQuery query) {
+    public List<PropertyDTO> queryProperties(PropertyQuery query) {
         List<PropertyEntity> entities = propertyQueryService.query(query);
-        List<PropertyModel> models = new ArrayList<>();
+        List<PropertyDTO> models = new ArrayList<>();
         for (PropertyEntity entity : entities) {
             models.add(buildModel(entity));
         }
         return models;
     }
 
-    private PropertyModel buildModel(PropertyEntity entity) {
-        PropertyModel model = new PropertyModel();
+    private PropertyDTO buildModel(PropertyEntity entity) {
+        PropertyDTO model = new PropertyDTO();
         model.setId(entity.getId());
         model.setName(entity.getName());
         model.setValue(entity.getValue());
@@ -71,7 +72,7 @@ public class PropertyManagementServiceImpl implements PropertyManagementService 
         return model;
     }
 
-    private PropertyEntity buildEntity(PropertyModel model) {
+    private PropertyEntity buildEntity(PropertyDTO model) {
         PropertyEntity propertyEntity;
         Long id = model.getId();
         if (id == null) {

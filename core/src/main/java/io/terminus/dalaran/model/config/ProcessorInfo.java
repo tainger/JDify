@@ -1,18 +1,47 @@
 package io.terminus.dalaran.model.config;
 
-import io.terminus.dalaran.BodyMode;
+import com.alibaba.fastjson.annotation.JSONField;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.terminus.dalaran.BodyType;
 import lombok.Data;
-
-import java.util.List;
+import org.jetbrains.annotations.NotNull;
 
 @Data
-public class ProcessorInfo {
+public class ProcessorInfo implements ComponentInfo {
 
     private String type;
 
-    private List<DalaranConfigField> configFields;
+    private DalaranConfigField[] configFields;
 
-    private transient BodyMode bodyMode;
+    @NotNull
+    private BodyType[] allowedBodyTypes;
 
-    private transient Class configType;
+    @JSONField(serialize = false)
+    @JsonIgnore
+    private ConnectorInfo connectorInfo;
+
+    @JSONField(serialize = false)
+    @JsonIgnore
+    private Class configType;
+
+    @JSONField(serialize = false)
+    @JsonIgnore
+    private boolean serializedBody;
+
+    public boolean allowedBodyType(BodyType bodyType) {
+        for (BodyType allowedBodyType : allowedBodyTypes) {
+            if (allowedBodyType == bodyType) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @NotNull
+    public BodyType firstAllowedBodyType() {
+        if (allowedBodyTypes.length == 0) {
+            throw new RuntimeException("processor[" + type + "] allowed body type is empty");
+        }
+        return allowedBodyTypes[0];
+    }
 }

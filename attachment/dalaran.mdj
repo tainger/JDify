@@ -7243,7 +7243,7 @@
 									"top": 685,
 									"width": 254.4404296875,
 									"height": 13,
-									"text": "dalaran_structure"
+									"text": "dalaran_model"
 								},
 								{
 									"_type": "ERDColumnCompartmentView",
@@ -7695,7 +7695,7 @@
 										"$ref": "AAAAAAFps8olrPsb69E="
 									},
 									"edgePosition": 1,
-									"text": "in_structure"
+									"text": "in_model"
 								},
 								{
 									"_type": "EdgeLabelView",
@@ -7777,7 +7777,7 @@
 										"$ref": "AAAAAAFps8rvbPtzUZY="
 									},
 									"edgePosition": 1,
-									"text": "out_structure"
+									"text": "out_model"
 								},
 								{
 									"_type": "EdgeLabelView",
@@ -7859,7 +7859,7 @@
 										"$ref": "AAAAAAFps83tYPwGjAM="
 									},
 									"edgePosition": 1,
-									"text": "in_structure"
+									"text": "in_model"
 								},
 								{
 									"_type": "EdgeLabelView",
@@ -7941,7 +7941,7 @@
 										"$ref": "AAAAAAFps835CfwaqYA="
 									},
 									"edgePosition": 1,
-									"text": "out_structure"
+									"text": "out_model"
 								},
 								{
 									"_type": "EdgeLabelView",
@@ -8946,7 +8946,7 @@
 							"_parent": {
 								"$ref": "AAAAAAFps8U7LPn5oa8="
 							},
-							"name": "in_structure",
+							"name": "in_model",
 							"type": "BIGINT",
 							"length": 0,
 							"foreignKey": true
@@ -8957,7 +8957,7 @@
 							"_parent": {
 								"$ref": "AAAAAAFps8U7LPn5oa8="
 							},
-							"name": "out_structure",
+							"name": "out_model",
 							"type": "BIGINT",
 							"length": 0,
 							"foreignKey": true
@@ -9093,7 +9093,7 @@
 							"_parent": {
 								"$ref": "AAAAAAFps8U7LPn/ZyM="
 							},
-							"name": "in_structure",
+							"name": "in_model",
 							"type": "BIGINT",
 							"length": 0,
 							"foreignKey": true
@@ -9104,7 +9104,7 @@
 							"_parent": {
 								"$ref": "AAAAAAFps8U7LPn/ZyM="
 							},
-							"name": "out_structure",
+							"name": "out_model",
 							"type": "BIGINT",
 							"length": 0,
 							"foreignKey": true
@@ -9290,7 +9290,7 @@
 					"_parent": {
 						"$ref": "AAAAAAFps8U7JvmrwYs="
 					},
-					"name": "dalaran_structure",
+					"name": "dalaran_model",
 					"ownedElements": [
 						{
 							"_type": "ERDRelationship",
@@ -9298,7 +9298,7 @@
 							"_parent": {
 								"$ref": "AAAAAAFps8U7LPoOpNQ="
 							},
-							"name": "in_structure",
+							"name": "in_model",
 							"end1": {
 								"_type": "ERDRelationshipEnd",
 								"_id": "AAAAAAFps8olq/sYAXI=",
@@ -9327,7 +9327,7 @@
 							"_parent": {
 								"$ref": "AAAAAAFps8U7LPoOpNQ="
 							},
-							"name": "out_structure",
+							"name": "out_model",
 							"end1": {
 								"_type": "ERDRelationshipEnd",
 								"_id": "AAAAAAFps8rvbPtw1jE=",
@@ -9356,7 +9356,7 @@
 							"_parent": {
 								"$ref": "AAAAAAFps8U7LPoOpNQ="
 							},
-							"name": "in_structure",
+							"name": "in_model",
 							"end1": {
 								"_type": "ERDRelationshipEnd",
 								"_id": "AAAAAAFps83tYPwDpGo=",
@@ -9385,7 +9385,7 @@
 							"_parent": {
 								"$ref": "AAAAAAFps8U7LPoOpNQ="
 							},
-							"name": "out_structure",
+							"name": "out_model",
 							"end1": {
 								"_type": "ERDRelationshipEnd",
 								"_id": "AAAAAAFps835CfwXlko=",
@@ -9448,7 +9448,7 @@
 							"_parent": {
 								"$ref": "AAAAAAFps8U7LPoOpNQ="
 							},
-							"name": "structure_type",
+							"name": "model_type",
 							"type": "VARCHAR",
 							"length": "255"
 						},
@@ -9458,7 +9458,7 @@
 							"_parent": {
 								"$ref": "AAAAAAFps8U7LPoOpNQ="
 							},
-							"name": "structure_schema",
+							"name": "model_schema",
 							"type": "JSON",
 							"length": 0
 						},

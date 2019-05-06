@@ -1,5 +1,6 @@
 package io.terminus.dalaran.model;
 
+import io.terminus.dalaran.model.flow.BasicFlow;
 import lombok.Data;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -10,7 +11,7 @@ public class TriggerModel<T> {
     private Long id;
 
     @NotNull
-    private DalaranFlow flow;
+    private BasicFlow flow;
 
     @NotNull
     private String type;

@@ -1,7 +1,7 @@
 package io.terminus.dalaran.console.util;
 
-import io.terminus.dalaran.model.schema.structure.FieldType;
-import io.terminus.dalaran.model.schema.structure.ModelField;
+import io.terminus.dalaran.FieldType;
+import io.terminus.dalaran.model.ModelField;
 import lombok.val;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
@@ -19,36 +19,47 @@ import java.util.Map;
  */
 public class ExcelUtils {
 
-    public Map<String, Map<String, ModelField>> parse(InputStream file) throws Exception {
-        Map<String, Map<String, ModelField>> objs = new HashMap<>();
+    public static Map<String, ModelField> parseFirstSheet(InputStream file) throws Exception {
         val workbook = new XSSFWorkbook(file);
-        for (Sheet sheet : workbook) {
-            Map<String, ModelField> obj = new HashMap<>();
-            val name = sheet.getSheetName();
-            for (Row row : sheet) {
-                int currentRowNum = row.getRowNum();
-                if (currentRowNum == 0) {
-                    continue;
-                }
-
-                int currentRowLevel = getRowLevel(currentRowNum, sheet);
-                if (currentRowLevel != 0) {
-                    continue;
-                }
-
-                int nextRowNum = currentRowNum + 1;
-                if (nextRowNum >= sheet.getPhysicalNumberOfRows() ) {
-                    break;
-                }
-                val field = build(-1, currentRowLevel, currentRowNum, sheet);
-                obj.putAll(field);
-            }
-            objs.put(name, obj);
-        }
-        return objs;
+        Sheet sheet = workbook.getSheetAt(0);
+        return buildModel(sheet);
     }
 
-    private  Map<String, ModelField> build(int topLevel, int currentRowLevel, int currentRowNum, Sheet sheet) {
+    public static Map<String, Map<String, ModelField>> parseAllSheet(InputStream file) throws Exception {
+        Map<String, Map<String, ModelField>> modelMap = new HashMap<>();
+        val workbook = new XSSFWorkbook(file);
+        for (Sheet sheet : workbook) {
+            val name = sheet.getSheetName();
+            val model = buildModel(sheet);
+            modelMap.put(name, model);
+        }
+        return modelMap;
+    }
+
+    private static Map<String, ModelField> buildModel(Sheet sheet) {
+        Map<String, ModelField> modelFieldMap = new HashMap<>();
+        for (Row row : sheet) {
+            int currentRowNum = row.getRowNum();
+            if (currentRowNum == 0) {
+                continue;
+            }
+
+            int currentRowLevel = getRowLevel(currentRowNum, sheet);
+            if (currentRowLevel != 0) {
+                continue;
+            }
+
+            int nextRowNum = currentRowNum + 1;
+            if (nextRowNum >= sheet.getPhysicalNumberOfRows()) {
+                break;
+            }
+            val field = buildFields(-1, currentRowLevel, currentRowNum, sheet);
+            modelFieldMap.putAll(field);
+        }
+        return modelFieldMap;
+    }
+
+    private static Map<String, ModelField> buildFields(int topLevel, int currentRowLevel, int currentRowNum, Sheet sheet) {
         Row currentRow = sheet.getRow(currentRowNum);
         ModelField currentField = new ModelField();
         String columnName = currentRow.getCell(currentRowLevel).getStringCellValue();
@@ -96,7 +107,7 @@ public class ExcelUtils {
                 break;
             }
 
-            Map<String, ModelField> children = build(currentRowLevel, level, rowNum, sheet);
+            Map<String, ModelField> children = buildFields(currentRowLevel, level, rowNum, sheet);
             if (currentField.getFields() != null) {
                 currentField.getFields().putAll(children);
             } else {
@@ -107,7 +118,7 @@ public class ExcelUtils {
         return fieldMap;
     }
 
-    private int getRowLevel(int rowNum, Sheet sheet) {
+    private static int getRowLevel(int rowNum, Sheet sheet) {
         for (Cell cell : sheet.getRow(rowNum)) {
             if (StringUtils.isNoneBlank(cell.getStringCellValue())) {
                 return cell.getColumnIndex();
