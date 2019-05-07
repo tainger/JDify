@@ -19,7 +19,7 @@ import java.util.Map;
  */
 public class ExcelUtils {
 
-    private static Map<Integer, Boolean> booleanMap = new HashMap<>();
+    private static Map<Integer, Boolean> rowMarks = new HashMap<>();
 
     public static Map<String, ModelField> parseFirstSheet(InputStream file) throws Exception {
         val workbook = new XSSFWorkbook(file);
@@ -40,7 +40,7 @@ public class ExcelUtils {
 
     private static Map<String, ModelField> buildModel(Sheet sheet) {
         for (int i = 0; i < sheet.getPhysicalNumberOfRows(); i++) {
-            booleanMap.put(i, false);
+            rowMarks.put(i, false);
         }
 
         Map<String, ModelField> modelFieldMap = new HashMap<>();
@@ -113,20 +113,14 @@ public class ExcelUtils {
             }
 
             Map<String, ModelField> children = buildFields(currentRowLevel, level, rowNum, sheet);
-            if (!booleanMap.get(rowNum)) {
-                booleanMap.put(rowNum, true);
-                if (currentField.getFields() != null) {
-                    if (level == currentRowLevel) {
-                        fieldMap.putAll(children);
-                    } else {
-                        currentField.getFields().putAll(children);
-                    }
+            if (!rowMarks.get(rowNum)) {
+                rowMarks.put(rowNum, true);
+                if (level == currentRowLevel) {
+                    fieldMap.putAll(children);
+                } else if (currentField.getFields() != null) {
+                    currentField.getFields().putAll(children);
                 } else {
-                    if (level == currentRowLevel) {
-                        fieldMap.putAll(children);
-                    } else {
-                        currentField.setFields(children);
-                    }
+                    currentField.setFields(children);
                 }
             }
         }
