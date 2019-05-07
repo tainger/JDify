@@ -19,6 +19,8 @@ import java.util.Map;
  */
 public class ExcelUtils {
 
+    private static Map<Integer, Boolean> rowMarks = new HashMap<>();
+
     public static Map<String, ModelField> parseFirstSheet(InputStream file) throws Exception {
         val workbook = new XSSFWorkbook(file);
         Sheet sheet = workbook.getSheetAt(0);
@@ -37,6 +39,10 @@ public class ExcelUtils {
     }
 
     private static Map<String, ModelField> buildModel(Sheet sheet) {
+        for (int i = 0; i < sheet.getPhysicalNumberOfRows(); i++) {
+            rowMarks.put(i, false);
+        }
+
         Map<String, ModelField> modelFieldMap = new HashMap<>();
         for (Row row : sheet) {
             int currentRowNum = row.getRowNum();
@@ -100,21 +106,24 @@ public class ExcelUtils {
             return fieldMap;
         }
 
-
         for (int rowNum = nextRowNum; rowNum < sheet.getPhysicalNumberOfRows(); rowNum++) {
             int level = getRowLevel(rowNum, sheet);
-            if (level <= currentRowLevel || level - currentRowLevel > 1) {
+            if ((nextRowNum >= rowNum && level <= currentRowLevel) || level - currentRowLevel > 1) {
                 break;
             }
 
             Map<String, ModelField> children = buildFields(currentRowLevel, level, rowNum, sheet);
-            if (currentField.getFields() != null) {
-                currentField.getFields().putAll(children);
-            } else {
-                currentField.setFields(children);
+            if (!rowMarks.get(rowNum)) {
+                rowMarks.put(rowNum, true);
+                if (level == currentRowLevel) {
+                    fieldMap.putAll(children);
+                } else if (currentField.getFields() != null) {
+                    currentField.getFields().putAll(children);
+                } else {
+                    currentField.setFields(children);
+                }
             }
         }
-
         return fieldMap;
     }
 
