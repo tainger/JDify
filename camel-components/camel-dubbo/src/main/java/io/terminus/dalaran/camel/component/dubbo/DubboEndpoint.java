@@ -37,6 +37,12 @@ public class DubboEndpoint extends ProcessorEndpoint {
 
     private ApplicationConfig applicationConfig;
 
+    private DalaranDubboContext dalaranDubboContext;
+
+    public DubboEndpoint(DalaranDubboContext dalaranDubboContext) {
+        this.dalaranDubboContext = dalaranDubboContext;
+    }
+
     @Override
     protected Processor createProcessor() {
         return new DubboCamelProcessor(this);
@@ -63,7 +69,11 @@ public class DubboEndpoint extends ProcessorEndpoint {
     @Override
     public Consumer createConsumer(Processor processor) throws Exception {
         System.out.println("createConsumer start");
-        return new DubboCamelConsumer(this, processor);
+        DubboGenericProvider genericProvider = dalaranDubboContext.getProvider(registryAddress, serviceId, version);
+        if (genericProvider == null) {
+            genericProvider = dalaranDubboContext.createProvider(this);
+        }
+        return new DubboCamelConsumer(this, processor, genericProvider);
     }
 
     public ApplicationConfig getApplicationConfig() {
@@ -73,6 +83,9 @@ public class DubboEndpoint extends ProcessorEndpoint {
     public void setApplication(String application) {
         this.application = application;
         this.applicationConfig = new ApplicationConfig(application);
+
+        RegistryConfig registryConfig = new RegistryConfig(this.registryAddress);
+        this.applicationConfig.setRegistry(registryConfig);
         this.applicationConfig.setQosEnable(false);
     }
 
@@ -121,5 +134,4 @@ public class DubboEndpoint extends ProcessorEndpoint {
     public void setParameterType(String parameterType) {
         this.parameterType = parameterType;
     }
-
 }

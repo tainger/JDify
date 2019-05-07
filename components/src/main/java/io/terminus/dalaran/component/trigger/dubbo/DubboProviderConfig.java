@@ -21,16 +21,10 @@ public class DubboProviderConfig extends AllModelConfig implements ConnectorConf
     private DubboRegistryConnector connector;
 
 
-
-    @ConfigFieldInfo(label = "应用名", inputType = FieldInputType.String)
-    private String application;
-
     @ConfigFieldInfo(label = "服务 ID", inputType = FieldInputType.String)
     private String serviceId;
     @ConfigFieldInfo(label = "服务方法", inputType = FieldInputType.String)
     private String method;
     @ConfigFieldInfo(label = "服务版本", inputType = FieldInputType.String)
     private String version;
-    @ConfigFieldInfo(label = "服务版本", inputType = FieldInputType.String)
-    private String parameterType;
 }

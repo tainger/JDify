@@ -20,14 +20,14 @@ public class DalaranDubboConsumerConfig extends OutModelConfig implements Connec
     @JsonIgnore
     private DubboRegistryConnector connector;
 
-    @ConfigFieldInfo(label = "应用名", inputType = FieldInputType.String)
-    private String application;
-
     @ConfigFieldInfo(label = "服务 ID", inputType = FieldInputType.String)
     private String serviceId;
     @ConfigFieldInfo(label = "服务方法", inputType = FieldInputType.String)
     private String method;
     @ConfigFieldInfo(label = "服务版本", inputType = FieldInputType.String)
     private String version;
+
+    @ConfigFieldInfo(label = "入参类型(有方法重载时才需要声明入参类型)", inputType = FieldInputType.String, required = false)
+    private String parameterType;
 
 }
