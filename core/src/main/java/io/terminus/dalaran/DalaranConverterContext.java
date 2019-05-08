@@ -1,17 +1,17 @@
 package io.terminus.dalaran;
 
 import io.terminus.dalaran.model.MessageModel;
-import org.apache.camel.model.RouteDefinition;
+import org.apache.camel.model.ProcessorDefinition;
 
 public interface DalaranConverterContext {
 
     Class<? extends DalaranModelSchema> getSchemaType(BodyType modelType);
 
-    void fromObject(RouteDefinition route, MessageModel model);
+    void fromObject(ProcessorDefinition route, MessageModel model);
 
-    void toObject(RouteDefinition route, MessageModel model);
+    void toObject(ProcessorDefinition route, MessageModel model);
 
-    void fromObject(RouteDefinition route, BodyType modelType);
+    void fromObject(ProcessorDefinition route, BodyType modelType);
 
-    void toObject(RouteDefinition route, BodyType modelType);
+    void toObject(ProcessorDefinition route, BodyType modelType);
 }

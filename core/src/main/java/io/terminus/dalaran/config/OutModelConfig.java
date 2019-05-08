@@ -13,6 +13,11 @@ public class OutModelConfig {
     @ConfigFieldInfo(inputType = FieldInputType.Hidden)
     @JSONField(serialize = false)
     @JsonIgnore
+    private transient MessageModel inModel;
+
+    @ConfigFieldInfo(inputType = FieldInputType.Hidden)
+    @JSONField(serialize = false)
+    @JsonIgnore
     private transient MessageModel outModel;
 
     @ConfigFieldInfo(label = "输出结构", inputType = FieldInputType.Model, required = false)
