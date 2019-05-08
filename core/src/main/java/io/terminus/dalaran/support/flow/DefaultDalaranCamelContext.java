@@ -6,7 +6,6 @@ import io.terminus.dalaran.DalaranConverterContext;
 import io.terminus.dalaran.model.flow.BasicFlow;
 import io.terminus.dalaran.model.flow.TriggerFlow;
 import org.apache.camel.CamelContext;
-import org.apache.camel.ExchangePattern;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.impl.DefaultProducerTemplate;
 import org.apache.camel.model.RouteDefinition;
@@ -87,11 +86,10 @@ public class DefaultDalaranCamelContext implements DalaranContext {
         flows.forEach(this::addTestFlow);
     }
 
-    // TODO 这里要处理数据的序列化等问题
     @Override
-    public Object testFlow(Long flowId, Object body, String recordId) {
+    public void testFlow(Long flowId, Object body, String recordId) {
         DefaultProducerTemplate template = (DefaultProducerTemplate) camelContext.createProducerTemplate();
-        return template.sendBodyAndProperty(TEST_FLOW_CAMEL_URI_PREFIX + flowId, ExchangePattern.InOut, body, TEST_FLOW_RECORD_ID_HEADER, recordId);
+        template.sendBodyAndProperty(TEST_FLOW_CAMEL_URI_PREFIX + flowId, body, TEST_FLOW_RECORD_ID_HEADER, recordId);
     }
 
     @Override
