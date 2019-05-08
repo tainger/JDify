@@ -21,8 +21,7 @@ public interface DalaranContext {
 
     void addTestFlows(List<BasicFlow> flows);
 
-    // TODO 这里要处理数据的序列化等问题
-    Object testFlow(Long flowId, Object body, String recordId);
+    void testFlow(Long flowId, Object body, String recordId);
 
     DalaranComponentContext getDalaranComponentContext();
 

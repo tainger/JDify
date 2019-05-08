@@ -1,22 +1,19 @@
 package io.terminus.dalaran.console.rest;
 
-import com.alibaba.dubbo.common.utils.IOUtils;
 import io.swagger.annotations.ApiOperation;
-import io.terminus.dalaran.BodyType;
 import io.terminus.dalaran.DalaranContext;
 import io.terminus.dalaran.console.model.TestResult;
 import io.terminus.dalaran.console.model.dto.flow.TriggerFlowDTO;
+import io.terminus.dalaran.console.model.dto.log.MainLogDTO;
 import io.terminus.dalaran.console.model.query.FlowQuery;
 import io.terminus.dalaran.console.service.FlowManagementService;
 import io.terminus.dalaran.console.service.ModelManagementService;
-import io.terminus.dalaran.entity.manage.ModelEntity;
+import io.terminus.dalaran.console.service.TracingLogService;
 import io.terminus.dalaran.repository.PropertyRepository;
 import org.apache.commons.lang.RandomStringUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.InputStream;
 import java.util.List;
 
 @RestController
@@ -31,6 +28,9 @@ public class FlowManagementRest {
 
     @Autowired
     private ModelManagementService modelManagementService;
+
+    @Autowired
+    private TracingLogService tracingLogService;
 
     @Autowired
     private DalaranContext dalaranContext;
@@ -73,41 +73,20 @@ public class FlowManagementRest {
     @PostMapping("/{flowId}/test")
     private TestResult doTest(@PathVariable Long flowId, @RequestBody String body) {
         String recordId = nextRecordId();
-
         TriggerFlowDTO flow = flowManagementService.getById(flowId);
         if (flow == null) {
             // TODO throw flow not found
             return null;
         }
-        ModelEntity inModel = modelManagementService.getById(flow.getOutModelId());
-
-        BodyType bodyType = inModel.getType();
-
         TestResult result = new TestResult();
-        result.setBodyType(bodyType);
-        result.setLogRecordId(recordId);
         try {
-            Object data = dalaranContext.testFlow(flowId, body, recordId);
-            // TODO on error
+            dalaranContext.testFlow(flowId, body, recordId);
             result.setSuccessful(true);
-            // TODO 如果最后一步是序列化的情况, 会被序列化成 byte[], 先 toString 一下
-            if (data instanceof String) {
-                result.setBody((String) data);
-            }
-            if (data instanceof byte[]) {
-                result.setBody(new String((byte[]) data));
-            }
-            // TODO 这里的输出还是要考虑抽象一下....
-            if (data instanceof InputStream) {
-                InputStream input = (InputStream) data;
-                String resultBody = StringUtils.join(IOUtils.readLines(input), "\n");
-                result.setBody(resultBody);
-            }
         } catch (Throwable e) {
             result.setSuccessful(false);
-            result.setBody(e.getMessage());
-            result.setBodyType(BodyType.EXCEPTION);
         }
+        MainLogDTO logDetail = tracingLogService.getRecordDetail(recordId);
+        result.setLogDetail(logDetail);
         return result;
     }
 

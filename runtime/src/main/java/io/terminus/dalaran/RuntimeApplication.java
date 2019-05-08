@@ -21,6 +21,12 @@ public class RuntimeApplication {
         return new ReleasedFlowLoader();
     }
 
+
+    @Bean
+    public DalaranTraceLogger dalaranTraceLogger() {
+        return new DefaultJpaDalaranTraceLogger();
+    }
+
     public static void main(String[] args) {
         SpringApplication.run(RuntimeApplication.class);
     }

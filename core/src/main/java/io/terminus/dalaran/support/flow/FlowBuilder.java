@@ -1,9 +1,6 @@
 package io.terminus.dalaran.support.flow;
 
-import io.terminus.dalaran.DalaranComponentContext;
-import io.terminus.dalaran.DalaranConverterContext;
-import io.terminus.dalaran.DalaranProcessor;
-import io.terminus.dalaran.DalaranTraceLogger;
+import io.terminus.dalaran.*;
 import io.terminus.dalaran.config.OutModelConfig;
 import io.terminus.dalaran.model.MessageModel;
 import io.terminus.dalaran.model.ProcessorModel;
@@ -69,9 +66,15 @@ public class FlowBuilder {
         route.setId(TEST_FLOW_PREFIX + flow.getId());
         route.errorHandler(errorHandlerFactory);
         route.from(TEST_FLOW_CAMEL_URI_PREFIX + flow.getId());
-        // TODO
+
+        // TODO 测试的输入一定是序列化的, XML/Json 等都是直接扔进去, 如果入参是 Object, 前端引导输入 Json 做反序列化处理吧
+        if (!flow.getInModel().getModelType().isSerialized()) {
+            converterContext.toObject(route, BodyType.JSON);
+        }
         flowTracer.before(route, flow.getInModel().getModelType());
+
         buildFlowRoute(route, flow);
+
         flowTracer.after(route, flow.getOutModel().getModelType());
         return route;
     }

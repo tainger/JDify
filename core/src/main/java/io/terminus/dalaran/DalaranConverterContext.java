@@ -10,4 +10,8 @@ public interface DalaranConverterContext {
     void fromObject(RouteDefinition route, MessageModel model);
 
     void toObject(RouteDefinition route, MessageModel model);
+
+    void fromObject(RouteDefinition route, BodyType modelType);
+
+    void toObject(RouteDefinition route, BodyType modelType);
 }

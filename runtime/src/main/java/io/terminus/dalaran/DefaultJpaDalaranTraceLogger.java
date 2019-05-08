@@ -1,6 +1,5 @@
-package io.terminus.dalaran.trace;
+package io.terminus.dalaran;
 
-import io.terminus.dalaran.DalaranTraceLogger;
 import io.terminus.dalaran.entity.manage.TracingLogEntity;
 import io.terminus.dalaran.model.DalaranTracingLog;
 import io.terminus.dalaran.repository.TracingLogRepository;
