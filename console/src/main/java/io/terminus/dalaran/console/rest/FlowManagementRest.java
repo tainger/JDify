@@ -2,7 +2,6 @@ package io.terminus.dalaran.console.rest;
 
 import io.swagger.annotations.ApiOperation;
 import io.terminus.dalaran.DalaranContext;
-import io.terminus.dalaran.console.model.TestResult;
 import io.terminus.dalaran.console.model.dto.flow.TriggerFlowDTO;
 import io.terminus.dalaran.console.model.dto.log.MainLogDTO;
 import io.terminus.dalaran.console.model.query.FlowQuery;
@@ -71,23 +70,18 @@ public class FlowManagementRest {
     }
 
     @PostMapping("/{flowId}/test")
-    private TestResult doTest(@PathVariable Long flowId, @RequestBody String body) {
+    private MainLogDTO doTest(@PathVariable Long flowId, @RequestBody String body) {
         String recordId = nextRecordId();
         TriggerFlowDTO flow = flowManagementService.getById(flowId);
         if (flow == null) {
             // TODO throw flow not found
             return null;
         }
-        TestResult result = new TestResult();
         try {
             dalaranContext.testFlow(flowId, body, recordId);
-            result.setSuccessful(true);
-        } catch (Throwable e) {
-            result.setSuccessful(false);
+        } catch (Throwable ignored) {
         }
-        MainLogDTO logDetail = tracingLogService.getRecordDetail(recordId);
-        result.setLogDetail(logDetail);
-        return result;
+        return tracingLogService.getRecordDetail(recordId);
     }
 
     // TODO 这里可以考虑换一下 camel 的 uuid 生成器
