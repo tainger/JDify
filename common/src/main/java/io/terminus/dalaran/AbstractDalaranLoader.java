@@ -86,11 +86,18 @@ public abstract class AbstractDalaranLoader<TriggerFlowEntity extends TriggerFlo
     }
 
     private void buildFlow(BasicFlow flow, BasicFlowEntity flowEntity) {
+        flow.setInModel(getMessageModel(flowEntity.getInModel()));
+        flow.setOutModel(getMessageModel(flowEntity.getOutModel()));
+
         List<ProcessorModel> pipeline = new ArrayList<>();
+        MessageModel lastOutModel = flow.getInModel();
         for (ProcessorEntity processorEntity : flowEntity.getPipeline()) {
             ProcessorInfo processorInfo = dalaranContext.getDalaranComponentContext().getProcessorInfo(processorEntity.getType());
             Object config = buildConfig(processorInfo, processorEntity.getConfig());
-
+            if (config instanceof OutModelConfig) {
+                ((OutModelConfig) config).setInModel(lastOutModel);
+                lastOutModel = ((OutModelConfig) config).getOutModel();
+            }
             ProcessorModel processor = new ProcessorModel();
             processor.setId(processorEntity.getId());
             processor.setType(processorEntity.getType());
@@ -100,8 +107,6 @@ public abstract class AbstractDalaranLoader<TriggerFlowEntity extends TriggerFlo
         }
 
         // TODO for test...
-        flow.setInModel(getMessageModel(flowEntity.getInModel()));
-        flow.setOutModel(getMessageModel(flowEntity.getOutModel()));
         flow.setPipeline(pipeline);
     }
 
