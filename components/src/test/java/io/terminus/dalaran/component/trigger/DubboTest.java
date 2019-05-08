@@ -61,13 +61,12 @@ public class DubboTest extends BasicTriggerTest {
         DubboProviderConfig config = new DubboProviderConfig();
         DubboRegistryConnector registryConnector = new DubboRegistryConnector();
         registryConnector.setAddress(REGISTRY_ADDRESS);
+        registryConnector.setApplication("test-terminus");
 
         config.setConnector(registryConnector);
-        config.setApplication("test-terminus");
         config.setServiceId(DUBBO_SERVICE_ID);
         config.setMethod(DUBBO_METHOD);
         config.setVersion(DUBBO_VERSION);
-        config.setParameterType(String.class.getCanonicalName());
 
         registerTrigger(trigger, config);
     }

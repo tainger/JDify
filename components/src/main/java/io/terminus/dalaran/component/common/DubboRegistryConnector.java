@@ -9,4 +9,7 @@ public class DubboRegistryConnector {
 
     @ConfigFieldInfo(label = "注册中心地址", inputType = FieldInputType.String, defaultValue = "zookeeper://${host}:${port}")
     private String address;
+
+    @ConfigFieldInfo(label = "应用名", inputType = FieldInputType.String)
+    private String application;
 }
