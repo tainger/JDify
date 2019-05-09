@@ -72,21 +72,26 @@ public class ExcelUtils {
         Iterator<Cell> cells = currentRow.cellIterator();
         while (cells.hasNext()) {
             Cell cell = cells.next();
-            val cellValue = cell.getStringCellValue();
-            if (StringUtils.isNotBlank(cellValue)) {
-                switch (cell.getColumnIndex()) {
-                    case 5:
-                        currentField.setType(FieldType.valueOf(cellValue.toUpperCase()));
-                        break;
-                    case 6:
+            String cellValue;
+            switch (cell.getColumnIndex()) {
+                case 5:
+                    currentField.setType(FieldType.valueOf(cell.getStringCellValue().toUpperCase()));
+                    break;
+                case 6:
+                    cellValue = cell.getStringCellValue();
+                    if (StringUtils.isNotBlank(cellValue)) {
                         currentField.setSubType(FieldType.valueOf(cellValue.toUpperCase()));
-                    case 8:
-                        currentField.setNullable(Boolean.valueOf(cellValue));
-                        break;
-                    case 9:
+                    }
+                    break;
+                case 8:
+                    currentField.setNullable(cell.getBooleanCellValue());
+                    break;
+                case 9:
+                    cellValue = cell.getStringCellValue();
+                    if (StringUtils.isNotBlank(cellValue)) {
                         currentField.setDescription(cellValue);
-                        break;
-                }
+                    }
+                    break;
             }
         }
 
