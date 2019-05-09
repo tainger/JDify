@@ -1,9 +1,8 @@
 package io.terminus.dalaran.component.processor.mapper;
 
 import io.terminus.dalaran.ModelRequiredConfig;
-import io.terminus.dalaran.component.processor.mapper.model.MappingField;
+import io.terminus.dalaran.component.processor.mapper.model.SimpleMappingField;
 import lombok.Data;
-
 import java.util.Map;
 
 /**
@@ -12,5 +11,5 @@ import java.util.Map;
 @Data
 public class DalaranMapperConfig extends ModelRequiredConfig {
 
-    private Map<String, MappingField> messageMapping;
+    private Map<String, SimpleMappingField> messageMapping;
 }

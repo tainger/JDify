@@ -7,9 +7,9 @@ public class MapperConstants {
 
     public static final String MESSAGE_MAPPING = "MessageMapping";
 
-    public static final String TARGET_MODEL = "target";
+    public static final String IN_MODEL = "inModel";
 
-    public static final String DESTINATION_MODEL = "destination";
+    public static final String OUT_MODEL = "outModel";
 
     public static final String MODEL_ROOT = "root";
 

@@ -15,7 +15,7 @@ public class MappingField {
 
     private FieldType subType;
 
-    private MappingFieldType mappingType;
+    private MappingType mappingType;
 
     private String value;
 
