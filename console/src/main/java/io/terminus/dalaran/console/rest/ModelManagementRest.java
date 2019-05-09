@@ -73,6 +73,7 @@ public class ModelManagementRest {
         // TODO 这些应该扔到 service 里
         ModelEntity model = modelRepository.findOne(id);
         model.setModelSchema(JSON.toJSONString(schema));
+        System.out.println(JSON.toJSONString(schema));
         modelRepository.save(model);
         return schema;
     }

@@ -1,5 +1,6 @@
 package io.terminus.dalaran.component.processor.mapper;
 
+import com.alibaba.fastjson.JSON;
 import com.github.drapostolos.typeparser.TypeParser;
 import io.terminus.dalaran.FieldType;
 import io.terminus.dalaran.component.processor.mapper.jxpath.DalaranJXPathFactory;
@@ -59,6 +60,7 @@ public class DalaranMapperProcessor implements Processor {
         mappingField.setSubType(outModel.getSubType());
         mappingField.setMapping(new HashMap<>());
         buildMessageMapping(simpleMapping, mappingField, inModel, outModel);
+        System.out.println(JSON.toJSONString(messageMapping));
         return messageMapping;
     }
 
@@ -94,7 +96,7 @@ public class DalaranMapperProcessor implements Processor {
                         field.setMappingFieldType(inField.getType());
                         field.setMappingType(outMappingField.getMappingType());
                         if (child.getType() == FieldType.ARRAY && child.getSubType() == FieldType.OBJECT) {
-                            field.setValue(StringUtils.substringAfterLast(inPath, "\\."));
+                            field.setValue(StringUtils.substringAfterLast(inPath, "."));
                         } else {
                             field.setValue(inPath.replaceAll("\\.", "/"));
                         }
@@ -137,7 +139,7 @@ public class DalaranMapperProcessor implements Processor {
             FieldType subType = mappingField.getSubType();
 
             String path = entry.getKey();
-            if (parentPath.equalsIgnoreCase( MapperConstants.MODEL_ROOT)) {
+            if (parentPath.equalsIgnoreCase(MapperConstants.MODEL_ROOT)) {
                 path = entry.getKey();
             } else if (StringUtils.isNotBlank(parentPath)) {
                 path = parentPath + "/" + entry.getKey();
@@ -149,7 +151,7 @@ public class DalaranMapperProcessor implements Processor {
                     if (path.equalsIgnoreCase(MapperConstants.MODEL_ROOT)) {
                         target = (List<Object>) targetContext.getContextBean();
                     } else {
-                        target = (List<Object>) targetContext.getValue(entry.getKey(), List.class);
+                        target = (List<Object>) targetContext.getValue(path, List.class);
                     }
 
                     List<Object> subList = new ArrayList<>();
@@ -159,7 +161,7 @@ public class DalaranMapperProcessor implements Processor {
                         Map<String, Object> subBody = new HashMap<>();
                         JXPathContext subDestinationContext = JXPathContext.newContext(subBody);
                         subDestinationContext.setFactory(new DalaranJXPathFactory());
-                        subConvert(subDestinationContext, subContext, mappingField.getMapping(), path, flag);
+                        subConvert(subDestinationContext, subContext, mappingField.getMapping(), "", flag);
                         subList.add(subDestinationContext.getContextBean());
                     }
 
@@ -183,7 +185,7 @@ public class DalaranMapperProcessor implements Processor {
             } else {
                 Object target;
                 if (mappingField.getMappingType() == MappingType.MAPPING) {
-                    target = targetContext.getValue(mappingField.getValue());
+                    target = targetContext.getValue(entry.getValue().getValue());
                 } else {
                     target = mappingField.getValue();
                 }
