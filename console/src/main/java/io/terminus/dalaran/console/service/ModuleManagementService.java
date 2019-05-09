@@ -3,6 +3,7 @@ package io.terminus.dalaran.console.service;
 import io.terminus.dalaran.console.model.dto.ModuleDTO;
 import io.terminus.dalaran.console.model.dto.ModuleDetailDTO;
 import io.terminus.dalaran.console.model.query.ModuleQuery;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
@@ -22,4 +23,6 @@ public interface ModuleManagementService {
     List<ModuleDTO> queryModules(ModuleQuery query);
 
     ModuleDetailDTO getModuleDetail(Long moduleId);
+
+    String getModuleName(@NotNull Long moduleId);
 }
