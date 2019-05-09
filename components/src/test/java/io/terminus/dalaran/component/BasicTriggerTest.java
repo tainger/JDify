@@ -12,6 +12,7 @@ public abstract class BasicTriggerTest {
     protected void registerTrigger(DalaranTrigger trigger, Object config) {
         try {
             RouteDefinition route = new RouteDefinition();
+            route.setId("test-route");
             camelContext.setTracing(true);
             trigger.buildFromRoute(route, config);
 //            route.setBody(Builder.constant(SUCCESSFUL));

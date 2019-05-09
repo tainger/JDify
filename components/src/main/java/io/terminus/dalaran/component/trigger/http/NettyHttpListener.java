@@ -1,5 +1,8 @@
 package io.terminus.dalaran.component.trigger.http;
 
+import com.google.common.base.Joiner;
+import com.google.common.base.Splitter;
+import io.netty.handler.codec.http.QueryStringDecoder;
 import io.terminus.dalaran.BodyType;
 import io.terminus.dalaran.DalaranTrigger;
 import io.terminus.dalaran.annotation.Trigger;
@@ -14,7 +17,11 @@ public class NettyHttpListener implements DalaranTrigger<NettyHttpConfig> {
                 "://0.0.0.0:" + config.getPort() + config.getPath() +
                 "?httpMethodRestrict=" + config.getMethod();
         route.from(uri);
-        // TODO Stream to string
-        route.convertBodyTo(String.class);
+        if (config.getMethod().isNoBody()) {
+            route.process(new QueryStringProcessor());
+        } else {
+            // TODO Stream to string
+            route.convertBodyTo(String.class);
+        }
     }
 }
