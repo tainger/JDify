@@ -1,6 +1,8 @@
 package io.terminus.dalaran.component.processor.http;
 
 import com.google.common.base.Joiner;
+import com.google.common.base.Predicate;
+import com.google.common.collect.Maps;
 import io.terminus.dalaran.BodyType;
 import io.terminus.dalaran.DalaranConverterContext;
 import io.terminus.dalaran.DalaranProcessor;
@@ -9,6 +11,7 @@ import org.apache.camel.Exchange;
 import org.apache.camel.builder.Builder;
 import org.apache.camel.model.ProcessorDefinition;
 import org.apache.camel.model.dataformat.JsonLibrary;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Map;
@@ -45,7 +48,8 @@ public class DalaranHttpClient implements DalaranProcessor<HttpClientConfig> {
 
     public String buildQueryString(Object obj) {
         if (obj instanceof Map) {
-            return "?" + Joiner.on("&").withKeyValueSeparator("=").join((Map<?, ?>) obj);
+            Map queryKV = Maps.filterEntries((Map) obj, (Predicate<Map.Entry>) entry -> entry.getValue() != null && entry.getKey() != null);
+            return "?" + Joiner.on("&").withKeyValueSeparator("=").join(queryKV);
         }
         return null;
     }

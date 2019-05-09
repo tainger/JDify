@@ -42,7 +42,7 @@ public class TracingErrorHandlerFactory implements ErrorHandlerFactory {
             output.process(exchange);
             // TODO 当执行发成异常时, 记录未持久化的日志
             if (exchange.getException() != null) {
-                String body = exchange.getException().getMessage();
+                String body = exchange.getException().toString();
                 DalaranTracingLog flowTracingLog = exchange.getProperty(FLOW_TRACING_LOG, DalaranTracingLog.class);
                 if (flowTracingLog != null) {
                     exchange.removeProperty(FLOW_TRACING_LOG);
