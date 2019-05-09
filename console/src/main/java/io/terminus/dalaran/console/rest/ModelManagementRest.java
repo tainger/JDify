@@ -65,19 +65,16 @@ public class ModelManagementRest {
 
     @ApiOperation(value = "导入 Excel 更新模型结构")
     @RequestMapping(value = "/{id}/import/excel", method = RequestMethod.POST)
-    public MessageModel importExcel(@RequestParam MultipartFile file, @PathVariable long id) throws Exception {
+    public JsonSchema importExcel(@RequestParam MultipartFile file, @PathVariable long id) throws Exception {
         Map<String, ModelField> fields = ExcelUtils.parseFirstSheet(file.getInputStream());
-        MessageModel<JsonSchema> messageModel = new MessageModel<>();
-        messageModel.setModelType(BodyType.JSON);
         JsonSchema schema = new JsonSchema();
         schema.setFields(fields);
-        messageModel.setModelSchema(schema);
+
         // TODO 这些应该扔到 service 里
         ModelEntity model = modelRepository.findOne(id);
-        model.setModelSchema(JSON.toJSONString(messageModel));
-        System.out.println(JSON.toJSONString(messageModel));
+        model.setModelSchema(JSON.toJSONString(schema));
         modelRepository.save(model);
-        return messageModel;
+        return schema;
     }
 
     // TODO 待开发
@@ -97,24 +94,20 @@ public class ModelManagementRest {
     // TODO 其实意义不大
     @ApiOperation(value = "批量导入 Excel 创建模型结构")
     @RequestMapping(value = "/multi-import/excel", method = RequestMethod.POST)
-    public Map<Long, Map<String, MessageModel>> multiImportExcel(@RequestParam MultipartFile file, @RequestParam BodyType type) throws Exception {
-        Map<Long, Map<String, MessageModel>> modelSchema = new HashMap<>();
+    public Map<Long, Map<String, JsonSchema>> multiImportExcel(@RequestParam MultipartFile file, @RequestParam BodyType type) throws Exception {
+        Map<Long, Map<String, JsonSchema>> modelSchema = new HashMap<>();
         Map<String, Map<String, ModelField>> schemas = ExcelUtils.parseAllSheet(file.getInputStream());
         // TODO 这些应该扔到 service 里
         for (Map.Entry<String, Map<String, ModelField>> entry : schemas.entrySet()) {
             ModelEntity model = new ModelEntity();
             JsonSchema schema = new JsonSchema();
             schema.setFields(entry.getValue());
-            MessageModel<JsonSchema> messageModel = new MessageModel<>();
-            messageModel.setModelType(BodyType.JSON);
-            messageModel.setModelSchema(schema);
-
-            model.setModelSchema(JSON.toJSONString(messageModel));
+            model.setModelSchema(JSON.toJSONString(schema));
             model.setName(entry.getKey());
             model.setType(type);
             modelRepository.save(model);
-            Map<String, MessageModel> singleSchema = new HashMap<>();
-            singleSchema.put(entry.getKey(), messageModel);
+            Map<String, JsonSchema> singleSchema = new HashMap<>();
+            singleSchema.put(entry.getKey(), schema);
             modelSchema.put(model.getId(), singleSchema);
         }
         return modelSchema;
