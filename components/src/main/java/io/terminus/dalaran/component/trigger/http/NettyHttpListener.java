@@ -1,8 +1,5 @@
 package io.terminus.dalaran.component.trigger.http;
 
-import com.google.common.base.Joiner;
-import com.google.common.base.Splitter;
-import io.netty.handler.codec.http.QueryStringDecoder;
 import io.terminus.dalaran.BodyType;
 import io.terminus.dalaran.DalaranTrigger;
 import io.terminus.dalaran.annotation.Trigger;
