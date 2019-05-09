@@ -4,13 +4,13 @@ import com.alibaba.fastjson.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.terminus.dalaran.ConnectorConfig;
 import io.terminus.dalaran.FieldInputType;
-import io.terminus.dalaran.ModelRequiredConfig;
 import io.terminus.dalaran.annotation.ConfigFieldInfo;
 import io.terminus.dalaran.component.common.HttpMethod;
+import io.terminus.dalaran.config.OutModelConfig;
 import lombok.Data;
 
 @Data
-public class HttpClientConfig extends ModelRequiredConfig implements ConnectorConfig<HttpClientConnector> {
+public class HttpClientConfig extends OutModelConfig implements ConnectorConfig<HttpClientConnector> {
 
     @ConfigFieldInfo(inputType = FieldInputType.Hidden)
     @JSONField(serialize = false)

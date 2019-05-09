@@ -1,14 +1,14 @@
 package io.terminus.dalaran.component.processor.script;
 
 import io.terminus.dalaran.FieldInputType;
-import io.terminus.dalaran.ModelOptionalConfig;
 import io.terminus.dalaran.annotation.ConfigFieldInfo;
+import io.terminus.dalaran.config.OutModelConfig;
 import lombok.Data;
 
 @Data
-public class DalaranScriptConfig extends ModelOptionalConfig {
+public class DalaranScriptConfig extends OutModelConfig {
 
-    @ConfigFieldInfo(label = "脚本语言", inputType = FieldInputType.Radio)
+    @ConfigFieldInfo(label = "脚本语言", inputType = FieldInputType.Radio, defaultValue = "JavaScript")
     private DalaranScriptType type;
 
     @ConfigFieldInfo(label = "脚本代码", inputType = FieldInputType.String)

@@ -17,6 +17,11 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 public class RuntimeApplication {
 
     @Bean
+    public DalaranTraceLogger dalaranTraceLogger() {
+        return new DefaultJpaDalaranTraceLogger();
+    }
+
+    @Bean
     public AbstractDalaranLoader dalaranLoader() {
         return new ReleasedFlowLoader();
     }

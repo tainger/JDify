@@ -4,6 +4,7 @@ import io.terminus.dalaran.model.MessageModel;
 import io.terminus.dalaran.model.ProcessorModel;
 import lombok.Data;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -15,8 +16,10 @@ public abstract class BasicFlow {
 
     private String version;
 
+    @Nullable
     private MessageModel inModel;
 
+    @Nullable
     private MessageModel outModel;
 
     @NotNull

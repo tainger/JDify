@@ -10,7 +10,7 @@ import io.terminus.dalaran.model.schema.ObjectSchema;
 import io.terminus.dalaran.model.schema.XMLSchema;
 import io.terminus.dalaran.support.convert.converter.JsonConverter;
 import io.terminus.dalaran.support.convert.converter.XMLConverter;
-import org.apache.camel.model.RouteDefinition;
+import org.apache.camel.model.ProcessorDefinition;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -38,12 +38,22 @@ public class DefaultDalaranConverterContext implements DalaranConverterContext {
     }
 
     @Override
-    public void fromObject(RouteDefinition route, MessageModel model) {
+    public void fromObject(ProcessorDefinition route, MessageModel model) {
         converterMapping.get(model.getModelType()).fromObject(route, model.getModelSchema());
     }
 
     @Override
-    public void toObject(RouteDefinition route, MessageModel model) {
+    public void toObject(ProcessorDefinition route, MessageModel model) {
         converterMapping.get(model.getModelType()).toObject(route, model.getModelSchema());
+    }
+
+    @Override
+    public void fromObject(ProcessorDefinition route, BodyType modelType) {
+        converterMapping.get(modelType).fromObject(route, null);
+    }
+
+    @Override
+    public void toObject(ProcessorDefinition route, BodyType modelType) {
+        converterMapping.get(modelType).toObject(route, null);
     }
 }

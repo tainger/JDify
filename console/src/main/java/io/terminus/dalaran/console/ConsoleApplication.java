@@ -1,5 +1,6 @@
 package io.terminus.dalaran.console;
 
+import io.terminus.dalaran.DalaranTraceLogger;
 import io.terminus.dalaran.configura.DalaranAutoConfigura;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -19,6 +20,11 @@ public class ConsoleApplication {
     @Bean
     public TestFlowLoader testFlowLoader() {
         return new TestFlowLoader();
+    }
+
+    @Bean
+    public DalaranTraceLogger dalaranTraceLogger() {
+        return new TestTraceLogger();
     }
 
     public static void main(String[] args) {

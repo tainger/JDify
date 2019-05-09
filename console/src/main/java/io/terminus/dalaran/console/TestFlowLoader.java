@@ -35,7 +35,7 @@ public class TestFlowLoader extends AbstractDalaranLoader<TriggerFlowEntity, Sub
     private void loadAllTestFlow() {
         for (TriggerFlowEntity flowEntity : triggerFlowRepository.findAll()) {
             loadTriggerFlow(flowEntity);
-            log.info("load flow[{}]", flowEntity.getId());
+            log.info("load test flow[{}]", flowEntity.getId());
         }
     }
 
