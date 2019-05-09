@@ -11,6 +11,7 @@ import io.terminus.dalaran.console.service.jpa.ModuleQueryService;
 import io.terminus.dalaran.entity.manage.ModuleEntity;
 import io.terminus.dalaran.repository.ModuleRepository;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -96,6 +97,15 @@ public class ModuleManagementServiceImpl implements ModuleManagementService {
         moduleDetail.setModels(modelManagementService.listBasicInfoByModuleId(moduleId));
         moduleDetail.setConnectors(connectorService.listBasicInfoByModuleId(moduleId));
         return moduleDetail;
+    }
+
+    @Override
+    public String getModuleName(@NotNull Long moduleId) {
+        ModuleEntity entity = moduleRepository.findOne(moduleId);
+        if (entity == null) {
+            return null;
+        }
+        return entity.getName();
     }
 
     private ModuleEntity buildEntity(ModuleDTO model) {
