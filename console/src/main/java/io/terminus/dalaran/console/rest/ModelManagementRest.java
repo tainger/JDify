@@ -66,16 +66,7 @@ public class ModelManagementRest {
     @ApiOperation(value = "导入 Excel 更新模型结构")
     @RequestMapping(value = "/{id}/import/excel", method = RequestMethod.POST)
     public JsonSchema importExcel(@RequestParam MultipartFile file, @PathVariable long id) throws Exception {
-        Map<String, ModelField> fields = ExcelUtils.parseFirstSheet(file.getInputStream());
-        JsonSchema schema = new JsonSchema();
-        schema.setFields(fields);
-
-        // TODO 这些应该扔到 service 里
-        ModelEntity model = modelRepository.findOne(id);
-        model.setModelSchema(JSON.toJSONString(schema));
-        System.out.println(JSON.toJSONString(schema));
-        modelRepository.save(model);
-        return schema;
+        return modelManagementService.importExcel(file, id);
     }
 
     // TODO 待开发
@@ -96,21 +87,6 @@ public class ModelManagementRest {
     @ApiOperation(value = "批量导入 Excel 创建模型结构")
     @RequestMapping(value = "/multi-import/excel", method = RequestMethod.POST)
     public Map<Long, Map<String, JsonSchema>> multiImportExcel(@RequestParam MultipartFile file, @RequestParam BodyType type) throws Exception {
-        Map<Long, Map<String, JsonSchema>> modelSchema = new HashMap<>();
-        Map<String, Map<String, ModelField>> schemas = ExcelUtils.parseAllSheet(file.getInputStream());
-        // TODO 这些应该扔到 service 里
-        for (Map.Entry<String, Map<String, ModelField>> entry : schemas.entrySet()) {
-            ModelEntity model = new ModelEntity();
-            JsonSchema schema = new JsonSchema();
-            schema.setFields(entry.getValue());
-            model.setModelSchema(JSON.toJSONString(schema));
-            model.setName(entry.getKey());
-            model.setType(type);
-            modelRepository.save(model);
-            Map<String, JsonSchema> singleSchema = new HashMap<>();
-            singleSchema.put(entry.getKey(), schema);
-            modelSchema.put(model.getId(), singleSchema);
-        }
-        return modelSchema;
+        return modelManagementService.multiImportExcel(file, type);
     }
 }

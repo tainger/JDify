@@ -15,12 +15,6 @@ import java.util.List;
 public class TestConvert extends CamelTestSupport {
 
     public static void main(String[] args) throws Exception {
-
-        String string = "user.id.name";
-        System.out.println(StringUtils.substringAfterLast(string, "."));
-
-
-
         CamelContext context = new DefaultCamelContext();
         context.addRoutes(new RouteBuilder() {
             @Override

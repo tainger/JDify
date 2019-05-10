@@ -1,6 +1,5 @@
 package io.terminus.dalaran.component.processor.mapper;
 
-import com.alibaba.fastjson.JSON;
 import com.github.drapostolos.typeparser.TypeParser;
 import io.terminus.dalaran.FieldType;
 import io.terminus.dalaran.component.processor.mapper.jxpath.DalaranJXPathFactory;
@@ -16,7 +15,6 @@ import org.apache.camel.Processor;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.jxpath.JXPathContext;
 import org.apache.commons.lang.StringUtils;
-
 import java.lang.reflect.Field;
 import java.util.*;
 
@@ -27,9 +25,10 @@ public class DalaranMapperProcessor implements Processor {
 
     @Override
     public void process(Exchange exchange) throws Exception {
-        Map<String, SimpleMappingField> messageMapping = exchange.getIn().getHeader(MapperConstants.MESSAGE_MAPPING, Map.class);
-        MessageModel<JsonSchema> in = exchange.getIn().getHeader(MapperConstants.IN_MODEL, MessageModel.class);
-        MessageModel<JsonSchema> out = exchange.getIn().getHeader(MapperConstants.OUT_MODEL, MessageModel.class);
+        DalaranMapperConfig mapperConfig = exchange.getIn().getHeader(MapperConstants.MAPPER_CONFIG, DalaranMapperConfig.class);
+        Map<String, SimpleMappingField> messageMapping = mapperConfig.getMessageMapping();
+        MessageModel<JsonSchema> in = mapperConfig.getInModel();
+        MessageModel<JsonSchema> out = mapperConfig.getOutModel();
         Object targetBody = exchange.getIn().getBody();
         Object destinationBody = convert(transfer(messageMapping, in, out), targetBody);
         exchange.getOut().setBody(destinationBody);
