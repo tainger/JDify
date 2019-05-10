@@ -14,8 +14,7 @@ public class DalaranMessageMapper implements DalaranProcessor<DalaranMapperConfi
 
     @Override
     public void configure(ProcessorDefinition route, DalaranMapperConfig config) {
-        DalaranMapperProcessor processor = new DalaranMapperProcessor();
-        route.setHeader(MapperConstants.MAPPER_CONFIG, Builder.constant(config));
+        DalaranMapperProcessor processor = new DalaranMapperProcessor(config);
         route.process(processor);
     }
 }

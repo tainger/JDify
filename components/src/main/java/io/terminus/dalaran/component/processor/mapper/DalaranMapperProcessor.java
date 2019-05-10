@@ -23,9 +23,14 @@ import java.util.*;
  */
 public class DalaranMapperProcessor implements Processor {
 
+    private final DalaranMapperConfig mapperConfig;
+
+    public DalaranMapperProcessor(DalaranMapperConfig mapperConfig) {
+        this.mapperConfig = mapperConfig;
+    }
+
     @Override
     public void process(Exchange exchange) throws Exception {
-        DalaranMapperConfig mapperConfig = exchange.getIn().getHeader(MapperConstants.MAPPER_CONFIG, DalaranMapperConfig.class);
         Map<String, SimpleMappingField> messageMapping = mapperConfig.getMessageMapping();
         MessageModel<JsonSchema> in = mapperConfig.getInModel();
         MessageModel<JsonSchema> out = mapperConfig.getOutModel();
@@ -154,16 +159,17 @@ public class DalaranMapperProcessor implements Processor {
                     }
 
                     List<Object> subList = new ArrayList<>();
-                    for (Object ob : target) {
-                        JXPathContext subContext = JXPathContext.newContext(ob);
+                    if (CollectionUtils.isNotEmpty(target)) {
+                        for (Object ob : target) {
+                            JXPathContext subContext = JXPathContext.newContext(ob);
 
-                        Map<String, Object> subBody = new HashMap<>();
-                        JXPathContext subDestinationContext = JXPathContext.newContext(subBody);
-                        subDestinationContext.setFactory(new DalaranJXPathFactory());
-                        subConvert(subDestinationContext, subContext, mappingField.getMapping(), "", flag);
-                        subList.add(subDestinationContext.getContextBean());
+                            Map<String, Object> subBody = new HashMap<>();
+                            JXPathContext subDestinationContext = JXPathContext.newContext(subBody);
+                            subDestinationContext.setFactory(new DalaranJXPathFactory());
+                            subConvert(subDestinationContext, subContext, mappingField.getMapping(), "", flag);
+                            subList.add(subDestinationContext.getContextBean());
+                        }
                     }
-
                     destinationContext.createPathAndSetValue(path, subList);
 
                     if (path.equalsIgnoreCase(MapperConstants.MODEL_ROOT)) {
@@ -177,6 +183,9 @@ public class DalaranMapperProcessor implements Processor {
                     }
                 } else {
                     List<Object> target = (List<Object>) targetContext.getValue(entry.getValue().getValue(), List.class);
+                    if (target == null) {
+                        target = new ArrayList<>();
+                    }
                     destinationContext.createPathAndSetValue(path, target);
                 }
             } else if (type == FieldType.OBJECT) {
@@ -188,7 +197,11 @@ public class DalaranMapperProcessor implements Processor {
                 } else {
                     target = mappingField.getValue();
                 }
-                destinationContext.createPathAndSetValue(path, parse(target, mappingField.getMappingFieldType()));
+                Object destinationValue = "";
+                if (target != null) {
+                    destinationValue = parse(target, mappingField.getMappingFieldType());
+                }
+                destinationContext.createPathAndSetValue(path, destinationValue);
             }
         }
     }
