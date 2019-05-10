@@ -69,19 +69,28 @@ public class ExcelUtils {
         Row currentRow = sheet.getRow(currentRowNum);
         ModelField currentField = new ModelField();
         String columnName = currentRow.getCell(currentRowLevel).getStringCellValue();
-
         Iterator<Cell> cells = currentRow.cellIterator();
         while (cells.hasNext()) {
             Cell cell = cells.next();
+            String cellValue;
             switch (cell.getColumnIndex()) {
                 case 5:
                     currentField.setType(FieldType.valueOf(cell.getStringCellValue().toUpperCase()));
                     break;
-                case 7:
-                    currentField.setNullable(cell.getBooleanCellValue());
+                case 6:
+                    cellValue = cell.getStringCellValue();
+                    if (StringUtils.isNotBlank(cellValue)) {
+                        currentField.setSubType(FieldType.valueOf(cellValue.toUpperCase()));
+                    }
                     break;
                 case 8:
-                    currentField.setDescription(cell.getStringCellValue());
+                    currentField.setNullable(cell.getBooleanCellValue());
+                    break;
+                case 9:
+                    cellValue = cell.getStringCellValue();
+                    if (StringUtils.isNotBlank(cellValue)) {
+                        currentField.setDescription(cellValue);
+                    }
                     break;
             }
         }

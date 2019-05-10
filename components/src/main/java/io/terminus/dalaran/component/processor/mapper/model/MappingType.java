@@ -3,6 +3,6 @@ package io.terminus.dalaran.component.processor.mapper.model;
 /**
  * Created by jingdi on 2019/4/22
  */
-public enum MappingFieldType {
+public enum MappingType {
     MAPPING
 }

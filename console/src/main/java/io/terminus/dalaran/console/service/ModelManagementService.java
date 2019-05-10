@@ -1,11 +1,15 @@
 package io.terminus.dalaran.console.service;
 
+import io.terminus.dalaran.BodyType;
 import io.terminus.dalaran.console.model.dto.BasicModelInfo;
 import io.terminus.dalaran.console.model.dto.ModelDTO;
 import io.terminus.dalaran.console.model.query.ModelQuery;
 import io.terminus.dalaran.entity.manage.ModelEntity;
+import io.terminus.dalaran.model.schema.JsonSchema;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by jingdi on 2019/3/28
@@ -25,4 +29,8 @@ public interface ModelManagementService {
     List<BasicModelInfo> listBasicInfoByModuleId(Long moduleId);
 
     ModelEntity getById(Long modelId);
+
+    JsonSchema importExcel(MultipartFile file, Long id);
+
+    Map<Long, Map<String, JsonSchema>> multiImportExcel(MultipartFile file, BodyType type);
 }
