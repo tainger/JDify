@@ -15,13 +15,16 @@ public class BasicFlowInfo {
 
     private FlowStatus status;
 
+    private String triggerType;
+
     public BasicFlowInfo() {
     }
 
-    public BasicFlowInfo(@Nullable Long id, Long moduleId, String name, FlowStatus status) {
+    public BasicFlowInfo(@Nullable Long id, Long moduleId, String name, FlowStatus status, String triggerType) {
         this.id = id;
         this.moduleId = moduleId;
         this.name = name;
         this.status = status;
+        this.triggerType = triggerType;
     }
 }
