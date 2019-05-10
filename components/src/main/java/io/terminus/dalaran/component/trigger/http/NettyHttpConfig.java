@@ -10,7 +10,8 @@ import lombok.Data;
 @Data
 public class NettyHttpConfig extends AllModelConfig {
 
-    @ConfigFieldInfo(label = "端口", inputType = FieldInputType.Integer, defaultValue = "8080")
+    // TODO load by application.yml
+    @ConfigFieldInfo(label = "端口", inputType = FieldInputType.Hidden)
     private Integer port = 8080;
 
     @ConfigFieldInfo(label = "协议", inputType = FieldInputType.Radio, defaultValue = "HTTP")
