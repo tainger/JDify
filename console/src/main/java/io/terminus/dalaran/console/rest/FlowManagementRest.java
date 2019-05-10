@@ -81,6 +81,7 @@ public class FlowManagementRest {
         try {
             dalaranContext.testFlow(request.getFlowId(), request.getBody(), recordId);
         } catch (Throwable ignored) {
+            ignored.printStackTrace();
         }
         return tracingLogService.getRecordDetail(recordId);
     }

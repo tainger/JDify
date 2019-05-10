@@ -9,6 +9,9 @@ import org.apache.camel.CamelContext;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.impl.DefaultProducerTemplate;
 import org.apache.camel.model.RouteDefinition;
+import org.apache.camel.spi.Registry;
+import org.apache.camel.spring.spi.ApplicationContextRegistry;
+import org.springframework.context.ApplicationContext;
 
 import java.util.List;
 
@@ -22,11 +25,12 @@ public class DefaultDalaranCamelContext implements DalaranContext {
     private final DalaranComponentContext componentContext;
 
 
-    public DefaultDalaranCamelContext(FlowBuilder flowBuilder, DalaranConverterContext converterContext, DalaranComponentContext componentContext) {
+    public DefaultDalaranCamelContext(FlowBuilder flowBuilder, DalaranConverterContext converterContext,
+                                      DalaranComponentContext componentContext, CamelContext camelContext) {
         this.flowBuilder = flowBuilder;
         this.converterContext = converterContext;
         this.componentContext = componentContext;
-        this.camelContext = new DefaultCamelContext();
+        this.camelContext = camelContext;
         try {
             camelContext.setTracing(true);
             camelContext.start();

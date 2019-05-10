@@ -1,7 +1,7 @@
 package io.terminus.dalaran.console;
 
 import io.terminus.dalaran.DalaranTraceLogger;
-import io.terminus.dalaran.configura.DalaranAutoConfigura;
+import io.terminus.dalaran.configura.DalaranAutoConfiguration;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
@@ -14,7 +14,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @EnableSwagger2
 @EntityScan(basePackages = {"io.terminus.dalaran"})
 @EnableJpaRepositories(basePackages = {"io.terminus.dalaran"})
-@Import(DalaranAutoConfigura.class)
+@Import(DalaranAutoConfiguration.class)
 public class ConsoleApplication {
 
     @Bean

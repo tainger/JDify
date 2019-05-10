@@ -1,6 +1,6 @@
 package io.terminus.dalaran;
 
-import io.terminus.dalaran.configura.DalaranAutoConfigura;
+import io.terminus.dalaran.configura.DalaranAutoConfiguration;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
@@ -13,7 +13,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EntityScan(basePackages = {"io.terminus.dalaran"})
 @EnableJpaRepositories(basePackages = {"io.terminus.dalaran"})
 @EnableScheduling
-@Import(DalaranAutoConfigura.class)
+@Import(DalaranAutoConfiguration.class)
 public class RuntimeApplication {
 
     @Bean

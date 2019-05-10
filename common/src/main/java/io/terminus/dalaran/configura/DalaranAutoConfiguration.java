@@ -9,18 +9,31 @@ import io.terminus.dalaran.support.convert.DefaultDalaranConverterContext;
 import io.terminus.dalaran.support.flow.DefaultDalaranCamelContext;
 import io.terminus.dalaran.support.flow.FlowBuilder;
 import io.terminus.dalaran.support.trace.TracingErrorHandlerFactory;
+import org.apache.camel.CamelContext;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.spi.Registry;
+import org.apache.camel.spring.spi.ApplicationContextRegistry;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class DalaranAutoConfigura {
+public class DalaranAutoConfiguration {
+
+    @Bean
+    public CamelContext camelContext(ApplicationContext applicationContext) {
+        Registry registry = new ApplicationContextRegistry(applicationContext);
+        return new DefaultCamelContext(registry);
+    }
+
     @Bean
     public DalaranContext dalaranContext(
             DalaranConverterContext converterContext,
             DalaranComponentContext componentContext,
-            FlowBuilder flowBuilder
+            FlowBuilder flowBuilder,
+            CamelContext camelContext
     ) {
-        return new DefaultDalaranCamelContext(flowBuilder, converterContext, componentContext);
+        return new DefaultDalaranCamelContext(flowBuilder, converterContext, componentContext, camelContext);
     }
 
     @Bean
