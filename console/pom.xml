@@ -13,11 +13,6 @@
 
     <dependencies>
         <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-            <version>5.1.47</version>
-        </dependency>
-        <dependency>
             <groupId>io.terminus</groupId>
             <artifactId>dalaran-common</artifactId>
             <version>${project.version}</version>
@@ -29,19 +24,7 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
-            <!--<exclusions>-->
-            <!--<exclusion>-->
-            <!--<groupId>com.fasterxml.jackson.core</groupId>-->
-            <!--<artifactId>jackson-databind</artifactId>-->
-            <!--</exclusion>-->
-            <!--</exclusions>-->
         </dependency>
-
-        <!-- FastJson 的依赖会被传递过来-->
-        <!--<dependency>-->
-        <!--<groupId>com.alibaba</groupId>-->
-        <!--<artifactId>fastjson</artifactId>-->
-        <!--</dependency>-->
 
         <!-- TODO 奇怪, 为什么需要显式声明-->
         <dependency>
