@@ -48,7 +48,7 @@ public class DalaranHttpClient implements DalaranProcessor<HttpClientConfig> {
     public String buildQueryString(Object obj) {
         if (obj instanceof Map) {
             Map queryKV = Maps.filterEntries((Map) obj, (Predicate<Map.Entry>) entry -> entry.getValue() != null && entry.getKey() != null);
-            return "?" + Joiner.on("&").withKeyValueSeparator("=").join(queryKV);
+            return Joiner.on("&").withKeyValueSeparator("=").join(queryKV);
         }
         return null;
     }
