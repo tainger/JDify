@@ -17,9 +17,10 @@ public class DalaranScript implements DalaranProcessor<DalaranScriptConfig> {
                 // TODO 这里很奇怪, 处理一下 array 的输出, 因为 java script 产出的数组其实也是一个 map....
                 route.process(exchange -> {
                     Object body = exchange.getIn().getBody();
-                    exchange.getOut().copyFrom(exchange.getIn());
                     if (body instanceof ScriptObjectMirror && ((ScriptObjectMirror) body).isArray()) {
                         exchange.getOut().setBody(((ScriptObjectMirror) body).values());
+                    } else {
+                        exchange.getOut().setBody(body);
                     }
                 });
                 route.end();

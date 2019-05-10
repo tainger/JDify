@@ -2,6 +2,7 @@ package io.terminus.dalaran.console.rest;
 
 import io.swagger.annotations.ApiOperation;
 import io.terminus.dalaran.DalaranContext;
+import io.terminus.dalaran.console.model.TestRequestDTO;
 import io.terminus.dalaran.console.model.dto.flow.TriggerFlowDTO;
 import io.terminus.dalaran.console.model.dto.log.MainLogDTO;
 import io.terminus.dalaran.console.model.query.FlowQuery;
@@ -69,16 +70,16 @@ public class FlowManagementRest {
         return flowManagementService.queryByProcessorIds(processorIds);
     }
 
-    @PostMapping("/{flowId}/test")
-    private MainLogDTO doTest(@PathVariable Long flowId, @RequestBody String body) {
+    @PostMapping("/test")
+    private MainLogDTO doTest(@RequestBody TestRequestDTO request) {
         String recordId = nextRecordId();
-        TriggerFlowDTO flow = flowManagementService.getById(flowId);
+        TriggerFlowDTO flow = flowManagementService.getById(request.getFlowId());
         if (flow == null) {
             // TODO throw flow not found
             return null;
         }
         try {
-            dalaranContext.testFlow(flowId, body, recordId);
+            dalaranContext.testFlow(request.getFlowId(), request.getBody(), recordId);
         } catch (Throwable ignored) {
         }
         return tracingLogService.getRecordDetail(recordId);

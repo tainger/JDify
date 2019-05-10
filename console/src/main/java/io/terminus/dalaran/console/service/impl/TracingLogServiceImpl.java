@@ -4,12 +4,14 @@ import io.terminus.dalaran.TracingType;
 import io.terminus.dalaran.console.model.dto.log.MainLogDTO;
 import io.terminus.dalaran.console.model.dto.log.TracingLogDTO;
 import io.terminus.dalaran.console.model.query.TracingLogQuery;
+import io.terminus.dalaran.console.service.ModuleManagementService;
 import io.terminus.dalaran.console.service.TracingLogService;
 import io.terminus.dalaran.entity.manage.TracingLogEntity;
 import io.terminus.dalaran.entity.manage.TriggerFlowEntity;
 import io.terminus.dalaran.repository.TracingLogRepository;
 import io.terminus.dalaran.repository.TriggerFlowRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
@@ -30,9 +32,13 @@ public class TracingLogServiceImpl implements TracingLogService {
     @Autowired
     private TriggerFlowRepository flowRepository;
 
+    @Autowired
+    private ModuleManagementService moduleService;
+
     @Override
     public List<MainLogDTO> triggerLogs(TracingLogQuery query) {
-        List<TracingLogEntity> logs = tracingLogRepository.findAll(buildSpecification(query));
+        Sort.Order order = new Sort.Order(Sort.Direction.DESC, "timestamp");
+        List<TracingLogEntity> logs = tracingLogRepository.findAll(buildSpecification(query), new Sort(order));
         return logs.stream().map(this::buildTracingMainLog).collect(Collectors.toList());
     }
 
@@ -90,9 +96,12 @@ public class TracingLogServiceImpl implements TracingLogService {
         mainLog.setOutputBodyType(log.getOutputBodyType());
         mainLog.setSuccessful(log.isSuccessful());
         if (log.getFlowId() != null) {
+            mainLog.setFlowId(log.getFlowId());
             TriggerFlowEntity flowEntity = flowRepository.findOne(log.getFlowId());
             if (flowEntity != null) {
                 mainLog.setFlowName(flowEntity.getName());
+                mainLog.setModuleId(flowEntity.getModuleId());
+                mainLog.setModuleName(moduleService.getModuleName(flowEntity.getModuleId()));
             }
         }
         return mainLog;
@@ -116,6 +125,7 @@ public class TracingLogServiceImpl implements TracingLogService {
         if (flowEntity != null) {
             tracingLog.setFlowName(flowEntity.getName());
         }
+
         return tracingLog;
     }
 }

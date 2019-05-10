@@ -1,6 +1,8 @@
 package io.terminus.dalaran.component.processor.http;
 
 import com.google.common.base.Joiner;
+import com.google.common.base.Predicate;
+import com.google.common.collect.Maps;
 import io.terminus.dalaran.BodyType;
 import io.terminus.dalaran.DalaranConverterContext;
 import io.terminus.dalaran.DalaranProcessor;
@@ -45,7 +47,8 @@ public class DalaranHttpClient implements DalaranProcessor<HttpClientConfig> {
 
     public String buildQueryString(Object obj) {
         if (obj instanceof Map) {
-            return "?" + Joiner.on("&").withKeyValueSeparator("=").join((Map<?, ?>) obj);
+            Map queryKV = Maps.filterEntries((Map) obj, (Predicate<Map.Entry>) entry -> entry.getValue() != null && entry.getKey() != null);
+            return "?" + Joiner.on("&").withKeyValueSeparator("=").join(queryKV);
         }
         return null;
     }
