@@ -14,6 +14,7 @@ public class BasicProcessorTest {
     protected ProducerTemplate getProcessorTemplate(DalaranProcessor processor, Object config) {
         try {
             RouteDefinition route = new RouteDefinition("direct:test-script");
+            route.setId("test-route");
             camelContext.setTracing(true);
             processor.configure(route, config);
             camelContext.addRouteDefinition(route);
