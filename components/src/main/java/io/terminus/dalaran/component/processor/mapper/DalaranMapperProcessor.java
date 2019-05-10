@@ -183,9 +183,9 @@ public class DalaranMapperProcessor implements Processor {
                     }
                 } else {
                     List<Object> target = (List<Object>) targetContext.getValue(entry.getValue().getValue(), List.class);
-                    if (target == null) {
-                        target = new ArrayList<>();
-                    }
+//                    if (target == null) {
+//                        target = new ArrayList<>();
+//                    }
                     destinationContext.createPathAndSetValue(path, target);
                 }
             } else if (type == FieldType.OBJECT) {
@@ -197,7 +197,7 @@ public class DalaranMapperProcessor implements Processor {
                 } else {
                     target = mappingField.getValue();
                 }
-                Object destinationValue = "";
+                Object destinationValue = null;
                 if (target != null) {
                     destinationValue = parse(target, mappingField.getMappingFieldType());
                 }
