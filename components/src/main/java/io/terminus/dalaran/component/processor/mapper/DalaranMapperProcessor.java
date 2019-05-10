@@ -60,20 +60,20 @@ public class DalaranMapperProcessor implements Processor {
         mappingField.setSubType(outModel.getSubType());
         mappingField.setMapping(new HashMap<>());
         buildMessageMapping(simpleMapping, mappingField, inModel, outModel);
-        System.out.println(JSON.toJSONString(messageMapping));
         return messageMapping;
     }
 
     private void buildMessageMapping(Map<String, SimpleMappingField> simpleMapping, MappingField mappingField, ModelField inModel, ModelField outModel) {
         TreeMap<String, SimpleMappingField> sortedMapping = new TreeMap<>(simpleMapping);
         sortedMapping.forEach((inPath, outField) -> {
-            buildSubMapping(mappingField, outField, outModel, inPath, inModel);
+            buildSubMapping(mappingField, outField, outModel, StringUtils.substringAfter(inPath, "."), inModel);
         });
     }
 
     private void buildSubMapping(MappingField mappingField, SimpleMappingField outMappingField, ModelField outModel, String inPath, ModelField inModel) {
         List<String> outFields = new ArrayList<>();
-        CollectionUtils.addAll(outFields, outMappingField.getValue().split("\\."));
+        String outPath = StringUtils.substringAfter(outMappingField.getValue(), ".");
+        CollectionUtils.addAll(outFields, outPath.split("\\."));
 
         MappingField child = mappingField;
         for (int i = 0; i < outFields.size(); i++) {
