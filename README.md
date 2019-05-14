@@ -28,7 +28,7 @@
 
 ## 示意图
 
-![](../images/architecture.jpg)
+![](./docs/images/architecture.jpg)
 
 ## 用户手册
 
