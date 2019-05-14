@@ -26,6 +26,10 @@
 * 可扩展
 * 可观察
 
+## 示意图
+
+![](../images/architecture.jpg)
+
 ## 用户手册
 
 * [概述](./docs/user/overview.md)
