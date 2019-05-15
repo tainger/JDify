@@ -76,15 +76,15 @@ public class DalaranMapperProcessor implements Processor {
             if (type == FieldType.ARRAY) {
                 if (subType == FieldType.OBJECT) {
                     List<Object> target;
+                    String arrayPath = mappingField.getArrayFieldPath();
                     if (path.equalsIgnoreCase(MapperConstants.MODEL_ROOT)) {
-                        String arrayPath = mappingField.getArrayFieldPath();
                         if (StringUtils.isNotBlank(arrayPath)) {
                             target = (List<Object>) targetContext.getValue(arrayPath, List.class);
                         } else {
                             target = (List<Object>) targetContext.getContextBean();
                         }
                     } else {
-                        target = (List<Object>) targetContext.getValue(mappingField.getArrayFieldPath(), List.class);
+                        target = (List<Object>) targetContext.getValue(arrayPath, List.class);
                     }
 
                     List<Object> subList = new ArrayList<>();

@@ -3,10 +3,7 @@ package io.terminus.dalaran.component.processor.mapper;
 import io.terminus.dalaran.DalaranProcessor;
 import io.terminus.dalaran.FieldType;
 import io.terminus.dalaran.annotation.Processor;
-import io.terminus.dalaran.component.processor.mapper.model.MapperConstants;
-import io.terminus.dalaran.component.processor.mapper.model.MappingField;
-import io.terminus.dalaran.component.processor.mapper.model.MappingType;
-import io.terminus.dalaran.component.processor.mapper.model.SimpleMappingField;
+import io.terminus.dalaran.component.processor.mapper.model.*;
 import io.terminus.dalaran.model.MessageModel;
 import io.terminus.dalaran.model.ModelField;
 import io.terminus.dalaran.model.schema.JsonSchema;
@@ -123,7 +120,7 @@ public class DalaranMessageMapper implements DalaranProcessor<DalaranMapperConfi
     }
 
     private void buildArrayMapping(Map<String, SimpleMappingField> fieldMap, ModelField inModel, ModelField outModel, Map<String, String> arrayFieldMapping) {
-
+        Flag flag = new Flag(false);
         fieldMap.forEach((outPath, inField) -> {
             if (inField.getMappingType() == MappingType.MAPPING) {
                 List<String> outSubFields = new ArrayList<>();
@@ -135,20 +132,47 @@ public class DalaranMessageMapper implements DalaranProcessor<DalaranMapperConfi
 //                CollectionUtils.addAll(inSubFields, inField.getValue().split("\\."));
 
                 int startIdx = 0;
+                int level = 0;
                 for (int i = 0; i < outSubFields.size(); i++) {
                     List<String> outSubPath = outSubFields.subList(0, i+1);
                     if (arrayFieldMapping.containsKey(buildFieldPath(outSubPath))) {
+                        level++;
                         continue;
                     }
                     ModelField outField = getField(outSubPath, outModel);
                     if ((outModel.getType() == FieldType.ARRAY && outModel.getSubType() == FieldType.OBJECT && i == 0) || (outField != null && outField.getType() == FieldType.ARRAY && outField.getSubType() == FieldType.OBJECT)) {
+
+                        if (level == 0 && inModel.getType() == FieldType.ARRAY && inModel.getSubType() == FieldType.OBJECT) {
+                            arrayFieldMapping.put(buildFieldPath(outSubPath), "");
+                            level++;
+                            flag.setValue(true);
+                            continue;
+                        }
+
+                        int subLevel = 0;
+                        if (inModel.getType() == FieldType.ARRAY && inModel.getSubType() == FieldType.OBJECT) {
+                            subLevel++;
+                        }
+
                         for (int j = startIdx; j < inSubFields.size(); j++) {
                             List<String> inSubPath = inSubFields.subList(0, j+1);
                             ModelField field = getField(inSubPath, inModel);
                             if (field != null && field.getType() == FieldType.ARRAY && field.getSubType() == FieldType.OBJECT) {
-                                arrayFieldMapping.put(buildFieldPath(outSubPath), buildFieldPath(inSubPath));
-                                startIdx = j;
-                                break;
+                                if (subLevel == level) {
+                                    if (level > 0) {
+                                        if (flag.isValue() && level < 2) {
+                                            arrayFieldMapping.put(buildFieldPath(outSubPath), buildFieldPath(inSubPath));
+                                        } else {
+                                            arrayFieldMapping.put(buildFieldPath(outSubPath), inSubPath.get(inSubPath.size()-1));
+                                        }
+                                    } else {
+                                        arrayFieldMapping.put(buildFieldPath(outSubPath), buildFieldPath(inSubPath));
+                                    }
+                                    startIdx = j;
+                                    level++;
+                                    break;
+                                }
+                                subLevel++;
                             }
                         }
                     }
