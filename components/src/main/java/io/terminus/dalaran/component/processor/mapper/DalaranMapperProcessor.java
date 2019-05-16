@@ -76,7 +76,7 @@ public class DalaranMapperProcessor implements Processor {
 
             if (type == FieldType.ARRAY) {
                 if (subType == FieldType.OBJECT) {
-                    List<Object> target;
+                    List<Object> target = null;
                     String arrayPath = mappingField.getArrayFieldPath();
                     try {
                         if (path.equalsIgnoreCase(MapperConstants.MODEL_ROOT)) {
@@ -90,7 +90,6 @@ public class DalaranMapperProcessor implements Processor {
                         }
                     } catch (JXPathNotFoundException e) {
 //                        e.printStackTrace();
-                        target = null;
                     }
 
                     List<Object> subList = new ArrayList<>();
@@ -117,13 +116,12 @@ public class DalaranMapperProcessor implements Processor {
             } else if (type == FieldType.OBJECT) {
                 subConvert(destinationContext, targetContext, mappingField.getMapping(), path, flag);
             } else {
-                Object target;
+                Object target = null;
                 if (mappingField.getMappingType() == MappingType.MAPPING) {
                     try {
                         target = targetContext.getValue(entry.getValue().getValue());
                     } catch (JXPathNotFoundException e) {
 //                        e.printStackTrace();
-                        target = null;
                     }
                 } else {
                     target = mappingField.getValue();
