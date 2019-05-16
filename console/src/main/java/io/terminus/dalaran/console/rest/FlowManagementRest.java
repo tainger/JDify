@@ -53,7 +53,7 @@ public class FlowManagementRest {
         flowManagementService.deleteFlow(id);
     }
 
-    @ApiOperation(value = "删除工作流")
+    @ApiOperation(value = "复制工作流")
     @RequestMapping(value = "/copy", method = RequestMethod.POST)
     public Long copy(@RequestParam Long id) {
         return flowManagementService.copyFlow(id);
