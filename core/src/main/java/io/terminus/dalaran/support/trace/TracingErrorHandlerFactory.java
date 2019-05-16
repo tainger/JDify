@@ -10,9 +10,7 @@ import org.apache.camel.Traceable;
 import org.apache.camel.processor.ErrorHandler;
 import org.apache.camel.spi.RouteContext;
 
-import static io.terminus.dalaran.DalaranConstants.FLOW_TRACING_LOG;
-import static io.terminus.dalaran.DalaranConstants.PROCESSOR_TRACING_LOG;
-import static io.terminus.dalaran.DalaranConstants.TEST_FLOW_TRACING_LOG;
+import static io.terminus.dalaran.DalaranConstants.*;
 
 public class TracingErrorHandlerFactory implements ErrorHandlerFactory {
 

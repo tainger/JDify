@@ -6,12 +6,8 @@ import io.terminus.dalaran.DalaranConverterContext;
 import io.terminus.dalaran.model.flow.BasicFlow;
 import io.terminus.dalaran.model.flow.TriggerFlow;
 import org.apache.camel.CamelContext;
-import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.impl.DefaultProducerTemplate;
 import org.apache.camel.model.RouteDefinition;
-import org.apache.camel.spi.Registry;
-import org.apache.camel.spring.spi.ApplicationContextRegistry;
-import org.springframework.context.ApplicationContext;
 
 import java.util.List;
 

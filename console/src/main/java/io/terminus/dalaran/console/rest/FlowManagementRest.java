@@ -53,6 +53,12 @@ public class FlowManagementRest {
         flowManagementService.deleteFlow(id);
     }
 
+    @ApiOperation(value = "复制工作流")
+    @RequestMapping(value = "/copy", method = RequestMethod.POST)
+    public Long copy(@RequestParam Long id) {
+        return flowManagementService.copyFlow(id);
+    }
+
     @ApiOperation(value = "条件查询工作流")
     @RequestMapping(value = "/query", method = RequestMethod.GET)
     public List<TriggerFlowDTO> query(FlowQuery query) {
