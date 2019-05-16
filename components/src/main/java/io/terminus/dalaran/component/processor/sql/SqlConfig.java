@@ -18,6 +18,6 @@ public class SqlConfig implements ConnectorConfig<SqlDataSourceConnector> {
     @ConfigFieldInfo(label = "DB 数据源", inputType = FieldInputType.Connector, connectorType = SqlDataSourceConnector.class)
     private Long connectorId;
 
-    @ConfigFieldInfo(label = "SQL 语句", inputType = FieldInputType.String)
+    @ConfigFieldInfo(label = "SQL 语句", inputType = FieldInputType.SQL)
     private String sql;
 }
