@@ -11,6 +11,7 @@ import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.jxpath.JXPathContext;
+import org.apache.commons.jxpath.JXPathNotFoundException;
 import org.apache.commons.lang.StringUtils;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -77,14 +78,19 @@ public class DalaranMapperProcessor implements Processor {
                 if (subType == FieldType.OBJECT) {
                     List<Object> target;
                     String arrayPath = mappingField.getArrayFieldPath();
-                    if (path.equalsIgnoreCase(MapperConstants.MODEL_ROOT)) {
-                        if (StringUtils.isNotBlank(arrayPath)) {
-                            target = (List<Object>) targetContext.getValue(arrayPath, List.class);
+                    try {
+                        if (path.equalsIgnoreCase(MapperConstants.MODEL_ROOT)) {
+                            if (StringUtils.isNotBlank(arrayPath)) {
+                                target = (List<Object>) targetContext.getValue(arrayPath, List.class);
+                            } else {
+                                target = (List<Object>) targetContext.getContextBean();
+                            }
                         } else {
-                            target = (List<Object>) targetContext.getContextBean();
+                            target = (List<Object>) targetContext.getValue(arrayPath, List.class);
                         }
-                    } else {
-                        target = (List<Object>) targetContext.getValue(arrayPath, List.class);
+                    } catch (JXPathNotFoundException e) {
+//                        e.printStackTrace();
+                        target = null;
                     }
 
                     List<Object> subList = new ArrayList<>();
@@ -113,15 +119,20 @@ public class DalaranMapperProcessor implements Processor {
             } else {
                 Object target;
                 if (mappingField.getMappingType() == MappingType.MAPPING) {
-                    target = targetContext.getValue(entry.getValue().getValue());
+                    try {
+                        target = targetContext.getValue(entry.getValue().getValue());
+                    } catch (JXPathNotFoundException e) {
+//                        e.printStackTrace();
+                        target = null;
+                    }
                 } else {
                     target = mappingField.getValue();
                 }
                 Object destinationValue = null;
                 if (target != null) {
                     destinationValue = parse(target, mappingField.getMappingFieldType());
+                    destinationContext.createPathAndSetValue(path, destinationValue);
                 }
-                destinationContext.createPathAndSetValue(path, destinationValue);
             }
         }
     }
