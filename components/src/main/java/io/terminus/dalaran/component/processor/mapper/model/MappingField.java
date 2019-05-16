@@ -15,6 +15,8 @@ public class MappingField {
 
     private FieldType subType;
 
+    private String arrayFieldPath;
+
     private MappingType mappingType;
 
     private String value;
