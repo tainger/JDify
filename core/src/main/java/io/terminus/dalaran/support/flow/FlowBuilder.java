@@ -95,7 +95,11 @@ public class FlowBuilder {
             // TODO 这里还是比较奇怪, 有点绕, 而且有些特殊场景没有考虑到
             if (currentModel != null) {
                 currentBodyIsSerialized = currentModel.getModelType().isSerialized();
-                if (processorInfo.isSerializedBody() != currentBodyIsSerialized) {
+                boolean needConvert = true;
+                if (processorComponent instanceof CustomConvert) {
+                    needConvert = ((CustomConvert) processorComponent).customConvert(route, processor.getConfig(), currentBodyIsSerialized);
+                }
+                if (needConvert && processorInfo.isSerializedBody() != currentBodyIsSerialized) {
                     // TODO convert tracing, 暂时没必要, 先注掉吧, 影响性能
 //                DalaranTracer convertTracer = DalaranTracer.buildConvertTracer(traceLogger, flow.getId(), processor.getId());
                     if (processorInfo.isSerializedBody()) {
