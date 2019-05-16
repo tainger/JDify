@@ -19,6 +19,7 @@ import io.terminus.dalaran.repository.PropertyRepository;
 import io.terminus.dalaran.repository.TriggerFlowRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -131,6 +132,20 @@ public class FlowManagementServiceImpl implements FlowManagementService {
             return null;
         }
         return flowConvertor.toDTO(flowEntity);
+    }
+
+    @Override
+    public Long copyFlow(Long id) {
+        TriggerFlowEntity flowEntity = flowRepository.findOne(id);
+        if (flowEntity == null) {
+            return null;
+        }
+        TriggerFlowEntity newFlowEntity = new TriggerFlowEntity();
+
+        BeanUtils.copyProperties(flowEntity, newFlowEntity);
+        newFlowEntity.setId(null);
+        flowRepository.save(newFlowEntity);
+        return newFlowEntity.getId();
     }
 
     private TriggerFlowEntity buildEntity(TriggerFlowDTO model) {

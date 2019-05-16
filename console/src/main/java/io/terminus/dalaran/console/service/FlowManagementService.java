@@ -28,4 +28,6 @@ public interface FlowManagementService {
 
     @Nullable
     TriggerFlowDTO getById(Long flowId);
+
+    Long copyFlow(Long id);
 }
