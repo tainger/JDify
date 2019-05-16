@@ -22,7 +22,7 @@ public class SqlProcessor implements DalaranProcessor<SqlConfig>, BeanFactoryPos
             beanFactory.registerSingleton(dataSourceBeanName, dataSource);
         }
         // TODO 目前取值只支持一级, 后面可用通过实现 SqlPrepareStatementStrategy 来扩展
-        route.to("sql:" + config.getSql() + "?dataSource=#" + dataSourceBeanName);
+        route.to("sql:" + config.getSql() + "?dataSource=" + dataSourceBeanName);
     }
 
 
