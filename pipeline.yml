@@ -20,8 +20,6 @@ resources:
   source:
     bp_args:
       USE_AGENT: "true"
-    bp_repo: http://git.terminus.io/buildpacks/dice-bpack-termjava.git
-    bp_ver: master
     context: dalaran/
     modules:
     - name: console
@@ -31,8 +29,6 @@ resources:
   source:
     bp_args:
       USE_AGENT: "true"
-    bp_repo: http://git.terminus.io/buildpacks/dice-bpack-termjava.git
-    bp_ver: master
     context: dalaran/
     modules:
     - name: runtime
