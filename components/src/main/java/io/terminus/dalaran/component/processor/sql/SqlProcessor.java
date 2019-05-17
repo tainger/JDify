@@ -32,7 +32,7 @@ public class SqlProcessor implements DalaranProcessor<SqlConfig>, BeanFactoryPos
         dataSource.setPassword(connector.getPassword());
         switch (connector.getDatabaseType()) {
             case MYSQL:
-                String urlTemplate = "jdbc:mysql://%s:%s/%s";
+                String urlTemplate = "jdbc:mysql://%s:%s/%s?useUnicode=true&characterEncoding=utf-8&useSSL=false";
                 String url = String.format(urlTemplate, connector.getHost(), connector.getPort(), connector.getSchema());
                 dataSource.setUrl(url);
                 dataSource.setDriverClassName("com.mysql.jdbc.Driver");
