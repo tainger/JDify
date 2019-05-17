@@ -83,7 +83,7 @@ public class FlowBuilder {
         List<ProcessorModel> processorList = flow.getPipeline();
         // TODO in model maybe null
         MessageModel currentModel = flow.getInModel();
-        boolean currentBodyIsSerialized = false;
+        boolean currentBodyIsSerialized = currentModel.getModelType().isSerialized();
 
         for (ProcessorModel processor : processorList) {
             DalaranTracer spanTracer = DalaranTracer.buildFlowSpanTracer(traceLogger, flow.getId(), processor.getId());
@@ -126,9 +126,10 @@ public class FlowBuilder {
             spanTracer.after(route, currentModel.getModelType());
         }
 
-        if (currentModel.getModelType().isSerialized() != currentBodyIsSerialized) {
+        MessageModel outModel = flow.getOutModel();
+        if (outModel != null && outModel.getModelType().isSerialized() != currentBodyIsSerialized) {
 //            DalaranTracer convertTracer = DalaranTracer.buildConvertTracer(traceLogger, flow.getId(), lastProcessor.getId());
-            if (currentModel.getModelType().isSerialized()) {
+            if (outModel.getModelType().isSerialized()) {
 //                convertTracer.before(route, BodyType.OBJECT);
                 converterContext.fromObject(route, currentModel);
 //                convertTracer.after(route, currentModel.getModelType());
