@@ -9,6 +9,7 @@ import io.terminus.dalaran.component.processor.mapper.model.MappingField;
 import io.terminus.dalaran.component.processor.mapper.model.MappingType;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
+import org.apache.camel.Traceable;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.jxpath.JXPathContext;
 import org.apache.commons.jxpath.JXPathNotFoundException;
@@ -22,7 +23,7 @@ import java.util.Map;
 /**
  * Created by jingdi on 2019/3/18
  */
-public class DalaranMapperProcessor implements Processor {
+public class DalaranMapperProcessor implements Processor, Traceable {
 
     private final Map<String, MappingField> messageMapping;
 
@@ -168,5 +169,10 @@ public class DalaranMapperProcessor implements Processor {
             }
         }
         return target;
+    }
+
+    @Override
+    public String getTraceLabel() {
+        return "DalaranMapper";
     }
 }
