@@ -29,17 +29,13 @@ public class DalaranHttpClient implements DalaranProcessor<HttpClientConfig>, Cu
         if (!config.getMethod().isNoBody()) {
             return true;
         }
-        if (bodyIsSerialized) {
-            if (config.getInModel().getModelType().isSerialized()) {
-                converterContext.toObject(route, config.getInModel());
-            }
-            route.setHeader(Exchange.HTTP_QUERY).method(this, "buildQueryString");
-            if (config.getInModel().getModelType().isSerialized()) {
-                // 如果转为 QueryString 后, body 实际上是无用的
-                route.setBody(Builder.constant(null));
-            }
-        } else {
-            route.setHeader(Exchange.HTTP_QUERY).method(this, "buildQueryString");
+        if (bodyIsSerialized && config.getInModel().getModelType().isSerialized()) {
+            converterContext.toObject(route, config.getInModel());
+        }
+        route.setHeader(Exchange.HTTP_QUERY).method(this, "buildQueryString");
+        if (config.getInModel().getModelType().isSerialized()) {
+            // 如果转为 QueryString 后, body 实际上是无用的
+            route.setBody(Builder.constant(null));
         }
         return false;
     }
