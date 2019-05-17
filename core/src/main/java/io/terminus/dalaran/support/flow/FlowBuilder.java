@@ -94,7 +94,7 @@ public class FlowBuilder {
             spanTracer.before(route, currentModel.getModelType());
             // TODO 这里还是比较奇怪, 有点绕, 而且有些特殊场景没有考虑到
             if (currentModel != null) {
-                currentBodyIsSerialized = currentModel.getModelType().isSerialized();
+//                currentBodyIsSerialized = currentModel.getModelType().isSerialized();
                 boolean needConvert = true;
                 if (processorComponent instanceof CustomConvert) {
                     needConvert = ((CustomConvert) processorComponent).customConvert(route, processor.getConfig(), currentBodyIsSerialized);
@@ -111,10 +111,10 @@ public class FlowBuilder {
                         converterContext.toObject(route, currentModel);
 //                    convertTracer.after(route, BodyType.OBJECT);
                     }
-                    // TODO processor 的输入和输出一定是一种类型
-                    currentBodyIsSerialized = processorInfo.isSerializedBody();
                 }
             }
+            // TODO processor 的输入和输出一定是一种类型
+            currentBodyIsSerialized = processorInfo.isSerializedBody();
 
             processorComponent.configure(route, processor.getConfig());
 
