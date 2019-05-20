@@ -19,6 +19,8 @@ public @interface ConfigFieldInfo {
 
     boolean required() default true;
 
+    boolean readonly() default false;
+
     FieldInputType inputType() default FieldInputType.Auto;
 
     Class connectorType() default Object.class;

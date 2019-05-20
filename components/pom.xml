@@ -78,6 +78,13 @@
             <artifactId>javax.servlet-api</artifactId>
             <version>4.0.1</version>
         </dependency>
+        <dependency>
+            <groupId>io.swagger</groupId>
+            <artifactId>swagger-models</artifactId>
+            <version>1.5.22</version>
+            <scope>compile</scope>
+        </dependency>
+
 
         <!-- test -->
         <dependency>
