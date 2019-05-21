@@ -19,7 +19,7 @@ public class DalaranHttpClient implements DalaranProcessor<HttpClientConfig>, Cu
     @Autowired
     private DalaranConverterContext converterContext;
 
-    private static final String HTTP_URI = "%s4://%s:%s%s?bridgeEndpoint=true";
+    private static final String HTTP_URI = "%s4://%s:%s%s%s?bridgeEndpoint=true";
 
     @Override
     public boolean customConvert(RouteDefinition route, HttpClientConfig config, boolean bodyIsSerialized) {
@@ -41,7 +41,8 @@ public class DalaranHttpClient implements DalaranProcessor<HttpClientConfig>, Cu
     @Override
     public void configure(ProcessorDefinition route, HttpClientConfig config) {
         HttpClientConnector connector = config.getConnector();
-        String uri = String.format(HTTP_URI, connector.getProtocol().name().toLowerCase(), connector.getHost(), connector.getPort(), config.getPath());
+        String uri = String.format(HTTP_URI, connector.getProtocol().name().toLowerCase(), connector.getHost(),
+                connector.getPort(), connector.getBasePath(), config.getPath());
         route.setHeader("CamelHttpMethod", Builder.constant(config.getMethod().name()));
         route.to(uri);
         // TODO Stream to string

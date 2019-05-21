@@ -1,7 +1,7 @@
 package io.terminus.dalaran.component.common;
 
 public enum HttpMethod {
-    GET(true), DELETE(true), OPTIONS(true), HEADER(true), CONNECT(true),
+    GET(true), DELETE(true), OPTIONS(true), HEAD(true), CONNECT(true),
     POST(false), PATCH(false), PUT(false), TRACE(false);
 
     private boolean noBody;

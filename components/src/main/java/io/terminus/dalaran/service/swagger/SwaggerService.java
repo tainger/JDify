@@ -1,0 +1,238 @@
+package io.terminus.dalaran.service.swagger;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Maps;
+import io.swagger.models.*;
+import io.swagger.models.parameters.BodyParameter;
+import io.swagger.models.parameters.Parameter;
+import io.swagger.models.properties.ArrayProperty;
+import io.swagger.models.properties.ObjectProperty;
+import io.swagger.models.properties.Property;
+import io.swagger.models.properties.RefProperty;
+import io.swagger.util.Json;
+import io.terminus.dalaran.BodyType;
+import io.terminus.dalaran.DalaranService;
+import io.terminus.dalaran.FieldType;
+import io.terminus.dalaran.annotation.ServiceConnector;
+import io.terminus.dalaran.component.common.HttpMethod;
+import io.terminus.dalaran.component.common.HttpProtocol;
+import io.terminus.dalaran.component.processor.http.HttpClientConnector;
+import io.terminus.dalaran.component.processor.swagger.SwaggerServiceClientConfig;
+import io.terminus.dalaran.model.MessageModel;
+import io.terminus.dalaran.model.ModelField;
+import io.terminus.dalaran.model.schema.JsonSchema;
+import org.apache.commons.lang.StringUtils;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.impl.client.HttpClientBuilder;
+
+import java.io.IOException;
+import java.net.URI;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+@ServiceConnector(
+        value = "swagger-connector",
+        importConfigType = SwaggerImportConfig.class,
+        serviceConfigType = SwaggerServiceConfig.class,
+        operationConfigType = SwaggerOperationConfig.class,
+        providerConfigType = SwaggerServiceClientConfig.class
+)
+public class SwaggerService implements DalaranService<SwaggerImportConfig, SwaggerServiceConfig, SwaggerOperationConfig, SwaggerServiceClientConfig> {
+
+    private static final String SUCCESSFUL_RESPONSE_CODE = "200";
+
+    @Override
+    public SwaggerOperationConfig configure(SwaggerServiceConfig swaggerOperations, SwaggerServiceClientConfig swaggerServiceClientConfig) {
+        for (SwaggerOperationConfig operationConfig : swaggerOperations.getConfigs()) {
+            if (operationConfig.getMethod() == swaggerServiceClientConfig.getMethod() && StringUtils.equals(operationConfig.getPath(), swaggerServiceClientConfig.getPath())) {
+                return operationConfig;
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public SwaggerServiceConfig importConfig(SwaggerImportConfig importConfig) {
+        HttpClient httpClient = HttpClientBuilder.create().build();
+
+        HttpUriRequest httpUriRequest = new HttpGet(importConfig.getSwaggerUrl());
+        try {
+            HttpResponse swaggerResponse = httpClient.execute(httpUriRequest);
+            ObjectMapper objectMapper = Json.mapper();
+
+            Swagger swagger = objectMapper.readValue(swaggerResponse.getEntity().getContent(), Swagger.class);
+            URI uri = URI.create(swagger.getHost());
+            HttpClientConnector connector = new HttpClientConnector();
+            connector.setHost(uri.getHost());
+            connector.setPort(uri.getPort());
+            connector.setProtocol(HttpProtocol.HTTP);
+            connector.setBasePath(swagger.getBasePath());
+
+            List<SwaggerOperationConfig> configs = swagger.getPaths().entrySet().stream().flatMap(path -> path.getValue().getOperationMap().entrySet().stream().map(method -> {
+                MessageModel inModel = buildInModel(method.getValue(), swagger.getDefinitions());
+                MessageModel outModel = buildOutModel(method.getValue(), swagger.getDefinitions());
+                SwaggerOperationConfig config = new SwaggerOperationConfig();
+                config.setPath(path.getKey());
+                config.setMethod(HttpMethod.valueOf(method.getKey().name()));
+                config.setInModel(inModel);
+                config.setOutModel(outModel);
+                return config;
+            })).collect(Collectors.toList());
+
+
+            SwaggerServiceConfig swaggerOperations = new SwaggerServiceConfig();
+            swaggerOperations.setConfigs(configs);
+            return null;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static void main(String[] args) {
+        SwaggerImportConfig config = new SwaggerImportConfig();
+        config.setSwaggerUrl("https://dev-dalaran-api.app.terminus.io/v2/api-docs");
+        new SwaggerService().importConfig(config);
+    }
+
+    private MessageModel buildOutModel(Operation operation, Map<String, Model> definitions) {
+        JsonSchema outSchema = new JsonSchema();
+        MessageModel outModel = new MessageModel<>();
+        outModel.setModelType(BodyType.JSON);
+        outModel.setModelSchema(outSchema);
+        Response response = operation.getResponses().get(SUCCESSFUL_RESPONSE_CODE);
+        Property property = response.getSchema();
+        if (property == null) {
+            return null;
+        }
+        ModelField outRootField = buildField(property, definitions);
+        Map<String, ModelField> outFields = Maps.newHashMap();
+        outFields.put("root", outRootField);
+        outSchema.setFields(outFields);
+        return outModel;
+    }
+
+    private MessageModel buildInModel(Operation operation, Map<String, Model> definitions) {
+        JsonSchema inSchema = new JsonSchema();
+        MessageModel inModel = new MessageModel<>();
+        inModel.setModelType(BodyType.JSON);
+        inModel.setModelSchema(inSchema);
+        Map<String, ModelField> inRootFields = Maps.newHashMap();
+        inSchema.setFields(inRootFields);
+
+        for (Parameter parameter : operation.getParameters()) {
+            switch (parameter.getIn()) {
+                case "body":
+                    Model model = ((BodyParameter) parameter).getSchema();
+                    if (model instanceof RefModel) {
+                        ModelField rootField = new ModelField();
+                        inRootFields.put("root", rootField);
+                        rootField.setType(FieldType.OBJECT);
+                        Map<String, ModelField> subFields = Maps.newHashMap();
+                        rootField.setFields(subFields);
+                        String modelName = ((RefModel) model).getSimpleRef();
+                        Model realModel = definitions.get(modelName);
+                        if (realModel instanceof ModelImpl) {
+                            ((ModelImpl) realModel).getType();
+                            realModel.getProperties().forEach((key, field) -> {
+                                subFields.put(key, buildField(field, definitions));
+                            });
+                        }
+                    }
+                    break;
+                case "path":
+//                                throw new RuntimeException("暂时不支持 path 格式");
+                    System.out.println("暂时不支持 path 格式");
+                    break;
+                case "query":
+//                                throw new RuntimeException("暂时不支持 query 格式");
+                    System.out.println("暂时不支持 query 格式");
+                    break;
+                case "formData":
+//                                throw new RuntimeException("暂时不支持 formData 格式");
+                    System.out.println("暂时不支持 formData 格式");
+                    break;
+                case "header":
+//                                throw new RuntimeException("暂时不支持 header 格式");
+                    System.out.println("暂时不支持 header 格式");
+                    break;
+                case "cookie":
+//                                throw new RuntimeException("暂时不支持 cookie 格式");
+                    System.out.println("暂时不支持 cookie 格式");
+                    break;
+            }
+        }
+        return inModel;
+    }
+
+    private ModelField buildField(Property property, Map<String, Model> definitions) {
+        ModelField field = new ModelField();
+        Map<String, ModelField> subFields = Maps.newHashMap();
+        field.setFields(subFields);
+        field.setDescription(property.getDescription());
+
+
+        switch (property.getType()) {
+            case "object":
+                field.setType(FieldType.OBJECT);
+                if (property instanceof ObjectProperty) {
+                    ((ObjectProperty) property).getProperties().forEach((subPropertyName, subProperty) -> {
+                        field.getFields().put(subPropertyName, buildField(subProperty, definitions));
+                    });
+                }
+                break;
+            case "array":
+                field.setType(FieldType.ARRAY);
+                if (property instanceof ArrayProperty) {
+                    ModelField arrayField = buildField(((ArrayProperty) property).getItems(), definitions);
+                    field.setSubType(arrayField.getType());
+                    field.setFields(arrayField.getFields());
+                }
+                break;
+            case "ref":
+                if (property instanceof RefProperty) {
+                    Model subModel = definitions.get(((RefProperty) property).getSimpleRef());
+                    if (subModel instanceof ModelImpl) {
+                        field.setType(getFieldType(((ModelImpl) subModel).getType()));
+                        subModel.getProperties().forEach((key, subField) -> subFields.put(key, buildField(subField, definitions)));
+                    }
+                }
+                break;
+            case "integer":
+                field.setType(FieldType.INTEGER);
+                break;
+            case "number":
+                field.setType(FieldType.NUMBER);
+                break;
+            case "string":
+                field.setType(FieldType.STRING);
+                break;
+            case "boolean":
+                field.setType(FieldType.BOOLEAN);
+                break;
+        }
+        return field;
+    }
+
+    private FieldType getFieldType(String type) {
+        switch (type) {
+            case "object":
+                return FieldType.OBJECT;
+            case "array":
+                return FieldType.ARRAY;
+            case "integer":
+                return FieldType.INTEGER;
+            case "number":
+                return FieldType.NUMBER;
+            case "string":
+                return FieldType.STRING;
+            case "boolean":
+                return FieldType.BOOLEAN;
+        }
+        return null;
+    }
+}
