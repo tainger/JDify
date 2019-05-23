@@ -45,9 +45,9 @@ public class ServiceRest {
         return serviceManagement.list();
     }
 
-    @GetMapping("/operation")
+    @GetMapping("/{id}/operation")
     @ApiOperation("获取服务可选项")
-    private List<String> operations(@RequestParam Long serviceId) {
-        return serviceManagement.listOperation(serviceId);
+    private List<String> operations(@PathVariable Long id) {
+        return serviceManagement.listOperation(id);
     }
 }

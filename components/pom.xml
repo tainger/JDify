@@ -103,9 +103,13 @@
             <groupId>io.swagger</groupId>
             <artifactId>swagger-core</artifactId>
             <version>1.5.22</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>javax.validation</groupId>
+                    <artifactId>validation-api</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
-
-
     </dependencies>
 
 </project>

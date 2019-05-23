@@ -1,7 +1,7 @@
 package io.terminus.dalaran;
 
-import io.terminus.dalaran.config.ImmutableModelConfig;
 import io.terminus.dalaran.config.ServiceOperationConfig;
+import io.terminus.dalaran.model.ServiceOperation;
 import io.terminus.dalaran.model.config.ServiceInfo;
 
 public interface DalaranServiceContext {
@@ -10,6 +10,6 @@ public interface DalaranServiceContext {
 
     ServiceInfo getServiceInfo(String serviceType);
 
-    ImmutableModelConfig buildOperationConfig(String serviceType, Object serviceConfig, ServiceOperationConfig config);
+    ServiceOperation buildOperationConfig(String serviceType, Object serviceConfig, ServiceOperationConfig config);
 
 }

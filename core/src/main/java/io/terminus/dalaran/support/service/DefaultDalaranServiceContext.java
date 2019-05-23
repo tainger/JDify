@@ -3,8 +3,8 @@ package io.terminus.dalaran.support.service;
 import io.terminus.dalaran.DalaranService;
 import io.terminus.dalaran.DalaranServiceContext;
 import io.terminus.dalaran.annotation.ServiceConnector;
-import io.terminus.dalaran.config.ImmutableModelConfig;
 import io.terminus.dalaran.config.ServiceOperationConfig;
+import io.terminus.dalaran.model.ServiceOperation;
 import io.terminus.dalaran.model.config.ServiceInfo;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
@@ -47,7 +47,7 @@ public class DefaultDalaranServiceContext implements DalaranServiceContext, Appl
     }
 
     @Override
-    public ImmutableModelConfig buildOperationConfig(String serviceType, Object serviceConfig, ServiceOperationConfig config) {
+    public ServiceOperation buildOperationConfig(String serviceType, Object serviceConfig, ServiceOperationConfig config) {
         return getService(serviceType).getOperationConfig(serviceConfig, config.getOperation());
     }
 

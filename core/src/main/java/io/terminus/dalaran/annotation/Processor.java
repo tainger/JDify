@@ -15,8 +15,6 @@ public @interface Processor {
 
     boolean serializedBody();
 
-    boolean service() default false;
-
     BodyType[] allowBodyTypes() default {};
 
     Class configType() default Object.class;
