@@ -5,19 +5,21 @@ import io.terminus.dalaran.DalaranServiceContext;
 import io.terminus.dalaran.annotation.ServiceConnector;
 import io.terminus.dalaran.config.ServiceOperationConfig;
 import io.terminus.dalaran.model.ServiceOperation;
+import io.terminus.dalaran.model.config.DalaranConfigField;
 import io.terminus.dalaran.model.config.ServiceInfo;
+import io.terminus.dalaran.util.ConfigFieldUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
 import javax.annotation.PostConstruct;
+import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class DefaultDalaranServiceContext implements DalaranServiceContext, ApplicationContextAware {
 
     private ApplicationContext applicationContext;
-
 
     private final Map<String, DalaranService> serviceMapping = new ConcurrentHashMap<>();
     private final Map<String, ServiceInfo> serviceInfoMapping = new ConcurrentHashMap<>();
@@ -27,10 +29,15 @@ public class DefaultDalaranServiceContext implements DalaranServiceContext, Appl
         Map<String, DalaranService> serviceBeanMap = applicationContext.getBeansOfType(DalaranService.class);
         serviceBeanMap.values().forEach(bean -> {
             ServiceConnector serviceAnnotation = bean.getClass().getDeclaredAnnotation(ServiceConnector.class);
+
             ServiceInfo serviceInfo = new ServiceInfo();
             serviceInfo.setType(serviceAnnotation.value());
             serviceInfo.setImportConfigType(serviceAnnotation.importConfigType());
             serviceInfo.setServiceConfigType(serviceAnnotation.serviceConfigType());
+
+            DalaranConfigField[] importConfigFields = ConfigFieldUtils.buildConfigFields(serviceAnnotation.importConfigType());
+            serviceInfo.setConfigFields(importConfigFields);
+
             serviceMapping.put(serviceAnnotation.value(), bean);
             serviceInfoMapping.put(serviceAnnotation.value(), serviceInfo);
         });
@@ -49,6 +56,11 @@ public class DefaultDalaranServiceContext implements DalaranServiceContext, Appl
     @Override
     public ServiceOperation buildOperationConfig(String serviceType, Object serviceConfig, ServiceOperationConfig config) {
         return getService(serviceType).getOperationConfig(serviceConfig, config.getOperation());
+    }
+
+    @Override
+    public Collection<ServiceInfo> getAllServiceInfo() {
+        return serviceInfoMapping.values();
     }
 
     @Override

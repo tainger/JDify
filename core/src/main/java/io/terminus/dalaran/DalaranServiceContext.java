@@ -4,6 +4,8 @@ import io.terminus.dalaran.config.ServiceOperationConfig;
 import io.terminus.dalaran.model.ServiceOperation;
 import io.terminus.dalaran.model.config.ServiceInfo;
 
+import java.util.Collection;
+
 public interface DalaranServiceContext {
 
     DalaranService getService(String serviceType);
@@ -12,4 +14,5 @@ public interface DalaranServiceContext {
 
     ServiceOperation buildOperationConfig(String serviceType, Object serviceConfig, ServiceOperationConfig config);
 
+    Collection<ServiceInfo> getAllServiceInfo();
 }
