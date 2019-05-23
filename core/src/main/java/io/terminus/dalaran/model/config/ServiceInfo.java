@@ -9,6 +9,8 @@ public class ServiceInfo {
 
     private String type;
 
+    private DalaranConfigField[] configFields;
+
     @JSONField(serialize = false)
     @JsonIgnore
     private Class importConfigType;
