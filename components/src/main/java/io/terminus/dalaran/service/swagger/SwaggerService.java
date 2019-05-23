@@ -50,7 +50,7 @@ public class SwaggerService implements DalaranService<SwaggerImportConfig, Swagg
     @Override
     public void configure(ProcessorDefinition route, SwaggerOperationConfig operationConfig) {
         // TODO protocol
-        String uri = String.format(HTTP_URI, "HTTP", operationConfig.getUrl(), operationConfig.getPath());
+        String uri = String.format(HTTP_URI, "http", operationConfig.getUrl(), operationConfig.getPath());
         route.setHeader("CamelHttpMethod", Builder.constant(operationConfig.getMethod().name()));
         route.to(uri);
         // TODO Stream to string

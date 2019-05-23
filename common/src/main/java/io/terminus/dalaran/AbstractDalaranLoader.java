@@ -2,7 +2,6 @@ package io.terminus.dalaran;
 
 import com.alibaba.fastjson.JSON;
 import io.terminus.dalaran.config.AllModelConfig;
-import io.terminus.dalaran.config.ImmutableModelConfig;
 import io.terminus.dalaran.config.OutModelConfig;
 import io.terminus.dalaran.config.ServiceOperationConfig;
 import io.terminus.dalaran.entity.BasicFlowEntity;
@@ -10,6 +9,7 @@ import io.terminus.dalaran.entity.basic.*;
 import io.terminus.dalaran.entity.manage.ProcessorEntity;
 import io.terminus.dalaran.model.MessageModel;
 import io.terminus.dalaran.model.ProcessorModel;
+import io.terminus.dalaran.model.ServiceOperation;
 import io.terminus.dalaran.model.config.ComponentInfo;
 import io.terminus.dalaran.model.config.ConnectorInfo;
 import io.terminus.dalaran.model.config.ProcessorInfo;
@@ -102,13 +102,13 @@ public abstract class AbstractDalaranLoader<TriggerFlowEntity extends TriggerFlo
             processor.setId(processorEntity.getId());
             processor.setType(processorEntity.getType());
             Object config = buildConfig(processorInfo, processorEntity.getConfig());
-            if (processorInfo.isService() && config instanceof ServiceOperationConfig) {
+            if (config instanceof ServiceOperationConfig) {
                 ServiceOperationConfig serviceOperationConfig = (ServiceOperationConfig) config;
                 ServiceAbstractEntity serviceEntity = getServiceEntity(serviceOperationConfig.getServiceId());
-                ServiceInfo serviceInfo = dalaranContext.getDalaranServiceContext().getServiceInfo(processorEntity.getType());
+                ServiceInfo serviceInfo = dalaranContext.getDalaranServiceContext().getServiceInfo(serviceEntity.getType());
                 Object serviceConfig = buildConfig(serviceEntity.getServiceConfig(), serviceInfo.getServiceConfigType());
-                ImmutableModelConfig operationConfig = dalaranContext.getDalaranServiceContext()
-                        .buildOperationConfig(processorEntity.getType(), serviceConfig, serviceOperationConfig);
+                ServiceOperation operationConfig = dalaranContext.getDalaranServiceContext()
+                        .buildOperationConfig(serviceEntity.getType(), serviceConfig, serviceOperationConfig);
 
                 serviceOperationConfig.setServiceType(serviceEntity.getType());
                 serviceOperationConfig.setOperationConfig(operationConfig);
