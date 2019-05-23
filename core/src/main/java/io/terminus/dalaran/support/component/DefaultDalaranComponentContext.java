@@ -172,6 +172,8 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext, 
                 configField.setExample(configFieldInfo.example());
                 configField.setDefaultValue(configFieldInfo.defaultValue());
                 configField.setLabel(configFieldInfo.label());
+                configField.setRequired(configFieldInfo.required());
+                configField.setReadonly(configFieldInfo.readonly());
 
                 if (field.getType().isEnum()) {
                     val enumValueMap = new HashMap<String, String>();

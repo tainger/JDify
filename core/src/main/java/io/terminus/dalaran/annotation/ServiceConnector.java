@@ -1,6 +1,5 @@
 package io.terminus.dalaran.annotation;
 
-import io.terminus.dalaran.BodyType;
 import org.springframework.stereotype.Component;
 
 import java.lang.annotation.*;
@@ -10,15 +9,11 @@ import java.lang.annotation.*;
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE})
-public @interface Processor {
+public @interface ServiceConnector {
     String value();
 
-    boolean serializedBody();
+    Class importConfigType();
 
-    boolean service() default false;
-
-    BodyType[] allowBodyTypes() default {};
-
-    Class configType() default Object.class;
+    Class serviceConfigType();
 
 }

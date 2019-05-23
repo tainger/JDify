@@ -1,5 +1,6 @@
 package io.terminus.dalaran;
 
+import io.terminus.dalaran.entity.basic.ServiceAbstractEntity;
 import io.terminus.dalaran.entity.manage.ReleaseRecordEntity;
 import io.terminus.dalaran.entity.release.*;
 import io.terminus.dalaran.model.config.TriggerInfo;
@@ -31,6 +32,9 @@ public class ReleasedFlowLoader extends AbstractDalaranLoader<TriggerFlowRelease
 
     @Autowired
     private PropertyReleasedRepository propertyRepository;
+
+    @Autowired
+    private ServiceReleasedRepository serviceRepository;
 
     @Autowired
     private DalaranContext dalaranContext;
@@ -89,6 +93,11 @@ public class ReleasedFlowLoader extends AbstractDalaranLoader<TriggerFlowRelease
     @Override
     protected PropertyReleasedEntity[] getPropertyEntities() {
         return propertyRepository.findByVersion(version).toArray(new PropertyReleasedEntity[0]);
+    }
+
+    @Override
+    protected ServiceAbstractEntity getServiceEntity(Long serviceId) {
+        return serviceRepository.findByVersionAndOriginId(version, serviceId);
     }
 
 }

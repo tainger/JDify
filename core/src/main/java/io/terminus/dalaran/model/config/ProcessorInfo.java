@@ -28,6 +28,10 @@ public class ProcessorInfo implements ComponentInfo {
     @JsonIgnore
     private boolean serializedBody;
 
+    @JSONField(serialize = false)
+    @JsonIgnore
+    private boolean service;
+
     public boolean allowedBodyType(BodyType bodyType) {
         for (BodyType allowedBodyType : allowedBodyTypes) {
             if (allowedBodyType == bodyType) {

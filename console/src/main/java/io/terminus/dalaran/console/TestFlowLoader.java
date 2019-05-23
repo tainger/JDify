@@ -2,6 +2,7 @@ package io.terminus.dalaran.console;
 
 import io.terminus.dalaran.AbstractDalaranLoader;
 import io.terminus.dalaran.DalaranContext;
+import io.terminus.dalaran.entity.basic.ServiceAbstractEntity;
 import io.terminus.dalaran.entity.manage.*;
 import io.terminus.dalaran.model.flow.SubFlow;
 import io.terminus.dalaran.model.flow.TriggerFlow;
@@ -27,6 +28,9 @@ public class TestFlowLoader extends AbstractDalaranLoader<TriggerFlowEntity, Sub
 
     @Autowired
     private PropertyRepository propertyRepository;
+
+    @Autowired
+    private ServiceRepository serviceRepository;
 
     @Autowired
     private DalaranContext dalaranContext;
@@ -69,5 +73,10 @@ public class TestFlowLoader extends AbstractDalaranLoader<TriggerFlowEntity, Sub
     @Override
     protected PropertyEntity[] getPropertyEntities() {
         return propertyRepository.findAll().toArray(new PropertyEntity[0]);
+    }
+
+    @Override
+    protected ServiceAbstractEntity getServiceEntity(Long serviceId) {
+        return serviceRepository.findOne(serviceId);
     }
 }

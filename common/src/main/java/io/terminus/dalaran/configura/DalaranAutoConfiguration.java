@@ -1,13 +1,11 @@
 package io.terminus.dalaran.configura;
 
-import io.terminus.dalaran.DalaranComponentContext;
-import io.terminus.dalaran.DalaranContext;
-import io.terminus.dalaran.DalaranConverterContext;
-import io.terminus.dalaran.DalaranTraceLogger;
+import io.terminus.dalaran.*;
 import io.terminus.dalaran.support.component.DefaultDalaranComponentContext;
 import io.terminus.dalaran.support.convert.DefaultDalaranConverterContext;
 import io.terminus.dalaran.support.flow.DefaultDalaranCamelContext;
 import io.terminus.dalaran.support.flow.FlowBuilder;
+import io.terminus.dalaran.support.service.DefaultDalaranServiceContext;
 import io.terminus.dalaran.support.trace.TracingErrorHandlerFactory;
 import org.apache.camel.CamelContext;
 import org.apache.camel.impl.DefaultCamelContext;
@@ -30,10 +28,11 @@ public class DalaranAutoConfiguration {
     public DalaranContext dalaranContext(
             DalaranConverterContext converterContext,
             DalaranComponentContext componentContext,
+            DalaranServiceContext serviceContext,
             FlowBuilder flowBuilder,
             CamelContext camelContext
     ) {
-        return new DefaultDalaranCamelContext(flowBuilder, converterContext, componentContext, camelContext);
+        return new DefaultDalaranCamelContext(camelContext, converterContext, componentContext, serviceContext, flowBuilder);
     }
 
     @Bean
@@ -44,6 +43,11 @@ public class DalaranAutoConfiguration {
     @Bean
     public DalaranConverterContext dalaranConverterContext() {
         return new DefaultDalaranConverterContext();
+    }
+
+    @Bean
+    public DalaranServiceContext dalaranServiceContext() {
+        return new DefaultDalaranServiceContext();
     }
 
     @Bean
