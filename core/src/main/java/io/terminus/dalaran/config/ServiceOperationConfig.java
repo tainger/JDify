@@ -4,19 +4,25 @@ import com.alibaba.fastjson.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.terminus.dalaran.FieldInputType;
 import io.terminus.dalaran.annotation.ConfigFieldInfo;
-import io.terminus.dalaran.model.MessageModel;
 import lombok.Data;
 
 @Data
-public class ImmutableModelConfig {
+public class ServiceOperationConfig extends ImmutableModelConfig {
+
+    @ConfigFieldInfo(label = "服务", inputType = FieldInputType.Service)
+    private Long serviceId;
+
+    @ConfigFieldInfo(label = "操作", inputType = FieldInputType.ServiceOperation)
+    private String operation;
+
     @ConfigFieldInfo(inputType = FieldInputType.Hidden)
     @JSONField(serialize = false)
     @JsonIgnore
-    private transient MessageModel inModel;
-
+    private String serviceType;
 
     @ConfigFieldInfo(inputType = FieldInputType.Hidden)
     @JSONField(serialize = false)
     @JsonIgnore
-    private transient MessageModel outModel;
+    private ImmutableModelConfig operationConfig;
+
 }

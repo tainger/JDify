@@ -15,44 +15,67 @@ import io.terminus.dalaran.DalaranService;
 import io.terminus.dalaran.FieldType;
 import io.terminus.dalaran.annotation.ServiceConnector;
 import io.terminus.dalaran.component.common.HttpMethod;
-import io.terminus.dalaran.component.common.HttpProtocol;
-import io.terminus.dalaran.component.processor.http.HttpClientConnector;
-import io.terminus.dalaran.component.processor.swagger.SwaggerServiceClientConfig;
 import io.terminus.dalaran.model.MessageModel;
 import io.terminus.dalaran.model.ModelField;
 import io.terminus.dalaran.model.schema.JsonSchema;
+import org.apache.camel.builder.Builder;
+import org.apache.camel.model.ProcessorDefinition;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.net.URI;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @ServiceConnector(
         value = "swagger-connector",
         importConfigType = SwaggerImportConfig.class,
-        serviceConfigType = SwaggerServiceConfig.class,
-        operationConfigType = SwaggerOperationConfig.class,
-        providerConfigType = SwaggerServiceClientConfig.class
+        serviceConfigType = SwaggerServiceConfig.class
 )
-public class SwaggerService implements DalaranService<SwaggerImportConfig, SwaggerServiceConfig, SwaggerOperationConfig, SwaggerServiceClientConfig> {
+public class SwaggerService implements DalaranService<SwaggerImportConfig, SwaggerServiceConfig, SwaggerOperationConfig> {
+
+    private static final String HTTP_URI = "%s4://%s%s?bridgeEndpoint=true";
 
     private static final String SUCCESSFUL_RESPONSE_CODE = "200";
 
+    private static final String OPERATION_SPLIT = ":::";
+
     @Override
-    public SwaggerOperationConfig configure(SwaggerServiceConfig swaggerOperations, SwaggerServiceClientConfig swaggerServiceClientConfig) {
-        for (SwaggerOperationConfig operationConfig : swaggerOperations.getConfigs()) {
-            if (operationConfig.getMethod() == swaggerServiceClientConfig.getMethod() && StringUtils.equals(operationConfig.getPath(), swaggerServiceClientConfig.getPath())) {
-                return operationConfig;
-            }
+    public void configure(ProcessorDefinition route, SwaggerOperationConfig operationConfig) {
+        // TODO protocol
+        String uri = String.format(HTTP_URI, "HTTP", operationConfig.getUrl(), operationConfig.getPath());
+        route.setHeader("CamelHttpMethod", Builder.constant(operationConfig.getMethod().name()));
+        route.to(uri);
+        // TODO Stream to string
+        route.convertBodyTo(String.class);
+    }
+
+    @Override
+    public SwaggerOperationConfig getOperationConfig(SwaggerServiceConfig swaggerServiceConfig, @NotNull String operationKey) {
+        String[] operation = operationKey.split(OPERATION_SPLIT);
+        Optional<SwaggerOperationConfig> operationConfigOptional = swaggerServiceConfig.getConfigs().stream()
+                .filter(config -> StringUtils.equals(config.getPath(), operation[0]) && StringUtils.equals(config.getMethod().toString(), operation[1]))
+                .findFirst();
+        if (!operationConfigOptional.isPresent()) {
+            // TODO throw
+            return null;
         }
-        return null;
+        return operationConfigOptional.get();
+    }
+
+    @Override
+    public List<String> operations(SwaggerServiceConfig swaggerServiceConfig) {
+        return swaggerServiceConfig
+                .getConfigs()
+                .stream().map(config -> config.getPath() + OPERATION_SPLIT + config.getMethod())
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -65,17 +88,18 @@ public class SwaggerService implements DalaranService<SwaggerImportConfig, Swagg
             ObjectMapper objectMapper = Json.mapper();
 
             Swagger swagger = objectMapper.readValue(swaggerResponse.getEntity().getContent(), Swagger.class);
-            URI uri = URI.create(swagger.getHost());
-            HttpClientConnector connector = new HttpClientConnector();
-            connector.setHost(uri.getHost());
-            connector.setPort(uri.getPort());
-            connector.setProtocol(HttpProtocol.HTTP);
-            connector.setBasePath(swagger.getBasePath());
 
+            String baseUrl = swagger.getHost();
+            if (StringUtils.isNotEmpty(swagger.getBasePath())) {
+                baseUrl += swagger.getBasePath();
+            }
+
+            String finalBaseUrl = baseUrl;
             List<SwaggerOperationConfig> configs = swagger.getPaths().entrySet().stream().flatMap(path -> path.getValue().getOperationMap().entrySet().stream().map(method -> {
                 MessageModel inModel = buildInModel(method.getValue(), swagger.getDefinitions());
                 MessageModel outModel = buildOutModel(method.getValue(), swagger.getDefinitions());
                 SwaggerOperationConfig config = new SwaggerOperationConfig();
+                config.setUrl(finalBaseUrl);
                 config.setPath(path.getKey());
                 config.setMethod(HttpMethod.valueOf(method.getKey().name()));
                 config.setInModel(inModel);
@@ -85,18 +109,14 @@ public class SwaggerService implements DalaranService<SwaggerImportConfig, Swagg
 
 
             SwaggerServiceConfig swaggerOperations = new SwaggerServiceConfig();
+            swaggerOperations.setUrl(swagger.getHost());
+            swaggerOperations.setBasePath(swagger.getBasePath());
             swaggerOperations.setConfigs(configs);
-            return null;
+            return swaggerOperations;
         } catch (IOException e) {
             e.printStackTrace();
         }
         return null;
-    }
-
-    public static void main(String[] args) {
-        SwaggerImportConfig config = new SwaggerImportConfig();
-        config.setSwaggerUrl("https://dev-dalaran-api.app.terminus.io/v2/api-docs");
-        new SwaggerService().importConfig(config);
     }
 
     private MessageModel buildOutModel(Operation operation, Map<String, Model> definitions) {

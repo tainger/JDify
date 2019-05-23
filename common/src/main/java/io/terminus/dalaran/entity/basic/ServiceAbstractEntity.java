@@ -16,6 +16,9 @@ public abstract class ServiceAbstractEntity extends BasicEntity {
     @Column(nullable = false, length = 64)
     private String name;
 
+    @Column(nullable = false, length = 64)
+    private String type;
+
     @Column(nullable = false, columnDefinition = "TEXT")
     private String importConfig;
 

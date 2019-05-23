@@ -20,5 +20,9 @@ public class DalaranConfigField {
 
     private String label;
 
+    private boolean required;
+
+    private boolean readonly;
+
     Map<String, String> enumValues;
 }

@@ -16,7 +16,4 @@ public @interface ServiceConnector {
 
     Class serviceConfigType();
 
-    Class operationConfigType();
-    
-    Class providerConfigType();
 }
