@@ -99,6 +99,11 @@
             <scope>test</scope>
         </dependency>
 
+        <dependency>
+            <groupId>com.predic8</groupId>
+            <artifactId>soa-model-core</artifactId>
+            <version>1.6.0</version>
+        </dependency>
 
     </dependencies>
 
