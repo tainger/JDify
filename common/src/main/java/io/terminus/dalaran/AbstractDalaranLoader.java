@@ -3,14 +3,17 @@ package io.terminus.dalaran;
 import com.alibaba.fastjson.JSON;
 import io.terminus.dalaran.config.AllModelConfig;
 import io.terminus.dalaran.config.OutModelConfig;
+import io.terminus.dalaran.config.ServiceOperationConfig;
 import io.terminus.dalaran.entity.BasicFlowEntity;
 import io.terminus.dalaran.entity.basic.*;
 import io.terminus.dalaran.entity.manage.ProcessorEntity;
 import io.terminus.dalaran.model.MessageModel;
 import io.terminus.dalaran.model.ProcessorModel;
+import io.terminus.dalaran.model.ServiceOperation;
 import io.terminus.dalaran.model.config.ComponentInfo;
 import io.terminus.dalaran.model.config.ConnectorInfo;
 import io.terminus.dalaran.model.config.ProcessorInfo;
+import io.terminus.dalaran.model.config.ServiceInfo;
 import io.terminus.dalaran.model.flow.BasicFlow;
 import io.terminus.dalaran.model.flow.SubFlow;
 import io.terminus.dalaran.model.flow.TriggerFlow;
@@ -39,6 +42,8 @@ public abstract class AbstractDalaranLoader<TriggerFlowEntity extends TriggerFlo
     protected abstract ModelAbstractEntity getModelEntity(Long modelId);
 
     protected abstract PropertyAbstractEntity[] getPropertyEntities();
+
+    protected abstract ServiceAbstractEntity getServiceEntity(Long serviceId);
 
     @Override
     public TriggerFlow loadTriggerFlow(TriggerFlowEntity flowEntity) {
@@ -93,16 +98,29 @@ public abstract class AbstractDalaranLoader<TriggerFlowEntity extends TriggerFlo
         MessageModel lastOutModel = flow.getInModel();
         for (ProcessorEntity processorEntity : flowEntity.getPipeline()) {
             ProcessorInfo processorInfo = dalaranContext.getDalaranComponentContext().getProcessorInfo(processorEntity.getType());
-            Object config = buildConfig(processorInfo, processorEntity.getConfig());
-            if (config instanceof OutModelConfig) {
-                ((OutModelConfig) config).setInModel(lastOutModel);
-                lastOutModel = ((OutModelConfig) config).getOutModel();
-            }
             ProcessorModel processor = new ProcessorModel();
             processor.setId(processorEntity.getId());
             processor.setType(processorEntity.getType());
-            processor.setConfig(config);
+            Object config = buildConfig(processorInfo, processorEntity.getConfig());
+            if (config instanceof ServiceOperationConfig) {
+                ServiceOperationConfig serviceOperationConfig = (ServiceOperationConfig) config;
+                ServiceAbstractEntity serviceEntity = getServiceEntity(serviceOperationConfig.getServiceId());
+                ServiceInfo serviceInfo = dalaranContext.getDalaranServiceContext().getServiceInfo(serviceEntity.getType());
+                Object serviceConfig = buildConfig(serviceEntity.getServiceConfig(), serviceInfo.getServiceConfigType());
+                ServiceOperation operationConfig = dalaranContext.getDalaranServiceContext()
+                        .buildOperationConfig(serviceEntity.getType(), serviceConfig, serviceOperationConfig);
 
+                serviceOperationConfig.setServiceType(serviceEntity.getType());
+                serviceOperationConfig.setOperationConfig(operationConfig);
+                serviceOperationConfig.setInModel(operationConfig.getInModel());
+                serviceOperationConfig.setOutModel(operationConfig.getOutModel());
+            } else {
+                if (config instanceof OutModelConfig) {
+                    ((OutModelConfig) config).setInModel(lastOutModel);
+                    lastOutModel = ((OutModelConfig) config).getOutModel();
+                }
+            }
+            processor.setConfig(config);
             pipeline.add(processor);
         }
 

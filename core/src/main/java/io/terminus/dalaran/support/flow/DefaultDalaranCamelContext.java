@@ -3,6 +3,7 @@ package io.terminus.dalaran.support.flow;
 import io.terminus.dalaran.DalaranComponentContext;
 import io.terminus.dalaran.DalaranContext;
 import io.terminus.dalaran.DalaranConverterContext;
+import io.terminus.dalaran.DalaranServiceContext;
 import io.terminus.dalaran.model.flow.BasicFlow;
 import io.terminus.dalaran.model.flow.TriggerFlow;
 import org.apache.camel.CamelContext;
@@ -19,14 +20,21 @@ public class DefaultDalaranCamelContext implements DalaranContext {
     private final CamelContext camelContext;
     private final DalaranConverterContext converterContext;
     private final DalaranComponentContext componentContext;
+    private final DalaranServiceContext serviceContext;
 
 
-    public DefaultDalaranCamelContext(FlowBuilder flowBuilder, DalaranConverterContext converterContext,
-                                      DalaranComponentContext componentContext, CamelContext camelContext) {
+    public DefaultDalaranCamelContext(
+            CamelContext camelContext,
+            DalaranConverterContext converterContext,
+            DalaranComponentContext componentContext,
+            DalaranServiceContext serviceContext,
+            FlowBuilder flowBuilder
+    ) {
+        this.camelContext = camelContext;
         this.flowBuilder = flowBuilder;
+        this.serviceContext = serviceContext;
         this.converterContext = converterContext;
         this.componentContext = componentContext;
-        this.camelContext = camelContext;
         try {
             camelContext.setTracing(true);
             camelContext.start();
@@ -100,6 +108,11 @@ public class DefaultDalaranCamelContext implements DalaranContext {
     @Override
     public DalaranConverterContext getDalaranConverterContext() {
         return converterContext;
+    }
+
+    @Override
+    public DalaranServiceContext getDalaranServiceContext() {
+        return serviceContext;
     }
 
 }

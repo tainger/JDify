@@ -26,5 +26,7 @@ public interface DalaranContext {
     DalaranComponentContext getDalaranComponentContext();
 
     DalaranConverterContext getDalaranConverterContext();
+    
+    DalaranServiceContext getDalaranServiceContext();
 
 }

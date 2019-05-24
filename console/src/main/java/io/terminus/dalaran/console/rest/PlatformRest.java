@@ -8,6 +8,7 @@ import io.terminus.dalaran.console.model.dto.flow.TriggerFlowDTO;
 import io.terminus.dalaran.console.service.ReleaseService;
 import io.terminus.dalaran.model.config.ConnectorInfo;
 import io.terminus.dalaran.model.config.ProcessorInfo;
+import io.terminus.dalaran.model.config.ServiceInfo;
 import io.terminus.dalaran.model.config.TriggerInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -65,5 +66,11 @@ public class PlatformRest {
     @GetMapping(value = "/connector")
     private Collection<ConnectorInfo> listConnectorInfo() {
         return dalaranContext.getDalaranComponentContext().getAllConnectorInfo();
+    }
+
+    @ApiOperation(value = "获取服务配置结构")
+    @GetMapping(value = "/service")
+    private Collection<ServiceInfo> listServiceInfo() {
+        return dalaranContext.getDalaranServiceContext().getAllServiceInfo();
     }
 }
