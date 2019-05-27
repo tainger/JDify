@@ -23,5 +23,5 @@ public @interface ConfigFieldInfo {
 
     FieldInputType inputType() default FieldInputType.Auto;
 
-    Class connectorType() default Object.class;
+    Class connectorType() default Void.class;
 }

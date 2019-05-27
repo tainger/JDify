@@ -45,7 +45,7 @@ public class SwaggerService implements DalaranService<SwaggerImportConfig, Swagg
 
     private static final String SUCCESSFUL_RESPONSE_CODE = "200";
 
-    private static final String OPERATION_SPLIT = ":::";
+    private static final String OPERATION_SPLIT = "::";
 
     @Override
     public void configure(ProcessorDefinition route, SwaggerOperationConfig operationConfig) {
@@ -61,7 +61,7 @@ public class SwaggerService implements DalaranService<SwaggerImportConfig, Swagg
     public SwaggerOperationConfig getOperationConfig(SwaggerServiceConfig swaggerServiceConfig, @NotNull String operationKey) {
         String[] operation = operationKey.split(OPERATION_SPLIT);
         Optional<SwaggerOperationConfig> operationConfigOptional = swaggerServiceConfig.getConfigs().stream()
-                .filter(config -> StringUtils.equals(config.getPath(), operation[0]) && StringUtils.equals(config.getMethod().toString(), operation[1]))
+                .filter(config -> StringUtils.equals(config.getPath(), operation[1]) && StringUtils.equals(config.getMethod().toString(), operation[0]))
                 .findFirst();
         if (!operationConfigOptional.isPresent()) {
             // TODO throw
@@ -74,7 +74,7 @@ public class SwaggerService implements DalaranService<SwaggerImportConfig, Swagg
     public List<String> operations(SwaggerServiceConfig swaggerServiceConfig) {
         return swaggerServiceConfig
                 .getConfigs()
-                .stream().map(config -> config.getPath() + OPERATION_SPLIT + config.getMethod())
+                .stream().map(config -> config.getMethod() + OPERATION_SPLIT + config.getPath())
                 .collect(Collectors.toList());
     }
 

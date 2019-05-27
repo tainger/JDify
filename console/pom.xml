@@ -33,11 +33,6 @@
             <version>3.8</version>
         </dependency>
         <dependency>
-            <groupId>io.terminus</groupId>
-            <artifactId>dalaran-components</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-test</artifactId>
         </dependency>

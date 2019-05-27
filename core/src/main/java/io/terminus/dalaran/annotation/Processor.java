@@ -17,6 +17,6 @@ public @interface Processor {
 
     BodyType[] allowBodyTypes() default {};
 
-    Class configType() default Object.class;
+    Class configType() default Void.class;
 
 }

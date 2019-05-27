@@ -5,6 +5,8 @@ import io.terminus.dalaran.DalaranContext;
 import io.terminus.dalaran.DalaranConverterContext;
 import io.terminus.dalaran.DalaranServiceContext;
 import io.terminus.dalaran.model.flow.BasicFlow;
+import io.terminus.dalaran.model.flow.FlowFragment;
+import io.terminus.dalaran.model.flow.SubFlow;
 import io.terminus.dalaran.model.flow.TriggerFlow;
 import org.apache.camel.CamelContext;
 import org.apache.camel.impl.DefaultProducerTemplate;
@@ -44,16 +46,16 @@ public class DefaultDalaranCamelContext implements DalaranContext {
     }
 
     @Override
-    public void removeFlow(Long flowId) {
+    public void removeFlow(String flowId) {
         try {
-            camelContext.removeRoute(FLOW_CAMEL_URI_PREFIX + flowId);
+            camelContext.removeRoute(flowId);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     @Override
-    public void removeFlows(List<Long> flowIds) {
+    public void removeFlows(List<String> flowIds) {
         flowIds.forEach(this::removeFlow);
     }
 
@@ -81,7 +83,7 @@ public class DefaultDalaranCamelContext implements DalaranContext {
     @Override
     public void addTestFlow(BasicFlow flow) {
         try {
-            camelContext.removeRoute(TEST_FLOW_PREFIX + flow.getId());
+            camelContext.removeRoute(TEST_FLOW_PREFIX + flow.getRouteId());
             RouteDefinition route = flowBuilder.buildTestFLow(flow);
             camelContext.addRouteDefinition(route);
         } catch (Exception e) {
@@ -95,9 +97,42 @@ public class DefaultDalaranCamelContext implements DalaranContext {
     }
 
     @Override
+    public void addSubFlow(SubFlow flow) {
+
+        try {
+            camelContext.removeRoute(flow.getRouteId());
+            RouteDefinition route = flowBuilder.buildSubFLow(flow);
+            camelContext.addRouteDefinition(route);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void addSubFlows(List<SubFlow> flows) {
+        flows.forEach(this::addSubFlow);
+    }
+
+    @Override
+    public void addFragmentFlow(FlowFragment flow) {
+        try {
+            camelContext.removeRoute(flow.getRouteId());
+            RouteDefinition route = flowBuilder.buildFlowFragment(flow);
+            camelContext.addRouteDefinition(route);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void addFragmentFlows(List<FlowFragment> flows) {
+        flows.forEach(this::addFragmentFlow);
+    }
+
+    @Override
     public void testFlow(Long flowId, Object body, String recordId) {
         DefaultProducerTemplate template = (DefaultProducerTemplate) camelContext.createProducerTemplate();
-        template.sendBodyAndProperty(TEST_FLOW_CAMEL_URI_PREFIX + flowId, body, TEST_FLOW_RECORD_ID_HEADER, recordId);
+        template.sendBodyAndProperty(TEST_FLOW_DIRECT_PREFIX + FLOW_PREFIX + flowId, body, TEST_FLOW_RECORD_ID_HEADER, recordId);
     }
 
     @Override

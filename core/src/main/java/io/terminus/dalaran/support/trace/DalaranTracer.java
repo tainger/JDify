@@ -54,6 +54,10 @@ public class DalaranTracer {
         return new DalaranTracer(logger, TracingType.Convert, flowId, processorId);
     }
 
+    public static DalaranTracer buildSubFlowTracer(DalaranTraceLogger logger, Long flowId) {
+        return new DalaranTracer(logger, TracingType.SubFlow, flowId, null);
+    }
+
     public void before(RouteDefinition route, BodyType modelType) {
         route.process(this.buildBeforeProcessor(modelType));
     }

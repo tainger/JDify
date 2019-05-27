@@ -24,4 +24,6 @@ public abstract class BasicFlow {
 
     @NotNull
     private List<ProcessorModel> pipeline;
+
+    public abstract String getRouteId();
 }

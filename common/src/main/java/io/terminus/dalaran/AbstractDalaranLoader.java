@@ -1,6 +1,8 @@
 package io.terminus.dalaran;
 
 import com.alibaba.fastjson.JSON;
+import io.terminus.dalaran.component.processor.route.DalaranRoute;
+import io.terminus.dalaran.component.processor.route.DalaranRouterConfig;
 import io.terminus.dalaran.config.AllModelConfig;
 import io.terminus.dalaran.config.OutModelConfig;
 import io.terminus.dalaran.config.ServiceOperationConfig;
@@ -15,6 +17,7 @@ import io.terminus.dalaran.model.config.ConnectorInfo;
 import io.terminus.dalaran.model.config.ProcessorInfo;
 import io.terminus.dalaran.model.config.ServiceInfo;
 import io.terminus.dalaran.model.flow.BasicFlow;
+import io.terminus.dalaran.model.flow.FlowFragment;
 import io.terminus.dalaran.model.flow.SubFlow;
 import io.terminus.dalaran.model.flow.TriggerFlow;
 import lombok.extern.slf4j.Slf4j;
@@ -102,6 +105,8 @@ public abstract class AbstractDalaranLoader<TriggerFlowEntity extends TriggerFlo
             processor.setId(processorEntity.getId());
             processor.setType(processorEntity.getType());
             Object config = buildConfig(processorInfo, processorEntity.getConfig());
+
+            // TODO 这里太爆炸了, 需要抽出去, 各个分片也独立一下
             if (config instanceof ServiceOperationConfig) {
                 ServiceOperationConfig serviceOperationConfig = (ServiceOperationConfig) config;
                 ServiceAbstractEntity serviceEntity = getServiceEntity(serviceOperationConfig.getServiceId());
@@ -109,17 +114,29 @@ public abstract class AbstractDalaranLoader<TriggerFlowEntity extends TriggerFlo
                 Object serviceConfig = buildConfig(serviceEntity.getServiceConfig(), serviceInfo.getServiceConfigType());
                 ServiceOperation operationConfig = dalaranContext.getDalaranServiceContext()
                         .buildOperationConfig(serviceEntity.getType(), serviceConfig, serviceOperationConfig);
-
                 serviceOperationConfig.setServiceType(serviceEntity.getType());
                 serviceOperationConfig.setOperationConfig(operationConfig);
                 serviceOperationConfig.setInModel(operationConfig.getInModel());
                 serviceOperationConfig.setOutModel(operationConfig.getOutModel());
-            } else {
-                if (config instanceof OutModelConfig) {
-                    ((OutModelConfig) config).setInModel(lastOutModel);
-                    lastOutModel = ((OutModelConfig) config).getOutModel();
+            } else if (config instanceof DalaranRouterConfig) {
+                ((OutModelConfig) config).setInModel(lastOutModel);
+                val outModel = ((OutModelConfig) config).getOutModel();
+                List<DalaranRoute> routes = ((DalaranRouterConfig) config).getRoutes();
+                for (DalaranRoute route : routes) {
+                    FlowFragment fragment = new FlowFragment();
+                    fragment.setId(flowEntity.getId());
+                    fragment.setFragmentProcessorId(processor.getId());
+                    fragment.setPipeline(route.getPipeline());
+                    fragment.setInModel(lastOutModel);
+                    fragment.setOutModel(outModel);
                 }
+                lastOutModel = outModel;
+            } else if (config instanceof OutModelConfig) {
+                ((OutModelConfig) config).setInModel(lastOutModel);
+                lastOutModel = ((OutModelConfig) config).getOutModel();
             }
+
+
             processor.setConfig(config);
             pipeline.add(processor);
         }

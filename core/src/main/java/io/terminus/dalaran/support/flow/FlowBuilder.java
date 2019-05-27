@@ -6,6 +6,7 @@ import io.terminus.dalaran.model.MessageModel;
 import io.terminus.dalaran.model.ProcessorModel;
 import io.terminus.dalaran.model.config.ProcessorInfo;
 import io.terminus.dalaran.model.flow.BasicFlow;
+import io.terminus.dalaran.model.flow.FlowFragment;
 import io.terminus.dalaran.model.flow.SubFlow;
 import io.terminus.dalaran.model.flow.TriggerFlow;
 import io.terminus.dalaran.support.trace.DalaranTracer;
@@ -42,9 +43,8 @@ public class FlowBuilder {
     RouteDefinition buildTriggerFlow(TriggerFlow flow) {
         val triggerComponent = componentContext.getTrigger(flow.getTriggerType());
         val flowTracer = DalaranTracer.buildFlowTracer(traceLogger, flow.getId());
-        val route = new RouteDefinition();
-        route.setId(FLOW_PREFIX + flow.getId());
-        route.errorHandler(errorHandlerFactory);
+        val route = newRouteDefinition();
+        route.setId(flow.getRouteId());
         triggerComponent.buildFromRoute(route, flow.getTriggerConfig());
         flowTracer.before(route, flow.getInModel().getModelType());
 
@@ -57,15 +57,29 @@ public class FlowBuilder {
     }
 
     RouteDefinition buildSubFLow(SubFlow flow) {
-        return null;
+        val flowTracer = DalaranTracer.buildSubFlowTracer(traceLogger, flow.getId());
+        val route = newRouteDefinition();
+        route.setId(flow.getRouteId());
+        route.from(DIRECT_PREFIX + flow.getRouteId());
+        flowTracer.before(route, flow.getInModel().getModelType());
+        buildFlowRoute(route, flow);
+        flowTracer.after(route, flow.getOutModel().getModelType());
+        return route;
+    }
+
+    RouteDefinition buildFlowFragment(FlowFragment fragment) {
+        val route = newRouteDefinition();
+        route.setId(fragment.getRouteId());
+        route.from(DIRECT_PREFIX + fragment.getRouteId());
+        buildFlowRoute(route, fragment);
+        return route;
     }
 
     RouteDefinition buildTestFLow(BasicFlow flow) {
         val flowTracer = DalaranTracer.buildTestFlowTracer(traceLogger, flow.getId());
-        val route = new RouteDefinition();
-        route.setId(TEST_FLOW_PREFIX + flow.getId());
-        route.errorHandler(errorHandlerFactory);
-        route.from(TEST_FLOW_CAMEL_URI_PREFIX + flow.getId());
+        val route = newRouteDefinition();
+        route.setId(flow.getRouteId());
+        route.from(TEST_FLOW_DIRECT_PREFIX + flow.getRouteId());
 
         // TODO 测试的输入一定是序列化的, XML/Json 等都是直接扔进去, 如果入参是 Object, 前端引导输入 Json 做反序列化处理吧
         if (!flow.getInModel().getModelType().isSerialized()) {
@@ -115,8 +129,9 @@ public class FlowBuilder {
             }
             // TODO processor 的输入和输出一定是一种类型
             currentBodyIsSerialized = processorInfo.isSerializedBody();
+            Object config = processor.getConfig();
 
-            processorComponent.configure(route, processor.getConfig());
+            processorComponent.configure(route, config);
 
             MessageModel outModel = getProcessorOutModel(processor);
 
@@ -146,5 +161,9 @@ public class FlowBuilder {
             return ((OutModelConfig) processor.getConfig()).getOutModel();
         }
         return null;
+    }
+
+    private RouteDefinition newRouteDefinition() {
+        return new RouteDefinition().errorHandler(errorHandlerFactory);
     }
 }
