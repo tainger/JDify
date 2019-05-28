@@ -1,7 +1,6 @@
 package io.terminus.dalaran.support.component;
 
 import io.terminus.dalaran.*;
-import io.terminus.dalaran.annotation.ConfigFieldInfo;
 import io.terminus.dalaran.annotation.Processor;
 import io.terminus.dalaran.annotation.Trigger;
 import io.terminus.dalaran.model.config.ConnectorInfo;
@@ -9,16 +8,17 @@ import io.terminus.dalaran.model.config.DalaranConfigField;
 import io.terminus.dalaran.model.config.ProcessorInfo;
 import io.terminus.dalaran.model.config.TriggerInfo;
 import io.terminus.dalaran.util.ConfigFieldUtils;
-import lombok.val;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
 import javax.annotation.PostConstruct;
-import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class DefaultDalaranComponentContext implements DalaranComponentContext, ApplicationContextAware {

@@ -4,6 +4,8 @@ import lombok.Data;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import static io.terminus.dalaran.DalaranConstants.FLOW_PREFIX;
+
 @Data
 public class TriggerFlow extends BasicFlow {
 
@@ -12,4 +14,9 @@ public class TriggerFlow extends BasicFlow {
 
     @Nullable
     private Object triggerConfig;
+
+    @Override
+    public String getRouteId() {
+        return FLOW_PREFIX + this.getId();
+    }
 }

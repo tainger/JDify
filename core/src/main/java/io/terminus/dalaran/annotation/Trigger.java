@@ -19,6 +19,6 @@ public @interface Trigger {
 
     boolean isVoid() default false;
 
-    Class configType() default Object.class;
+    Class configType() default Void.class;
 
 }

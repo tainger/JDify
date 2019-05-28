@@ -1,6 +1,7 @@
 package io.terminus.dalaran;
 
 import com.alibaba.fastjson.JSON;
+import io.terminus.dalaran.component.processor.route.DalaranRouterConfig;
 import io.terminus.dalaran.config.AllModelConfig;
 import io.terminus.dalaran.config.OutModelConfig;
 import io.terminus.dalaran.config.ServiceOperationConfig;
@@ -15,6 +16,7 @@ import io.terminus.dalaran.model.config.ConnectorInfo;
 import io.terminus.dalaran.model.config.ProcessorInfo;
 import io.terminus.dalaran.model.config.ServiceInfo;
 import io.terminus.dalaran.model.flow.BasicFlow;
+import io.terminus.dalaran.model.flow.FlowFragment;
 import io.terminus.dalaran.model.flow.SubFlow;
 import io.terminus.dalaran.model.flow.TriggerFlow;
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +28,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static io.terminus.dalaran.DalaranConstants.DELIMITER;
+import static io.terminus.dalaran.DalaranConstants.DIRECT_PREFIX;
 
 // TODO 这里整体还是有点乱
 @Slf4j
@@ -97,35 +102,67 @@ public abstract class AbstractDalaranLoader<TriggerFlowEntity extends TriggerFlo
         List<ProcessorModel> pipeline = new ArrayList<>();
         MessageModel lastOutModel = flow.getInModel();
         for (ProcessorEntity processorEntity : flowEntity.getPipeline()) {
-            ProcessorInfo processorInfo = dalaranContext.getDalaranComponentContext().getProcessorInfo(processorEntity.getType());
             ProcessorModel processor = new ProcessorModel();
             processor.setId(processorEntity.getId());
             processor.setType(processorEntity.getType());
-            Object config = buildConfig(processorInfo, processorEntity.getConfig());
-            if (config instanceof ServiceOperationConfig) {
-                ServiceOperationConfig serviceOperationConfig = (ServiceOperationConfig) config;
-                ServiceAbstractEntity serviceEntity = getServiceEntity(serviceOperationConfig.getServiceId());
-                ServiceInfo serviceInfo = dalaranContext.getDalaranServiceContext().getServiceInfo(serviceEntity.getType());
-                Object serviceConfig = buildConfig(serviceEntity.getServiceConfig(), serviceInfo.getServiceConfigType());
-                ServiceOperation operationConfig = dalaranContext.getDalaranServiceContext()
-                        .buildOperationConfig(serviceEntity.getType(), serviceConfig, serviceOperationConfig);
-
-                serviceOperationConfig.setServiceType(serviceEntity.getType());
-                serviceOperationConfig.setOperationConfig(operationConfig);
-                serviceOperationConfig.setInModel(operationConfig.getInModel());
-                serviceOperationConfig.setOutModel(operationConfig.getOutModel());
-            } else {
-                if (config instanceof OutModelConfig) {
-                    ((OutModelConfig) config).setInModel(lastOutModel);
-                    lastOutModel = ((OutModelConfig) config).getOutModel();
-                }
-            }
-            processor.setConfig(config);
             pipeline.add(processor);
+
+            lastOutModel = buildProcessorModel(processor, processorEntity.getConfig(), lastOutModel, flowEntity.getId());
         }
 
         // TODO for test...
         flow.setPipeline(pipeline);
+    }
+
+    private MessageModel buildProcessorModel(ProcessorModel processor, String processorConfigJson, MessageModel lastOutModel, Long flowId) {
+        ProcessorInfo processorInfo = dalaranContext.getDalaranComponentContext().getProcessorInfo(processor.getType());
+        Object config = buildConfig(processorInfo, processorConfigJson);
+        if (config == null) {
+            return lastOutModel;
+        }
+        // TODO 这里太爆炸了, 需要抽出去, 各个分片也独立一下
+        if (config instanceof ServiceOperationConfig) {
+            ServiceOperationConfig serviceOperationConfig = (ServiceOperationConfig) config;
+            ServiceAbstractEntity serviceEntity = getServiceEntity(serviceOperationConfig.getServiceId());
+            ServiceInfo serviceInfo = dalaranContext.getDalaranServiceContext().getServiceInfo(serviceEntity.getType());
+            Object serviceConfig = buildConfig(serviceEntity.getServiceConfig(), serviceInfo.getServiceConfigType());
+            ServiceOperation operationConfig = dalaranContext.getDalaranServiceContext()
+                    .buildOperationConfig(serviceEntity.getType(), serviceConfig, serviceOperationConfig);
+            serviceOperationConfig.setServiceType(serviceEntity.getType());
+            serviceOperationConfig.setOperationConfig(operationConfig);
+            serviceOperationConfig.setInModel(operationConfig.getInModel());
+            serviceOperationConfig.setOutModel(operationConfig.getOutModel());
+        } else if (config instanceof DalaranRouterConfig) {
+            DalaranRouterConfig routerConfig = (DalaranRouterConfig) config;
+            routerConfig.setInModel(lastOutModel);
+            val outModel = routerConfig.getOutModel();
+            List<DalaranRouterConfig.Route> routes = routerConfig.getRoutes();
+            for (int i = 0; i < routes.size(); i++) {
+                val route = routes.get(i);
+                String fragmentId = processor.getId() + DELIMITER + i;
+                FlowFragment fragment = new FlowFragment();
+
+                MessageModel fragmentLastOutModel = lastOutModel;
+                route.getPipeline().forEach(node -> buildProcessorModel(node, (String) node.getConfig(), fragmentLastOutModel, flowId));
+
+                fragment.setId(flowId);
+                fragment.setFragmentId(fragmentId);
+                fragment.setPipeline(route.getPipeline());
+                fragment.setInModel(lastOutModel);
+                fragment.setOutModel(outModel);
+
+                route.setFragmentUri(DIRECT_PREFIX + fragment.getRouteId());
+
+                dalaranContext.addFragmentFlow(fragment);
+            }
+            lastOutModel = outModel;
+        } else if (config instanceof OutModelConfig) {
+            ((OutModelConfig) config).setInModel(lastOutModel);
+            lastOutModel = ((OutModelConfig) config).getOutModel();
+        }
+        processor.setConfig(config);
+
+        return lastOutModel;
     }
 
     private void injectOutModel(OutModelConfig modelableConfig) {

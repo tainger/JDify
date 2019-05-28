@@ -85,6 +85,12 @@
             <scope>compile</scope>
         </dependency>
 
+        <!-- route processor-->
+        <dependency>
+            <groupId>org.apache.camel</groupId>
+            <artifactId>camel-mvel</artifactId>
+            <version>${camel.version}</version>
+        </dependency>
 
         <!-- test -->
         <dependency>

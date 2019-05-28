@@ -17,4 +17,6 @@ public class ModuleDetailDTO extends ModuleDTO {
 
     private List<BasicConnectorInfo> connectors;
 
+    private List<BasicServiceInfo> services;
+
 }
