@@ -1,6 +1,5 @@
 package io.terminus.dalaran.console.service;
 
-import io.terminus.dalaran.console.model.dto.BasicModelInfo;
 import io.terminus.dalaran.console.model.dto.BasicServiceInfo;
 import io.terminus.dalaran.console.model.dto.ServiceDTO;
 

@@ -1,7 +1,6 @@
 package io.terminus.dalaran.console.model.dto;
 
 import lombok.Data;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
 

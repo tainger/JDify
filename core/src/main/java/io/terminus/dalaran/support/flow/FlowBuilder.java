@@ -12,15 +12,14 @@ import io.terminus.dalaran.model.flow.TriggerFlow;
 import io.terminus.dalaran.support.trace.DalaranTracer;
 import io.terminus.dalaran.support.trace.TracingErrorHandlerFactory;
 import lombok.val;
-import org.apache.camel.Exchange;
-import org.apache.camel.Processor;
 import org.apache.camel.model.RouteDefinition;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.List;
 
-import static io.terminus.dalaran.DalaranConstants.*;
+import static io.terminus.dalaran.DalaranConstants.DIRECT_PREFIX;
+import static io.terminus.dalaran.DalaranConstants.TEST_FLOW_DIRECT_PREFIX;
 
 public class FlowBuilder {
 
