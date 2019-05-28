@@ -8,10 +8,10 @@ import static io.terminus.dalaran.DalaranConstants.FLOW_FRAGMENT_PREFIX;
 @Data
 public class FlowFragment extends BasicFlow {
 
-    private String fragmentProcessorId;
+    private String fragmentId;
 
     @Override
     public String getRouteId() {
-        return FLOW_FRAGMENT_PREFIX + this.getId() + DELIMITER + fragmentProcessorId;
+        return FLOW_FRAGMENT_PREFIX + this.getId() + DELIMITER + fragmentId;
     }
 }

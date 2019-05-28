@@ -12,6 +12,9 @@ import org.apache.camel.CamelContext;
 import org.apache.camel.impl.DefaultProducerTemplate;
 import org.apache.camel.model.RouteDefinition;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.io.StringBufferInputStream;
 import java.util.List;
 
 import static io.terminus.dalaran.DalaranConstants.*;
@@ -130,7 +133,7 @@ public class DefaultDalaranCamelContext implements DalaranContext {
     }
 
     @Override
-    public void testFlow(Long flowId, Object body, String recordId) {
+    public void testFlow(Long flowId, String body, String recordId) {
         DefaultProducerTemplate template = (DefaultProducerTemplate) camelContext.createProducerTemplate();
         template.sendBodyAndProperty(TEST_FLOW_DIRECT_PREFIX + FLOW_PREFIX + flowId, body, TEST_FLOW_RECORD_ID_HEADER, recordId);
     }

@@ -12,11 +12,13 @@ public class DalaranRouter implements DalaranProcessor<DalaranRouterConfig> {
 
     public void configure(ProcessorDefinition route, DalaranRouterConfig config) {
         ChoiceDefinition choiceDefinition = route.choice();
-        for (DalaranRoute configRoute : config.getRoutes()) {
-            choiceDefinition.when().el(configRoute.getExpression()).to(configRoute.getDisplayName()).stop();
+        for (DalaranRouterConfig.Route configRoute : config.getRoutes()) {
             if (OTHERWISE_EXPRESSION.equals(configRoute.getExpression())) {
-                choiceDefinition.otherwise().to(configRoute.getDisplayName());
+                choiceDefinition.otherwise();
+            } else {
+                choiceDefinition.when().mvel(configRoute.getExpression());
             }
+            choiceDefinition.to(configRoute.getFragmentUri());
         }
         choiceDefinition.end();
     }

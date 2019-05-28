@@ -31,7 +31,7 @@ public interface DalaranContext {
 
     void addFragmentFlows(List<FlowFragment> flows);
 
-    void testFlow(Long flowId, Object body, String recordId);
+    void testFlow(Long flowId, String body, String recordId);
 
     DalaranComponentContext getDalaranComponentContext();
 
