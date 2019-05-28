@@ -36,7 +36,7 @@ import static io.terminus.dalaran.DalaranConstants.DIRECT_PREFIX;
 // TODO 这里整体还是有点乱
 @Slf4j
 public abstract class AbstractDalaranLoader<TriggerFlowEntity extends TriggerFlowAbstractEntity, SubFlowEntity extends SubFlowAbstractEntity>
-        implements DalaranLoader<TriggerFlowEntity, SubFlowEntity> {
+        implements DalaranEntityLoader<TriggerFlowEntity, SubFlowEntity> {
 
     @Autowired
     private DalaranContext dalaranContext;
