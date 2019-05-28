@@ -11,7 +11,7 @@ import java.util.List;
 @Data
 public class DalaranRouterConfig extends OutModelConfig {
 
-    @ConfigFieldInfo(inputType = FieldInputType.Routes)
+    @ConfigFieldInfo(label = "路由列表", inputType = FieldInputType.Routes)
     private List<Route> routes;
 
     @Data
