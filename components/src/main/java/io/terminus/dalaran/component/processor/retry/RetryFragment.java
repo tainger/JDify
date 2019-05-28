@@ -5,10 +5,11 @@ import io.terminus.dalaran.DalaranProcessor;
 import io.terminus.dalaran.annotation.Processor;
 import org.apache.camel.model.ProcessorDefinition;
 
-@Processor(value = "retry", serializeType = BodySerializeType.All, configType = RetryConfig.class)
-public class Retry implements DalaranProcessor<RetryConfig> {
+// TODO 不对外暴露
+@Processor(value = "retry-fragment", serializeType = BodySerializeType.All, configType = RetryConfig.class)
+public class RetryFragment implements DalaranProcessor<RetryConfig> {
     @Override
     public void configure(ProcessorDefinition route, RetryConfig config) {
-        route.to(config.getFragmentUri());
+        route.onException(Throwable.class).maximumRedeliveries(config.getMaxRetry()).redeliveryDelay(config.getRetryDelay());
     }
 }

@@ -5,7 +5,7 @@ import io.terminus.dalaran.annotation.Processor;
 import org.apache.camel.model.ChoiceDefinition;
 import org.apache.camel.model.ProcessorDefinition;
 
-@Processor(value = "router", serializedBody = false, configType = DalaranRouterConfig.class)
+@Processor(value = "router", configType = DalaranRouterConfig.class)
 public class DalaranRouter implements DalaranProcessor<DalaranRouterConfig> {
 
     private static final String OTHERWISE_EXPRESSION = "otherwise";

@@ -5,7 +5,7 @@ import io.terminus.dalaran.annotation.Processor;
 import jdk.nashorn.api.scripting.ScriptObjectMirror;
 import org.apache.camel.model.ProcessorDefinition;
 
-@Processor(value = "script", serializedBody = false, configType = DalaranScriptConfig.class)
+@Processor(value = "script", configType = DalaranScriptConfig.class)
 public class DalaranScript implements DalaranProcessor<DalaranScriptConfig> {
 
     @Override

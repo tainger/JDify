@@ -9,7 +9,7 @@ import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 
 import javax.sql.DataSource;
 
-@Processor(value = "sql", configType = SqlConfig.class, serializedBody = false)
+@Processor(value = "sql", configType = SqlConfig.class)
 public class SqlProcessor implements DalaranProcessor<SqlConfig>, BeanFactoryPostProcessor {
 
     private ConfigurableListableBeanFactory beanFactory;

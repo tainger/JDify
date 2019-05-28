@@ -123,21 +123,22 @@ public class FlowBuilder {
             if (processorComponent instanceof CustomConvert) {
                 needConvert = ((CustomConvert) processorComponent).customConvert(route, processor.getConfig(), currentBodyIsSerialized);
             }
-            if (needConvert && processorInfo.isSerializedBody() != currentBodyIsSerialized) {
+            if (needConvert && processorInfo.getSerializeType() != BodySerializeType.All) {
                 // TODO convert tracing, 暂时没必要, 先注掉吧, 影响性能
+                // TODO processor 的输入和输出一定是一种类型
 //                DalaranTracer convertTracer = DalaranTracer.buildConvertTracer(traceLogger, flow.getId(), processor.getId());
-                if (processorInfo.isSerializedBody()) {
+                if (processorInfo.getSerializeType() == BodySerializeType.Serialized && !currentBodyIsSerialized) {
 //                    convertTracer.before(route, BodyType.OBJECT);
                     converterContext.fromObject(route, currentModel);
+                    currentBodyIsSerialized = true;
 //                    convertTracer.after(route, currentModel.getModelType());
-                } else {
+                } else if (processorInfo.getSerializeType() == BodySerializeType.Object && currentBodyIsSerialized) {
 //                    convertTracer.before(route, currentModel.getModelType());
                     converterContext.toObject(route, currentModel);
+                    currentBodyIsSerialized = false;
 //                    convertTracer.after(route, BodyType.OBJECT);
                 }
             }
-            // TODO processor 的输入和输出一定是一种类型
-            currentBodyIsSerialized = processorInfo.isSerializedBody();
             Object config = processor.getConfig();
 
             processorComponent.configure(route, config);

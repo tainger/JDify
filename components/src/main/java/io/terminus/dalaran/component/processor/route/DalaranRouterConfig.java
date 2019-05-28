@@ -1,5 +1,7 @@
 package io.terminus.dalaran.component.processor.route;
 
+import com.alibaba.fastjson.annotation.JSONField;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.terminus.dalaran.FieldInputType;
 import io.terminus.dalaran.annotation.ConfigFieldInfo;
 import io.terminus.dalaran.config.OutModelConfig;
@@ -16,12 +18,13 @@ public class DalaranRouterConfig extends OutModelConfig {
 
     @Data
     public class Route {
+        @JSONField(serialize = false)
+        @JsonIgnore
+        private String fragmentUri;
 
         private String displayName;
 
         private String expression;
-
-        private String fragmentUri;
 
         private List<ProcessorModel> pipeline;
     }

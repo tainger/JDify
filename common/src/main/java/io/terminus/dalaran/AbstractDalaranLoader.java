@@ -1,6 +1,7 @@
 package io.terminus.dalaran;
 
 import com.alibaba.fastjson.JSON;
+import io.terminus.dalaran.component.processor.retry.RetryConfig;
 import io.terminus.dalaran.component.processor.route.DalaranRouterConfig;
 import io.terminus.dalaran.config.AllModelConfig;
 import io.terminus.dalaran.config.OutModelConfig;
@@ -114,15 +115,11 @@ public abstract class AbstractDalaranLoader<TriggerFlowEntity extends TriggerFlo
         flow.setPipeline(pipeline);
     }
 
-    private MessageModel buildProcessorModel(ProcessorModel processor, String processorConfigJson, MessageModel lastOutModel, Long flowId) {
-        ProcessorInfo processorInfo = dalaranContext.getDalaranComponentContext().getProcessorInfo(processor.getType());
-        Object config = buildConfig(processorInfo, processorConfigJson);
-        if (config == null) {
-            return lastOutModel;
-        }
+    private MessageModel buildProcessorModel(ProcessorModel processor, Object processorConfig, MessageModel lastOutModel, Long flowId) {
         // TODO 这里太爆炸了, 需要抽出去, 各个分片也独立一下
-        if (config instanceof ServiceOperationConfig) {
-            ServiceOperationConfig serviceOperationConfig = (ServiceOperationConfig) config;
+        // TODO 这里真的是太丑了, 最好能揉到 processor 内, 搞一个独立的 interface, 允许自行处理 config 的转化, 难处理的是对 db 的读操作
+        if (processorConfig instanceof ServiceOperationConfig) {
+            ServiceOperationConfig serviceOperationConfig = (ServiceOperationConfig) processorConfig;
             ServiceAbstractEntity serviceEntity = getServiceEntity(serviceOperationConfig.getServiceId());
             ServiceInfo serviceInfo = dalaranContext.getDalaranServiceContext().getServiceInfo(serviceEntity.getType());
             Object serviceConfig = buildConfig(serviceEntity.getServiceConfig(), serviceInfo.getServiceConfigType());
@@ -132,8 +129,8 @@ public abstract class AbstractDalaranLoader<TriggerFlowEntity extends TriggerFlo
             serviceOperationConfig.setOperationConfig(operationConfig);
             serviceOperationConfig.setInModel(operationConfig.getInModel());
             serviceOperationConfig.setOutModel(operationConfig.getOutModel());
-        } else if (config instanceof DalaranRouterConfig) {
-            DalaranRouterConfig routerConfig = (DalaranRouterConfig) config;
+        } else if (processorConfig instanceof DalaranRouterConfig) {
+            DalaranRouterConfig routerConfig = (DalaranRouterConfig) processorConfig;
             routerConfig.setInModel(lastOutModel);
             val outModel = routerConfig.getOutModel();
             List<DalaranRouterConfig.Route> routes = routerConfig.getRoutes();
@@ -143,7 +140,9 @@ public abstract class AbstractDalaranLoader<TriggerFlowEntity extends TriggerFlo
                 FlowFragment fragment = new FlowFragment();
 
                 MessageModel fragmentLastOutModel = lastOutModel;
-                route.getPipeline().forEach(node -> buildProcessorModel(node, (String) node.getConfig(), fragmentLastOutModel, flowId));
+                for (ProcessorModel processorModel : route.getPipeline()) {
+                    fragmentLastOutModel = buildProcessorModel(processorModel, (String) processorModel.getConfig(), fragmentLastOutModel, flowId);
+                }
 
                 fragment.setId(flowId);
                 fragment.setFragmentId(fragmentId);
@@ -156,13 +155,48 @@ public abstract class AbstractDalaranLoader<TriggerFlowEntity extends TriggerFlo
                 dalaranContext.addFragmentFlow(fragment);
             }
             lastOutModel = outModel;
-        } else if (config instanceof OutModelConfig) {
-            ((OutModelConfig) config).setInModel(lastOutModel);
-            lastOutModel = ((OutModelConfig) config).getOutModel();
+        } else if (processorConfig instanceof RetryConfig) {
+            RetryConfig retryConfig = ((RetryConfig) processorConfig);
+            FlowFragment fragment = new FlowFragment();
+
+            MessageModel fragmentLastOutModel = lastOutModel;
+
+            List<ProcessorModel> pipeline = retryConfig.getPipeline();
+            for (ProcessorModel processorModel : pipeline) {
+                fragmentLastOutModel = buildProcessorModel(processorModel, (String) processorModel.getConfig(), fragmentLastOutModel, flowId);
+            }
+
+            ProcessorModel<RetryConfig> retryFragmentProcessorModel = new ProcessorModel<>();
+            retryFragmentProcessorModel.setId(processor.getId());
+            retryFragmentProcessorModel.setType("retry-fragment");
+            retryFragmentProcessorModel.setConfig(retryConfig);
+            pipeline.add(retryFragmentProcessorModel);
+
+            fragment.setId(flowId);
+            fragment.setFragmentId(processor.getId());
+            fragment.setPipeline(pipeline);
+            fragment.setInModel(lastOutModel);
+            fragment.setOutModel(fragmentLastOutModel);
+
+            retryConfig.setFragmentUri(DIRECT_PREFIX + fragment.getRouteId());
+
+            dalaranContext.addFragmentFlow(fragment);
+        } else if (processorConfig instanceof OutModelConfig) {
+            ((OutModelConfig) processorConfig).setInModel(lastOutModel);
+            lastOutModel = ((OutModelConfig) processorConfig).getOutModel();
         }
-        processor.setConfig(config);
+        processor.setConfig(processorConfig);
 
         return lastOutModel;
+    }
+
+    private MessageModel buildProcessorModel(ProcessorModel processor, String processorConfigJson, MessageModel lastOutModel, Long flowId) {
+        ProcessorInfo processorInfo = dalaranContext.getDalaranComponentContext().getProcessorInfo(processor.getType());
+        Object config = buildConfig(processorInfo, processorConfigJson);
+        if (config == null) {
+            return lastOutModel;
+        }
+        return buildProcessorModel(processor, config, lastOutModel, flowId);
     }
 
     private void injectOutModel(OutModelConfig modelableConfig) {

@@ -3,42 +3,62 @@ package io.terminus.dalaran.support.trace;
 import io.terminus.dalaran.BodyType;
 import io.terminus.dalaran.DalaranTraceLogger;
 import io.terminus.dalaran.model.DalaranTracingLog;
-import org.apache.camel.ErrorHandlerFactory;
-import org.apache.camel.Exchange;
-import org.apache.camel.Processor;
-import org.apache.camel.Traceable;
-import org.apache.camel.processor.ErrorHandler;
+import org.apache.camel.*;
+import org.apache.camel.builder.DefaultErrorHandlerBuilder;
+import org.apache.camel.processor.DefaultErrorHandler;
+import org.apache.camel.processor.RedeliveryPolicy;
+import org.apache.camel.processor.exceptionpolicy.ExceptionPolicyStrategy;
 import org.apache.camel.spi.RouteContext;
+import org.apache.camel.util.CamelLogger;
+
+import java.util.concurrent.ScheduledExecutorService;
 
 import static io.terminus.dalaran.DalaranConstants.*;
 
-public class TracingErrorHandlerFactory implements ErrorHandlerFactory {
+public class TracingErrorHandlerFactory extends DefaultErrorHandlerBuilder implements ErrorHandlerFactory {
 
-    private final DalaranTraceLogger logger;
+    private final DalaranTraceLogger dalaranTraceLogger;
 
-    public TracingErrorHandlerFactory(DalaranTraceLogger logger) {
-        this.logger = logger;
+    public TracingErrorHandlerFactory(DalaranTraceLogger dalaranTraceLogger) {
+        this.dalaranTraceLogger = dalaranTraceLogger;
     }
 
     @Override
     public Processor createErrorHandler(RouteContext routeContext, Processor processor) throws Exception {
-        return new DalaranErrorHandler(processor);
+        DefaultErrorHandler answer = new DalaranErrorHandler(routeContext.getCamelContext(), processor, getLogger(), getOnRedelivery(),
+                getRedeliveryPolicy(), getExceptionPolicyStrategy(), getRetryWhilePolicy(routeContext.getCamelContext()),
+                getExecutorService(routeContext.getCamelContext()), getOnPrepareFailure(), getOnExceptionOccurred());
+        // configure error handler before we can use it
+        configure(routeContext, answer);
+        return answer;
     }
 
-
     // TODO for test...
-    private class DalaranErrorHandler implements ErrorHandler, Traceable {
+    private class DalaranErrorHandler extends DefaultErrorHandler implements Traceable {
 
-        private Processor output;
-
-        DalaranErrorHandler(Processor output) {
-            this.output = output;
+        /**
+         * Creates the default error handler.
+         *
+         * @param camelContext                 the camel context
+         * @param output                       outer processor that should use this default error handler
+         * @param logger                       logger to use for logging failures and redelivery attempts
+         * @param redeliveryProcessor          an optional processor to run before redelivery attempt
+         * @param redeliveryPolicy             policy for redelivery
+         * @param exceptionPolicyStrategy      strategy for onException handling
+         * @param retryWhile                   retry while
+         * @param executorService              the {@link ScheduledExecutorService} to be used for redelivery thread pool. Can be <tt>null</tt>.
+         * @param onPrepareProcessor           a custom {@link Processor} to prepare the {@link Exchange} before
+         *                                     handled by the failure processor / dead letter channel.
+         * @param onExceptionOccurredProcessor a custom {@link Processor} to process the {@link Exchange} just after an exception was thrown.
+         */
+        public DalaranErrorHandler(CamelContext camelContext, Processor output, CamelLogger logger, Processor redeliveryProcessor, RedeliveryPolicy redeliveryPolicy, ExceptionPolicyStrategy exceptionPolicyStrategy, Predicate retryWhile, ScheduledExecutorService executorService, Processor onPrepareProcessor, Processor onExceptionOccurredProcessor) {
+            super(camelContext, output, logger, redeliveryProcessor, redeliveryPolicy, exceptionPolicyStrategy, retryWhile, executorService, onPrepareProcessor, onExceptionOccurredProcessor);
         }
 
         @Override
         public void process(Exchange exchange) throws Exception {
             // TODO 理论上可以在这里做 tracing, 这样就不需要包前后的 processor 了, 回头可以看一下可行性
-            output.process(exchange);
+            super.process(exchange);
             // TODO 当执行发成异常时, 记录未持久化的日志
             if (exchange.getException() != null) {
                 String body = exchange.getException().toString();
@@ -59,7 +79,7 @@ public class TracingErrorHandlerFactory implements ErrorHandlerFactory {
             tracingLog.setOutputBody(body);
             tracingLog.setElapsed(System.currentTimeMillis() - tracingLog.getTimestamp());
 //            tracingLog.setOutputHeaders(exchange.getIn().getHeaders());
-            logger.log(tracingLog);
+            dalaranTraceLogger.log(tracingLog);
         }
 
         @Override

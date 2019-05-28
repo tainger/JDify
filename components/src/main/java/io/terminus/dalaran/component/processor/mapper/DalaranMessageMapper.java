@@ -16,7 +16,7 @@ import java.util.*;
 /**
  * Created by jingdi on 2019/3/18
  */
-@Processor(value = "mapper-convert", serializedBody = false, configType = DalaranMapperConfig.class)
+@Processor(value = "mapper-convert", configType = DalaranMapperConfig.class)
 public class DalaranMessageMapper implements DalaranProcessor<DalaranMapperConfig> {
 
     @Override
@@ -134,7 +134,7 @@ public class DalaranMessageMapper implements DalaranProcessor<DalaranMapperConfi
                 int startIdx = 0;
                 int level = 0;
                 for (int i = 0; i < outSubFields.size(); i++) {
-                    List<String> outSubPath = outSubFields.subList(0, i+1);
+                    List<String> outSubPath = outSubFields.subList(0, i + 1);
                     if (arrayFieldMapping.containsKey(buildFieldPath(outSubPath))) {
                         level++;
                         continue;
@@ -155,7 +155,7 @@ public class DalaranMessageMapper implements DalaranProcessor<DalaranMapperConfi
                         }
 
                         for (int j = startIdx; j < inSubFields.size(); j++) {
-                            List<String> inSubPath = inSubFields.subList(0, j+1);
+                            List<String> inSubPath = inSubFields.subList(0, j + 1);
                             ModelField field = getField(inSubPath, inModel);
                             if (field != null && field.getType() == FieldType.ARRAY && field.getSubType() == FieldType.OBJECT) {
                                 if (subLevel == level) {
@@ -163,7 +163,7 @@ public class DalaranMessageMapper implements DalaranProcessor<DalaranMapperConfi
                                         if (flag.isValue() && level < 2) {
                                             arrayFieldMapping.put(buildFieldPath(outSubPath), buildFieldPath(inSubPath));
                                         } else {
-                                            arrayFieldMapping.put(buildFieldPath(outSubPath), inSubPath.get(inSubPath.size()-1));
+                                            arrayFieldMapping.put(buildFieldPath(outSubPath), inSubPath.get(inSubPath.size() - 1));
                                         }
                                     } else {
                                         arrayFieldMapping.put(buildFieldPath(outSubPath), buildFieldPath(inSubPath));
@@ -183,7 +183,7 @@ public class DalaranMessageMapper implements DalaranProcessor<DalaranMapperConfi
 
     private String buildFieldPath(List<String> subPaths) {
         StringBuilder fieldPath = new StringBuilder();
-        for (int i = 0; i< subPaths.size(); i++) {
+        for (int i = 0; i < subPaths.size(); i++) {
             fieldPath.append(subPaths.get(i));
             if (i < subPaths.size() - 1) {
                 fieldPath.append("/");

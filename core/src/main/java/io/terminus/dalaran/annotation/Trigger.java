@@ -1,5 +1,6 @@
 package io.terminus.dalaran.annotation;
 
+import io.terminus.dalaran.BodySerializeType;
 import io.terminus.dalaran.BodyType;
 import org.springframework.stereotype.Component;
 
@@ -13,7 +14,7 @@ import java.lang.annotation.*;
 public @interface Trigger {
     String value();
 
-    boolean serializedBody();
+    BodySerializeType serializeType() default BodySerializeType.Serialized;
 
     BodyType[] allowBodyTypes() default {};
 
