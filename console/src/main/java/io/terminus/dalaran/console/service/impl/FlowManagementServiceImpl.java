@@ -1,22 +1,22 @@
 package io.terminus.dalaran.console.service.impl;
 
 import com.alibaba.fastjson.JSON;
-import io.terminus.dalaran.DalaranContext;
-import io.terminus.dalaran.console.TestFlowLoader;
+import io.terminus.dalaran.console.TestFlowInitializer;
 import io.terminus.dalaran.console.convertor.FlowConvertor;
+import io.terminus.dalaran.console.entity.ModelEntity;
+import io.terminus.dalaran.console.entity.TriggerFlowEntity;
 import io.terminus.dalaran.console.model.dto.ModelDTO;
 import io.terminus.dalaran.console.model.dto.flow.BasicFlowInfo;
 import io.terminus.dalaran.console.model.dto.flow.TriggerFlowDTO;
 import io.terminus.dalaran.console.model.query.FlowQuery;
+import io.terminus.dalaran.console.repository.ModelRepository;
+import io.terminus.dalaran.console.repository.ModuleRepository;
+import io.terminus.dalaran.console.repository.PropertyRepository;
+import io.terminus.dalaran.console.repository.TriggerFlowRepository;
 import io.terminus.dalaran.console.service.FlowManagementService;
 import io.terminus.dalaran.console.service.jpa.FlowQueryService;
-import io.terminus.dalaran.entity.manage.ModelEntity;
-import io.terminus.dalaran.entity.manage.ProcessorEntity;
-import io.terminus.dalaran.entity.manage.TriggerFlowEntity;
-import io.terminus.dalaran.repository.ModelRepository;
-import io.terminus.dalaran.repository.ModuleRepository;
-import io.terminus.dalaran.repository.PropertyRepository;
-import io.terminus.dalaran.repository.TriggerFlowRepository;
+import io.terminus.dalaran.core.context.DalaranContext;
+import io.terminus.dalaran.core.resource.entity.common.ProcessorEntity;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.BeanUtils;
@@ -52,7 +52,7 @@ public class FlowManagementServiceImpl implements FlowManagementService {
     private ModelRepository modelRepository;
 
     @Autowired
-    private TestFlowLoader testFlowLoader;
+    private TestFlowInitializer testFlowInitializer;
 
     private final FlowConvertor flowConvertor = new FlowConvertor();
 
@@ -70,7 +70,7 @@ public class FlowManagementServiceImpl implements FlowManagementService {
     public Long saveFlow(TriggerFlowEntity flowEntity) {
         Long id = flowRepository.save(flowEntity).getId();
         // TODO 这里依赖 loader 有点怪 而且可以异步
-        testFlowLoader.loadTriggerFlow(flowEntity);
+        testFlowInitializer.reloadTestTriggerFlow(flowEntity.getId());
         return id;
     }
 
@@ -79,7 +79,7 @@ public class FlowManagementServiceImpl implements FlowManagementService {
         TriggerFlowEntity flowEntity = buildEntity(flowModel);
         Long id = flowRepository.save(flowEntity).getId();
         // TODO 这里依赖 loader 有点怪 而且可以异步
-        testFlowLoader.loadTriggerFlow(flowEntity);
+        testFlowInitializer.reloadTestTriggerFlow(flowEntity.getId());
         return id;
     }
 
@@ -93,7 +93,7 @@ public class FlowManagementServiceImpl implements FlowManagementService {
         TriggerFlowEntity flowEntity = buildEntity(flowModel);
         flowRepository.save(flowEntity);
         // TODO 这里依赖 loader 有点怪 而且可以异步
-        testFlowLoader.loadTriggerFlow(flowEntity);
+        testFlowInitializer.reloadTestTriggerFlow(flowEntity.getId());
         return flowModel;
     }
 

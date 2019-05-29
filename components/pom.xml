@@ -85,6 +85,20 @@
             <scope>compile</scope>
         </dependency>
 
+        <!-- mapper processor-->
+        <dependency>
+            <groupId>commons-jxpath</groupId>
+            <artifactId>commons-jxpath</artifactId>
+            <version>RELEASE</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.github.drapostolos</groupId>
+            <artifactId>type-parser</artifactId>
+            <version>RELEASE</version>
+            <scope>compile</scope>
+        </dependency>
+
         <!-- route processor-->
         <dependency>
             <groupId>org.apache.camel</groupId>

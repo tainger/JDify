@@ -1,10 +1,10 @@
 package io.terminus.dalaran.component.trigger.scheduler;
 
-import io.terminus.dalaran.BodySerializeType;
-import io.terminus.dalaran.BodyType;
-import io.terminus.dalaran.DalaranTrigger;
-import io.terminus.dalaran.annotation.Trigger;
-import io.terminus.dalaran.util.UriUtils;
+import io.terminus.dalaran.core.component.BodySerializeType;
+import io.terminus.dalaran.core.component.DalaranTrigger;
+import io.terminus.dalaran.core.component.annotation.Trigger;
+import io.terminus.dalaran.core.model.BodyType;
+import io.terminus.dalaran.core.util.UriUtils;
 import org.apache.camel.model.RouteDefinition;
 
 import java.util.HashMap;

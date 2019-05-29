@@ -3,8 +3,8 @@ package io.terminus.dalaran.console.convertor;
 import com.alibaba.fastjson.JSON;
 import io.terminus.dalaran.console.model.dto.ProcessorDTO;
 import io.terminus.dalaran.console.model.dto.flow.TriggerFlowDTO;
-import io.terminus.dalaran.entity.basic.TriggerFlowAbstractEntity;
-import io.terminus.dalaran.entity.manage.ProcessorEntity;
+import io.terminus.dalaran.core.resource.entity.TriggerFlowAbstractEntity;
+import io.terminus.dalaran.core.resource.entity.common.ProcessorEntity;
 
 import java.util.ArrayList;
 import java.util.List;

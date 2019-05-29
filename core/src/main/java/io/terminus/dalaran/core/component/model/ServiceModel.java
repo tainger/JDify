@@ -1,0 +1,11 @@
+package io.terminus.dalaran.core.component.model;
+
+import lombok.Data;
+import org.jetbrains.annotations.Nullable;
+
+@Data
+public class ServiceModel<T> {
+
+    @Nullable
+    private T serviceConfig;
+}

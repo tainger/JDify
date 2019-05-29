@@ -1,18 +1,18 @@
 package io.terminus.dalaran.console.service.impl;
 
 import com.alibaba.fastjson.JSON;
-import io.terminus.dalaran.BodyType;
+import io.terminus.dalaran.console.entity.ModelEntity;
 import io.terminus.dalaran.console.model.dto.BasicModelInfo;
 import io.terminus.dalaran.console.model.dto.ModelDTO;
 import io.terminus.dalaran.console.model.query.ModelQuery;
+import io.terminus.dalaran.console.repository.ModelRepository;
+import io.terminus.dalaran.console.repository.ModuleRepository;
 import io.terminus.dalaran.console.service.ModelManagementService;
 import io.terminus.dalaran.console.service.jpa.ModelQueryService;
 import io.terminus.dalaran.console.util.ExcelUtils;
-import io.terminus.dalaran.entity.manage.ModelEntity;
-import io.terminus.dalaran.model.ModelField;
-import io.terminus.dalaran.model.schema.JsonSchema;
-import io.terminus.dalaran.repository.ModelRepository;
-import io.terminus.dalaran.repository.ModuleRepository;
+import io.terminus.dalaran.core.model.BodyType;
+import io.terminus.dalaran.core.model.ModelField;
+import io.terminus.dalaran.core.model.schema.JsonSchema;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

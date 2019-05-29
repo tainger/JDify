@@ -3,8 +3,12 @@ package io.terminus.dalaran.component.processor.http;
 import com.google.common.base.Joiner;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Maps;
-import io.terminus.dalaran.*;
-import io.terminus.dalaran.annotation.Processor;
+import io.terminus.dalaran.core.component.BodySerializeType;
+import io.terminus.dalaran.core.component.DalaranMessageBodyCustomConverter;
+import io.terminus.dalaran.core.component.DalaranProcessor;
+import io.terminus.dalaran.core.component.annotation.Processor;
+import io.terminus.dalaran.core.context.DalaranConverterContext;
+import io.terminus.dalaran.core.model.BodyType;
 import org.apache.camel.Exchange;
 import org.apache.camel.builder.Builder;
 import org.apache.camel.model.ProcessorDefinition;
@@ -14,7 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.Map;
 
 @Processor(value = "http-client", configType = HttpClientConfig.class, serializeType = BodySerializeType.Serialized, allowBodyTypes = {BodyType.JSON, BodyType.XML})
-public class DalaranHttpClient implements DalaranProcessor<HttpClientConfig>, CustomConvert<HttpClientConfig> {
+public class DalaranHttpClient implements DalaranProcessor<HttpClientConfig>, DalaranMessageBodyCustomConverter<HttpClientConfig> {
 
     @Autowired
     private DalaranConverterContext converterContext;

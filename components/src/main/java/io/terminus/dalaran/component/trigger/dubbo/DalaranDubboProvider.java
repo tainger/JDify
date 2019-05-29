@@ -1,9 +1,9 @@
 package io.terminus.dalaran.component.trigger.dubbo;
 
-import io.terminus.dalaran.BodySerializeType;
-import io.terminus.dalaran.BodyType;
-import io.terminus.dalaran.DalaranTrigger;
-import io.terminus.dalaran.annotation.Trigger;
+import io.terminus.dalaran.core.component.BodySerializeType;
+import io.terminus.dalaran.core.component.DalaranTrigger;
+import io.terminus.dalaran.core.component.annotation.Trigger;
+import io.terminus.dalaran.core.model.BodyType;
 import org.apache.camel.model.RouteDefinition;
 
 @Trigger(value = "dubbo-provider", configType = DubboProviderConfig.class, allowBodyTypes = {BodyType.OBJECT}, serializeType = BodySerializeType.Object)

@@ -1,11 +1,11 @@
 package io.terminus.dalaran.console.service;
 
-import io.terminus.dalaran.BodyType;
+import io.terminus.dalaran.console.entity.ModelEntity;
 import io.terminus.dalaran.console.model.dto.BasicModelInfo;
 import io.terminus.dalaran.console.model.dto.ModelDTO;
 import io.terminus.dalaran.console.model.query.ModelQuery;
-import io.terminus.dalaran.entity.manage.ModelEntity;
-import io.terminus.dalaran.model.schema.JsonSchema;
+import io.terminus.dalaran.core.model.BodyType;
+import io.terminus.dalaran.core.model.schema.JsonSchema;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;

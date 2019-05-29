@@ -1,13 +1,13 @@
 package io.terminus.dalaran.test;
 
-import io.terminus.dalaran.BodyType;
-import io.terminus.dalaran.DalaranContext;
 import io.terminus.dalaran.component.processor.script.DalaranScriptConfig;
 import io.terminus.dalaran.component.processor.script.DalaranScriptType;
-import io.terminus.dalaran.model.MessageModel;
-import io.terminus.dalaran.model.ProcessorModel;
-import io.terminus.dalaran.model.schema.JsonSchema;
-import io.terminus.dalaran.model.schema.XMLSchema;
+import io.terminus.dalaran.core.component.model.ProcessorModel;
+import io.terminus.dalaran.core.context.DalaranContext;
+import io.terminus.dalaran.core.model.BodyType;
+import io.terminus.dalaran.core.model.MessageModel;
+import io.terminus.dalaran.core.model.schema.JsonSchema;
+import io.terminus.dalaran.core.model.schema.XMLSchema;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;

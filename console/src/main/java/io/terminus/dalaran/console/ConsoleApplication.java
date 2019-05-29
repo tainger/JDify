@@ -1,7 +1,8 @@
 package io.terminus.dalaran.console;
 
-import io.terminus.dalaran.DalaranTraceLogger;
-import io.terminus.dalaran.configura.DalaranAutoConfiguration;
+import io.terminus.dalaran.core.log.DalaranTraceLogger;
+import io.terminus.dalaran.core.resource.repository.TracingLogRepository;
+import io.terminus.dalaran.core.spring.DalaranAutoConfiguration;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
@@ -12,19 +13,24 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 @SpringBootApplication(scanBasePackages = {"io.terminus.dalaran"})
 @EnableSwagger2
-@EntityScan(basePackages = {"io.terminus.dalaran"})
-@EnableJpaRepositories(basePackages = {"io.terminus.dalaran"})
+@EntityScan(basePackages = {"io.terminus.dalaran.console.entity", "io.terminus.dalaran.core.resource.entity"})
+@EnableJpaRepositories(basePackages = {"io.terminus.dalaran.console.repository", "io.terminus.dalaran.core.resource.repository"})
 @Import(DalaranAutoConfiguration.class)
 public class ConsoleApplication {
 
     @Bean
-    public TestFlowLoader testFlowLoader() {
-        return new TestFlowLoader();
+    public TestResourceLoader testFlowLoader() {
+        return new TestResourceLoader();
     }
 
     @Bean
-    public DalaranTraceLogger dalaranTraceLogger() {
-        return new TestTraceLogger();
+    public DalaranTraceLogger dalaranTraceLogger(TracingLogRepository tracingLogRepository) {
+        return new TestTraceLogger(tracingLogRepository);
+    }
+
+    @Bean
+    public TestFlowInitializer testFlowInitializer() {
+        return new TestFlowInitializer();
     }
 
     public static void main(String[] args) {

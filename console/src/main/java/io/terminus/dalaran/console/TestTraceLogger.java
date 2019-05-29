@@ -1,18 +1,20 @@
 package io.terminus.dalaran.console;
 
-import io.terminus.dalaran.DalaranTraceLogger;
-import io.terminus.dalaran.entity.manage.TracingLogEntity;
-import io.terminus.dalaran.model.DalaranTracingLog;
-import io.terminus.dalaran.repository.TracingLogRepository;
+import io.terminus.dalaran.core.log.DalaranTraceLogger;
+import io.terminus.dalaran.core.log.DalaranTracingLog;
+import io.terminus.dalaran.core.resource.entity.common.TracingLogEntity;
+import io.terminus.dalaran.core.resource.repository.TracingLogRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 
 @Slf4j
 public class TestTraceLogger implements DalaranTraceLogger {
 
-    @Autowired
     private TracingLogRepository tracingLogRepository;
+
+    public TestTraceLogger(TracingLogRepository tracingLogRepository) {
+        this.tracingLogRepository = tracingLogRepository;
+    }
 
     @Override
     public void log(DalaranTracingLog tracingLog) {

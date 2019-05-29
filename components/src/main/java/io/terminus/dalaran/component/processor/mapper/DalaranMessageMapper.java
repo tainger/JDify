@@ -1,15 +1,15 @@
 package io.terminus.dalaran.component.processor.mapper;
 
-import io.terminus.dalaran.DalaranProcessor;
-import io.terminus.dalaran.FieldType;
-import io.terminus.dalaran.annotation.Processor;
 import io.terminus.dalaran.component.processor.mapper.model.*;
-import io.terminus.dalaran.model.MessageModel;
-import io.terminus.dalaran.model.ModelField;
-import io.terminus.dalaran.model.schema.JsonSchema;
+import io.terminus.dalaran.core.component.DalaranProcessor;
+import io.terminus.dalaran.core.component.annotation.Processor;
+import io.terminus.dalaran.core.model.FieldType;
+import io.terminus.dalaran.core.model.MessageModel;
+import io.terminus.dalaran.core.model.ModelField;
+import io.terminus.dalaran.core.model.schema.JsonSchema;
 import org.apache.camel.model.ProcessorDefinition;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
 

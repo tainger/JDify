@@ -1,0 +1,31 @@
+package io.terminus.dalaran.core.log;
+
+import io.terminus.dalaran.core.model.BodyType;
+import lombok.Data;
+
+@Data
+public class DalaranTracingLog {
+    private Long flowId;
+
+    private String processorId;
+
+    private Long timestamp;
+
+    private Long elapsed;
+
+    private String recordId;
+
+    private boolean successful;
+
+    private boolean main;
+
+    private TracingType tracingType;
+
+    private String inputBody;
+
+    private BodyType inputBodyType;
+
+    private String outputBody;
+
+    private BodyType outputBodyType;
+}

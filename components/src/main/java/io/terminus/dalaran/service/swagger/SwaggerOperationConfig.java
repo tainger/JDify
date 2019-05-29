@@ -1,7 +1,7 @@
 package io.terminus.dalaran.service.swagger;
 
 import io.terminus.dalaran.component.common.HttpMethod;
-import io.terminus.dalaran.model.ServiceOperation;
+import io.terminus.dalaran.core.component.model.ServiceOperation;
 import lombok.Data;
 
 @Data

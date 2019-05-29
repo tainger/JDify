@@ -1,15 +1,15 @@
 package io.terminus.dalaran.console.service.impl;
 
-import io.terminus.dalaran.TracingType;
+import io.terminus.dalaran.console.entity.TriggerFlowEntity;
 import io.terminus.dalaran.console.model.dto.log.MainLogDTO;
 import io.terminus.dalaran.console.model.dto.log.TracingLogDTO;
 import io.terminus.dalaran.console.model.query.TracingLogQuery;
+import io.terminus.dalaran.console.repository.TriggerFlowRepository;
 import io.terminus.dalaran.console.service.ModuleManagementService;
 import io.terminus.dalaran.console.service.TracingLogService;
-import io.terminus.dalaran.entity.manage.TracingLogEntity;
-import io.terminus.dalaran.entity.manage.TriggerFlowEntity;
-import io.terminus.dalaran.repository.TracingLogRepository;
-import io.terminus.dalaran.repository.TriggerFlowRepository;
+import io.terminus.dalaran.core.log.TracingType;
+import io.terminus.dalaran.core.resource.entity.common.TracingLogEntity;
+import io.terminus.dalaran.core.resource.repository.TracingLogRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
