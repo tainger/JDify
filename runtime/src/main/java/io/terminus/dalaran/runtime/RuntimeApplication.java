@@ -28,6 +28,11 @@ public class RuntimeApplication {
         return new ReleasedResourceLoader();
     }
 
+    @Bean
+    public ReleasedFlowInitializer releasedFlowInitializer() {
+        return new ReleasedFlowInitializer();
+    }
+
     public static void main(String[] args) {
         SpringApplication.run(RuntimeApplication.class);
     }

@@ -23,7 +23,11 @@ public class TriggerInfo implements ComponentInfo {
 
     @JSONField(serialize = false)
     @JsonIgnore
-    private BodySerializeType serializeType;
+    private BodySerializeType inputSerializeType;
+
+    @JSONField(serialize = false)
+    @JsonIgnore
+    private BodySerializeType outputSerializeType;
 
     @JSONField(serialize = false)
     @JsonIgnore

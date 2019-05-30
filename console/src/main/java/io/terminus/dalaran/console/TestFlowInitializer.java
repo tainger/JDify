@@ -2,7 +2,7 @@ package io.terminus.dalaran.console;
 
 import io.terminus.dalaran.console.entity.TriggerFlowEntity;
 import io.terminus.dalaran.core.context.DalaranContext;
-import io.terminus.dalaran.core.flow.model.SubFlow;
+import io.terminus.dalaran.core.flow.model.BasicFlow;
 import io.terminus.dalaran.core.flow.model.TriggerFlow;
 import io.terminus.dalaran.core.resource.DalaranResourceBuilder;
 import io.terminus.dalaran.core.resource.entity.SubFlowAbstractEntity;
@@ -10,7 +10,6 @@ import io.terminus.dalaran.core.resource.entity.TriggerFlowAbstractEntity;
 import io.terminus.dalaran.core.resource.repository.ReleaseRecordRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.Ordered;
 
 import javax.annotation.PostConstruct;
 import java.util.List;
@@ -34,16 +33,18 @@ public class TestFlowInitializer {
 
     public void reloadTestTriggerFlow(Long triggerFlowId) {
         TriggerFlowAbstractEntity triggerFlowEntity = resourceLoader.loadTriggerFlow(triggerFlowId);
-        TriggerFlow triggerFlow = resourceBuilder.buildTriggerFlow(triggerFlowEntity);
-        dalaranContext.addTestFlow(triggerFlow);
+        BasicFlow testFlow = resourceBuilder.buildTestFlow(triggerFlowEntity);
+        dalaranContext.addTestFlow(testFlow);
     }
 
     public void reloadTestSubFlow(Long subFlowId) {
         SubFlowAbstractEntity subFlowEntity = resourceLoader.loadSubFlow(subFlowId);
-        SubFlow subFlow = resourceBuilder.buildSubFlow(subFlowEntity);
-        dalaranContext.addTestFlow(subFlow);
+        BasicFlow testFlow = resourceBuilder.buildTestFlow(subFlowEntity);
+        dalaranContext.addTestFlow(testFlow);
     }
 
+    // TODO 延时 5 秒, 因为目前 Component 的加载是根据 Spring Bean 的初始化, 有时候初始化流时, Component 还没有 ready
+    // TODO 组件需要更好的加载方式, 更早加载或者有机制确保加载完成在初始化流
     @PostConstruct
     private void init() {
         Timer timer = new Timer();

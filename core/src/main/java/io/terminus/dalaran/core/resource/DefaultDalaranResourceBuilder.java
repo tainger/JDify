@@ -1,14 +1,17 @@
 package io.terminus.dalaran.core.resource;
 
 import com.alibaba.fastjson.JSON;
-import io.terminus.dalaran.core.component.DalaranComponentConfigConverter;
 import io.terminus.dalaran.core.component.DalaranProcessor;
+import io.terminus.dalaran.core.component.DalaranProcessorConfigCustomConverter;
+import io.terminus.dalaran.core.component.DalaranTrigger;
+import io.terminus.dalaran.core.component.DalaranTriggerFlowConfigCustomConverter;
 import io.terminus.dalaran.core.component.config.AllModelConfig;
-import io.terminus.dalaran.core.component.config.ComponentModelConfig;
 import io.terminus.dalaran.core.component.config.ConnectorConfig;
+import io.terminus.dalaran.core.component.config.ImmutableModelConfig;
 import io.terminus.dalaran.core.component.config.OutModelConfig;
 import io.terminus.dalaran.core.component.model.ProcessorModel;
 import io.terminus.dalaran.core.config.ProcessorInfo;
+import io.terminus.dalaran.core.config.TriggerInfo;
 import io.terminus.dalaran.core.context.DalaranComponentContext;
 import io.terminus.dalaran.core.context.DalaranConverterContext;
 import io.terminus.dalaran.core.flow.model.BasicFlow;
@@ -19,6 +22,7 @@ import io.terminus.dalaran.core.model.MessageModel;
 import io.terminus.dalaran.core.resource.entity.*;
 import io.terminus.dalaran.core.resource.entity.basic.BasicFlowEntity;
 import io.terminus.dalaran.core.resource.entity.common.ProcessorEntity;
+import io.terminus.dalaran.core.resource.entity.released.ReleasedEntity;
 import lombok.val;
 import org.apache.commons.text.StringSubstitutor;
 
@@ -42,9 +46,35 @@ public class DefaultDalaranResourceBuilder implements DalaranResourceBuilder {
     }
 
     @Override
+    public BasicFlow buildTestFlow(BasicFlowEntity flowEntity) {
+        BasicFlow flow = new BasicFlow();
+        buildFlow(flow, flowEntity);
+        return flow;
+    }
+
+    @Override
     public TriggerFlow buildTriggerFlow(TriggerFlowAbstractEntity triggerFlowEntity) {
         TriggerFlow flow = new TriggerFlow();
+        DalaranTrigger triggerBean = componentContext.getTrigger(triggerFlowEntity.getTriggerType());
+        TriggerInfo triggerInfo = componentContext.getTriggerInfo(triggerFlowEntity.getTriggerType());
         buildFlow(flow, triggerFlowEntity);
+        flow.setTriggerType(triggerFlowEntity.getTriggerType());
+
+        Object config = buildConfig(triggerFlowEntity.getTriggerConfig(), triggerInfo.getConfigType());
+        if (triggerBean instanceof DalaranTriggerFlowConfigCustomConverter) {
+            config = ((DalaranTriggerFlowConfigCustomConverter) triggerBean).convert(config, flow);
+        }
+
+        flow.setTriggerConfig(config);
+
+        if (config instanceof ConnectorConfig) {
+            ConnectorConfig connectorConfig = (ConnectorConfig) config;
+            Long connectorId = connectorConfig.getConnectorId();
+            if (connectorId != null) {
+                Object connector = buildConnectorConfig(connectorId, triggerInfo.getConnectorInfo().getConnectorType());
+                connectorConfig.setConnector(connector);
+            }
+        }
         return flow;
     }
 
@@ -83,7 +113,11 @@ public class DefaultDalaranResourceBuilder implements DalaranResourceBuilder {
     }
 
     private void buildFlow(BasicFlow flow, BasicFlowEntity flowEntity) {
-        flow.setId(flowEntity.getId());
+        if (flowEntity instanceof ReleasedEntity) {
+            flow.setId(((ReleasedEntity) flowEntity).getOriginId());
+        } else {
+            flow.setId(flowEntity.getId());
+        }
         flow.setInModel(buildModel(flowEntity.getInModel()));
         flow.setOutModel(buildModel(flowEntity.getOutModel()));
 
@@ -92,7 +126,9 @@ public class DefaultDalaranResourceBuilder implements DalaranResourceBuilder {
         for (ProcessorEntity processorEntity : flowEntity.getPipeline()) {
             ProcessorModel processor = buildProcessorModel(processorEntity, lastOutModel, flow);
             pipeline.add(processor);
-            lastOutModel = processor.getOutModel();
+            if (processor.getOutModel() != null) {
+                lastOutModel = processor.getOutModel();
+            }
         }
         flow.setPipeline(pipeline);
     }
@@ -117,8 +153,9 @@ public class DefaultDalaranResourceBuilder implements DalaranResourceBuilder {
         processor.setOutModel(outModel);
 
         DalaranProcessor processorBean = componentContext.getProcessor(processorEntity.getType());
-        if (processorBean instanceof DalaranComponentConfigConverter) {
-            config = ((DalaranComponentConfigConverter) processorBean).convert(config, processor, flow);
+
+        if (processorBean instanceof DalaranProcessorConfigCustomConverter) {
+            config = ((DalaranProcessorConfigCustomConverter) processorBean).convert(config, processor, flow);
         }
         if (config instanceof ConnectorConfig) {
             ConnectorConfig connectorConfig = (ConnectorConfig) config;
@@ -129,6 +166,7 @@ public class DefaultDalaranResourceBuilder implements DalaranResourceBuilder {
             }
         }
         processor.setConfig(config);
+
         return processor;
     }
 
@@ -136,14 +174,20 @@ public class DefaultDalaranResourceBuilder implements DalaranResourceBuilder {
         if (config instanceof OutModelConfig) {
             OutModelConfig outModelConfig = (OutModelConfig) config;
             outModelConfig.setInModel(lastOutModel);
+            if (outModelConfig.getOutModelId() != null) {
+                lastOutModel = buildModel(outModelConfig.getOutModelId());
+                outModelConfig.setOutModel(lastOutModel);
+            }
+        } else if (config instanceof ImmutableModelConfig) {
+            lastOutModel = ((ImmutableModelConfig) config).getOutModel();
         }
         if (config instanceof AllModelConfig) {
             AllModelConfig allModelConfig = (AllModelConfig) config;
             allModelConfig.setInModel(buildModel(allModelConfig.getInModelId()));
-            allModelConfig.setOutModel(buildModel(allModelConfig.getOutModelId()));
-        }
-        if (config instanceof ComponentModelConfig) {
-            lastOutModel = ((ComponentModelConfig) config).getOutModel();
+            if (allModelConfig.getOutModelId() != null) {
+                lastOutModel = buildModel(allModelConfig.getOutModelId());
+                allModelConfig.setOutModel(lastOutModel);
+            }
         }
         return lastOutModel;
     }

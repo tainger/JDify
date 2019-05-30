@@ -1,11 +1,16 @@
 package io.terminus.dalaran.component.processor.script;
 
+import io.terminus.dalaran.core.component.BodySerializeType;
 import io.terminus.dalaran.core.component.DalaranProcessor;
 import io.terminus.dalaran.core.component.annotation.Processor;
 import jdk.nashorn.api.scripting.ScriptObjectMirror;
 import org.apache.camel.model.ProcessorDefinition;
 
-@Processor(value = "script", configType = DalaranScriptConfig.class)
+@Processor(
+        value = "script", configType = DalaranScriptConfig.class,
+        inputSerializeType = BodySerializeType.Object,
+        outputSerializeType = BodySerializeType.Object
+)
 public class DalaranScript implements DalaranProcessor<DalaranScriptConfig> {
 
     @Override

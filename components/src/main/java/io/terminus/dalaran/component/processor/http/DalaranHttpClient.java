@@ -17,7 +17,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Map;
 
-@Processor(value = "http-client", configType = HttpClientConfig.class, serializeType = BodySerializeType.Serialized, allowBodyTypes = {BodyType.JSON, BodyType.XML})
+@Processor(
+        value = "http-client", configType = HttpClientConfig.class,
+        allowBodyTypes = {BodyType.JSON, BodyType.XML},
+        inputSerializeType = BodySerializeType.Serialized,
+        outputSerializeType = BodySerializeType.Serialized
+)
 public class DalaranHttpClient implements DalaranProcessor<HttpClientConfig>, DalaranMessageBodyCustomConverter<HttpClientConfig> {
 
     @Autowired

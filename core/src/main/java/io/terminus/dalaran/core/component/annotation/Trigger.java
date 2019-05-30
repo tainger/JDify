@@ -14,7 +14,9 @@ import java.lang.annotation.*;
 public @interface Trigger {
     String value();
 
-    BodySerializeType serializeType() default BodySerializeType.Serialized;
+    BodySerializeType inputSerializeType() default BodySerializeType.All;
+
+    BodySerializeType outputSerializeType() default BodySerializeType.All;
 
     BodyType[] allowBodyTypes() default {};
 

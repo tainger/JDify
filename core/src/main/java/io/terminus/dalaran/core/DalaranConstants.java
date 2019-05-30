@@ -13,7 +13,7 @@ public final class DalaranConstants {
     public static final String TEST_FLOW_PREFIX = "test" + DELIMITER;
 
     public static final String FLOW_PREFIX = "flow" + DELIMITER;
-    public static final String FLOW_FRAGMENT_PREFIX = "fragment" + DELIMITER;
+    public static final String FLOW_FRAGMENT_PREFIX = DELIMITER + "fragment" + DELIMITER;
     public static final String SUB_FLOW_PREFIX = "sub" + DELIMITER + FLOW_PREFIX;
     public static final String DIRECT_PREFIX = "direct:";
     public static final String TEST_FLOW_DIRECT_PREFIX = DIRECT_PREFIX + TEST_FLOW_PREFIX;

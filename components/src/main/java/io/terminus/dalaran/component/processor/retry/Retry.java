@@ -1,9 +1,9 @@
 package io.terminus.dalaran.component.processor.retry;
 
-import io.terminus.dalaran.core.component.BodySerializeType;
-import io.terminus.dalaran.core.component.DalaranComponentConfigConverter;
 import io.terminus.dalaran.core.component.DalaranProcessor;
+import io.terminus.dalaran.core.component.DalaranProcessorConfigCustomConverter;
 import io.terminus.dalaran.core.component.annotation.Processor;
+import io.terminus.dalaran.core.component.model.ComponentModel;
 import io.terminus.dalaran.core.component.model.ProcessorModel;
 import io.terminus.dalaran.core.context.DalaranContext;
 import io.terminus.dalaran.core.flow.DalaranFlowBuilder;
@@ -20,8 +20,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.ArrayList;
 import java.util.List;
 
-@Processor(value = "retry", serializeType = BodySerializeType.All, configType = RetryConfig.class)
-public class Retry implements DalaranProcessor<String>, DalaranComponentConfigConverter<RetryConfig, String> {
+@Processor(
+        value = "retry", configType = RetryConfig.class
+)
+public class Retry implements DalaranProcessor<String>, DalaranProcessorConfigCustomConverter<RetryConfig, String> {
 
     @Autowired
     private DalaranContext<RouteDefinition> dalaranContext;
@@ -38,8 +40,8 @@ public class Retry implements DalaranProcessor<String>, DalaranComponentConfigCo
     }
 
     @Override
-    public String convert(RetryConfig config, ProcessorModel processor, BasicFlow flow) {
-        MessageModel fragmentLastOutModel = processor.getOutModel();
+    public String convert(RetryConfig config, ComponentModel component, BasicFlow flow) {
+        MessageModel fragmentLastOutModel = component.getOutModel();
         List<ProcessorModel> pipeline = new ArrayList<>();
         for (ProcessorEntity processorEntity : config.getPipeline()) {
             val processorModel = resourceBuilder.buildProcessorModel(processorEntity, fragmentLastOutModel, flow);
@@ -49,8 +51,9 @@ public class Retry implements DalaranProcessor<String>, DalaranComponentConfigCo
 
         FlowFragment fragment = new FlowFragment();
         fragment.setId(flow.getId());
+        fragment.setFragmentId(component.getId());
         fragment.setPipeline(pipeline);
-        fragment.setInModel(processor.getOutModel());
+        fragment.setInModel(component.getOutModel());
         fragment.setOutModel(fragmentLastOutModel);
 
         RouteDefinition retryRoute = flowBuilder.buildFlowFragment(fragment);

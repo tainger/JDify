@@ -14,7 +14,9 @@ import java.lang.annotation.*;
 public @interface Processor {
     String value();
 
-    BodySerializeType serializeType() default BodySerializeType.Object;
+    BodySerializeType inputSerializeType() default BodySerializeType.All;
+
+    BodySerializeType outputSerializeType() default BodySerializeType.All;
 
     BodyType[] allowBodyTypes() default {};
 

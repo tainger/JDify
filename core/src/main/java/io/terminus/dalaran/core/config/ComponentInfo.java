@@ -12,7 +12,9 @@ public interface ComponentInfo {
 
     ConnectorInfo getConnectorInfo();
 
-    BodySerializeType getSerializeType();
+    BodySerializeType getInputSerializeType();
+
+    BodySerializeType getOutputSerializeType();
 
     Class getConfigType();
 }

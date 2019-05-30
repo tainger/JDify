@@ -10,7 +10,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 
-import javax.annotation.PostConstruct;
 import java.util.List;
 
 @Slf4j
@@ -29,8 +28,9 @@ public class ReleasedFlowInitializer {
     private DalaranContext dalaranContext;
 
     // TODO 临时每分钟 load 一下...
-    @PostConstruct
-    @Scheduled(cron = "0 * * * * *")
+    // TODO 启动延时 5 秒, 因为目前 Component 的加载是根据 Spring Bean 的初始化, 有时候初始化流时, Component 还没有 ready
+    // TODO 组件需要更好的加载方式, 更早加载或者有机制确保加载完成在初始化流
+    @Scheduled(fixedDelay = 60 * 1000L, initialDelay = 5 * 1000L)
     private void init() {
         ReleaseRecordEntity recordEntity = releaseRecordRepository.findByEnabledTrue();
         synchronized (this) {

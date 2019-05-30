@@ -1,5 +1,6 @@
 package io.terminus.dalaran.core.flow.model;
 
+import io.terminus.dalaran.core.DalaranConstants;
 import io.terminus.dalaran.core.component.model.ProcessorModel;
 import io.terminus.dalaran.core.model.MessageModel;
 import lombok.Data;
@@ -11,7 +12,7 @@ import java.util.List;
 import static io.terminus.dalaran.core.DalaranConstants.DIRECT_PREFIX;
 
 @Data
-public abstract class BasicFlow {
+public class BasicFlow {
 
     @NotNull
     private Long id;
@@ -27,7 +28,9 @@ public abstract class BasicFlow {
     @NotNull
     private List<ProcessorModel> pipeline;
 
-    public abstract String getRouteId();
+    public String getRouteId() {
+        return DalaranConstants.TEST_FLOW_PREFIX + this.getId();
+    }
 
     public String getDirectRouteUri() {
         return DIRECT_PREFIX + this.getRouteId();

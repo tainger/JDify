@@ -1,8 +1,10 @@
 package io.terminus.dalaran.component.processor.route;
 
-import io.terminus.dalaran.core.component.DalaranComponentConfigConverter;
+import io.terminus.dalaran.core.component.BodySerializeType;
 import io.terminus.dalaran.core.component.DalaranProcessor;
+import io.terminus.dalaran.core.component.DalaranProcessorConfigCustomConverter;
 import io.terminus.dalaran.core.component.annotation.Processor;
+import io.terminus.dalaran.core.component.model.ComponentModel;
 import io.terminus.dalaran.core.component.model.ProcessorModel;
 import io.terminus.dalaran.core.context.DalaranContext;
 import io.terminus.dalaran.core.flow.model.BasicFlow;
@@ -20,8 +22,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Processor(value = "router", configType = DalaranRouterConfig.class)
-public class DalaranRouter implements DalaranProcessor<Map<String, String>>, DalaranComponentConfigConverter<DalaranRouterConfig, Map<String, String>> {
+@Processor(value = "router", configType = DalaranRouterConfig.class, inputSerializeType = BodySerializeType.Object)
+public class DalaranRouter implements DalaranProcessor<Map<String, String>>, DalaranProcessorConfigCustomConverter<DalaranRouterConfig, Map<String, String>> {
 
     private static final String OTHERWISE_EXPRESSION = "OTHERWISE";
 
@@ -49,7 +51,7 @@ public class DalaranRouter implements DalaranProcessor<Map<String, String>>, Dal
      * return: Map<Expression, RouteUri>
      */
     @Override
-    public Map<String, String> convert(DalaranRouterConfig config, ProcessorModel processor, BasicFlow flow) {
+    public Map<String, String> convert(DalaranRouterConfig config, ComponentModel component, BasicFlow flow) {
         List<DalaranRouterConfig.Route> routes = config.getRoutes();
         Map<String, String> routeMapper = new HashMap<>();
 
@@ -66,6 +68,7 @@ public class DalaranRouter implements DalaranProcessor<Map<String, String>>, Dal
             }
 
             fragment.setId(flow.getId());
+            fragment.setFragmentId(component.getId());
             fragment.setPipeline(pipeline);
             fragment.setInModel(config.getInModel());
             fragment.setOutModel(fragmentLastOutModel);

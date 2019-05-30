@@ -8,9 +8,12 @@ import io.terminus.dalaran.core.model.MessageModel;
 import io.terminus.dalaran.core.resource.entity.ModelAbstractEntity;
 import io.terminus.dalaran.core.resource.entity.SubFlowAbstractEntity;
 import io.terminus.dalaran.core.resource.entity.TriggerFlowAbstractEntity;
+import io.terminus.dalaran.core.resource.entity.basic.BasicFlowEntity;
 import io.terminus.dalaran.core.resource.entity.common.ProcessorEntity;
 
 public interface DalaranResourceBuilder {
+
+    BasicFlow buildTestFlow(BasicFlowEntity flowEntity);
 
     TriggerFlow buildTriggerFlow(TriggerFlowAbstractEntity triggerFlowEntity);
 

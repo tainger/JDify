@@ -1,6 +1,7 @@
 package io.terminus.dalaran.component.processor.mapper;
 
 import io.terminus.dalaran.component.processor.mapper.model.*;
+import io.terminus.dalaran.core.component.BodySerializeType;
 import io.terminus.dalaran.core.component.DalaranProcessor;
 import io.terminus.dalaran.core.component.annotation.Processor;
 import io.terminus.dalaran.core.model.FieldType;
@@ -16,7 +17,11 @@ import java.util.*;
 /**
  * Created by jingdi on 2019/3/18
  */
-@Processor(value = "mapper-convert", configType = DalaranMapperConfig.class)
+@Processor(
+        value = "mapper-convert", configType = DalaranMapperConfig.class,
+        inputSerializeType = BodySerializeType.Object,
+        outputSerializeType = BodySerializeType.Object
+)
 public class DalaranMessageMapper implements DalaranProcessor<DalaranMapperConfig> {
 
     @Override
