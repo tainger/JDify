@@ -97,7 +97,7 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext {
         triggerInfoMapping.put(triggerAnnotation.value(), triggerInfo);
         triggerMapping.put(triggerAnnotation.value(), trigger);
 
-        log.info("load trigger {}", triggerAnnotation.value());
+        log.info("load trigger {}", triggerAnnotation);
     }
 
     // TODO 很多重复性的代码
@@ -122,7 +122,7 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext {
         processorInfoMapping.put(processorAnnotation.value(), processorInfo);
         processorMapping.put(processorAnnotation.value(), processor);
 
-        log.info("load processor {}", processorAnnotation.value());
+        log.info("load processor {}", processorAnnotation);
     }
 
     private ConnectorInfo buildConnectorInfo(ComponentType component, Class connectorType, String componentName) {
