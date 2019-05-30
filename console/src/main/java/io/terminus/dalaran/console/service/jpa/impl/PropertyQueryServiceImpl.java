@@ -1,9 +1,9 @@
 package io.terminus.dalaran.console.service.jpa.impl;
 
+import io.terminus.dalaran.console.entity.PropertyEntity;
 import io.terminus.dalaran.console.model.query.PropertyQuery;
+import io.terminus.dalaran.console.repository.PropertyRepository;
 import io.terminus.dalaran.console.service.jpa.PropertyQueryService;
-import io.terminus.dalaran.entity.manage.PropertyEntity;
-import io.terminus.dalaran.repository.PropertyRepository;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;

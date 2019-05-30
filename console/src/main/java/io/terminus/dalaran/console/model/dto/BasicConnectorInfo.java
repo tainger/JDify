@@ -1,6 +1,6 @@
 package io.terminus.dalaran.console.model.dto;
 
-import io.terminus.dalaran.ComponentType;
+import io.terminus.dalaran.core.component.ComponentType;
 import lombok.Data;
 
 @Data

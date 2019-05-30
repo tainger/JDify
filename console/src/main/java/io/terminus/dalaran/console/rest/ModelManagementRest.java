@@ -1,13 +1,13 @@
 package io.terminus.dalaran.console.rest;
 
 import io.swagger.annotations.ApiOperation;
-import io.terminus.dalaran.BodyType;
 import io.terminus.dalaran.console.model.dto.ModelDTO;
 import io.terminus.dalaran.console.model.query.ModelQuery;
+import io.terminus.dalaran.console.repository.ModelRepository;
 import io.terminus.dalaran.console.service.ModelManagementService;
-import io.terminus.dalaran.model.ModelField;
-import io.terminus.dalaran.model.schema.JsonSchema;
-import io.terminus.dalaran.repository.ModelRepository;
+import io.terminus.dalaran.core.model.BodyType;
+import io.terminus.dalaran.core.model.ModelField;
+import io.terminus.dalaran.core.model.schema.JsonSchema;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;

@@ -1,6 +1,6 @@
 package io.terminus.dalaran.console.model.dto;
 
-import io.terminus.dalaran.BodyType;
+import io.terminus.dalaran.core.model.BodyType;
 import lombok.Data;
 import org.jetbrains.annotations.Nullable;
 

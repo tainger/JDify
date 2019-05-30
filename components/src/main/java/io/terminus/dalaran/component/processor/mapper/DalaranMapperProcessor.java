@@ -1,19 +1,19 @@
 package io.terminus.dalaran.component.processor.mapper;
 
 import com.github.drapostolos.typeparser.TypeParser;
-import io.terminus.dalaran.FieldType;
 import io.terminus.dalaran.component.processor.mapper.jxpath.DalaranJXPathFactory;
 import io.terminus.dalaran.component.processor.mapper.model.Flag;
 import io.terminus.dalaran.component.processor.mapper.model.MapperConstants;
 import io.terminus.dalaran.component.processor.mapper.model.MappingField;
 import io.terminus.dalaran.component.processor.mapper.model.MappingType;
+import io.terminus.dalaran.core.model.FieldType;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.Traceable;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.jxpath.JXPathContext;
 import org.apache.commons.jxpath.JXPathNotFoundException;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;

@@ -1,6 +1,6 @@
 package io.terminus.dalaran.console.model.dto.log;
 
-import io.terminus.dalaran.BodyType;
+import io.terminus.dalaran.core.model.BodyType;
 import lombok.Data;
 
 import java.util.Date;

@@ -1,15 +1,15 @@
 package io.terminus.dalaran.console.rest;
 
 import io.swagger.annotations.ApiOperation;
-import io.terminus.dalaran.DalaranContext;
 import io.terminus.dalaran.console.model.ReleaseRequestDTO;
 import io.terminus.dalaran.console.model.dto.ReleaseRecordDTO;
 import io.terminus.dalaran.console.model.dto.flow.TriggerFlowDTO;
 import io.terminus.dalaran.console.service.ReleaseService;
-import io.terminus.dalaran.model.config.ConnectorInfo;
-import io.terminus.dalaran.model.config.ProcessorInfo;
-import io.terminus.dalaran.model.config.ServiceInfo;
-import io.terminus.dalaran.model.config.TriggerInfo;
+import io.terminus.dalaran.core.config.ConnectorInfo;
+import io.terminus.dalaran.core.config.ProcessorInfo;
+import io.terminus.dalaran.core.config.ServiceInfo;
+import io.terminus.dalaran.core.config.TriggerInfo;
+import io.terminus.dalaran.core.context.DalaranContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

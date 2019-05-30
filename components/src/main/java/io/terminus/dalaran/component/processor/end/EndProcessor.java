@@ -1,12 +1,11 @@
 package io.terminus.dalaran.component.processor.end;
 
-import io.terminus.dalaran.UnconfigurableDalaranProcessor;
-import io.terminus.dalaran.annotation.Processor;
+import io.terminus.dalaran.core.component.UnconfigurableDalaranProcessor;
+import io.terminus.dalaran.core.component.annotation.Processor;
 import org.apache.camel.model.ProcessorDefinition;
 
-
 // TODO serializedBody
-@Processor(value = "end", serializedBody = true)
+@Processor(value = "end")
 public class EndProcessor implements UnconfigurableDalaranProcessor {
     @Override
     public void configure(ProcessorDefinition route) {
