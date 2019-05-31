@@ -6,6 +6,7 @@ import io.terminus.dalaran.core.context.DalaranContext;
 import io.terminus.dalaran.core.context.DalaranConverterContext;
 import io.terminus.dalaran.core.context.DalaranServiceContext;
 import io.terminus.dalaran.core.flow.DalaranFlowBuilder;
+import io.terminus.dalaran.core.flow.DalaranRoute;
 import io.terminus.dalaran.core.flow.model.BasicFlow;
 import io.terminus.dalaran.core.flow.model.FlowFragment;
 import io.terminus.dalaran.core.flow.model.SubFlow;
@@ -16,9 +17,9 @@ import org.apache.camel.model.RouteDefinition;
 
 import java.util.List;
 
-public class DefaultDalaranCamelContext implements DalaranContext<RouteDefinition> {
+public class DefaultDalaranCamelContext implements DalaranContext<DalaranRoute> {
 
-    private final DalaranFlowBuilder<RouteDefinition> flowBuilder;
+    private final DalaranFlowBuilder<DalaranRoute> flowBuilder;
     private final CamelContext camelContext;
     private final DalaranConverterContext converterContext;
     private final DalaranComponentContext componentContext;
@@ -136,7 +137,7 @@ public class DefaultDalaranCamelContext implements DalaranContext<RouteDefinitio
     }
 
     @Override
-    public void addRoute(RouteDefinition route) {
+    public void addRoute(DalaranRoute route) {
         try {
             camelContext.addRouteDefinition(route);
         } catch (Exception e) {

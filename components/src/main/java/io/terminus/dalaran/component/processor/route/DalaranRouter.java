@@ -22,6 +22,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static io.terminus.dalaran.core.DalaranConstants.DELIMITER;
+
 @Processor(value = "router", configType = DalaranRouterConfig.class, inputSerializeType = BodySerializeType.Object)
 public class DalaranRouter implements DalaranProcessor<Map<String, String>>, DalaranProcessorConfigCustomConverter<DalaranRouterConfig, Map<String, String>> {
 
@@ -68,7 +70,7 @@ public class DalaranRouter implements DalaranProcessor<Map<String, String>>, Dal
             }
 
             fragment.setId(flow.getId());
-            fragment.setFragmentId(component.getId());
+            fragment.setFragmentId(component.getId() + DELIMITER + i);
             fragment.setPipeline(pipeline);
             fragment.setInModel(config.getInModel());
             fragment.setOutModel(fragmentLastOutModel);
