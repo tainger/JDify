@@ -31,13 +31,13 @@ import static io.terminus.dalaran.core.DalaranConstants.DELIMITER;
 public class ScatterGather implements DalaranProcessor<List<String>>, DalaranProcessorConfigCustomConverter<ScatterGatherConfig, List<String>> {
 
     @Autowired
-    private DalaranContext dalaranContext;
-
-    @Autowired
-    private DalaranConverterContext converterContext;
+    private DalaranContext<DalaranRoute> dalaranContext;
 
     @Autowired
     private DalaranFlowBuilder<DalaranRoute> flowBuilder;
+
+    @Autowired
+    private DalaranConverterContext converterContext;
 
     @Autowired
     private DalaranResourceBuilder resourceBuilder;
