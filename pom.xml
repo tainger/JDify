@@ -22,7 +22,6 @@
         <module>camel-components</module>
         <module>console</module>
         <module>runtime</module>
-        <module>common</module>
     </modules>
 
     <properties>
