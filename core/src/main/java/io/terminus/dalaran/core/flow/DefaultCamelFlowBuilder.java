@@ -17,7 +17,6 @@ import io.terminus.dalaran.core.log.TracingErrorHandlerFactory;
 import io.terminus.dalaran.core.model.BodyType;
 import io.terminus.dalaran.core.model.MessageModel;
 import lombok.val;
-import org.apache.camel.model.RouteDefinition;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -26,7 +25,7 @@ import java.util.List;
 import static io.terminus.dalaran.core.DalaranConstants.DIRECT_PREFIX;
 import static io.terminus.dalaran.core.DalaranConstants.TEST_FLOW_DIRECT_PREFIX;
 
-public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<RouteDefinition> {
+public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute> {
 
     private final DalaranTraceLogger traceLogger;
 
@@ -49,7 +48,7 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<RouteDefiniti
     }
 
     @Override
-    public RouteDefinition buildTriggerFlow(TriggerFlow flow) {
+    public DalaranRoute buildTriggerFlow(TriggerFlow flow) {
         val triggerComponent = componentContext.getTrigger(flow.getTriggerType());
         val flowTracer = DalaranTracer.buildFlowTracer(traceLogger, flow.getId());
         val route = newRouteDefinition();
@@ -66,7 +65,7 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<RouteDefiniti
     }
 
     @Override
-    public RouteDefinition buildSubFLow(SubFlow flow) {
+    public DalaranRoute buildSubFLow(SubFlow flow) {
         val flowTracer = DalaranTracer.buildSubFlowTracer(traceLogger, flow.getId());
         val route = newRouteDefinition();
         route.setId(flow.getRouteId());
@@ -78,7 +77,7 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<RouteDefiniti
     }
 
     @Override
-    public RouteDefinition buildFlowFragment(FlowFragment fragment) {
+    public DalaranRoute buildFlowFragment(FlowFragment fragment) {
         val route = newRouteDefinition();
         route.setId(fragment.getRouteId());
         route.from(DIRECT_PREFIX + fragment.getRouteId());
@@ -88,7 +87,7 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<RouteDefiniti
     }
 
     @Override
-    public RouteDefinition buildTestFLow(BasicFlow flow) {
+    public DalaranRoute buildTestFLow(BasicFlow flow) {
         val flowTracer = DalaranTracer.buildTestFlowTracer(traceLogger, flow.getId());
         val route = newRouteDefinition();
         route.setId(flow.getRouteId());
@@ -112,7 +111,7 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<RouteDefiniti
     }
 
     // TODO currentBodyIsSerialized 这个还是比较绕的....
-    private void buildFlowRoute(RouteDefinition route, BasicFlow flow, Boolean currentBodyIsSerialized) {
+    private void buildFlowRoute(DalaranRoute route, BasicFlow flow, Boolean currentBodyIsSerialized) {
         List<ProcessorModel> processorList = flow.getPipeline();
         MessageModel currentModel = flow.getInModel();
         // TODO in model maybe null
@@ -155,6 +154,15 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<RouteDefiniti
 
             MessageModel outModel = processor.getOutModel();
 
+            switch (currentProcessorInfo.getOutputSerializeType()) {
+                case Serialized:
+                    currentBodyIsSerialized = true;
+                    break;
+                case Object:
+                    currentBodyIsSerialized = false;
+                    break;
+            }
+
             if (outModel != null) {
                 currentModel = outModel;
             }
@@ -170,17 +178,24 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<RouteDefiniti
                 if (outModel.getModelType().isSerialized()) {
 //                convertTracer.before(route, BodyType.OBJECT);
                     converterContext.fromObject(route, currentModel);
+                    currentBodyIsSerialized = true;
 //                convertTracer.after(route, currentModel.getModelType());
                 } else {
 //                convertTracer.before(route, currentModel.getModelType());
                     converterContext.toObject(route, currentModel);
+                    currentBodyIsSerialized = false;
 //                convertTracer.after(route, BodyType.OBJECT);
                 }
             }
         }
+
+        route.setSerializedBody(currentBodyIsSerialized);
+        route.setLastOutModel(outModel);
     }
 
-    private RouteDefinition newRouteDefinition() {
-        return new RouteDefinition().errorHandler(errorHandlerFactory);
+    private DalaranRoute newRouteDefinition() {
+        DalaranRoute route = new DalaranRoute();
+        route.errorHandler(errorHandlerFactory);
+        return route;
     }
 }

@@ -9,6 +9,8 @@ public final class DalaranConstants {
     public static final String FLOW_TRACING_LOG = "dalaran_flow_tracing_log";
     public static final String PROCESSOR_TRACING_LOG = "dalaran_processor_tracing_log";
     public static final String TEST_FLOW_RECORD_ID_HEADER = "dalaran_test_flow_record_id";
+    public static final String BRANCH_FLOW_NAME_HEADER = "DalaranBranchFlowName";
+    public static final String SCATTER_GATHER_EXCHANGE= "DalaranScatterGatherExchange";
 
     public static final String TEST_FLOW_PREFIX = "test" + DELIMITER;
 

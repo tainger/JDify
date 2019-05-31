@@ -7,6 +7,7 @@ import io.terminus.dalaran.core.component.model.ComponentModel;
 import io.terminus.dalaran.core.component.model.ProcessorModel;
 import io.terminus.dalaran.core.context.DalaranContext;
 import io.terminus.dalaran.core.flow.DalaranFlowBuilder;
+import io.terminus.dalaran.core.flow.DalaranRoute;
 import io.terminus.dalaran.core.flow.model.BasicFlow;
 import io.terminus.dalaran.core.flow.model.FlowFragment;
 import io.terminus.dalaran.core.model.MessageModel;
@@ -14,7 +15,6 @@ import io.terminus.dalaran.core.resource.DalaranResourceBuilder;
 import io.terminus.dalaran.core.resource.entity.common.ProcessorEntity;
 import lombok.val;
 import org.apache.camel.model.ProcessorDefinition;
-import org.apache.camel.model.RouteDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
@@ -26,10 +26,10 @@ import java.util.List;
 public class Retry implements DalaranProcessor<String>, DalaranProcessorConfigCustomConverter<RetryConfig, String> {
 
     @Autowired
-    private DalaranContext<RouteDefinition> dalaranContext;
+    private DalaranContext<DalaranRoute> dalaranContext;
 
     @Autowired
-    private DalaranFlowBuilder<RouteDefinition> flowBuilder;
+    private DalaranFlowBuilder<DalaranRoute> flowBuilder;
 
     @Autowired
     private DalaranResourceBuilder resourceBuilder;
@@ -56,7 +56,7 @@ public class Retry implements DalaranProcessor<String>, DalaranProcessorConfigCu
         fragment.setInModel(component.getOutModel());
         fragment.setOutModel(fragmentLastOutModel);
 
-        RouteDefinition retryRoute = flowBuilder.buildFlowFragment(fragment);
+        DalaranRoute retryRoute = flowBuilder.buildFlowFragment(fragment);
         retryRoute.onException(Throwable.class).maximumRedeliveries(config.getMaxRetry()).redeliveryDelay(config.getRetryDelay());
         dalaranContext.addRoute(retryRoute);
 
