@@ -48,7 +48,8 @@ public class DalaranAutoConfiguration {
     public DalaranResourceBuilder dalaranResourceBuilder(
             DalaranResourceLoader resourceLoader,
             DalaranComponentContext componentContext,
-            DalaranConverterContext converterContext
+            DalaranConverterContext converterContext,
+            DalaranServiceContext serviceContext
     ) {
         return new DefaultDalaranResourceBuilder(resourceLoader, componentContext, converterContext, serviceContext);
     }
