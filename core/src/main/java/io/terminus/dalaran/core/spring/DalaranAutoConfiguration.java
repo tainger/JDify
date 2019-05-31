@@ -50,7 +50,7 @@ public class DalaranAutoConfiguration {
             DalaranComponentContext componentContext,
             DalaranConverterContext converterContext
     ) {
-        return new DefaultDalaranResourceBuilder(resourceLoader, componentContext, converterContext);
+        return new DefaultDalaranResourceBuilder(resourceLoader, componentContext, converterContext, serviceContext);
     }
 
     @Bean("component-loader")

@@ -11,9 +11,11 @@ import io.terminus.dalaran.core.component.config.ImmutableModelConfig;
 import io.terminus.dalaran.core.component.config.OutModelConfig;
 import io.terminus.dalaran.core.component.model.ProcessorModel;
 import io.terminus.dalaran.core.config.ProcessorInfo;
+import io.terminus.dalaran.core.config.ServiceInfo;
 import io.terminus.dalaran.core.config.TriggerInfo;
 import io.terminus.dalaran.core.context.DalaranComponentContext;
 import io.terminus.dalaran.core.context.DalaranConverterContext;
+import io.terminus.dalaran.core.context.DalaranServiceContext;
 import io.terminus.dalaran.core.flow.model.BasicFlow;
 import io.terminus.dalaran.core.flow.model.SubFlow;
 import io.terminus.dalaran.core.flow.model.TriggerFlow;
@@ -39,10 +41,16 @@ public class DefaultDalaranResourceBuilder implements DalaranResourceBuilder {
 
     private final DalaranConverterContext converterContext;
 
-    public DefaultDalaranResourceBuilder(DalaranResourceLoader resourceLoader, DalaranComponentContext componentContext, DalaranConverterContext converterContext) {
+    private final DalaranServiceContext serviceContext;
+
+    public DefaultDalaranResourceBuilder(
+            DalaranResourceLoader resourceLoader, DalaranComponentContext componentContext,
+            DalaranConverterContext converterContext, DalaranServiceContext serviceContext
+    ) {
         this.resourceLoader = resourceLoader;
         this.componentContext = componentContext;
         this.converterContext = converterContext;
+        this.serviceContext = serviceContext;
     }
 
     @Override
@@ -109,7 +117,9 @@ public class DefaultDalaranResourceBuilder implements DalaranResourceBuilder {
 
     @Override
     public Object buildServiceConfig(Long serviceId) {
-        return null;
+        ServiceAbstractEntity entity = resourceLoader.loadService(serviceId);
+        ServiceInfo serviceInfo = serviceContext.getServiceInfo(entity.getType());
+        return buildConfig(entity.getServiceConfig(), serviceInfo.getServiceConfigType());
     }
 
     private void buildFlow(BasicFlow flow, BasicFlowEntity flowEntity) {
