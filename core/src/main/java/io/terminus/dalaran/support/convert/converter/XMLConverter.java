@@ -32,7 +32,7 @@ public class XMLConverter implements DalaranConverter<XMLSchema> {
     private XmlJsonDataFormat buildJsonFormat(XMLSchema schema) {
         XmlJsonDataFormat dataFormat = new XmlJsonDataFormat();
 //        dataFormat.setExpandableProperties(schema.getExpandableProperties());
-//        dataFormat.setRootName(schema.getRoot());
+        dataFormat.setRootName(schema.getRoot());
 //        dataFormat.setArrayName(schema.getArrayName());
 //        dataFormat.setElementName(schema.getElementName());
         dataFormat.setForceTopLevelObject(schema.isForceTopLevelObject());

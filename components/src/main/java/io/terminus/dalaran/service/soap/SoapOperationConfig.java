@@ -1,13 +1,13 @@
-package io.terminus.dalaran.component.processor.soap;
+package io.terminus.dalaran.service.soap;
 
-import io.terminus.dalaran.config.OutModelConfig;
+import io.terminus.dalaran.model.ServiceOperation;
 import lombok.Data;
 
 /**
- * Created by jingdi on 2019/5/23
+ * Created by jingdi on 2019/5/27
  */
 @Data
-public class DalaranSoapConfig extends OutModelConfig {
+public class SoapOperationConfig extends ServiceOperation {
 
     private String name;
 

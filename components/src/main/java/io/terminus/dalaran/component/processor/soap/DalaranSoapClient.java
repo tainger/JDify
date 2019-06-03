@@ -7,8 +7,6 @@ import io.terminus.dalaran.DalaranProcessor;
 import io.terminus.dalaran.annotation.Processor;
 import org.apache.camel.model.ProcessorDefinition;
 
-import java.util.Map;
-
 /**
  * Created by jingdi on 2019/5/23
  */
@@ -18,9 +16,8 @@ public class DalaranSoapClient implements DalaranProcessor<DalaranSoapConfig> {
     @Override
     public void configure(ProcessorDefinition route, DalaranSoapConfig config) {
         WSDLParser parser = new WSDLParser();
-        Definitions definitions = parser.parse(config.getWsdl());
-
-        DalaranSoapProcessor processor = new DalaranSoapProcessor();
-        route.process(processor).convertBodyTo(String.class);
+        Definitions definitions = parser.parse("http://127.0.0.1:8081/ws/countries.wsdl");
+        DalaranSoapProcessor processor = new DalaranSoapProcessor(config, definitions);
+        route.process(processor);
     }
 }
