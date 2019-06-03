@@ -14,7 +14,7 @@ import static io.terminus.dalaran.core.DalaranConstants.DALARAN_CONTEXT_EXCHANGE
 @Processor(
         value = "set-context", configType = SetContextConfig.class,
         inputSerializeType = BodySerializeType.Object,
-        outputSerializeType = BodySerializeType.All
+        outputSerializeType = BodySerializeType.Object
 )
 public class SetContextProcessor implements DalaranProcessor<SetContextConfig> {
     @Override
