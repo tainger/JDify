@@ -57,7 +57,6 @@ public class DubboCamelProcessor extends DefaultProducer {
             try {
                 args = exchange.getIn().getBody(Object[].class);
             } catch (ClassCastException e) {
-                // TODO no args
             }
             Object result = genericService.$invoke(method, parameterTypes, args);
             exchange.getOut().setBody(result);
