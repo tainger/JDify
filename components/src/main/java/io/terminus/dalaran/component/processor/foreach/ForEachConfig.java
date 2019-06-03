@@ -1,4 +1,4 @@
-package io.terminus.dalaran.component.processor.retry;
+package io.terminus.dalaran.component.processor.foreach;
 
 import io.terminus.dalaran.core.component.FieldInputType;
 import io.terminus.dalaran.core.component.annotation.ConfigFieldInfo;
@@ -8,13 +8,7 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class RetryConfig {
-
-    @ConfigFieldInfo(label = "最大重试次数", inputType = FieldInputType.Integer)
-    private Integer maxRetry;
-
-    @ConfigFieldInfo(label = "重试间隔(ms)", inputType = FieldInputType.Integer)
-    private Integer retryDelay;
+public class ForEachConfig {
 
     @ConfigFieldInfo(inputType = FieldInputType.Pipeline)
     private List<ProcessorEntity> pipeline;

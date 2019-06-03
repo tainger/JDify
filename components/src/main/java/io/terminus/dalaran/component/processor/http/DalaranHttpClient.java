@@ -28,7 +28,7 @@ public class DalaranHttpClient implements DalaranProcessor<HttpClientConfig>, Da
     @Autowired
     private DalaranConverterContext converterContext;
 
-    private static final String HTTP_URI = "%s4://%s:%s%s%s?bridgeEndpoint=true";
+    private static final String HTTP_URI = "%s4://%s:%s%s?bridgeEndpoint=true";
 
     @Override
     public boolean customConvert(RouteDefinition route, HttpClientConfig config, boolean bodyIsSerialized) {
@@ -39,10 +39,8 @@ public class DalaranHttpClient implements DalaranProcessor<HttpClientConfig>, Da
             converterContext.toObject(route, config.getInModel());
         }
         route.setHeader(Exchange.HTTP_QUERY).method(this, "buildQueryString");
-        if (config.getInModel().getModelType().isSerialized()) {
-            // 如果转为 QueryString 后, body 实际上是无用的
-            route.setBody(Builder.constant(null));
-        }
+        // 如果转为 QueryString 后, body 实际上是无用的
+        route.setBody(Builder.constant(null));
         return false;
     }
 
@@ -51,7 +49,7 @@ public class DalaranHttpClient implements DalaranProcessor<HttpClientConfig>, Da
     public void configure(ProcessorDefinition route, HttpClientConfig config) {
         HttpClientConnector connector = config.getConnector();
         String uri = String.format(HTTP_URI, connector.getProtocol().name().toLowerCase(), connector.getHost(),
-                connector.getPort(), connector.getBasePath(), config.getPath());
+                connector.getPort(), config.getPath());
         route.setHeader("CamelHttpMethod", Builder.constant(config.getMethod().name()));
         route.to(uri);
         // TODO Stream to string
