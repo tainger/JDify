@@ -1,6 +1,7 @@
 package io.terminus.dalaran.core.resource;
 
 import com.alibaba.fastjson.JSON;
+import io.terminus.dalaran.core.DalaranConstants;
 import io.terminus.dalaran.core.component.DalaranProcessor;
 import io.terminus.dalaran.core.component.DalaranProcessorConfigCustomConverter;
 import io.terminus.dalaran.core.component.DalaranTrigger;
@@ -116,10 +117,9 @@ public class DefaultDalaranResourceBuilder implements DalaranResourceBuilder {
     }
 
     @Override
-    public Object buildServiceConfig(Long serviceId) {
-        ServiceAbstractEntity entity = resourceLoader.loadService(serviceId);
-        ServiceInfo serviceInfo = serviceContext.getServiceInfo(entity.getType());
-        return buildConfig(entity.getServiceConfig(), serviceInfo.getServiceConfigType());
+    public Object buildServiceConfig(ServiceAbstractEntity serviceEntity) {
+        ServiceInfo serviceInfo = serviceContext.getServiceInfo(serviceEntity.getType());
+        return buildConfig(serviceEntity.getServiceConfig(), serviceInfo.getServiceConfigType());
     }
 
     private void buildFlow(BasicFlow flow, BasicFlowEntity flowEntity) {
@@ -208,7 +208,7 @@ public class DefaultDalaranResourceBuilder implements DalaranResourceBuilder {
     }
 
     private String replaceProperties(String configValue, Map<String, String> properties) {
-        StringSubstitutor stringSubstitutor = new StringSubstitutor(properties, "${{", "}}");
+        StringSubstitutor stringSubstitutor = new StringSubstitutor(properties, DalaranConstants.ENV_REPLACE_PREFIX, DalaranConstants.ENV_REPLACE_SUFFIX);
         return stringSubstitutor.replace(configValue);
     }
 

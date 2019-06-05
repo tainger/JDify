@@ -177,7 +177,7 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
 //            DalaranTracer convertTracer = DalaranTracer.buildConvertTracer(traceLogger, flow.getId(), lastProcessor.getId());
                 if (outModel.getModelType().isSerialized()) {
 //                convertTracer.before(route, BodyType.OBJECT);
-                    converterContext.fromObject(route, currentModel);
+                    converterContext.fromObject(route, outModel);
                     currentBodyIsSerialized = true;
 //                convertTracer.after(route, currentModel.getModelType());
                 } else {

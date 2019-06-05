@@ -6,6 +6,7 @@ import io.terminus.dalaran.core.flow.model.SubFlow;
 import io.terminus.dalaran.core.flow.model.TriggerFlow;
 import io.terminus.dalaran.core.model.MessageModel;
 import io.terminus.dalaran.core.resource.entity.ModelAbstractEntity;
+import io.terminus.dalaran.core.resource.entity.ServiceAbstractEntity;
 import io.terminus.dalaran.core.resource.entity.SubFlowAbstractEntity;
 import io.terminus.dalaran.core.resource.entity.TriggerFlowAbstractEntity;
 import io.terminus.dalaran.core.resource.entity.basic.BasicFlowEntity;
@@ -27,6 +28,6 @@ public interface DalaranResourceBuilder {
 
     Object buildConnectorConfig(Long connectorId, Class connectorConfigType);
 
-    Object buildServiceConfig(Long serviceId);
+    Object buildServiceConfig(ServiceAbstractEntity serviceEntity);
 
 }
