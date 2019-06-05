@@ -79,8 +79,7 @@ public class DalaranSoapProcessor implements Processor {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-        exchange.getOut().setBody(ob);
+        exchange.getOut().setBody(JSON.toJSON(ob));
     }
 
     private Map<String, Object> buildRequestParams(Map<String, ModelField> modelFields, String body, String rootPath) {

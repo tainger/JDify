@@ -35,7 +35,7 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
         WSDLParser parser = new WSDLParser();
         Definitions definitions = parser.parse(soapOperationConfig.getWsdl());
         DalaranSoapProcessor processor = new DalaranSoapProcessor(soapOperationConfig, definitions);
-        route.unmarshal().json(JsonLibrary.Fastjson).process(processor).marshal().json(JsonLibrary.Fastjson);
+        route.convertBodyTo(String.class).process(processor);
     }
 
     @Override

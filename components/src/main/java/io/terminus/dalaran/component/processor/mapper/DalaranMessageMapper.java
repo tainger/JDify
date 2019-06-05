@@ -41,11 +41,8 @@ public class DalaranMessageMapper implements DalaranProcessor<DalaranMapperConfi
         MappingField mappingField = new MappingField();
         messageMapping.put(MapperConstants.MODEL_ROOT, mappingField);
 
-
         ModelField inModel = buildModelField(in);
         ModelField outModel = buildModelField(out);
-
-
         mappingField.setType(outModel.getType());
         mappingField.setSubType(outModel.getSubType());
         mappingField.setMapping(new HashMap<>());
@@ -55,18 +52,7 @@ public class DalaranMessageMapper implements DalaranProcessor<DalaranMapperConfi
     }
 
     private ModelField buildModelField(MessageModel model) {
-        BodyType bodyType = model.getModelType();
-        ModelField modelField = new ModelField();
-        switch (bodyType) {
-            case JSON:
-                JsonSchema jsonSchema = (JsonSchema)model.getModelSchema();
-                modelField = jsonSchema.getFields().get(MapperConstants.MODEL_ROOT);
-                break;
-            case XML:
-                XMLSchema xmlSchema = (XMLSchema)model.getModelSchema();
-                modelField = xmlSchema.getFields().get(MapperConstants.MODEL_ROOT);
-        }
-        return modelField;
+        return model.getModelSchema().getFields().get(MapperConstants.MODEL_ROOT);
     }
 
     private void buildMessageMapping(Map<String, SimpleMappingField> simpleMapping, MappingField mappingField, ModelField inModel, ModelField outModel, Map<String, String> arrayMapping) {
