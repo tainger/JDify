@@ -29,7 +29,7 @@ public class BasicFlow {
     private List<ProcessorModel> pipeline;
 
     public String getRouteId() {
-        return DalaranConstants.TEST_FLOW_PREFIX + this.getId();
+        return DalaranConstants.FLOW_PREFIX + this.getId();
     }
 
     public String getDirectRouteUri() {
