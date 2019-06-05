@@ -1,6 +1,6 @@
 package io.terminus.dalaran.component.processor.soap;
 
-import io.terminus.dalaran.config.OutModelConfig;
+import io.terminus.dalaran.core.component.config.OutModelConfig;
 import lombok.Data;
 
 /**

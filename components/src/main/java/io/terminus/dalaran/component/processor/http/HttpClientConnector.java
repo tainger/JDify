@@ -1,8 +1,8 @@
 package io.terminus.dalaran.component.processor.http;
 
-import io.terminus.dalaran.FieldInputType;
-import io.terminus.dalaran.annotation.ConfigFieldInfo;
 import io.terminus.dalaran.component.common.HttpProtocol;
+import io.terminus.dalaran.core.component.FieldInputType;
+import io.terminus.dalaran.core.component.annotation.ConfigFieldInfo;
 import lombok.Data;
 
 @Data
@@ -12,9 +12,6 @@ public class HttpClientConnector {
 
     @ConfigFieldInfo(label = "协议", inputType = FieldInputType.Radio, defaultValue = "HTTP")
     private HttpProtocol protocol;
-
-    @ConfigFieldInfo(label = "基础地址", inputType = FieldInputType.String, defaultValue = "/")
-    private String basePath;
 
     @ConfigFieldInfo(label = "端口", inputType = FieldInputType.Integer, defaultValue = "80")
     private Integer port = 80;

@@ -2,19 +2,20 @@ package io.terminus.dalaran.service.soap;
 
 import com.predic8.schema.*;
 import com.predic8.wsdl.*;
-import io.terminus.dalaran.BodyType;
-import io.terminus.dalaran.DalaranService;
-import io.terminus.dalaran.FieldType;
-import io.terminus.dalaran.annotation.ServiceConnector;
 import io.terminus.dalaran.component.processor.soap.DalaranSoapProcessor;
-import io.terminus.dalaran.model.MessageModel;
-import io.terminus.dalaran.model.ModelField;
-import io.terminus.dalaran.model.schema.XMLSchema;
+import io.terminus.dalaran.core.component.DalaranService;
+import io.terminus.dalaran.core.component.annotation.ServiceConnector;
+import io.terminus.dalaran.core.model.BodyType;
+import io.terminus.dalaran.core.model.FieldType;
+import io.terminus.dalaran.core.model.MessageModel;
+import io.terminus.dalaran.core.model.ModelField;
+import io.terminus.dalaran.core.model.schema.XMLSchema;
 import org.apache.camel.model.ProcessorDefinition;
 import org.apache.camel.model.dataformat.JsonLibrary;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

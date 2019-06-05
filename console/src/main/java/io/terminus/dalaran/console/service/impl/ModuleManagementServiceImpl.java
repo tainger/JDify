@@ -1,15 +1,12 @@
 package io.terminus.dalaran.console.service.impl;
 
+import io.terminus.dalaran.console.entity.ModuleEntity;
 import io.terminus.dalaran.console.model.dto.ModuleDTO;
 import io.terminus.dalaran.console.model.dto.ModuleDetailDTO;
 import io.terminus.dalaran.console.model.query.ModuleQuery;
-import io.terminus.dalaran.console.service.ConnectorService;
-import io.terminus.dalaran.console.service.FlowManagementService;
-import io.terminus.dalaran.console.service.ModelManagementService;
-import io.terminus.dalaran.console.service.ModuleManagementService;
+import io.terminus.dalaran.console.repository.ModuleRepository;
+import io.terminus.dalaran.console.service.*;
 import io.terminus.dalaran.console.service.jpa.ModuleQueryService;
-import io.terminus.dalaran.entity.manage.ModuleEntity;
-import io.terminus.dalaran.repository.ModuleRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +37,9 @@ public class ModuleManagementServiceImpl implements ModuleManagementService {
 
     @Autowired
     private ConnectorService connectorService;
+
+    @Autowired
+    private ServiceManagement serviceManagement;
 
     @Override
     public Long createModule(ModuleDTO moduleModel) {
@@ -96,6 +96,7 @@ public class ModuleManagementServiceImpl implements ModuleManagementService {
         moduleDetail.setFlows(flowManagementService.listBasicFlowInfoByModuleId(moduleId));
         moduleDetail.setModels(modelManagementService.listBasicInfoByModuleId(moduleId));
         moduleDetail.setConnectors(connectorService.listBasicInfoByModuleId(moduleId));
+        moduleDetail.setServices(serviceManagement.listBasicInfoByModuleId(moduleId));
         return moduleDetail;
     }
 

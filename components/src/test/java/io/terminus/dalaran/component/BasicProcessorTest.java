@@ -1,6 +1,6 @@
 package io.terminus.dalaran.component;
 
-import io.terminus.dalaran.DalaranProcessor;
+import io.terminus.dalaran.core.component.DalaranProcessor;
 import org.apache.camel.CamelContext;
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.impl.DefaultCamelContext;

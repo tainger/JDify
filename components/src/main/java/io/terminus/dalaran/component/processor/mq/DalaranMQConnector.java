@@ -1,8 +1,8 @@
 package io.terminus.dalaran.component.processor.mq;
 
-import io.terminus.dalaran.FieldInputType;
-import io.terminus.dalaran.annotation.ConfigFieldInfo;
 import io.terminus.dalaran.component.processor.mq.model.MQType;
+import io.terminus.dalaran.core.component.FieldInputType;
+import io.terminus.dalaran.core.component.annotation.ConfigFieldInfo;
 import lombok.Data;
 
 /**

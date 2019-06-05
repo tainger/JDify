@@ -3,10 +3,10 @@ package io.terminus.dalaran.console.service;
 import io.terminus.dalaran.console.model.ReleaseRequestDTO;
 import io.terminus.dalaran.console.model.dto.ReleaseRecordDTO;
 import io.terminus.dalaran.console.model.dto.flow.TriggerFlowDTO;
-import io.terminus.dalaran.entity.release.ModelReleasedEntity;
-import io.terminus.dalaran.entity.release.PropertyReleasedEntity;
-import io.terminus.dalaran.entity.release.SubFlowReleasedEntity;
-import io.terminus.dalaran.entity.release.TriggerFlowReleasedEntity;
+import io.terminus.dalaran.core.resource.entity.released.ModelReleasedEntity;
+import io.terminus.dalaran.core.resource.entity.released.PropertyReleasedEntity;
+import io.terminus.dalaran.core.resource.entity.released.SubFlowReleasedEntity;
+import io.terminus.dalaran.core.resource.entity.released.TriggerFlowReleasedEntity;
 
 import java.util.List;
 

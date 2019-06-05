@@ -14,7 +14,7 @@
     <dependencies>
         <dependency>
             <groupId>io.terminus</groupId>
-            <artifactId>dalaran-common</artifactId>
+            <artifactId>dalaran-components</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -26,20 +26,10 @@
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
-        <!-- TODO 奇怪, 为什么需要显式声明-->
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
-            <version>3.8</version>
-        </dependency>
-        <dependency>
-            <groupId>io.terminus</groupId>
-            <artifactId>dalaran-components</artifactId>
-            <version>${project.version}</version>
-        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-test</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -50,6 +40,7 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-test</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>io.springfox</groupId>

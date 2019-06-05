@@ -10,17 +10,17 @@ import io.swagger.models.properties.ObjectProperty;
 import io.swagger.models.properties.Property;
 import io.swagger.models.properties.RefProperty;
 import io.swagger.util.Json;
-import io.terminus.dalaran.BodyType;
-import io.terminus.dalaran.DalaranService;
-import io.terminus.dalaran.FieldType;
-import io.terminus.dalaran.annotation.ServiceConnector;
 import io.terminus.dalaran.component.common.HttpMethod;
-import io.terminus.dalaran.model.MessageModel;
-import io.terminus.dalaran.model.ModelField;
-import io.terminus.dalaran.model.schema.JsonSchema;
+import io.terminus.dalaran.core.component.DalaranService;
+import io.terminus.dalaran.core.component.annotation.ServiceConnector;
+import io.terminus.dalaran.core.model.BodyType;
+import io.terminus.dalaran.core.model.FieldType;
+import io.terminus.dalaran.core.model.MessageModel;
+import io.terminus.dalaran.core.model.ModelField;
+import io.terminus.dalaran.core.model.schema.JsonSchema;
 import org.apache.camel.builder.Builder;
 import org.apache.camel.model.ProcessorDefinition;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
@@ -45,7 +45,7 @@ public class SwaggerService implements DalaranService<SwaggerImportConfig, Swagg
 
     private static final String SUCCESSFUL_RESPONSE_CODE = "200";
 
-    private static final String OPERATION_SPLIT = ":::";
+    private static final String OPERATION_SPLIT = "::";
 
     @Override
     public void configure(ProcessorDefinition route, SwaggerOperationConfig operationConfig) {
@@ -61,7 +61,7 @@ public class SwaggerService implements DalaranService<SwaggerImportConfig, Swagg
     public SwaggerOperationConfig getOperationConfig(SwaggerServiceConfig swaggerServiceConfig, @NotNull String operationKey) {
         String[] operation = operationKey.split(OPERATION_SPLIT);
         Optional<SwaggerOperationConfig> operationConfigOptional = swaggerServiceConfig.getConfigs().stream()
-                .filter(config -> StringUtils.equals(config.getPath(), operation[0]) && StringUtils.equals(config.getMethod().toString(), operation[1]))
+                .filter(config -> StringUtils.equals(config.getPath(), operation[1]) && StringUtils.equals(config.getMethod().toString(), operation[0]))
                 .findFirst();
         if (!operationConfigOptional.isPresent()) {
             // TODO throw
@@ -74,7 +74,7 @@ public class SwaggerService implements DalaranService<SwaggerImportConfig, Swagg
     public List<String> operations(SwaggerServiceConfig swaggerServiceConfig) {
         return swaggerServiceConfig
                 .getConfigs()
-                .stream().map(config -> config.getPath() + OPERATION_SPLIT + config.getMethod())
+                .stream().map(config -> config.getMethod() + OPERATION_SPLIT + config.getPath())
                 .collect(Collectors.toList());
     }
 

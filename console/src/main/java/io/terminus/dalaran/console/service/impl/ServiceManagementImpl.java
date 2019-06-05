@@ -1,15 +1,20 @@
 package io.terminus.dalaran.console.service.impl;
 
 import com.alibaba.fastjson.JSON;
-import io.terminus.dalaran.DalaranServiceContext;
+import io.terminus.dalaran.console.entity.ServiceEntity;
+import io.terminus.dalaran.console.model.dto.BasicServiceInfo;
 import io.terminus.dalaran.console.model.dto.ServiceDTO;
+import io.terminus.dalaran.console.repository.ServiceRepository;
 import io.terminus.dalaran.console.service.ServiceManagement;
-import io.terminus.dalaran.entity.manage.ServiceEntity;
-import io.terminus.dalaran.model.config.ServiceInfo;
-import io.terminus.dalaran.repository.ServiceRepository;
+import io.terminus.dalaran.core.config.ServiceInfo;
+import io.terminus.dalaran.core.context.DalaranServiceContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityManager;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -22,6 +27,9 @@ public class ServiceManagementImpl implements ServiceManagement {
 
     @Autowired
     private DalaranServiceContext serviceContext;
+
+    @Autowired
+    private EntityManager entityManager;
 
     @Override
     public Long create(ServiceDTO serviceDTO) {
@@ -60,6 +68,16 @@ public class ServiceManagementImpl implements ServiceManagement {
         return serviceContext.getService(entity.getType()).operations(serviceConfig);
     }
 
+    @Override
+    public List<BasicServiceInfo> listBasicInfoByModuleId(Long moduleId) {
+        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<BasicServiceInfo> criteriaQuery = builder.createQuery(BasicServiceInfo.class);
+        Root<ServiceEntity> root = criteriaQuery.from(ServiceEntity.class);
+        criteriaQuery.multiselect(root.get("id"), root.get("moduleId"), root.get("type"), root.get("name"))
+                .where(builder.equal(root.get("moduleId"), moduleId));
+        return entityManager.createQuery(criteriaQuery).getResultList();
+    }
+
     private ServiceDTO toDTO(ServiceEntity entity) {
         ServiceDTO dto = new ServiceDTO();
         dto.setId(entity.getId());
@@ -68,6 +86,7 @@ public class ServiceManagementImpl implements ServiceManagement {
         dto.setType(entity.getType());
         dto.setDescription(entity.getDescription());
         dto.setImportConfig(JSON.parseObject(entity.getImportConfig(), Map.class));
+        dto.setServiceConfig(JSON.parseObject(entity.getServiceConfig(), Map.class));
         return dto;
     }
 

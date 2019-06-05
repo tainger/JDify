@@ -1,14 +1,18 @@
 package io.terminus.dalaran.component.trigger.mq.kafka;
 
-import io.terminus.dalaran.BodyType;
-import io.terminus.dalaran.DalaranTrigger;
-import io.terminus.dalaran.annotation.Trigger;
+import io.terminus.dalaran.core.component.BodySerializeType;
+import io.terminus.dalaran.core.component.DalaranTrigger;
+import io.terminus.dalaran.core.component.annotation.Trigger;
+import io.terminus.dalaran.core.model.BodyType;
 import org.apache.camel.model.RouteDefinition;
 
 /**
  * Created by jingdi on 2019/5/20
  */
-@Trigger(value = "kafka-consumer", configType = DalaranKafkaConsumerConfig.class, allowBodyTypes = {BodyType.JSON, BodyType.XML}, serializedBody = true)
+@Trigger(value = "kafka-consumer", configType = DalaranKafkaConsumerConfig.class, allowBodyTypes = {BodyType.JSON, BodyType.XML},
+        inputSerializeType = BodySerializeType.Serialized,
+        outputSerializeType = BodySerializeType.Serialized
+)
 public class DalaranKafkaConsumer implements DalaranTrigger<DalaranKafkaConsumerConfig> {
 
     @Override

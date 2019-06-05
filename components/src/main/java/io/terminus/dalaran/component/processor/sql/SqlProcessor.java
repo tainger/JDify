@@ -1,17 +1,22 @@
 package io.terminus.dalaran.component.processor.sql;
 
-import io.terminus.dalaran.DalaranProcessor;
-import io.terminus.dalaran.annotation.Processor;
+import io.terminus.dalaran.core.component.BodySerializeType;
+import io.terminus.dalaran.core.component.DalaranProcessor;
+import io.terminus.dalaran.core.component.annotation.Processor;
 import org.apache.camel.model.ProcessorDefinition;
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 
 import javax.sql.DataSource;
 
-@Processor(value = "sql", configType = SqlConfig.class, serializedBody = false)
-public class SqlProcessor implements DalaranProcessor<SqlConfig>, BeanFactoryPostProcessor {
+@Processor(
+        value = "sql", configType = SqlConfig.class,
+        inputSerializeType = BodySerializeType.Object,
+        outputSerializeType = BodySerializeType.Object
+)
+public class SqlProcessor implements DalaranProcessor<SqlConfig> {
 
+    @Autowired
     private ConfigurableListableBeanFactory beanFactory;
 
     @Override
@@ -45,10 +50,5 @@ public class SqlProcessor implements DalaranProcessor<SqlConfig>, BeanFactoryPos
 
     private String getDataSourceBeanName(Long connectorId) {
         return "sqlDataSource-" + connectorId;
-    }
-
-    @Override
-    public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
-        this.beanFactory = beanFactory;
     }
 }

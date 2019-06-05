@@ -3,11 +3,12 @@ package io.terminus.dalaran.component.processor.http;
 import com.google.common.base.Joiner;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Maps;
-import io.terminus.dalaran.BodyType;
-import io.terminus.dalaran.CustomConvert;
-import io.terminus.dalaran.DalaranConverterContext;
-import io.terminus.dalaran.DalaranProcessor;
-import io.terminus.dalaran.annotation.Processor;
+import io.terminus.dalaran.core.component.BodySerializeType;
+import io.terminus.dalaran.core.component.DalaranMessageBodyCustomConverter;
+import io.terminus.dalaran.core.component.DalaranProcessor;
+import io.terminus.dalaran.core.component.annotation.Processor;
+import io.terminus.dalaran.core.context.DalaranConverterContext;
+import io.terminus.dalaran.core.model.BodyType;
 import org.apache.camel.Exchange;
 import org.apache.camel.builder.Builder;
 import org.apache.camel.model.ProcessorDefinition;
@@ -16,13 +17,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Map;
 
-@Processor(value = "http-client", configType = HttpClientConfig.class, serializedBody = true, allowBodyTypes = {BodyType.JSON, BodyType.XML})
-public class DalaranHttpClient implements DalaranProcessor<HttpClientConfig>, CustomConvert<HttpClientConfig> {
+@Processor(
+        value = "http-client", configType = HttpClientConfig.class,
+        allowBodyTypes = {BodyType.JSON, BodyType.XML},
+        inputSerializeType = BodySerializeType.Serialized,
+        outputSerializeType = BodySerializeType.Serialized
+)
+public class DalaranHttpClient implements DalaranProcessor<HttpClientConfig>, DalaranMessageBodyCustomConverter<HttpClientConfig> {
 
     @Autowired
     private DalaranConverterContext converterContext;
 
-    private static final String HTTP_URI = "%s4://%s:%s%s%s?bridgeEndpoint=true";
+    private static final String HTTP_URI = "%s4://%s:%s%s?bridgeEndpoint=true";
 
     @Override
     public boolean customConvert(RouteDefinition route, HttpClientConfig config, boolean bodyIsSerialized) {
@@ -33,10 +39,8 @@ public class DalaranHttpClient implements DalaranProcessor<HttpClientConfig>, Cu
             converterContext.toObject(route, config.getInModel());
         }
         route.setHeader(Exchange.HTTP_QUERY).method(this, "buildQueryString");
-        if (config.getInModel().getModelType().isSerialized()) {
-            // 如果转为 QueryString 后, body 实际上是无用的
-            route.setBody(Builder.constant(null));
-        }
+        // 如果转为 QueryString 后, body 实际上是无用的
+        route.setBody(Builder.constant(null));
         return false;
     }
 
@@ -45,7 +49,7 @@ public class DalaranHttpClient implements DalaranProcessor<HttpClientConfig>, Cu
     public void configure(ProcessorDefinition route, HttpClientConfig config) {
         HttpClientConnector connector = config.getConnector();
         String uri = String.format(HTTP_URI, connector.getProtocol().name().toLowerCase(), connector.getHost(),
-                connector.getPort(), connector.getBasePath(), config.getPath());
+                connector.getPort(), config.getPath());
         route.setHeader("CamelHttpMethod", Builder.constant(config.getMethod().name()));
         route.to(uri);
         // TODO Stream to string
