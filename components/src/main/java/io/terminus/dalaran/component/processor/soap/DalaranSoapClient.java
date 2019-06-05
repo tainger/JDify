@@ -10,14 +10,14 @@ import org.apache.camel.model.ProcessorDefinition;
 /**
  * Created by jingdi on 2019/5/23
  */
-@Processor(value = "soap-client", configType = DalaranSoapConfig.class, serializedBody = true, allowBodyTypes = {BodyType.JSON, BodyType.XML})
+@Processor(value = "soap-client", configType = DalaranSoapConfig.class, serializedBody = false, allowBodyTypes = {BodyType.JSON, BodyType.XML})
 public class DalaranSoapClient implements DalaranProcessor<DalaranSoapConfig> {
 
     @Override
     public void configure(ProcessorDefinition route, DalaranSoapConfig config) {
         WSDLParser parser = new WSDLParser();
         Definitions definitions = parser.parse("http://127.0.0.1:8081/ws/countries.wsdl");
-        DalaranSoapProcessor processor = new DalaranSoapProcessor(config, definitions);
+        DalaranSoapProcessor processor = new DalaranSoapProcessor(null, definitions);
         route.process(processor);
     }
 }

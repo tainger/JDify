@@ -11,6 +11,7 @@ import io.terminus.dalaran.model.MessageModel;
 import io.terminus.dalaran.model.ModelField;
 import io.terminus.dalaran.model.schema.XMLSchema;
 import org.apache.camel.model.ProcessorDefinition;
+import org.apache.camel.model.dataformat.JsonLibrary;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
@@ -32,8 +33,8 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
     public void configure(ProcessorDefinition route, SoapOperationConfig soapOperationConfig) {
         WSDLParser parser = new WSDLParser();
         Definitions definitions = parser.parse(soapOperationConfig.getWsdl());
-        DalaranSoapProcessor processor = new DalaranSoapProcessor(null, definitions);
-        route.process(processor).convertBodyTo(String.class);
+        DalaranSoapProcessor processor = new DalaranSoapProcessor(soapOperationConfig, definitions);
+        route.unmarshal().json(JsonLibrary.Fastjson).process(processor).marshal().json(JsonLibrary.Fastjson);
     }
 
     @Override
@@ -109,7 +110,6 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
             List<Part> parts = message.getParts();
             if (CollectionUtils.isNotEmpty(parts)) {
                 parts.forEach(part -> {
-                    ModelField modelField = new ModelField();
                     Element element = part.getElement();
                     if (element != null) {
                         Schema schema = element.getSchema();
