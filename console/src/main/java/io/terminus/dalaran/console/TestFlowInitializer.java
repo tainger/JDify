@@ -1,9 +1,10 @@
 package io.terminus.dalaran.console;
 
+import io.terminus.dalaran.console.entity.SubFlowEntity;
 import io.terminus.dalaran.console.entity.TriggerFlowEntity;
 import io.terminus.dalaran.core.context.DalaranContext;
 import io.terminus.dalaran.core.flow.model.BasicFlow;
-import io.terminus.dalaran.core.flow.model.TriggerFlow;
+import io.terminus.dalaran.core.flow.model.SubFlow;
 import io.terminus.dalaran.core.resource.DalaranResourceBuilder;
 import io.terminus.dalaran.core.resource.entity.SubFlowAbstractEntity;
 import io.terminus.dalaran.core.resource.entity.TriggerFlowAbstractEntity;
@@ -53,14 +54,18 @@ public class TestFlowInitializer {
             public void run() {
                 List<TriggerFlowEntity> triggerFlows = resourceLoader.loadAllTriggerFlow();
                 for (TriggerFlowEntity triggerFlowEntity : triggerFlows) {
-                    TriggerFlow triggerFlow = resourceBuilder.buildTriggerFlow(triggerFlowEntity);
-                    dalaranContext.addTestFlow(triggerFlow);
-                    log.info("load test flow {}", triggerFlow.getId());
+                    BasicFlow testFlow = resourceBuilder.buildTriggerFlow(triggerFlowEntity);
+                    dalaranContext.addTestFlow(testFlow);
+                    log.info("load test flow {}", testFlow.getId());
+                }
+                List<SubFlowEntity> subFlows = resourceLoader.loadAllSubFlow();
+                for (SubFlowEntity subFlowEntity : subFlows) {
+                    SubFlow testFlow = resourceBuilder.buildSubFlow(subFlowEntity);
+                    dalaranContext.addSubFlow(testFlow);
+                    dalaranContext.addTestFlow(testFlow);
+                    log.info("load test sub-flow {}", testFlow.getId());
                 }
             }
         }, 5000L);
-
-
-        // TODO load sub flow
     }
 }

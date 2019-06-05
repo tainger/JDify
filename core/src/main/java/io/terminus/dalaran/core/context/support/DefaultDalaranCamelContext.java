@@ -17,6 +17,9 @@ import org.apache.camel.model.RouteDefinition;
 
 import java.util.List;
 
+import static io.terminus.dalaran.core.DalaranConstants.FLOW_PREFIX;
+import static io.terminus.dalaran.core.DalaranConstants.TEST_FLOW_DIRECT_PREFIX;
+
 public class DefaultDalaranCamelContext implements DalaranContext<DalaranRoute> {
 
     private final DalaranFlowBuilder<DalaranRoute> flowBuilder;
@@ -68,7 +71,7 @@ public class DefaultDalaranCamelContext implements DalaranContext<DalaranRoute> 
     @Override
     public void addTriggerFlow(TriggerFlow flow) {
         try {
-            camelContext.removeRoute(DalaranConstants.FLOW_PREFIX + flow.getId());
+            camelContext.removeRoute(FLOW_PREFIX + flow.getId());
             RouteDefinition route = flowBuilder.buildTriggerFlow(flow);
             camelContext.addRouteDefinition(route);
         } catch (Exception e) {
@@ -133,7 +136,7 @@ public class DefaultDalaranCamelContext implements DalaranContext<DalaranRoute> 
     @Override
     public void testFlow(Long flowId, String body, String recordId) {
         DefaultProducerTemplate template = (DefaultProducerTemplate) camelContext.createProducerTemplate();
-        template.sendBodyAndProperty(DalaranConstants.TEST_FLOW_DIRECT_PREFIX + DalaranConstants.FLOW_PREFIX + flowId, body, DalaranConstants.TEST_FLOW_RECORD_ID_HEADER, recordId);
+        template.sendBodyAndProperty(TEST_FLOW_DIRECT_PREFIX + FLOW_PREFIX + flowId, body, DalaranConstants.TEST_FLOW_RECORD_ID_HEADER, recordId);
     }
 
     @Override

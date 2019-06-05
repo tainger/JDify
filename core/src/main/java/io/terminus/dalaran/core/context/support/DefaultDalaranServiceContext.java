@@ -2,8 +2,6 @@ package io.terminus.dalaran.core.context.support;
 
 import io.terminus.dalaran.core.component.DalaranService;
 import io.terminus.dalaran.core.component.annotation.ServiceConnector;
-import io.terminus.dalaran.core.component.config.ServiceOperationConfig;
-import io.terminus.dalaran.core.component.model.ServiceOperation;
 import io.terminus.dalaran.core.config.DalaranConfigField;
 import io.terminus.dalaran.core.config.ServiceInfo;
 import io.terminus.dalaran.core.context.DalaranServiceContext;
@@ -51,11 +49,6 @@ public class DefaultDalaranServiceContext implements DalaranServiceContext, Appl
     @Override
     public ServiceInfo getServiceInfo(String serviceType) {
         return serviceInfoMapping.get(serviceType);
-    }
-
-    @Override
-    public ServiceOperation buildOperationConfig(String serviceType, Object serviceConfig, ServiceOperationConfig config) {
-        return getService(serviceType).getOperationConfig(serviceConfig, config.getOperation());
     }
 
     @Override

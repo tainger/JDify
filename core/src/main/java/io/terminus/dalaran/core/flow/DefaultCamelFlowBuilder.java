@@ -1,5 +1,6 @@
 package io.terminus.dalaran.core.flow;
 
+import io.terminus.dalaran.core.DalaranConstants;
 import io.terminus.dalaran.core.component.BodySerializeType;
 import io.terminus.dalaran.core.component.DalaranMessageBodyCustomConverter;
 import io.terminus.dalaran.core.component.DalaranProcessor;
@@ -21,9 +22,6 @@ import lombok.val;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.List;
-
-import static io.terminus.dalaran.core.DalaranConstants.DIRECT_PREFIX;
-import static io.terminus.dalaran.core.DalaranConstants.TEST_FLOW_DIRECT_PREFIX;
 
 public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute> {
 
@@ -51,7 +49,7 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
     public DalaranRoute buildTriggerFlow(TriggerFlow flow) {
         val triggerComponent = componentContext.getTrigger(flow.getTriggerType());
         val flowTracer = DalaranTracer.buildFlowTracer(traceLogger, flow.getId());
-        val route = newRouteDefinition();
+        val route = createRouteDefinition();
         route.setId(flow.getRouteId());
         triggerComponent.buildFromRoute(route, flow.getTriggerConfig());
         flowTracer.before(route, flow.getInModel().getModelType());
@@ -67,9 +65,7 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
     @Override
     public DalaranRoute buildSubFLow(SubFlow flow) {
         val flowTracer = DalaranTracer.buildSubFlowTracer(traceLogger, flow.getId());
-        val route = newRouteDefinition();
-        route.setId(flow.getRouteId());
-        route.from(DIRECT_PREFIX + flow.getRouteId());
+        val route = createRouteDefinition(flow);
         flowTracer.before(route, flow.getInModel().getModelType());
         buildFlowRoute(route, flow, null);
         flowTracer.after(route, flow.getOutModel().getModelType());
@@ -78,10 +74,7 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
 
     @Override
     public DalaranRoute buildFlowFragment(FlowFragment fragment) {
-        val route = newRouteDefinition();
-        route.setId(fragment.getRouteId());
-        route.from(DIRECT_PREFIX + fragment.getRouteId());
-
+        val route = createRouteDefinition(fragment);
         buildFlowRoute(route, fragment, false);
         return route;
     }
@@ -89,9 +82,8 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
     @Override
     public DalaranRoute buildTestFLow(BasicFlow flow) {
         val flowTracer = DalaranTracer.buildTestFlowTracer(traceLogger, flow.getId());
-        val route = newRouteDefinition();
-        route.setId(flow.getRouteId());
-        route.from(TEST_FLOW_DIRECT_PREFIX + flow.getRouteId());
+        val route = createRouteDefinition();
+        route.from(DalaranConstants.TEST_FLOW_DIRECT_PREFIX + flow.getRouteId());
         flowTracer.before(route, flow.getInModel().getModelType());
 
         // TODO 测试的输入一定是序列化的, XML/Json 等都是直接扔进去, 如果入参是 Object, 前端引导输入 Json 做反序列化处理吧
@@ -193,7 +185,14 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
         route.setLastOutModel(outModel);
     }
 
-    private DalaranRoute newRouteDefinition() {
+    private DalaranRoute createRouteDefinition(BasicFlow flow) {
+        val route = createRouteDefinition();
+        route.setId(flow.getRouteId());
+        route.from(flow.getDirectRouteUri());
+        return route;
+    }
+
+    private DalaranRoute createRouteDefinition() {
         DalaranRoute route = new DalaranRoute();
         route.errorHandler(errorHandlerFactory);
         return route;
