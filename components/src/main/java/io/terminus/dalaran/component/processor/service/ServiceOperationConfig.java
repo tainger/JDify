@@ -1,9 +1,10 @@
-package io.terminus.dalaran.core.component.config;
+package io.terminus.dalaran.component.processor.service;
 
 import com.alibaba.fastjson.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.terminus.dalaran.core.component.FieldInputType;
 import io.terminus.dalaran.core.component.annotation.ConfigFieldInfo;
+import io.terminus.dalaran.core.component.config.ComponentModelConfig;
 import lombok.Data;
 
 @Data
