@@ -1,27 +1,32 @@
 package io.terminus.dalaran.core.flow;
 
 import io.terminus.dalaran.core.DalaranConstants;
-import io.terminus.dalaran.core.component.BodySerializeType;
-import io.terminus.dalaran.core.component.DalaranMessageBodyCustomConverter;
-import io.terminus.dalaran.core.component.DalaranProcessor;
+import io.terminus.dalaran.core.component.*;
 import io.terminus.dalaran.core.component.model.ProcessorModel;
+import io.terminus.dalaran.core.config.ComponentInfo;
+import io.terminus.dalaran.core.config.DalaranConfigField;
 import io.terminus.dalaran.core.config.ProcessorInfo;
+import io.terminus.dalaran.core.config.TriggerInfo;
 import io.terminus.dalaran.core.context.DalaranComponentContext;
 import io.terminus.dalaran.core.context.DalaranConverterContext;
-import io.terminus.dalaran.core.flow.model.BasicFlow;
-import io.terminus.dalaran.core.flow.model.FlowFragment;
-import io.terminus.dalaran.core.flow.model.SubFlow;
-import io.terminus.dalaran.core.flow.model.TriggerFlow;
+import io.terminus.dalaran.core.flow.model.*;
 import io.terminus.dalaran.core.log.DalaranTraceLogger;
 import io.terminus.dalaran.core.log.DalaranTracer;
 import io.terminus.dalaran.core.log.TracingErrorHandlerFactory;
 import io.terminus.dalaran.core.model.BodyType;
 import io.terminus.dalaran.core.model.MessageModel;
 import lombok.val;
+import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import static io.terminus.dalaran.core.flow.FlowValidateMessage.NOT_NULL;
 
 public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute> {
 
@@ -100,6 +105,58 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
 
         flowTracer.after(route, flow.getOutModel().getModelType());
         return route;
+    }
+
+    @Override
+    public List<FlowValidation> validateFlow(BasicFlow flow) {
+        List<FlowValidation> validateMessages = flow.getPipeline().stream().flatMap(processorModel -> {
+            DalaranProcessor processor = componentContext.getProcessor(processorModel.getType());
+            ProcessorInfo processorInfo = componentContext.getProcessorInfo(processorModel.getType());
+            List<FlowValidation> processorMessageList = validate(processorInfo, processorModel.getConfig());
+            if (processor instanceof DalaranComponentValidator) {
+                List<FlowValidation> processorCustomMessageList = ((DalaranComponentValidator) processor).validate(processorModel.getConfig());
+                processorMessageList.addAll(processorCustomMessageList);
+            }
+            processorMessageList.forEach(message -> {
+                message.setTargetType(ComponentType.Processor);
+                message.setTargetId(processorModel.getId());
+            });
+            return processorMessageList.stream();
+        }).collect(Collectors.toList());
+        if (flow instanceof TriggerFlow) {
+            TriggerFlow triggerFlow = ((TriggerFlow) flow);
+            DalaranTrigger trigger = componentContext.getTrigger(triggerFlow.getTriggerType());
+            TriggerInfo triggerInfo = componentContext.getTriggerInfo(triggerFlow.getTriggerType());
+
+            List<FlowValidation> flowValidateMessages = validate(triggerInfo, triggerFlow.getTriggerConfig());
+            if (trigger instanceof DalaranComponentValidator) {
+                List<FlowValidation> triggerCustomMessageList = ((DalaranComponentValidator) trigger).validate(triggerFlow.getTriggerConfig());
+                flowValidateMessages.addAll(triggerCustomMessageList);
+            }
+            flowValidateMessages.forEach(message -> {
+                message.setTargetType(ComponentType.Trigger);
+            });
+            validateMessages.addAll(flowValidateMessages);
+        }
+        return validateMessages;
+    }
+
+    private List<FlowValidation> validate(ComponentInfo componentInfo, Object config) {
+        List<FlowValidation> validateMessages = new ArrayList<>();
+        for (DalaranConfigField configField : componentInfo.getConfigFields()) {
+            try {
+                if (configField.isRequired() && StringUtils.isBlank(BeanUtils.getProperty(config, configField.getName()))) {
+                    FlowValidation message = new FlowValidation();
+                    message.setType(ValidateMessageType.Error);
+                    message.setField(configField.getName());
+                    message.setMessage(NOT_NULL);
+                    validateMessages.add(message);
+                }
+            } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+                e.printStackTrace();
+            }
+        }
+        return validateMessages;
     }
 
     // TODO currentBodyIsSerialized 这个还是比较绕的....
