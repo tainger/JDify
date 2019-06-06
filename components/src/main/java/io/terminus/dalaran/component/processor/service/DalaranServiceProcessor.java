@@ -1,7 +1,9 @@
 package io.terminus.dalaran.component.processor.service;
 
-import io.terminus.dalaran.component.processor.http.HttpClientConfig;
-import io.terminus.dalaran.core.component.*;
+import io.terminus.dalaran.core.component.BodySerializeType;
+import io.terminus.dalaran.core.component.DalaranProcessor;
+import io.terminus.dalaran.core.component.DalaranProcessorConfigCustomConverter;
+import io.terminus.dalaran.core.component.DalaranService;
 import io.terminus.dalaran.core.component.annotation.Processor;
 import io.terminus.dalaran.core.component.model.ComponentModel;
 import io.terminus.dalaran.core.component.model.ServiceOperation;
@@ -11,7 +13,6 @@ import io.terminus.dalaran.core.resource.DalaranResourceBuilder;
 import io.terminus.dalaran.core.resource.DalaranResourceLoader;
 import io.terminus.dalaran.core.resource.entity.ServiceAbstractEntity;
 import org.apache.camel.model.ProcessorDefinition;
-import org.apache.camel.model.RouteDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @Processor(
@@ -19,7 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
         inputSerializeType = BodySerializeType.Serialized,
         outputSerializeType = BodySerializeType.Serialized
 )
-public class DalaranServiceProcessor implements DalaranProcessor<DalaranServiceOperation>, DalaranDynamicBodySerializeType<HttpClientConfig>, DalaranProcessorConfigCustomConverter<ServiceOperationConfig, DalaranServiceOperation> {
+public class DalaranServiceProcessor implements DalaranProcessor<DalaranServiceOperation>, DalaranProcessorConfigCustomConverter<ServiceOperationConfig, DalaranServiceOperation> {
 
     private final DalaranServiceContext serviceContext;
 
@@ -37,11 +38,6 @@ public class DalaranServiceProcessor implements DalaranProcessor<DalaranServiceO
     @Override
     public void configure(ProcessorDefinition route, DalaranServiceOperation config) {
         config.getDalaranService().configure(route, config.getOperationConfig());
-    }
-
-    @Override
-    public BodySerializeType customBodySerializeType(HttpClientConfig config) {
-        return null;
     }
 
     @Override
