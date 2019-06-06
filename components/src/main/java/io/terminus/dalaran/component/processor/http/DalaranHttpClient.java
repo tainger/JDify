@@ -31,7 +31,7 @@ public class DalaranHttpClient implements DalaranProcessor<HttpClientConfig>, Da
     private static final String HTTP_URI = "%s4://%s:%s%s%s?bridgeEndpoint=true";
 
     @Override
-    public boolean customConvert(RouteDefinition route, HttpClientConfig config, boolean bodyIsSerialized) {
+    public boolean customBodyConvert(RouteDefinition route, HttpClientConfig config, boolean bodyIsSerialized) {
         if (!config.getMethod().isNoBody()) {
             return true;
         }

@@ -130,7 +130,7 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
 //                currentBodyIsSerialized = currentModel.getModelType().isSerialized();
             boolean needConvert = true;
             if (processorComponent instanceof DalaranMessageBodyCustomConverter) {
-                needConvert = ((DalaranMessageBodyCustomConverter) processorComponent).customConvert(route, processor.getConfig(), currentBodyIsSerialized);
+                needConvert = ((DalaranMessageBodyCustomConverter) processorComponent).customBodyConvert(route, processor.getConfig(), currentBodyIsSerialized);
             }
             if (needConvert && currentProcessorInfo.getInputSerializeType() != BodySerializeType.All) {
                 // TODO convert tracing, 暂时没必要, 先注掉吧, 影响性能
