@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static io.terminus.dalaran.core.DalaranConstants.TEST_FLOW_PREFIX;
 import static io.terminus.dalaran.core.component.ComponentType.Trigger;
 import static io.terminus.dalaran.core.flow.FlowSuggest.ADD_MAPPER;
 import static io.terminus.dalaran.core.flow.FlowValidateMessage.FIELD_NOT_NULL;
@@ -91,6 +92,7 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
     public DalaranRoute buildTestFLow(BasicFlow flow) {
         val flowTracer = DalaranTracer.buildTestFlowTracer(traceLogger, flow.getId());
         val route = createRouteDefinition();
+        route.setId(TEST_FLOW_PREFIX + flow.getRouteId());
         route.from(DalaranConstants.TEST_FLOW_DIRECT_PREFIX + flow.getRouteId());
         flowTracer.before(route, flow.getInModel().getModelType());
 
