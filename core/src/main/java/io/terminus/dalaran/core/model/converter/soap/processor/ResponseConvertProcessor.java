@@ -4,10 +4,10 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import io.terminus.dalaran.core.model.converter.soap.jackson.DalaranObjectDeserializer;
 import io.terminus.dalaran.core.model.converter.soap.jackson.DalaranXMLStreamReader;
-import io.terminus.dalaran.core.model.converter.soap.model.SoapOperationConfig;
 import io.terminus.dalaran.core.model.converter.soap.model.SoapSchemaOperation;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
+
 import javax.xml.stream.XMLInputFactory;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;

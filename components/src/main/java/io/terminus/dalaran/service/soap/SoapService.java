@@ -3,20 +3,17 @@ package io.terminus.dalaran.service.soap;
 import com.predic8.schema.*;
 import com.predic8.wsdl.*;
 import io.terminus.dalaran.component.common.HttpMethod;
-import io.terminus.dalaran.component.processor.soap.DalaranSoapProcessor;
 import io.terminus.dalaran.core.component.DalaranService;
 import io.terminus.dalaran.core.component.annotation.ServiceConnector;
 import io.terminus.dalaran.core.model.*;
 import io.terminus.dalaran.core.model.converter.soap.model.SoapOperationConfig;
 import io.terminus.dalaran.core.model.converter.soap.model.SoapSchemaOperation;
 import io.terminus.dalaran.core.model.schema.SoapSchema;
-import io.terminus.dalaran.core.model.schema.XMLSchema;
 import org.apache.camel.Exchange;
 import org.apache.camel.builder.Builder;
 import org.apache.camel.model.ProcessorDefinition;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.entity.ContentType;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -38,7 +35,7 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
     @Override
     public void configure(ProcessorDefinition route, SoapOperationConfig soapOperationConfig) {
         String uri = String.format(HTTP_URI, "http", soapOperationConfig.getBaseUrl());
-        route.setHeader("CamelHttpMethod", Builder.constant(HttpMethod.POST));
+        route.setHeader(Exchange.HTTP_METHOD, Builder.constant(HttpMethod.POST));
         route.setHeader(Exchange.CONTENT_TYPE, Builder.constant("text/xml"));
         route.to(uri);
         // TODO Stream to string
