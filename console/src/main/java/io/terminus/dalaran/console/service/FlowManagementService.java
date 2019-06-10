@@ -4,6 +4,7 @@ import io.terminus.dalaran.console.entity.TriggerFlowEntity;
 import io.terminus.dalaran.console.model.dto.flow.BasicFlowInfo;
 import io.terminus.dalaran.console.model.dto.flow.TriggerFlowDTO;
 import io.terminus.dalaran.console.model.query.FlowQuery;
+import io.terminus.dalaran.core.flow.model.FlowValidation;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -30,4 +31,6 @@ public interface FlowManagementService {
     TriggerFlowDTO getById(Long flowId);
 
     Long copyFlow(Long id);
+
+    List<FlowValidation> validateFlow(TriggerFlowDTO model);
 }

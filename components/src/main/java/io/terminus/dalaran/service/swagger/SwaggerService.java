@@ -34,6 +34,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static org.apache.camel.Exchange.HTTP_METHOD;
+
 @ServiceConnector(
         value = "swagger-connector",
         importConfigType = SwaggerImportConfig.class,
@@ -51,7 +53,7 @@ public class SwaggerService implements DalaranService<SwaggerImportConfig, Swagg
     public void configure(ProcessorDefinition route, SwaggerOperationConfig operationConfig) {
         // TODO protocol
         String uri = String.format(HTTP_URI, "http", operationConfig.getUrl(), operationConfig.getPath());
-        route.setHeader("CamelHttpMethod", Builder.constant(operationConfig.getMethod().name()));
+        route.setHeader(HTTP_METHOD, Builder.constant(operationConfig.getMethod().name()));
         route.to(uri);
         // TODO Stream to string
         route.convertBodyTo(String.class);

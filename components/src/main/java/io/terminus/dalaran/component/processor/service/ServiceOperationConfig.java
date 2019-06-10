@@ -1,7 +1,5 @@
 package io.terminus.dalaran.component.processor.service;
 
-import com.alibaba.fastjson.annotation.JSONField;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.terminus.dalaran.core.component.FieldInputType;
 import io.terminus.dalaran.core.component.annotation.ConfigFieldInfo;
 import io.terminus.dalaran.core.component.config.ComponentModelConfig;
@@ -15,10 +13,4 @@ public class ServiceOperationConfig extends ComponentModelConfig {
 
     @ConfigFieldInfo(label = "操作", inputType = FieldInputType.ServiceOperation)
     private String operation;
-
-    @ConfigFieldInfo(inputType = FieldInputType.Hidden)
-    @JSONField(serialize = false)
-    @JsonIgnore
-    private String serviceType;
-
 }

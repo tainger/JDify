@@ -16,6 +16,10 @@ import io.terminus.dalaran.console.repository.TriggerFlowRepository;
 import io.terminus.dalaran.console.service.FlowManagementService;
 import io.terminus.dalaran.console.service.jpa.FlowQueryService;
 import io.terminus.dalaran.core.context.DalaranContext;
+import io.terminus.dalaran.core.flow.DalaranFlowBuilder;
+import io.terminus.dalaran.core.flow.model.FlowValidation;
+import io.terminus.dalaran.core.flow.model.TriggerFlow;
+import io.terminus.dalaran.core.resource.DalaranResourceBuilder;
 import io.terminus.dalaran.core.resource.entity.common.ProcessorEntity;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
@@ -53,6 +57,12 @@ public class FlowManagementServiceImpl implements FlowManagementService {
 
     @Autowired
     private TestFlowInitializer testFlowInitializer;
+
+    @Autowired
+    private DalaranFlowBuilder flowBuilder;
+
+    @Autowired
+    private DalaranResourceBuilder resourceBuilder;
 
     private final FlowConvertor flowConvertor = new FlowConvertor();
 
@@ -146,6 +156,13 @@ public class FlowManagementServiceImpl implements FlowManagementService {
         newFlowEntity.setId(null);
         flowRepository.save(newFlowEntity);
         return newFlowEntity.getId();
+    }
+
+    @Override
+    public List<FlowValidation> validateFlow(TriggerFlowDTO model) {
+        TriggerFlowEntity entity = buildEntity(model);
+        TriggerFlow triggerFlow = resourceBuilder.buildTriggerFlow(entity);
+        return flowBuilder.validateFlow(triggerFlow);
     }
 
     private TriggerFlowEntity buildEntity(TriggerFlowDTO model) {
