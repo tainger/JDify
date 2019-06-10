@@ -1,6 +1,7 @@
-package io.terminus.dalaran.service.soap;
+package io.terminus.dalaran.core.model.converter.soap.model;
 
 import io.terminus.dalaran.core.component.model.ServiceOperation;
+import io.terminus.dalaran.core.model.HttpProtocol;
 import lombok.Data;
 
 /**
@@ -20,4 +21,8 @@ public class SoapOperationConfig extends ServiceOperation {
     private String outPut;
 
     private String wsdl;
+
+    private String baseUrl;
+
+    private HttpProtocol protocol;
 }

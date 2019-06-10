@@ -2,18 +2,19 @@ package io.terminus.dalaran.service.soap;
 
 import com.predic8.schema.*;
 import com.predic8.wsdl.*;
+import io.terminus.dalaran.component.common.HttpMethod;
 import io.terminus.dalaran.component.processor.soap.DalaranSoapProcessor;
 import io.terminus.dalaran.core.component.DalaranService;
 import io.terminus.dalaran.core.component.annotation.ServiceConnector;
-import io.terminus.dalaran.core.model.BodyType;
-import io.terminus.dalaran.core.model.FieldType;
-import io.terminus.dalaran.core.model.MessageModel;
-import io.terminus.dalaran.core.model.ModelField;
+import io.terminus.dalaran.core.model.*;
+import io.terminus.dalaran.core.model.converter.soap.model.SoapOperationConfig;
 import io.terminus.dalaran.core.model.schema.XMLSchema;
+import org.apache.camel.Exchange;
+import org.apache.camel.builder.Builder;
 import org.apache.camel.model.ProcessorDefinition;
-import org.apache.camel.model.dataformat.JsonLibrary;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.entity.ContentType;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -30,12 +31,16 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
 
     private static final String OPERATION_SPLIT = ":::";
 
+    private static final String HTTP_URI = "%s4://%s";
+
     @Override
     public void configure(ProcessorDefinition route, SoapOperationConfig soapOperationConfig) {
-        WSDLParser parser = new WSDLParser();
-        Definitions definitions = parser.parse(soapOperationConfig.getWsdl());
-        DalaranSoapProcessor processor = new DalaranSoapProcessor(soapOperationConfig, definitions);
-        route.convertBodyTo(String.class).process(processor);
+        String uri = String.format(HTTP_URI, "http", soapOperationConfig.getBaseUrl());
+        route.setHeader("CamelHttpMethod", Builder.constant(HttpMethod.POST));
+        route.setHeader(Exchange.CONTENT_TYPE, Builder.constant("text/xml"));
+        route.to(uri);
+        // TODO Stream to string
+        route.convertBodyTo(String.class);
     }
 
     @Override
@@ -80,6 +85,11 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
                 soapOperation.setInput(inputName);
                 soapOperation.setOutPut(outputName);
                 soapOperation.setWsdl(wsdl);
+
+                String baseDir = definitions.getBaseDir().toString();
+                soapOperation.setBaseUrl(StringUtils.substringAfter(baseDir, "://"));
+                soapOperation.setProtocol(HttpProtocol.valueOf(StringUtils.substringBefore(baseDir, "://")));
+
                 MessageModel inModel = buildModel(definitions.getMessage(inputName));
                 MessageModel outModel = buildModel(definitions.getMessage(outputName));
                 soapOperation.setInModel(inModel);
@@ -113,36 +123,40 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
                 parts.forEach(part -> {
                     Element element = part.getElement();
                     if (element != null) {
-                        Schema schema = element.getSchema();
-                        String type;
-                        if (element.getType() != null) {
-                            type = element.getType().getLocalPart();
-                            if (containsComplexType(type, schema) && !containsSimpleType(type, schema)) {
-                                if (element.getArrayType() == null
-                                        && (StringUtils.equalsIgnoreCase(element.getMaxOccurs(), "0") || StringUtils.equalsIgnoreCase(element.getMaxOccurs(), "1"))) {
-                                    parent.setType(FieldType.OBJECT);
-                                } else {
-                                    parent.setType(FieldType.ARRAY);
-                                    parent.setSubType(FieldType.OBJECT);
-                                }
-                                buildWithoutRootPath(child, schema, type);
-                            } else {
-                                FieldType fieldType = getFieldType(type);
-                                if (element.getArrayType() == null) {
-                                    parent.setType(fieldType);
-                                } else {
-                                    parent.setType(FieldType.ARRAY);
-                                    parent.setType(fieldType);
-                                }
-                            }
-                        } else {
-                            buildByEmbeddedTypeWithoutRootPath(child, element, schema, parent);
-                        }
+                        handleElement(element, parent, child);
                     }
                 });
             }
         }
         parent.setFields(child);
+    }
+
+    private void handleElement(Element element, ModelField parent, Map<String, ModelField> child) {
+        Schema schema = element.getSchema();
+        String type;
+        if (element.getType() != null) {
+            type = element.getType().getLocalPart();
+            if (containsComplexType(type, schema) && !containsSimpleType(type, schema)) {
+                if (element.getArrayType() == null
+                        && (StringUtils.equalsIgnoreCase(element.getMaxOccurs(), "0") || StringUtils.equalsIgnoreCase(element.getMaxOccurs(), "1"))) {
+                    parent.setType(FieldType.OBJECT);
+                } else {
+                    parent.setType(FieldType.ARRAY);
+                    parent.setSubType(FieldType.OBJECT);
+                }
+                buildWithoutRootPath(child, schema, type);
+            } else {
+                FieldType fieldType = getFieldType(type);
+                if (element.getArrayType() == null) {
+                    parent.setType(fieldType);
+                } else {
+                    parent.setType(FieldType.ARRAY);
+                    parent.setType(fieldType);
+                }
+            }
+        } else {
+            buildByEmbeddedTypeWithoutRootPath(child, element, schema);
+        }
     }
 
     private void buildWithoutRootPath(Map<String, ModelField> parent, Schema schema, String type) {
@@ -152,75 +166,81 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
             List<SchemaComponent> particles = sequence.getParticles();
             if (CollectionUtils.isNotEmpty(particles)) {
                 particles.forEach(p -> {
-                    ModelField modelField = new ModelField();
-                    Element element = (Element) p;
-                    String name = element.getName();
-                    String elementType = element.getType().getLocalPart();
-                    if (containsComplexType(elementType, schema) && !containsSimpleType(elementType, schema)) {
-                        if (element.getArrayType() == null && (StringUtils.equalsIgnoreCase(element.getMaxOccurs(), "0") || StringUtils.equalsIgnoreCase(element.getMaxOccurs(), "1"))) {
-                            modelField.setType(FieldType.OBJECT);
-                        } else {
-                            modelField.setType(FieldType.ARRAY);
-                            modelField.setSubType(FieldType.OBJECT);
-                        }
-                        Map<String, ModelField> child = new HashMap<>();
-                        modelField.setFields(child);
-                        buildWithoutRootPath(child, schema, elementType);
-                    } else {
-                        FieldType fieldType = getFieldType(elementType);
-                        if (element.getArrayType() == null) {
-                            modelField.setType(fieldType);
-                        } else {
-                            modelField.setType(FieldType.ARRAY);
-                            modelField.setSubType(fieldType);
-                        }
-                    }
-                    parent.put(name, modelField);
+                    handleSchemaComponent(p, schema, parent);
                 });
             }
         }
     }
 
-    private void buildByEmbeddedTypeWithoutRootPath(Map<String, ModelField> parent, Element element, Schema schema, ModelField model) {
-        ComplexType complexType = (ComplexType) element.getEmbeddedType();
-        if (complexType != null) {
-            Sequence sequence = (Sequence) complexType.getModel();
-            if (sequence != null) {
-                List<SchemaComponent> particles = sequence.getParticles();
-                String maxOccurs = (String) sequence.getMaxOccurs();
-                if (CollectionUtils.isNotEmpty(particles)) {
-                    particles.forEach(p -> {
-                        ModelField modelField = new ModelField();
-                        Element e = (Element) p;
-                        String name = e.getName();
-                        String elementType = e.getType().getLocalPart();
-                        if (containsComplexType(elementType, schema) && !containsSimpleType(elementType, schema)) {
-                            if (element.getArrayType() == null
-                                    && (StringUtils.equalsIgnoreCase(element.getMaxOccurs(), "0") || StringUtils.equalsIgnoreCase(element.getMaxOccurs(), "1"))
-                                    && (StringUtils.equalsIgnoreCase(maxOccurs, "0") || StringUtils.equalsIgnoreCase(maxOccurs, "1"))) {
-                                modelField.setType(FieldType.OBJECT);
-                            } else {
-                                modelField.setType(FieldType.ARRAY);
-                                modelField.setSubType(FieldType.OBJECT);
-                            }
-                            Map<String, ModelField> child = new HashMap<>();
-                            modelField.setFields(child);
-                            buildWithoutRootPath(child, schema, elementType);
-                        } else {
-                            FieldType fieldType = getFieldType(elementType);
-                            if (element.getArrayType() == null
-                                    && (StringUtils.equalsIgnoreCase(maxOccurs, "0") || StringUtils.equalsIgnoreCase(maxOccurs, "1"))) {
-                                modelField.setType(fieldType);
-                            } else {
-                                modelField.setType(FieldType.ARRAY);
-                                modelField.setSubType(fieldType);
-                            }
-                        }
-                        parent.put(name, modelField);
-                    });
-                }
+    private void handleSchemaComponent(SchemaComponent p, Schema schema, Map<String, ModelField> parent) {
+        ModelField modelField = new ModelField();
+        Element element = (Element) p;
+        String name = element.getName();
+        String elementType = element.getType().getLocalPart();
+        if (containsComplexType(elementType, schema) && !containsSimpleType(elementType, schema)) {
+            if (element.getArrayType() == null && (StringUtils.equalsIgnoreCase(element.getMaxOccurs(), "0") || StringUtils.equalsIgnoreCase(element.getMaxOccurs(), "1"))) {
+                modelField.setType(FieldType.OBJECT);
+            } else {
+                modelField.setType(FieldType.ARRAY);
+                modelField.setSubType(FieldType.OBJECT);
+            }
+            Map<String, ModelField> child = new HashMap<>();
+            modelField.setFields(child);
+            buildWithoutRootPath(child, schema, elementType);
+        } else {
+            FieldType fieldType = getFieldType(elementType);
+            if (element.getArrayType() == null) {
+                modelField.setType(fieldType);
+            } else {
+                modelField.setType(FieldType.ARRAY);
+                modelField.setSubType(fieldType);
             }
         }
+        parent.put(name, modelField);
+    }
+
+    private void buildByEmbeddedTypeWithoutRootPath(Map<String, ModelField> parent, Element element, Schema schema) {
+        ComplexType complexType = (ComplexType) element.getEmbeddedType();
+        Sequence sequence;
+        if (complexType != null && (sequence = (Sequence) complexType.getModel()) != null) {
+            List<SchemaComponent> particles = sequence.getParticles();
+            String maxOccurs = (String) sequence.getMaxOccurs();
+            if (CollectionUtils.isNotEmpty(particles)) {
+                particles.forEach(p -> {
+                    handleSchemaComponent(p, element, schema, maxOccurs, parent);
+                });
+            }
+        }
+    }
+
+    private void handleSchemaComponent(SchemaComponent p, Element element, Schema schema, String maxOccurs, Map<String, ModelField> parent) {
+        ModelField modelField = new ModelField();
+        Element e = (Element) p;
+        String name = e.getName();
+        String elementType = e.getType().getLocalPart();
+        if (containsComplexType(elementType, schema) && !containsSimpleType(elementType, schema)) {
+            if (element.getArrayType() == null
+                    && (StringUtils.equalsIgnoreCase(element.getMaxOccurs(), "0") || StringUtils.equalsIgnoreCase(element.getMaxOccurs(), "1"))
+                    && (StringUtils.equalsIgnoreCase(maxOccurs, "0") || StringUtils.equalsIgnoreCase(maxOccurs, "1"))) {
+                modelField.setType(FieldType.OBJECT);
+            } else {
+                modelField.setType(FieldType.ARRAY);
+                modelField.setSubType(FieldType.OBJECT);
+            }
+            Map<String, ModelField> child = new HashMap<>();
+            modelField.setFields(child);
+            buildWithoutRootPath(child, schema, elementType);
+        } else {
+            FieldType fieldType = getFieldType(elementType);
+            if (element.getArrayType() == null
+                    && (StringUtils.equalsIgnoreCase(maxOccurs, "0") || StringUtils.equalsIgnoreCase(maxOccurs, "1"))) {
+                modelField.setType(fieldType);
+            } else {
+                modelField.setType(FieldType.ARRAY);
+                modelField.setSubType(fieldType);
+            }
+        }
+        parent.put(name, modelField);
     }
 
     private void buildField(ModelField parent, Message message) {

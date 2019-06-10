@@ -8,6 +8,7 @@ public enum BodyType {
     JSON(true),
     XML(true),
     OBJECT(false),
+    SOAP(false),
     EXCEPTION(false);
 
     private boolean serialized;

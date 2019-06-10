@@ -12,6 +12,7 @@ public final class DalaranConstants {
     public static final String BRANCH_FLOW_NAME_HEADER = "DalaranBranchFlowName";
     public static final String SCATTER_GATHER_EXCHANGE= "DalaranScatterGatherExchange";
     public static final String DALARAN_CONTEXT_EXCHANGE= "DalaranContextExchange";
+    public static final String MODEL_ROOT = "root";
 
     public static final String TEST_FLOW_PREFIX = "test" + DELIMITER;
 

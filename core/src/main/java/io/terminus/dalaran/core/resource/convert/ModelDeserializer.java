@@ -4,6 +4,7 @@ import com.alibaba.fastjson.parser.DefaultJSONParser;
 import com.alibaba.fastjson.parser.deserializer.ObjectDeserializer;
 import io.terminus.dalaran.core.model.MessageModel;
 import io.terminus.dalaran.core.model.schema.JsonSchema;
+import io.terminus.dalaran.core.model.schema.SoapSchema;
 import io.terminus.dalaran.core.model.schema.XMLSchema;
 
 import java.lang.reflect.Type;
@@ -19,6 +20,8 @@ public class ModelDeserializer implements ObjectDeserializer {
                     return parser.parseObject(XMLSchema.class);
                 case OBJECT:
                     return parser.parseObject();
+                case SOAP:
+                    return parser.parseObject(SoapSchema.class);
             }
         }
         return null;

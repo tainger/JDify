@@ -36,7 +36,7 @@ public class XMLConverter implements DalaranConverter<XMLSchema> {
         dataFormat.setRootName(schema.getRoot());
 //        dataFormat.setArrayName(schema.getArrayName());
 //        dataFormat.setElementName(schema.getElementName());
-        dataFormat.setForceTopLevelObject(schema.isForceTopLevelObject());
+//        dataFormat.setForceTopLevelObject(schema.isForceTopLevelObject());
 
         return dataFormat;
     }
