@@ -26,7 +26,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static io.terminus.dalaran.core.flow.FlowValidateMessage.NOT_NULL;
+import static io.terminus.dalaran.core.component.ComponentType.Trigger;
+import static io.terminus.dalaran.core.flow.FlowSuggest.ADD_MAPPER;
+import static io.terminus.dalaran.core.flow.FlowValidateMessage.FIELD_NOT_NULL;
+import static io.terminus.dalaran.core.flow.FlowValidateMessage.MODEL_NOT_EQUALLY;
 
 public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute> {
 
@@ -109,7 +112,10 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
 
     @Override
     public List<FlowValidation> validateFlow(BasicFlow flow) {
-        List<FlowValidation> validateMessages = flow.getPipeline().stream().flatMap(processorModel -> {
+        MessageModel lastModel = flow.getInModel();
+        List<FlowValidation> validateMessages = new ArrayList<>();
+        // TODO 检查模型, 提示模型不匹配以及加入 Mapper 的建议
+        for (ProcessorModel processorModel : flow.getPipeline()) {
             DalaranProcessor processor = componentContext.getProcessor(processorModel.getType());
             ProcessorInfo processorInfo = componentContext.getProcessorInfo(processorModel.getType());
             List<FlowValidation> processorMessageList = validate(processorInfo, processorModel.getConfig());
@@ -117,12 +123,19 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
                 List<FlowValidation> processorCustomMessageList = ((DalaranComponentValidator) processor).validate(processorModel.getConfig());
                 processorMessageList.addAll(processorCustomMessageList);
             }
+            if (!lastModel.equals(processorModel.getInModel())) {
+                FlowValidation message = new FlowValidation();
+                message.setType(ValidateMessageType.Warning);
+                message.setMessage(MODEL_NOT_EQUALLY);
+                processorMessageList.add(message);
+            }
             processorMessageList.forEach(message -> {
                 message.setTargetType(ComponentType.Processor);
                 message.setTargetId(processorModel.getId());
             });
-            return processorMessageList.stream();
-        }).collect(Collectors.toList());
+            lastModel = processorModel.getOutModel();
+            validateMessages.addAll(processorMessageList);
+        }
         if (flow instanceof TriggerFlow) {
             TriggerFlow triggerFlow = ((TriggerFlow) flow);
             DalaranTrigger trigger = componentContext.getTrigger(triggerFlow.getTriggerType());
@@ -134,9 +147,17 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
                 flowValidateMessages.addAll(triggerCustomMessageList);
             }
             flowValidateMessages.forEach(message -> {
-                message.setTargetType(ComponentType.Trigger);
+                message.setTargetType(Trigger);
             });
             validateMessages.addAll(flowValidateMessages);
+        }
+        if (!lastModel.equals(flow.getOutModel())) {
+            FlowValidation message = new FlowValidation();
+            message.setTargetType(Trigger);
+            message.setType(ValidateMessageType.Warning);
+            message.setMessage(MODEL_NOT_EQUALLY);
+            message.setSuggest(ADD_MAPPER);
+            validateMessages.add(message);
         }
         return validateMessages;
     }
@@ -149,7 +170,7 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
                     FlowValidation message = new FlowValidation();
                     message.setType(ValidateMessageType.Error);
                     message.setField(configField.getName());
-                    message.setMessage(NOT_NULL);
+                    message.setMessage(FIELD_NOT_NULL);
                     validateMessages.add(message);
                 }
             } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
