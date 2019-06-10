@@ -1,9 +1,11 @@
 package io.terminus.dalaran.runtime;
 
 import io.terminus.dalaran.core.context.DalaranContext;
+import io.terminus.dalaran.core.flow.model.SubFlow;
 import io.terminus.dalaran.core.flow.model.TriggerFlow;
 import io.terminus.dalaran.core.resource.DalaranResourceBuilder;
 import io.terminus.dalaran.core.resource.entity.common.ReleaseRecordEntity;
+import io.terminus.dalaran.core.resource.entity.released.SubFlowReleasedEntity;
 import io.terminus.dalaran.core.resource.entity.released.TriggerFlowReleasedEntity;
 import io.terminus.dalaran.core.resource.repository.ReleaseRecordRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -47,7 +49,12 @@ public class ReleasedFlowInitializer {
                 log.info("load released flow {}", triggerFlow.getId());
             }
 
-            // TODO load sub flow
+            List<SubFlowReleasedEntity> subFLows = resourceLoader.loadAllSubFlow();
+            for (SubFlowReleasedEntity subFlowEntity : subFLows) {
+                SubFlow subFlow = resourceBuilder.buildSubFlow(subFlowEntity);
+                dalaranContext.addSubFlow(subFlow);
+                log.info("load released sub-flow {}", subFlow.getId());
+            }
         }
     }
 }

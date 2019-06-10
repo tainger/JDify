@@ -1,29 +1,36 @@
 package io.terminus.dalaran.core.flow;
 
-import io.terminus.dalaran.core.component.BodySerializeType;
-import io.terminus.dalaran.core.component.DalaranMessageBodyCustomConverter;
-import io.terminus.dalaran.core.component.DalaranProcessor;
+import io.terminus.dalaran.core.DalaranConstants;
+import io.terminus.dalaran.core.component.*;
 import io.terminus.dalaran.core.component.model.ProcessorModel;
+import io.terminus.dalaran.core.config.ComponentInfo;
+import io.terminus.dalaran.core.config.DalaranConfigField;
 import io.terminus.dalaran.core.config.ProcessorInfo;
+import io.terminus.dalaran.core.config.TriggerInfo;
 import io.terminus.dalaran.core.context.DalaranComponentContext;
 import io.terminus.dalaran.core.context.DalaranConverterContext;
-import io.terminus.dalaran.core.flow.model.BasicFlow;
-import io.terminus.dalaran.core.flow.model.FlowFragment;
-import io.terminus.dalaran.core.flow.model.SubFlow;
-import io.terminus.dalaran.core.flow.model.TriggerFlow;
+import io.terminus.dalaran.core.flow.model.*;
 import io.terminus.dalaran.core.log.DalaranTraceLogger;
 import io.terminus.dalaran.core.log.DalaranTracer;
 import io.terminus.dalaran.core.log.TracingErrorHandlerFactory;
 import io.terminus.dalaran.core.model.BodyType;
 import io.terminus.dalaran.core.model.MessageModel;
 import lombok.val;
+import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
-import static io.terminus.dalaran.core.DalaranConstants.DIRECT_PREFIX;
-import static io.terminus.dalaran.core.DalaranConstants.TEST_FLOW_DIRECT_PREFIX;
+import static io.terminus.dalaran.core.DalaranConstants.TEST_FLOW_PREFIX;
+import static io.terminus.dalaran.core.component.ComponentType.Trigger;
+import static io.terminus.dalaran.core.flow.FlowSuggest.ADD_MAPPER;
+import static io.terminus.dalaran.core.flow.FlowValidateMessage.FIELD_NOT_NULL;
+import static io.terminus.dalaran.core.flow.FlowValidateMessage.MODEL_NOT_EQUALLY;
 
 public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute> {
 
@@ -51,7 +58,7 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
     public DalaranRoute buildTriggerFlow(TriggerFlow flow) {
         val triggerComponent = componentContext.getTrigger(flow.getTriggerType());
         val flowTracer = DalaranTracer.buildFlowTracer(traceLogger, flow.getId());
-        val route = newRouteDefinition();
+        val route = createRouteDefinition();
         route.setId(flow.getRouteId());
         triggerComponent.buildFromRoute(route, flow.getTriggerConfig());
         flowTracer.before(route, flow.getInModel().getModelType());
@@ -67,9 +74,7 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
     @Override
     public DalaranRoute buildSubFLow(SubFlow flow) {
         val flowTracer = DalaranTracer.buildSubFlowTracer(traceLogger, flow.getId());
-        val route = newRouteDefinition();
-        route.setId(flow.getRouteId());
-        route.from(DIRECT_PREFIX + flow.getRouteId());
+        val route = createRouteDefinition(flow);
         flowTracer.before(route, flow.getInModel().getModelType());
         buildFlowRoute(route, flow, null);
         flowTracer.after(route, flow.getOutModel().getModelType());
@@ -78,10 +83,7 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
 
     @Override
     public DalaranRoute buildFlowFragment(FlowFragment fragment) {
-        val route = newRouteDefinition();
-        route.setId(fragment.getRouteId());
-        route.from(DIRECT_PREFIX + fragment.getRouteId());
-
+        val route = createRouteDefinition(fragment);
         buildFlowRoute(route, fragment, false);
         return route;
     }
@@ -89,9 +91,9 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
     @Override
     public DalaranRoute buildTestFLow(BasicFlow flow) {
         val flowTracer = DalaranTracer.buildTestFlowTracer(traceLogger, flow.getId());
-        val route = newRouteDefinition();
-        route.setId(flow.getRouteId());
-        route.from(TEST_FLOW_DIRECT_PREFIX + flow.getRouteId());
+        val route = createRouteDefinition();
+        route.setId(TEST_FLOW_PREFIX + flow.getRouteId());
+        route.from(DalaranConstants.TEST_FLOW_DIRECT_PREFIX + flow.getRouteId());
         flowTracer.before(route, flow.getInModel().getModelType());
 
         // TODO 测试的输入一定是序列化的, XML/Json 等都是直接扔进去, 如果入参是 Object, 前端引导输入 Json 做反序列化处理吧
@@ -108,6 +110,76 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
 
         flowTracer.after(route, flow.getOutModel().getModelType());
         return route;
+    }
+
+    @Override
+    public List<FlowValidation> validateFlow(BasicFlow flow) {
+        MessageModel lastModel = flow.getInModel();
+        List<FlowValidation> validateMessages = new ArrayList<>();
+        // TODO 检查模型, 提示模型不匹配以及加入 Mapper 的建议
+        for (ProcessorModel processorModel : flow.getPipeline()) {
+            DalaranProcessor processor = componentContext.getProcessor(processorModel.getType());
+            ProcessorInfo processorInfo = componentContext.getProcessorInfo(processorModel.getType());
+            List<FlowValidation> processorMessageList = validate(processorInfo, processorModel.getConfig());
+            if (processor instanceof DalaranComponentValidator) {
+                List<FlowValidation> processorCustomMessageList = ((DalaranComponentValidator) processor).validate(processorModel.getConfig());
+                processorMessageList.addAll(processorCustomMessageList);
+            }
+            if (!lastModel.equals(processorModel.getInModel())) {
+                FlowValidation message = new FlowValidation();
+                message.setType(ValidateMessageType.Warning);
+                message.setMessage(MODEL_NOT_EQUALLY);
+                processorMessageList.add(message);
+            }
+            processorMessageList.forEach(message -> {
+                message.setTargetType(ComponentType.Processor);
+                message.setTargetId(processorModel.getId());
+            });
+            lastModel = processorModel.getOutModel();
+            validateMessages.addAll(processorMessageList);
+        }
+        if (flow instanceof TriggerFlow) {
+            TriggerFlow triggerFlow = ((TriggerFlow) flow);
+            DalaranTrigger trigger = componentContext.getTrigger(triggerFlow.getTriggerType());
+            TriggerInfo triggerInfo = componentContext.getTriggerInfo(triggerFlow.getTriggerType());
+
+            List<FlowValidation> flowValidateMessages = validate(triggerInfo, triggerFlow.getTriggerConfig());
+            if (trigger instanceof DalaranComponentValidator) {
+                List<FlowValidation> triggerCustomMessageList = ((DalaranComponentValidator) trigger).validate(triggerFlow.getTriggerConfig());
+                flowValidateMessages.addAll(triggerCustomMessageList);
+            }
+            flowValidateMessages.forEach(message -> {
+                message.setTargetType(Trigger);
+            });
+            validateMessages.addAll(flowValidateMessages);
+        }
+        if (!lastModel.equals(flow.getOutModel())) {
+            FlowValidation message = new FlowValidation();
+            message.setTargetType(Trigger);
+            message.setType(ValidateMessageType.Warning);
+            message.setMessage(MODEL_NOT_EQUALLY);
+            message.setSuggest(ADD_MAPPER);
+            validateMessages.add(message);
+        }
+        return validateMessages;
+    }
+
+    private List<FlowValidation> validate(ComponentInfo componentInfo, Object config) {
+        List<FlowValidation> validateMessages = new ArrayList<>();
+        for (DalaranConfigField configField : componentInfo.getConfigFields()) {
+            try {
+                if (configField.isRequired() && StringUtils.isBlank(BeanUtils.getProperty(config, configField.getName()))) {
+                    FlowValidation message = new FlowValidation();
+                    message.setType(ValidateMessageType.Error);
+                    message.setField(configField.getName());
+                    message.setMessage(FIELD_NOT_NULL);
+                    validateMessages.add(message);
+                }
+            } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+                e.printStackTrace();
+            }
+        }
+        return validateMessages;
     }
 
     // TODO currentBodyIsSerialized 这个还是比较绕的....
@@ -130,7 +202,7 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
 //                currentBodyIsSerialized = currentModel.getModelType().isSerialized();
             boolean needConvert = true;
             if (processorComponent instanceof DalaranMessageBodyCustomConverter) {
-                needConvert = ((DalaranMessageBodyCustomConverter) processorComponent).customConvert(route, processor.getConfig(), currentBodyIsSerialized);
+                needConvert = ((DalaranMessageBodyCustomConverter) processorComponent).customBodyConvert(route, processor.getConfig(), currentBodyIsSerialized);
             }
             if (needConvert && currentProcessorInfo.getInputSerializeType() != BodySerializeType.All) {
                 // TODO convert tracing, 暂时没必要, 先注掉吧, 影响性能
@@ -193,7 +265,14 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
         route.setLastOutModel(outModel);
     }
 
-    private DalaranRoute newRouteDefinition() {
+    private DalaranRoute createRouteDefinition(BasicFlow flow) {
+        val route = createRouteDefinition();
+        route.setId(flow.getRouteId());
+        route.from(flow.getDirectRouteUri());
+        return route;
+    }
+
+    private DalaranRoute createRouteDefinition() {
         DalaranRoute route = new DalaranRoute();
         route.errorHandler(errorHandlerFactory);
         return route;

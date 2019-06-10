@@ -9,13 +9,15 @@ import io.terminus.dalaran.core.component.DalaranProcessor;
 import io.terminus.dalaran.core.component.annotation.Processor;
 import io.terminus.dalaran.core.context.DalaranConverterContext;
 import io.terminus.dalaran.core.model.BodyType;
-import org.apache.camel.Exchange;
 import org.apache.camel.builder.Builder;
 import org.apache.camel.model.ProcessorDefinition;
 import org.apache.camel.model.RouteDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Map;
+
+import static org.apache.camel.Exchange.HTTP_METHOD;
+import static org.apache.camel.Exchange.HTTP_QUERY;
 
 @Processor(
         value = "http-client", configType = HttpClientConfig.class,
@@ -31,14 +33,14 @@ public class DalaranHttpClient implements DalaranProcessor<HttpClientConfig>, Da
     private static final String HTTP_URI = "%s4://%s:%s%s?bridgeEndpoint=true";
 
     @Override
-    public boolean customConvert(RouteDefinition route, HttpClientConfig config, boolean bodyIsSerialized) {
+    public boolean customBodyConvert(RouteDefinition route, HttpClientConfig config, boolean bodyIsSerialized) {
         if (!config.getMethod().isNoBody()) {
             return true;
         }
         if (bodyIsSerialized && config.getInModel().getModelType().isSerialized()) {
             converterContext.toObject(route, config.getInModel());
         }
-        route.setHeader(Exchange.HTTP_QUERY).method(this, "buildQueryString");
+        route.setHeader(HTTP_QUERY).method(this, "buildQueryString");
         // 如果转为 QueryString 后, body 实际上是无用的
         route.setBody(Builder.constant(null));
         return false;
@@ -50,7 +52,7 @@ public class DalaranHttpClient implements DalaranProcessor<HttpClientConfig>, Da
         HttpClientConnector connector = config.getConnector();
         String uri = String.format(HTTP_URI, connector.getProtocol().name().toLowerCase(), connector.getHost(),
                 connector.getPort(), config.getPath());
-        route.setHeader("CamelHttpMethod", Builder.constant(config.getMethod().name()));
+        route.setHeader(HTTP_METHOD, Builder.constant(config.getMethod().name()));
         route.to(uri);
         // TODO Stream to string
         route.convertBodyTo(String.class);

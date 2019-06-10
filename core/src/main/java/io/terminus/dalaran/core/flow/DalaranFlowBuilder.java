@@ -1,9 +1,8 @@
 package io.terminus.dalaran.core.flow;
 
-import io.terminus.dalaran.core.flow.model.BasicFlow;
-import io.terminus.dalaran.core.flow.model.FlowFragment;
-import io.terminus.dalaran.core.flow.model.SubFlow;
-import io.terminus.dalaran.core.flow.model.TriggerFlow;
+import io.terminus.dalaran.core.flow.model.*;
+
+import java.util.List;
 
 public interface DalaranFlowBuilder<T> {
 
@@ -14,5 +13,7 @@ public interface DalaranFlowBuilder<T> {
     T buildFlowFragment(FlowFragment flow);
 
     T buildTestFLow(BasicFlow flow);
+
+    List<FlowValidation> validateFlow(BasicFlow flow);
 
 }

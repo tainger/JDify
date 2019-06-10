@@ -1,6 +1,5 @@
 package io.terminus.dalaran.core.flow.model;
 
-import io.terminus.dalaran.core.DalaranConstants;
 import lombok.Data;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -13,9 +12,4 @@ public class TriggerFlow extends BasicFlow {
 
     @Nullable
     private Object triggerConfig;
-
-    @Override
-    public String getRouteId() {
-        return DalaranConstants.FLOW_PREFIX + this.getId();
-    }
 }

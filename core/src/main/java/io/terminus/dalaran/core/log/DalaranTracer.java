@@ -82,6 +82,8 @@ public class DalaranTracer {
                 return DalaranConstants.PROCESSOR_TRACING_LOG;
             case Convert:
                 return DalaranConstants.CONVERT_TRACING_LOG;
+            case SubFlow:
+                return DalaranConstants.SUB_FLOW_TRACING_LOG;
             default:
                 throw new RuntimeException("not support tracing type[" + tracingType + "]");
         }
