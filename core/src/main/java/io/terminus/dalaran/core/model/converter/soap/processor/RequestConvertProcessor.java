@@ -7,7 +7,7 @@ import groovy.xml.MarkupBuilder;
 import io.terminus.dalaran.core.DalaranConstants;
 import io.terminus.dalaran.core.model.FieldType;
 import io.terminus.dalaran.core.model.ModelField;
-import io.terminus.dalaran.core.model.converter.soap.model.SoapOperationConfig;
+import io.terminus.dalaran.core.model.converter.soap.model.SoapSchemaOperation;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.http.entity.StringEntity;
@@ -23,13 +23,13 @@ public class RequestConvertProcessor implements Processor {
 
     private final Map<String, ModelField> modelFields;
 
-    private final SoapOperationConfig soapOperationConfig;
+    private final SoapSchemaOperation soapOperationConfig;
 
     private final Definitions definitions;
 
     private static final String XPATH = "xpath:";
 
-    public RequestConvertProcessor(Map<String, ModelField> modelFields, SoapOperationConfig soapOperationConfig, Definitions definitions) {
+    public RequestConvertProcessor(Map<String, ModelField> modelFields, SoapSchemaOperation soapOperationConfig, Definitions definitions) {
         this.modelFields = modelFields;
         this.soapOperationConfig = soapOperationConfig;
         this.definitions = definitions;

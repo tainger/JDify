@@ -2,7 +2,7 @@ package io.terminus.dalaran.core.model.schema;
 
 import io.terminus.dalaran.core.model.DalaranModelSchema;
 import io.terminus.dalaran.core.model.ModelField;
-import io.terminus.dalaran.core.model.converter.soap.model.SoapOperationConfig;
+import io.terminus.dalaran.core.model.converter.soap.model.SoapSchemaOperation;
 import lombok.Data;
 
 import java.util.Map;
@@ -15,5 +15,5 @@ public class SoapSchema implements DalaranModelSchema {
 
     private Map<String, ModelField> fields;
 
-    private SoapOperationConfig operationConfig;
+    private SoapSchemaOperation operationConfig;
 }

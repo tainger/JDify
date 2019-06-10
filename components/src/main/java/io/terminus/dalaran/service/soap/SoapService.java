@@ -8,6 +8,8 @@ import io.terminus.dalaran.core.component.DalaranService;
 import io.terminus.dalaran.core.component.annotation.ServiceConnector;
 import io.terminus.dalaran.core.model.*;
 import io.terminus.dalaran.core.model.converter.soap.model.SoapOperationConfig;
+import io.terminus.dalaran.core.model.converter.soap.model.SoapSchemaOperation;
+import io.terminus.dalaran.core.model.schema.SoapSchema;
 import io.terminus.dalaran.core.model.schema.XMLSchema;
 import org.apache.camel.Exchange;
 import org.apache.camel.builder.Builder;
@@ -75,23 +77,25 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
 
         bindings.forEach(binding -> {
             String bindingName = binding.getName();
+            String portType = binding.getType().getLocalPart();
             binding.getOperations().forEach(operation -> {
                 SoapOperationConfig soapOperation = new SoapOperationConfig();
                 soapOperation.setBinding(bindingName);
                 soapOperation.setName(operation.getName());
                 String inputName = operation.getInput().getName();
                 String outputName = operation.getOutput().getName();
-                soapOperation.setPortType(inputName);
+                soapOperation.setPortType(portType);
                 soapOperation.setInput(inputName);
                 soapOperation.setOutPut(outputName);
                 soapOperation.setWsdl(wsdl);
+                soapOperation.setOperationKey(portType + OPERATION_SPLIT + operation.getName());
 
                 String baseDir = definitions.getBaseDir().toString();
                 soapOperation.setBaseUrl(StringUtils.substringAfter(baseDir, "://"));
-                soapOperation.setProtocol(HttpProtocol.valueOf(StringUtils.substringBefore(baseDir, "://")));
+                soapOperation.setProtocol(HttpProtocol.valueOf(StringUtils.substringBefore(baseDir, "://").toUpperCase()));
 
-                MessageModel inModel = buildModel(definitions.getMessage(inputName));
-                MessageModel outModel = buildModel(definitions.getMessage(outputName));
+                MessageModel inModel = buildModel(definitions.getMessage(inputName), soapOperation);
+                MessageModel outModel = buildModel(definitions.getMessage(outputName), soapOperation);
                 soapOperation.setInModel(inModel);
                 soapOperation.setOutModel(outModel);
                 soapOperations.add(soapOperation);
@@ -102,17 +106,31 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
         return serviceConfig;
     }
 
-    public MessageModel buildModel(Message message) {
+    public MessageModel buildModel(Message message, SoapOperationConfig operationConfig) {
         MessageModel model = new MessageModel();
-        XMLSchema xmlSchema = new XMLSchema();
-        model.setModelSchema(xmlSchema);
-        model.setModelType(BodyType.XML);
+        SoapSchema soapSchema = new SoapSchema();
+        soapSchema.setOperationConfig(buildSchemaOperation(operationConfig));
+        model.setModelSchema(soapSchema);
+        model.setModelType(BodyType.SOAP);
         Map<String, ModelField> fields = new HashMap<>();
         ModelField rootField = new ModelField();
         buildFieldWithoutRootPath(rootField, message);
         fields.put("root", rootField);
-        xmlSchema.setFields(fields);
+        soapSchema.setFields(fields);
         return model;
+    }
+
+    private SoapSchemaOperation buildSchemaOperation(SoapOperationConfig operationConfig) {
+        SoapSchemaOperation schemaOperation = new SoapSchemaOperation();
+        schemaOperation.setWsdl(operationConfig.getWsdl());
+        schemaOperation.setBaseUrl(operationConfig.getBaseUrl());
+        schemaOperation.setBinding(operationConfig.getBinding());
+        schemaOperation.setInput(operationConfig.getInput());
+        schemaOperation.setName(operationConfig.getName());
+        schemaOperation.setOutPut(operationConfig.getOutPut());
+        schemaOperation.setPortType(operationConfig.getPortType());
+        schemaOperation.setProtocol(operationConfig.getProtocol());
+        return schemaOperation;
     }
 
     private void buildFieldWithoutRootPath(ModelField parent, Message message) {
@@ -241,122 +259,6 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
             }
         }
         parent.put(name, modelField);
-    }
-
-    private void buildField(ModelField parent, Message message) {
-        Map<String, ModelField> child = new HashMap<>();
-        if (message != null) {
-            List<Part> parts = message.getParts();
-            if (CollectionUtils.isNotEmpty(parts)) {
-                parts.forEach(part -> {
-                    ModelField modelField = new ModelField();
-                    Element element = part.getElement();
-                    if (element != null) {
-                        Schema schema = element.getSchema();
-                        String name = element.getName();
-                        String type;
-                        if (element.getType() != null) {
-                            type = element.getType().getLocalPart();
-                            if (containsComplexType(type, schema) && !containsSimpleType(type, schema)) {
-                                if (element.getArrayType() == null) {
-                                    modelField.setType(FieldType.OBJECT);
-                                } else {
-                                    modelField.setType(FieldType.ARRAY);
-                                    modelField.setSubType(FieldType.OBJECT);
-                                }
-                                build(modelField, schema, type);
-                            } else {
-                                FieldType fieldType = getFieldType(type);
-                                if (element.getArrayType() == null) {
-                                    modelField.setType(fieldType);
-                                } else {
-                                    modelField.setType(FieldType.ARRAY);
-                                    modelField.setType(fieldType);
-                                }
-                            }
-                        } else {
-                            buildByEmbeddedType(modelField, element, schema);
-                        }
-                        child.put(name, modelField);
-                    }
-                });
-            }
-        }
-        parent.setFields(child);
-    }
-
-    private void buildByEmbeddedType(ModelField parent, Element element, Schema schema) {
-        Map<String, ModelField> child = new HashMap<>();
-        ComplexType complexType = (ComplexType) element.getEmbeddedType();
-        if (complexType != null) {
-            Sequence sequence = (Sequence) complexType.getModel();
-            if (sequence != null) {
-                List<SchemaComponent> particles = sequence.getParticles();
-                if (CollectionUtils.isNotEmpty(particles)) {
-                    particles.forEach(p -> {
-                        ModelField modelField = new ModelField();
-                        Element e = (Element) p;
-                        String name = e.getName();
-                        String elementType = e.getType().getLocalPart();
-                        if (containsComplexType(elementType, schema) && !containsSimpleType(elementType, schema)) {
-                            if (element.getArrayType() == null) {
-                                modelField.setType(FieldType.OBJECT);
-                            } else {
-                                modelField.setType(FieldType.ARRAY);
-                                modelField.setSubType(FieldType.OBJECT);
-                            }
-                            build(modelField, schema, elementType);
-                        } else {
-                            FieldType fieldType = getFieldType(elementType);
-                            if (element.getArrayType() == null) {
-                                modelField.setType(fieldType);
-                            } else {
-                                modelField.setType(FieldType.ARRAY);
-                                modelField.setSubType(fieldType);
-                            }
-                        }
-                        child.put(name, modelField);
-                    });
-                }
-            }
-        }
-        parent.setFields(child);
-    }
-
-    private void build(ModelField field, Schema schema, String type) {
-        Map<String, ModelField> child = new HashMap<>();
-        ComplexType complexType = schema.getComplexType(type);
-        Sequence sequence = complexType.getSequence();
-        if (sequence != null) {
-            List<SchemaComponent> particles = sequence.getParticles();
-            if (CollectionUtils.isNotEmpty(particles)) {
-                particles.forEach(p -> {
-                    ModelField modelField = new ModelField();
-                    Element element = (Element) p;
-                    String name = element.getName();
-                    String elementType = element.getType().getLocalPart();
-                    if (containsComplexType(elementType, schema) && !containsSimpleType(elementType, schema)) {
-                        if (element.getArrayType() == null) {
-                            modelField.setType(FieldType.OBJECT);
-                        } else {
-                            modelField.setType(FieldType.ARRAY);
-                            modelField.setSubType(FieldType.OBJECT);
-                        }
-                        build(modelField, schema, elementType);
-                    } else {
-                        FieldType fieldType = getFieldType(elementType);
-                        if (element.getArrayType() == null) {
-                            modelField.setType(fieldType);
-                        } else {
-                            modelField.setType(FieldType.ARRAY);
-                            modelField.setSubType(fieldType);
-                        }
-                    }
-                    child.put(name, modelField);
-                });
-            }
-        }
-        field.setFields(child);
     }
 
     private boolean containsSimpleType(String type, Schema schema) {
