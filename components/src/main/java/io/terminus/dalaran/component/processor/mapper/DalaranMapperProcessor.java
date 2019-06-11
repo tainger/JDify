@@ -32,7 +32,7 @@ public class DalaranMapperProcessor implements Processor, Traceable {
     }
 
     @Override
-    public void process(Exchange exchange) throws Exception {
+    public void process(Exchange exchange) {
         Object targetBody = exchange.getIn().getBody();
         Object destinationBody = convert(messageMapping, targetBody);
         exchange.getOut().setBody(destinationBody);

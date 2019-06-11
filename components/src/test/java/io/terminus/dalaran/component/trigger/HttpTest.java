@@ -4,7 +4,7 @@ import com.alibaba.dubbo.common.utils.IOUtils;
 import com.alibaba.dubbo.common.utils.StringUtils;
 import io.terminus.dalaran.component.BasicTriggerTest;
 import io.terminus.dalaran.component.common.HttpMethod;
-import io.terminus.dalaran.component.common.HttpProtocol;
+import io.terminus.dalaran.core.model.HttpProtocol;
 import io.terminus.dalaran.component.trigger.http.NettyHttpConfig;
 import io.terminus.dalaran.component.trigger.http.NettyHttpListener;
 import org.apache.http.HttpResponse;

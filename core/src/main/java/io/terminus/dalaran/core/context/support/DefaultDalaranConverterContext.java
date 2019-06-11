@@ -6,9 +6,11 @@ import io.terminus.dalaran.core.model.DalaranConverter;
 import io.terminus.dalaran.core.model.DalaranModelSchema;
 import io.terminus.dalaran.core.model.MessageModel;
 import io.terminus.dalaran.core.model.converter.JsonConverter;
+import io.terminus.dalaran.core.model.converter.soap.SoapConverter;
 import io.terminus.dalaran.core.model.converter.XMLConverter;
 import io.terminus.dalaran.core.model.schema.JsonSchema;
 import io.terminus.dalaran.core.model.schema.ObjectSchema;
+import io.terminus.dalaran.core.model.schema.SoapSchema;
 import io.terminus.dalaran.core.model.schema.XMLSchema;
 import org.apache.camel.model.ProcessorDefinition;
 
@@ -28,6 +30,9 @@ public class DefaultDalaranConverterContext implements DalaranConverterContext {
 
         converterMapping.put(BodyType.XML, new XMLConverter());
         converterSchemaMapping.put(BodyType.XML, XMLSchema.class);
+
+        converterMapping.put(BodyType.SOAP, new SoapConverter());
+        converterSchemaMapping.put(BodyType.SOAP, SoapSchema.class);
 
         converterSchemaMapping.put(BodyType.OBJECT, ObjectSchema.class);
     }

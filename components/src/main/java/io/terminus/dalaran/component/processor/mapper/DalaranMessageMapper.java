@@ -7,7 +7,6 @@ import io.terminus.dalaran.core.component.annotation.Processor;
 import io.terminus.dalaran.core.model.FieldType;
 import io.terminus.dalaran.core.model.MessageModel;
 import io.terminus.dalaran.core.model.ModelField;
-import io.terminus.dalaran.core.model.schema.JsonSchema;
 import org.apache.camel.model.ProcessorDefinition;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -28,24 +27,29 @@ public class DalaranMessageMapper implements DalaranProcessor<DalaranMapperConfi
     public void configure(ProcessorDefinition route, DalaranMapperConfig config) {
         Map<String, String> arrayFieldMapping = new HashMap<>();
         Map<String, SimpleMappingField> messageMapping = config.getMessageMapping();
-        MessageModel<JsonSchema> in = config.getInModel();
-        MessageModel<JsonSchema> out = config.getOutModel();
+        MessageModel in = config.getInModel();
+        MessageModel out = config.getOutModel();
         DalaranMapperProcessor processor = new DalaranMapperProcessor(transfer(messageMapping, in, out, arrayFieldMapping));
         route.process(processor);
     }
 
-    private Map<String, MappingField> transfer(Map<String, SimpleMappingField> simpleMapping, MessageModel<JsonSchema> in, MessageModel<JsonSchema> out, Map<String, String> arrayMapping) {
+    private Map<String, MappingField> transfer(Map<String, SimpleMappingField> simpleMapping, MessageModel in, MessageModel out, Map<String, String> arrayMapping) {
         Map<String, MappingField> messageMapping = new HashMap<>();
         MappingField mappingField = new MappingField();
         messageMapping.put(MapperConstants.MODEL_ROOT, mappingField);
-        ModelField inModel = in.getModelSchema().getFields().get(MapperConstants.MODEL_ROOT);
-        ModelField outModel = out.getModelSchema().getFields().get(MapperConstants.MODEL_ROOT);
+
+        ModelField inModel = buildModelField(in);
+        ModelField outModel = buildModelField(out);
         mappingField.setType(outModel.getType());
         mappingField.setSubType(outModel.getSubType());
         mappingField.setMapping(new HashMap<>());
         buildArrayMapping(simpleMapping, inModel, outModel, arrayMapping);
         buildMessageMapping(simpleMapping, mappingField, inModel, outModel, arrayMapping);
         return messageMapping;
+    }
+
+    private ModelField buildModelField(MessageModel model) {
+        return model.getModelSchema().getFields().get(MapperConstants.MODEL_ROOT);
     }
 
     private void buildMessageMapping(Map<String, SimpleMappingField> simpleMapping, MappingField mappingField, ModelField inModel, ModelField outModel, Map<String, String> arrayMapping) {
