@@ -4,17 +4,16 @@ import com.alibaba.fastjson.JSON;
 import io.terminus.dalaran.console.TestFlowInitializer;
 import io.terminus.dalaran.console.convertor.FlowConvertor;
 import io.terminus.dalaran.console.entity.SubFlowEntity;
-import io.terminus.dalaran.console.entity.TriggerFlowEntity;
+import io.terminus.dalaran.console.model.dto.flow.BasicFlowInfo;
 import io.terminus.dalaran.console.model.dto.flow.SubFlowDTO;
-import io.terminus.dalaran.console.model.dto.flow.TriggerFlowDTO;
 import io.terminus.dalaran.console.model.query.FlowQuery;
 import io.terminus.dalaran.console.repository.SubFlowRepository;
 import io.terminus.dalaran.console.service.SubFlowManagementService;
+import io.terminus.dalaran.console.service.jpa.SubFlowQueryService;
 import io.terminus.dalaran.core.flow.DalaranFlowBuilder;
 import io.terminus.dalaran.core.flow.FlowStatus;
 import io.terminus.dalaran.core.flow.model.FlowValidation;
 import io.terminus.dalaran.core.flow.model.SubFlow;
-import io.terminus.dalaran.core.flow.model.TriggerFlow;
 import io.terminus.dalaran.core.resource.DalaranResourceBuilder;
 import io.terminus.dalaran.core.resource.entity.common.ProcessorEntity;
 import org.apache.commons.lang3.StringUtils;
@@ -31,6 +30,9 @@ public class SubFlowManagementServiceImpl implements SubFlowManagementService {
 
     @Autowired
     private SubFlowRepository subFlowRepository;
+
+    @Autowired
+    private SubFlowQueryService subFlowQueryService;
 
     @Autowired
     private TestFlowInitializer testFlowInitializer;
@@ -102,6 +104,11 @@ public class SubFlowManagementServiceImpl implements SubFlowManagementService {
     public List<FlowValidation> validateFlow(SubFlowDTO model) {
         SubFlowEntity entity = buildEntity(model);
         return validateFlow(entity);
+    }
+
+    @Override
+    public List<BasicFlowInfo> listBasicSubFlowInfoByModuleId(Long moduleId) {
+        return subFlowQueryService.listBasicInfoByModuleId(moduleId);
     }
 
     private void setFlowStatus(SubFlowEntity flowEntity) {
