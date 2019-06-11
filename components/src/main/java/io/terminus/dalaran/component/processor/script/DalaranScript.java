@@ -6,6 +6,8 @@ import io.terminus.dalaran.core.component.annotation.Processor;
 import jdk.nashorn.api.scripting.ScriptObjectMirror;
 import org.apache.camel.model.ProcessorDefinition;
 
+import static io.terminus.dalaran.core.DalaranConstants.DALARAN_CONTEXT_EXCHANGE;
+
 @Processor(
         value = "script", configType = DalaranScriptConfig.class,
         inputSerializeType = BodySerializeType.Object,
@@ -17,7 +19,7 @@ public class DalaranScript implements DalaranProcessor<DalaranScriptConfig> {
     public void configure(ProcessorDefinition route, DalaranScriptConfig config) {
         switch (config.getType()) {
             case JavaScript: {
-                String content = config.getScript() + "\nexchange.out.body = execute(request.body, request.header)";
+                String content = config.getScript() + "\nexecute(request.body, request.headers, exchange.properties." + DALARAN_CONTEXT_EXCHANGE + ")";
                 route.script().javaScript(content);
                 // TODO 这里很奇怪, 处理一下 array 的输出, 因为 java script 产出的数组其实也是一个 map....
                 route.process(exchange -> {
@@ -29,6 +31,13 @@ public class DalaranScript implements DalaranProcessor<DalaranScriptConfig> {
                     }
                 });
                 route.end();
+                break;
+            }
+            case Groovy: {
+                String content = config.getScript() + "\nexecute(request.body, request.headers, exchange.properties." + DALARAN_CONTEXT_EXCHANGE + ")";
+                route.script().groovy(content);
+                route.end();
+                break;
             }
         }
     }

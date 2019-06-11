@@ -2,5 +2,5 @@ package io.terminus.dalaran.component.processor.script;
 
 public enum DalaranScriptType {
 
-    JavaScript
+    JavaScript, Groovy
 }

@@ -66,6 +66,11 @@
             <artifactId>camel-script</artifactId>
             <version>${camel.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.camel</groupId>
+            <artifactId>camel-groovy</artifactId>
+            <version>${camel.version}</version>
+        </dependency>
 
         <!-- http processor -->
         <dependency>
