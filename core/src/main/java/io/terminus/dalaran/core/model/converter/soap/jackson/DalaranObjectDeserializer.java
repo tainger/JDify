@@ -17,21 +17,21 @@ import java.util.Map;
 public class DalaranObjectDeserializer extends UntypedObjectDeserializer {
 
     @Override
-    protected Map<String,Object> mapObject(JsonParser jp, DeserializationContext ctxt) throws IOException
+    protected Map<String,Object> mapObject(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException
     {
-        JsonToken t = jp.getCurrentToken();
-        if (t == JsonToken.START_OBJECT) {
-            t = jp.nextToken();
+        JsonToken token = jsonParser.getCurrentToken();
+        if (token == JsonToken.START_OBJECT) {
+            token = jsonParser.nextToken();
         }
-        if (t == JsonToken.END_OBJECT) {
+        if (token == JsonToken.END_OBJECT) {
             return new LinkedHashMap<String,Object>(2);
         }
         LinkedHashMap<String, Object> result = new LinkedHashMap<String, Object>();
         do {
-            String fieldName = jp.getCurrentName();
-            jp.nextToken();
-            result.put(fieldName, handleMultipleValue(result, fieldName, deserialize(jp, ctxt)));
-        } while (jp.nextToken() != JsonToken.END_OBJECT);
+            String fieldName = jsonParser.getCurrentName();
+            jsonParser.nextToken();
+            result.put(fieldName, handleMultipleValue(result, fieldName, deserialize(jsonParser, deserializationContext)));
+        } while (jsonParser.nextToken() != JsonToken.END_OBJECT);
         return result;
     }
 

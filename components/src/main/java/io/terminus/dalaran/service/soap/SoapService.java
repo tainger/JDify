@@ -1,7 +1,9 @@
 package io.terminus.dalaran.service.soap;
 
+import com.alibaba.fastjson.JSON;
 import com.predic8.schema.*;
 import com.predic8.wsdl.*;
+import io.terminus.common.utils.JsonMapper;
 import io.terminus.dalaran.component.common.HttpMethod;
 import io.terminus.dalaran.core.component.DalaranService;
 import io.terminus.dalaran.core.component.annotation.ServiceConnector;
@@ -14,8 +16,11 @@ import org.apache.camel.builder.Builder;
 import org.apache.camel.model.ProcessorDefinition;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.util.EntityUtils;
 import org.jetbrains.annotations.NotNull;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -71,28 +76,36 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
         String wsdl = wsdlImportConfig.getWsdlUrl();
         Definitions definitions = parser.parse(wsdl);
         List<Binding> bindings = definitions.getBindings();
-
+        String wsdlDoc = getWsdlDoc(wsdl);
         bindings.forEach(binding -> {
             String bindingName = binding.getName();
             String portType = binding.getType().getLocalPart();
             binding.getOperations().forEach(operation -> {
                 SoapOperationConfig soapOperation = new SoapOperationConfig();
-                soapOperation.setBinding(bindingName);
+                SoapSchemaOperation schemaOperation = new SoapSchemaOperation();
+
+                schemaOperation.setBinding(bindingName);
                 soapOperation.setName(operation.getName());
+                schemaOperation.setName(operation.getName());
+
                 String inputName = operation.getInput().getName();
                 String outputName = operation.getOutput().getName();
                 soapOperation.setPortType(portType);
-                soapOperation.setInput(inputName);
-                soapOperation.setOutPut(outputName);
-                soapOperation.setWsdl(wsdl);
+                schemaOperation.setPortType(portType);
+
+                schemaOperation.setInput(inputName);
+                schemaOperation.setOutPut(outputName);
+                schemaOperation.setWsdl(wsdl);
                 soapOperation.setOperationKey(portType + OPERATION_SPLIT + operation.getName());
 
                 String baseDir = definitions.getBaseDir().toString();
                 soapOperation.setBaseUrl(StringUtils.substringAfter(baseDir, "://"));
+                schemaOperation.setBaseUrl(soapOperation.getBaseUrl());
                 soapOperation.setProtocol(HttpProtocol.valueOf(StringUtils.substringBefore(baseDir, "://").toUpperCase()));
+                schemaOperation.setProtocol(soapOperation.getProtocol());
 
-                MessageModel inModel = buildModel(definitions.getMessage(inputName), soapOperation);
-                MessageModel outModel = buildModel(definitions.getMessage(outputName), soapOperation);
+                MessageModel inModel = buildModel(definitions.getMessage(inputName), schemaOperation, wsdlDoc);
+                MessageModel outModel = buildModel(definitions.getMessage(outputName), schemaOperation, wsdlDoc);
                 soapOperation.setInModel(inModel);
                 soapOperation.setOutModel(outModel);
                 soapOperations.add(soapOperation);
@@ -103,10 +116,11 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
         return serviceConfig;
     }
 
-    public MessageModel buildModel(Message message, SoapOperationConfig operationConfig) {
+    public MessageModel buildModel(Message message, SoapSchemaOperation operationConfig, String wsdlDoc) {
         MessageModel model = new MessageModel();
         SoapSchema soapSchema = new SoapSchema();
-        soapSchema.setOperationConfig(buildSchemaOperation(operationConfig));
+        soapSchema.setWsdlDoc(wsdlDoc);
+        soapSchema.setOperationConfig(operationConfig);
         model.setModelSchema(soapSchema);
         model.setModelType(BodyType.SOAP);
         Map<String, ModelField> fields = new HashMap<>();
@@ -115,19 +129,6 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
         fields.put("root", rootField);
         soapSchema.setFields(fields);
         return model;
-    }
-
-    private SoapSchemaOperation buildSchemaOperation(SoapOperationConfig operationConfig) {
-        SoapSchemaOperation schemaOperation = new SoapSchemaOperation();
-        schemaOperation.setWsdl(operationConfig.getWsdl());
-        schemaOperation.setBaseUrl(operationConfig.getBaseUrl());
-        schemaOperation.setBinding(operationConfig.getBinding());
-        schemaOperation.setInput(operationConfig.getInput());
-        schemaOperation.setName(operationConfig.getName());
-        schemaOperation.setOutPut(operationConfig.getOutPut());
-        schemaOperation.setPortType(operationConfig.getPortType());
-        schemaOperation.setProtocol(operationConfig.getProtocol());
-        return schemaOperation;
     }
 
     private void buildFieldWithoutRootPath(ModelField parent, Message message) {
@@ -282,12 +283,6 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
         return false;
     }
 
-    private String lowerFirstChar(String str) {
-        char[] chars = str.toCharArray();
-        chars[0] += 32;
-        return String.valueOf(chars);
-    }
-
     private FieldType getFieldType(String type) {
         switch (type) {
             case "int":
@@ -298,6 +293,19 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
                 return FieldType.STRING;
             case "boolean":
                 return FieldType.BOOLEAN;
+        }
+        return null;
+    }
+
+    private String getWsdlDoc(String url) {
+        HttpGet httpGet = new HttpGet(url);
+        try {
+            HttpResponse response = new DefaultHttpClient().execute(httpGet);
+            if (response.getStatusLine().getStatusCode() == 200) {
+                return EntityUtils.toString(response.getEntity());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return null;
     }

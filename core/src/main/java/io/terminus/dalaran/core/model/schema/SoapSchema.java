@@ -16,4 +16,6 @@ public class SoapSchema implements DalaranModelSchema {
     private Map<String, ModelField> fields;
 
     private SoapSchemaOperation operationConfig;
+
+    private String wsdlDoc;
 }

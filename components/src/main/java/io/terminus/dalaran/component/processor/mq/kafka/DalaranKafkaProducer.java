@@ -18,7 +18,7 @@ public class DalaranKafkaProducer implements DalaranProcessor<DalaranKafkaProduc
     @Override
     public void configure(ProcessorDefinition route, DalaranKafkaProducerConfig config) {
         String uri = "kafka:" + config.getTopic()
-                + "?brokers=" + config.getBrokers();
+                + "?brokers=" + config.getConnector().getBrokers();
         route.to(uri);
     }
 }

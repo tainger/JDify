@@ -1,4 +1,4 @@
-package io.terminus.dalaran.component.trigger.mq.kafka.commit;
+package io.terminus.dalaran.component.trigger.kafka.commit;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;

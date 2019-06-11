@@ -1,4 +1,4 @@
-package io.terminus.dalaran.component.trigger.mq.kafka.commit;
+package io.terminus.dalaran.component.trigger.kafka.commit;
 
 import io.terminus.dalaran.core.component.BodySerializeType;
 import io.terminus.dalaran.core.component.DalaranProcessor;

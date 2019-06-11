@@ -1,4 +1,4 @@
-package io.terminus.dalaran.component.trigger.mq.kafka;
+package io.terminus.dalaran.component.trigger.kafka;
 
 import io.terminus.dalaran.core.component.BodySerializeType;
 import io.terminus.dalaran.core.component.DalaranTrigger;
@@ -18,7 +18,7 @@ public class DalaranKafkaConsumer implements DalaranTrigger<DalaranKafkaConsumer
     @Override
     public void buildFromRoute(RouteDefinition route, DalaranKafkaConsumerConfig config) {
         String uri = "kafka:" + config.getTopic()
-                + "?brokers=" + config.getBrokers()
+                + "?brokers=" + config.getConnector().getBrokers()
                 + "&groupId=" + config.getGroupId();
         if (!Boolean.valueOf(config.getAutocommit())) {
             uri = uri + "&autoCommitEnable=false"

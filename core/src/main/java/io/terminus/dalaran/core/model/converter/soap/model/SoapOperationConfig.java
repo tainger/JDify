@@ -14,14 +14,6 @@ public class SoapOperationConfig extends ServiceOperation {
 
     private String portType;
 
-    private String binding;
-
-    private String input;
-
-    private String outPut;
-
-    private String wsdl;
-
     private String baseUrl;
 
     private HttpProtocol protocol;

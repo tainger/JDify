@@ -7,6 +7,7 @@ import io.terminus.dalaran.core.model.converter.soap.processor.RequestConvertPro
 import io.terminus.dalaran.core.model.converter.soap.processor.ResponseConvertProcessor;
 import io.terminus.dalaran.core.model.schema.SoapSchema;
 import org.apache.camel.model.ProcessorDefinition;
+import org.apache.commons.io.IOUtils;
 
 /**
  * Created by jingdi on 2019/6/6
@@ -22,7 +23,12 @@ public class SoapConverter implements DalaranConverter<SoapSchema> {
     @Override
     public void fromObject(ProcessorDefinition route, SoapSchema schema) {
         WSDLParser parser = new WSDLParser();
-        Definitions definitions = parser.parse(schema.getOperationConfig().getWsdl());
+        Definitions definitions = new Definitions();
+        try {
+            definitions = parser.parse(IOUtils.toInputStream(schema.getWsdlDoc(), "utf-8"));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         RequestConvertProcessor processor = new RequestConvertProcessor(schema.getFields(), schema.getOperationConfig(), definitions);
         route.process(processor);
     }

@@ -16,11 +16,11 @@ public class DalaranXMLStreamReader extends StreamReaderDelegate {
 
     @Override
     public int next() throws XMLStreamException {
-        int v = super.next();
+        int next = super.next();
         if (_rootElementLocalName == null) {
             _rootElementLocalName = super.getLocalName();
         }
-        return v;
+        return next;
     }
 
     public String getLocalNameForRootElement() {
