@@ -27,6 +27,17 @@ public class DalaranComponentLoader implements BeanPostProcessor {
         if (bean instanceof DalaranTrigger) {
             componentContext.addTrigger((DalaranTrigger) bean);
         }
+
+        switch (""){
+            case "A":
+                System.out.println("");
+            case "B":
+                System.out.println("");
+            case "C":
+                System.out.println("");
+        }
+
+
         return bean;
     }
 }

@@ -4,6 +4,7 @@ import io.swagger.annotations.ApiOperation;
 import io.terminus.dalaran.console.model.dto.flow.SubFlowDTO;
 import io.terminus.dalaran.console.model.query.FlowQuery;
 import io.terminus.dalaran.console.service.SubFlowManagementService;
+import io.terminus.dalaran.core.flow.model.FlowValidation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -50,5 +51,11 @@ public class SubFlowManagementRest {
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     public List<SubFlowDTO> list() {
         return service.list();
+    }
+
+    @ApiOperation(value = "检查集成流")
+    @RequestMapping(value = "/validate", method = RequestMethod.POST)
+    public List<FlowValidation> validate(@RequestBody SubFlowDTO model) {
+        return service.validateFlow(model);
     }
 }
