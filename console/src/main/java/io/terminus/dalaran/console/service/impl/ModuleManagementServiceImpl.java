@@ -33,6 +33,9 @@ public class ModuleManagementServiceImpl implements ModuleManagementService {
     private FlowManagementService flowManagementService;
 
     @Autowired
+    private SubFlowManagementService subFlowManagementService;
+
+    @Autowired
     private ModelManagementService modelManagementService;
 
     @Autowired
@@ -94,6 +97,7 @@ public class ModuleManagementServiceImpl implements ModuleManagementService {
         // TODO to DTO
         moduleDetail.setDependencies(moduleEntity.getDependencies());
         moduleDetail.setFlows(flowManagementService.listBasicFlowInfoByModuleId(moduleId));
+        moduleDetail.setSubFlows(subFlowManagementService.listBasicSubFlowInfoByModuleId(moduleId));
         moduleDetail.setModels(modelManagementService.listBasicInfoByModuleId(moduleId));
         moduleDetail.setConnectors(connectorService.listBasicInfoByModuleId(moduleId));
         moduleDetail.setServices(serviceManagement.listBasicInfoByModuleId(moduleId));
