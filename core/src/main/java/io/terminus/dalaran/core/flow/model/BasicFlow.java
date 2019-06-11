@@ -2,6 +2,7 @@ package io.terminus.dalaran.core.flow.model;
 
 import io.terminus.dalaran.core.DalaranConstants;
 import io.terminus.dalaran.core.component.model.ProcessorModel;
+import io.terminus.dalaran.core.flow.FlowStatus;
 import io.terminus.dalaran.core.model.MessageModel;
 import lombok.Data;
 import org.jetbrains.annotations.NotNull;
@@ -18,6 +19,8 @@ public class BasicFlow {
     private Long id;
 
     private String version;
+
+    private FlowStatus status;
 
     @Nullable
     private MessageModel inModel;

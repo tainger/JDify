@@ -3,6 +3,7 @@ package io.terminus.dalaran.console;
 import io.terminus.dalaran.console.entity.SubFlowEntity;
 import io.terminus.dalaran.console.entity.TriggerFlowEntity;
 import io.terminus.dalaran.core.context.DalaranContext;
+import io.terminus.dalaran.core.flow.FlowStatus;
 import io.terminus.dalaran.core.flow.model.BasicFlow;
 import io.terminus.dalaran.core.flow.model.SubFlow;
 import io.terminus.dalaran.core.resource.DalaranResourceBuilder;
@@ -54,16 +55,24 @@ public class TestFlowInitializer {
             public void run() {
                 List<TriggerFlowEntity> triggerFlows = resourceLoader.loadAllTriggerFlow();
                 for (TriggerFlowEntity triggerFlowEntity : triggerFlows) {
-                    BasicFlow testFlow = resourceBuilder.buildTriggerFlow(triggerFlowEntity);
-                    dalaranContext.addTestFlow(testFlow);
-                    log.info("load test flow {}", testFlow.getId());
+                    if (triggerFlowEntity.getStatus() == FlowStatus.Available) {
+                        BasicFlow testFlow = resourceBuilder.buildTriggerFlow(triggerFlowEntity);
+                        dalaranContext.addTestFlow(testFlow);
+                        log.info("load test flow {}", testFlow.getId());
+                    } else {
+                        log.info("can't load test flow [{}], because has error.", triggerFlowEntity.getId());
+                    }
                 }
                 List<SubFlowEntity> subFlows = resourceLoader.loadAllSubFlow();
                 for (SubFlowEntity subFlowEntity : subFlows) {
-                    SubFlow testFlow = resourceBuilder.buildSubFlow(subFlowEntity);
-                    dalaranContext.addSubFlow(testFlow);
-                    dalaranContext.addTestFlow(testFlow);
-                    log.info("load test sub-flow {}", testFlow.getId());
+                    if (subFlowEntity.getStatus() == FlowStatus.Available) {
+                        SubFlow testFlow = resourceBuilder.buildSubFlow(subFlowEntity);
+                        dalaranContext.addSubFlow(testFlow);
+                        dalaranContext.addTestFlow(testFlow);
+                        log.info("load test sub-flow {}", testFlow.getId());
+                    } else {
+                        log.info("can't load test sub-flow [{}], because has error.", subFlowEntity.getId());
+                    }
                 }
             }
         }, 5000L);

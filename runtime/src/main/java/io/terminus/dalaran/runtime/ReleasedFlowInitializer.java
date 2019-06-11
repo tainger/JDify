@@ -1,6 +1,7 @@
 package io.terminus.dalaran.runtime;
 
 import io.terminus.dalaran.core.context.DalaranContext;
+import io.terminus.dalaran.core.flow.FlowStatus;
 import io.terminus.dalaran.core.flow.model.SubFlow;
 import io.terminus.dalaran.core.flow.model.TriggerFlow;
 import io.terminus.dalaran.core.resource.DalaranResourceBuilder;
@@ -44,16 +45,24 @@ public class ReleasedFlowInitializer {
 
             List<TriggerFlowReleasedEntity> triggerFlows = resourceLoader.loadAllTriggerFlow();
             for (TriggerFlowReleasedEntity triggerFlowEntity : triggerFlows) {
-                TriggerFlow triggerFlow = resourceBuilder.buildTriggerFlow(triggerFlowEntity);
-                dalaranContext.addTriggerFlow(triggerFlow);
-                log.info("load released flow {}", triggerFlow.getId());
+                if (triggerFlowEntity.getStatus() == FlowStatus.Available) {
+                    TriggerFlow triggerFlow = resourceBuilder.buildTriggerFlow(triggerFlowEntity);
+                    dalaranContext.addTriggerFlow(triggerFlow);
+                    log.info("load released flow [{}]", triggerFlow.getId());
+                } else {
+                    log.info("can't load flow [{}], because has error.", triggerFlowEntity.getId());
+                }
             }
 
             List<SubFlowReleasedEntity> subFLows = resourceLoader.loadAllSubFlow();
             for (SubFlowReleasedEntity subFlowEntity : subFLows) {
-                SubFlow subFlow = resourceBuilder.buildSubFlow(subFlowEntity);
-                dalaranContext.addSubFlow(subFlow);
-                log.info("load released sub-flow {}", subFlow.getId());
+                if (subFlowEntity.getStatus() == FlowStatus.Available) {
+                    SubFlow subFlow = resourceBuilder.buildSubFlow(subFlowEntity);
+                    dalaranContext.addSubFlow(subFlow);
+                    log.info("load released sub-flow {}", subFlow.getId());
+                } else {
+                    log.info("can't load sub-flow [{}], because has error.", subFlowEntity.getId());
+                }
             }
         }
     }
