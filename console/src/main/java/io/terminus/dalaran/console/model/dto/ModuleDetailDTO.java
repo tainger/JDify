@@ -13,6 +13,8 @@ public class ModuleDetailDTO extends ModuleDTO {
 
     private List<BasicFlowInfo> flows;
 
+    private List<BasicFlowInfo> subFlows;
+
     private List<BasicModelInfo> models;
 
     private List<BasicConnectorInfo> connectors;

@@ -17,6 +17,7 @@ import io.terminus.dalaran.console.service.FlowManagementService;
 import io.terminus.dalaran.console.service.jpa.FlowQueryService;
 import io.terminus.dalaran.core.context.DalaranContext;
 import io.terminus.dalaran.core.flow.DalaranFlowBuilder;
+import io.terminus.dalaran.core.flow.FlowStatus;
 import io.terminus.dalaran.core.flow.model.FlowValidation;
 import io.terminus.dalaran.core.flow.model.TriggerFlow;
 import io.terminus.dalaran.core.resource.DalaranResourceBuilder;
@@ -78,6 +79,7 @@ public class FlowManagementServiceImpl implements FlowManagementService {
 
     @Override
     public Long saveFlow(TriggerFlowEntity flowEntity) {
+        setFlowStatus(flowEntity);
         Long id = flowRepository.save(flowEntity).getId();
         // TODO 这里依赖 loader 有点怪 而且可以异步
         testFlowInitializer.reloadTestTriggerFlow(flowEntity.getId());
@@ -87,6 +89,7 @@ public class FlowManagementServiceImpl implements FlowManagementService {
     @Override
     public Long createFlow(TriggerFlowDTO flowModel) {
         TriggerFlowEntity flowEntity = buildEntity(flowModel);
+        setFlowStatus(flowEntity);
         Long id = flowRepository.save(flowEntity).getId();
         // TODO 这里依赖 loader 有点怪 而且可以异步
         testFlowInitializer.reloadTestTriggerFlow(flowEntity.getId());
@@ -101,6 +104,7 @@ public class FlowManagementServiceImpl implements FlowManagementService {
     @Override
     public TriggerFlowDTO updateFlow(TriggerFlowDTO flowModel) {
         TriggerFlowEntity flowEntity = buildEntity(flowModel);
+        setFlowStatus(flowEntity);
         flowRepository.save(flowEntity);
         // TODO 这里依赖 loader 有点怪 而且可以异步
         testFlowInitializer.reloadTestTriggerFlow(flowEntity.getId());
@@ -161,6 +165,20 @@ public class FlowManagementServiceImpl implements FlowManagementService {
     @Override
     public List<FlowValidation> validateFlow(TriggerFlowDTO model) {
         TriggerFlowEntity entity = buildEntity(model);
+        return validateFlow(entity);
+    }
+
+    private void setFlowStatus(TriggerFlowEntity flowEntity) {
+        FlowStatus flowStatus;
+        if (validateFlow(flowEntity).isEmpty()) {
+            flowStatus = FlowStatus.Available;
+        } else {
+            flowStatus = FlowStatus.Error;
+        }
+        flowEntity.setStatus(flowStatus);
+    }
+
+    private List<FlowValidation> validateFlow(TriggerFlowEntity entity) {
         TriggerFlow triggerFlow = resourceBuilder.buildTriggerFlow(entity);
         return flowBuilder.validateFlow(triggerFlow);
     }

@@ -1,12 +1,20 @@
 package io.terminus.dalaran.console.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import io.terminus.dalaran.console.TestFlowInitializer;
 import io.terminus.dalaran.console.convertor.FlowConvertor;
 import io.terminus.dalaran.console.entity.SubFlowEntity;
+import io.terminus.dalaran.console.model.dto.flow.BasicFlowInfo;
 import io.terminus.dalaran.console.model.dto.flow.SubFlowDTO;
 import io.terminus.dalaran.console.model.query.FlowQuery;
 import io.terminus.dalaran.console.repository.SubFlowRepository;
 import io.terminus.dalaran.console.service.SubFlowManagementService;
+import io.terminus.dalaran.console.service.jpa.SubFlowQueryService;
+import io.terminus.dalaran.core.flow.DalaranFlowBuilder;
+import io.terminus.dalaran.core.flow.FlowStatus;
+import io.terminus.dalaran.core.flow.model.FlowValidation;
+import io.terminus.dalaran.core.flow.model.SubFlow;
+import io.terminus.dalaran.core.resource.DalaranResourceBuilder;
 import io.terminus.dalaran.core.resource.entity.common.ProcessorEntity;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
@@ -23,12 +31,26 @@ public class SubFlowManagementServiceImpl implements SubFlowManagementService {
     @Autowired
     private SubFlowRepository subFlowRepository;
 
+    @Autowired
+    private SubFlowQueryService subFlowQueryService;
+
+    @Autowired
+    private TestFlowInitializer testFlowInitializer;
+
+    @Autowired
+    private DalaranResourceBuilder resourceBuilder;
+
+    @Autowired
+    private DalaranFlowBuilder flowBuilder;
+
     private final FlowConvertor flowConvertor = new FlowConvertor();
 
     @Override
     public Long createFlow(SubFlowDTO flowModel) {
         SubFlowEntity subFlowEntity = buildEntity(flowModel);
+        setFlowStatus(subFlowEntity);
         subFlowRepository.save(subFlowEntity);
+        testFlowInitializer.reloadTestSubFlow(subFlowEntity.getId());
         return subFlowEntity.getId();
     }
 
@@ -40,7 +62,9 @@ public class SubFlowManagementServiceImpl implements SubFlowManagementService {
     @Override
     public SubFlowDTO updateFlow(SubFlowDTO flowModel) {
         SubFlowEntity subFlowEntity = buildEntity(flowModel);
+        setFlowStatus(subFlowEntity);
         subFlowRepository.save(subFlowEntity);
+        testFlowInitializer.reloadTestSubFlow(subFlowEntity.getId());
         return flowConvertor.toDTO(subFlowEntity);
     }
 
@@ -74,6 +98,32 @@ public class SubFlowManagementServiceImpl implements SubFlowManagementService {
     public Long copyFlow(Long id) {
         // TODO
         return null;
+    }
+
+    @Override
+    public List<FlowValidation> validateFlow(SubFlowDTO model) {
+        SubFlowEntity entity = buildEntity(model);
+        return validateFlow(entity);
+    }
+
+    @Override
+    public List<BasicFlowInfo> listBasicSubFlowInfoByModuleId(Long moduleId) {
+        return subFlowQueryService.listBasicInfoByModuleId(moduleId);
+    }
+
+    private void setFlowStatus(SubFlowEntity flowEntity) {
+        FlowStatus flowStatus;
+        if (validateFlow(flowEntity).isEmpty()) {
+            flowStatus = FlowStatus.Available;
+        } else {
+            flowStatus = FlowStatus.Error;
+        }
+        flowEntity.setStatus(flowStatus);
+    }
+
+    private List<FlowValidation> validateFlow(SubFlowEntity entity) {
+        SubFlow subFlow = resourceBuilder.buildSubFlow(entity);
+        return flowBuilder.validateFlow(subFlow);
     }
 
     private SubFlowEntity buildEntity(SubFlowDTO model) {

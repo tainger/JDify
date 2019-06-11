@@ -24,13 +24,12 @@ import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static io.terminus.dalaran.core.DalaranConstants.TEST_FLOW_PREFIX;
-import static io.terminus.dalaran.core.component.ComponentType.Trigger;
 import static io.terminus.dalaran.core.flow.FlowSuggest.ADD_MAPPER;
 import static io.terminus.dalaran.core.flow.FlowValidateMessage.FIELD_NOT_NULL;
 import static io.terminus.dalaran.core.flow.FlowValidateMessage.MODEL_NOT_EQUALLY;
+import static io.terminus.dalaran.core.flow.ValidateMessageTarget.*;
 
 public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute> {
 
@@ -132,7 +131,7 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
                 processorMessageList.add(message);
             }
             processorMessageList.forEach(message -> {
-                message.setTargetType(ComponentType.Processor);
+                message.setTargetType(Processor);
                 message.setTargetId(processorModel.getId());
             });
             lastModel = processorModel.getOutModel();
@@ -148,14 +147,12 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
                 List<FlowValidation> triggerCustomMessageList = ((DalaranComponentValidator) trigger).validate(triggerFlow.getTriggerConfig());
                 flowValidateMessages.addAll(triggerCustomMessageList);
             }
-            flowValidateMessages.forEach(message -> {
-                message.setTargetType(Trigger);
-            });
+            flowValidateMessages.forEach(message -> message.setTargetType(Trigger));
             validateMessages.addAll(flowValidateMessages);
         }
         if (!lastModel.equals(flow.getOutModel())) {
             FlowValidation message = new FlowValidation();
-            message.setTargetType(Trigger);
+            message.setTargetType(FlowEnd);
             message.setType(ValidateMessageType.Warning);
             message.setMessage(MODEL_NOT_EQUALLY);
             message.setSuggest(ADD_MAPPER);

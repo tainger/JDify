@@ -140,9 +140,15 @@ public class DalaranTracer {
         public String getTraceLabel() {
             switch (tracingType) {
                 case Flow:
-                    return "flow tracing before[flow(" + flowId + ") -> processor(" + processorId + ")]";
+                    return "flow tracing before[flow(" + flowId + ")]";
                 case TestFlow:
                     return "test flow tracing before[testFlow(" + flowId + ")]";
+                case SubFlow:
+                    return "sub flow tracing before[testFlow(" + flowId + ")]";
+                case Processor:
+                    return "processor tracing before[testFlow(" + flowId + ") -> processor(" + processorId + ")]";
+                case Convert:
+                    return "convert tracing before[testFlow(" + flowId + ") -> processor(" + processorId + ")]";
                 default:
                     return "DalaranTraceBefore";
             }
@@ -185,9 +191,15 @@ public class DalaranTracer {
         public String getTraceLabel() {
             switch (tracingType) {
                 case Flow:
-                    return "flow tracing after[flow(" + flowId + ") -> processor(" + processorId + ")]";
+                    return "flow tracing after[flow(" + flowId + ")]";
                 case TestFlow:
                     return "test flow tracing after[testFlow(" + flowId + ")]";
+                case SubFlow:
+                    return "sub flow tracing after[testFlow(" + flowId + ")]";
+                case Processor:
+                    return "processor tracing after[testFlow(" + flowId + ") -> processor(" + processorId + ")]";
+                case Convert:
+                    return "convert tracing after[testFlow(" + flowId + ") -> processor(" + processorId + ")]";
                 default:
                     return "DalaranTraceAfter";
             }

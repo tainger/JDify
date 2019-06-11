@@ -11,15 +11,16 @@ import io.terminus.dalaran.core.flow.model.BasicFlow;
 import io.terminus.dalaran.core.flow.model.FlowFragment;
 import io.terminus.dalaran.core.flow.model.SubFlow;
 import io.terminus.dalaran.core.flow.model.TriggerFlow;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.camel.CamelContext;
 import org.apache.camel.impl.DefaultProducerTemplate;
-import org.apache.camel.model.RouteDefinition;
 
 import java.util.List;
 
 import static io.terminus.dalaran.core.DalaranConstants.FLOW_PREFIX;
 import static io.terminus.dalaran.core.DalaranConstants.TEST_FLOW_DIRECT_PREFIX;
 
+@Slf4j
 public class DefaultDalaranCamelContext implements DalaranContext<DalaranRoute> {
 
     private final DalaranFlowBuilder<DalaranRoute> flowBuilder;
@@ -72,7 +73,8 @@ public class DefaultDalaranCamelContext implements DalaranContext<DalaranRoute> 
     public void addTriggerFlow(TriggerFlow flow) {
         try {
             camelContext.removeRoute(FLOW_PREFIX + flow.getId());
-            RouteDefinition route = flowBuilder.buildTriggerFlow(flow);
+            DalaranRoute route = flowBuilder.buildTriggerFlow(flow);
+            log.info("load trigger flow [{}], steps: {}", route.getId(), route.getSteps());
             camelContext.addRouteDefinition(route);
         } catch (Exception e) {
             e.printStackTrace();
@@ -88,7 +90,8 @@ public class DefaultDalaranCamelContext implements DalaranContext<DalaranRoute> 
     public void addTestFlow(BasicFlow flow) {
         try {
             camelContext.removeRoute(DalaranConstants.TEST_FLOW_PREFIX + flow.getRouteId());
-            RouteDefinition route = flowBuilder.buildTestFLow(flow);
+            DalaranRoute route = flowBuilder.buildTestFLow(flow);
+            log.info("load test flow [{}], steps: {}", route.getId(), route.getSteps());
             camelContext.addRouteDefinition(route);
         } catch (Exception e) {
             e.printStackTrace();
@@ -102,10 +105,10 @@ public class DefaultDalaranCamelContext implements DalaranContext<DalaranRoute> 
 
     @Override
     public void addSubFlow(SubFlow flow) {
-
         try {
             camelContext.removeRoute(flow.getRouteId());
-            RouteDefinition route = flowBuilder.buildSubFLow(flow);
+            DalaranRoute route = flowBuilder.buildSubFLow(flow);
+            log.info("load sub flow [{}], steps: {}", route.getId(), route.getSteps());
             camelContext.addRouteDefinition(route);
         } catch (Exception e) {
             e.printStackTrace();
@@ -121,7 +124,8 @@ public class DefaultDalaranCamelContext implements DalaranContext<DalaranRoute> 
     public void addFragmentFlow(FlowFragment flow) {
         try {
             camelContext.removeRoute(flow.getRouteId());
-            RouteDefinition route = flowBuilder.buildFlowFragment(flow);
+            DalaranRoute route = flowBuilder.buildFlowFragment(flow);
+            log.info("load fragment flow [{}], steps: {}", route.getId(), route.getSteps());
             camelContext.addRouteDefinition(route);
         } catch (Exception e) {
             e.printStackTrace();
