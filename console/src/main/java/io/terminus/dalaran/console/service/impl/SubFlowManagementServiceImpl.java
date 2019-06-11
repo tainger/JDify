@@ -7,6 +7,10 @@ import io.terminus.dalaran.console.model.dto.flow.SubFlowDTO;
 import io.terminus.dalaran.console.model.query.FlowQuery;
 import io.terminus.dalaran.console.repository.SubFlowRepository;
 import io.terminus.dalaran.console.service.SubFlowManagementService;
+import io.terminus.dalaran.core.flow.DalaranFlowBuilder;
+import io.terminus.dalaran.core.flow.model.FlowValidation;
+import io.terminus.dalaran.core.flow.model.SubFlow;
+import io.terminus.dalaran.core.resource.DalaranResourceBuilder;
 import io.terminus.dalaran.core.resource.entity.common.ProcessorEntity;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
@@ -22,6 +26,12 @@ public class SubFlowManagementServiceImpl implements SubFlowManagementService {
 
     @Autowired
     private SubFlowRepository subFlowRepository;
+
+    @Autowired
+    private DalaranResourceBuilder resourceBuilder;
+
+    @Autowired
+    private DalaranFlowBuilder flowBuilder;
 
     private final FlowConvertor flowConvertor = new FlowConvertor();
 
@@ -74,6 +84,13 @@ public class SubFlowManagementServiceImpl implements SubFlowManagementService {
     public Long copyFlow(Long id) {
         // TODO
         return null;
+    }
+
+    @Override
+    public List<FlowValidation> validateFlow(SubFlowDTO model) {
+        SubFlowEntity entity = buildEntity(model);
+        SubFlow subFlow = resourceBuilder.buildSubFlow(entity);
+        return flowBuilder.validateFlow(subFlow);
     }
 
     private SubFlowEntity buildEntity(SubFlowDTO model) {

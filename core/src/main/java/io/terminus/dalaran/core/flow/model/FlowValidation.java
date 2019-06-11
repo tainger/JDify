@@ -1,17 +1,15 @@
 package io.terminus.dalaran.core.flow.model;
 
-import io.terminus.dalaran.core.component.ComponentType;
+import io.terminus.dalaran.core.flow.ValidateMessageTarget;
 import io.terminus.dalaran.core.flow.ValidateMessageType;
 import lombok.Data;
-
-import java.util.List;
 
 @Data
 public class FlowValidation {
 
     private String targetId;
 
-    private ComponentType targetType;
+    private ValidateMessageTarget targetType;
 
     private ValidateMessageType type;
 
