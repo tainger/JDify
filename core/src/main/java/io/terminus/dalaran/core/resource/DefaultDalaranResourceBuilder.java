@@ -218,7 +218,6 @@ public class DefaultDalaranResourceBuilder implements DalaranResourceBuilder {
         for (PropertyAbstractEntity propertyEntity : resourceLoader.loadAllProperties()) {
             properties.put(propertyEntity.getName(), propertyEntity.getValue());
         }
-        properties.putAll(System.getenv());
         return properties;
     }
 }
