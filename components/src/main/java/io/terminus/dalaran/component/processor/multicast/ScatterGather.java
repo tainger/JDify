@@ -52,9 +52,10 @@ public class ScatterGather implements DalaranProcessor<List<String>>, DalaranPro
     }
 
     /**
-     * 将路由配置转化为多条路由片段, 并返回路由条件和片段路径
-     * return: Map<Expression, RouteUri>
+     * 将分支配置转化为多条流程片段, 并返回片段路径
+     * return: List<RouteUri>
      */
+    // TODO 这里还少一个合并, 就是每个分支的出参最后合并为 scatter gather 的出参
     public List<String> convert(ScatterGatherConfig config, ComponentModel component, BasicFlow flow) {
         List<ScatterGatherConfig.Branch> branches = config.getBranches();
         List<String> branchList = new ArrayList<>();

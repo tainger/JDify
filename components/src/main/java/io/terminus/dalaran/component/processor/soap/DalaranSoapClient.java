@@ -1,6 +1,5 @@
 package io.terminus.dalaran.component.processor.soap;
 
-import io.terminus.dalaran.component.common.HttpMethod;
 import io.terminus.dalaran.core.component.DalaranProcessor;
 import org.apache.camel.Exchange;
 import org.apache.camel.builder.Builder;

@@ -1,10 +1,10 @@
 package io.terminus.dalaran.component.trigger.http;
 
 import io.terminus.dalaran.component.common.HttpMethod;
-import io.terminus.dalaran.core.model.HttpProtocol;
 import io.terminus.dalaran.core.component.FieldInputType;
 import io.terminus.dalaran.core.component.annotation.ConfigFieldInfo;
 import io.terminus.dalaran.core.component.config.AllModelConfig;
+import io.terminus.dalaran.core.model.HttpProtocol;
 import lombok.Data;
 
 @Data

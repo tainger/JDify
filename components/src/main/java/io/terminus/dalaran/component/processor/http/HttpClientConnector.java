@@ -1,8 +1,8 @@
 package io.terminus.dalaran.component.processor.http;
 
-import io.terminus.dalaran.core.model.HttpProtocol;
 import io.terminus.dalaran.core.component.FieldInputType;
 import io.terminus.dalaran.core.component.annotation.ConfigFieldInfo;
+import io.terminus.dalaran.core.model.HttpProtocol;
 import lombok.Data;
 
 @Data
