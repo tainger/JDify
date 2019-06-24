@@ -1,0 +1,19 @@
+package io.terminus.dalaran.console.model;
+
+/**
+ * Created by jingdi on 2019/6/24
+ */
+public class DalaranConsoleConstants {
+
+    public static final String JAVA_STRING = "java.lang.String";
+
+    public static final String JAVA_INTEGER = "java.lang.Integer";
+
+    public static final String JAVA_LONG = "java.lang.Long";
+
+    public static final String JAVA_NUMBER = "java.lang.Number";
+
+    public static final String JSON_OBJECT = "com.alibaba.fastjson.JSONObject";
+
+    public static final String JSON_ARRAY = "com.alibaba.fastjson.JSONArray";
+}

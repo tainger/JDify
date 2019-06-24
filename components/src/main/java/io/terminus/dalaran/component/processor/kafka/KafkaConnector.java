@@ -1,4 +1,4 @@
-package io.terminus.dalaran.component.processor.mq.kafka;
+package io.terminus.dalaran.component.processor.kafka;
 
 import io.terminus.dalaran.core.component.FieldInputType;
 import io.terminus.dalaran.core.component.annotation.ConfigFieldInfo;
