@@ -56,8 +56,8 @@ public class FlowManagementRest {
 
     @ApiOperation(value = "复制工作流")
     @RequestMapping(value = "/copy", method = RequestMethod.POST)
-    public Long copy(@RequestParam Long id) {
-        return flowManagementService.copyFlow(id);
+    public Long copy(@RequestParam Long id, @RequestParam String name) {
+        return flowManagementService.copyFlow(id, name);
     }
 
     @ApiOperation(value = "条件查询工作流")

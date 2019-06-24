@@ -30,7 +30,7 @@ public interface FlowManagementService {
     @Nullable
     TriggerFlowDTO getById(Long flowId);
 
-    Long copyFlow(Long id);
+    Long copyFlow(Long id, String name);
 
     List<FlowValidation> validateFlow(TriggerFlowDTO model);
 }

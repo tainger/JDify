@@ -149,7 +149,7 @@ public class FlowManagementServiceImpl implements FlowManagementService {
     }
 
     @Override
-    public Long copyFlow(Long id) {
+    public Long copyFlow(Long id, String name) {
         TriggerFlowEntity flowEntity = flowRepository.findOne(id);
         if (flowEntity == null) {
             return null;
@@ -158,6 +158,7 @@ public class FlowManagementServiceImpl implements FlowManagementService {
 
         BeanUtils.copyProperties(flowEntity, newFlowEntity);
         newFlowEntity.setId(null);
+        newFlowEntity.setName(name);
         flowRepository.save(newFlowEntity);
         return newFlowEntity.getId();
     }
