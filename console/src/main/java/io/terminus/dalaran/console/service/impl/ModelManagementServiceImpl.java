@@ -2,6 +2,7 @@ package io.terminus.dalaran.console.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import io.terminus.dalaran.console.entity.ModelEntity;
+import io.terminus.dalaran.console.model.DalaranConsoleConstants;
 import io.terminus.dalaran.console.model.dto.BasicModelInfo;
 import io.terminus.dalaran.console.model.dto.ModelDTO;
 import io.terminus.dalaran.console.model.query.ModelQuery;
@@ -11,8 +12,10 @@ import io.terminus.dalaran.console.service.ModelManagementService;
 import io.terminus.dalaran.console.service.jpa.ModelQueryService;
 import io.terminus.dalaran.console.util.ExcelUtils;
 import io.terminus.dalaran.core.model.BodyType;
+import io.terminus.dalaran.core.model.FieldType;
 import io.terminus.dalaran.core.model.ModelField;
 import io.terminus.dalaran.core.model.schema.JsonSchema;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -133,6 +136,23 @@ public class ModelManagementServiceImpl implements ModelManagementService {
         return new HashMap<>();
     }
 
+    @Override
+    public JsonSchema importDataTemplate(String dataTemplate, Long id) {
+        Map<String, ModelField> root = new HashMap<>();
+        ModelField modelField = new ModelField();
+        Object data = JSON.parse(dataTemplate);
+        if (data instanceof List) {
+            modelField.setType(FieldType.ARRAY);
+            List list = (List) data;
+            if (CollectionUtils.isNotEmpty(list)) {
+                Object child = list.get(0);
+
+            }
+
+        }
+        return null;
+    }
+
     private ModelEntity buildEntity(ModelDTO model) {
         ModelEntity modelEntity;
         Long id = model.getId();
@@ -163,5 +183,15 @@ public class ModelManagementServiceImpl implements ModelManagementService {
         model.setModelType(entity.getType());
         model.setId(entity.getId());
         return model;
+    }
+
+    private boolean isComplexType(Object body) {
+        String type = body.getClass().getTypeName();
+        switch (type) {
+            case DalaranConsoleConstants.JAVA_STRING:
+                return false;
+        }
+
+        return false;
     }
 }

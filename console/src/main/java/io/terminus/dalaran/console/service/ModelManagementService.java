@@ -33,4 +33,6 @@ public interface ModelManagementService {
     JsonSchema importExcel(MultipartFile file, Long id);
 
     Map<Long, Map<String, JsonSchema>> multiImportExcel(MultipartFile file, BodyType type);
+
+    JsonSchema importDataTemplate(String dataTemplate, Long id);
 }

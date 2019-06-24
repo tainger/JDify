@@ -24,6 +24,13 @@
             <version>${camel.version}</version>
         </dependency>
 
+        <!-- RocketMQ Component -->
+        <dependency>
+            <groupId>io.terminus</groupId>
+            <artifactId>camel-rocketmq</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
         <!-- scheduler trigger -->
         <dependency>
             <groupId>org.apache.camel</groupId>
