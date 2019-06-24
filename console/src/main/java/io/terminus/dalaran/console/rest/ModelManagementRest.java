@@ -1,6 +1,7 @@
 package io.terminus.dalaran.console.rest;
 
 import io.swagger.annotations.ApiOperation;
+import io.terminus.dalaran.console.model.dto.DataTemplate;
 import io.terminus.dalaran.console.model.dto.ModelDTO;
 import io.terminus.dalaran.console.model.query.ModelQuery;
 import io.terminus.dalaran.console.repository.ModelRepository;
@@ -67,7 +68,7 @@ public class ModelManagementRest {
 
     @ApiOperation(value = "导入数据模板更新模型结构")
     @RequestMapping(value = "/{id}/import/data-template", method = RequestMethod.POST)
-    public Map<String, ModelField> importDataTemplate(@RequestBody String dataTemplate, @PathVariable long id) {
+    public Map<String, ModelField> importDataTemplate(@RequestBody DataTemplate dataTemplate, @PathVariable long id) {
         JsonSchema schema = modelManagementService.importDataTemplate(dataTemplate, id);
         return schema.getFields();
     }

@@ -7,6 +7,7 @@ import io.terminus.dalaran.component.processor.mapper.model.MapperConstants;
 import io.terminus.dalaran.console.entity.ModelEntity;
 import io.terminus.dalaran.console.model.DalaranConsoleConstants;
 import io.terminus.dalaran.console.model.dto.BasicModelInfo;
+import io.terminus.dalaran.console.model.dto.DataTemplate;
 import io.terminus.dalaran.console.model.dto.ModelDTO;
 import io.terminus.dalaran.console.model.query.ModelQuery;
 import io.terminus.dalaran.console.repository.ModelRepository;
@@ -140,11 +141,11 @@ public class ModelManagementServiceImpl implements ModelManagementService {
     }
 
     @Override
-    public JsonSchema importDataTemplate(String dataTemplate, Long id) {
+    public JsonSchema importDataTemplate(DataTemplate dataTemplate, Long id) {
         Map<String, ModelField> root = new HashMap<>();
         ModelField modelField = new ModelField();
         root.put(MapperConstants.MODEL_ROOT, modelField);
-        Object body = JSON.parse(dataTemplate);
+        Object body = JSON.parse(dataTemplate.getDataTemplate());
         String type = body.getClass().getTypeName();
         if (isComplexType(type)) {
             buildModel(body, type, modelField);
