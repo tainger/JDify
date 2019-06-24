@@ -65,11 +65,11 @@ public class ModelManagementRest {
         return modelManagementService.importExcel(file, id);
     }
 
-    // TODO 待开发
     @ApiOperation(value = "导入数据模板更新模型结构")
     @RequestMapping(value = "/{id}/import/data-template", method = RequestMethod.POST)
     public Map<String, ModelField> importDataTemplate(@RequestBody String dataTemplate, @PathVariable long id) {
-        return new HashMap<>();
+        JsonSchema schema = modelManagementService.importDataTemplate(dataTemplate, id);
+        return schema.getFields();
     }
 
     // TODO 待开发

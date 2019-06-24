@@ -5,5 +5,15 @@ package io.terminus.dalaran.console.model;
  */
 public class DalaranConsoleConstants {
 
-    public static final String JAVA_STRING = "java.lang.string";
+    public static final String JAVA_STRING = "java.lang.String";
+
+    public static final String JAVA_INTEGER = "java.lang.Integer";
+
+    public static final String JAVA_LONG = "java.lang.Long";
+
+    public static final String JAVA_NUMBER = "java.lang.Number";
+
+    public static final String JSON_OBJECT = "com.alibaba.fastjson.JSONObject";
+
+    public static final String JSON_ARRAY = "com.alibaba.fastjson.JSONArray";
 }
