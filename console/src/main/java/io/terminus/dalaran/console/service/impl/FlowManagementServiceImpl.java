@@ -5,6 +5,7 @@ import io.terminus.dalaran.console.TestFlowInitializer;
 import io.terminus.dalaran.console.convertor.FlowConvertor;
 import io.terminus.dalaran.console.entity.ModelEntity;
 import io.terminus.dalaran.console.entity.TriggerFlowEntity;
+import io.terminus.dalaran.console.model.dto.CopyFlow;
 import io.terminus.dalaran.console.model.dto.ModelDTO;
 import io.terminus.dalaran.console.model.dto.flow.BasicFlowInfo;
 import io.terminus.dalaran.console.model.dto.flow.TriggerFlowDTO;
@@ -149,8 +150,8 @@ public class FlowManagementServiceImpl implements FlowManagementService {
     }
 
     @Override
-    public Long copyFlow(Long id, String name) {
-        TriggerFlowEntity flowEntity = flowRepository.findOne(id);
+    public Long copyFlow(CopyFlow copyFlow) {
+        TriggerFlowEntity flowEntity = flowRepository.findOne(copyFlow.getId());
         if (flowEntity == null) {
             return null;
         }
@@ -158,7 +159,7 @@ public class FlowManagementServiceImpl implements FlowManagementService {
 
         BeanUtils.copyProperties(flowEntity, newFlowEntity);
         newFlowEntity.setId(null);
-        newFlowEntity.setName(name);
+        newFlowEntity.setName(copyFlow.getName());
         flowRepository.save(newFlowEntity);
         return newFlowEntity.getId();
     }

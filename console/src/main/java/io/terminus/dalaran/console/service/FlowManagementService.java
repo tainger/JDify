@@ -1,6 +1,7 @@
 package io.terminus.dalaran.console.service;
 
 import io.terminus.dalaran.console.entity.TriggerFlowEntity;
+import io.terminus.dalaran.console.model.dto.CopyFlow;
 import io.terminus.dalaran.console.model.dto.flow.BasicFlowInfo;
 import io.terminus.dalaran.console.model.dto.flow.TriggerFlowDTO;
 import io.terminus.dalaran.console.model.query.FlowQuery;
@@ -30,7 +31,7 @@ public interface FlowManagementService {
     @Nullable
     TriggerFlowDTO getById(Long flowId);
 
-    Long copyFlow(Long id, String name);
+    Long copyFlow(CopyFlow copyFlow);
 
     List<FlowValidation> validateFlow(TriggerFlowDTO model);
 }
