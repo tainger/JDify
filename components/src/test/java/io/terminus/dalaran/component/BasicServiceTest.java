@@ -3,6 +3,7 @@ package io.terminus.dalaran.component;
 import io.terminus.dalaran.core.component.DalaranService;
 import io.terminus.dalaran.core.component.model.ServiceOperation;
 import org.apache.camel.CamelContext;
+import org.apache.camel.Processor;
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.impl.SimpleRegistry;
@@ -15,12 +16,14 @@ public class BasicServiceTest {
 
     protected CamelContext camelContext = new DefaultCamelContext(new SimpleRegistry());
 
-    protected ProducerTemplate getProcessorTemplate(DalaranService service, ServiceOperation config) {
+    protected ProducerTemplate getProcessorTemplate(DalaranService service, ServiceOperation config, Processor requestProcessor, Processor responseProcessor) {
         try {
             RouteDefinition route = new RouteDefinition("direct:test-script");
             route.setId("test-route");
             camelContext.setTracing(true);
+            route.process(requestProcessor);
             service.configure(route, config);
+            route.process(responseProcessor);
             camelContext.addRouteDefinition(route);
             camelContext.start();
             ProducerTemplate template = camelContext.createProducerTemplate();
