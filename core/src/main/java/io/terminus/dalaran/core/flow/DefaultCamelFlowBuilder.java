@@ -213,14 +213,16 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
             currentProcessorInfo = componentContext.getProcessorInfo(processor.getType());
 
             // TODO no model
-            spanTracer.before(route, currentModel.getModelType());
+            if (currentModel != null) {
+                spanTracer.before(route, currentModel.getModelType());
+            }
             // TODO 这里还是比较奇怪, 有点绕, 而且有些特殊场景没有考虑到
 //                currentBodyIsSerialized = currentModel.getModelType().isSerialized();
             boolean needConvert = true;
             if (processorComponent instanceof DalaranMessageBodyCustomConverter) {
                 needConvert = ((DalaranMessageBodyCustomConverter) processorComponent).customBodyConvert(route, processor.getConfig(), currentBodyIsSerialized);
             }
-            if (needConvert && currentProcessorInfo.getInputSerializeType() != BodySerializeType.All) {
+            if (currentModel != null && needConvert && currentProcessorInfo.getInputSerializeType() != BodySerializeType.All) {
                 // TODO convert tracing, 暂时没必要, 先注掉吧, 影响性能
                 // TODO processor 的输入和输出一定是一种类型
 //                DalaranTracer convertTracer = DalaranTracer.buildConvertTracer(traceLogger, flow.getId(), processor.getId());
@@ -254,7 +256,9 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
             if (outModel != null) {
                 currentModel = outModel;
             }
-            spanTracer.after(route, currentModel.getModelType());
+            if (currentModel != null) {
+                spanTracer.after(route, currentModel.getModelType());
+            }
         }
 
         MessageModel outModel = flow.getOutModel();
