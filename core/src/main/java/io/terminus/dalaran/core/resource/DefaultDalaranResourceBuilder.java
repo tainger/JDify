@@ -99,7 +99,7 @@ public class DefaultDalaranResourceBuilder implements DalaranResourceBuilder {
         if (modelId != null) {
             return buildModel(resourceLoader.loadModel(modelId));
         }
-        return new MessageModel();
+        return null;
     }
 
     @Override
