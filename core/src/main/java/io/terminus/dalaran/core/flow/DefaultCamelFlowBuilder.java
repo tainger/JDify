@@ -27,8 +27,8 @@ import java.util.List;
 
 import static io.terminus.dalaran.core.DalaranConstants.TEST_FLOW_PREFIX;
 import static io.terminus.dalaran.core.flow.FlowSuggest.ADD_MAPPER;
-import static io.terminus.dalaran.core.flow.FlowValidateMessage.FIELD_NOT_NULL;
-import static io.terminus.dalaran.core.flow.FlowValidateMessage.MODEL_NOT_EQUALLY;
+import static io.terminus.dalaran.core.flow.FlowSuggest.ADD_MODEL;
+import static io.terminus.dalaran.core.flow.FlowValidateMessage.*;
 import static io.terminus.dalaran.core.flow.ValidateMessageTarget.*;
 
 public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute> {
@@ -124,7 +124,7 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
                 List<FlowValidation> processorCustomMessageList = ((DalaranComponentValidator) processor).validate(processorModel.getConfig());
                 processorMessageList.addAll(processorCustomMessageList);
             }
-            if (!lastModel.equals(processorModel.getInModel())) {
+            if (lastModel != null && !lastModel.equals(processorModel.getInModel())) {
                 FlowValidation message = new FlowValidation();
                 message.setType(ValidateMessageType.Warning);
                 message.setMessage(MODEL_NOT_EQUALLY);
@@ -149,8 +149,27 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
             }
             flowValidateMessages.forEach(message -> message.setTargetType(Trigger));
             validateMessages.addAll(flowValidateMessages);
+
+            if (flow.getInModel() == null) {
+                FlowValidation validation = new FlowValidation();
+                validation.setTargetType(Trigger);
+                validation.setSuggest(ADD_MODEL);
+                validation.setType(ValidateMessageType.Error);
+                validation.setMessage(IN_MODEL_NOT_NULL);
+                validateMessages.add(validation);
+            }
+
+            if (flow.getOutModel() == null) {
+                FlowValidation validation = new FlowValidation();
+                validation.setTargetType(Trigger);
+                validation.setSuggest(ADD_MODEL);
+                validation.setType(ValidateMessageType.Error);
+                validation.setMessage(OUT_MODEL_NOT_NULL);
+                validateMessages.add(validation);
+
+            }
         }
-        if (!lastModel.equals(flow.getOutModel())) {
+        if (lastModel!= null && !lastModel.equals(flow.getOutModel())) {
             FlowValidation message = new FlowValidation();
             message.setTargetType(FlowEnd);
             message.setType(ValidateMessageType.Warning);
