@@ -2,6 +2,10 @@ package io.terminus.dalaran.component.processor;
 
 import io.terminus.dalaran.component.BasicProcessorTest;
 import io.terminus.dalaran.component.processor.route.DalaranRouter;
+import io.terminus.dalaran.component.processor.sql.Database;
+import io.terminus.dalaran.component.processor.sql.SqlConfig;
+import io.terminus.dalaran.component.processor.sql.SqlDataSourceConnector;
+import io.terminus.dalaran.component.processor.sql.SqlProcessor;
 import org.apache.camel.ProducerTemplate;
 import org.apache.commons.collections.MapUtils;
 import org.junit.Assert;
@@ -15,6 +19,16 @@ import java.util.Map;
  */
 public class RouterTest extends BasicProcessorTest {
 
+    private static final String MYSQL_HOST = "127.0.0.1";
+
+    private static final Integer MYSQL_PORT = 3306;
+
+    private static final String SCHEMA = "ability-test";
+
+    private static final String USER_NAME = "root";
+
+    private static final String PASSWORD = "secret";
+
     private static final int id = 3;
 
     /**
@@ -26,6 +40,37 @@ public class RouterTest extends BasicProcessorTest {
     @Test
     public void testRouterTest() {
         DalaranRouter router = new DalaranRouter();
+
+        SqlDataSourceConnector connector = new SqlDataSourceConnector();
+        connector.setDatabaseType(Database.MYSQL);
+        connector.setHost(MYSQL_HOST);
+        connector.setPort(MYSQL_PORT);
+        connector.setUsername(USER_NAME);
+        connector.setPassword(PASSWORD);
+        connector.setSchema(SCHEMA);
+
+
+        SqlProcessor sqlProcessor1 = new SqlProcessor();
+        SqlConfig sqlConfig1 = new SqlConfig();
+        sqlConfig1.setConnector(connector);
+        sqlConfig1.setSql("insert into user (name, age, company_id, salary) values ('branch01', 18, 1, 1)\"}");
+
+        SqlProcessor sqlProcessor2 = new SqlProcessor();
+        SqlConfig sqlConfig2 = new SqlConfig();
+        sqlConfig1.setConnector(connector);
+        sqlConfig1.setSql("insert into user (name, age, company_id, salary) values ('branch02', 18, 1, 1)\"}");
+
+        SqlProcessor sqlProcessor3 = new SqlProcessor();
+        SqlConfig sqlConfig3 = new SqlConfig();
+        sqlConfig1.setConnector(connector);
+        sqlConfig1.setSql("insert into user (name, age, company_id, salary) values ('branch03', 18, 1, 1)\"}");
+
+        SqlProcessor sqlProcessor4 = new SqlProcessor();
+        SqlConfig sqlConfig4 = new SqlConfig();
+        sqlConfig1.setConnector(connector);
+        sqlConfig1.setSql("insert into user (name, age, company_id, salary) values ('default', 18, 1, 1)\"}");
+
+
         Map<String, String> config = new HashMap<>();
 
         ProducerTemplate template = getProcessorTemplate(router, config);
