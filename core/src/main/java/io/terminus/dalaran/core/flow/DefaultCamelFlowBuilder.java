@@ -150,24 +150,6 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
             flowValidateMessages.forEach(message -> message.setTargetType(Trigger));
             validateMessages.addAll(flowValidateMessages);
 
-            if (flow.getInModel() == null) {
-                FlowValidation validation = new FlowValidation();
-                validation.setTargetType(Trigger);
-                validation.setSuggest(ADD_MODEL);
-                validation.setType(ValidateMessageType.Error);
-                validation.setMessage(IN_MODEL_NOT_NULL);
-                validateMessages.add(validation);
-            }
-
-            if (flow.getOutModel() == null) {
-                FlowValidation validation = new FlowValidation();
-                validation.setTargetType(Trigger);
-                validation.setSuggest(ADD_MODEL);
-                validation.setType(ValidateMessageType.Error);
-                validation.setMessage(OUT_MODEL_NOT_NULL);
-                validateMessages.add(validation);
-
-            }
         }
         if (lastModel!= null && !lastModel.equals(flow.getOutModel())) {
             FlowValidation message = new FlowValidation();
