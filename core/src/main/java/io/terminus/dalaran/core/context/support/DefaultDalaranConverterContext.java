@@ -44,12 +44,16 @@ public class DefaultDalaranConverterContext implements DalaranConverterContext {
 
     @Override
     public void fromObject(ProcessorDefinition route, MessageModel model) {
-        converterMapping.get(model.getModelType()).fromObject(route, model.getModelSchema());
+        if (model != null) {
+            converterMapping.get(model.getModelType()).fromObject(route, model.getModelSchema());
+        }
     }
 
     @Override
     public void toObject(ProcessorDefinition route, MessageModel model) {
-        converterMapping.get(model.getModelType()).toObject(route, model.getModelSchema());
+        if (model != null) {
+            converterMapping.get(model.getModelType()).toObject(route, model.getModelSchema());
+        }
     }
 
     @Override

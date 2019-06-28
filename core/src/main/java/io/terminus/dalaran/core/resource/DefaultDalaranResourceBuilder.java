@@ -96,18 +96,24 @@ public class DefaultDalaranResourceBuilder implements DalaranResourceBuilder {
 
     @Override
     public MessageModel buildModel(Long modelId) {
-        return buildModel(resourceLoader.loadModel(modelId));
+        if (modelId != null) {
+            return buildModel(resourceLoader.loadModel(modelId));
+        }
+        return null;
     }
 
     @Override
     public MessageModel buildModel(ModelAbstractEntity modelEntity) {
-        val model = new MessageModel();
-        val modelType = modelEntity.getType();
-        model.setModelType(modelType);
-        Class<? extends DalaranModelSchema> schemaType = converterContext.getSchemaType(modelType);
-        DalaranModelSchema modelSchema = buildConfig(modelEntity.getModelSchema(), schemaType);
-        model.setModelSchema(modelSchema);
-        return model;
+        if (modelEntity != null) {
+            val model = new MessageModel();
+            val modelType = modelEntity.getType();
+            model.setModelType(modelType);
+            Class<? extends DalaranModelSchema> schemaType = converterContext.getSchemaType(modelType);
+            DalaranModelSchema modelSchema = buildConfig(modelEntity.getModelSchema(), schemaType);
+            model.setModelSchema(modelSchema);
+            return model;
+        }
+        return null;
     }
 
     @Override

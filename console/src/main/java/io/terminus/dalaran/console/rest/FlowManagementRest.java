@@ -2,6 +2,7 @@ package io.terminus.dalaran.console.rest;
 
 import io.swagger.annotations.ApiOperation;
 import io.terminus.dalaran.console.model.TestRequestDTO;
+import io.terminus.dalaran.console.model.dto.CopyFlow;
 import io.terminus.dalaran.console.model.dto.flow.TriggerFlowDTO;
 import io.terminus.dalaran.console.model.dto.log.MainLogDTO;
 import io.terminus.dalaran.console.model.query.FlowQuery;
@@ -56,8 +57,8 @@ public class FlowManagementRest {
 
     @ApiOperation(value = "复制工作流")
     @RequestMapping(value = "/copy", method = RequestMethod.POST)
-    public Long copy(@RequestParam Long id, @RequestParam String name) {
-        return flowManagementService.copyFlow(id, name);
+    public Long copy(@RequestBody CopyFlow copyFlow) {
+        return flowManagementService.copyFlow(copyFlow);
     }
 
     @ApiOperation(value = "条件查询工作流")
