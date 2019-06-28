@@ -49,7 +49,6 @@ public class RouterTest extends BasicProcessorTest {
         connector.setPassword(PASSWORD);
         connector.setSchema(SCHEMA);
 
-
         SqlProcessor sqlProcessor1 = new SqlProcessor();
         SqlConfig sqlConfig1 = new SqlConfig();
         sqlConfig1.setConnector(connector);
@@ -57,18 +56,19 @@ public class RouterTest extends BasicProcessorTest {
 
         SqlProcessor sqlProcessor2 = new SqlProcessor();
         SqlConfig sqlConfig2 = new SqlConfig();
-        sqlConfig1.setConnector(connector);
-        sqlConfig1.setSql("insert into user (name, age, company_id, salary) values ('branch02', 18, 1, 1)\"}");
+        sqlConfig2.setConnector(connector);
+        sqlConfig2.setSql("insert into user (name, age, company_id, salary) values ('branch02', 18, 1, 1)\"}");
 
         SqlProcessor sqlProcessor3 = new SqlProcessor();
         SqlConfig sqlConfig3 = new SqlConfig();
-        sqlConfig1.setConnector(connector);
-        sqlConfig1.setSql("insert into user (name, age, company_id, salary) values ('branch03', 18, 1, 1)\"}");
+        sqlConfig3.setConnector(connector);
+        sqlConfig3.setSql("insert into user (name, age, company_id, salary) values ('branch03', 18, 1, 1)\"}");
 
         SqlProcessor sqlProcessor4 = new SqlProcessor();
         SqlConfig sqlConfig4 = new SqlConfig();
-        sqlConfig1.setConnector(connector);
-        sqlConfig1.setSql("insert into user (name, age, company_id, salary) values ('default', 18, 1, 1)\"}");
+        sqlConfig4.setConnector(connector);
+        sqlConfig4.setSql("insert into user (name, age, company_id, salary) values ('default', 18, 1, 1)\"}");
+
 
 
         Map<String, String> config = new HashMap<>();
