@@ -6,10 +6,23 @@ import io.terminus.dalaran.component.processor.sql.Database;
 import io.terminus.dalaran.component.processor.sql.SqlConfig;
 import io.terminus.dalaran.component.processor.sql.SqlDataSourceConnector;
 import io.terminus.dalaran.component.processor.sql.SqlProcessor;
+import io.terminus.dalaran.core.spring.DalaranAutoConfiguration;
 import org.apache.camel.ProducerTemplate;
+import org.apache.camel.model.RouteDefinition;
 import org.apache.commons.collections.MapUtils;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -49,29 +62,55 @@ public class RouterTest extends BasicProcessorTest {
         connector.setPassword(PASSWORD);
         connector.setSchema(SCHEMA);
 
+        /**
+         * branch 01
+         */
         SqlProcessor sqlProcessor1 = new SqlProcessor();
         SqlConfig sqlConfig1 = new SqlConfig();
         sqlConfig1.setConnector(connector);
+        sqlConfig1.setConnectorId(1L);
         sqlConfig1.setSql("insert into user (name, age, company_id, salary) values ('branch01', 18, 1, 1)\"}");
+        RouteDefinition route1 = new RouteDefinition("branch-01");
+        sqlProcessor1.configure(route1, sqlConfig1);
 
+        /**
+         * branch 02
+         */
         SqlProcessor sqlProcessor2 = new SqlProcessor();
         SqlConfig sqlConfig2 = new SqlConfig();
         sqlConfig2.setConnector(connector);
+        sqlConfig2.setConnectorId(1L);
         sqlConfig2.setSql("insert into user (name, age, company_id, salary) values ('branch02', 18, 1, 1)\"}");
+        RouteDefinition route2 = new RouteDefinition("branch-02");
+        sqlProcessor2.configure(route2, sqlConfig2);
 
+        /**
+         * branch 03
+         */
         SqlProcessor sqlProcessor3 = new SqlProcessor();
         SqlConfig sqlConfig3 = new SqlConfig();
         sqlConfig3.setConnector(connector);
+        sqlConfig3.setConnectorId(1L);
         sqlConfig3.setSql("insert into user (name, age, company_id, salary) values ('branch03', 18, 1, 1)\"}");
+        RouteDefinition route3 = new RouteDefinition("branch-03");
+        sqlProcessor3.configure(route3, sqlConfig3);
 
+        /**
+         * otherwise
+         */
         SqlProcessor sqlProcessor4 = new SqlProcessor();
         SqlConfig sqlConfig4 = new SqlConfig();
         sqlConfig4.setConnector(connector);
+        sqlConfig4.setConnectorId(1L);
         sqlConfig4.setSql("insert into user (name, age, company_id, salary) values ('default', 18, 1, 1)\"}");
-
-
+        RouteDefinition route4 = new RouteDefinition("branch-04");
+        sqlProcessor4.configure(route4, sqlConfig4);
 
         Map<String, String> config = new HashMap<>();
+        config.put("request.body.user.id==1", "branch-01");
+        config.put("request.body.user.id==2", "branch-02");
+        config.put("request.body.user.id==3", "branch-03");
+        config.put("OTHERWISE", "branch-04");
 
         ProducerTemplate template = getProcessorTemplate(router, config);
         Assert.assertNotNull(template);
