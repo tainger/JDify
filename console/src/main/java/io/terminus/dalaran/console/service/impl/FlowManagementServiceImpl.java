@@ -177,6 +177,8 @@ public class FlowManagementServiceImpl implements FlowManagementService {
             if (flowValidation.getType() == ValidateMessageType.Error) {
                 flowEntity.setStatus(FlowStatus.Error);
                 return;
+            } else {
+                flowEntity.setStatus(FlowStatus.Warning);
             }
         }
         flowStatus = FlowStatus.Available;

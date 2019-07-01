@@ -55,7 +55,8 @@ public class TestFlowInitializer {
             public void run() {
                 List<TriggerFlowEntity> triggerFlows = resourceLoader.loadAllTriggerFlow();
                 for (TriggerFlowEntity triggerFlowEntity : triggerFlows) {
-                    if (triggerFlowEntity.getStatus() == FlowStatus.Available) {
+                    // warning 的也可以加载
+                    if (triggerFlowEntity.getStatus() != FlowStatus.Error) {
                         BasicFlow testFlow = resourceBuilder.buildTriggerFlow(triggerFlowEntity);
                         dalaranContext.addTestFlow(testFlow);
                         log.info("load test flow {}", testFlow.getId());
@@ -65,7 +66,8 @@ public class TestFlowInitializer {
                 }
                 List<SubFlowEntity> subFlows = resourceLoader.loadAllSubFlow();
                 for (SubFlowEntity subFlowEntity : subFlows) {
-                    if (subFlowEntity.getStatus() == FlowStatus.Available) {
+                    // warning 的也可以加载
+                    if (subFlowEntity.getStatus() != FlowStatus.Error) {
                         SubFlow testFlow = resourceBuilder.buildSubFlow(subFlowEntity);
                         dalaranContext.addSubFlow(testFlow);
                         dalaranContext.addTestFlow(testFlow);
@@ -75,6 +77,6 @@ public class TestFlowInitializer {
                     }
                 }
             }
-        }, 5000L);
+        }, 10 * 1000L);
     }
 }
