@@ -10,8 +10,8 @@ import org.apache.camel.model.RouteDefinition;
  * Created by jingdi on 2019/5/20
  */
 @Trigger(value = "kafka-consumer", configType = DalaranKafkaConsumerConfig.class, allowBodyTypes = {BodyType.JSON, BodyType.XML},
-        inputSerializeType = BodySerializeType.Serialized,
-        outputSerializeType = BodySerializeType.Serialized
+        inputSerializeType = BodySerializeType.Object,
+        outputSerializeType = BodySerializeType.Object
 )
 public class DalaranKafkaConsumer implements DalaranTrigger<DalaranKafkaConsumerConfig> {
 
@@ -25,6 +25,6 @@ public class DalaranKafkaConsumer implements DalaranTrigger<DalaranKafkaConsumer
                     + "&allowManualCommit=true"
                     + "&breakOnFirstError=true";
         }
-        route.from(uri).to("log:consumer");
+        route.from(uri);
     }
 }

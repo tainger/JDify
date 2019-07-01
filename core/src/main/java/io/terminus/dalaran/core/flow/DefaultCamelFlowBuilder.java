@@ -27,8 +27,8 @@ import java.util.List;
 
 import static io.terminus.dalaran.core.DalaranConstants.TEST_FLOW_PREFIX;
 import static io.terminus.dalaran.core.flow.FlowSuggest.ADD_MAPPER;
-import static io.terminus.dalaran.core.flow.FlowValidateMessage.FIELD_NOT_NULL;
-import static io.terminus.dalaran.core.flow.FlowValidateMessage.MODEL_NOT_EQUALLY;
+import static io.terminus.dalaran.core.flow.FlowSuggest.ADD_MODEL;
+import static io.terminus.dalaran.core.flow.FlowValidateMessage.*;
 import static io.terminus.dalaran.core.flow.ValidateMessageTarget.*;
 
 public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute> {
@@ -124,7 +124,7 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
                 List<FlowValidation> processorCustomMessageList = ((DalaranComponentValidator) processor).validate(processorModel.getConfig());
                 processorMessageList.addAll(processorCustomMessageList);
             }
-            if (!lastModel.equals(processorModel.getInModel())) {
+            if (lastModel != null && !lastModel.equals(processorModel.getInModel())) {
                 FlowValidation message = new FlowValidation();
                 message.setType(ValidateMessageType.Warning);
                 message.setMessage(MODEL_NOT_EQUALLY);
@@ -149,8 +149,9 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
             }
             flowValidateMessages.forEach(message -> message.setTargetType(Trigger));
             validateMessages.addAll(flowValidateMessages);
+
         }
-        if (!lastModel.equals(flow.getOutModel())) {
+        if (lastModel!= null && !lastModel.equals(flow.getOutModel())) {
             FlowValidation message = new FlowValidation();
             message.setTargetType(FlowEnd);
             message.setType(ValidateMessageType.Warning);
@@ -194,14 +195,16 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
             currentProcessorInfo = componentContext.getProcessorInfo(processor.getType());
 
             // TODO no model
-            spanTracer.before(route, currentModel.getModelType());
+            if (currentModel != null) {
+                spanTracer.before(route, currentModel.getModelType());
+            }
             // TODO 这里还是比较奇怪, 有点绕, 而且有些特殊场景没有考虑到
 //                currentBodyIsSerialized = currentModel.getModelType().isSerialized();
             boolean needConvert = true;
             if (processorComponent instanceof DalaranMessageBodyCustomConverter) {
                 needConvert = ((DalaranMessageBodyCustomConverter) processorComponent).customBodyConvert(route, processor.getConfig(), currentBodyIsSerialized);
             }
-            if (needConvert && currentProcessorInfo.getInputSerializeType() != BodySerializeType.All) {
+            if (currentModel != null && needConvert && currentProcessorInfo.getInputSerializeType() != BodySerializeType.All) {
                 // TODO convert tracing, 暂时没必要, 先注掉吧, 影响性能
                 // TODO processor 的输入和输出一定是一种类型
 //                DalaranTracer convertTracer = DalaranTracer.buildConvertTracer(traceLogger, flow.getId(), processor.getId());
@@ -235,7 +238,9 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
             if (outModel != null) {
                 currentModel = outModel;
             }
-            spanTracer.after(route, currentModel.getModelType());
+            if (currentModel != null) {
+                spanTracer.after(route, currentModel.getModelType());
+            }
         }
 
         MessageModel outModel = flow.getOutModel();

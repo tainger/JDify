@@ -1,4 +1,4 @@
-package io.terminus.dalaran.component.processor.mq.kafka;
+package io.terminus.dalaran.component.processor.kafka;
 
 import com.alibaba.fastjson.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonIgnore;

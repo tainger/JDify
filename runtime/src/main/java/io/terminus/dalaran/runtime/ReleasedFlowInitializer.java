@@ -45,7 +45,7 @@ public class ReleasedFlowInitializer {
 
             List<TriggerFlowReleasedEntity> triggerFlows = resourceLoader.loadAllTriggerFlow();
             for (TriggerFlowReleasedEntity triggerFlowEntity : triggerFlows) {
-                if (triggerFlowEntity.getStatus() == FlowStatus.Available) {
+                if (triggerFlowEntity.getStatus() != FlowStatus.Error) {
                     TriggerFlow triggerFlow = resourceBuilder.buildTriggerFlow(triggerFlowEntity);
                     dalaranContext.addTriggerFlow(triggerFlow);
                     log.info("load released flow [{}]", triggerFlow.getId());
@@ -56,7 +56,7 @@ public class ReleasedFlowInitializer {
 
             List<SubFlowReleasedEntity> subFLows = resourceLoader.loadAllSubFlow();
             for (SubFlowReleasedEntity subFlowEntity : subFLows) {
-                if (subFlowEntity.getStatus() == FlowStatus.Available) {
+                if (subFlowEntity.getStatus() != FlowStatus.Error) {
                     SubFlow subFlow = resourceBuilder.buildSubFlow(subFlowEntity);
                     dalaranContext.addSubFlow(subFlow);
                     log.info("load released sub-flow {}", subFlow.getId());

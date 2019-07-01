@@ -5,6 +5,7 @@ import io.terminus.dalaran.console.TestFlowInitializer;
 import io.terminus.dalaran.console.convertor.FlowConvertor;
 import io.terminus.dalaran.console.entity.ModelEntity;
 import io.terminus.dalaran.console.entity.TriggerFlowEntity;
+import io.terminus.dalaran.console.model.dto.CopyFlow;
 import io.terminus.dalaran.console.model.dto.ModelDTO;
 import io.terminus.dalaran.console.model.dto.flow.BasicFlowInfo;
 import io.terminus.dalaran.console.model.dto.flow.TriggerFlowDTO;
@@ -18,6 +19,7 @@ import io.terminus.dalaran.console.service.jpa.FlowQueryService;
 import io.terminus.dalaran.core.context.DalaranContext;
 import io.terminus.dalaran.core.flow.DalaranFlowBuilder;
 import io.terminus.dalaran.core.flow.FlowStatus;
+import io.terminus.dalaran.core.flow.ValidateMessageType;
 import io.terminus.dalaran.core.flow.model.FlowValidation;
 import io.terminus.dalaran.core.flow.model.TriggerFlow;
 import io.terminus.dalaran.core.resource.DalaranResourceBuilder;
@@ -149,8 +151,8 @@ public class FlowManagementServiceImpl implements FlowManagementService {
     }
 
     @Override
-    public Long copyFlow(Long id) {
-        TriggerFlowEntity flowEntity = flowRepository.findOne(id);
+    public Long copyFlow(CopyFlow copyFlow) {
+        TriggerFlowEntity flowEntity = flowRepository.findOne(copyFlow.getId());
         if (flowEntity == null) {
             return null;
         }
@@ -158,6 +160,7 @@ public class FlowManagementServiceImpl implements FlowManagementService {
 
         BeanUtils.copyProperties(flowEntity, newFlowEntity);
         newFlowEntity.setId(null);
+        newFlowEntity.setName(copyFlow.getName());
         flowRepository.save(newFlowEntity);
         return newFlowEntity.getId();
     }
@@ -170,11 +173,15 @@ public class FlowManagementServiceImpl implements FlowManagementService {
 
     private void setFlowStatus(TriggerFlowEntity flowEntity) {
         FlowStatus flowStatus;
-        if (validateFlow(flowEntity).isEmpty()) {
-            flowStatus = FlowStatus.Available;
-        } else {
-            flowStatus = FlowStatus.Error;
+        for (FlowValidation flowValidation : validateFlow(flowEntity)) {
+            if (flowValidation.getType() == ValidateMessageType.Error) {
+                flowEntity.setStatus(FlowStatus.Error);
+                return;
+            } else {
+                flowEntity.setStatus(FlowStatus.Warning);
+            }
         }
+        flowStatus = FlowStatus.Available;
         flowEntity.setStatus(flowStatus);
     }
 

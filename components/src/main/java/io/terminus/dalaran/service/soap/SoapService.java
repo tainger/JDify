@@ -3,6 +3,7 @@ package io.terminus.dalaran.service.soap;
 import com.predic8.schema.*;
 import com.predic8.wsdl.*;
 import io.terminus.dalaran.component.common.HttpMethod;
+import io.terminus.dalaran.core.DalaranConstants;
 import io.terminus.dalaran.core.component.DalaranService;
 import io.terminus.dalaran.core.component.annotation.ServiceConnector;
 import io.terminus.dalaran.core.model.*;
@@ -125,7 +126,7 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
         Map<String, ModelField> fields = new HashMap<>();
         ModelField rootField = new ModelField();
         buildFieldWithoutRootPath(rootField, message);
-        fields.put("root", rootField);
+        fields.put(DalaranConstants.MODEL_ROOT, rootField);
         soapSchema.setFields(fields);
         return model;
     }

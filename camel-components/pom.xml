@@ -13,6 +13,7 @@
     <packaging>pom</packaging>
     <modules>
         <module>camel-dubbo</module>
+        <module>camel-rocketmq</module>
     </modules>
 
     <dependencies>

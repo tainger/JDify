@@ -2,6 +2,7 @@ package io.terminus.dalaran.console.service;
 
 import io.terminus.dalaran.console.entity.ModelEntity;
 import io.terminus.dalaran.console.model.dto.BasicModelInfo;
+import io.terminus.dalaran.console.model.dto.DataTemplate;
 import io.terminus.dalaran.console.model.dto.ModelDTO;
 import io.terminus.dalaran.console.model.query.ModelQuery;
 import io.terminus.dalaran.core.model.BodyType;
@@ -33,4 +34,6 @@ public interface ModelManagementService {
     JsonSchema importExcel(MultipartFile file, Long id);
 
     Map<Long, Map<String, JsonSchema>> multiImportExcel(MultipartFile file, BodyType type);
+
+    JsonSchema importDataTemplate(DataTemplate dataTemplate, Long id);
 }

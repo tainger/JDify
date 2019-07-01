@@ -1,8 +1,13 @@
 package io.terminus.dalaran.console.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import io.terminus.dalaran.component.processor.mapper.model.MapperConstants;
 import io.terminus.dalaran.console.entity.ModelEntity;
+import io.terminus.dalaran.console.model.DalaranConsoleConstants;
 import io.terminus.dalaran.console.model.dto.BasicModelInfo;
+import io.terminus.dalaran.console.model.dto.DataTemplate;
 import io.terminus.dalaran.console.model.dto.ModelDTO;
 import io.terminus.dalaran.console.model.query.ModelQuery;
 import io.terminus.dalaran.console.repository.ModelRepository;
@@ -11,8 +16,10 @@ import io.terminus.dalaran.console.service.ModelManagementService;
 import io.terminus.dalaran.console.service.jpa.ModelQueryService;
 import io.terminus.dalaran.console.util.ExcelUtils;
 import io.terminus.dalaran.core.model.BodyType;
+import io.terminus.dalaran.core.model.FieldType;
 import io.terminus.dalaran.core.model.ModelField;
 import io.terminus.dalaran.core.model.schema.JsonSchema;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -133,6 +140,64 @@ public class ModelManagementServiceImpl implements ModelManagementService {
         return new HashMap<>();
     }
 
+    @Override
+    public JsonSchema importDataTemplate(DataTemplate dataTemplate, Long id) {
+        Map<String, ModelField> root = new HashMap<>();
+        ModelField modelField = new ModelField();
+        root.put(MapperConstants.MODEL_ROOT, modelField);
+        Object body = JSON.parse(dataTemplate.getDataTemplate());
+        String type = body.getClass().getTypeName();
+        if (isComplexType(type)) {
+            buildModel(body, type, modelField);
+        }
+        JsonSchema schema = new JsonSchema();
+        schema.setFields(root);
+        ModelEntity model = modelRepository.findOne(id);
+        model.setModelSchema(JSON.toJSONString(schema));
+        modelRepository.save(model);
+        return schema;
+    }
+
+    private void buildModel(Object body, String type, ModelField modelField) {
+        Map<String, ModelField> child = new HashMap<>();
+        modelField.setFields(child);
+        if (type.equalsIgnoreCase(DalaranConsoleConstants.JSON_OBJECT)) {
+            modelField.setType(FieldType.OBJECT);
+            JSONObject jsonObject = (JSONObject) body;
+            jsonObject.forEach((name, value) -> {
+                ModelField field = new ModelField();
+                child.put(name, field);
+                String fileType = value.getClass().getTypeName();
+                if (!isComplexType(fileType)) {
+                    field.setType(getFiledType(fileType));
+                }
+                buildModel(value, fileType, field);
+            });
+        } else if (type.equalsIgnoreCase(DalaranConsoleConstants.JSON_ARRAY)) {
+            modelField.setType(FieldType.ARRAY);
+            JSONArray jsonArray = (JSONArray) body;
+            if (CollectionUtils.isNotEmpty(jsonArray)) {
+                Object element = jsonArray.get(0);
+                String elementType = element.getClass().getTypeName();
+                modelField.setSubType(getFiledType(elementType));
+                if (isComplexType(elementType)) {
+                    if (elementType.equalsIgnoreCase(DalaranConsoleConstants.JSON_OBJECT)) {
+                        JSONObject jsonObject = (JSONObject) element;
+                        jsonObject.forEach((name, value) -> {
+                            ModelField field = new ModelField();
+                            child.put(name, field);
+                            String fileType = value.getClass().getTypeName();
+                            if (!isComplexType(fileType)) {
+                                field.setType(getFiledType(fileType));
+                            }
+                            buildModel(value, fileType, field);
+                        });
+                    }
+                }
+            }
+        }
+    }
+
     private ModelEntity buildEntity(ModelDTO model) {
         ModelEntity modelEntity;
         Long id = model.getId();
@@ -163,5 +228,30 @@ public class ModelManagementServiceImpl implements ModelManagementService {
         model.setModelType(entity.getType());
         model.setId(entity.getId());
         return model;
+    }
+
+    private boolean isComplexType(String type) {
+        switch (type) {
+            case DalaranConsoleConstants.JSON_OBJECT:
+            case DalaranConsoleConstants.JSON_ARRAY:
+                return true;
+        }
+        return false;
+    }
+
+    private FieldType getFiledType(String type) {
+        switch (type) {
+            case DalaranConsoleConstants.JAVA_INTEGER:
+                return FieldType.INTEGER;
+            case DalaranConsoleConstants.JAVA_LONG:
+                return FieldType.LONG;
+            case DalaranConsoleConstants.JAVA_STRING:
+                return FieldType.STRING;
+            case DalaranConsoleConstants.JSON_OBJECT:
+                return FieldType.OBJECT;
+            case DalaranConsoleConstants.JSON_ARRAY:
+                return FieldType.ARRAY;
+        }
+        return FieldType.STRING;
     }
 }
