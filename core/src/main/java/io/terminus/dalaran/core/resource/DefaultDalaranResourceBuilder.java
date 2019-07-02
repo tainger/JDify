@@ -129,6 +129,8 @@ public class DefaultDalaranResourceBuilder implements DalaranResourceBuilder {
         flow.setInModel(buildModel(flowEntity.getInModel()));
         flow.setOutModel(buildModel(flowEntity.getOutModel()));
 
+        flow.setTracing(flowEntity.isTracing());
+
         List<ProcessorModel> pipeline = new ArrayList<>();
         MessageModel lastOutModel = flow.getInModel();
         for (ProcessorEntity processorEntity : flowEntity.getPipeline()) {

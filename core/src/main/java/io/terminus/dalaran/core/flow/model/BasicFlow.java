@@ -31,6 +31,8 @@ public class BasicFlow {
     @NotNull
     private List<ProcessorModel> pipeline;
 
+    private boolean tracing;
+
     public String getRouteId() {
         return DalaranConstants.FLOW_PREFIX + this.getId();
     }
