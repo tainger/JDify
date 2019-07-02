@@ -20,7 +20,7 @@ import java.util.Map;
 /**
  * Created by jingdi on 2019/6/6
  */
-public class RequestConvertProcessor implements Processor {
+public class ObjectToSoapProcessor implements Processor {
 
     private final Map<String, ModelField> modelFields;
 
@@ -30,7 +30,7 @@ public class RequestConvertProcessor implements Processor {
 
     private static final String XPATH = "xpath:";
 
-    public RequestConvertProcessor(Map<String, ModelField> modelFields, SoapSchemaOperation soapOperationConfig, Definitions definitions) {
+    public ObjectToSoapProcessor(Map<String, ModelField> modelFields, SoapSchemaOperation soapOperationConfig, Definitions definitions) {
         this.modelFields = modelFields;
         this.soapOperationConfig = soapOperationConfig;
         this.definitions = definitions;

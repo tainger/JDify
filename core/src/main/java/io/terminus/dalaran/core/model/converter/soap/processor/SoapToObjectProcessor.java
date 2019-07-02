@@ -17,11 +17,11 @@ import java.util.Map;
 /**
  * Created by jingdi on 2019/6/6
  */
-public class ResponseConvertProcessor implements Processor {
+public class SoapToObjectProcessor implements Processor {
 
     private final SoapSchemaOperation soapOperationConfig;
 
-    public ResponseConvertProcessor(SoapSchemaOperation soapOperationConfig) {
+    public SoapToObjectProcessor(SoapSchemaOperation soapOperationConfig) {
         this.soapOperationConfig = soapOperationConfig;
     }
 

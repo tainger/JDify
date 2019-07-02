@@ -163,16 +163,7 @@ public class ModelManagementServiceImpl implements ModelManagementService {
         modelField.setFields(child);
         if (type.equalsIgnoreCase(DalaranConsoleConstants.JSON_OBJECT)) {
             modelField.setType(FieldType.OBJECT);
-            JSONObject jsonObject = (JSONObject) body;
-            jsonObject.forEach((name, value) -> {
-                ModelField field = new ModelField();
-                child.put(name, field);
-                String fileType = value.getClass().getTypeName();
-                if (!isComplexType(fileType)) {
-                    field.setType(getFiledType(fileType));
-                }
-                buildModel(value, fileType, field);
-            });
+            buildChildren(body, child);
         } else if (type.equalsIgnoreCase(DalaranConsoleConstants.JSON_ARRAY)) {
             modelField.setType(FieldType.ARRAY);
             JSONArray jsonArray = (JSONArray) body;
@@ -180,22 +171,24 @@ public class ModelManagementServiceImpl implements ModelManagementService {
                 Object element = jsonArray.get(0);
                 String elementType = element.getClass().getTypeName();
                 modelField.setSubType(getFiledType(elementType));
-                if (isComplexType(elementType)) {
-                    if (elementType.equalsIgnoreCase(DalaranConsoleConstants.JSON_OBJECT)) {
-                        JSONObject jsonObject = (JSONObject) element;
-                        jsonObject.forEach((name, value) -> {
-                            ModelField field = new ModelField();
-                            child.put(name, field);
-                            String fileType = value.getClass().getTypeName();
-                            if (!isComplexType(fileType)) {
-                                field.setType(getFiledType(fileType));
-                            }
-                            buildModel(value, fileType, field);
-                        });
-                    }
+                if (isComplexType(elementType) && elementType.equalsIgnoreCase(DalaranConsoleConstants.JSON_OBJECT)) {
+                    buildChildren(element, child);
                 }
             }
         }
+    }
+
+    private void buildChildren(Object element, Map<String, ModelField> child) {
+        JSONObject jsonObject = (JSONObject) element;
+        jsonObject.forEach((name, value) -> {
+            ModelField field = new ModelField();
+            child.put(name, field);
+            String fileType = value.getClass().getTypeName();
+            if (!isComplexType(fileType)) {
+                field.setType(getFiledType(fileType));
+            }
+            buildModel(value, fileType, field);
+        });
     }
 
     private ModelEntity buildEntity(ModelDTO model) {

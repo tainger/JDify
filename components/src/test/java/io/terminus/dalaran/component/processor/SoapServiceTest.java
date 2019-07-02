@@ -1,23 +1,19 @@
 package io.terminus.dalaran.component.processor;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.util.IOUtils;
 import com.predic8.wsdl.Definitions;
 import com.predic8.wsdl.WSDLParser;
 import io.terminus.dalaran.component.BasicServiceTest;
 import io.terminus.dalaran.core.model.*;
 import io.terminus.dalaran.core.model.converter.soap.model.SoapOperationConfig;
 import io.terminus.dalaran.core.model.converter.soap.model.SoapSchemaOperation;
-import io.terminus.dalaran.core.model.converter.soap.processor.RequestConvertProcessor;
-import io.terminus.dalaran.core.model.converter.soap.processor.ResponseConvertProcessor;
+import io.terminus.dalaran.core.model.converter.soap.processor.ObjectToSoapProcessor;
+import io.terminus.dalaran.core.model.converter.soap.processor.SoapToObjectProcessor;
 import io.terminus.dalaran.core.model.schema.SoapSchema;
 import io.terminus.dalaran.service.soap.SoapService;
 import org.apache.camel.ProducerTemplate;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -54,9 +50,9 @@ public class SoapServiceTest extends BasicServiceTest {
             e.printStackTrace();
         }
 
-        RequestConvertProcessor requestConvertProcessor = new RequestConvertProcessor(model.getModelSchema().getFields(), model.getModelSchema().getOperationConfig(), definitions);
-        ResponseConvertProcessor responseConvertProcessor = new ResponseConvertProcessor(model.getModelSchema().getOperationConfig());
-        ProducerTemplate template = getProcessorTemplate(service, operationConfig, requestConvertProcessor, responseConvertProcessor);
+        ObjectToSoapProcessor objectToSoapProcessor = new ObjectToSoapProcessor(model.getModelSchema().getFields(), model.getModelSchema().getOperationConfig(), definitions);
+        SoapToObjectProcessor soapToObjectProcessor = new SoapToObjectProcessor(model.getModelSchema().getOperationConfig());
+        ProducerTemplate template = getProcessorTemplate(service, operationConfig, objectToSoapProcessor, soapToObjectProcessor);
         Assert.assertNotNull(template);
 
         Object result = template.requestBody(requestBody);

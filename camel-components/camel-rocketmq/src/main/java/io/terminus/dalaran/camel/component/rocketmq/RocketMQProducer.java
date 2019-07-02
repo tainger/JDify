@@ -60,7 +60,7 @@ public class RocketMQProducer extends DefaultProducer {
 //        if (StringUtils.isNotBlank(tags)) {
 //            msg.setTags(tags);
 //        }
-        msg.setBody(camelMsg.getBody(byte[].class));
+        msg.setBody(camelMsg.getBody().toString().getBytes());
         return msg;
     }
 }
