@@ -57,9 +57,16 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
     public DalaranRoute buildTriggerFlow(TriggerFlow flow) {
         val triggerComponent = componentContext.getTrigger(flow.getTriggerType());
         val flowTracer = DalaranTracer.buildFlowTracer(traceLogger, flow.getId());
+
+        DalaranTrigger triggerBean = componentContext.getTrigger(flow.getTriggerType());
+        Object triggerConfig = flow.getTriggerConfig();
+        if (triggerBean instanceof DalaranTriggerFlowConfigCustomConverter) {
+            triggerConfig = ((DalaranTriggerFlowConfigCustomConverter) triggerBean).convert(triggerConfig, flow);
+        }
+
         val route = createRouteDefinition();
         route.setId(flow.getRouteId());
-        triggerComponent.buildFromRoute(route, flow.getTriggerConfig());
+        triggerComponent.buildFromRoute(route, triggerConfig);
         flowTracer.before(route, flow.getInModel().getModelType());
 
         buildFlowRoute(route, flow, null);
@@ -151,7 +158,7 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
             validateMessages.addAll(flowValidateMessages);
 
         }
-        if (lastModel!= null && !lastModel.equals(flow.getOutModel())) {
+        if (lastModel != null && !lastModel.equals(flow.getOutModel())) {
             FlowValidation message = new FlowValidation();
             message.setTargetType(FlowEnd);
             message.setType(ValidateMessageType.Warning);
@@ -221,6 +228,10 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
                 }
             }
             Object config = processor.getConfig();
+
+            if (processorComponent instanceof DalaranProcessorConfigCustomConverter) {
+                config = ((DalaranProcessorConfigCustomConverter) processorComponent).convert(config, processor, flow);
+            }
 
             processorComponent.configure(route, config);
 
