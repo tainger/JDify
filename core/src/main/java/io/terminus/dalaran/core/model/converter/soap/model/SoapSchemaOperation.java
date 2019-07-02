@@ -23,5 +23,7 @@ public class SoapSchemaOperation {
 
     private String baseUrl;
 
+    private String modelRoot;
+
     private HttpProtocol protocol;
 }

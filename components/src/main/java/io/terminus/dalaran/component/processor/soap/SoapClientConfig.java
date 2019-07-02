@@ -7,6 +7,7 @@ import io.terminus.dalaran.core.component.FieldInputType;
 import io.terminus.dalaran.core.component.annotation.ConfigFieldInfo;
 import io.terminus.dalaran.core.component.config.ComponentModelConfig;
 import io.terminus.dalaran.core.component.config.ConnectorConfig;
+import io.terminus.dalaran.core.component.config.OutModelConfig;
 import lombok.Data;
 
 /**

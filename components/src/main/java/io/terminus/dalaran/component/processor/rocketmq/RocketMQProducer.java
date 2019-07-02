@@ -10,15 +10,15 @@ import org.apache.camel.model.ProcessorDefinition;
  * Created by jingdi on 2019/6/19
  */
 @Processor(value = "rocketmq-producer", configType = RocketMQProducerConfig.class,
-        inputSerializeType = BodySerializeType.Serialized,
-        outputSerializeType = BodySerializeType.Serialized,
+        inputSerializeType = BodySerializeType.Object,
+        outputSerializeType = BodySerializeType.Object,
         allowBodyTypes = {BodyType.JSON, BodyType.XML})
 public class RocketMQProducer implements DalaranProcessor<RocketMQProducerConfig> {
 
     @Override
     public void configure(ProcessorDefinition route, RocketMQProducerConfig config) {
         String uri = "rocketmq:"
-                + "?nameServer=" + config.getNameServer()
+                + "?nameServer=" + config.getConnector().getNameServer()
                 + "&groupId=" + config.getProducerGroup()
                 + "&topic=" + config.getTopic();
         route.to(uri);

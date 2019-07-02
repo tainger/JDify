@@ -54,8 +54,6 @@ public class RocketMQEndpoint extends ProcessorEndpoint {
         Exchange exchange = super.createExchange();
         Message in = exchange.getIn();
         in.setBody(body);
-        Message out = exchange.getOut();
-        out.setBody(body);
         return exchange;
     }
 

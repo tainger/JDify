@@ -104,8 +104,8 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
                 soapOperation.setProtocol(HttpProtocol.valueOf(StringUtils.substringBefore(baseDir, "://").toUpperCase()));
                 schemaOperation.setProtocol(soapOperation.getProtocol());
 
-                MessageModel inModel = buildModel(definitions.getMessage(inputName), schemaOperation, wsdlDoc);
-                MessageModel outModel = buildModel(definitions.getMessage(outputName), schemaOperation, wsdlDoc);
+                MessageModel inModel = buildModel(definitions.getMessage(inputName), schemaOperation, wsdlDoc, inputName);
+                MessageModel outModel = buildModel(definitions.getMessage(outputName), schemaOperation, wsdlDoc, outputName);
                 soapOperation.setInModel(inModel);
                 soapOperation.setOutModel(outModel);
                 soapOperations.add(soapOperation);
@@ -116,10 +116,11 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
         return serviceConfig;
     }
 
-    public MessageModel buildModel(Message message, SoapSchemaOperation operationConfig, String wsdlDoc) {
+    public MessageModel buildModel(Message message, SoapSchemaOperation operationConfig, String wsdlDoc, String modelRoot) {
         MessageModel model = new MessageModel();
         SoapSchema soapSchema = new SoapSchema();
         soapSchema.setWsdlDoc(wsdlDoc);
+        operationConfig.setModelRoot(modelRoot);
         soapSchema.setOperationConfig(operationConfig);
         model.setModelSchema(soapSchema);
         model.setModelType(BodyType.SOAP);
