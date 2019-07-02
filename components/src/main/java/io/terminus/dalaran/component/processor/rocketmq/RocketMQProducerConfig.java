@@ -1,5 +1,7 @@
 package io.terminus.dalaran.component.processor.rocketmq;
 
+import com.alibaba.fastjson.annotation.JSONField;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.terminus.dalaran.core.component.FieldInputType;
 import io.terminus.dalaran.core.component.annotation.ConfigFieldInfo;
 import io.terminus.dalaran.core.component.config.OutModelConfig;
@@ -11,8 +13,13 @@ import lombok.Data;
 @Data
 public class RocketMQProducerConfig extends OutModelConfig {
 
-    @ConfigFieldInfo(label = "注册中心", inputType = FieldInputType.String)
-    private String nameServer;
+    @ConfigFieldInfo(inputType = FieldInputType.Hidden)
+    @JSONField(serialize = false)
+    @JsonIgnore
+    private RocketMQConnector connector;
+
+    @ConfigFieldInfo(label = "RocketMQ 连接器", inputType = FieldInputType.Connector, connectorType = RocketMQConnector.class)
+    private Long connectorId;
 
     @ConfigFieldInfo(label = "主题", inputType = FieldInputType.String)
     private String topic;

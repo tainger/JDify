@@ -17,7 +17,7 @@ public class RocketMQConsumer implements DalaranTrigger<RocketMQConsumerConfig> 
 
     @Override
     public void buildFromRoute(RouteDefinition route, RocketMQConsumerConfig config) {
-        String uri = "rocketmq:?nameServer=" + config.getNameServer()
+        String uri = "rocketmq:?nameServer=" + config.getConnector().getNameServer()
                 + "&groupId=" + config.getConsumerGroup()
                 + "&topic=" + config.getTopic();
         route.from(uri).to("log:consumer");
