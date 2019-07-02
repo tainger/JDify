@@ -14,6 +14,7 @@ import io.terminus.dalaran.core.flow.model.TriggerFlow;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.camel.CamelContext;
 import org.apache.camel.impl.DefaultProducerTemplate;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.util.List;
 
@@ -29,7 +30,6 @@ public class DefaultDalaranCamelContext implements DalaranContext<DalaranRoute> 
     private final DalaranComponentContext componentContext;
     private final DalaranServiceContext serviceContext;
 
-
     public DefaultDalaranCamelContext(
             CamelContext camelContext,
             DalaranConverterContext converterContext,
@@ -42,12 +42,6 @@ public class DefaultDalaranCamelContext implements DalaranContext<DalaranRoute> 
         this.serviceContext = serviceContext;
         this.converterContext = converterContext;
         this.componentContext = componentContext;
-        try {
-            camelContext.setTracing(true);
-            camelContext.start();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     @Override

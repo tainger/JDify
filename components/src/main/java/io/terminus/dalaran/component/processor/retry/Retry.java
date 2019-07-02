@@ -55,6 +55,7 @@ public class Retry implements DalaranProcessor<String>, DalaranProcessorConfigCu
         fragment.setPipeline(pipeline);
         fragment.setInModel(component.getInModel());
         fragment.setOutModel(fragmentLastOutModel);
+        fragment.setTracing(flow.isTracing());
 
         DalaranRoute retryRoute = flowBuilder.buildFlowFragment(fragment);
         retryRoute.onException(Throwable.class).maximumRedeliveries(config.getMaxRetry()).redeliveryDelay(config.getRetryDelay());
