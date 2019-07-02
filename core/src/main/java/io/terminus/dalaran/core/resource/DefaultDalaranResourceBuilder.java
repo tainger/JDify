@@ -2,10 +2,6 @@ package io.terminus.dalaran.core.resource;
 
 import com.alibaba.fastjson.JSON;
 import io.terminus.dalaran.core.DalaranConstants;
-import io.terminus.dalaran.core.component.DalaranProcessor;
-import io.terminus.dalaran.core.component.DalaranProcessorConfigCustomConverter;
-import io.terminus.dalaran.core.component.DalaranTrigger;
-import io.terminus.dalaran.core.component.DalaranTriggerFlowConfigCustomConverter;
 import io.terminus.dalaran.core.component.config.AllModelConfig;
 import io.terminus.dalaran.core.component.config.ConnectorConfig;
 import io.terminus.dalaran.core.component.config.ImmutableModelConfig;
@@ -64,15 +60,11 @@ public class DefaultDalaranResourceBuilder implements DalaranResourceBuilder {
     @Override
     public TriggerFlow buildTriggerFlow(TriggerFlowAbstractEntity triggerFlowEntity) {
         TriggerFlow flow = new TriggerFlow();
-        DalaranTrigger triggerBean = componentContext.getTrigger(triggerFlowEntity.getTriggerType());
         TriggerInfo triggerInfo = componentContext.getTriggerInfo(triggerFlowEntity.getTriggerType());
         buildFlow(flow, triggerFlowEntity);
         flow.setTriggerType(triggerFlowEntity.getTriggerType());
 
         Object config = buildConfig(triggerFlowEntity.getTriggerConfig(), triggerInfo.getConfigType());
-        if (triggerBean instanceof DalaranTriggerFlowConfigCustomConverter) {
-            config = ((DalaranTriggerFlowConfigCustomConverter) triggerBean).convert(config, flow);
-        }
 
         flow.setTriggerConfig(config);
 
@@ -167,12 +159,6 @@ public class DefaultDalaranResourceBuilder implements DalaranResourceBuilder {
         processor.setInModel(lastOutModel);
         MessageModel outModel = injectModel(config, lastOutModel);
         processor.setOutModel(outModel);
-
-        DalaranProcessor processorBean = componentContext.getProcessor(processorEntity.getType());
-
-        if (processorBean instanceof DalaranProcessorConfigCustomConverter) {
-            config = ((DalaranProcessorConfigCustomConverter) processorBean).convert(config, processor, flow);
-        }
         if (config instanceof ConnectorConfig) {
             ConnectorConfig connectorConfig = (ConnectorConfig) config;
             Long connectorId = connectorConfig.getConnectorId();
