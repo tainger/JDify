@@ -1,5 +1,4 @@
-version: 2.0
-
+version: 2
 services:
   console:
     deployments:
@@ -13,7 +12,7 @@ services:
       mem: 1024
     health_check:
       exec:
-       cmd: echo 1
+        cmd: "echo 1"
   runtime:
     deployments:
       replicas: 1
@@ -26,7 +25,16 @@ services:
       mem: 4096
     health_check:
       exec:
-       cmd: echo 1
+        cmd: "echo 1"
 addons:
   monitor:
-    plan: monitor:dev
+    plan: "monitor:dev"
+  dalaran_mysql:
+    plan: "mysql:professional"
+    options:
+      version: "5.7.23"
+  注册中心:
+    plan: "terminus-roost:basic"
+    options:
+      version: "0.0.1"
+envs: {}
