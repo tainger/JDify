@@ -33,6 +33,7 @@ addons:
     plan: "mysql:professional"
     options:
       version: "5.7.23"
+      create_dbs: dalaran
   注册中心:
     plan: "terminus-roost:basic"
     options:
