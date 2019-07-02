@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.terminus.dalaran.component.common.HttpMethod;
 import io.terminus.dalaran.core.component.FieldInputType;
 import io.terminus.dalaran.core.component.annotation.ConfigFieldInfo;
+import io.terminus.dalaran.core.component.config.ComponentModelConfig;
 import io.terminus.dalaran.core.component.config.ConnectorConfig;
 import io.terminus.dalaran.core.component.config.OutModelConfig;
 import lombok.Data;
@@ -13,7 +14,7 @@ import lombok.Data;
  * Created by jingdi on 2019/6/11
  */
 @Data
-public class SoapClientConfig extends OutModelConfig implements ConnectorConfig<SoapClientConnector> {
+public class SoapClientConfig extends ComponentModelConfig implements ConnectorConfig<SoapClientConnector> {
 
     @ConfigFieldInfo(inputType = FieldInputType.Hidden)
     @JSONField(serialize = false)
