@@ -77,6 +77,7 @@ public class ScatterGather implements DalaranProcessor<List<String>>, DalaranPro
             fragment.setPipeline(pipeline);
             fragment.setInModel(config.getInModel());
             fragment.setOutModel(fragmentLastOutModel);
+            fragment.setTracing(flow.isTracing());
 
 
             DalaranRoute fragmentRoute = flowBuilder.buildFlowFragment(fragment);

@@ -172,16 +172,18 @@ public class FlowManagementServiceImpl implements FlowManagementService {
     }
 
     private void setFlowStatus(TriggerFlowEntity flowEntity) {
-        FlowStatus flowStatus;
+        FlowStatus flowStatus = null;
         for (FlowValidation flowValidation : validateFlow(flowEntity)) {
             if (flowValidation.getType() == ValidateMessageType.Error) {
                 flowEntity.setStatus(FlowStatus.Error);
                 return;
             } else {
-                flowEntity.setStatus(FlowStatus.Warning);
+                flowStatus = FlowStatus.Warning;
             }
         }
-        flowStatus = FlowStatus.Available;
+        if (flowStatus == null) {
+            flowStatus = FlowStatus.Available;
+        }
         flowEntity.setStatus(flowStatus);
     }
 

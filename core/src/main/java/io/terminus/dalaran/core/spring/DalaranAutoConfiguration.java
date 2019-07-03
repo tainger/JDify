@@ -19,6 +19,7 @@ import org.apache.camel.CamelContext;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.spi.Registry;
 import org.apache.camel.spring.spi.ApplicationContextRegistry;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -28,9 +29,16 @@ import org.springframework.context.annotation.Configuration;
 public class DalaranAutoConfiguration {
 
     @Bean
-    public CamelContext camelContext(ApplicationContext applicationContext) {
+    public CamelContext camelContext(ApplicationContext applicationContext, @Value("${terminus.dalaran.tracing:true}") boolean tracing) {
         Registry registry = new ApplicationContextRegistry(applicationContext);
-        return new DefaultCamelContext(registry);
+        CamelContext camelContext = new DefaultCamelContext(registry);
+        try {
+            camelContext.setTracing(tracing);
+            camelContext.start();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return camelContext;
     }
 
     @Bean

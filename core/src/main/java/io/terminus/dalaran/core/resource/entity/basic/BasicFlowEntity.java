@@ -28,11 +28,12 @@ public class BasicFlowEntity extends BasicEntity {
     @Enumerated(EnumType.STRING)
     private FlowStatus status;
 
+    private boolean tracing;
+
     /**
      * all processor list
      */
     @Convert(converter = PipelineJsonConverter.class)
     @Column(nullable = false, columnDefinition = "LONGTEXT")
     private List<ProcessorEntity> pipeline;
-
 }
