@@ -15,6 +15,9 @@ public class TracingLogEntity {
     private Long id;
 
     @Column(nullable = false)
+    private Long moduleId;
+
+    @Column(nullable = false)
     private Long flowId;
 
     @Column(length = 64)

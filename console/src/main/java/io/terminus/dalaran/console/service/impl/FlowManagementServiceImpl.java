@@ -192,16 +192,16 @@ public class FlowManagementServiceImpl implements FlowManagementService {
         return flowBuilder.validateFlow(triggerFlow);
     }
 
-    private TriggerFlowEntity buildEntity(TriggerFlowDTO model) {
+    private TriggerFlowEntity buildEntity(TriggerFlowDTO triggerFlow) {
         TriggerFlowEntity flowEntity;
-        Long id = model.getId();
+        Long id = triggerFlow.getId();
         if (id != null) {
             flowEntity = flowRepository.findOne(id);
         } else {
             flowEntity = new TriggerFlowEntity();
         }
 
-        List<ProcessorEntity> pipeline = model.getPipeline().stream().map(processor -> {
+        List<ProcessorEntity> pipeline = triggerFlow.getPipeline().stream().map(processor -> {
             ProcessorEntity processorEntity = new ProcessorEntity();
             processorEntity.setId(processor.getId());
             processorEntity.setType(processor.getType());
@@ -210,19 +210,19 @@ public class FlowManagementServiceImpl implements FlowManagementService {
             return processorEntity;
         }).collect(Collectors.toList());
 
-        String name = model.getName();
+        String name = triggerFlow.getName();
         if (StringUtils.isNoneBlank(name)) {
             flowEntity.setName(name);
         } else {
             flowEntity.setName("Dalaran Flow");
         }
-        flowEntity.setTriggerType(model.getTriggerType());
-        flowEntity.setTriggerConfig(JSON.toJSONString(model.getTriggerConfig()));
-        flowEntity.setModuleId(model.getModuleId());
-        flowEntity.setInModel(model.getInModelId());
-        flowEntity.setOutModel(model.getOutModelId());
+        flowEntity.setTriggerType(triggerFlow.getTriggerType());
+        flowEntity.setTriggerConfig(JSON.toJSONString(triggerFlow.getTriggerConfig()));
+        flowEntity.setModuleId(triggerFlow.getModuleId());
+        flowEntity.setInModel(triggerFlow.getInModelId());
+        flowEntity.setOutModel(triggerFlow.getOutModelId());
         flowEntity.setPipeline(pipeline);
-        flowEntity.setDescription(model.getDescription());
+        flowEntity.setDescription(triggerFlow.getDescription());
 
         return flowEntity;
     }

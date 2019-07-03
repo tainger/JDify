@@ -1,6 +1,7 @@
 package io.terminus.dalaran.component.trigger;
 
 import io.terminus.dalaran.component.BasicTriggerTest;
+import io.terminus.dalaran.component.processor.rocketmq.RocketMQConnector;
 import io.terminus.dalaran.component.trigger.rocketmq.RocketMQConsumer;
 import io.terminus.dalaran.component.trigger.rocketmq.RocketMQConsumerConfig;
 import org.apache.rocketmq.client.producer.DefaultMQProducer;
@@ -54,7 +55,9 @@ public class RocketMQTest extends BasicTriggerTest {
         RocketMQConsumer consumer = new RocketMQConsumer();
 
         RocketMQConsumerConfig consumerConfig = new RocketMQConsumerConfig();
-//        consumerConfig.setNameServer(NAME_SERVER);
+        RocketMQConnector connector = new RocketMQConnector();
+        connector.setNameServer(NAME_SERVER);
+        consumerConfig.setConnector(connector);
         consumerConfig.setTopic(TOPIC);
         consumerConfig.setConsumerGroup("dalaran");
 

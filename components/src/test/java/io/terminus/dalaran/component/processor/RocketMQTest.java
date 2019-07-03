@@ -1,6 +1,7 @@
 package io.terminus.dalaran.component.processor;
 
 import io.terminus.dalaran.component.BasicProcessorTest;
+import io.terminus.dalaran.component.processor.rocketmq.RocketMQConnector;
 import io.terminus.dalaran.component.processor.rocketmq.RocketMQProducer;
 import io.terminus.dalaran.component.processor.rocketmq.RocketMQProducerConfig;
 import org.apache.camel.ProducerTemplate;
@@ -17,8 +18,10 @@ public class RocketMQTest extends BasicProcessorTest {
         RocketMQProducer producer = new RocketMQProducer();
 
         RocketMQProducerConfig producerConfig = new RocketMQProducerConfig();
+        RocketMQConnector connector = new RocketMQConnector();
+        connector.setNameServer("127.0.0.1:9876");
+        producerConfig.setConnector(connector);
         producerConfig.setTopic("dalaran");
-//        producerConfig.setNameServer("127.0.0.1:9876");
         producerConfig.setProducerGroup("dalaran");
 
         ProducerTemplate template = getProcessorTemplate(producer, producerConfig);
