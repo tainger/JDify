@@ -1,9 +1,11 @@
 package io.terminus.dalaran.console.flow;
 
 import com.alibaba.fastjson.JSON;
+import io.terminus.dalaran.console.entity.ModelEntity;
 import io.terminus.dalaran.console.model.dto.DataTemplate;
 import io.terminus.dalaran.console.model.dto.ModelDTO;
 import io.terminus.dalaran.console.model.query.ModelQuery;
+import io.terminus.dalaran.console.repository.ModelRepository;
 import io.terminus.dalaran.console.service.ModelManagementService;
 import io.terminus.dalaran.core.model.BodyType;
 import io.terminus.dalaran.core.model.FieldType;
@@ -40,6 +42,9 @@ public class ModelManagementServiceTest {
     @Autowired
     private ModelManagementService modelManagementService;
 
+    @Autowired
+    private ModelRepository modelRepository;
+
     @Test
     public void create() {
         ModelDTO model = new ModelDTO();
@@ -47,19 +52,20 @@ public class ModelManagementServiceTest {
         model.setModelType(BodyType.JSON);
         model.setModuleId(1L);
         Long id = modelManagementService.createModel(model);
-        Assert.assertNotNull(id);
+        ModelEntity entity = modelRepository.findOne(id);
+        Assert.assertEquals(entity.getName(), model.getName());
     }
 
     @Test
     public void update() {
         ModelDTO model = new ModelDTO();
-        model.setId(1L);
+        model.setId(23L);
         model.setModuleId(1L);
         model.setModelType(BodyType.JSON);
         model.setName("test");
         model.setModelSchema(buildModelSchema());
         ModelDTO newModel = modelManagementService.updateModel(model);
-        Assert.assertNotNull(newModel);
+        Assert.assertEquals(newModel.getName(), model.getName());
     }
 
     @Test
@@ -69,7 +75,7 @@ public class ModelManagementServiceTest {
             File file = resource.getFile();
             FileInputStream inputStream = new FileInputStream(file);
             MultipartFile multipartFile = new MockMultipartFile(file.getName(), file.getName(), ContentType.APPLICATION_OCTET_STREAM.toString(), inputStream);
-            JsonSchema schema = modelManagementService.importExcel(multipartFile, 1L);
+            JsonSchema schema = modelManagementService.importExcel(multipartFile, 23L);
             Assert.assertNotNull(schema);
         } catch (Exception e) {
             e.printStackTrace();
@@ -80,7 +86,7 @@ public class ModelManagementServiceTest {
     public void importFromDataTemplate() {
         DataTemplate dataTemplate = new DataTemplate();
         dataTemplate.setDataTemplate("[{\"user\":{\"id\":2, \"name\":\"momo\", \"phone\":\"10086\", \"address\":\"mmmmmm\", \"wechat\":\"9999\"}, \"order\":{\"id\":\"11001\", \"time\":\"00:00\", \"detail\":\"asdfghjkl\", \"user\":\"momo\", \"address\":[{\"addr1\":\"mmmm\", \"addr2\":\"llllll\", \"list\":[{\"itemA\":\"11111\", \"itemB\":\"2222222\"}]}, {\"addr1\":\"pppppp\"}]}}]");
-        JsonSchema schema = modelManagementService.importDataTemplate(dataTemplate, 1L);
+        JsonSchema schema = modelManagementService.importDataTemplate(dataTemplate, 23L);
         Assert.assertNotNull(schema);
     }
 
@@ -96,10 +102,12 @@ public class ModelManagementServiceTest {
         query.setModuleId(1L);
         query.setName("test-model");
         List<Long> modelIds = new ArrayList<>();
-        modelIds.add(14L);
+        modelIds.add(19L);
         query.setModelIds(modelIds);
         List<ModelDTO> models = modelManagementService.queryModels(query);
-        Assert.assertNotNull(models);
+        models.forEach(model -> {
+            Assert.assertSame(model.getModuleId(), 1L);
+        });
     }
 
     private Map<String, Object> buildModelSchema() {

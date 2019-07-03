@@ -1,8 +1,10 @@
 package io.terminus.dalaran.console.flow;
 
 import com.alibaba.fastjson.JSON;
+import io.terminus.dalaran.console.entity.ConnectorEntity;
 import io.terminus.dalaran.console.model.dto.BasicConnectorInfo;
 import io.terminus.dalaran.console.model.dto.ConnectorDTO;
+import io.terminus.dalaran.console.repository.ConnectorRepository;
 import io.terminus.dalaran.console.service.ConnectorService;
 import io.terminus.dalaran.core.component.ComponentType;
 import org.junit.Assert;
@@ -27,10 +29,15 @@ public class ConnectorManagementServiceTest {
     @Autowired
     private ConnectorService connectorService;
 
+    @Autowired
+    private ConnectorRepository connectorRepository;
+
     @Test
     public void create() {
-        Long id = connectorService.create(buildConnector());
-        Assert.assertNotNull(id);
+        ConnectorDTO connector = buildConnector();
+        Long id = connectorService.create(connector);
+        ConnectorEntity entity = connectorRepository.findOne(id);
+        Assert.assertEquals(connector.getName(), entity.getName());
     }
 
     @Test
@@ -38,25 +45,30 @@ public class ConnectorManagementServiceTest {
         ConnectorDTO connector = buildConnector();
         connector.setId(4L);
         ConnectorDTO newConnector = connectorService.update(connector);
-        Assert.assertNotNull(newConnector);
+        Assert.assertSame(newConnector.getName(), newConnector.getName());
     }
 
     @Test
     public void detail() {
-        ConnectorDTO connector = connectorService.detail(4L);
-        Assert.assertNotNull(connector);
+        ConnectorDTO connector = connectorService.detail(1L);
+        ConnectorEntity entity = connectorRepository.findOne(1L);
+        Assert.assertEquals(connector.getName(), entity.getName());
     }
 
     @Test
     public void listBasicInfoByModuleId() {
         List<BasicConnectorInfo> connectors = connectorService.listBasicInfoByModuleId(1L);
-        Assert.assertNotNull(connectors);
+        connectors.forEach(connector -> {
+            Assert.assertSame(connector.getModuleId(), 1L);
+        });
     }
 
     @Test
     public void listBasicInfoByComponent() {
         List<BasicConnectorInfo> connectors = connectorService.listBasicInfoByComponent(ComponentType.Processor, "http-client");
-        Assert.assertNotNull(connectors);
+        connectors.forEach(connector -> {
+            Assert.assertEquals(connector.getComponentType(), ComponentType.Processor);
+        });
     }
 
     @Test

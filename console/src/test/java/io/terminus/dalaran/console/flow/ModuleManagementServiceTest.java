@@ -1,8 +1,10 @@
 package io.terminus.dalaran.console.flow;
 
+import io.terminus.dalaran.console.entity.ModuleEntity;
 import io.terminus.dalaran.console.model.dto.ModuleDTO;
 import io.terminus.dalaran.console.model.dto.ModuleDetailDTO;
 import io.terminus.dalaran.console.model.query.ModuleQuery;
+import io.terminus.dalaran.console.repository.ModuleRepository;
 import io.terminus.dalaran.console.service.ModuleManagementService;
 import org.junit.Assert;
 import org.junit.Test;
@@ -26,12 +28,16 @@ public class ModuleManagementServiceTest {
     @Autowired
     private ModuleManagementService moduleManagementService;
 
+    @Autowired
+    private ModuleRepository moduleRepository;
+
     @Test
     public void create() {
         ModuleDTO module = new ModuleDTO();
         module.setName("test-module");
         Long id = moduleManagementService.createModule(module);
-        Assert.assertNotNull(id);
+        ModuleEntity entity = moduleRepository.findOne(id);
+        Assert.assertEquals(entity.getName(), module.getName());
     }
 
     @Test
@@ -40,7 +46,7 @@ public class ModuleManagementServiceTest {
         module.setName("update-module");
         module.setDescription("update");
         ModuleDTO newModule = moduleManagementService.updateModule(module);
-        Assert.assertNotNull(newModule);
+        Assert.assertEquals(newModule.getName(), module.getName());
     }
 
     @Test
@@ -56,18 +62,20 @@ public class ModuleManagementServiceTest {
         moduleIds.add(1L);
         query.setModuleIds(moduleIds);
         List<ModuleDTO> modules = moduleManagementService.queryModules(query);
-        Assert.assertNotNull(modules);
+        Assert.assertSame(modules.size(), 1);
     }
 
     @Test
     public void getModuleDetail() {
         ModuleDetailDTO moduleDetail = moduleManagementService.getModuleDetail(1L);
-        Assert.assertNotNull(moduleDetail);
+        ModuleEntity entity = moduleRepository.findOne(1L);
+        Assert.assertEquals(moduleDetail.getName(), entity.getName());
     }
 
     @Test
     public void getModuleName() {
         String name = moduleManagementService.getModuleName(1L);
-        Assert.assertNotNull(name);
+        ModuleEntity entity = moduleRepository.findOne(1L);
+        Assert.assertEquals(name, entity.getName());
     }
 }

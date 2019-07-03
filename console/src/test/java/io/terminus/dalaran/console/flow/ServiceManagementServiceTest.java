@@ -1,8 +1,10 @@
 package io.terminus.dalaran.console.flow;
 
 import com.alibaba.fastjson.JSON;
+import io.terminus.dalaran.console.entity.ServiceEntity;
 import io.terminus.dalaran.console.model.dto.BasicServiceInfo;
 import io.terminus.dalaran.console.model.dto.ServiceDTO;
+import io.terminus.dalaran.console.repository.ServiceRepository;
 import io.terminus.dalaran.console.service.ServiceManagement;
 import org.junit.Assert;
 import org.junit.Test;
@@ -26,10 +28,15 @@ public class ServiceManagementServiceTest {
     @Autowired
     private ServiceManagement serviceManagement;
 
+    @Autowired
+    private ServiceRepository serviceRepository;
+
     @Test
     public void create() {
-        Long id = serviceManagement.create(buildService());
-        Assert.assertNotNull(id);
+        ServiceDTO service = buildService();
+        Long id = serviceManagement.create(service);
+        ServiceEntity entity = serviceRepository.findOne(id);
+        Assert.assertEquals(service.getName(), entity.getName());
     }
 
     @Test
@@ -37,7 +44,7 @@ public class ServiceManagementServiceTest {
         ServiceDTO service = buildService();
         service.setId(1L);
         ServiceDTO newService = serviceManagement.update(service);
-        Assert.assertNotNull(newService);
+        Assert.assertEquals(service.getName(), newService.getName());
     }
 
     @Test
@@ -49,7 +56,8 @@ public class ServiceManagementServiceTest {
     @Test
     public void detail() {
         ServiceDTO service = serviceManagement.detail(1L);
-        Assert.assertNotNull(service);
+        ServiceEntity entity = serviceRepository.findOne(1L);
+        Assert.assertEquals(service.getName(), entity.getName());
     }
 
     @Test
@@ -61,7 +69,9 @@ public class ServiceManagementServiceTest {
     @Test
     public void listBasicInfoByModuleId() {
         List<BasicServiceInfo> services = serviceManagement.listBasicInfoByModuleId(1L);
-        Assert.assertNotNull(services);
+        services.forEach(service -> {
+            Assert.assertSame(service.getModuleId(), 1L);
+        });
     }
 
     private ServiceDTO buildService() {
