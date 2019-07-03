@@ -54,7 +54,7 @@ public class RocketMQTest extends BasicTriggerTest {
         RocketMQConsumer consumer = new RocketMQConsumer();
 
         RocketMQConsumerConfig consumerConfig = new RocketMQConsumerConfig();
-        consumerConfig.setNameServer(NAME_SERVER);
+//        consumerConfig.setNameServer(NAME_SERVER);
         consumerConfig.setTopic(TOPIC);
         consumerConfig.setConsumerGroup("dalaran");
 

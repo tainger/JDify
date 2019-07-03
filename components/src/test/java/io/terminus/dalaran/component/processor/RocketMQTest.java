@@ -18,7 +18,7 @@ public class RocketMQTest extends BasicProcessorTest {
 
         RocketMQProducerConfig producerConfig = new RocketMQProducerConfig();
         producerConfig.setTopic("dalaran");
-        producerConfig.setNameServer("127.0.0.1:9876");
+//        producerConfig.setNameServer("127.0.0.1:9876");
         producerConfig.setProducerGroup("dalaran");
 
         ProducerTemplate template = getProcessorTemplate(producer, producerConfig);

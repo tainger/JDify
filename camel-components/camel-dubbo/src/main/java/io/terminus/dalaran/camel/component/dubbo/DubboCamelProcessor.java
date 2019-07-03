@@ -1,5 +1,6 @@
 package io.terminus.dalaran.camel.component.dubbo;
 
+import com.alibaba.dubbo.common.utils.StringUtils;
 import com.alibaba.dubbo.rpc.service.GenericService;
 import org.apache.camel.Exchange;
 import org.apache.camel.impl.DefaultProducer;
@@ -21,7 +22,12 @@ public class DubboCamelProcessor extends DefaultProducer {
     @Override
     public void process(Exchange exchange) {
         Object arg = exchange.getIn().getBody();
-        Object result = genericService.$invoke(method, new String[]{}, new Object[]{arg});
+        Object result;
+        if (StringUtils.isNotEmpty(parameterType)) {
+            result = genericService.$invoke(method, new String[]{parameterType}, new Object[]{arg});
+        } else {
+            result = genericService.$invoke(method, new String[]{}, new Object[]{});
+        }
         exchange.getOut().setBody(result);
     }
 }
