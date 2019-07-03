@@ -110,19 +110,19 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
         flowTracer.before(route, flow.getInModel().getModelType());
 
         // TODO 测试的输入一定是序列化的, XML/Json 等都是直接扔进去, 如果入参是 Object, 前端引导输入 Json 做反序列化处理吧
-        if (!flow.getInModel().getModelType().isSerialized()) {
-            route.process(exchange -> {
-                String bodyString = exchange.getIn().getBody(String.class);
-                InputStream input = new ByteArrayInputStream(bodyString.getBytes());
-                exchange.getOut().setBody(input);
-            });
-            converterContext.toObject(route, BodyType.JSON);
-        }
+//        if (!flow.getInModel().getModelType().isSerialized()) {
+//            route.process(exchange -> {
+//                String bodyString = exchange.getIn().getBody(String.class);
+//                InputStream input = new ByteArrayInputStream(bodyString.getBytes());
+//                exchange.getOut().setBody(input);
+//            });
+//            converterContext.toObject(route, BodyType.JSON);
+//        }
 
         // enable tracing on test mode
         flow.setTracing(true);
 
-        buildFlowRoute(route, flow, false);
+        buildFlowRoute(route, flow, true);
 
         flowTracer.after(route, flow.getOutModel().getModelType());
         return route;

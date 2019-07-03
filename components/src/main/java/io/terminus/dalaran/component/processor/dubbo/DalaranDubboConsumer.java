@@ -12,12 +12,12 @@ import org.apache.camel.model.ProcessorDefinition;
 )
 public class DalaranDubboConsumer implements DalaranProcessor<DalaranDubboConsumerConfig> {
 
-    private static final String DUBBO_PROVIDER_URI = "dubbo:?application=%s&registryAddress=%s&serviceId=%s&method=%s&version=%s";
+    private static final String DUBBO_PROVIDER_URI = "dubbo:?application=%s&registryAddress=%s&serviceId=%s&method=%s&version=%s&parameterType=%s";
 
     @Override
     public void configure(ProcessorDefinition route, DalaranDubboConsumerConfig config) {
         String uri = String.format(DUBBO_PROVIDER_URI, config.getConnector().getApplication(), config.getConnector().getAddress(),
-                config.getServiceId(), config.getMethod(), config.getVersion());
+                config.getServiceId(), config.getMethod(), config.getVersion(), config.getParameterType());
         route.to(uri);
     }
 }
