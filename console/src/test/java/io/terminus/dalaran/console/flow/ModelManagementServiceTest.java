@@ -119,7 +119,6 @@ public class ModelManagementServiceTest {
             MultipartFile multipartFile = new MockMultipartFile(file.getName(), file.getName(), ContentType.APPLICATION_OCTET_STREAM.toString(), inputStream);
             JsonSchema schema = modelManagementService.importExcel(multipartFile, 23L);
             String request = modelManagementService.buildRequest(schema, 23L);
-            System.out.println(request);
             Assert.assertNotNull(request);
         } catch (Exception e) {
             e.printStackTrace();
