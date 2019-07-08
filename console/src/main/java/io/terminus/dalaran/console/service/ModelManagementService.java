@@ -37,5 +37,5 @@ public interface ModelManagementService {
 
     JsonSchema importDataTemplate(DataTemplate dataTemplate, Long id);
 
-    String buildRequest(JsonSchema schema, Long id);
+    String buildDataTemplate(JsonSchema schema, Long id);
 }

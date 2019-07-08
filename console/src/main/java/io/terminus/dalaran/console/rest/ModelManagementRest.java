@@ -73,10 +73,10 @@ public class ModelManagementRest {
         return schema.getFields();
     }
 
-    @ApiOperation(value = "根据模型结构生成请求数据样例")
-    @RequestMapping(value = "/{id}/build/request-template", method = RequestMethod.POST)
+    @ApiOperation(value = "根据模型结构生成数据样例")
+    @RequestMapping(value = "/{id}/build/data-template", method = RequestMethod.POST)
     public String buildRequestTemplate(@RequestBody JsonSchema schema, @PathVariable long id) {
-        return modelManagementService.buildRequest(schema, id);
+        return modelManagementService.buildDataTemplate(schema, id);
     }
 
     // TODO 待开发

@@ -156,26 +156,26 @@ public class ModelManagementServiceImpl implements ModelManagementService {
     }
 
     @Override
-    public String buildRequest(JsonSchema schema, Long id) {
+    public String buildDataTemplate(JsonSchema schema, Long id) {
         Map<String, ModelField> modelField = schema.getFields();
         ModelField root = modelField.get(DalaranConsoleConstants.MODEL_FIELD_ROOT);
-        Object body = buildRequestBody(root, "");
+        Object body = buildTemplateBody(root, "");
         if (body != null) {
             return JSON.toJSONString(body);
         }
         return null;
     }
 
-    private Object buildRequestBody(ModelField parent, String parentFieldName) {
+    private Object buildTemplateBody(ModelField parent, String parentFieldName) {
         FieldType parentType = parent.getType();
         if (parentType == FieldType.OBJECT) {
-            return handleChildRequest(parent);
+            return handleChildBody(parent);
         } else if (parentType == FieldType.ARRAY) {
             FieldType subType = parent.getSubType();
             if (subType == FieldType.OBJECT) {
                 List<Object> list = new ArrayList<>();
                 for (int i = 0; i < DalaranConsoleConstants.MODEL_ARRAY_SIZE; i++) {
-                    list.add(handleChildRequest(parent));
+                    list.add(handleChildBody(parent));
                 }
                 return list;
             } else {
@@ -190,12 +190,12 @@ public class ModelManagementServiceImpl implements ModelManagementService {
         }
     }
 
-    private Object handleChildRequest(ModelField parentField) {
+    private Object handleChildBody(ModelField parentField) {
         Map<String, Object> request = new HashMap<>();
         Map<String, ModelField> child = parentField.getFields();
         if (child != null) {
             child.forEach((name, field) -> {
-                Object value = buildRequestBody(field, name);
+                Object value = buildTemplateBody(field, name);
                 request.put(name, value);
             });
         }
