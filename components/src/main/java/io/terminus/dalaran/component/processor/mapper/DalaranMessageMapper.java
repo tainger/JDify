@@ -121,9 +121,9 @@ public class DalaranMessageMapper implements DalaranProcessor<DalaranMapperConfi
         if (CollectionUtils.isEmpty(fields)) {
             return null;
         }
-        ModelField child = model.getFields().get(fields.get(0));
-        for (int i = 1; i < fields.size(); i++) {
-            child = child.getFields().get(fields.get(i));
+        ModelField child = model;
+        for (String field : fields) {
+            child = child.getFields().get(field);
         }
         return child;
     }

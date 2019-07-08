@@ -41,7 +41,7 @@ public class TracingLogManagementServiceTest {
 
     @Test
     public void getRecordDetail() {
-        String recordId = "ID-jingdideMacBook-Pro-local-1556007795710-0-1";
+        String recordId = "p64JkTTBZgc0hu4S";
         MainLogDTO log = tracingLogService.getRecordDetail(recordId);
         Assert.assertEquals(log.getRecordId(), recordId);
     }

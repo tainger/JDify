@@ -36,4 +36,6 @@ public interface ModelManagementService {
     Map<Long, Map<String, JsonSchema>> multiImportExcel(MultipartFile file, BodyType type);
 
     JsonSchema importDataTemplate(DataTemplate dataTemplate, Long id);
+
+    String buildDataTemplate(JsonSchema schema, Long id);
 }
