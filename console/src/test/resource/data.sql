@@ -13,6 +13,7 @@ CREATE TABLE `dalaran_trigger_flow` (
   `out_model` bigint(20) DEFAULT NULL,
   `pipeline` longtext NOT NULL,
   `status` varchar(255) DEFAULT NULL,
+  `tracing` tinyint(1) DEFAULT NULL,
   `trigger_config` text NOT NULL,
   `trigger_type` varchar(255) NOT NULL,
   PRIMARY KEY (`id`)
@@ -325,39 +326,27 @@ DROP TABLE IF EXISTS `dalaran_tracing_log`;
 CREATE TABLE `dalaran_tracing_log` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `module_id` bigint(20) DEFAULT NULL,
-  `elapsed` bigint(20) DEFAULT NULL,
-  `flow_id` bigint(20) DEFAULT NULL,
-  `input_body` text,
-  `input_body_type` varchar(255) DEFAULT NULL,
-  `output_body` text,
-  `output_body_type` varchar(255) DEFAULT NULL,
-  `processor_id` bigint(20) DEFAULT NULL,
-  `timestamp` bigint(20) DEFAULT NULL,
-  `trigger_id` bigint(20) DEFAULT NULL,
-  `record_id` varchar(255) DEFAULT NULL,
-  `test_flow` bit(1) NOT NULL DEFAULT NULL,
-  `tracing_type` varchar(255) DEFAULT NULL,
-  `successful` bit(1) DEFAULT NULL,
+  `elapsed` bigint(20) NOT NULL,
+  `flow_id` bigint(20) NOT NULL,
+  `input_body` longtext,
+  `input_body_type` varchar(255) NOT NULL,
   `main` bit(1) NOT NULL,
+  `output_body` longtext,
+  `output_body_type` varchar(255) NOT NULL,
+  `processor_id` varchar(64) DEFAULT NULL,
+  `record_id` varchar(64) NOT NULL,
+  `successful` bit(1) NOT NULL,
+  `timestamp` bigint(20) NOT NULL,
+  `tracing_type` varchar(255) NOT NULL,
+  `trigger_id` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-INSERT INTO `dalaran_tracing_log` (`id`, `module_id`, `elapsed`, `flow_id`, `input_body`, `input_body_type`, `output_body`, `output_body_type`, `processor_id`, `timestamp`, `trigger_id`, `record_id`, `test_flow`, `tracing_type`, `successful`, `main`)
+INSERT INTO `dalaran_tracing_log` (`id`, `module_id`, `elapsed`, `flow_id`, `input_body`, `input_body_type`, `main`, `output_body`, `output_body_type`, `processor_id`, `record_id`, `successful`, `timestamp`, `tracing_type`, `trigger_id`)
 VALUES
-	(2, 1, 89090, 8, '{userId=1, userName=lala, order=[{orderId=101, orderStatus=0}, {orderId=102, orderStatus=1}], consumer={consumerId=201, consumerName=lalaConsumer}}', 'JSON', 'com.google.gson.internal.LinkedTreeMap cannot be cast to io.terminus.dalaran.component.processor.mapper.model.MappingField', 'EXCEPTION', 30, 1556007836627, NULL, 'ID-jingdideMacBook-Pro-local-1556007795710-0-1', 0, 'Flow', 0, 1),
-	(3, 1, 89091, NULL, '{userId=1, userName=lala, order=[{orderId=101, orderStatus=0}, {orderId=102, orderStatus=1}], consumer={consumerId=201, consumerName=lalaConsumer}}', 'JSON', 'com.google.gson.internal.LinkedTreeMap cannot be cast to io.terminus.dalaran.component.processor.mapper.model.MappingField', 'EXCEPTION', NULL, 1556007836626, 5, 'ID-jingdideMacBook-Pro-local-1556007795710-0-1', 0, 'Trigger', 0, 0),
-	(4, 1, 786441, 8, '{userId=1, userName=lala, order=[{orderId=101, orderStatus=0}, {orderId=102, orderStatus=1}], consumer={consumerId=201, consumerName=lalaConsumer}}', 'JSON', 'com.google.gson.internal.LinkedTreeMap cannot be cast to io.terminus.dalaran.component.processor.mapper.model.MappingField', 'EXCEPTION', 30, 1556007965236, NULL, 'ID-jingdideMacBook-Pro-local-1556007795710-0-3', 0, 'Flow', 0, 1),
-	(5, 1, 786442, NULL, '{userId=1, userName=lala, order=[{orderId=101, orderStatus=0}, {orderId=102, orderStatus=1}], consumer={consumerId=201, consumerName=lalaConsumer}}', 'JSON', 'com.google.gson.internal.LinkedTreeMap cannot be cast to io.terminus.dalaran.component.processor.mapper.model.MappingField', 'EXCEPTION', NULL, 1556007965235, 5, 'ID-jingdideMacBook-Pro-local-1556007795710-0-3', 0, 'Trigger', 0, 0),
-	(6, 1, 321343, 8, '{userId=1, userName=lala, order=[{orderId=101, orderStatus=0}, {orderId=102, orderStatus=1}], consumer={consumerId=201, consumerName=lalaConsumer}}', 'JSON', NULL, 'EXCEPTION', 30, 1556008921442, NULL, 'ID-jingdideMacBook-Pro-local-1556008881530-0-1', 0, 'Flow', 0, 1),
-	(7, 1, 321345, NULL, '{userId=1, userName=lala, order=[{orderId=101, orderStatus=0}, {orderId=102, orderStatus=1}], consumer={consumerId=201, consumerName=lalaConsumer}}', 'JSON', NULL, 'EXCEPTION', NULL, 1556008921440, 5, 'ID-jingdideMacBook-Pro-local-1556008881530-0-1', 0, 'Trigger', 0, 1),
-	(8, 1, 120135, 8, '{userId=1, userName=lala, order=[{orderId=101, orderStatus=0}, {orderId=102, orderStatus=1}], consumer={consumerId=201, consumerName=lalaConsumer}}', 'JSON', NULL, 'EXCEPTION', 30, 1556009498778, NULL, 'ID-jingdideMacBook-Pro-local-1556009278490-0-1', 0, 'Flow', 0, 1),
-	(9, 1, 120138, NULL, '{userId=1, userName=lala, order=[{orderId=101, orderStatus=0}, {orderId=102, orderStatus=1}], consumer={consumerId=201, consumerName=lalaConsumer}}', 'JSON', NULL, 'EXCEPTION', NULL, 1556009498776, 5, 'ID-jingdideMacBook-Pro-local-1556009278490-0-1', 0, 'Trigger', 0, 1),
-	(11, 1, 154623, 8, '{userId=1, userName=lala, order=[{orderId=101, orderStatus=0}, {orderId=102, orderStatus=1}], consumer={consumerId=201, consumerName=lalaConsumer}}', 'JSON', NULL, 'EXCEPTION', 30, 1556009902934, NULL, 'ID-jingdideMacBook-Pro-local-1556009858729-0-1', 0, 'Flow', 0, 1),
-	(12, 1, 154625, NULL, '{userId=1, userName=lala, order=[{orderId=101, orderStatus=0}, {orderId=102, orderStatus=1}], consumer={consumerId=201, consumerName=lalaConsumer}}', 'JSON', NULL, 'EXCEPTION', NULL, 1556009902932, 5, 'ID-jingdideMacBook-Pro-local-1556009858729-0-1', 0, 'Trigger', 0, 1),
-	(13, 1, 72223, 8, '{userId=1, userName=lala, order=[{orderId=101, orderStatus=0}, {orderId=102, orderStatus=1}], consumer={consumerId=201, consumerName=lalaConsumer}}', 'JSON', NULL, 'EXCEPTION', 30, 1556010128345, NULL, 'ID-jingdideMacBook-Pro-local-1556010093585-0-1', 0, 'Flow', 0, 1),
-	(14, 1, 72225, NULL, '{userId=1, userName=lala, order=[{orderId=101, orderStatus=0}, {orderId=102, orderStatus=1}], consumer={consumerId=201, consumerName=lalaConsumer}}', 'JSON', NULL, 'EXCEPTION', NULL, 1556010128343, 5, 'ID-jingdideMacBook-Pro-local-1556010093585-0-1', 0, 'Trigger', 0, 1),
-	(15, 1, 88147, 8, '{userId=1, userName=lala, order=[{orderId=101, orderStatus=0}, {orderId=102, orderStatus=1}], consumer={consumerId=201, consumerName=lalaConsumer}}', 'JSON', NULL, 'EXCEPTION', 30, 1556010541181, NULL, 'ID-jingdideMacBook-Pro-local-1556010502487-0-1', 0, 'Flow', 0, 0),
-	(16, 1, 88149, NULL, '{userId=1, userName=lala, order=[{orderId=101, orderStatus=0}, {orderId=102, orderStatus=1}], consumer={consumerId=201, consumerName=lalaConsumer}}', 'JSON', NULL, 'EXCEPTION', NULL, 1556010541179, 5, 'ID-jingdideMacBook-Pro-local-1556010502487-0-1', 0, 'Trigger', 0, 0),
-	(17, 1, 40632, 8, '{userId=1, userName=lala, order=[{orderId=101, orderStatus=0}, {orderId=102, orderStatus=1}], consumer={consumerId=201, consumerName=lalaConsumer}}', 'JSON', NULL, 'EXCEPTION', 30, 1556010701861, NULL, 'ID-jingdideMacBook-Pro-local-1556010664258-0-1', 0, 'Flow', 0, 0),
-	(18, 1, 40633, NULL, '{userId=1, userName=lala, order=[{orderId=101, orderStatus=0}, {orderId=102, orderStatus=1}], consumer={consumerId=201, consumerName=lalaConsumer}}', 'JSON', NULL, 'EXCEPTION', NULL, 1556010701860, 5, 'ID-jingdideMacBook-Pro-local-1556010664258-0-1', 0, 'Trigger', 0, 0),
-	(19, 1, 117003, 8, '{userId=1, userName=lala, order=[{orderId=101, orderStatus=0}, {orderId=102, orderStatus=1}], consumer={consumerId=201, consumerName=lalaConsumer}}', 'JSON', 'No value for xpath: order/orderId', 'EXCEPTION', 30, 1556011122636, NULL, 'ID-jingdideMacBook-Pro-local-1556011039617-0-1', 0, 'Flow', 0, 0);
+	(1, 1, 5, 1, '{"flowId":1,"body":"123213123213"}', 'JSON', 1, '{"flowId":1,"body":"123213123213"}', 'JSON', NULL, 'p64JkTTBZgc0hu4S', 1, 1557134036247, 'TestFlow', NULL),
+	(2, 1, 0, 1, '{"flowId":1,"body":"1321"}', 'JSON', 1, '{"flowId":1,"body":"1321"}', 'JSON', NULL, 'RzUmSycE4n7auKgC', 1, 1557193372741, 'TestFlow', NULL),
+	(3, 1, 0, 1, '{"flowId":1,"body":null}', 'JSON', 1, '{"flowId":1,"body":null}', 'JSON', NULL, '8YG2s38nJJj1ZCoc', 1, 1557193425408, 'TestFlow', NULL),
+	(4, 1, 1, 1, '{"flowId":1,"body":null}', 'JSON', 1, '{"flowId":1,"body":null}', 'JSON', NULL, 'yDNr77C8prJL8Afl', 1, 1557193508957, 'TestFlow', NULL),
+	(5, 1, 0, 1, '{"flowId":1,"body":"2312321321"}', 'JSON', 1, '{"flowId":1,"body":"2312321321"}', 'JSON', NULL, 'siFmlELlFGJpymTp', 1, 1557193516779, 'TestFlow', NULL),
+	(6, 1, 1, 1, '{"flowId":1,"body":"xml"}', 'JSON', 1, '{"flowId":1,"body":"xml"}', 'JSON', NULL, '0V32F9b5xtj9OouN', 1, 1557193563822, 'TestFlow', NULL);

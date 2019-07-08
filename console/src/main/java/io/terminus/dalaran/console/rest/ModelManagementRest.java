@@ -73,6 +73,12 @@ public class ModelManagementRest {
         return schema.getFields();
     }
 
+    @ApiOperation(value = "导入数据模板更新模型结构")
+    @RequestMapping(value = "/{id}/build/request-template", method = RequestMethod.POST)
+    public String buildRequestTemplate(@RequestBody JsonSchema schema, @PathVariable long id) {
+        return modelManagementService.buildRequest(schema, id);
+    }
+
     // TODO 待开发
     @ApiOperation(value = "导入数据模板更新模型结构")
     @RequestMapping(value = "/{id}/import/code-template", method = RequestMethod.POST)

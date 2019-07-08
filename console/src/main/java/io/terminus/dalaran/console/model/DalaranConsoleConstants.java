@@ -16,4 +16,8 @@ public class DalaranConsoleConstants {
     public static final String JSON_OBJECT = "com.alibaba.fastjson.JSONObject";
 
     public static final String JSON_ARRAY = "com.alibaba.fastjson.JSONArray";
+
+    public static final String MODEL_FIELD_ROOT = "root";
+
+    public static final int MODEL_ARRAY_SIZE = 2;
 }

@@ -112,7 +112,7 @@ public class DalaranMapperProcessor implements Processor, Traceable {
                        flag.setValue(true);
                     }
                 } else {
-                    List<Object> target = (List<Object>) targetContext.getValue(entry.getValue().getValue(), List.class);
+                    List<Object> target = (List<Object>) targetContext.getValue(mappingField.getValue(), List.class);
                     destinationContext.createPathAndSetValue(path, target);
                 }
             } else if (type == FieldType.OBJECT) {
@@ -121,7 +121,7 @@ public class DalaranMapperProcessor implements Processor, Traceable {
                 Object target = null;
                 if (mappingField.getMappingType() == MappingType.MAPPING) {
                     try {
-                        target = targetContext.getValue(entry.getValue().getValue());
+                        target = targetContext.getValue(mappingField.getValue());
                     } catch (JXPathNotFoundException e) {
 //                        e.printStackTrace();
                     }

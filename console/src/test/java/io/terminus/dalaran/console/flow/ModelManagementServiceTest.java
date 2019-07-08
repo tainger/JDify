@@ -110,6 +110,22 @@ public class ModelManagementServiceTest {
         });
     }
 
+    @Test
+    public void buildRequest() {
+        Resource resource = new ClassPathResource("excel-parse-model-s-3.xlsx");
+        try {
+            File file = resource.getFile();
+            FileInputStream inputStream = new FileInputStream(file);
+            MultipartFile multipartFile = new MockMultipartFile(file.getName(), file.getName(), ContentType.APPLICATION_OCTET_STREAM.toString(), inputStream);
+            JsonSchema schema = modelManagementService.importExcel(multipartFile, 23L);
+            String request = modelManagementService.buildRequest(schema, 23L);
+            System.out.println(request);
+            Assert.assertNotNull(request);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     private Map<String, Object> buildModelSchema() {
         Map<String, ModelField> inField = new HashMap<>();
         ModelField inModelField = new ModelField();

@@ -26,10 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by jingdi on 2019/3/29
@@ -156,6 +153,74 @@ public class ModelManagementServiceImpl implements ModelManagementService {
         model.setModelSchema(JSON.toJSONString(schema));
         modelRepository.save(model);
         return schema;
+    }
+
+    @Override
+    public String buildRequest(JsonSchema schema, Long id) {
+        Map<String, ModelField> modelField = schema.getFields();
+        ModelField root = modelField.get(DalaranConsoleConstants.MODEL_FIELD_ROOT);
+        Object body = buildRequestBody(root, "");
+        if (body != null) {
+            return JSON.toJSONString(body);
+        }
+        return null;
+    }
+
+    private Object buildRequestBody(ModelField parent, String parentFieldName) {
+        FieldType parentType = parent.getType();
+        if (parentType == FieldType.OBJECT) {
+            return handleChildRequest(parent);
+        } else if (parentType == FieldType.ARRAY) {
+            FieldType subType = parent.getSubType();
+            if (subType == FieldType.OBJECT) {
+                List<Object> list = new ArrayList<>();
+                for (int i = 0; i < DalaranConsoleConstants.MODEL_ARRAY_SIZE; i++) {
+                    list.add(handleChildRequest(parent));
+                }
+                return list;
+            } else {
+                List<Object> list = new ArrayList<>();
+                for (int i = 0; i < DalaranConsoleConstants.MODEL_ARRAY_SIZE; i++) {
+                    list.add(getBasicValue(subType, parentFieldName, i));
+                }
+                return list;
+            }
+        } else {
+            return getBasicValue(parentType, parentFieldName, 0);
+        }
+    }
+
+    private Object handleChildRequest(ModelField parentField) {
+        Map<String, Object> request = new HashMap<>();
+        Map<String, ModelField> child = parentField.getFields();
+        if (child != null) {
+            child.forEach((name, field) -> {
+                Object value = buildRequestBody(field, name);
+                request.put(name, value);
+            });
+        }
+        return request;
+    }
+
+    private Object getBasicValue(FieldType type, String fieldName, int index) {
+        if (type != null) {
+            switch (type) {
+                case STRING:
+                    return fieldName + index;
+                case INTEGER:
+                case LONG:
+                case SHORT:
+                    return index;
+                case BOOLEAN:
+                    return true;
+                case DATE:
+                    return new Date();
+                case DOUBLE:
+                case FLOAT:
+                    return (float) index;
+            }
+        }
+        return "";
     }
 
     private void buildModel(Object body, String type, ModelField modelField) {
