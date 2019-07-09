@@ -11,3 +11,5 @@ spring:
     database-platform: org.hibernate.dialect.MySQLDialect
 
 terminus.dalaran.tracing: ${DALARAN_TRACING:true}
+server:
+  port: 8088
