@@ -70,26 +70,36 @@ public class DalaranMapperProcessor implements Processor, Traceable {
             FieldType subType = mappingField.getSubType();
 
             String path = entry.getKey();
-            if (parentPath.equalsIgnoreCase(MapperConstants.MODEL_ROOT)) {
-                path = entry.getKey();
-            } else if (StringUtils.isNotBlank(parentPath)) {
+            if (StringUtils.isNotBlank(parentPath) && !parentPath.equalsIgnoreCase(MapperConstants.MODEL_ROOT)) {
                 path = parentPath + "/" + entry.getKey();
             }
+
+//            if (parentPath.equalsIgnoreCase(MapperConstants.MODEL_ROOT)) {
+//                path = entry.getKey();
+//            } else if (StringUtils.isNotBlank(parentPath)) {
+//                path = parentPath + "/" + entry.getKey();
+//            }
 
             if (type == FieldType.ARRAY) {
                 if (subType == FieldType.OBJECT) {
                     List<Object> target = null;
                     String arrayPath = mappingField.getArrayFieldPath();
                     try {
-                        if (path.equalsIgnoreCase(MapperConstants.MODEL_ROOT)) {
-                            if (StringUtils.isNotBlank(arrayPath)) {
-                                target = (List<Object>) targetContext.getValue(arrayPath, List.class);
-                            } else {
-                                target = (List<Object>) targetContext.getContextBean();
-                            }
+                        if (path.equalsIgnoreCase(MapperConstants.MODEL_ROOT) && !StringUtils.isNotBlank(arrayPath)) {
+                            target = (List<Object>) targetContext.getContextBean();
                         } else {
                             target = (List<Object>) targetContext.getValue(arrayPath, List.class);
                         }
+                        
+//                        if (path.equalsIgnoreCase(MapperConstants.MODEL_ROOT)) {
+//                            if (StringUtils.isNotBlank(arrayPath)) {
+//                                target = (List<Object>) targetContext.getValue(arrayPath, List.class);
+//                            } else {
+//                                target = (List<Object>) targetContext.getContextBean();
+//                            }
+//                        } else {
+//                            target = (List<Object>) targetContext.getValue(arrayPath, List.class);
+//                        }
                     } catch (JXPathNotFoundException e) {
 //                        e.printStackTrace();
                     }
@@ -128,9 +138,8 @@ public class DalaranMapperProcessor implements Processor, Traceable {
                 } else {
                     target = mappingField.getValue();
                 }
-                Object destinationValue = null;
                 if (target != null) {
-                    destinationValue = parse(target, mappingField.getMappingFieldType());
+                    Object destinationValue = parse(target, mappingField.getMappingFieldType());
                     destinationContext.createPathAndSetValue(path, destinationValue);
                 }
             }
