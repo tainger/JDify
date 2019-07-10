@@ -13,6 +13,7 @@ import io.terminus.dalaran.core.model.schema.SoapSchema;
 import org.apache.camel.Exchange;
 import org.apache.camel.builder.Builder;
 import org.apache.camel.model.ProcessorDefinition;
+import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
@@ -77,38 +78,42 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
         Definitions definitions = parser.parse(wsdl);
         List<Binding> bindings = definitions.getBindings();
         String wsdlDoc = getWsdlDoc(wsdl);
+        Map<String, SoapOperation> operationMap = buildOperations(definitions);
         bindings.forEach(binding -> {
             String bindingName = binding.getName();
             String portType = binding.getType().getLocalPart();
             binding.getOperations().forEach(operation -> {
-                SoapOperationConfig soapOperation = new SoapOperationConfig();
+                SoapOperationConfig operationConfig = new SoapOperationConfig();
                 SoapSchemaOperation schemaOperation = new SoapSchemaOperation();
 
-                schemaOperation.setBinding(bindingName);
-                soapOperation.setName(operation.getName());
-                schemaOperation.setName(operation.getName());
+                String operationName = operation.getName();
+                SoapOperation soapOperation = operationMap.get(portType + ":" + operationName);
 
-                String inputName = operation.getInput().getName();
-                String outputName = operation.getOutput().getName();
-                soapOperation.setPortType(portType);
+                schemaOperation.setBinding(bindingName);
+                operationConfig.setName(operationName);
+                schemaOperation.setName(operationName);
+
+                String inputName = soapOperation.getInput();
+                String outputName = soapOperation.getOutput();
+                operationConfig.setPortType(portType);
                 schemaOperation.setPortType(portType);
 
                 schemaOperation.setInput(inputName);
                 schemaOperation.setOutPut(outputName);
                 schemaOperation.setWsdl(wsdl);
-                soapOperation.setOperationKey(portType + OPERATION_SPLIT + operation.getName());
+                operationConfig.setOperationKey(portType + OPERATION_SPLIT + operationName);
 
                 String baseDir = definitions.getBaseDir().toString();
-                soapOperation.setBaseUrl(StringUtils.substringAfter(baseDir, "://"));
-                schemaOperation.setBaseUrl(soapOperation.getBaseUrl());
-                soapOperation.setProtocol(HttpProtocol.valueOf(StringUtils.substringBefore(baseDir, "://").toUpperCase()));
-                schemaOperation.setProtocol(soapOperation.getProtocol());
+                operationConfig.setBaseUrl(StringUtils.substringAfter(baseDir, "://"));
+                schemaOperation.setBaseUrl(operationConfig.getBaseUrl());
+                operationConfig.setProtocol(HttpProtocol.valueOf(StringUtils.substringBefore(baseDir, "://").toUpperCase()));
+                schemaOperation.setProtocol(operationConfig.getProtocol());
 
                 MessageModel inModel = buildModel(definitions.getMessage(inputName), schemaOperation, wsdlDoc, inputName);
                 MessageModel outModel = buildModel(definitions.getMessage(outputName), schemaOperation, wsdlDoc, outputName);
-                soapOperation.setInModel(inModel);
-                soapOperation.setOutModel(outModel);
-                soapOperations.add(soapOperation);
+                operationConfig.setInModel(inModel);
+                operationConfig.setOutModel(outModel);
+                soapOperations.add(operationConfig);
             });
         });
         serviceConfig.setSoapOperations(soapOperations);
@@ -116,12 +121,47 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
         return serviceConfig;
     }
 
+    private Map<String, SoapOperation> buildOperations(Definitions definitions) {
+        Map<String, SoapOperation> operations = new HashMap<>();
+        List<PortType> portTypes = definitions.getPortTypes();
+        portTypes.forEach(portType -> {
+            String portName = portType.getName();
+            portType.getOperations().forEach(operation -> {
+                SoapOperation soapOperation = new SoapOperation();
+                String name = operation.getName();
+
+                soapOperation.setName(name);
+                soapOperation.setPortType(portName);
+                String input = operation.getInput().getName();
+                if (StringUtils.isBlank(input)) {
+                    input = operation.getInput().getMessagePrefixedName().getLocalName();
+                }
+                soapOperation.setInput(input);
+
+                String output = operation.getOutput().getName();
+                if (StringUtils.isBlank(output)) {
+                    output = operation.getOutput().getMessagePrefixedName().getLocalName();
+                }
+                soapOperation.setOutput(output);
+
+                operations.put(portName + ":" + name, soapOperation);
+            });
+        });
+        return operations;
+    }
+
     public MessageModel buildModel(Message message, SoapSchemaOperation operationConfig, String wsdlDoc, String modelRoot) {
         MessageModel model = new MessageModel();
         SoapSchema soapSchema = new SoapSchema();
+        try {
+            SoapSchemaOperation schemaOperation = new SoapSchemaOperation();
+            BeanUtils.copyProperties(schemaOperation, operationConfig);
+            schemaOperation.setModelRoot(modelRoot);
+            soapSchema.setOperationConfig(schemaOperation);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         soapSchema.setWsdlDoc(wsdlDoc);
-        operationConfig.setModelRoot(modelRoot);
-        soapSchema.setOperationConfig(operationConfig);
         model.setModelSchema(soapSchema);
         model.setModelType(BodyType.SOAP);
         Map<String, ModelField> fields = new HashMap<>();
@@ -221,7 +261,7 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
         Sequence sequence;
         if (complexType != null && (sequence = (Sequence) complexType.getModel()) != null) {
             List<SchemaComponent> particles = sequence.getParticles();
-            String maxOccurs = (String) sequence.getMaxOccurs();
+            String maxOccurs = sequence.getMaxOccurs().toString();
             if (CollectionUtils.isNotEmpty(particles)) {
                 particles.forEach(p -> {
                     handleSchemaComponent(p, element, schema, maxOccurs, parent);

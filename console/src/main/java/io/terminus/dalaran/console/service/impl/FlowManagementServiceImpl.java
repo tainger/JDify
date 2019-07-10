@@ -167,6 +167,7 @@ public class FlowManagementServiceImpl implements FlowManagementService {
 
     @Override
     public List<FlowValidation> validateFlow(TriggerFlowDTO model) {
+        model.setId(null);
         TriggerFlowEntity entity = buildEntity(model);
         return validateFlow(entity);
     }
