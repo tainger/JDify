@@ -34,10 +34,8 @@
 
 * [概述](./docs/user/overview.md)
 * [快速开始](./docs/user/quick-start.md)
-* [触发器](./docs/user/trigger/index.md)
-* [处理器](./docs/user/processor/index.md)
-* [模型](./docs/user/model.md)
-* [流程设计器](./docs/user/flow-design.md)
+* [高级功能](./docs/user/other.md)
+* [常见问题](./docs/user/Q&A.md)
 
 ## 开发者手册
 
