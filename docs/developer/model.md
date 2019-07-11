@@ -66,7 +66,7 @@ Mapper out: Object: (`Object`) -> Trigger out: XML (`Serialized`)
 
 这样, 过程中的格式转换的问题, 就交给了组件声明, 而不是用户配置.
 
-## 可接口配置类型
+## 组件可接受配置类型
 
 Trigger 和 Processor 的注解上, 除了 出入序列化类型之外, 还有一个 `allowBodyTypes` 配置, 类型是 BodyType[], 该参数声明了组件能够接收什么样的参数类型.
 
