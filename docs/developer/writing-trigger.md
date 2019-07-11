@@ -2,30 +2,45 @@
 
 > 因为触发器默认为单例, 所以不推荐使用任何成员变量
 
-编写一个触发器, 和编写处理器非常相似, 只需要实现 `DalaranTrigger` 接口, 并标记 `@DalaranComponent` 注解即可, `DalaranTrigger` 接口如下.
+编写一个触发器, 和编写处理器非常相似, 只需要实现 `DalaranTrigger` 接口, 并标记 `@Trigger` 注解即可, `DalaranTrigger` 接口如下.
 
 ```java
-public interface DalaranTrigger<T> {
-    String buildRouterUri(T config);
+public interface DalaranTrigger<T> extends DalaranComponent {
+    void buildFromRoute(RouteDefinition route, T config);
 }
 ```
 
-接口中只有一个 buildRouterUri 方法, 会传入该接口声明的配置实例, 在实现方法内返回 `Camel from uri` 即可.
+接口中只有一个 buildFromRoute 方法, 会传入该接口声明的配置实例, 在实现方法内返回 `Camel from uri` 即可.
 
-下面例子为接收 Dubbo 请求的 `http-provider`, 本质上是在配置过程中, 声明了 `dubbo` 的 `component`, 以及相关配置, 最后返回 `Camel uri`:
-
+下面例子为接收 Dubbo 请求的 `http-listener`, 本质上是在配置过程中, 声明了 `netty4-http` 的 `component`, 以及相关配置, 最后返回 `Camel uri`:
 
 ```java
-@DalaranComponent(value = "dubbo-provider", configType = DubboProviderConfig.class)
-public class DalaranDubboProvider implements DalaranTrigger<DubboProviderConfig> {
+@Trigger(
+        value = "netty-http-listener",
+        configType = NettyHttpConfig.class,
+        allowBodyTypes = {BodyType.JSON, BodyType.XML},
+        inputSerializeType = BodySerializeType.Serialized,
+        outputSerializeType = BodySerializeType.Serialized
+)
+public class NettyHttpListener implements DalaranTrigger<NettyHttpConfig> {
 
-    private static final String DUBBO_PROVIDER_URI = "dubbo:?registryAddress=%s&serviceId=%s&method=%s&version=%s";
-
-    public String buildRouterUri(DubboProviderConfig config) {
-        return String.format(DUBBO_PROVIDER_URI, config.getRegistryAddress(), config.getServiceId(), config.getMethod(), config.getVersion());
+    @Override
+    public void buildFromRoute(RouteDefinition route, NettyHttpConfig config) {
+        String uri = "netty4-http:" + config.getProtocol().name().toLowerCase() +
+                "://0.0.0.0:" + config.getPort() + config.getPath() +
+                "?httpMethodRestrict=" + config.getMethod();
+        route.from(uri);
+        if (config.getMethod().isNoBody()) {
+            route.process(new QueryStringProcessor());
+        } else {
+            // TODO Stream to string
+            route.convertBodyTo(String.class);
+        }
     }
 }
 ```
+
+> `inputSerializeType` 和 `outputSerializeType` 是集成平台封装的模型转换声明, 具体详见 [模型](./model.md)
 
 > 理论上不存在无配置触发器, 所以不提供无配置触发器接口.
 

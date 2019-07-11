@@ -9,9 +9,9 @@ String, Integer, Long 等常用类型直接生成对用输入框, 实现了 Dala
 
 ## 界面示意
 
-![](./docs/images/flow-design.jpg)
+![](../images/flow-design.jpg)
 
-![](./docs/images/flow-config.jpg)
+![](../docs/images/flow-config.jpg)
 
 ## 录入模式
 

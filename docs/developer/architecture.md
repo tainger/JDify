@@ -10,27 +10,16 @@ Camel 提供了一系列集成向的 Component, 另外还有一套成熟的路�
 
 > Apache Camel 基于 Apache License 2.0 授权协议, 商业友好.
 
-### 核心概念
-
-> 我们可以认为所有的集成动作, 都是一个可以编排的流程, 即有明确的开始方式, 明确的执行路径和结果声明.
-
-* Flow (集成流程): 即集成动作的编排流程, 指从集成事件触发, 到所有集成动作完成的整体过程编排, 一般描述了整体的集成逻辑.
-* Trigger (触发器): 提供触发集成的服务, 一切集成流程的起点, 如监听 Http 请求, 定时触发, 消费消息等, 详见 触发器章节.
-* Processor (处理器): 具体执行集成的逻辑动作, 如参数转换, Rest 调用, 读取数据等等, 详见 处理器章节.
-* Message (集成消息): 集成流程节点间传递的内容, 我们称之为 Message, 一般带有固定格式, 以 Model 为结构描述.
-* Model (模型): 即 MessageModel, 描述了消息的结构化模型, 数据映射转换也是基于模型处理. 如果有 MDD 开发框架或平台, 可以考虑直接拉取过来.
-
-Flow 示意图, 其中蓝色节点为 Trigger, 白色节点为 Processor:
-
-![](../images/flow.jpg)
-
 ### 可扩展设计
+
+> 开发集成平台的触发器与处理器, 需要对 `Camel` 有一定了解, 可以查看[Camel Java DSL](http://camel.apache.org/java-dsl.html) 和 [Camel Component](http://camel.apache.org/components.html)
 
 本产品最核心的可扩展点在于 `触发器` 和 `处理器`, 因为我们设计上都是基于 Camel 进行封装开发, 所以本质上 `触发器/处理器` 都是 Camel 中的 DSL 配置过程.
 
-> 具体开发细节可以参考 [如何编写处理器](./writing-processor.md) 和 [如何编写触发器](./writing-trigger.md).
+具体开发细节可以参考 [如何编写处理器](./writing-processor.md) 和 [如何编写触发器](./writing-trigger.md).
 
-如果现有的 Camel component 不能满足需求, 可以自行定制 camel component, 在新的 trigger/processor 内加入其依赖即可, 如我们自行编写的 `Dubbo Component`:
+
+如果现有的 Camel component 不能满足需求, 可以自行定制 camel component, 在新的 trigger/processor 内加入其依赖即可, 如我们自行编写的 `Dubbo Component` 和 `RocketMQ Component`:
 
 > camel component 的编写标准详见[Writing Camel components](http://camel.apache.org/writing-components.html)
 
@@ -38,70 +27,21 @@ Flow 示意图, 其中蓝色节点为 Trigger, 白色节点为 Processor:
 
 ![](../images/xmind.jpg)
 
-### 核心类图
+### 核心类图 (待更新)
 
 ![](../images/core-class.jpg)
 
 ### 核心逻辑
 
 ```sequence
-Dalaran -> DalaranComponentLoader: 加载所有触发器和处理器
-Dalaran -> DalaranFlowLoader: 加载所有集成流程
-DalaranFlowLoader -> CamelRouteBuilder: 转化为 Camel Java DSL
-CamelRouteBuilder -> DalaranComponentLoader: 过程中拉取所需触发器和处理器
-CamelRouteBuilder -> DalaranFlowLoader: 注册并生效
+DalaranStarter -> DalaranComponentLoader: 加载所有触发器和处理器
+DalaranStarter -> FlowInitializer: 初始化容器
+Note right of ResourceLoader: ResourceLoader 有 Console \n 和 Released 两个实现
+FlowInitializer -> ResourceLoader: 加载所有集成流/连接器/模型等
+FlowInitializer -> ResourceBuilder: 将加载的资源 Entity 转为通用配置模型
+FlowInitializer -> DalaranContext: 构建加载集成流
+DalaranContext -> DalaranFlowBuilder: 构建为 Camel DSL 的 Route 实例
+DalaranContext -> DalaranStarter: 加载 Camel Route 并生效
 ```
 
 ![](../images/startup-flow.jpg)
-
-### 核心组件
-
-* 触发器:
-    * Timer
-    * Http listener
-    * SOAP listener ?
-    * Dubbo provider ?
-* 处理器:
-    * Http client
-    * ReTry
-    * Delayer
-    * Mapper: 提供基本映射, mapping function 下版提供
-    * SOAP client: [Camel soap](http://camel.apache.org/soap.html)
-    * Scatter-Gather: 分别执行后聚合, 可以做接口聚合等操作
-    * Dubbo consumer ?
-
-> 视东购项目需求调整优先级
-
-### 二期组件
-
-* 触发器:
-    * RocketMQ consumer
-    * Kafka consumer
-* 处理器:
-    * SAP HANA client
-    * Exception
-    * Router
-    * Loop
-    * Async: 异步执行
-    * Mapping function
-    * Database read
-    * Database write
-    * Script: 脚本语言还未定, 大概率 Java 或者 JS
-    * Cache
-    * Dynamic Router
-    * RocketMQ producer
-    * Kafka producer
-
-### 后期组件
-
-* 处理器:
-    * Oracle CRM
-    * Oracle E-Business
-    * Salesforce
-
-### 可能不需要的组件
-
-* 处理器:
-    * Filter
-    * Sequencer
-    * Splitter:
