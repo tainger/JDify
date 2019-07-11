@@ -30,9 +30,12 @@
 
 ![](./docs/images/architecture.jpg)
 
+## 基本概念
+
+* [概述](./docs/overview.md)
+
 ## 用户手册
 
-* [概述](./docs/user/overview.md)
 * [快速开始](./docs/user/quick-start.md)
 * [高级功能](./docs/user/other.md)
 * [常见问题](./docs/user/Q&A.md)
@@ -41,15 +44,12 @@
 
 * [架构介绍](./docs/developer/architecture.md)
 * [模块说明](./docs/developer/module.md)
-* [集成流程](./docs/developer/flow.md)
-* [流程设计器配置](./docs/developer/flow-design.md)
-* [接口设计](./docs/developer/api-design.md)
+* [模型](./docs/developer/model.md)
 * [触发器开发](./docs/developer/writing-trigger.md)
 * [处理器开发](./docs/developer/writing-processor.md)
-* [模型](./docs/developer/model.md)
 * [发布](./docs/developer/publish.md)
 * [监控](./docs/developer/monitor.md)
-* [开发计划](./docs/developer/develop-plan.md)
+* [流程设计器配置](./docs/developer/flow-design.md)
 * [其他](./docs/developer/other.md)
 
 ## 管理员手册

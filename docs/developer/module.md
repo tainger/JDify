@@ -5,4 +5,3 @@
 * core: dalaran 核心库, 只负责将数据转化为可运行的 Camel route, 集成组件的加载, 输入加载等统统不关心
 * runtime: Dalaran 的运行容器, 负责加载数据, 通过 core 完成集成配置的初始化和运行
 * console: Dalaran 控制台, 提供可视化配置集成数据的相关接口
-* common: 运行容器与控制台公用的部分, 主要是核心模型和 Repository 方法
