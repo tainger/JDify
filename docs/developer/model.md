@@ -4,9 +4,9 @@
 
 ## 模型类型
 
-目前已经支持的有 `Json`, `Object`, `XML` 三种.
+目前已经支持的有 `Json`, `Object`, `XML`, `Soap` 四种.
 
-如果集成过程中, 让用户关心格式的话, 就会出现一些额外的操作. 我们以一个 Json 接口调用外部 XML 接口为例:
+如果集成过程中, 让用户关心格式的话, 就会出现一些额外的操作. 我们以一个 Json 接口调用外部 Soap 接口为例:
 
 > 基本流程:
 接口 A -> 
@@ -19,9 +19,9 @@ Mapper(B 出参 转 A 出参) ->
 接口 A -> 
 `Json 转 Object` -> 
 Mapper(A 入参 转 B 入参) -> 
-`Object 转 XML` -> 
+`Object 转 Soap` -> 
 接口 B -> 
-`XML 转 Object` -> 
+`Soap 转 Object` -> 
 Mapper(B 出参 转 A 出参) -> 
 `Object 转 Json` -> 
 返回
@@ -39,7 +39,7 @@ public enum BodySerializeType {
 ```
 
 通过枚举值也比较好理解, 就是组件会声明, 自己是接受 Object 还是 序列化的类型, 亦或是都可以. 
-序列化的类型目前泛指除了 Object 之外的其他类型, 比如 `Json`, `XML` 等.
+序列化的类型目前泛指除了 Object 之外的其他类型, 比如 `Json`, `XML`, `Soap` 等.
 
 在流程构建时, 由触发器和处理器形成了一个流, 可以认为是一个单向链表或者是树. 
 除了起始节点(根节点)外, 都会有一个前节点(父节点), 节点都会声明入参类型和出参类型, 所以我们就可以根据声明来做自动的序列化和反序列化.
@@ -58,11 +58,11 @@ Mapper (in:Object, out:Object) ->
 
 Trigger in: Json (`Serialized`) -> Mapper in: Object: (`Object`)
 
-Mapper out: Object: (`Object`) -> Soap Client in: XML (`Serialized`)
+Mapper out: Object: (`Object`) -> Soap Client in: Soap (`Serialized`)
 
-Soap Client out: XML (`Serialized`) -> Mapper in: Object: (`Object`)
+Soap Client out: Soap (`Serialized`) -> Mapper in: Object: (`Object`)
 
-Mapper out: Object: (`Object`) -> Trigger out: XML (`Serialized`)
+Mapper out: Object: (`Object`) -> Trigger out: Soap (`Serialized`)
 
 这样, 过程中的格式转换的问题, 就交给了组件声明, 而不是用户配置.
 
@@ -70,6 +70,19 @@ Mapper out: Object: (`Object`) -> Trigger out: XML (`Serialized`)
 
 Trigger 和 Processor 的注解上, 除了 出入序列化类型之外, 还有一个 `allowBodyTypes` 配置, 类型是 BodyType[], 该参数声明了组件能够接收什么样的参数类型.
 
-比如上文提到的 Rest Trigger, 就只能接受 Json 类型的模型, 选择时其他类型的模型会被屏蔽. 而 Soap Client 只支持 XML 类型.
+比如上文提到的 Rest Trigger, 就只能接受 Json 类型的模型, 选择时其他类型的模型会被屏蔽. 而 Soap Client 只支持 Soap 类型.
 
 如此一来, 用户配置的过程会根据组件要求的模型类型受到一些限制, 减少配置过程的干扰.
+
+## 模型类型的扩展
+
+模型是可以被扩展的, 目前没有做成注册机制, 但是只需要增加一个 `BodyType` 的枚举项, 并且完成对应转换器的实现即可. 转换器的接口声明如下:
+
+```java
+public interface DalaranConverter<Schema extends DalaranModelSchema> {
+    void toObject(ProcessorDefinition route, Schema schema);
+    void fromObject(ProcessorDefinition route, Schema schema);
+}
+```
+
+转换器就是负责将序列化对象转为 Object, 或者 Object 转为序列化对象的实现. 实现之后, 加入 `DalaranConverterContext` 就完成了转换器的注册.
