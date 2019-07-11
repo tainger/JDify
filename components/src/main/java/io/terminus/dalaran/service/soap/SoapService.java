@@ -55,7 +55,7 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
         String portType = keys[0];
         String operationName = keys[1];
         for (SoapOperationConfig operationConfig: configs) {
-            if (StringUtils.equalsIgnoreCase(operationConfig.getPortType(), portType) && StringUtils.equalsIgnoreCase(operationConfig.getName(), operationName)) {
+            if (StringUtils.equalsIgnoreCase(operationConfig.getPortType(), portType) && StringUtils.equalsIgnoreCase(operationConfig.getOperation(), operationName)) {
                 return operationConfig;
             }
         }
@@ -65,7 +65,7 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
     @Override
     public List<String> operations(SoapServiceConfig soapServiceConfig) {
         return soapServiceConfig.getConfigs().stream()
-                .map(config -> config.getPortType() + OPERATION_SPLIT + config.getName())
+                .map(config -> config.getPortType() + OPERATION_SPLIT + config.getOperation())
                 .collect(Collectors.toList());
     }
 
@@ -92,7 +92,7 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
                 schemaOperation.setBinding(bindingName);
                 operationConfig.setBinding(bindingName);
                 schemaOperation.setName(operationName);
-                operationConfig.setName(operationName);
+                operationConfig.setOperation(operationName);
 
                 String inputName = soapOperation.getInput();
                 String outputName = soapOperation.getOutput();
