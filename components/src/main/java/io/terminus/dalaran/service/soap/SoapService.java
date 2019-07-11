@@ -50,7 +50,7 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
 
     @Override
     public SoapOperationConfig getOperationConfig(SoapServiceConfig soapServiceConfig, @NotNull String operationKey) {
-        List<SoapOperationConfig> configs = soapServiceConfig.getSoapOperations();
+        List<SoapOperationConfig> configs = soapServiceConfig.getConfigs();
         String[] keys = operationKey.split(OPERATION_SPLIT);
         String portType = keys[0];
         String operationName = keys[1];
@@ -64,7 +64,7 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
 
     @Override
     public List<String> operations(SoapServiceConfig soapServiceConfig) {
-        return soapServiceConfig.getSoapOperations().stream()
+        return soapServiceConfig.getConfigs().stream()
                 .map(config -> config.getPortType() + OPERATION_SPLIT + config.getName())
                 .collect(Collectors.toList());
     }
@@ -90,8 +90,9 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
                 SoapOperation soapOperation = operationMap.get(portType + ":" + operationName);
 
                 schemaOperation.setBinding(bindingName);
-                operationConfig.setName(operationName);
+                operationConfig.setBinding(bindingName);
                 schemaOperation.setName(operationName);
+                operationConfig.setName(operationName);
 
                 String inputName = soapOperation.getInput();
                 String outputName = soapOperation.getOutput();
@@ -116,7 +117,7 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
                 soapOperations.add(operationConfig);
             });
         });
-        serviceConfig.setSoapOperations(soapOperations);
+        serviceConfig.setConfigs(soapOperations);
         serviceConfig.setWsdl(wsdl);
         return serviceConfig;
     }

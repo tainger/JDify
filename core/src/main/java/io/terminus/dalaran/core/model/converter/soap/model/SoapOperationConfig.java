@@ -17,4 +17,6 @@ public class SoapOperationConfig extends ServiceOperation {
     private String baseUrl;
 
     private HttpProtocol protocol;
+
+    private String binding;
 }
