@@ -34,13 +34,14 @@ Camel 提供了一系列集成向的 Component, 另外还有一套成熟的路�
 ### 核心逻辑
 
 ```sequence
-Dalaran -> Dalaran: 加载所有触发器和处理器
-Dalaran -> FlowInitializer: 初始化容器
+DalaranStarter -> DalaranComponentLoader: 加载所有触发器和处理器
+DalaranStarter -> FlowInitializer: 初始化容器
+Note right of ResourceLoader: ResourceLoader 有 Console \n 和 Released 两个实现
 FlowInitializer -> ResourceLoader: 加载所有集成流/连接器/模型等
 FlowInitializer -> ResourceBuilder: 将加载的资源 Entity 转为通用配置模型
 FlowInitializer -> DalaranContext: 构建加载集成流
 DalaranContext -> DalaranFlowBuilder: 构建为 Camel DSL 的 Route 实例
-DalaranContext -> Dalaran: 注册并生效
+DalaranContext -> DalaranStarter: 加载 Camel Route 并生效
 ```
 
 ![](../images/startup-flow.jpg)
