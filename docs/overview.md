@@ -29,7 +29,7 @@
 
 我们把这个过程以流程化的方式来表达, 就会得到下图:
 
-![basic-flow](../images/basic-flow.jpg)
+![basic-flow](./images/basic-flow.jpg)
 
 当然, 如果有一些更复杂的处理, 代码中增加逻辑, 在流程化的图中, 也可以明确的加入具体逻辑节点来标识.
 
