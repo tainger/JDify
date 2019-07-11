@@ -13,5 +13,5 @@ public class SoapServiceConfig {
 
     private String wsdl;
 
-    private List<SoapOperationConfig> soapOperations;
+    private List<SoapOperationConfig> configs;
 }

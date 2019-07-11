@@ -10,11 +10,13 @@ import lombok.Data;
 @Data
 public class SoapOperationConfig extends ServiceOperation {
 
-    private String name;
+    private String operation;
 
     private String portType;
 
     private String baseUrl;
 
     private HttpProtocol protocol;
+
+    private String binding;
 }
