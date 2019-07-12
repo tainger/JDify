@@ -1,13 +1,7 @@
 package io.terminus.dalaran.core.spring;
 
-import io.terminus.dalaran.core.context.DalaranComponentContext;
-import io.terminus.dalaran.core.context.DalaranContext;
-import io.terminus.dalaran.core.context.DalaranConverterContext;
-import io.terminus.dalaran.core.context.DalaranServiceContext;
-import io.terminus.dalaran.core.context.support.DefaultDalaranCamelContext;
-import io.terminus.dalaran.core.context.support.DefaultDalaranComponentContext;
-import io.terminus.dalaran.core.context.support.DefaultDalaranConverterContext;
-import io.terminus.dalaran.core.context.support.DefaultDalaranServiceContext;
+import io.terminus.dalaran.core.context.*;
+import io.terminus.dalaran.core.context.support.*;
 import io.terminus.dalaran.core.flow.DalaranFlowBuilder;
 import io.terminus.dalaran.core.flow.DefaultCamelFlowBuilder;
 import io.terminus.dalaran.core.log.DalaranTraceLogger;
@@ -45,11 +39,12 @@ public class DalaranAutoConfiguration {
     public DalaranContext dalaranContext(
             DalaranConverterContext converterContext,
             DalaranComponentContext componentContext,
+            DalaranFunctionContext functionContext,
             DalaranServiceContext serviceContext,
             DalaranFlowBuilder flowBuilder,
             CamelContext camelContext
     ) {
-        return new DefaultDalaranCamelContext(camelContext, converterContext, componentContext, serviceContext, flowBuilder);
+        return new DefaultDalaranCamelContext(camelContext, converterContext, componentContext, functionContext, serviceContext, flowBuilder);
     }
 
     @Bean
@@ -63,13 +58,18 @@ public class DalaranAutoConfiguration {
     }
 
     @Bean("component-loader")
-    public BeanPostProcessor beanPostProcessor(DalaranComponentContext dalaranComponentContext) {
-        return new DalaranComponentLoader(dalaranComponentContext);
+    public BeanPostProcessor beanPostProcessor(DalaranComponentContext dalaranComponentContext, DalaranFunctionContext dalaranFunctionContext) {
+        return new DalaranComponentLoader(dalaranComponentContext, dalaranFunctionContext);
     }
 
     @Bean
     public DalaranComponentContext dalaranComponentContext() {
         return new DefaultDalaranComponentContext();
+    }
+
+    @Bean
+    public DalaranFunctionContext dalaranFunctionContext() {
+        return new DefaultDalaranFunctionContext();
     }
 
     @Bean
