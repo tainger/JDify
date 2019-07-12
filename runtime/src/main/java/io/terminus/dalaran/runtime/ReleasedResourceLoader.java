@@ -1,6 +1,7 @@
 package io.terminus.dalaran.runtime;
 
 import io.terminus.dalaran.core.resource.DalaranResourceLoader;
+import io.terminus.dalaran.core.resource.entity.FunctionAbstractEntity;
 import io.terminus.dalaran.core.resource.entity.released.*;
 import io.terminus.dalaran.core.resource.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +30,9 @@ public class ReleasedResourceLoader implements DalaranResourceLoader {
     @Autowired
     private ServiceReleasedRepository serviceRepository;
 
+    @Autowired
+    private FunctionReleasedRepository functionRepository;
+
     @Override
     public List<TriggerFlowReleasedEntity> loadAllTriggerFlow() {
         return releasedTriggerFlowRepository.findByVersion(version);
@@ -42,6 +46,11 @@ public class ReleasedResourceLoader implements DalaranResourceLoader {
     @Override
     public List<PropertyReleasedEntity> loadAllProperties() {
         return propertyRepository.findByVersion(version);
+    }
+
+    @Override
+    public List<FunctionReleasedEntity> loadAllFunctions() {
+        return functionRepository.findByVersion(version);
     }
 
     @Override

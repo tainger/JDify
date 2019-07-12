@@ -12,6 +12,8 @@ public interface DalaranResourceLoader {
 
     List<? extends PropertyAbstractEntity> loadAllProperties();
 
+    List<? extends FunctionAbstractEntity> loadAllFunctions();
+
     TriggerFlowAbstractEntity loadTriggerFlow(Long triggerFlowId);
 
     SubFlowAbstractEntity loadSubFlow(Long subFlowId);

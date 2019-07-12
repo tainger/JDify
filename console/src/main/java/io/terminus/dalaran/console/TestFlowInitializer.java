@@ -1,5 +1,6 @@
 package io.terminus.dalaran.console;
 
+import io.terminus.dalaran.console.entity.FunctionEntity;
 import io.terminus.dalaran.console.entity.SubFlowEntity;
 import io.terminus.dalaran.console.entity.TriggerFlowEntity;
 import io.terminus.dalaran.core.context.DalaranContext;
@@ -75,6 +76,10 @@ public class TestFlowInitializer {
                     } else {
                         log.info("can't load test sub-flow [{}], because has error.", subFlowEntity.getId());
                     }
+                }
+                List<FunctionEntity> functions = resourceLoader.loadAllFunctions();
+                for (FunctionEntity function : functions) {
+                    dalaranContext.getDalaranFunctionContext().addCustomFunction(function.getId(), function.getScript());
                 }
             }
         }, 10 * 1000L);
