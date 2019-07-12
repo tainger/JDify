@@ -1,6 +1,10 @@
 package io.terminus.dalaran.core.model.function;
 
+import com.alibaba.fastjson.annotation.JSONField;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
+
+import java.lang.reflect.Method;
 
 @Data
 public class MappingFunctionInfo {
@@ -9,4 +13,12 @@ public class MappingFunctionInfo {
     private String description;
 
     private String[] params;
+
+    @JSONField(serialize = false)
+    @JsonIgnore
+    private Object bean;
+
+    @JSONField(serialize = false)
+    @JsonIgnore
+    private Method method;
 }
