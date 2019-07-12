@@ -6,6 +6,7 @@ import io.terminus.dalaran.core.flow.model.SubFlow;
 import io.terminus.dalaran.core.flow.model.TriggerFlow;
 import io.terminus.dalaran.core.resource.DalaranResourceBuilder;
 import io.terminus.dalaran.core.resource.entity.common.ReleaseRecordEntity;
+import io.terminus.dalaran.core.resource.entity.released.FunctionReleasedEntity;
 import io.terminus.dalaran.core.resource.entity.released.SubFlowReleasedEntity;
 import io.terminus.dalaran.core.resource.entity.released.TriggerFlowReleasedEntity;
 import io.terminus.dalaran.core.resource.repository.ReleaseRecordRepository;
@@ -63,6 +64,11 @@ public class ReleasedFlowInitializer {
                 } else {
                     log.info("can't load sub-flow [{}], because has error.", subFlowEntity.getId());
                 }
+            }
+
+            List<FunctionReleasedEntity> functions = resourceLoader.loadAllFunctions();
+            for (FunctionReleasedEntity function : functions) {
+                dalaranContext.getDalaranFunctionContext().addCustomFunction(function.getId(), function.getScript());
             }
         }
     }
