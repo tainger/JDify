@@ -7,9 +7,9 @@ import io.terminus.dalaran.core.component.annotation.MappingFunction;
 @MappingFunction(value = "ToJson", description = "将入参转换为 Json 格式")
 public class ToJsonFunction {
 
-    private static final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
-    public static Object execute(Object object) throws JsonProcessingException {
+    public Object execute(Object object) throws JsonProcessingException {
         return objectMapper.writeValueAsString(object);
     }
 }

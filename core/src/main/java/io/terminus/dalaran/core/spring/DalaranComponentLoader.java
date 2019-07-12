@@ -42,7 +42,7 @@ public class DalaranComponentLoader implements BeanPostProcessor {
                 }
             }
             if (method != null) {
-                functionContext.addStaticFunction(mappingFunction.value(), mappingFunction.description(), method);
+                functionContext.addStaticFunction(mappingFunction.value(), mappingFunction.description(), bean, method);
             }
             // TODO else throw
         }

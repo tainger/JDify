@@ -14,16 +14,19 @@ import java.util.*;
 
 public class DefaultDalaranFunctionContext implements DalaranFunctionContext {
 
-    private final Map<String, Method> staticFunctions = new HashMap<>();
     private final Map<String, MappingFunctionInfo> functionInfoMapper = new HashMap<>();
 
     private final Map<Long, Invocable> scriptFunctions = new HashMap<>();
 
     @Override
     public Object executeStaticFunction(String functionKey, Object[] params) {
-        Method method = staticFunctions.get(functionKey);
+        MappingFunctionInfo functionInfo = functionInfoMapper.get(functionKey);
+        if (functionInfo == null) {
+            // TODO throw function not found
+            return null;
+        }
         try {
-            return method.invoke(null, params);
+            return functionInfo.getMethod().invoke(functionInfo.getBean(), params);
         } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
             // TODO throw function execute error
@@ -43,12 +46,12 @@ public class DefaultDalaranFunctionContext implements DalaranFunctionContext {
     }
 
     @Override
-    public void addStaticFunction(String key, String desc, Method method) {
-        staticFunctions.put(key, method);
-
+    public void addStaticFunction(String key, String desc, Object bean, Method method) {
         MappingFunctionInfo functionInfo = new MappingFunctionInfo();
         functionInfo.setKey(key);
         functionInfo.setDescription(desc);
+        functionInfo.setBean(bean);
+        functionInfo.setMethod(method);
         LocalVariableTableParameterNameDiscoverer u = new LocalVariableTableParameterNameDiscoverer();
         functionInfo.setParams(u.getParameterNames(method));
         functionInfoMapper.put(key, functionInfo);
