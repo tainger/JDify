@@ -10,6 +10,7 @@ import io.terminus.dalaran.core.config.ProcessorInfo;
 import io.terminus.dalaran.core.config.ServiceInfo;
 import io.terminus.dalaran.core.config.TriggerInfo;
 import io.terminus.dalaran.core.context.DalaranContext;
+import io.terminus.dalaran.core.model.function.MappingFunctionInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -60,6 +61,18 @@ public class PlatformRest {
     @GetMapping(value = "/trigger")
     private Collection<TriggerInfo> listTriggerInfo() {
         return dalaranContext.getDalaranComponentContext().getAllTriggerInfo();
+    }
+
+    @ApiOperation(value = "获取静态 MappingFunction 信息")
+    @GetMapping(value = "/mappingFunctions")
+    private Collection<MappingFunctionInfo> mappingFunctions() {
+        return dalaranContext.getDalaranFunctionContext().allFunctionInfo();
+    }
+
+    @ApiOperation(value = "获取静态 MappingFunction 信息")
+    @GetMapping(value = "/testMappingFunctions")
+    private Object testMappingFunctions() {
+        return dalaranContext.getDalaranFunctionContext().executeStaticFunction("ToJson", new Object[]{dalaranContext.getDalaranFunctionContext().allFunctionInfo()});
     }
 
     @ApiOperation(value = "获取连接器配置结构")
