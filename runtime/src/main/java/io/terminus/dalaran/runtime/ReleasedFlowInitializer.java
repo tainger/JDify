@@ -68,7 +68,8 @@ public class ReleasedFlowInitializer {
 
             List<FunctionReleasedEntity> functions = resourceLoader.loadAllFunctions();
             for (FunctionReleasedEntity function : functions) {
-                dalaranContext.getDalaranFunctionContext().addCustomFunction(function.getId(), function.getScript());
+                dalaranContext.getDalaranFunctionContext().addCustomFunction(function.getId(), function.getType(),
+                        function.getScript(), function.getParams());
             }
         }
     }

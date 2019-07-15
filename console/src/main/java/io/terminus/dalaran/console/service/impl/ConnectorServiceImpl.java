@@ -60,7 +60,7 @@ public class ConnectorServiceImpl implements ConnectorService {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<BasicConnectorInfo> criteriaQuery = builder.createQuery(BasicConnectorInfo.class);
         Root<ConnectorEntity> root = criteriaQuery.from(ConnectorEntity.class);
-        criteriaQuery.multiselect(root.get("id"), root.get("name"), root.get("description"), root.get("params"))
+        criteriaQuery.multiselect(root.get("id"), root.get("moduleId"), root.get("name"), root.get("componentType"), root.get("componentName"))
                 .where(builder.equal(root.get("moduleId"), moduleId));
         return entityManager.createQuery(criteriaQuery).getResultList();
     }
