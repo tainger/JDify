@@ -75,6 +75,13 @@ public class PlatformRest {
         return dalaranContext.getDalaranFunctionContext().executeStaticFunction("ToJson", new Object[]{dalaranContext.getDalaranFunctionContext().allFunctionInfo()});
     }
 
+
+    @ApiOperation(value = "获取静态 MappingFunction 信息")
+    @GetMapping(value = "/testMappingFunctions2")
+    private Object testMappingFunctions2() {
+        return dalaranContext.getDalaranFunctionContext().executeCustomFunction(1L, new Object[]{"myName"});
+    }
+
     @ApiOperation(value = "获取连接器配置结构")
     @GetMapping(value = "/connector")
     private Collection<ConnectorInfo> listConnectorInfo() {

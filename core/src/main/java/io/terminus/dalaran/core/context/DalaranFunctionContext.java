@@ -1,9 +1,11 @@
 package io.terminus.dalaran.core.context;
 
 import io.terminus.dalaran.core.model.function.MappingFunctionInfo;
+import io.terminus.dalaran.core.model.function.MappingFunctionType;
 
 import java.lang.reflect.Method;
 import java.util.Collection;
+import java.util.List;
 
 public interface DalaranFunctionContext {
 
@@ -13,7 +15,7 @@ public interface DalaranFunctionContext {
 
     void addStaticFunction(String key, String desc, Object bean, Method method);
 
-    void addCustomFunction(Long id, String script);
+    void addCustomFunction(Long id, MappingFunctionType type, String script, List<String> params);
 
     Collection<MappingFunctionInfo> allFunctionInfo();
 

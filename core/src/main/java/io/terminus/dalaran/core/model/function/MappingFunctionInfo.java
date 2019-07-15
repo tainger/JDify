@@ -11,6 +11,7 @@ public class MappingFunctionInfo {
 
     private String key;
     private String description;
+    private MappingFunctionType type;
 
     private String[] params;
 

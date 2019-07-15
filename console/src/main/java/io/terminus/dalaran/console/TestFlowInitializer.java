@@ -79,7 +79,8 @@ public class TestFlowInitializer {
                 }
                 List<FunctionEntity> functions = resourceLoader.loadAllFunctions();
                 for (FunctionEntity function : functions) {
-                    dalaranContext.getDalaranFunctionContext().addCustomFunction(function.getId(), function.getScript());
+                    dalaranContext.getDalaranFunctionContext().addCustomFunction(function.getId(), function.getType(),
+                            function.getScript(), function.getParams());
                 }
             }
         }, 10 * 1000L);
