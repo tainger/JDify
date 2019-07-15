@@ -16,7 +16,7 @@ public class ListToJsonConverter implements AttributeConverter<List, String> {
 
     @Override
     public List convertToEntityAttribute(String dbData) {
-        Type type = new TypeReference<List<Long>>() {
+        Type type = new TypeReference<List>() {
         }.getType();
         return JSON.parseObject(dbData, type);
     }

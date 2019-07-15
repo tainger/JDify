@@ -42,6 +42,9 @@ public class ModuleManagementServiceImpl implements ModuleManagementService {
     private ConnectorService connectorService;
 
     @Autowired
+    private FunctionService functionService;
+
+    @Autowired
     private ServiceManagement serviceManagement;
 
     @Override
@@ -101,6 +104,7 @@ public class ModuleManagementServiceImpl implements ModuleManagementService {
         moduleDetail.setModels(modelManagementService.listBasicInfoByModuleId(moduleId));
         moduleDetail.setConnectors(connectorService.listBasicInfoByModuleId(moduleId));
         moduleDetail.setServices(serviceManagement.listBasicInfoByModuleId(moduleId));
+        moduleDetail.setFunctions(functionService.listBasicInfoByModuleId(moduleId));
         return moduleDetail;
     }
 

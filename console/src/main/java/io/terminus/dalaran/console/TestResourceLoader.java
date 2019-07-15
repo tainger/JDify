@@ -4,6 +4,7 @@ import io.terminus.dalaran.console.entity.*;
 import io.terminus.dalaran.console.repository.*;
 import io.terminus.dalaran.core.context.DalaranContext;
 import io.terminus.dalaran.core.resource.DalaranResourceLoader;
+import io.terminus.dalaran.core.resource.entity.FunctionAbstractEntity;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -31,6 +32,9 @@ public class TestResourceLoader implements DalaranResourceLoader {
     private ServiceRepository serviceRepository;
 
     @Autowired
+    private FunctionRepository functionRepository;
+
+    @Autowired
     private DalaranContext dalaranContext;
 
     @Override
@@ -46,6 +50,11 @@ public class TestResourceLoader implements DalaranResourceLoader {
     @Override
     public List<PropertyEntity> loadAllProperties() {
         return propertyRepository.findAll();
+    }
+
+    @Override
+    public List<FunctionEntity> loadAllFunctions() {
+        return functionRepository.findAll();
     }
 
     @Override
