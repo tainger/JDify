@@ -81,6 +81,8 @@ public class ConnectorServiceImpl implements ConnectorService {
         ConnectorDTO dto = new ConnectorDTO();
         dto.setId(entity.getId());
         dto.setName(entity.getName());
+        dto.setComponentType(entity.getComponentType());
+        dto.setComponentName(entity.getComponentName());
         dto.setDescription(entity.getDescription());
         dto.setModuleId(entity.getModuleId());
         dto.setConfig(JSON.parseObject(entity.getConfig(), Map.class));
