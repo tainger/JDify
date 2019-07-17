@@ -233,12 +233,19 @@ public class ModelManagementServiceImpl implements ModelManagementService {
             modelField.setType(FieldType.ARRAY);
             JSONArray jsonArray = (JSONArray) body;
             if (CollectionUtils.isNotEmpty(jsonArray)) {
-                Object element = jsonArray.get(0);
-                String elementType = element.getClass().getTypeName();
-                modelField.setSubType(getFiledType(elementType));
-                if (isComplexType(elementType) && elementType.equalsIgnoreCase(DalaranConsoleConstants.JSON_OBJECT)) {
-                    buildChildren(element, child);
-                }
+//                Object element = jsonArray.get(0);
+//                String elementType = element.getClass().getTypeName();
+//                modelField.setSubType(getFiledType(elementType));
+//                if (isComplexType(elementType) && elementType.equalsIgnoreCase(DalaranConsoleConstants.JSON_OBJECT)) {
+//                    buildChildren(element, child);
+//                }
+                jsonArray.forEach(element -> {
+                    String elementType = element.getClass().getTypeName();
+                    modelField.setSubType(getFiledType(elementType));
+                    if (isComplexType(elementType) && elementType.equalsIgnoreCase(DalaranConsoleConstants.JSON_OBJECT)) {
+                        buildChildren(element, child);
+                    }
+                });
             }
         }
     }
@@ -248,11 +255,14 @@ public class ModelManagementServiceImpl implements ModelManagementService {
         jsonObject.forEach((name, value) -> {
             ModelField field = new ModelField();
             child.put(name, field);
-            String fileType = value.getClass().getTypeName();
-            if (!isComplexType(fileType)) {
-                field.setType(getFiledType(fileType));
+            if (value != null) {
+                String fileType = value.getClass().getTypeName();
+                if (!isComplexType(fileType)) {
+                    field.setType(getFiledType(fileType));
+                } else {
+                    buildModel(value, fileType, field);
+                }
             }
-            buildModel(value, fileType, field);
         });
     }
 

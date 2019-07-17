@@ -53,6 +53,10 @@ public class DalaranMapperProcessor implements Processor, Traceable {
         return destinationContext.getContextBean();
     }
 
+//    private Object convertByJsonPath(Map<String, MappingField> messageMapping, Object targetBody) {
+//
+//    }
+
     private Object convert(Map<String, MappingField> messageMapping, Object targetBody) {
         JXPathContext targetContext = JXPathContext.newContext(targetBody);
         Map<String, Object> destinationBody = new HashMap<>();
