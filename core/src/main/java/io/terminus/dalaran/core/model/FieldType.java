@@ -9,7 +9,7 @@ public enum FieldType {
     private boolean basicType;
 
     FieldType() {
-        this.basicType = true;
+        this(true);
     }
 
     FieldType(boolean basicType) {
