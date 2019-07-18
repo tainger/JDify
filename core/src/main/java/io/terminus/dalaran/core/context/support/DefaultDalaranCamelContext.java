@@ -1,10 +1,7 @@
 package io.terminus.dalaran.core.context.support;
 
 import io.terminus.dalaran.core.DalaranConstants;
-import io.terminus.dalaran.core.context.DalaranComponentContext;
-import io.terminus.dalaran.core.context.DalaranContext;
-import io.terminus.dalaran.core.context.DalaranConverterContext;
-import io.terminus.dalaran.core.context.DalaranServiceContext;
+import io.terminus.dalaran.core.context.*;
 import io.terminus.dalaran.core.flow.DalaranFlowBuilder;
 import io.terminus.dalaran.core.flow.DalaranRoute;
 import io.terminus.dalaran.core.flow.model.BasicFlow;
@@ -28,12 +25,14 @@ public class DefaultDalaranCamelContext implements DalaranContext<DalaranRoute> 
     private final CamelContext camelContext;
     private final DalaranConverterContext converterContext;
     private final DalaranComponentContext componentContext;
+    private final DalaranFunctionContext functionContext;
     private final DalaranServiceContext serviceContext;
 
     public DefaultDalaranCamelContext(
             CamelContext camelContext,
             DalaranConverterContext converterContext,
             DalaranComponentContext componentContext,
+            DalaranFunctionContext functionContext,
             DalaranServiceContext serviceContext,
             DalaranFlowBuilder flowBuilder
     ) {
@@ -42,6 +41,7 @@ public class DefaultDalaranCamelContext implements DalaranContext<DalaranRoute> 
         this.serviceContext = serviceContext;
         this.converterContext = converterContext;
         this.componentContext = componentContext;
+        this.functionContext = functionContext;
     }
 
     @Override
@@ -159,6 +159,11 @@ public class DefaultDalaranCamelContext implements DalaranContext<DalaranRoute> 
     @Override
     public DalaranServiceContext getDalaranServiceContext() {
         return serviceContext;
+    }
+
+    @Override
+    public DalaranFunctionContext getDalaranFunctionContext() {
+        return functionContext;
     }
 
 }

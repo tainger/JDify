@@ -3,7 +3,10 @@ package io.terminus.dalaran.console.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.google.common.collect.Lists;
 import io.terminus.dalaran.component.processor.mapper.model.MapperConstants;
+import io.terminus.dalaran.component.processor.mapper.model.MappingType;
+import io.terminus.dalaran.component.processor.mapper.model.SimpleMappingField;
 import io.terminus.dalaran.console.entity.ModelEntity;
 import io.terminus.dalaran.console.model.DalaranConsoleConstants;
 import io.terminus.dalaran.console.model.dto.BasicModelInfo;
@@ -15,12 +18,17 @@ import io.terminus.dalaran.console.repository.ModuleRepository;
 import io.terminus.dalaran.console.service.ModelManagementService;
 import io.terminus.dalaran.console.service.jpa.ModelQueryService;
 import io.terminus.dalaran.console.util.ExcelUtils;
+import io.terminus.dalaran.core.context.DalaranContext;
 import io.terminus.dalaran.core.model.BodyType;
+import io.terminus.dalaran.core.model.DalaranModelSchema;
 import io.terminus.dalaran.core.model.FieldType;
 import io.terminus.dalaran.core.model.ModelField;
 import io.terminus.dalaran.core.model.schema.JsonSchema;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.text.similarity.JaroWinklerDistance;
+import org.apache.commons.text.similarity.LevenshteinDistance;
+import org.apache.commons.text.similarity.SimilarityScore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -43,6 +51,11 @@ public class ModelManagementServiceImpl implements ModelManagementService {
 
     @Autowired
     private ModuleRepository moduleRepository;
+
+    @Autowired
+    private DalaranContext dalaranContext;
+
+    private JaroWinklerDistance jd = new JaroWinklerDistance();
 
     @Override
     public Long createModel(ModelDTO modelModel) {
@@ -164,6 +177,62 @@ public class ModelManagementServiceImpl implements ModelManagementService {
             return JSON.toJSONString(body);
         }
         return null;
+    }
+
+    @Override
+    public Map<String, SimpleMappingField> suggestMapping(Long sourceId, Long targetId) {
+        ModelEntity sourceEntity = modelRepository.findOne(sourceId);
+        Class<? extends DalaranModelSchema> sourceSchemaType = dalaranContext.getDalaranConverterContext().getSchemaType(sourceEntity.getType());
+        DalaranModelSchema sourceModelSchema = JSON.parseObject(sourceEntity.getModelSchema(), sourceSchemaType);
+
+        ModelEntity targetEntity = modelRepository.findOne(targetId);
+        Class<? extends DalaranModelSchema> targetSchemaType = dalaranContext.getDalaranConverterContext().getSchemaType(targetEntity.getType());
+        DalaranModelSchema targetModelSchema = JSON.parseObject(targetEntity.getModelSchema(), targetSchemaType);
+        Map<String, SimpleMappingField> mappings = new HashMap<>();
+        deepBuildSuggest(sourceModelSchema.getFields(), targetModelSchema.getFields(), new ArrayList<>(), new ArrayList<>(), mappings);
+        return mappings;
+    }
+
+    private void deepBuildSuggest(Map<String, ModelField> sourceFields, Map<String, ModelField> targetFields,
+                                  List<String> sourceParentPath, List<String> targetParentPath, Map<String, SimpleMappingField> mappings) {
+        if (sourceFields == null || targetFields == null) {
+            return;
+        }
+        for (Map.Entry<String, ModelField> targetEntry : targetFields.entrySet()) {
+            double maxJD = 0;
+            Map.Entry<String, ModelField> suggestField = null;
+            for (Map.Entry<String, ModelField> sourceEntry : sourceFields.entrySet()) {
+                // TODO 这里可以处理一下 驼峰转换之类的, 增加建议映射准确度
+                double currentJD = jd.apply(targetEntry.getKey(), sourceEntry.getKey());
+                if (maxJD < currentJD) {
+                    maxJD = currentJD;
+                    suggestField = sourceEntry;
+                }
+            }
+            // 如果小于 0.5 相似性就很差了
+            if (suggestField == null || maxJD <= 0.5) {
+                continue;
+            }
+            if (targetEntry.getValue().getType().isBasicType() && suggestField.getValue().getType().isBasicType()) {
+                List<String> newSourceParentPath = new ArrayList<>(sourceParentPath);
+                List<String> newTargetParentPath = new ArrayList<>(targetParentPath);
+                newSourceParentPath.add(suggestField.getKey());
+                newTargetParentPath.add(targetEntry.getKey());
+
+                SimpleMappingField mappingField = new SimpleMappingField();
+                mappingField.setValue(StringUtils.join(newSourceParentPath, "."));
+                mappingField.setMappingType(MappingType.MAPPING);
+                mappings.put(StringUtils.join(newTargetParentPath, "."), mappingField);
+            } else if (targetEntry.getValue().getType() == suggestField.getValue().getType()) {
+                List<String> newSourceParentPath = new ArrayList<>(sourceParentPath);
+                List<String> newTargetParentPath = new ArrayList<>(targetParentPath);
+                newSourceParentPath.add(suggestField.getKey());
+                newTargetParentPath.add(targetEntry.getKey());
+                deepBuildSuggest(suggestField.getValue().getFields(), targetEntry.getValue().getFields(),
+                        newSourceParentPath, newTargetParentPath, mappings);
+            }
+        }
+
     }
 
     private Object buildTemplateBody(ModelField parent, String parentFieldName) {

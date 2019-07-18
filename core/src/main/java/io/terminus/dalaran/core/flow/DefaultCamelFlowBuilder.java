@@ -13,14 +13,11 @@ import io.terminus.dalaran.core.flow.model.*;
 import io.terminus.dalaran.core.log.DalaranTraceLogger;
 import io.terminus.dalaran.core.log.DalaranTracer;
 import io.terminus.dalaran.core.log.TracingErrorHandlerFactory;
-import io.terminus.dalaran.core.model.BodyType;
 import io.terminus.dalaran.core.model.MessageModel;
 import lombok.val;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
