@@ -12,9 +12,9 @@ public class SourcePath {
 
     private String path;
 
-    private List<String> details;
+    private List<PathDetail> details;
 
-    public SourcePath(String path, List<String> details) {
+    public SourcePath(String path, List<PathDetail> details) {
         this.path = path;
         this.details = details;
     }

@@ -1,6 +1,7 @@
 package io.terminus.dalaran.component.processor.mapper.jsonPath;
 
 import com.alibaba.fastjson.JSONPath;
+import com.github.drapostolos.typeparser.TypeParser;
 import io.terminus.dalaran.component.processor.mapper.model.*;
 import io.terminus.dalaran.core.context.support.DefaultDalaranFunctionContext;
 import io.terminus.dalaran.core.model.FieldType;
@@ -35,7 +36,8 @@ public class Converter {
 
     private void buildValue(Object source, MessageMapping messageMapping, Object destination) {
         List<Object> values = new ArrayList<>();
-        messageMapping.getSourceFields().forEach(sourceField -> {
+        List<SourceField> sourceFields = messageMapping.getSourceFields();
+        sourceFields.forEach(sourceField -> {
             Object value = JSONPath.eval(source, sourceField.getPath());
             values.add(value);
         });
@@ -50,7 +52,8 @@ public class Converter {
                 functionContext.executeCustomFunction(Long.valueOf(function.getKey()), values.toArray());
             }
         } else if (values.size() == 1) {
-            JSONPath.set(destination, "$." + destinationPath, values.get(0));
+            FieldType type = sourceFields.get(0).getField().getType();
+            JSONPath.set(destination, "$." + destinationPath, parse(values.get(0), type));
         }
     }
 
@@ -65,7 +68,7 @@ public class Converter {
             for (int i = 0; i < bodySize; i++) {
                 String path = "$[" + i + "]";
                 for (SourceField sourceField: fields) {
-                    List<String> paths = new ArrayList<>();
+                    List<PathDetail> paths = new ArrayList<>();
                     buildSourcePaths(path, sourceField.getField(), arraySize, level, source, paths);
                     SourcePath sourcePath = new SourcePath(sourceField.getPath(), paths);
                     pathMapping.add(sourcePath);
@@ -74,7 +77,7 @@ public class Converter {
         } else {
             String path = "$";
             for (SourceField sourceField: fields) {
-                List<String> paths = new ArrayList<>();
+                List<PathDetail> paths = new ArrayList<>();
                 buildSourcePaths(path, sourceField.getField(), arraySize, lastArray, source, paths);
                 SourcePath sourcePath = new SourcePath(sourceField.getPath(), paths);
                 pathMapping.add(sourcePath);
@@ -82,7 +85,7 @@ public class Converter {
         }
     }
 
-    private void buildSourcePaths(String parentPath, SimpleMappingField field, Map<Integer, Integer> arraySize, Integer lastArrayLevel, Object source, List<String> paths) {
+    private void buildSourcePaths(String parentPath, SimpleMappingField field, Map<Integer, Integer> arraySize, Integer lastArrayLevel, Object source, List<PathDetail> paths) {
         String name = parentPath + "." + field.getName();
         if (field.getLocal() == FieldLocal.MIDDLE) {
             Object body = JSONPath.eval(source, name);
@@ -102,7 +105,10 @@ public class Converter {
                 buildSourcePaths(name, childField, arraySize, lastArrayLevel, source, paths);
             }
         } else if (field.getLocal() == FieldLocal.END) {
-            paths.add(name);
+            PathDetail detail = new PathDetail();
+            detail.setPath(name);
+            detail.setType(field.getType());
+            paths.add(detail);
         }
     }
 
@@ -149,7 +155,7 @@ public class Converter {
             for (int i = 0; i < size; i++) {
                 List<Object> values = new ArrayList<>();
                 for (SourcePath sourcePath: sourcePaths) {
-                    Object value = JSONPath.eval(source, sourcePath.getDetails().get(i));
+                    Object value = JSONPath.eval(source, sourcePath.getDetails().get(i).getPath());
                     values.add(value);
                 }
 
@@ -160,9 +166,36 @@ public class Converter {
                         functionContext.executeCustomFunction(Long.valueOf(function.getKey()), values.toArray());
                     }
                 } else if (values.size() == 1) {
-                    JSONPath.set(destination, destinationPaths.get(i), values.get(0));
+                    FieldType type = sourcePaths.get(i).getDetails().get(0).getType();
+                    JSONPath.set(destination, destinationPaths.get(i), parse(values.get(0), type));
                 }
             }
         }
+    }
+
+    private Object parse(Object target, FieldType destination) {
+        String input = target.toString();
+        TypeParser parser = TypeParser.newBuilder().build();
+        if (destination != null) {
+            switch (destination) {
+                case INTEGER:
+                    return parser.parse(input, Integer.class);
+                case LONG:
+                    return parser.parse(input, Long.class);
+                case SHORT:
+                    return parser.parse(input, Short.class);
+                case FLOAT:
+                    return parser.parse(input, Float.class);
+                case DOUBLE:
+                    return parser.parse(input, Double.class);
+                case NUMBER:
+                    return parser.parse(input, Number.class);
+                case BOOLEAN:
+                    return parser.parse(input, Boolean.class);
+                default:
+                    return target;
+            }
+        }
+        return target;
     }
 }

@@ -44,32 +44,6 @@ public class DalaranMapperProcessor implements Processor, Traceable {
         return destinationBody;
     }
 
-    private Object parse(Object target, FieldType destination) {
-        String input = target.toString();
-        TypeParser parser = TypeParser.newBuilder().build();
-        if (destination != null) {
-            switch (destination) {
-                case INTEGER:
-                    return parser.parse(input, Integer.class);
-                case LONG:
-                    return parser.parse(input, Long.class);
-                case SHORT:
-                    return parser.parse(input, Short.class);
-                case FLOAT:
-                    return parser.parse(input, Float.class);
-                case DOUBLE:
-                    return parser.parse(input, Double.class);
-                case NUMBER:
-                    return parser.parse(input, Number.class);
-                case BOOLEAN:
-                    return parser.parse(input, Boolean.class);
-                default:
-                    return target;
-            }
-        }
-        return target;
-    }
-
     @Override
     public String getTraceLabel() {
         return "DalaranMapper";
