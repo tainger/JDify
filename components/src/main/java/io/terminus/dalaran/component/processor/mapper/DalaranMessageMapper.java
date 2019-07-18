@@ -8,10 +8,11 @@ import io.terminus.dalaran.core.model.FieldType;
 import io.terminus.dalaran.core.model.MessageModel;
 import io.terminus.dalaran.core.model.ModelField;
 import org.apache.camel.model.ProcessorDefinition;
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by jingdi on 2019/3/18
@@ -25,179 +26,105 @@ public class DalaranMessageMapper implements DalaranProcessor<DalaranMapperConfi
 
     @Override
     public void configure(ProcessorDefinition route, DalaranMapperConfig config) {
-        Map<String, String> arrayFieldMapping = new HashMap<>();
-        Map<String, SimpleMappingField> messageMapping = config.getMessageMapping();
+        Map<String, SimpleMapping> messageMapping = config.getMessageMapping();
         MessageModel in = config.getInModel();
         MessageModel out = config.getOutModel();
-        DalaranMapperProcessor processor = new DalaranMapperProcessor(transfer(messageMapping, in, out, arrayFieldMapping));
+        DalaranMapperProcessor processor = new DalaranMapperProcessor(transfer(messageMapping, in, out));
         route.process(processor);
     }
 
-    private Map<String, MappingField> transfer(Map<String, SimpleMappingField> simpleMapping, MessageModel in, MessageModel out, Map<String, String> arrayMapping) {
-        Map<String, MappingField> messageMapping = new HashMap<>();
-        MappingField mappingField = new MappingField();
-        messageMapping.put(MapperConstants.MODEL_ROOT, mappingField);
-
-        ModelField inModel = buildModelField(in);
-        ModelField outModel = buildModelField(out);
-        mappingField.setType(outModel.getType());
-        mappingField.setSubType(outModel.getSubType());
-        mappingField.setMapping(new HashMap<>());
-        buildArrayMapping(simpleMapping, inModel, outModel, arrayMapping);
-        buildMessageMapping(simpleMapping, mappingField, inModel, outModel, arrayMapping);
-        return messageMapping;
-    }
-
-    private ModelField buildModelField(MessageModel model) {
-        return model.getModelSchema().getFields().get(MapperConstants.MODEL_ROOT);
-    }
-
-    private void buildMessageMapping(Map<String, SimpleMappingField> simpleMapping, MappingField mappingField, ModelField inModel, ModelField outModel, Map<String, String> arrayMapping) {
-        TreeMap<String, SimpleMappingField> sortedMapping = new TreeMap<>(simpleMapping);
-        sortedMapping.forEach((outPath, inField) -> {
-            buildSubMapping(mappingField, inField, inModel, StringUtils.substringAfter(outPath, "."), outModel, arrayMapping);
+    public DalaranMappingConfig transfer(Map<String, SimpleMapping> simpleMapping, MessageModel in, MessageModel out) {
+        DalaranMappingConfig mappingConfig = new DalaranMappingConfig();
+        List<MessageMapping> messageMappings = new ArrayList<>();
+        simpleMapping.forEach((path, mapping) -> {
+            MessageMapping messageMapping = new MessageMapping();
+            buildMapping(messageMapping, path, mapping, in, out);
+            messageMappings.add(messageMapping);
         });
+        mappingConfig.setMessageMappings(messageMappings);
+        SimpleMappingField sourceRoot = new SimpleMappingField();
+        sourceRoot.setType(in.getModelSchema().getFields().get(MapperConstants.MODEL_ROOT).getType());
+        mappingConfig.setSourceRoot(sourceRoot);
+
+        SimpleMappingField destinationRoot = new SimpleMappingField();
+        destinationRoot.setType(out.getModelSchema().getFields().get(MapperConstants.MODEL_ROOT).getType());
+        mappingConfig.setDestinationRoot(destinationRoot);
+
+        return mappingConfig;
     }
 
-    private void buildSubMapping(MappingField mappingField, SimpleMappingField inMappingField, ModelField inModel, String outPath, ModelField outModel, Map<String, String> arrayFieldMapping) {
-        MappingType mappingType = inMappingField.getMappingType();
-        String inPath;
-        if (mappingType == MappingType.MAPPING) {
-            inPath = StringUtils.substringAfter(inMappingField.getValue(), ".");
-        } else {
-            inPath = inMappingField.getValue();
+    private void buildMapping(MessageMapping messageMapping, String path, SimpleMapping mapping, MessageModel in, MessageModel out) {
+        String destinationPath = StringUtils.substringAfter(path, MapperConstants.MODEL_ROOT+ ".");
+        messageMapping.setPath(destinationPath);
+
+        MappingFunction function = mapping.getFunction();
+        messageMapping.setFunction(function);
+
+        MappingType mappingType = mapping.getMappingType();
+        messageMapping.setMappingType(mappingType);
+
+        String[] sourcePaths = StringUtils.split(mapping.getValue().trim(), ",");
+        Map<String, ModelField> inField = in.getModelSchema().getFields();
+        FieldType inRootType = inField.get(MapperConstants.MODEL_ROOT).getType();
+        SimpleMappingField sourceRootField = new SimpleMappingField();
+        sourceRootField.setType(inRootType);
+        messageMapping.setSourceRoot(sourceRootField);
+
+        Map<String, ModelField> outField = out.getModelSchema().getFields();
+        FieldType outRootType = outField.get(MapperConstants.MODEL_ROOT).getType();
+        SimpleMappingField destinationRootField = new SimpleMappingField();
+        destinationRootField.setType(outRootType);
+        messageMapping.setRootField(destinationRootField);
+
+        SimpleMappingField destinationField = new SimpleMappingField();
+        buildMappingField(path, outField, destinationField);
+        messageMapping.setDestinationField(destinationField);
+
+        List<SourceField> sourceFields = new ArrayList<>();
+        boolean complex = false;
+        for (String sourcePath: sourcePaths) {
+            SourceField sourceField = new SourceField();
+            complex = buildSourceField(sourcePath, inField, sourceField);
+            sourceFields.add(sourceField);
         }
+        messageMapping.setSourceFields(sourceFields);
+        messageMapping.setComplex(complex);
+    }
 
-        List<String> outFields = new ArrayList<>();
-        CollectionUtils.addAll(outFields, outPath.split("\\."));
-        MappingField child = mappingField;
-        for (int i = 0; i < outFields.size(); i++) {
-            if (child.getMapping().containsKey(outFields.get(i))) {
-                child = child.getMapping().get(outFields.get(i));
-                continue;
-            }
+    private boolean buildSourceField(String sourcePath, Map<String, ModelField> in, SourceField sourceField) {
+        SimpleMappingField simpleMappingField = new SimpleMappingField();
+        boolean complex = buildMappingField(sourcePath, in, simpleMappingField);
+        sourceField.setField(simpleMappingField);
+        sourceField.setPath(StringUtils.substringAfter(sourcePath, MapperConstants.MODEL_ROOT+ "."));
+        return complex;
+    }
 
-            MappingField field = new MappingField();
-            List<String> subList;
-            subList = outFields.subList(0, i + 1);
-            ModelField outField = getField(subList, outModel);
-            if (outField != null) {
-                field.setType(outField.getType());
-                field.setSubType(outField.getSubType());
-                if (i == outFields.size() - 1) {
-                    ModelField inField = getField(Arrays.asList(inPath.split("\\.")), inModel);
-                    if (inField != null && mappingType == MappingType.MAPPING) {
-                        field.setMappingFieldType(inField.getType());
-                        field.setMappingType(inMappingField.getMappingType());
+    private boolean buildMappingField(String path, Map<String, ModelField> modelField, SimpleMappingField simpleMappingField) {
+        Map<String, ModelField> child = modelField.get(MapperConstants.MODEL_ROOT).getFields();
+        boolean complex = false;
+        String[] fields = StringUtils.split(path, ".");
 
-                        if (child.getType() == FieldType.ARRAY && child.getSubType() == FieldType.OBJECT) {
-                            field.setValue(StringUtils.substringAfterLast(inPath, "."));
-                            String path;
-                            if (subList.size() > 1) {
-                                path = buildFieldPath(subList.subList(0, subList.size() - 1));
-                            } else {
-                                path = subList.get(0);
-                            }
-                            if (arrayFieldMapping.containsKey(path)) {
-                                child.setArrayFieldPath(arrayFieldMapping.get(path));
-                            }
-                        } else {
-                            field.setValue(inPath.replaceAll("\\.", "/"));
-                        }
-                    } else {
-                        field.setValue(inPath);
-                    }
+        Map<String, ModelField> temporaryField = child;
+        SimpleMappingField temporaryMappingField = simpleMappingField;
+        for (int i = 1; i < fields.length; i++) {
+            String fieldName = fields[i];
+            ModelField field = temporaryField.get(fieldName);
+            temporaryMappingField.setName(fieldName);
+            temporaryMappingField.setType(field.getType());
+
+            if (i == fields.length - 1) {
+                temporaryMappingField.setLocal(FieldLocal.END);
+            } else {
+                if (field.getType() == FieldType.ARRAY) {
+                    complex = true;
                 }
-            }
-            child.getMapping().put(outFields.get(i), field);
-            child = field;
-            if (child.getMapping() == null) {
-                child.setMapping(new HashMap<>());
-            }
-        }
-    }
-
-    private ModelField getField(List<String> fields, ModelField model) {
-        if (CollectionUtils.isEmpty(fields)) {
-            return null;
-        }
-        ModelField child = model;
-        for (String field : fields) {
-            child = child.getFields().get(field);
-        }
-        return child;
-    }
-
-    private void buildArrayMapping(Map<String, SimpleMappingField> fieldMap, ModelField inModel, ModelField outModel, Map<String, String> arrayFieldMapping) {
-        Flag flag = new Flag(false);
-        fieldMap.forEach((outPath, inField) -> {
-            if (inField.getMappingType() == MappingType.MAPPING) {
-                List<String> outSubFields = new ArrayList<>();
-                CollectionUtils.addAll(outSubFields, StringUtils.substringAfter(outPath, ".").split("\\."));
-//                CollectionUtils.addAll(outSubFields, outPath.split("\\."));
-
-                List<String> inSubFields = new ArrayList<>();
-                CollectionUtils.addAll(inSubFields, StringUtils.substringAfter(inField.getValue(), ".").split("\\."));
-//                CollectionUtils.addAll(inSubFields, inField.getValue().split("\\."));
-
-                int startIdx = 0;
-                int level = 0;
-                for (int i = 0; i < outSubFields.size(); i++) {
-                    List<String> outSubPath = outSubFields.subList(0, i + 1);
-                    if (arrayFieldMapping.containsKey(buildFieldPath(outSubPath))) {
-                        level++;
-                        continue;
-                    }
-                    ModelField outField = getField(outSubPath, outModel);
-                    if ((outModel.getType() == FieldType.ARRAY && outModel.getSubType() == FieldType.OBJECT && i == 0) || (outField != null && outField.getType() == FieldType.ARRAY && outField.getSubType() == FieldType.OBJECT)) {
-
-                        if (level == 0 && inModel.getType() == FieldType.ARRAY && inModel.getSubType() == FieldType.OBJECT) {
-                            arrayFieldMapping.put(buildFieldPath(outSubPath), "");
-                            level++;
-                            flag.setValue(true);
-                            continue;
-                        }
-
-                        int subLevel = 0;
-                        if (inModel.getType() == FieldType.ARRAY && inModel.getSubType() == FieldType.OBJECT) {
-                            subLevel++;
-                        }
-
-                        for (int j = startIdx; j < inSubFields.size(); j++) {
-                            List<String> inSubPath = inSubFields.subList(0, j + 1);
-                            ModelField field = getField(inSubPath, inModel);
-                            if (field != null && field.getType() == FieldType.ARRAY && field.getSubType() == FieldType.OBJECT) {
-                                if (subLevel == level) {
-                                    if (level > 0) {
-                                        if (flag.isValue() && level < 2) {
-                                            arrayFieldMapping.put(buildFieldPath(outSubPath), buildFieldPath(inSubPath));
-                                        } else {
-                                            arrayFieldMapping.put(buildFieldPath(outSubPath), inSubPath.get(inSubPath.size() - 1));
-                                        }
-                                    } else {
-                                        arrayFieldMapping.put(buildFieldPath(outSubPath), buildFieldPath(inSubPath));
-                                    }
-                                    startIdx = j;
-                                    level++;
-                                    break;
-                                }
-                                subLevel++;
-                            }
-                        }
-                    }
-                }
-            }
-        });
-    }
-
-    private String buildFieldPath(List<String> subPaths) {
-        StringBuilder fieldPath = new StringBuilder();
-        for (int i = 0; i < subPaths.size(); i++) {
-            fieldPath.append(subPaths.get(i));
-            if (i < subPaths.size() - 1) {
-                fieldPath.append("/");
+                temporaryMappingField.setLocal(FieldLocal.MIDDLE);
+                temporaryField = field.getFields();
+                SimpleMappingField childField = new SimpleMappingField();
+                temporaryMappingField.setChild(childField);
+                temporaryMappingField = childField;
             }
         }
-        return fieldPath.toString();
+        return complex;
     }
 }
