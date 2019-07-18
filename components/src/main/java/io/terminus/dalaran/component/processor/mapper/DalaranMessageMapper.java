@@ -65,16 +65,7 @@ public class DalaranMessageMapper implements DalaranProcessor<DalaranMapperConfi
 
         String[] sourcePaths = StringUtils.split(mapping.getValue().trim(), ",");
         Map<String, ModelField> inField = in.getModelSchema().getFields();
-        FieldType inRootType = inField.get(MapperConstants.MODEL_ROOT).getType();
-        SimpleMappingField sourceRootField = new SimpleMappingField();
-        sourceRootField.setType(inRootType);
-        messageMapping.setSourceRoot(sourceRootField);
-
         Map<String, ModelField> outField = out.getModelSchema().getFields();
-        FieldType outRootType = outField.get(MapperConstants.MODEL_ROOT).getType();
-        SimpleMappingField destinationRootField = new SimpleMappingField();
-        destinationRootField.setType(outRootType);
-        messageMapping.setRootField(destinationRootField);
 
         SimpleMappingField destinationField = new SimpleMappingField();
         buildMappingField(path, outField, destinationField);

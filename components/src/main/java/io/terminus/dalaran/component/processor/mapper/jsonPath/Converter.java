@@ -2,6 +2,7 @@ package io.terminus.dalaran.component.processor.mapper.jsonPath;
 
 import com.alibaba.fastjson.JSONPath;
 import io.terminus.dalaran.component.processor.mapper.model.*;
+import io.terminus.dalaran.core.context.support.DefaultDalaranFunctionContext;
 import io.terminus.dalaran.core.model.FieldType;
 
 import java.util.ArrayList;
@@ -14,39 +15,48 @@ import java.util.Map;
  */
 public class Converter {
 
-    public void convert(List<MessageMapping> messageMappings, Object source, Object destination) {
+    public void convert(DalaranMappingConfig mappingConfig, Object source, Object destination) {
+        List<MessageMapping> messageMappings = mappingConfig.getMessageMappings();
+        SimpleMappingField sourceRoot = mappingConfig.getSourceRoot();
+        SimpleMappingField destinationRoot = mappingConfig.getDestinationRoot();
         messageMappings.forEach(messageMapping -> {
             if (messageMapping.isComplex()) {
                 List<SourcePath> sourcePaths = new ArrayList<>();
                 Map<Integer, Integer> arraySize = new HashMap<>();
-                buildSource(source, messageMapping, sourcePaths, arraySize);
+                buildSource(source, messageMapping, sourcePaths, arraySize, sourceRoot);
                 List<String> destinationPaths = new ArrayList<>();
-                buildPathMapping(messageMapping, arraySize, destinationPaths);
+                buildPathMapping(messageMapping, arraySize, destinationPaths, destinationRoot);
                 buildValue(source, sourcePaths, destinationPaths, messageMapping, destination);
             } else {
-                buildValue(source, messageMapping.getPath(), messageMapping.getSourceFields(), destination);
+                buildValue(source, messageMapping, destination);
             }
         });
     }
 
-    private void buildValue(Object source, String destinationPath, List<SourceField> sourceFields, Object destination) {
+    private void buildValue(Object source, MessageMapping messageMapping, Object destination) {
         List<Object> values = new ArrayList<>();
-        sourceFields.forEach(sourceField -> {
+        messageMapping.getSourceFields().forEach(sourceField -> {
             Object value = JSONPath.eval(source, sourceField.getPath());
             values.add(value);
         });
 
-        /**
-         * todo call function  val = execute(values, function-key)
-         */
-        Object val = values.toString();
-        JSONPath.set(destination, "$." + destinationPath, val);
+        String destinationPath = messageMapping.getPath();
+        MappingFunction function = messageMapping.getFunction();
+        DefaultDalaranFunctionContext functionContext = new DefaultDalaranFunctionContext();
+        if (function != null) {
+            if (function.getType() == FunctionType.STANDARD) {
+                functionContext.executeStaticFunction(function.getKey(), values.toArray());
+            } else {
+                functionContext.executeCustomFunction(Long.valueOf(function.getKey()), values.toArray());
+            }
+        } else if (values.size() == 1) {
+            JSONPath.set(destination, "$." + destinationPath, values.get(0));
+        }
     }
 
-    private void buildSource(Object source, MessageMapping mapping, List<SourcePath> pathMapping, Map<Integer, Integer> arraySize) {
+    private void buildSource(Object source, MessageMapping mapping, List<SourcePath> pathMapping, Map<Integer, Integer> arraySize, SimpleMappingField sourceRoot) {
         Integer lastArray = 0;
         List<SourceField> fields = mapping.getSourceFields();
-        SimpleMappingField sourceRoot = mapping.getSourceRoot();
         if (sourceRoot.getType() == FieldType.ARRAY) {
             List<Object> body = (List) source;
             int bodySize = body.size();
@@ -96,11 +106,10 @@ public class Converter {
         }
     }
 
-    private void buildPathMapping(MessageMapping mapping, Map<Integer, Integer> arraySize, List<String> paths) {
-        SimpleMappingField root = mapping.getRootField();
+    private void buildPathMapping(MessageMapping mapping, Map<Integer, Integer> arraySize, List<String> paths, SimpleMappingField destinationRoot) {
         int level = 0;
         SimpleMappingField field = mapping.getDestinationField();
-        if (root.getType() == FieldType.ARRAY) {
+        if (destinationRoot.getType() == FieldType.ARRAY) {
             int size = arraySize.get(++level);
             for (int i = 0; i < size; i++) {
                 String path = "$[" + i + "]";
@@ -133,6 +142,8 @@ public class Converter {
     }
 
     private void buildValue(Object source, List<SourcePath> sourcePaths, List<String> destinationPaths, MessageMapping messageMapping, Object destination) {
+        MappingFunction function = messageMapping.getFunction();
+        DefaultDalaranFunctionContext functionContext = new DefaultDalaranFunctionContext();
         if (sourcePaths != null && sourcePaths.size() > 0) {
             int size = sourcePaths.get(0).getDetails().size();
             for (int i = 0; i < size; i++) {
@@ -142,11 +153,15 @@ public class Converter {
                     values.add(value);
                 }
 
-                /**
-                 * todo call function  val = execute(values, function-key)
-                 */
-                Object val = values.toString();
-                JSONPath.set(destination, destinationPaths.get(i), val);
+                if (function != null) {
+                    if (function.getType() == FunctionType.STANDARD) {
+                        functionContext.executeStaticFunction(function.getKey(), values.toArray());
+                    } else {
+                        functionContext.executeCustomFunction(Long.valueOf(function.getKey()), values.toArray());
+                    }
+                } else if (values.size() == 1) {
+                    JSONPath.set(destination, destinationPaths.get(i), values.get(0));
+                }
             }
         }
     }
