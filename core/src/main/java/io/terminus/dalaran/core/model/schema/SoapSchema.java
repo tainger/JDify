@@ -11,9 +11,7 @@ import java.util.Map;
  * Created by jingdi on 2019/6/6
  */
 @Data
-public class SoapSchema implements DalaranModelSchema {
-
-    private Map<String, ModelField> fields;
+public class SoapSchema extends DalaranModelSchema {
 
     private SoapSchemaOperation operationConfig;
 

@@ -5,10 +5,5 @@ import io.terminus.dalaran.core.model.ModelField;
 
 import java.util.Map;
 
-public class ObjectSchema implements DalaranModelSchema {
-
-    @Override
-    public Map<String, ModelField> getFields() {
-        return null;
-    }
+public class ObjectSchema extends DalaranModelSchema {
 }

@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 @Data
-public class XMLSchema implements DalaranModelSchema {
+public class XMLSchema extends DalaranModelSchema {
 
     private String root;
 
@@ -20,5 +20,4 @@ public class XMLSchema implements DalaranModelSchema {
 
     private boolean forceTopLevelObject;
 
-    private Map<String, ModelField> fields;
 }
