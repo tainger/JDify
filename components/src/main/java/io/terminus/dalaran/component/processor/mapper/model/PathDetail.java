@@ -4,16 +4,12 @@ import io.terminus.dalaran.core.model.FieldType;
 import lombok.Data;
 
 /**
- * Created by jingdi on 2019/7/17
+ * Created by jingdi on 2019/7/18
  */
 @Data
-public class SimpleMappingField {
+public class PathDetail {
 
-    private String name;
+    private String path;
 
     private FieldType type;
-
-    private FieldLocal local;
-
-    private SimpleMappingField child;
 }

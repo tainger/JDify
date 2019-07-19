@@ -4,7 +4,7 @@ import io.terminus.dalaran.component.BasicProcessorTest;
 import io.terminus.dalaran.component.processor.mapper.DalaranMapperConfig;
 import io.terminus.dalaran.component.processor.mapper.DalaranMessageMapper;
 import io.terminus.dalaran.component.processor.mapper.model.MappingType;
-import io.terminus.dalaran.component.processor.mapper.model.SimpleMappingField;
+import io.terminus.dalaran.component.processor.mapper.model.SimpleMapping;
 import io.terminus.dalaran.core.model.BodyType;
 import io.terminus.dalaran.core.model.FieldType;
 import io.terminus.dalaran.core.model.MessageModel;
@@ -25,13 +25,13 @@ public class MapperTest extends BasicProcessorTest {
     @Test
     public void testMapperProcessor() {
         DalaranMapperConfig config = new DalaranMapperConfig();
-        Map<String, SimpleMappingField> messageMapping = new HashMap<>();
-        SimpleMappingField field1 = new SimpleMappingField();
+        Map<String, SimpleMapping> messageMapping = new HashMap<>();
+        SimpleMapping field1 = new SimpleMapping();
         field1.setMappingType(MappingType.MAPPING);
         field1.setValue("root.id");
         messageMapping.put("root.userId", field1);
 
-        SimpleMappingField field2 = new SimpleMappingField();
+        SimpleMapping field2 = new SimpleMapping();
         field2.setMappingType(MappingType.DEFAULT);
         field2.setValue("momo");
         messageMapping.put("root.userName", field2);
