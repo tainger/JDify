@@ -30,4 +30,6 @@ public final class DalaranConstants {
     public static final String ENV_REPLACE_PREFIX = "${{";
     public static final String ENV_REPLACE_SUFFIX = "}}";
 
+    public static final String TRANTOR_EXT_POINT_METHOD = "Dalaran_Trantor_Ext_Point_Method";
+
 }

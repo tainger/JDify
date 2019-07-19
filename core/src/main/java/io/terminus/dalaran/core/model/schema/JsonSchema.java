@@ -7,6 +7,5 @@ import lombok.Data;
 import java.util.Map;
 
 @Data
-public class JsonSchema implements DalaranModelSchema {
-    private Map<String, ModelField> fields;
+public class JsonSchema extends DalaranModelSchema {
 }
