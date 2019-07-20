@@ -25,7 +25,7 @@ public class Converter {
                 List<SourcePath> sourcePaths = new ArrayList<>();
                 Map<Integer, Integer> arraySize = new HashMap<>();
                 buildSource(source, messageMapping, sourcePaths, arraySize, sourceRoot);
-                List<String> destinationPaths = new ArrayList<>();
+                List<PathDetail> destinationPaths = new ArrayList<>();
                 buildPathMapping(messageMapping, arraySize, destinationPaths, destinationRoot);
                 buildValue(source, sourcePaths, destinationPaths, messageMapping, destination);
             } else {
@@ -53,7 +53,7 @@ public class Converter {
             }
         } else if (values.size() == 1) {
             FieldType type = sourceFields.get(0).getField().getType();
-            JSONPath.set(destination, "$." + destinationPath, parse(values.get(0), type));
+            JSONPath.set(destination, "$root." + destinationPath, parse(values.get(0), type));
         }
     }
 
@@ -112,22 +112,22 @@ public class Converter {
         }
     }
 
-    private void buildPathMapping(MessageMapping mapping, Map<Integer, Integer> arraySize, List<String> paths, SimpleMappingField destinationRoot) {
+    private void buildPathMapping(MessageMapping mapping, Map<Integer, Integer> arraySize, List<PathDetail> paths, SimpleMappingField destinationRoot) {
         int level = 0;
         SimpleMappingField field = mapping.getDestinationField();
         if (destinationRoot.getType() == FieldType.ARRAY) {
             int size = arraySize.get(++level);
             for (int i = 0; i < size; i++) {
-                String path = "$[" + i + "]";
+                String path = "$root[" + i + "]";
                 buildDestinationPaths(path, field, arraySize, level, paths);
             }
         } else {
-            String path = "$";
+            String path = "$root";
             buildDestinationPaths(path, field, arraySize, level, paths);
         }
     }
 
-    private void buildDestinationPaths(String parentPath, SimpleMappingField field, Map<Integer, Integer> arraySize, int level, List<String> paths) {
+    private void buildDestinationPaths(String parentPath, SimpleMappingField field, Map<Integer, Integer> arraySize, int level, List<PathDetail> paths) {
         String name = parentPath + "." + field.getName();
         if (field.getLocal() == FieldLocal.MIDDLE) {
             SimpleMappingField child = field.getChild();
@@ -143,11 +143,14 @@ public class Converter {
                 buildDestinationPaths(name, child, arraySize, level, paths);
             }
         } else if (field.getLocal() == FieldLocal.END) {
-            paths.add(name);
+            PathDetail detail = new PathDetail();
+            detail.setPath(name);
+            detail.setType(field.getType());
+            paths.add(detail);
         }
     }
 
-    private void buildValue(Object source, List<SourcePath> sourcePaths, List<String> destinationPaths, MessageMapping messageMapping, Object destination) {
+    private void buildValue(Object source, List<SourcePath> sourcePaths, List<PathDetail> destinationPaths, MessageMapping messageMapping, Object destination) {
         MappingFunction function = messageMapping.getFunction();
         DefaultDalaranFunctionContext functionContext = new DefaultDalaranFunctionContext();
         if (sourcePaths != null && sourcePaths.size() > 0) {
@@ -159,16 +162,19 @@ public class Converter {
                     values.add(value);
                 }
 
+                Object value = null;
+                String destinationPath = destinationPaths.get(i).getPath();
                 if (function != null) {
                     if (function.getType() == FunctionType.STANDARD) {
-                        functionContext.executeStaticFunction(function.getKey(), values.toArray());
+                        value = functionContext.executeStaticFunction(function.getKey(), values.toArray());
                     } else {
-                        functionContext.executeCustomFunction(Long.valueOf(function.getKey()), values.toArray());
+                        value = functionContext.executeCustomFunction(Long.valueOf(function.getKey()), values.toArray());
                     }
                 } else if (values.size() == 1) {
-                    FieldType type = sourcePaths.get(i).getDetails().get(0).getType();
-                    JSONPath.set(destination, destinationPaths.get(i), parse(values.get(0), type));
+                    FieldType type = destinationPaths.get(i).getType();
+                    value = parse(values.get(0), type);
                 }
+                JSONPath.set(destination, destinationPath, value);
             }
         }
     }

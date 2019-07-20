@@ -1,7 +1,7 @@
 package io.terminus.dalaran.console.rest;
 
 import io.swagger.annotations.ApiOperation;
-import io.terminus.dalaran.component.processor.mapper.model.SimpleMappingField;
+import io.terminus.dalaran.component.processor.mapper.model.SimpleMapping;
 import io.terminus.dalaran.console.model.dto.DataTemplate;
 import io.terminus.dalaran.console.model.dto.ModelDTO;
 import io.terminus.dalaran.console.model.query.ModelQuery;
@@ -63,7 +63,7 @@ public class ModelManagementRest {
 
     @ApiOperation(value = "根据模型匹配自动生成建议的映射")
     @RequestMapping(value = "/suggestMapping", method = RequestMethod.GET)
-    public Map<String, SimpleMappingField> suggestMapping(@RequestParam Long sourceId, @RequestParam Long targetId) {
+    public Map<String, SimpleMapping> suggestMapping(@RequestParam Long sourceId, @RequestParam Long targetId) {
         return modelManagementService.suggestMapping(sourceId, targetId);
     }
 
