@@ -3,7 +3,7 @@ package io.terminus.dalaran.core.config;
 import com.alibaba.fastjson.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.terminus.dalaran.core.component.BodySerializeType;
-import io.terminus.dalaran.core.model.BodyType;
+import io.terminus.dalaran.model.BodyType;
 import lombok.Data;
 import org.jetbrains.annotations.NotNull;
 

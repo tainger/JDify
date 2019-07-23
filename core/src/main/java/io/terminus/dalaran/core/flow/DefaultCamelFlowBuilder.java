@@ -1,19 +1,19 @@
 package io.terminus.dalaran.core.flow;
 
-import io.terminus.dalaran.core.DalaranConstants;
+import io.terminus.dalaran.DalaranConstants;
 import io.terminus.dalaran.core.component.*;
-import io.terminus.dalaran.core.component.model.ProcessorModel;
 import io.terminus.dalaran.core.config.ComponentInfo;
 import io.terminus.dalaran.core.config.DalaranConfigField;
 import io.terminus.dalaran.core.config.ProcessorInfo;
 import io.terminus.dalaran.core.config.TriggerInfo;
 import io.terminus.dalaran.core.context.DalaranComponentContext;
 import io.terminus.dalaran.core.context.DalaranConverterContext;
-import io.terminus.dalaran.core.flow.model.*;
 import io.terminus.dalaran.core.log.DalaranTraceLogger;
 import io.terminus.dalaran.core.log.DalaranTracer;
 import io.terminus.dalaran.core.log.TracingErrorHandlerFactory;
-import io.terminus.dalaran.core.model.MessageModel;
+import io.terminus.dalaran.model.MessageModel;
+import io.terminus.dalaran.model.component.ProcessorModel;
+import io.terminus.dalaran.model.flow.*;
 import lombok.val;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -22,11 +22,11 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static io.terminus.dalaran.core.DalaranConstants.TEST_FLOW_PREFIX;
+import static io.terminus.dalaran.DalaranConstants.TEST_FLOW_PREFIX;
 import static io.terminus.dalaran.core.flow.FlowSuggest.ADD_MAPPER;
 import static io.terminus.dalaran.core.flow.FlowValidateMessage.FIELD_NOT_NULL;
 import static io.terminus.dalaran.core.flow.FlowValidateMessage.MODEL_NOT_EQUALLY;
-import static io.terminus.dalaran.core.flow.ValidateMessageTarget.*;
+import static io.terminus.dalaran.model.flow.ValidateMessageTarget.*;
 
 public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute> {
 

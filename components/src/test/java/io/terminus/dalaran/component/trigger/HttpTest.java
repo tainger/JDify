@@ -6,7 +6,7 @@ import io.terminus.dalaran.component.BasicTriggerTest;
 import io.terminus.dalaran.component.common.HttpMethod;
 import io.terminus.dalaran.component.trigger.http.NettyHttpConfig;
 import io.terminus.dalaran.component.trigger.http.NettyHttpListener;
-import io.terminus.dalaran.core.model.HttpProtocol;
+import io.terminus.dalaran.model.HttpProtocol;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;

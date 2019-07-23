@@ -5,7 +5,7 @@ import io.terminus.dalaran.console.model.dto.CopyFlow;
 import io.terminus.dalaran.console.model.dto.flow.BasicFlowInfo;
 import io.terminus.dalaran.console.model.dto.flow.TriggerFlowDTO;
 import io.terminus.dalaran.console.model.query.FlowQuery;
-import io.terminus.dalaran.core.flow.model.FlowValidation;
+import io.terminus.dalaran.model.flow.FlowValidation;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;

@@ -4,7 +4,7 @@ import io.swagger.annotations.ApiOperation;
 import io.terminus.dalaran.console.model.dto.flow.SubFlowDTO;
 import io.terminus.dalaran.console.model.query.FlowQuery;
 import io.terminus.dalaran.console.service.SubFlowManagementService;
-import io.terminus.dalaran.core.flow.model.FlowValidation;
+import io.terminus.dalaran.model.flow.FlowValidation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

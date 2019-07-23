@@ -2,7 +2,7 @@ package io.terminus.dalaran.component.processor.soap;
 
 import io.terminus.dalaran.core.component.FieldInputType;
 import io.terminus.dalaran.core.component.annotation.ConfigFieldInfo;
-import io.terminus.dalaran.core.model.HttpProtocol;
+import io.terminus.dalaran.model.HttpProtocol;
 import lombok.Data;
 
 /**

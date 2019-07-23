@@ -13,6 +13,11 @@
 
     <dependencies>
         <dependency>
+            <groupId>io.terminus</groupId>
+            <artifactId>dalaran-common</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
             <groupId>com.squareup.okhttp3</groupId>
             <artifactId>okhttp</artifactId>
             <version>3.9.1</version>

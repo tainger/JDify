@@ -1,7 +1,7 @@
 package io.terminus.dalaran.core.resource.entity.common;
 
 import io.terminus.dalaran.core.log.TracingType;
-import io.terminus.dalaran.core.model.BodyType;
+import io.terminus.dalaran.model.BodyType;
 import lombok.Data;
 
 import javax.persistence.*;

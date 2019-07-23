@@ -6,7 +6,7 @@ import io.terminus.dalaran.core.component.annotation.Processor;
 import jdk.nashorn.api.scripting.ScriptObjectMirror;
 import org.apache.camel.model.ProcessorDefinition;
 
-import static io.terminus.dalaran.core.DalaranConstants.DALARAN_CONTEXT_EXCHANGE;
+import static io.terminus.dalaran.DalaranConstants.DALARAN_CONTEXT_EXCHANGE;
 
 @Processor(
         value = "script", configType = DalaranScriptConfig.class,

@@ -1,7 +1,7 @@
 package io.terminus.dalaran.component;
 
 import io.terminus.dalaran.core.component.DalaranService;
-import io.terminus.dalaran.core.component.model.ServiceOperation;
+import io.terminus.dalaran.model.component.ServiceOperation;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Processor;
 import org.apache.camel.ProducerTemplate;

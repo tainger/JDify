@@ -47,8 +47,8 @@ class TestController {
     lateinit var testExtPoint: TestExtPoint
 
     @GetMapping("/ext")
-    fun test(a: String, b: String): Map<Any?, Any?> {
-        val data = testExtPoint.getName(a, b)
+    fun test(a: Long, b: String): Any {
+        val data = testExtPoint.allOrders(a, listOf())
         return data
     }
 

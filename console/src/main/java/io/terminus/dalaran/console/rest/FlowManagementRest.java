@@ -11,7 +11,7 @@ import io.terminus.dalaran.console.service.FlowManagementService;
 import io.terminus.dalaran.console.service.ModelManagementService;
 import io.terminus.dalaran.console.service.TracingLogService;
 import io.terminus.dalaran.core.context.DalaranContext;
-import io.terminus.dalaran.core.flow.model.FlowValidation;
+import io.terminus.dalaran.model.flow.FlowValidation;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;

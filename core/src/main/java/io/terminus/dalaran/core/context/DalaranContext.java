@@ -1,9 +1,9 @@
 package io.terminus.dalaran.core.context;
 
-import io.terminus.dalaran.core.flow.model.BasicFlow;
-import io.terminus.dalaran.core.flow.model.FlowFragment;
-import io.terminus.dalaran.core.flow.model.SubFlow;
-import io.terminus.dalaran.core.flow.model.TriggerFlow;
+import io.terminus.dalaran.model.flow.BasicFlow;
+import io.terminus.dalaran.model.flow.FlowFragment;
+import io.terminus.dalaran.model.flow.SubFlow;
+import io.terminus.dalaran.model.flow.TriggerFlow;
 
 import java.util.List;
 

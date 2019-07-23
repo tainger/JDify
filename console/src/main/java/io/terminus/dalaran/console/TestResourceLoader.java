@@ -4,7 +4,6 @@ import io.terminus.dalaran.console.entity.*;
 import io.terminus.dalaran.console.repository.*;
 import io.terminus.dalaran.core.context.DalaranContext;
 import io.terminus.dalaran.core.resource.DalaranResourceLoader;
-import io.terminus.dalaran.core.resource.entity.FunctionAbstractEntity;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 

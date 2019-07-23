@@ -23,6 +23,7 @@
         <module>console</module>
         <module>runtime</module>
         <module>sdk</module>
+        <module>common</module>
     </modules>
 
     <properties>
@@ -84,5 +85,18 @@
             </plugin>
         </plugins>
     </build>
+
+    <distributionManagement>
+        <repository>
+            <id>terminus</id>
+            <name>terminus release repository</name>
+            <url>https://repo.terminus.io/content/repositories/releases/</url>
+        </repository>
+        <snapshotRepository>
+            <id>terminus</id>
+            <name>terminus snapshot repository</name>
+            <url>https://repo.terminus.io/content/repositories/snapshots/</url>
+        </snapshotRepository>
+    </distributionManagement>
 
 </project>

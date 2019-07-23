@@ -1,6 +1,6 @@
 package io.terminus.dalaran.core.flow;
 
-import io.terminus.dalaran.core.model.MessageModel;
+import io.terminus.dalaran.model.MessageModel;
 import lombok.Data;
 import org.apache.camel.Processor;
 import org.apache.camel.model.FromDefinition;

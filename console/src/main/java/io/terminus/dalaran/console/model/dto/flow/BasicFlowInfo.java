@@ -1,6 +1,6 @@
 package io.terminus.dalaran.console.model.dto.flow;
 
-import io.terminus.dalaran.core.flow.FlowStatus;
+import io.terminus.dalaran.model.flow.FlowStatus;
 import lombok.Data;
 import org.jetbrains.annotations.Nullable;
 

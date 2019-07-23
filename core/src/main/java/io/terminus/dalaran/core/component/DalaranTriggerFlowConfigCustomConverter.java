@@ -1,6 +1,6 @@
 package io.terminus.dalaran.core.component;
 
-import io.terminus.dalaran.core.flow.model.BasicFlow;
+import io.terminus.dalaran.model.flow.BasicFlow;
 
 public interface DalaranTriggerFlowConfigCustomConverter<T, R> {
 
