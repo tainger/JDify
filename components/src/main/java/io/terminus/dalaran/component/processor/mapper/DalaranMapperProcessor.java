@@ -2,14 +2,11 @@ package io.terminus.dalaran.component.processor.mapper;
 
 import io.terminus.dalaran.component.processor.mapper.jsonPath.Converter;
 import io.terminus.dalaran.component.processor.mapper.model.DalaranMappingConfig;
-import io.terminus.dalaran.component.processor.mapper.model.SimpleMappingField;
-import io.terminus.dalaran.model.FieldType;
+import io.terminus.dalaran.component.processor.mapper.model.MapperConstants;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.Traceable;
-
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by jingdi on 2019/3/18
@@ -24,23 +21,14 @@ public class DalaranMapperProcessor implements Processor, Traceable {
 
     @Override
     public void process(Exchange exchange) {
-        Object targetBody = exchange.getIn().getBody();
-        Object destinationBody = convert(mappingConfig, targetBody);
-        exchange.getOut().setBody(destinationBody);
+        Object source = exchange.getIn().getBody();
+        Object destination = convert(mappingConfig, source);
+        exchange.getOut().setBody(destination);
     }
 
     public Object convert(DalaranMappingConfig mappingConfig, Object source) {
-        SimpleMappingField destination = mappingConfig.getDestinationRoot();
-        Object destinationBody;
-        if (destination.getType() == FieldType.ARRAY) {
-            destinationBody = new ArrayList<>();
-        } else {
-            destinationBody = new HashMap<>();
-        }
-
-        Converter converter = new Converter();
-        converter.convert(mappingConfig, source, destinationBody);
-        return destinationBody;
+        Map<String, Object> destination = Converter.convert(mappingConfig, source);
+        return destination.get(MapperConstants.MODEL_ROOT);
     }
 
     @Override

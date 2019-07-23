@@ -9,7 +9,6 @@ import io.terminus.dalaran.model.MessageModel;
 import io.terminus.dalaran.model.ModelField;
 import org.apache.camel.model.ProcessorDefinition;
 import org.apache.commons.lang3.StringUtils;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
