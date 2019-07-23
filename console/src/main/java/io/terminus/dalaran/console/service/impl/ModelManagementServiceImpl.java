@@ -6,6 +6,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Lists;
 import io.terminus.dalaran.component.processor.mapper.model.MapperConstants;
 import io.terminus.dalaran.component.processor.mapper.model.MappingType;
+import io.terminus.dalaran.component.processor.mapper.model.SimpleMapping;
 import io.terminus.dalaran.component.processor.mapper.model.SimpleMappingField;
 import io.terminus.dalaran.console.entity.ModelEntity;
 import io.terminus.dalaran.console.model.DalaranConsoleConstants;
@@ -180,7 +181,7 @@ public class ModelManagementServiceImpl implements ModelManagementService {
     }
 
     @Override
-    public Map<String, SimpleMappingField> suggestMapping(Long sourceId, Long targetId) {
+    public Map<String, SimpleMapping> suggestMapping(Long sourceId, Long targetId) {
         ModelEntity sourceEntity = modelRepository.findOne(sourceId);
         Class<? extends DalaranModelSchema> sourceSchemaType = dalaranContext.getDalaranConverterContext().getSchemaType(sourceEntity.getType());
         DalaranModelSchema sourceModelSchema = JSON.parseObject(sourceEntity.getModelSchema(), sourceSchemaType);
@@ -188,13 +189,13 @@ public class ModelManagementServiceImpl implements ModelManagementService {
         ModelEntity targetEntity = modelRepository.findOne(targetId);
         Class<? extends DalaranModelSchema> targetSchemaType = dalaranContext.getDalaranConverterContext().getSchemaType(targetEntity.getType());
         DalaranModelSchema targetModelSchema = JSON.parseObject(targetEntity.getModelSchema(), targetSchemaType);
-        Map<String, SimpleMappingField> mappings = new HashMap<>();
+        Map<String, SimpleMapping> mappings = new HashMap<>();
         deepBuildSuggest(sourceModelSchema.getFields(), targetModelSchema.getFields(), new ArrayList<>(), new ArrayList<>(), mappings);
         return mappings;
     }
 
     private void deepBuildSuggest(Map<String, ModelField> sourceFields, Map<String, ModelField> targetFields,
-                                  List<String> sourceParentPath, List<String> targetParentPath, Map<String, SimpleMappingField> mappings) {
+                                  List<String> sourceParentPath, List<String> targetParentPath, Map<String, SimpleMapping> mappings) {
         if (sourceFields == null || targetFields == null) {
             return;
         }
@@ -219,7 +220,7 @@ public class ModelManagementServiceImpl implements ModelManagementService {
                 newSourceParentPath.add(suggestField.getKey());
                 newTargetParentPath.add(targetEntry.getKey());
 
-                SimpleMappingField mappingField = new SimpleMappingField();
+                SimpleMapping mappingField = new SimpleMapping();
                 mappingField.setValue(StringUtils.join(newSourceParentPath, "."));
                 mappingField.setMappingType(MappingType.MAPPING);
                 mappings.put(StringUtils.join(newTargetParentPath, "."), mappingField);

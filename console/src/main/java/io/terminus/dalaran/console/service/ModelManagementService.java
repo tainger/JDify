@@ -1,6 +1,6 @@
 package io.terminus.dalaran.console.service;
 
-import io.terminus.dalaran.component.processor.mapper.model.SimpleMappingField;
+import io.terminus.dalaran.component.processor.mapper.model.SimpleMapping;
 import io.terminus.dalaran.console.entity.ModelEntity;
 import io.terminus.dalaran.console.model.dto.BasicModelInfo;
 import io.terminus.dalaran.console.model.dto.DataTemplate;
@@ -40,5 +40,5 @@ public interface ModelManagementService {
 
     String buildDataTemplate(JsonSchema schema, Long id);
 
-    Map<String, SimpleMappingField> suggestMapping(Long sourceId, Long targetId);
+    Map<String, SimpleMapping> suggestMapping(Long sourceId, Long targetId);
 }
