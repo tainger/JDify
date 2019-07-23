@@ -2,6 +2,8 @@
 **/target/
 .idea/
 
+*.log
+
 .settings/
 .project
 
