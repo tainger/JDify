@@ -2,6 +2,8 @@ package io.terminus.dalaran.spring;
 
 import com.alibaba.fastjson.JSON;
 import io.terminus.dalaran.DalaranIntegration;
+import io.terminus.dalaran.DalaranIntegrationAction;
+import io.terminus.dalaran.DalaranInvokeException;
 import okhttp3.*;
 import org.springframework.beans.factory.FactoryBean;
 
@@ -20,7 +22,6 @@ public class DalaranFactoryBean implements FactoryBean {
 
     @Override
     public Object getObject() {
-
         OkHttpClient okHttpClient = new OkHttpClient.Builder().readTimeout(5, TimeUnit.SECONDS).build();
         DalaranIntegration dalaranIntegration = (DalaranIntegration) type.getAnnotation(DalaranIntegration.class);
         InvocationHandler invocationHandler = (proxy, method, args) -> {
@@ -30,14 +31,24 @@ public class DalaranFactoryBean implements FactoryBean {
             for (int i = 0; i < parameters.length; i++) {
                 params.put(parameters[i].getName(), args[i]);
             }
+            // TODO 这里每次都 call 反射会有性能消耗, 可以 cache 一下
+            DalaranIntegrationAction integrationAction = method.getAnnotation(DalaranIntegrationAction.class);
+            String methodName = method.getName();
+            if (integrationAction != null) {
+                methodName = integrationAction.key();
+            }
             final Request request = new Request.Builder()
-                    .url(runtimeUrl + "/__dalaran-trantor/" + dalaranIntegration.key() + "/" + method.getName())
+                    .url(runtimeUrl + "/__dalaran-trantor/" + dalaranIntegration.key() + "/" + methodName)
                     .post(RequestBody.create(MediaType.parse("application/json"), JSON.toJSONString(params)))
                     .build();
             Call call = okHttpClient.newCall(request);
             Response response = call.execute();
             if (method.getReturnType() != Void.class) {
-                return JSON.parseObject(response.body().bytes(), method.getReturnType());
+                // todo 泛型问题
+                if (response.isSuccessful()) {
+                    return JSON.parseObject(response.body().bytes(), method.getGenericReturnType());
+                }
+                throw new DalaranInvokeException(dalaranIntegration.key(), methodName, response.code(), response.message(), response.body().string());
             }
             return null;
         };

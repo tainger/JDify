@@ -4,15 +4,17 @@ import com.alibaba.fastjson.JSON;
 import io.terminus.dalaran.component.BasicProcessorTest;
 import io.terminus.dalaran.component.processor.mapper.DalaranMapperProcessor;
 import io.terminus.dalaran.component.processor.mapper.DalaranMessageMapper;
-import io.terminus.dalaran.component.processor.mapper.model.*;
-import io.terminus.dalaran.core.model.FieldType;
-import io.terminus.dalaran.core.model.MessageModel;
-import io.terminus.dalaran.core.model.ModelField;
-import io.terminus.dalaran.core.model.schema.JsonSchema;
+import io.terminus.dalaran.component.processor.mapper.model.DalaranMappingConfig;
+import io.terminus.dalaran.component.processor.mapper.model.MappingType;
+import io.terminus.dalaran.component.processor.mapper.model.SimpleMapping;
+import io.terminus.dalaran.component.processor.mapper.model.SimpleMappingField;
+import io.terminus.dalaran.model.FieldType;
+import io.terminus.dalaran.model.MessageModel;
+import io.terminus.dalaran.model.ModelField;
+import io.terminus.dalaran.model.schema.JsonSchema;
 import org.junit.Test;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**

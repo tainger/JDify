@@ -8,7 +8,7 @@ import org.apache.camel.model.ProcessorDefinition;
 import java.util.HashMap;
 import java.util.Map;
 
-import static io.terminus.dalaran.core.DalaranConstants.DALARAN_CONTEXT_EXCHANGE;
+import static io.terminus.dalaran.DalaranConstants.DALARAN_CONTEXT_EXCHANGE;
 
 
 @Processor(

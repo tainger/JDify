@@ -1,6 +1,6 @@
 package io.terminus.dalaran.core.log;
 
-import io.terminus.dalaran.core.model.BodyType;
+import io.terminus.dalaran.model.BodyType;
 import org.apache.camel.*;
 import org.apache.camel.builder.DefaultErrorHandlerBuilder;
 import org.apache.camel.processor.DefaultErrorHandler;
@@ -11,7 +11,7 @@ import org.apache.camel.util.CamelLogger;
 
 import java.util.concurrent.ScheduledExecutorService;
 
-import static io.terminus.dalaran.core.DalaranConstants.*;
+import static io.terminus.dalaran.DalaranConstants.*;
 
 public class TracingErrorHandlerFactory extends DefaultErrorHandlerBuilder implements ErrorHandlerFactory {
 

@@ -6,8 +6,8 @@ import org.apache.camel.processor.aggregate.CompletionAwareAggregationStrategy;
 import java.util.HashMap;
 import java.util.Map;
 
-import static io.terminus.dalaran.core.DalaranConstants.BRANCH_FLOW_NAME_HEADER;
-import static io.terminus.dalaran.core.DalaranConstants.SCATTER_GATHER_EXCHANGE;
+import static io.terminus.dalaran.DalaranConstants.BRANCH_FLOW_NAME_HEADER;
+import static io.terminus.dalaran.DalaranConstants.SCATTER_GATHER_EXCHANGE;
 
 public class ScatterGatherAggregationStrategy implements CompletionAwareAggregationStrategy {
     @Override

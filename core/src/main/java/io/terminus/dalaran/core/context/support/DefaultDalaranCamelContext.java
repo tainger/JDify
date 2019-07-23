@@ -1,22 +1,21 @@
 package io.terminus.dalaran.core.context.support;
 
-import io.terminus.dalaran.core.DalaranConstants;
+import io.terminus.dalaran.DalaranConstants;
 import io.terminus.dalaran.core.context.*;
 import io.terminus.dalaran.core.flow.DalaranFlowBuilder;
 import io.terminus.dalaran.core.flow.DalaranRoute;
-import io.terminus.dalaran.core.flow.model.BasicFlow;
-import io.terminus.dalaran.core.flow.model.FlowFragment;
-import io.terminus.dalaran.core.flow.model.SubFlow;
-import io.terminus.dalaran.core.flow.model.TriggerFlow;
+import io.terminus.dalaran.model.flow.BasicFlow;
+import io.terminus.dalaran.model.flow.FlowFragment;
+import io.terminus.dalaran.model.flow.SubFlow;
+import io.terminus.dalaran.model.flow.TriggerFlow;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.camel.CamelContext;
 import org.apache.camel.impl.DefaultProducerTemplate;
-import org.springframework.beans.factory.annotation.Value;
 
 import java.util.List;
 
-import static io.terminus.dalaran.core.DalaranConstants.FLOW_PREFIX;
-import static io.terminus.dalaran.core.DalaranConstants.TEST_FLOW_DIRECT_PREFIX;
+import static io.terminus.dalaran.DalaranConstants.FLOW_PREFIX;
+import static io.terminus.dalaran.DalaranConstants.TEST_FLOW_DIRECT_PREFIX;
 
 @Slf4j
 public class DefaultDalaranCamelContext implements DalaranContext<DalaranRoute> {

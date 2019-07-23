@@ -4,7 +4,7 @@ import com.alibaba.fastjson.JSONPath;
 import com.github.drapostolos.typeparser.TypeParser;
 import io.terminus.dalaran.component.processor.mapper.model.*;
 import io.terminus.dalaran.core.context.support.DefaultDalaranFunctionContext;
-import io.terminus.dalaran.core.model.FieldType;
+import io.terminus.dalaran.model.FieldType;
 
 import java.util.ArrayList;
 import java.util.HashMap;

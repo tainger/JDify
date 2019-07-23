@@ -1,7 +1,7 @@
 package io.terminus.dalaran.core.component;
 
-import io.terminus.dalaran.core.component.model.ComponentModel;
-import io.terminus.dalaran.core.flow.model.BasicFlow;
+import io.terminus.dalaran.model.component.ComponentModel;
+import io.terminus.dalaran.model.flow.BasicFlow;
 
 public interface DalaranProcessorConfigCustomConverter<T, R> {
 

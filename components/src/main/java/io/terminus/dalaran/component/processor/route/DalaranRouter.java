@@ -4,14 +4,14 @@ import io.terminus.dalaran.core.component.BodySerializeType;
 import io.terminus.dalaran.core.component.DalaranProcessor;
 import io.terminus.dalaran.core.component.DalaranProcessorConfigCustomConverter;
 import io.terminus.dalaran.core.component.annotation.Processor;
-import io.terminus.dalaran.core.component.model.ComponentModel;
-import io.terminus.dalaran.core.component.model.ProcessorModel;
 import io.terminus.dalaran.core.context.DalaranContext;
-import io.terminus.dalaran.core.flow.model.BasicFlow;
-import io.terminus.dalaran.core.flow.model.FlowFragment;
-import io.terminus.dalaran.core.model.MessageModel;
 import io.terminus.dalaran.core.resource.DalaranResourceBuilder;
 import io.terminus.dalaran.core.resource.entity.common.ProcessorEntity;
+import io.terminus.dalaran.model.MessageModel;
+import io.terminus.dalaran.model.component.ComponentModel;
+import io.terminus.dalaran.model.component.ProcessorModel;
+import io.terminus.dalaran.model.flow.BasicFlow;
+import io.terminus.dalaran.model.flow.FlowFragment;
 import lombok.val;
 import org.apache.camel.model.ChoiceDefinition;
 import org.apache.camel.model.ProcessorDefinition;
@@ -22,7 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static io.terminus.dalaran.core.DalaranConstants.DELIMITER;
+import static io.terminus.dalaran.DalaranConstants.DELIMITER;
 
 @Processor(value = "router", configType = DalaranRouterConfig.class, inputSerializeType = BodySerializeType.Object)
 public class DalaranRouter implements DalaranProcessor<Map<String, String>>, DalaranProcessorConfigCustomConverter<DalaranRouterConfig, Map<String, String>> {

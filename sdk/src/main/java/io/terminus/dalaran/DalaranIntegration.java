@@ -10,6 +10,8 @@ public @interface DalaranIntegration {
 
     String key();
 
+    String name();
+
     String description() default "";
 
 }

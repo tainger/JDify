@@ -1,6 +1,6 @@
 package io.terminus.dalaran.console.model.dto;
 
-import io.terminus.dalaran.core.model.function.MappingFunctionType;
+import io.terminus.dalaran.model.function.MappingFunctionType;
 import lombok.Data;
 
 import java.util.List;

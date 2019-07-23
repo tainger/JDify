@@ -1,7 +1,6 @@
 package io.terminus.dalaran.runtime;
 
 import io.terminus.dalaran.core.resource.DalaranResourceLoader;
-import io.terminus.dalaran.core.resource.entity.FunctionAbstractEntity;
 import io.terminus.dalaran.core.resource.entity.released.*;
 import io.terminus.dalaran.core.resource.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;

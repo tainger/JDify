@@ -10,7 +10,7 @@ import io.terminus.dalaran.core.config.ProcessorInfo;
 import io.terminus.dalaran.core.config.ServiceInfo;
 import io.terminus.dalaran.core.config.TriggerInfo;
 import io.terminus.dalaran.core.context.DalaranContext;
-import io.terminus.dalaran.core.model.function.MappingFunctionInfo;
+import io.terminus.dalaran.model.function.MappingFunctionInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

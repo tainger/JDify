@@ -2,7 +2,6 @@ package io.terminus.dalaran.camel.component.rocketmq;
 
 import org.apache.camel.Endpoint;
 import org.apache.camel.impl.DefaultComponent;
-import org.apache.rocketmq.client.producer.DefaultMQProducer;
 
 import java.util.Map;
 

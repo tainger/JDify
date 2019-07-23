@@ -1,6 +1,6 @@
 package io.terminus.dalaran.console.entity;
 
-import io.terminus.dalaran.core.resource.convert.ListToJsonConverter;
+import io.terminus.dalaran.core.resource.converter.ListToJsonConverter;
 import io.terminus.dalaran.core.resource.entity.basic.BasicEntity;
 import lombok.Data;
 

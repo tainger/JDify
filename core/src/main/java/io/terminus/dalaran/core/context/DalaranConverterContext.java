@@ -1,8 +1,8 @@
 package io.terminus.dalaran.core.context;
 
-import io.terminus.dalaran.core.model.BodyType;
-import io.terminus.dalaran.core.model.DalaranModelSchema;
-import io.terminus.dalaran.core.model.MessageModel;
+import io.terminus.dalaran.model.BodyType;
+import io.terminus.dalaran.model.DalaranModelSchema;
+import io.terminus.dalaran.model.MessageModel;
 import org.apache.camel.model.ProcessorDefinition;
 
 public interface DalaranConverterContext {

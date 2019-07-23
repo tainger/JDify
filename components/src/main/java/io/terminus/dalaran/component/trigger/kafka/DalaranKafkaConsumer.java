@@ -3,7 +3,7 @@ package io.terminus.dalaran.component.trigger.kafka;
 import io.terminus.dalaran.core.component.BodySerializeType;
 import io.terminus.dalaran.core.component.DalaranTrigger;
 import io.terminus.dalaran.core.component.annotation.Trigger;
-import io.terminus.dalaran.core.model.BodyType;
+import io.terminus.dalaran.model.BodyType;
 import org.apache.camel.model.RouteDefinition;
 
 /**

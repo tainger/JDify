@@ -4,9 +4,9 @@ import io.terminus.dalaran.component.processor.mapper.model.*;
 import io.terminus.dalaran.core.component.BodySerializeType;
 import io.terminus.dalaran.core.component.DalaranProcessor;
 import io.terminus.dalaran.core.component.annotation.Processor;
-import io.terminus.dalaran.core.model.FieldType;
-import io.terminus.dalaran.core.model.MessageModel;
-import io.terminus.dalaran.core.model.ModelField;
+import io.terminus.dalaran.model.FieldType;
+import io.terminus.dalaran.model.MessageModel;
+import io.terminus.dalaran.model.ModelField;
 import org.apache.camel.model.ProcessorDefinition;
 import org.apache.commons.lang3.StringUtils;
 

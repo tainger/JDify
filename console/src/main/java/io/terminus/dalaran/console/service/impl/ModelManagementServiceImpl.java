@@ -3,10 +3,9 @@ package io.terminus.dalaran.console.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.google.common.collect.Lists;
 import io.terminus.dalaran.component.processor.mapper.model.MapperConstants;
 import io.terminus.dalaran.component.processor.mapper.model.MappingType;
-import io.terminus.dalaran.component.processor.mapper.model.SimpleMappingField;
+import io.terminus.dalaran.component.processor.mapper.model.SimpleMapping;
 import io.terminus.dalaran.console.entity.ModelEntity;
 import io.terminus.dalaran.console.model.DalaranConsoleConstants;
 import io.terminus.dalaran.console.model.dto.BasicModelInfo;
@@ -19,16 +18,14 @@ import io.terminus.dalaran.console.service.ModelManagementService;
 import io.terminus.dalaran.console.service.jpa.ModelQueryService;
 import io.terminus.dalaran.console.util.ExcelUtils;
 import io.terminus.dalaran.core.context.DalaranContext;
-import io.terminus.dalaran.core.model.BodyType;
-import io.terminus.dalaran.core.model.DalaranModelSchema;
-import io.terminus.dalaran.core.model.FieldType;
-import io.terminus.dalaran.core.model.ModelField;
-import io.terminus.dalaran.core.model.schema.JsonSchema;
+import io.terminus.dalaran.model.BodyType;
+import io.terminus.dalaran.model.DalaranModelSchema;
+import io.terminus.dalaran.model.FieldType;
+import io.terminus.dalaran.model.ModelField;
+import io.terminus.dalaran.model.schema.JsonSchema;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.similarity.JaroWinklerDistance;
-import org.apache.commons.text.similarity.LevenshteinDistance;
-import org.apache.commons.text.similarity.SimilarityScore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -180,7 +177,7 @@ public class ModelManagementServiceImpl implements ModelManagementService {
     }
 
     @Override
-    public Map<String, SimpleMappingField> suggestMapping(Long sourceId, Long targetId) {
+    public Map<String, SimpleMapping> suggestMapping(Long sourceId, Long targetId) {
         ModelEntity sourceEntity = modelRepository.findOne(sourceId);
         Class<? extends DalaranModelSchema> sourceSchemaType = dalaranContext.getDalaranConverterContext().getSchemaType(sourceEntity.getType());
         DalaranModelSchema sourceModelSchema = JSON.parseObject(sourceEntity.getModelSchema(), sourceSchemaType);
@@ -188,13 +185,13 @@ public class ModelManagementServiceImpl implements ModelManagementService {
         ModelEntity targetEntity = modelRepository.findOne(targetId);
         Class<? extends DalaranModelSchema> targetSchemaType = dalaranContext.getDalaranConverterContext().getSchemaType(targetEntity.getType());
         DalaranModelSchema targetModelSchema = JSON.parseObject(targetEntity.getModelSchema(), targetSchemaType);
-        Map<String, SimpleMappingField> mappings = new HashMap<>();
+        Map<String, SimpleMapping> mappings = new HashMap<>();
         deepBuildSuggest(sourceModelSchema.getFields(), targetModelSchema.getFields(), new ArrayList<>(), new ArrayList<>(), mappings);
         return mappings;
     }
 
     private void deepBuildSuggest(Map<String, ModelField> sourceFields, Map<String, ModelField> targetFields,
-                                  List<String> sourceParentPath, List<String> targetParentPath, Map<String, SimpleMappingField> mappings) {
+                                  List<String> sourceParentPath, List<String> targetParentPath, Map<String, SimpleMapping> mappings) {
         if (sourceFields == null || targetFields == null) {
             return;
         }
@@ -219,7 +216,7 @@ public class ModelManagementServiceImpl implements ModelManagementService {
                 newSourceParentPath.add(suggestField.getKey());
                 newTargetParentPath.add(targetEntry.getKey());
 
-                SimpleMappingField mappingField = new SimpleMappingField();
+                SimpleMapping mappingField = new SimpleMapping();
                 mappingField.setValue(StringUtils.join(newSourceParentPath, "."));
                 mappingField.setMappingType(MappingType.MAPPING);
                 mappings.put(StringUtils.join(newTargetParentPath, "."), mappingField);

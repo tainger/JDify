@@ -1,11 +1,11 @@
 package io.terminus.dalaran.component.processor.subflow;
 
-import io.terminus.dalaran.core.DalaranConstants;
+import io.terminus.dalaran.DalaranConstants;
 import io.terminus.dalaran.core.component.DalaranProcessor;
 import io.terminus.dalaran.core.component.DalaranProcessorConfigCustomConverter;
 import io.terminus.dalaran.core.component.annotation.Processor;
-import io.terminus.dalaran.core.component.model.ComponentModel;
-import io.terminus.dalaran.core.flow.model.BasicFlow;
+import io.terminus.dalaran.model.component.ComponentModel;
+import io.terminus.dalaran.model.flow.BasicFlow;
 import org.apache.camel.model.ProcessorDefinition;
 
 @Processor(
