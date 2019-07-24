@@ -20,7 +20,9 @@ import static org.apache.camel.Exchange.HTTP_METHOD;
 import static org.apache.camel.Exchange.HTTP_QUERY;
 
 @Processor(
-        value = "http-client", configType = HttpClientConfig.class,
+        value = "http-client",
+        name = "Http 调用器",
+        configType = HttpClientConfig.class,
         allowBodyTypes = {BodyType.JSON, BodyType.XML},
         inputSerializeType = BodySerializeType.Serialized,
         outputSerializeType = BodySerializeType.Serialized

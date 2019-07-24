@@ -9,7 +9,11 @@ import org.apache.camel.model.RouteDefinition;
 /**
  * Created by jingdi on 2019/5/20
  */
-@Trigger(value = "kafka-consumer", configType = DalaranKafkaConsumerConfig.class, allowBodyTypes = {BodyType.JSON, BodyType.XML},
+@Trigger(
+        value = "kafka-consumer",
+        name = "Kafka 消费者",
+        configType = DalaranKafkaConsumerConfig.class,
+        allowBodyTypes = {BodyType.JSON, BodyType.XML},
         inputSerializeType = BodySerializeType.Object,
         outputSerializeType = BodySerializeType.Object
 )

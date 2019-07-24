@@ -8,6 +8,7 @@ import org.apache.camel.model.RouteDefinition;
 
 @Trigger(
         value = "netty-http-listener",
+        name = "Http 监听器",
         configType = NettyHttpConfig.class,
         allowBodyTypes = {BodyType.JSON, BodyType.XML},
         inputSerializeType = BodySerializeType.Serialized,

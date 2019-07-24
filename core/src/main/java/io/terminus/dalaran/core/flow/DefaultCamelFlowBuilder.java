@@ -266,7 +266,7 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
 
         MessageModel outModel = flow.getOutModel();
         // TODO SubFlow / Router 等 Processor 不需要做转化, 因为在片段里已经做过了, 而且只能在里面做, 但是形式有点丑, 回头看看怎么优化
-        if (currentProcessorInfo.getOutputSerializeType() != BodySerializeType.All) {
+        if (currentProcessorInfo != null && currentProcessorInfo.getOutputSerializeType() != BodySerializeType.All) {
 //            DalaranTracer convertTracer = DalaranTracer.buildConvertTracer(traceLogger, flow.getId(), lastProcessor.getId());
             if (outModel != null && outModel.getModelType().isSerialized() != currentBodyIsSerialized) {
 //            DalaranTracer convertTracer = DalaranTracer.buildConvertTracer(traceLogger, flow.getId(), lastProcessor.getId());

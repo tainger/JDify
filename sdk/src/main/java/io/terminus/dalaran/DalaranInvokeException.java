@@ -8,13 +8,36 @@ public class DalaranInvokeException extends RuntimeException {
 
     private int code;
 
-    private String message;
+    private String invokeMessage;
 
-    private String desc;
+    private String description;
 
-    public DalaranInvokeException(String key, String method, int code, String message, String desc) {
-        super("Call dalaran integration [" + key + ":" + method + "] has error, code[" + code + "], message: " + message + ", description:" + desc);
+    public DalaranInvokeException(String key, String method, int code, String invokeMessage, String description) {
+        super("Call dalaran integration [" + key + ":" + method + "] has error, code[" + code + "], message: " + invokeMessage + ", description:" + description);
+        this.key = key;
+        this.method = method;
         this.code = code;
-        this.message = message;
+        this.invokeMessage = invokeMessage;
+        this.description = description;
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public String getMethod() {
+        return method;
+    }
+
+    public int getCode() {
+        return code;
+    }
+
+    public String getInvokeMessage() {
+        return invokeMessage;
+    }
+
+    public String getDescription() {
+        return description;
     }
 }

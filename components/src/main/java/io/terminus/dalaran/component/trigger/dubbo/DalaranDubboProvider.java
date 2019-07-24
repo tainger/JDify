@@ -6,7 +6,9 @@ import io.terminus.dalaran.core.component.annotation.Trigger;
 import io.terminus.dalaran.model.BodyType;
 import org.apache.camel.model.RouteDefinition;
 
-@Trigger(value = "dubbo-provider",
+@Trigger(
+        value = "dubbo-provider",
+        name = "Dubbo 服务提供者",
         configType = DubboProviderConfig.class,
         allowBodyTypes = {BodyType.OBJECT},
         inputSerializeType = BodySerializeType.Object,

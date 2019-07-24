@@ -27,7 +27,12 @@ import java.util.List;
 import static io.terminus.dalaran.DalaranConstants.BRANCH_FLOW_NAME_HEADER;
 import static io.terminus.dalaran.DalaranConstants.DELIMITER;
 
-@Processor(value = "scatter-gather", configType = ScatterGatherConfig.class, outputSerializeType = BodySerializeType.Object)
+@Processor(
+        value = "scatter-gather",
+        name = "并行/聚合",
+        configType = ScatterGatherConfig.class,
+        outputSerializeType = BodySerializeType.Object
+)
 public class ScatterGather implements DalaranProcessor<List<String>>, DalaranProcessorConfigCustomConverter<ScatterGatherConfig, List<String>> {
 
     @Autowired

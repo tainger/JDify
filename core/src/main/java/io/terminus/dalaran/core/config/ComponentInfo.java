@@ -6,6 +6,8 @@ import io.terminus.dalaran.model.BodyType;
 public interface ComponentInfo {
     String getType();
 
+    String getName();
+
     DalaranConfigField[] getConfigFields();
 
     BodyType[] getAllowedBodyTypes();
