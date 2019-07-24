@@ -1,6 +1,5 @@
 package io.terminus.dalaran.spring;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
@@ -20,13 +19,10 @@ public class DalaranBeanDefinitionRegistrar implements ImportBeanDefinitionRegis
     private ResourceLoader resourceLoader;
     private Environment environment;
 
-    @Autowired
-    private DalaranSdkProperties properties;
-
     @Override
     public void registerBeanDefinitions(AnnotationMetadata importingClassMetadata, BeanDefinitionRegistry registry) {
         DalaranComponentProvider scanner = new DalaranComponentProvider(resourceLoader, environment);
-        String[] basePackages = environment.getRequiredProperty("terminus.dalaran.basePackages", String[].class);
+        String[] basePackages = environment.getRequiredProperty("trantor.module.scan-packages", String[].class);
         String runtimeUrl = environment.getRequiredProperty("terminus.dalaran.runtimeUrl");
 
         for (String basePackage : basePackages) {
