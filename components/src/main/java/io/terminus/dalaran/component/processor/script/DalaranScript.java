@@ -9,7 +9,9 @@ import org.apache.camel.model.ProcessorDefinition;
 import static io.terminus.dalaran.DalaranConstants.DALARAN_CONTEXT_EXCHANGE;
 
 @Processor(
-        value = "script", configType = DalaranScriptConfig.class,
+        value = "script",
+        name = "执行脚本",
+        configType = DalaranScriptConfig.class,
         inputSerializeType = BodySerializeType.Object,
         outputSerializeType = BodySerializeType.Object
 )

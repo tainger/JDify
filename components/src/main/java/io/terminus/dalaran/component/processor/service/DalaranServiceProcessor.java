@@ -16,7 +16,9 @@ import org.apache.camel.model.ProcessorDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @Processor(
-        value = "service", configType = ServiceOperationConfig.class,
+        value = "service",
+        name = "服务调用器",
+        configType = ServiceOperationConfig.class,
         inputSerializeType = BodySerializeType.Serialized,
         outputSerializeType = BodySerializeType.Serialized
 )

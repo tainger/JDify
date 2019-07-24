@@ -80,6 +80,7 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext {
 
         TriggerInfo triggerInfo = new TriggerInfo();
         triggerInfo.setType(triggerAnnotation.value());
+        triggerInfo.setName(triggerAnnotation.name());
         triggerInfo.setConfigFields(configFields);
         triggerInfo.setConfigType(triggerAnnotation.configType());
         triggerInfo.setAllowedBodyTypes(triggerAnnotation.allowBodyTypes());
@@ -107,6 +108,7 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext {
 
         ProcessorInfo processorInfo = new ProcessorInfo();
         processorInfo.setType(processorAnnotation.value());
+        processorInfo.setName(processorAnnotation.name());
         processorInfo.setConfigFields(configFields);
         processorInfo.setConfigType(processorAnnotation.configType());
         processorInfo.setInputSerializeType(processorAnnotation.inputSerializeType());

@@ -10,7 +10,9 @@ import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import javax.sql.DataSource;
 
 @Processor(
-        value = "sql", configType = SqlConfig.class,
+        value = "sql",
+        name = "执行 SQL",
+        configType = SqlConfig.class,
         inputSerializeType = BodySerializeType.Object,
         outputSerializeType = BodySerializeType.Object
 )

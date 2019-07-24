@@ -11,6 +11,7 @@ import org.apache.camel.model.RouteDefinition;
  */
 @Trigger(
         value = "soap-listener",
+        name = "Soap 监听器",
         configType = SoapListenerConfig.class,
         allowBodyTypes = {BodyType.XML},
         inputSerializeType = BodySerializeType.Serialized,

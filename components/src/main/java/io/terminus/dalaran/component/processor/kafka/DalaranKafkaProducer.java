@@ -9,7 +9,10 @@ import org.apache.camel.model.ProcessorDefinition;
 /**
  * Created by jingdi on 2019/5/16
  */
-@Processor(value = "kafka-producer", configType = DalaranKafkaProducerConfig.class,
+@Processor(
+        value = "kafka-producer",
+        name = "Kafka 发送器",
+        configType = DalaranKafkaProducerConfig.class,
         inputSerializeType = BodySerializeType.Object,
         outputSerializeType = BodySerializeType.Object,
         allowBodyTypes = {BodyType.JSON, BodyType.XML})

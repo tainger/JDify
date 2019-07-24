@@ -7,7 +7,8 @@ import io.terminus.dalaran.model.BodyType;
 import org.apache.camel.model.RouteDefinition;
 
 @Trigger(
-        value = "trantor-ext-point",
+        value = "Trantor-Integration",
+        name = "Trantor 集成点",
         configType = TrantorTriggerConfig.class,
         allowBodyTypes = {BodyType.JSON},
         inputSerializeType = BodySerializeType.Serialized,

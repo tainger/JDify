@@ -24,7 +24,12 @@ import java.util.Map;
 
 import static io.terminus.dalaran.DalaranConstants.DELIMITER;
 
-@Processor(value = "router", configType = DalaranRouterConfig.class, inputSerializeType = BodySerializeType.Object)
+@Processor(
+        value = "router",
+        name = "条件路由",
+        configType = DalaranRouterConfig.class,
+        inputSerializeType = BodySerializeType.Object
+)
 public class DalaranRouter implements DalaranProcessor<Map<String, String>>, DalaranProcessorConfigCustomConverter<DalaranRouterConfig, Map<String, String>> {
 
     private static final String OTHERWISE_EXPRESSION = "OTHERWISE";

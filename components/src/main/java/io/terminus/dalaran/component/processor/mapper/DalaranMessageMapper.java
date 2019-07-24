@@ -9,6 +9,7 @@ import io.terminus.dalaran.model.MessageModel;
 import io.terminus.dalaran.model.ModelField;
 import org.apache.camel.model.ProcessorDefinition;
 import org.apache.commons.lang3.StringUtils;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -17,7 +18,9 @@ import java.util.Map;
  * Created by jingdi on 2019/3/18
  */
 @Processor(
-        value = "mapper-convert", configType = DalaranMapperConfig.class,
+        value = "mapper-convert",
+        name = "数据映射",
+        configType = DalaranMapperConfig.class,
         inputSerializeType = BodySerializeType.Object,
         outputSerializeType = BodySerializeType.Object
 )
@@ -53,7 +56,7 @@ public class DalaranMessageMapper implements DalaranProcessor<DalaranMapperConfi
     }
 
     private void buildMapping(MessageMapping messageMapping, String path, SimpleMapping mapping, MessageModel in, MessageModel out) {
-        String destinationPath = StringUtils.substringAfter(path, MapperConstants.MODEL_ROOT+ ".");
+        String destinationPath = StringUtils.substringAfter(path, MapperConstants.MODEL_ROOT + ".");
         messageMapping.setPath(destinationPath);
 
         MappingFunction function = mapping.getFunction();
@@ -72,7 +75,7 @@ public class DalaranMessageMapper implements DalaranProcessor<DalaranMapperConfi
 
         List<SourceField> sourceFields = new ArrayList<>();
         boolean complex = false;
-        for (String sourcePath: sourcePaths) {
+        for (String sourcePath : sourcePaths) {
             SourceField sourceField = new SourceField();
             complex = buildSourceField(sourcePath, inField, sourceField);
             sourceFields.add(sourceField);
@@ -85,7 +88,7 @@ public class DalaranMessageMapper implements DalaranProcessor<DalaranMapperConfi
         SimpleMappingField simpleMappingField = new SimpleMappingField();
         boolean complex = buildMappingField(sourcePath, in, simpleMappingField);
         sourceField.setField(simpleMappingField);
-        sourceField.setPath(StringUtils.substringAfter(sourcePath, MapperConstants.MODEL_ROOT+ "."));
+        sourceField.setPath(StringUtils.substringAfter(sourcePath, MapperConstants.MODEL_ROOT + "."));
         return complex;
     }
 

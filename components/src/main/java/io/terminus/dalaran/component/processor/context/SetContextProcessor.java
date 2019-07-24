@@ -10,9 +10,10 @@ import java.util.Map;
 
 import static io.terminus.dalaran.DalaranConstants.DALARAN_CONTEXT_EXCHANGE;
 
-
 @Processor(
-        value = "set-context", configType = SetContextConfig.class,
+        value = "set-context",
+        name = "设置上下文",
+        configType = SetContextConfig.class,
         inputSerializeType = BodySerializeType.Object,
         outputSerializeType = BodySerializeType.Object
 )

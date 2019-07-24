@@ -9,7 +9,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Trigger(
-        value = "scheduler", isVoid = true,
+        value = "scheduler",
+        name = "调度触发器",
+        isVoid = true,
         configType = DalaranSchedulerConfig.class
 )
 public class DalaranScheduler implements DalaranTrigger<DalaranSchedulerConfig> {

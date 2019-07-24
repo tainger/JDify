@@ -22,7 +22,9 @@ import java.util.List;
 import static org.apache.camel.builder.Builder.body;
 
 @Processor(
-        value = "foreach", configType = ForEachConfig.class
+        value = "foreach",
+        name = "数组循环",
+        configType = ForEachConfig.class
 )
 public class ForEachProcessor implements DalaranProcessor<String>, DalaranProcessorConfigCustomConverter<ForEachConfig, String> {
 

@@ -21,7 +21,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Processor(
-        value = "retry", configType = RetryConfig.class
+        value = "retry",
+        name = "失败重试",
+        configType = RetryConfig.class
 )
 public class Retry implements DalaranProcessor<String>, DalaranProcessorConfigCustomConverter<RetryConfig, String> {
 

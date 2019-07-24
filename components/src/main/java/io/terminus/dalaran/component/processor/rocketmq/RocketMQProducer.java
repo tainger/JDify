@@ -9,7 +9,10 @@ import org.apache.camel.model.ProcessorDefinition;
 /**
  * Created by jingdi on 2019/6/19
  */
-@Processor(value = "rocketmq-producer", configType = RocketMQProducerConfig.class,
+@Processor(
+        value = "rocketmq-producer",
+        name = "RocketMQ 消息发送器",
+        configType = RocketMQProducerConfig.class,
         inputSerializeType = BodySerializeType.Object,
         outputSerializeType = BodySerializeType.Object,
         allowBodyTypes = {BodyType.JSON, BodyType.XML})

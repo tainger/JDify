@@ -6,7 +6,9 @@ import io.terminus.dalaran.core.component.annotation.Processor;
 import org.apache.camel.model.ProcessorDefinition;
 
 @Processor(
-        value = "dubbo-consumer", configType = DalaranDubboConsumerConfig.class,
+        value = "dubbo-consumer",
+        name = "Dubbo 服务消费者",
+        configType = DalaranDubboConsumerConfig.class,
         inputSerializeType = BodySerializeType.Object,
         outputSerializeType = BodySerializeType.Object
 )

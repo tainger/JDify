@@ -12,7 +12,9 @@ import org.apache.camel.model.ProcessorDefinition;
  * Created by jingdi on 2019/5/23
  */
 @Processor(
-        value = "soap-client", configType = SoapClientConfig.class,
+        value = "soap-client",
+        name = "Soap 调用器",
+        configType = SoapClientConfig.class,
         allowBodyTypes = {BodyType.JSON, BodyType.XML},
         inputSerializeType = BodySerializeType.Serialized,
         outputSerializeType = BodySerializeType.Serialized

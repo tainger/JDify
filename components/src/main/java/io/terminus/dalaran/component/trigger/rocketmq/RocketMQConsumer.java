@@ -9,7 +9,11 @@ import org.apache.camel.model.RouteDefinition;
 /**
  * Created by jingdi on 2019/6/19
  */
-@Trigger(value = "rocketmq-consumer", configType = RocketMQConsumerConfig.class, allowBodyTypes = {BodyType.JSON, BodyType.XML},
+@Trigger(
+        value = "rocketmq-consumer",
+        name = "RocketMQ 消费者",
+        configType = RocketMQConsumerConfig.class,
+        allowBodyTypes = {BodyType.JSON, BodyType.XML},
         inputSerializeType = BodySerializeType.Serialized,
         outputSerializeType = BodySerializeType.Serialized
 )
