@@ -1,7 +1,7 @@
 package io.terminus.dalaran.core.context;
 
-import io.terminus.dalaran.core.model.function.MappingFunctionInfo;
-import io.terminus.dalaran.core.model.function.MappingFunctionType;
+import io.terminus.dalaran.model.function.MappingFunctionInfo;
+import io.terminus.dalaran.model.function.MappingFunctionType;
 
 import java.lang.reflect.Method;
 import java.util.Collection;

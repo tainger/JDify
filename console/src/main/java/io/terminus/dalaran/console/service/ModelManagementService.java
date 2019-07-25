@@ -6,8 +6,8 @@ import io.terminus.dalaran.console.model.dto.BasicModelInfo;
 import io.terminus.dalaran.console.model.dto.DataTemplate;
 import io.terminus.dalaran.console.model.dto.ModelDTO;
 import io.terminus.dalaran.console.model.query.ModelQuery;
-import io.terminus.dalaran.core.model.BodyType;
-import io.terminus.dalaran.core.model.schema.JsonSchema;
+import io.terminus.dalaran.model.BodyType;
+import io.terminus.dalaran.model.schema.JsonSchema;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;

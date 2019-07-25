@@ -1,7 +1,10 @@
 package io.terminus.dalaran.example
 
+import io.terminus.dalaran.spring.DalaranSdkConfiguration
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication
+import org.springframework.context.annotation.Import
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -10,6 +13,7 @@ import javax.servlet.http.HttpServletRequest
 import javax.xml.bind.annotation.XmlRootElement
 
 @SpringBootApplication
+@Import(DalaranSdkConfiguration::class)
 open class Application
 
 
@@ -38,6 +42,16 @@ class TargetOrderItem {
 
 @RestController
 class TestController {
+
+    @Autowired
+    lateinit var testExtPoint: TestExtPoint
+
+    @GetMapping("/ext")
+    fun test(a: Long, b: String): Any {
+        val data = testExtPoint.allOrders(a, listOf())
+        return data
+    }
+
     @PostMapping("/orders")
     fun orders(@RequestBody orderItem: ExtOrderItem, req: HttpServletRequest) = Order("${orderItem.itemName}: ${orderItem.itemPrice}")
 

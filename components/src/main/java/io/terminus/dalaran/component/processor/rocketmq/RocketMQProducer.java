@@ -3,13 +3,16 @@ package io.terminus.dalaran.component.processor.rocketmq;
 import io.terminus.dalaran.core.component.BodySerializeType;
 import io.terminus.dalaran.core.component.DalaranProcessor;
 import io.terminus.dalaran.core.component.annotation.Processor;
-import io.terminus.dalaran.core.model.BodyType;
+import io.terminus.dalaran.model.BodyType;
 import org.apache.camel.model.ProcessorDefinition;
 
 /**
  * Created by jingdi on 2019/6/19
  */
-@Processor(value = "rocketmq-producer", configType = RocketMQProducerConfig.class,
+@Processor(
+        value = "rocketmq-producer",
+        name = "RocketMQ 消息发送器",
+        configType = RocketMQProducerConfig.class,
         inputSerializeType = BodySerializeType.Object,
         outputSerializeType = BodySerializeType.Object,
         allowBodyTypes = {BodyType.JSON, BodyType.XML})

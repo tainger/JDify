@@ -3,7 +3,7 @@ package io.terminus.dalaran.component.processor.soap;
 import io.terminus.dalaran.core.component.BodySerializeType;
 import io.terminus.dalaran.core.component.DalaranProcessor;
 import io.terminus.dalaran.core.component.annotation.Processor;
-import io.terminus.dalaran.core.model.BodyType;
+import io.terminus.dalaran.model.BodyType;
 import org.apache.camel.Exchange;
 import org.apache.camel.builder.Builder;
 import org.apache.camel.model.ProcessorDefinition;
@@ -12,7 +12,9 @@ import org.apache.camel.model.ProcessorDefinition;
  * Created by jingdi on 2019/5/23
  */
 @Processor(
-        value = "soap-client", configType = SoapClientConfig.class,
+        value = "soap-client",
+        name = "Soap 调用器",
+        configType = SoapClientConfig.class,
         allowBodyTypes = {BodyType.JSON, BodyType.XML},
         inputSerializeType = BodySerializeType.Serialized,
         outputSerializeType = BodySerializeType.Serialized

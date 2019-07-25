@@ -1,16 +1,16 @@
 package io.terminus.dalaran.core.resource;
 
-import io.terminus.dalaran.core.component.model.ProcessorModel;
-import io.terminus.dalaran.core.flow.model.BasicFlow;
-import io.terminus.dalaran.core.flow.model.SubFlow;
-import io.terminus.dalaran.core.flow.model.TriggerFlow;
-import io.terminus.dalaran.core.model.MessageModel;
 import io.terminus.dalaran.core.resource.entity.ModelAbstractEntity;
 import io.terminus.dalaran.core.resource.entity.ServiceAbstractEntity;
 import io.terminus.dalaran.core.resource.entity.SubFlowAbstractEntity;
 import io.terminus.dalaran.core.resource.entity.TriggerFlowAbstractEntity;
 import io.terminus.dalaran.core.resource.entity.basic.BasicFlowEntity;
 import io.terminus.dalaran.core.resource.entity.common.ProcessorEntity;
+import io.terminus.dalaran.model.MessageModel;
+import io.terminus.dalaran.model.component.ProcessorModel;
+import io.terminus.dalaran.model.flow.BasicFlow;
+import io.terminus.dalaran.model.flow.SubFlow;
+import io.terminus.dalaran.model.flow.TriggerFlow;
 
 public interface DalaranResourceBuilder {
 

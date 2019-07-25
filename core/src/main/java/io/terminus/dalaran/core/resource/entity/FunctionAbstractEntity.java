@@ -1,8 +1,8 @@
 package io.terminus.dalaran.core.resource.entity;
 
-import io.terminus.dalaran.core.model.function.MappingFunctionType;
-import io.terminus.dalaran.core.resource.convert.ListToJsonConverter;
+import io.terminus.dalaran.core.resource.converter.ListToJsonConverter;
 import io.terminus.dalaran.core.resource.entity.basic.BasicEntity;
+import io.terminus.dalaran.model.function.MappingFunctionType;
 import lombok.Data;
 
 import javax.persistence.*;

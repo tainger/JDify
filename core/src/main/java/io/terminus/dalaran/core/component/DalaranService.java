@@ -1,10 +1,9 @@
 package io.terminus.dalaran.core.component;
 
-import io.terminus.dalaran.core.component.model.ServiceOperation;
 import io.terminus.dalaran.core.component.model.ServiceOperationModel;
+import io.terminus.dalaran.model.component.ServiceOperation;
 import org.apache.camel.model.ProcessorDefinition;
 import org.jetbrains.annotations.NotNull;
-
 import java.util.List;
 
 public interface DalaranService<ImportConfig, ServiceConfig, OperationConfig extends ServiceOperation> {

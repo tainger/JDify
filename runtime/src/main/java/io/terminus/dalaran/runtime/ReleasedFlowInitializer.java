@@ -1,15 +1,15 @@
 package io.terminus.dalaran.runtime;
 
 import io.terminus.dalaran.core.context.DalaranContext;
-import io.terminus.dalaran.core.flow.FlowStatus;
-import io.terminus.dalaran.core.flow.model.SubFlow;
-import io.terminus.dalaran.core.flow.model.TriggerFlow;
 import io.terminus.dalaran.core.resource.DalaranResourceBuilder;
 import io.terminus.dalaran.core.resource.entity.common.ReleaseRecordEntity;
 import io.terminus.dalaran.core.resource.entity.released.FunctionReleasedEntity;
 import io.terminus.dalaran.core.resource.entity.released.SubFlowReleasedEntity;
 import io.terminus.dalaran.core.resource.entity.released.TriggerFlowReleasedEntity;
 import io.terminus.dalaran.core.resource.repository.ReleaseRecordRepository;
+import io.terminus.dalaran.model.flow.FlowStatus;
+import io.terminus.dalaran.model.flow.SubFlow;
+import io.terminus.dalaran.model.flow.TriggerFlow;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;

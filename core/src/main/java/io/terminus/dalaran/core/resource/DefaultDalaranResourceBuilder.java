@@ -1,27 +1,27 @@
 package io.terminus.dalaran.core.resource;
 
 import com.alibaba.fastjson.JSON;
-import io.terminus.dalaran.core.DalaranConstants;
+import io.terminus.dalaran.DalaranConstants;
 import io.terminus.dalaran.core.component.config.AllModelConfig;
 import io.terminus.dalaran.core.component.config.ConnectorConfig;
 import io.terminus.dalaran.core.component.config.ImmutableModelConfig;
 import io.terminus.dalaran.core.component.config.OutModelConfig;
-import io.terminus.dalaran.core.component.model.ProcessorModel;
 import io.terminus.dalaran.core.config.ProcessorInfo;
 import io.terminus.dalaran.core.config.ServiceInfo;
 import io.terminus.dalaran.core.config.TriggerInfo;
 import io.terminus.dalaran.core.context.DalaranComponentContext;
 import io.terminus.dalaran.core.context.DalaranConverterContext;
 import io.terminus.dalaran.core.context.DalaranServiceContext;
-import io.terminus.dalaran.core.flow.model.BasicFlow;
-import io.terminus.dalaran.core.flow.model.SubFlow;
-import io.terminus.dalaran.core.flow.model.TriggerFlow;
-import io.terminus.dalaran.core.model.DalaranModelSchema;
-import io.terminus.dalaran.core.model.MessageModel;
 import io.terminus.dalaran.core.resource.entity.*;
 import io.terminus.dalaran.core.resource.entity.basic.BasicFlowEntity;
 import io.terminus.dalaran.core.resource.entity.common.ProcessorEntity;
 import io.terminus.dalaran.core.resource.entity.released.ReleasedEntity;
+import io.terminus.dalaran.model.DalaranModelSchema;
+import io.terminus.dalaran.model.MessageModel;
+import io.terminus.dalaran.model.component.ProcessorModel;
+import io.terminus.dalaran.model.flow.BasicFlow;
+import io.terminus.dalaran.model.flow.SubFlow;
+import io.terminus.dalaran.model.flow.TriggerFlow;
 import lombok.val;
 import org.apache.commons.text.StringSubstitutor;
 

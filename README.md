@@ -37,6 +37,7 @@
 ## 用户手册
 
 * [快速开始](./docs/user/quick-start.md)
+* [与 Trantor 集成](./docs/user/trantor.md)
 * [高级功能](./docs/user/other.md)
 * [常见问题](./docs/user/Q&A.md)
 

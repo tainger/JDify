@@ -5,18 +5,20 @@ import io.terminus.dalaran.core.component.DalaranProcessor;
 import io.terminus.dalaran.core.component.DalaranProcessorConfigCustomConverter;
 import io.terminus.dalaran.core.component.DalaranService;
 import io.terminus.dalaran.core.component.annotation.Processor;
-import io.terminus.dalaran.core.component.model.ComponentModel;
-import io.terminus.dalaran.core.component.model.ServiceOperation;
 import io.terminus.dalaran.core.context.DalaranServiceContext;
-import io.terminus.dalaran.core.flow.model.BasicFlow;
 import io.terminus.dalaran.core.resource.DalaranResourceBuilder;
 import io.terminus.dalaran.core.resource.DalaranResourceLoader;
 import io.terminus.dalaran.core.resource.entity.ServiceAbstractEntity;
+import io.terminus.dalaran.model.component.ComponentModel;
+import io.terminus.dalaran.model.component.ServiceOperation;
+import io.terminus.dalaran.model.flow.BasicFlow;
 import org.apache.camel.model.ProcessorDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @Processor(
-        value = "service", configType = ServiceOperationConfig.class,
+        value = "service",
+        name = "服务调用器",
+        configType = ServiceOperationConfig.class,
         inputSerializeType = BodySerializeType.Serialized,
         outputSerializeType = BodySerializeType.Serialized
 )

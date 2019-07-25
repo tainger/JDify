@@ -1,6 +1,6 @@
 package io.terminus.dalaran.component.processor.mapper.model;
 
-import io.terminus.dalaran.core.model.FieldType;
+import io.terminus.dalaran.model.FieldType;
 import lombok.Data;
 
 /**
@@ -10,6 +10,8 @@ import lombok.Data;
 public class PathDetail {
 
     private String path;
+
+    private String indexes;
 
     private FieldType type;
 }

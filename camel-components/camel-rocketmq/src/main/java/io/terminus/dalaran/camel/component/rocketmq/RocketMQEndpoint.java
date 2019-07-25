@@ -1,14 +1,10 @@
 package io.terminus.dalaran.camel.component.rocketmq;
 
-import com.alibaba.fastjson.JSON;
 import org.apache.camel.*;
 import org.apache.camel.impl.ProcessorEndpoint;
 import org.apache.camel.spi.Metadata;
 import org.apache.camel.spi.UriEndpoint;
 import org.apache.camel.spi.UriParam;
-import org.apache.rocketmq.common.message.MessageExt;
-
-import java.util.List;
 
 /**
  * Created by jingdi on 2019/6/14

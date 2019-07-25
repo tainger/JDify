@@ -8,7 +8,7 @@ import io.terminus.dalaran.core.component.DalaranMessageBodyCustomConverter;
 import io.terminus.dalaran.core.component.DalaranProcessor;
 import io.terminus.dalaran.core.component.annotation.Processor;
 import io.terminus.dalaran.core.context.DalaranConverterContext;
-import io.terminus.dalaran.core.model.BodyType;
+import io.terminus.dalaran.model.BodyType;
 import org.apache.camel.builder.Builder;
 import org.apache.camel.model.ProcessorDefinition;
 import org.apache.camel.model.RouteDefinition;
@@ -20,7 +20,9 @@ import static org.apache.camel.Exchange.HTTP_METHOD;
 import static org.apache.camel.Exchange.HTTP_QUERY;
 
 @Processor(
-        value = "http-client", configType = HttpClientConfig.class,
+        value = "http-client",
+        name = "Http 调用器",
+        configType = HttpClientConfig.class,
         allowBodyTypes = {BodyType.JSON, BodyType.XML},
         inputSerializeType = BodySerializeType.Serialized,
         outputSerializeType = BodySerializeType.Serialized

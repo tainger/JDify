@@ -1,7 +1,7 @@
 package io.terminus.dalaran.core.resource.entity;
 
-import io.terminus.dalaran.core.model.BodyType;
 import io.terminus.dalaran.core.resource.entity.basic.BasicEntity;
+import io.terminus.dalaran.model.BodyType;
 import lombok.Data;
 
 import javax.persistence.Column;

@@ -3,8 +3,10 @@ package io.terminus.dalaran.component.processor.mapper.jsonPath;
 import com.alibaba.fastjson.JSONPath;
 import com.github.drapostolos.typeparser.TypeParser;
 import io.terminus.dalaran.component.processor.mapper.model.*;
-import io.terminus.dalaran.core.context.support.DefaultDalaranFunctionContext;
-import io.terminus.dalaran.core.model.FieldType;
+import io.terminus.dalaran.core.context.DalaranContext;
+import io.terminus.dalaran.model.FieldType;
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -15,7 +17,7 @@ import java.util.Map;
  */
 public class Converter {
 
-    public static Map<String, Object> convert(DalaranMappingConfig mappingConfig, Object source) {
+    public static Map<String, Object> convert(DalaranMappingConfig mappingConfig, Object source, DalaranContext dalaranContext) {
         Map<String, Object> destination = new HashMap<>();
         List<MessageMapping> messageMappings = mappingConfig.getMessageMappings();
         SimpleMappingField sourceRoot = mappingConfig.getSourceRoot();
@@ -24,15 +26,15 @@ public class Converter {
             if (messageMapping.isComplex()) {
                 SourceFieldDetail sourceFieldDetail = buildSource(source, messageMapping, sourceRoot);
                 List<PathDetail> destinationPaths = buildPathMapping(messageMapping, sourceFieldDetail.getArrayFieldSize(), destinationRoot);
-                buildValue(source, sourceFieldDetail.getSourcePaths(), destinationPaths, messageMapping, destination);
+                buildValue(source, sourceFieldDetail.getSourcePaths(), destinationPaths, messageMapping, destination, dalaranContext);
             } else {
-                buildValue(source, messageMapping, destination);
+                buildValue(source, messageMapping, destination, dalaranContext);
             }
         });
         return destination;
     }
 
-    private static void buildValue(Object source, MessageMapping messageMapping, Object destination) {
+    private static void buildValue(Object source, MessageMapping messageMapping, Object destination, DalaranContext dalaranContext) {
         List<Object> values = new ArrayList<>();
         List<SourceField> sourceFields = messageMapping.getSourceFields();
         sourceFields.forEach(sourceField -> {
@@ -42,12 +44,11 @@ public class Converter {
 
         String destinationPath = messageMapping.getPath();
         MappingFunction function = messageMapping.getFunction();
-        DefaultDalaranFunctionContext functionContext = new DefaultDalaranFunctionContext();
         if (function != null) {
             if (function.getType() == FunctionType.STANDARD) {
-                functionContext.executeStaticFunction(function.getKey(), values.toArray());
+                dalaranContext.getDalaranFunctionContext().executeStaticFunction(function.getKey(), values.toArray());
             } else {
-                functionContext.executeCustomFunction(Long.valueOf(function.getKey()), values.toArray());
+                dalaranContext.getDalaranFunctionContext().executeCustomFunction(Long.valueOf(function.getKey()), values.toArray());
             }
         } else if (values.size() == 1) {
             FieldType type = sourceFields.get(0).getField().getType();
@@ -56,7 +57,7 @@ public class Converter {
     }
 
     private static SourceFieldDetail buildSource(Object source, MessageMapping mapping, SimpleMappingField sourceRoot) {
-        List<SourcePath> sourcePaths = new ArrayList<>();
+        List<List<SourcePath>> sourcePathList = new ArrayList<>();
         List<Integer> arrayFieldSize = new ArrayList<>();
         Integer lastArray = 0;
         List<SourceField> fields = mapping.getSourceFields();
@@ -67,48 +68,61 @@ public class Converter {
             arrayFieldSize.add(bodySize);
             for (int i = 0; i < bodySize; i++) {
                 String path = "$[" + i + "]";
+                StringBuilder indexes = new StringBuilder();
+                indexes.append(i);
+                List<SourcePath> sourcePaths = new ArrayList<>();
                 for (SourceField sourceField: fields) {
                     List<PathDetail> paths = new ArrayList<>();
-                    buildSourcePaths(path, sourceField.getField(), arrayFieldSize, level, source, paths);
+                    buildSourcePaths(path, sourceField.getField(), arrayFieldSize, level, source, paths, indexes);
                     SourcePath sourcePath = new SourcePath(sourceField.getPath(), paths);
                     sourcePaths.add(sourcePath);
                 }
+                sourcePathList.add(sourcePaths);
             }
         } else {
             String path = "$";
+            StringBuilder indexes = new StringBuilder();
+            List<SourcePath> sourcePaths = new ArrayList<>();
             for (SourceField sourceField: fields) {
                 List<PathDetail> paths = new ArrayList<>();
-                buildSourcePaths(path, sourceField.getField(), arrayFieldSize, lastArray, source, paths);
+                buildSourcePaths(path, sourceField.getField(), arrayFieldSize, lastArray, source, paths, indexes);
                 SourcePath sourcePath = new SourcePath(sourceField.getPath(), paths);
                 sourcePaths.add(sourcePath);
             }
+            sourcePathList.add(sourcePaths);
         }
-        return new SourceFieldDetail(arrayFieldSize, sourcePaths);
+        return new SourceFieldDetail(arrayFieldSize, sourcePathList);
     }
 
-    private static void buildSourcePaths(String parentPath, SimpleMappingField field, List<Integer> arrayFieldSize, Integer lastArrayLevel, Object source, List<PathDetail> paths) {
+    private static void buildSourcePaths(String parentPath, SimpleMappingField field, List<Integer> arrayFieldSize, Integer lastArrayLevel, Object source, List<PathDetail> paths, StringBuilder indexes) {
         String name = parentPath + "." + field.getName();
         if (field.getLocal() == FieldLocal.MIDDLE) {
             Object body = JSONPath.eval(source, name);
-            SimpleMappingField childField = field.getChild();
-            if (field.getType() == FieldType.ARRAY) {
-                List<Object> child = (List) body;
-                int bodySize = child.size();
-                Integer level = lastArrayLevel + 1;
-                arrayFieldSize.add(bodySize);
+            if (body != null) {
+                SimpleMappingField childField = field.getChild();
+                if (field.getType() == FieldType.ARRAY) {
+                    List<Object> child = (List) body;
+                    int bodySize = child.size();
+                    Integer level = lastArrayLevel + 1;
+                    arrayFieldSize.add(bodySize);
 
-                for (int i = 0; i < bodySize; i++) {
-                    String path = name + "[" + i + "]";
-                    buildSourcePaths(path, childField, arrayFieldSize, level, source, paths);
+                    for (int i = 0; i < bodySize; i++) {
+                        StringBuilder index = new StringBuilder();
+                        index.append(indexes);
+                        index.append(i);
+                        String path = name + "[" + i + "]";
+                        buildSourcePaths(path, childField, arrayFieldSize, level, source, paths, index);
+                    }
                 }
-            }
-            if (field.getType() == FieldType.OBJECT) {
-                buildSourcePaths(name, childField, arrayFieldSize, lastArrayLevel, source, paths);
+                if (field.getType() == FieldType.OBJECT) {
+                    buildSourcePaths(name, childField, arrayFieldSize, lastArrayLevel, source, paths, indexes);
+                }
             }
         } else if (field.getLocal() == FieldLocal.END) {
             PathDetail detail = new PathDetail();
             detail.setPath(name);
             detail.setType(field.getType());
+            detail.setIndexes(indexes.toString());
             paths.add(detail);
         }
     }
@@ -120,68 +134,94 @@ public class Converter {
         if (destinationRoot.getType() == FieldType.ARRAY) {
             int size = arrayFieldSize.get(level++);
             for (int i = 0; i < size; i++) {
+                StringBuilder indexes = new StringBuilder();
+                indexes.append(i);
                 String path = "$root[" + i + "]";
-                buildDestinationPaths(path, field, arrayFieldSize, level, paths);
+                buildDestinationPaths(path, field, arrayFieldSize, level, paths, indexes);
             }
         } else {
             String path = "$root";
-            buildDestinationPaths(path, field, arrayFieldSize, level, paths);
+            StringBuilder indexes = new StringBuilder();
+            buildDestinationPaths(path, field, arrayFieldSize, level, paths, indexes);
         }
         return paths;
     }
 
-    private static void buildDestinationPaths(String parentPath, SimpleMappingField field, List<Integer> arrayFieldSize, int level, List<PathDetail> paths) {
+    private static void buildDestinationPaths(String parentPath, SimpleMappingField field, List<Integer> arrayFieldSize, int level, List<PathDetail> paths, StringBuilder indexes) {
         String name = parentPath + "." + field.getName();
         if (field.getLocal() == FieldLocal.MIDDLE) {
             SimpleMappingField child = field.getChild();
             if (field.getType() == FieldType.ARRAY) {
                 int bodySize = arrayFieldSize.get(level++);
                 for (int i = 0; i < bodySize; i++) {
+                    StringBuilder index = new StringBuilder();
+                    index.append(indexes.toString());
+                    index.append(i);
                     String path = name + "[" + i + "]";
-                    buildDestinationPaths(path, child, arrayFieldSize, level, paths);
+                    buildDestinationPaths(path, child, arrayFieldSize, level, paths, index);
                 }
             }
             if (field.getType() == FieldType.OBJECT) {
-                buildDestinationPaths(name, child, arrayFieldSize, level, paths);
+                buildDestinationPaths(name, child, arrayFieldSize, level, paths, indexes);
             }
         } else if (field.getLocal() == FieldLocal.END) {
             PathDetail detail = new PathDetail();
             detail.setPath(name);
             detail.setType(field.getType());
+            detail.setIndexes(indexes.toString());
             paths.add(detail);
         }
     }
 
-    private static void buildValue(Object source, List<SourcePath> sourcePaths, List<PathDetail> destinationPaths, MessageMapping messageMapping, Object destination) {
+    private static void buildValue(Object source, List<List<SourcePath>> sourcePaths, List<PathDetail> destinationPaths, MessageMapping messageMapping, Object destination, DalaranContext dalaranContext) {
         MappingFunction function = messageMapping.getFunction();
-        DefaultDalaranFunctionContext functionContext = new DefaultDalaranFunctionContext();
         if (sourcePaths != null && sourcePaths.size() > 0) {
-            int size = sourcePaths.get(0).getDetails().size();
+            int size = sourcePaths.size();
             for (int i = 0; i < size; i++) {
                 List<Object> values = new ArrayList<>();
-                for (SourcePath sourcePath: sourcePaths) {
-                    Object value = JSONPath.eval(source, sourcePath.getDetails().get(i).getPath());
+                String indexes = "";
+                for (SourcePath sourcePath: sourcePaths.get(i)) {
+                    Object value = null;
+                    if (sourcePath.getDetails() != null && sourcePath.getDetails().size() > 0) {
+                        PathDetail pathDetail = sourcePath.getDetails().get(0);
+                        value = JSONPath.eval(source, pathDetail.getPath());
+                        indexes = pathDetail.getIndexes();
+                    }
                     values.add(value);
                 }
 
                 Object value = null;
-                String destinationPath = destinationPaths.get(i).getPath();
                 if (function != null) {
                     if (function.getType() == FunctionType.STANDARD) {
-                        value = functionContext.executeStaticFunction(function.getKey(), values.toArray());
+                        value = dalaranContext.getDalaranFunctionContext().executeStaticFunction(function.getKey(), values.toArray());
                     } else {
-                        value = functionContext.executeCustomFunction(Long.valueOf(function.getKey()), values.toArray());
+                        value = dalaranContext.getDalaranFunctionContext().executeCustomFunction(Long.valueOf(function.getKey()), values.toArray());
                     }
                 } else if (values.size() == 1) {
                     FieldType type = destinationPaths.get(i).getType();
                     value = parse(values.get(0), type);
                 }
-                JSONPath.set(destination, destinationPath, value);
+                String destinationPath = getDestinationPath(indexes, destinationPaths);
+                if (destinationPath != null) {
+                    JSONPath.set(destination, destinationPath, value);
+                }
             }
         }
     }
 
+    private static String getDestinationPath(String indexes, List<PathDetail> destinationPaths) {
+        for (PathDetail pathDetail: destinationPaths) {
+            if (StringUtils.equalsIgnoreCase(indexes, pathDetail.getIndexes())) {
+                return pathDetail.getPath();
+            }
+        }
+        return null;
+    }
+
     private static Object parse(Object target, FieldType destination) {
+        if (target == null) {
+            return null;
+        }
         String input = target.toString();
         TypeParser parser = TypeParser.newBuilder().build();
         if (destination != null) {

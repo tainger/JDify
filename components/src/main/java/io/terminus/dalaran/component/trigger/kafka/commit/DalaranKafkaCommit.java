@@ -8,7 +8,9 @@ import org.apache.camel.model.ProcessorDefinition;
 /**
  * Created by jingdi on 2019/5/20
  */
-@Processor(value = "kafka-commit",
+@Processor(
+        value = "kafka-commit",
+        name = "Kafka 消费确认",
         inputSerializeType = BodySerializeType.Serialized,
         outputSerializeType = BodySerializeType.Serialized
 )
