@@ -33,8 +33,8 @@ public class SoapServiceTest extends BasicServiceTest {
         SoapOperationConfig operationConfig = new SoapOperationConfig();
         operationConfig.setProtocol(HttpProtocol.HTTP);
         operationConfig.setBaseUrl("127.0.0.1:8081/ws");
-        operationConfig.setInModel(model);
-        operationConfig.setOutModel(model);
+//        operationConfig.setInModel(model);
+//        operationConfig.setOutModel(model);
 
         Map<String, List<String>> requestBody = new HashMap<>();
         List<String> list = new ArrayList<>();

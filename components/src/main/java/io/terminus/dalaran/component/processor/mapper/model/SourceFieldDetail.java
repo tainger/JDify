@@ -13,4 +13,9 @@ public class SourceFieldDetail {
     private List<Integer> arrayFieldSize;
 
     private List<SourcePath> sourcePaths;
+
+    public SourceFieldDetail(List<Integer> arrayFieldSize, List<SourcePath> sourcePaths) {
+        this.arrayFieldSize = arrayFieldSize;
+        this.sourcePaths = sourcePaths;
+    }
 }

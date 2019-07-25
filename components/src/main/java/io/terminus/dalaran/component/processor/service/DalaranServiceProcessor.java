@@ -49,8 +49,8 @@ public class DalaranServiceProcessor implements DalaranProcessor<DalaranServiceO
         DalaranServiceOperation serviceOperation = new DalaranServiceOperation();
         serviceOperation.setDalaranService(dalaranService);
         serviceOperation.setOperationConfig(operationConfig);
-        serviceOperation.setInModel(operationConfig.getInModel());
-        serviceOperation.setOutModel(operationConfig.getOutModel());
+        serviceOperation.setInModel(resourceBuilder.buildModel((operationConfig.getInModelId())));
+        serviceOperation.setOutModel(resourceBuilder.buildModel(operationConfig.getOutModelId()));
         return serviceOperation;
     }
 }

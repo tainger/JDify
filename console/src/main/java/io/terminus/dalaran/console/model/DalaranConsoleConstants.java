@@ -20,4 +20,8 @@ public class DalaranConsoleConstants {
     public static final String MODEL_FIELD_ROOT = "root";
 
     public static final int MODEL_ARRAY_SIZE = 2;
+
+    public static final String SOAP_CONNECTOR = "soap-connector";
+
+    public static final String SWAGGER_CONNECTOR = "swagger-connector";
 }

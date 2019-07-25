@@ -56,7 +56,6 @@ public class Converter {
     }
 
     private static SourceFieldDetail buildSource(Object source, MessageMapping mapping, SimpleMappingField sourceRoot) {
-        SourceFieldDetail sourceFieldDetail = new SourceFieldDetail();
         List<SourcePath> sourcePaths = new ArrayList<>();
         List<Integer> arrayFieldSize = new ArrayList<>();
         Integer lastArray = 0;
@@ -65,7 +64,7 @@ public class Converter {
             List<Object> body = (List) source;
             int bodySize = body.size();
             Integer level = lastArray + 1;
-            arrayFieldSize.add(level, bodySize);
+            arrayFieldSize.add(bodySize);
             for (int i = 0; i < bodySize; i++) {
                 String path = "$[" + i + "]";
                 for (SourceField sourceField: fields) {
@@ -84,9 +83,7 @@ public class Converter {
                 sourcePaths.add(sourcePath);
             }
         }
-        sourceFieldDetail.setSourcePaths(sourcePaths);
-        sourceFieldDetail.setArrayFieldSize(arrayFieldSize);
-        return sourceFieldDetail;
+        return new SourceFieldDetail(arrayFieldSize, sourcePaths);
     }
 
     private static void buildSourcePaths(String parentPath, SimpleMappingField field, List<Integer> arrayFieldSize, Integer lastArrayLevel, Object source, List<PathDetail> paths) {
@@ -98,7 +95,7 @@ public class Converter {
                 List<Object> child = (List) body;
                 int bodySize = child.size();
                 Integer level = lastArrayLevel + 1;
-                arrayFieldSize.add(level, bodySize);
+                arrayFieldSize.add(bodySize);
 
                 for (int i = 0; i < bodySize; i++) {
                     String path = name + "[" + i + "]";
@@ -121,7 +118,7 @@ public class Converter {
         List<PathDetail> paths = new ArrayList<>();
         SimpleMappingField field = mapping.getDestinationField();
         if (destinationRoot.getType() == FieldType.ARRAY) {
-            int size = arrayFieldSize.get(++level);
+            int size = arrayFieldSize.get(level++);
             for (int i = 0; i < size; i++) {
                 String path = "$root[" + i + "]";
                 buildDestinationPaths(path, field, arrayFieldSize, level, paths);
@@ -138,8 +135,7 @@ public class Converter {
         if (field.getLocal() == FieldLocal.MIDDLE) {
             SimpleMappingField child = field.getChild();
             if (field.getType() == FieldType.ARRAY) {
-                ++level;
-                int bodySize = arrayFieldSize.get(level);
+                int bodySize = arrayFieldSize.get(level++);
                 for (int i = 0; i < bodySize; i++) {
                     String path = name + "[" + i + "]";
                     buildDestinationPaths(path, child, arrayFieldSize, level, paths);

@@ -13,11 +13,11 @@ import io.swagger.util.Json;
 import io.terminus.dalaran.component.common.HttpMethod;
 import io.terminus.dalaran.core.component.DalaranService;
 import io.terminus.dalaran.core.component.annotation.ServiceConnector;
-import io.terminus.dalaran.core.model.BodyType;
-import io.terminus.dalaran.core.model.FieldType;
-import io.terminus.dalaran.core.model.MessageModel;
-import io.terminus.dalaran.core.model.ModelField;
+import io.terminus.dalaran.core.component.model.ServiceOperation;
+import io.terminus.dalaran.core.component.model.ServiceOperationModel;
+import io.terminus.dalaran.core.model.*;
 import io.terminus.dalaran.core.model.schema.JsonSchema;
+import io.terminus.dalaran.service.soap.SoapService;
 import org.apache.camel.builder.Builder;
 import org.apache.camel.model.ProcessorDefinition;
 import org.apache.commons.lang3.StringUtils;
@@ -27,6 +27,8 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.List;
@@ -42,6 +44,8 @@ import static org.apache.camel.Exchange.HTTP_METHOD;
         serviceConfigType = SwaggerServiceConfig.class
 )
 public class SwaggerService implements DalaranService<SwaggerImportConfig, SwaggerServiceConfig, SwaggerOperationConfig> {
+
+    private static final Logger logger = LoggerFactory.getLogger(SoapService.class);
 
     private static final String HTTP_URI = "%s4://%s%s?bridgeEndpoint=true";
 
@@ -76,7 +80,7 @@ public class SwaggerService implements DalaranService<SwaggerImportConfig, Swagg
     public List<String> operations(SwaggerServiceConfig swaggerServiceConfig) {
         return swaggerServiceConfig
                 .getConfigs()
-                .stream().map(config -> config.getMethod() + OPERATION_SPLIT + config.getPath())
+                .stream().map(ServiceOperation::getOperationKey)
                 .collect(Collectors.toList());
     }
 
@@ -98,17 +102,13 @@ public class SwaggerService implements DalaranService<SwaggerImportConfig, Swagg
 
             String finalBaseUrl = baseUrl;
             List<SwaggerOperationConfig> configs = swagger.getPaths().entrySet().stream().flatMap(path -> path.getValue().getOperationMap().entrySet().stream().map(method -> {
-                MessageModel inModel = buildInModel(method.getValue(), swagger.getDefinitions());
-                MessageModel outModel = buildOutModel(method.getValue(), swagger.getDefinitions());
                 SwaggerOperationConfig config = new SwaggerOperationConfig();
                 config.setUrl(finalBaseUrl);
                 config.setPath(path.getKey());
                 config.setMethod(HttpMethod.valueOf(method.getKey().name()));
-                config.setInModel(inModel);
-                config.setOutModel(outModel);
+                config.setOperationKey(config.getMethod() + OPERATION_SPLIT + config.getPath());
                 return config;
             })).collect(Collectors.toList());
-
 
             SwaggerServiceConfig swaggerOperations = new SwaggerServiceConfig();
             swaggerOperations.setUrl(swagger.getHost());
@@ -121,7 +121,35 @@ public class SwaggerService implements DalaranService<SwaggerImportConfig, Swagg
         return null;
     }
 
-    private MessageModel buildOutModel(Operation operation, Map<String, Model> definitions) {
+    @Override
+    public ServiceOperationModel buildOperationModel(SwaggerImportConfig swaggerImportConfig, SwaggerOperationConfig swaggerOperationConfig) {
+        HttpClient httpClient = HttpClientBuilder.create().build();
+        HttpUriRequest httpUriRequest = new HttpGet(swaggerImportConfig.getSwaggerUrl());
+        try {
+            HttpResponse swaggerResponse = httpClient.execute(httpUriRequest);
+            ObjectMapper objectMapper = Json.mapper();
+
+            Swagger swagger = objectMapper.readValue(swaggerResponse.getEntity().getContent(), Swagger.class);
+            for (Map.Entry<String, Path> entry: swagger.getPaths().entrySet()) {
+                String pathName = entry.getKey();
+                Path path = entry.getValue();
+                for (Map.Entry<io.swagger.models.HttpMethod, Operation> method: path.getOperationMap().entrySet()) {
+                    if (StringUtils.equals(swaggerOperationConfig.getPath(), pathName)
+                            && swaggerOperationConfig.getMethod() == HttpMethod.valueOf(method.getKey().name())) {
+                        ServiceModel inModel = buildInModel(method.getValue(), swagger.getDefinitions());
+                        ServiceModel outModel = buildOutModel(method.getValue(), swagger.getDefinitions());
+                        return new ServiceOperationModel(inModel.getModel(), inModel.getName(), outModel.getModel(), outModel.getName());
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    private ServiceModel buildOutModel(Operation operation, Map<String, Model> definitions) {
+        ServiceModel serviceModel = new ServiceModel();
         JsonSchema outSchema = new JsonSchema();
         MessageModel outModel = new MessageModel<>();
         outModel.setModelType(BodyType.JSON);
@@ -129,16 +157,19 @@ public class SwaggerService implements DalaranService<SwaggerImportConfig, Swagg
         Response response = operation.getResponses().get(SUCCESSFUL_RESPONSE_CODE);
         Property property = response.getSchema();
         if (property == null) {
-            return null;
+            return serviceModel;
         }
+        serviceModel.setName(property.getName());
         ModelField outRootField = buildField(property, definitions);
         Map<String, ModelField> outFields = Maps.newHashMap();
         outFields.put("root", outRootField);
         outSchema.setFields(outFields);
-        return outModel;
+        serviceModel.setModel(outModel);
+        return serviceModel;
     }
 
-    private MessageModel buildInModel(Operation operation, Map<String, Model> definitions) {
+    private ServiceModel buildInModel(Operation operation, Map<String, Model> definitions) {
+        ServiceModel serviceModel = new ServiceModel();
         JsonSchema inSchema = new JsonSchema();
         MessageModel inModel = new MessageModel<>();
         inModel.setModelType(BodyType.JSON);
@@ -157,6 +188,7 @@ public class SwaggerService implements DalaranService<SwaggerImportConfig, Swagg
                         Map<String, ModelField> subFields = Maps.newHashMap();
                         rootField.setFields(subFields);
                         String modelName = ((RefModel) model).getSimpleRef();
+                        serviceModel.setName(modelName);
                         Model realModel = definitions.get(modelName);
                         if (realModel instanceof ModelImpl) {
                             ((ModelImpl) realModel).getType();
@@ -168,27 +200,28 @@ public class SwaggerService implements DalaranService<SwaggerImportConfig, Swagg
                     break;
                 case "path":
 //                                throw new RuntimeException("暂时不支持 path 格式");
-                    System.out.println("暂时不支持 path 格式");
+                    logger.warn("暂时不支持 path 格式");
                     break;
                 case "query":
 //                                throw new RuntimeException("暂时不支持 query 格式");
-                    System.out.println("暂时不支持 query 格式");
+                    logger.warn("暂时不支持 query 格式");
                     break;
                 case "formData":
 //                                throw new RuntimeException("暂时不支持 formData 格式");
-                    System.out.println("暂时不支持 formData 格式");
+                    logger.warn("暂时不支持 formData 格式");
                     break;
                 case "header":
 //                                throw new RuntimeException("暂时不支持 header 格式");
-                    System.out.println("暂时不支持 header 格式");
+                    logger.warn("暂时不支持 header 格式");
                     break;
                 case "cookie":
 //                                throw new RuntimeException("暂时不支持 cookie 格式");
-                    System.out.println("暂时不支持 cookie 格式");
+                    logger.warn("暂时不支持 cookie 格式");
                     break;
             }
         }
-        return inModel;
+        serviceModel.setModel(inModel);
+        return serviceModel;
     }
 
     private ModelField buildField(Property property, Map<String, Model> definitions) {

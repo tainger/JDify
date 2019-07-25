@@ -12,5 +12,7 @@ public class ModelDTO extends BasicModelInfo {
 
     private Map<String, Object> modelSchema;
 
+    private Long serviceId;
+
     private String description;
 }
