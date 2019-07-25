@@ -23,7 +23,7 @@ public class DalaranBeanDefinitionRegistrar implements ImportBeanDefinitionRegis
     public void registerBeanDefinitions(AnnotationMetadata importingClassMetadata, BeanDefinitionRegistry registry) {
         DalaranComponentProvider scanner = new DalaranComponentProvider(resourceLoader, environment);
         String[] basePackages = environment.getRequiredProperty("trantor.module.scan-packages", String[].class);
-        String runtimeUrl = environment.getRequiredProperty("terminus.dalaran.runtimeUrl");
+        String runtimeUrl = environment.getRequiredProperty("trantor.dalaran.runtimeUrl");
 
         for (String basePackage : basePackages) {
             Set<BeanDefinition> components = scanner.findCandidateComponents(basePackage);

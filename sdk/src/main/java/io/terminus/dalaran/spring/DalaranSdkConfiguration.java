@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
 @Configuration
-@ConditionalOnProperty(value = "terminus.dalaran.enable", havingValue = "true", matchIfMissing = true)
+@ConditionalOnProperty(value = "trantor.dalaran.runtimeUrl")
 @EnableConfigurationProperties(DalaranSdkConfiguration.class)
 @Import(DalaranBeanDefinitionRegistrar.class)
 public class DalaranSdkConfiguration {
