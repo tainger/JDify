@@ -8,6 +8,7 @@ import org.apache.camel.model.ProcessorDefinition;
 @Processor(
         value = "dubbo-consumer",
         name = "Dubbo 服务消费者",
+        order = 12,
         configType = DalaranDubboConsumerConfig.class,
         inputSerializeType = BodySerializeType.Object,
         outputSerializeType = BodySerializeType.Object

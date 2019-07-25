@@ -8,6 +8,8 @@ public interface ComponentInfo {
 
     String getName();
 
+    int getOrder();
+
     DalaranConfigField[] getConfigFields();
 
     BodyType[] getAllowedBodyTypes();
