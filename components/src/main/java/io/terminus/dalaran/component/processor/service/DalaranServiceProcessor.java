@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 @Processor(
         value = "service",
         name = "服务调用器",
+        order = 11,
         configType = ServiceOperationConfig.class,
         inputSerializeType = BodySerializeType.Serialized,
         outputSerializeType = BodySerializeType.Serialized

@@ -12,6 +12,7 @@ import javax.sql.DataSource;
 @Processor(
         value = "sql",
         name = "执行 SQL",
+        order = 12,
         configType = SqlConfig.class,
         inputSerializeType = BodySerializeType.Object,
         outputSerializeType = BodySerializeType.Object

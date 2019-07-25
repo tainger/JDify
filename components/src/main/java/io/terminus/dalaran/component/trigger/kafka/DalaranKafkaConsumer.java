@@ -12,6 +12,7 @@ import org.apache.camel.model.RouteDefinition;
 @Trigger(
         value = "kafka-consumer",
         name = "Kafka 消费者",
+        order = 14,
         configType = DalaranKafkaConsumerConfig.class,
         allowBodyTypes = {BodyType.JSON, BodyType.XML},
         inputSerializeType = BodySerializeType.Object,

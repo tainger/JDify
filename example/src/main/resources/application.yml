@@ -1,5 +1,7 @@
 server.port: 8888
 
-terminus.dalaran:
-  runtimeUrl: http://localhost:8080
-  basePackages: "io.terminus.dalaran"
+trantor:
+  dalaran:
+    runtimeUrl: http://localhost:8080
+  module:
+    scan-packages: "io.terminus.dalaran"

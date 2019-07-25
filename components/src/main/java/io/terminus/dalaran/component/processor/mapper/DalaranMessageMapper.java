@@ -22,6 +22,7 @@ import java.util.Map;
 @Processor(
         value = "mapper-convert",
         name = "数据映射",
+        order = 10,
         configType = DalaranMapperConfig.class,
         inputSerializeType = BodySerializeType.Object,
         outputSerializeType = BodySerializeType.Object

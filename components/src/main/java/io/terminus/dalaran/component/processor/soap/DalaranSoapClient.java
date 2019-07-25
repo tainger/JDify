@@ -14,6 +14,7 @@ import org.apache.camel.model.ProcessorDefinition;
 @Processor(
         value = "soap-client",
         name = "Soap 调用器",
+        order = 11,
         configType = SoapClientConfig.class,
         allowBodyTypes = {BodyType.JSON, BodyType.XML},
         inputSerializeType = BodySerializeType.Serialized,

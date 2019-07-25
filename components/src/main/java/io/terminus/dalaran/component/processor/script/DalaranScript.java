@@ -11,6 +11,7 @@ import static io.terminus.dalaran.DalaranConstants.DALARAN_CONTEXT_EXCHANGE;
 @Processor(
         value = "script",
         name = "执行脚本",
+        order = 12,
         configType = DalaranScriptConfig.class,
         inputSerializeType = BodySerializeType.Object,
         outputSerializeType = BodySerializeType.Object
