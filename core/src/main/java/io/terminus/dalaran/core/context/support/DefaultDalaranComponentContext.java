@@ -137,14 +137,16 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext {
 
     private Class getConnectorType(Class configType) {
         for (Type genericInterface : configType.getGenericInterfaces()) {
-            if (genericInterface instanceof ParameterizedType) {
-                Class rawType = (Class) ((ParameterizedType) genericInterface).getRawType();
-                if (rawType == ConnectorConfig.class) {
-                    Type[] parameterizedType = ((ParameterizedType) genericInterface).getActualTypeArguments();
-                    if (parameterizedType.length == 1) {
-                        return (Class) parameterizedType[0];
-                    }
-                }
+            if (!(genericInterface instanceof ParameterizedType)) {
+                return null;
+            }
+            Class rawType = (Class) ((ParameterizedType) genericInterface).getRawType();
+            if (rawType != ConnectorConfig.class) {
+                return null;
+            }
+            Type[] parameterizedType = ((ParameterizedType) genericInterface).getActualTypeArguments();
+            if (parameterizedType.length == 1) {
+                return (Class) parameterizedType[0];
             }
         }
         return null;
