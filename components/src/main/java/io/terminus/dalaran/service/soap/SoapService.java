@@ -18,10 +18,13 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -54,7 +57,7 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
         String[] keys = operationKey.split(OPERATION_SPLIT);
         String portType = keys[0];
         String operationName = keys[1];
-        for (SoapOperationConfig operationConfig: configs) {
+        for (SoapOperationConfig operationConfig : configs) {
             if (StringUtils.equalsIgnoreCase(operationConfig.getPortType(), portType) && StringUtils.equalsIgnoreCase(operationConfig.getOperation(), operationName)) {
                 return operationConfig;
             }
@@ -304,7 +307,7 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
     private boolean containsSimpleType(String type, Schema schema) {
         List<SimpleType> simpleTypes = schema.getSimpleTypes();
         if (CollectionUtils.isNotEmpty(simpleTypes)) {
-            for (SimpleType simpleType: simpleTypes) {
+            for (SimpleType simpleType : simpleTypes) {
                 if (StringUtils.equalsIgnoreCase(type, simpleType.getName())) {
                     return true;
                 }
@@ -316,7 +319,7 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
     private boolean containsComplexType(String type, Schema schema) {
         List<ComplexType> complexTypes = schema.getComplexTypes();
         if (CollectionUtils.isNotEmpty(complexTypes)) {
-            for (ComplexType complexType: complexTypes) {
+            for (ComplexType complexType : complexTypes) {
                 if (StringUtils.equalsIgnoreCase(type, complexType.getName())) {
                     return true;
                 }
@@ -341,13 +344,20 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
 
     private String getWsdlDoc(String url) {
         HttpGet httpGet = new HttpGet(url);
+        CloseableHttpClient httpClient = HttpClientBuilder.create().build();
         try {
-            HttpResponse response = new DefaultHttpClient().execute(httpGet);
+            HttpResponse response = httpClient.execute(httpGet);
             if (response.getStatusLine().getStatusCode() == 200) {
                 return EntityUtils.toString(response.getEntity());
             }
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            try {
+                httpClient.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
         return null;
     }
