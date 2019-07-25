@@ -27,6 +27,7 @@ import static io.terminus.dalaran.DalaranConstants.DELIMITER;
 @Processor(
         value = "router",
         name = "条件路由",
+        order = 15,
         configType = DalaranRouterConfig.class,
         inputSerializeType = BodySerializeType.Object
 )

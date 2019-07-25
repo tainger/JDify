@@ -12,6 +12,7 @@ import org.apache.camel.model.ProcessorDefinition;
 @Processor(
         value = "rocketmq-producer",
         name = "RocketMQ 消息发送器",
+        order = 13,
         configType = RocketMQProducerConfig.class,
         inputSerializeType = BodySerializeType.Object,
         outputSerializeType = BodySerializeType.Object,

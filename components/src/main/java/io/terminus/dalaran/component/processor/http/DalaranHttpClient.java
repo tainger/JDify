@@ -22,6 +22,7 @@ import static org.apache.camel.Exchange.HTTP_QUERY;
 @Processor(
         value = "http-client",
         name = "Http 调用器",
+        order = 11,
         configType = HttpClientConfig.class,
         allowBodyTypes = {BodyType.JSON, BodyType.XML},
         inputSerializeType = BodySerializeType.Serialized,

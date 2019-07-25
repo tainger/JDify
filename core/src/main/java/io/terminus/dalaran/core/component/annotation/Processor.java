@@ -16,6 +16,8 @@ public @interface Processor {
 
     String name();
 
+    int order() default Short.MAX_VALUE;
+
     BodySerializeType inputSerializeType() default BodySerializeType.All;
 
     BodySerializeType outputSerializeType() default BodySerializeType.All;

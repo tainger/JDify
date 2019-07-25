@@ -14,6 +14,8 @@ public abstract class AbstractComponentInfo implements ComponentInfo {
 
     private String name;
 
+    private int order;
+
     private DalaranConfigField[] configFields;
 
     @NotNull

@@ -12,6 +12,7 @@ import org.apache.camel.model.RouteDefinition;
 @Trigger(
         value = "rocketmq-consumer",
         name = "RocketMQ 消费者",
+        order = 15,
         configType = RocketMQConsumerConfig.class,
         allowBodyTypes = {BodyType.JSON, BodyType.XML},
         inputSerializeType = BodySerializeType.Serialized,

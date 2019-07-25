@@ -24,6 +24,7 @@ import static org.apache.camel.builder.Builder.body;
 @Processor(
         value = "foreach",
         name = "数组循环",
+        order = 20,
         configType = ForEachConfig.class
 )
 public class ForEachProcessor implements DalaranProcessor<String>, DalaranProcessorConfigCustomConverter<ForEachConfig, String> {

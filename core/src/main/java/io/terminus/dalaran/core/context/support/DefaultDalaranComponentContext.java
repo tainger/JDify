@@ -6,21 +6,16 @@ import io.terminus.dalaran.core.component.DalaranTrigger;
 import io.terminus.dalaran.core.component.annotation.Processor;
 import io.terminus.dalaran.core.component.annotation.Trigger;
 import io.terminus.dalaran.core.component.config.ConnectorConfig;
-import io.terminus.dalaran.core.config.ConnectorInfo;
-import io.terminus.dalaran.core.config.DalaranConfigField;
-import io.terminus.dalaran.core.config.ProcessorInfo;
-import io.terminus.dalaran.core.config.TriggerInfo;
+import io.terminus.dalaran.core.config.*;
 import io.terminus.dalaran.core.context.DalaranComponentContext;
 import io.terminus.dalaran.core.util.ConfigFieldUtils;
 import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 @Slf4j
 public class DefaultDalaranComponentContext implements DalaranComponentContext {
@@ -60,7 +55,7 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext {
 
     @Override
     public Collection<TriggerInfo> getAllTriggerInfo() {
-        return triggerInfoMapping.values();
+        return triggerInfoMapping.values().stream().sorted(Comparator.comparingInt(AbstractComponentInfo::getOrder)).collect(Collectors.toList());
     }
 
     @Override
@@ -70,7 +65,7 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext {
 
     @Override
     public Collection<ProcessorInfo> getAllProcessorInfo() {
-        return processorInfoMapping.values();
+        return processorInfoMapping.values().stream().sorted(Comparator.comparingInt(AbstractComponentInfo::getOrder)).collect(Collectors.toList());
     }
 
     // TODO 很多重复性的代码
@@ -81,6 +76,7 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext {
         TriggerInfo triggerInfo = new TriggerInfo();
         triggerInfo.setType(triggerAnnotation.value());
         triggerInfo.setName(triggerAnnotation.name());
+        triggerInfo.setOrder(triggerAnnotation.order());
         triggerInfo.setConfigFields(configFields);
         triggerInfo.setConfigType(triggerAnnotation.configType());
         triggerInfo.setAllowedBodyTypes(triggerAnnotation.allowBodyTypes());
@@ -109,6 +105,7 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext {
         ProcessorInfo processorInfo = new ProcessorInfo();
         processorInfo.setType(processorAnnotation.value());
         processorInfo.setName(processorAnnotation.name());
+        processorInfo.setOrder(processorAnnotation.order());
         processorInfo.setConfigFields(configFields);
         processorInfo.setConfigType(processorAnnotation.configType());
         processorInfo.setInputSerializeType(processorAnnotation.inputSerializeType());
