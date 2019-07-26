@@ -2,6 +2,8 @@ package io.terminus.dalaran;
 
 import io.terminus.dalaran.model.*;
 import io.terminus.dalaran.model.schema.ObjectSchema;
+import io.terminus.dalaran.model.trantor.DalaranIntegrationInfo;
+import io.terminus.dalaran.model.trantor.DalaranIntegrationPoint;
 import org.springframework.util.TypeUtils;
 
 import java.lang.reflect.*;
@@ -9,30 +11,35 @@ import java.util.*;
 
 public class TrantorComponentLoader {
 
-    public static List<DalaranIntegrationInfo> buildTrantorActionInfo(Class clazz) {
+    public static DalaranIntegrationInfo buildTrantorActionInfo(Class clazz) {
         DalaranIntegration dalaranIntegration = (DalaranIntegration) clazz.getAnnotation(DalaranIntegration.class);
         if (dalaranIntegration == null || !clazz.isInterface()) {
             return null;
         }
-        List<DalaranIntegrationInfo> actions = new ArrayList<>();
+        DalaranIntegrationInfo integrationInfo = new DalaranIntegrationInfo();
+        integrationInfo.setKey(dalaranIntegration.key());
+        integrationInfo.setName(dalaranIntegration.name());
+        integrationInfo.setDescription(dalaranIntegration.description());
+
+        List<DalaranIntegrationPoint> actions = new ArrayList<>();
+        integrationInfo.setIntegrationPoints(actions);
+
         for (Method method : clazz.getDeclaredMethods()) {
             DalaranIntegrationAction integrationAction = method.getAnnotation(DalaranIntegrationAction.class);
-            DalaranIntegrationInfo integrationInfo = new DalaranIntegrationInfo();
-            integrationInfo.setKey(dalaranIntegration.key());
+            DalaranIntegrationPoint integrationPoint = new DalaranIntegrationPoint();
             if (integrationAction == null) {
-                integrationInfo.setMethod(method.getName());
-                integrationInfo.setName(dalaranIntegration.name());
-                integrationInfo.setDescription(dalaranIntegration.description());
+                integrationPoint.setKey(method.getName());
+                integrationPoint.setName(method.getName());
             } else {
-                integrationInfo.setMethod(integrationAction.key());
-                integrationInfo.setName(integrationAction.name());
-                integrationInfo.setDescription(integrationAction.description());
+                integrationPoint.setKey(integrationAction.key());
+                integrationPoint.setName(integrationAction.name());
+                integrationPoint.setDescription(integrationAction.description());
             }
-            integrationInfo.setReturnType(buildReturnModel(method.getGenericReturnType()));
-            integrationInfo.setParamType(buildParameters(method.getParameters()));
-            actions.add(integrationInfo);
+            integrationPoint.setReturnType(buildReturnModel(method.getGenericReturnType()));
+            integrationPoint.setParamType(buildParameters(method.getParameters()));
+            actions.add(integrationPoint);
         }
-        return actions;
+        return integrationInfo;
     }
 
     private static MessageModel<ObjectSchema> buildReturnModel(Type type) {
