@@ -2,8 +2,6 @@ package io.terminus.dalaran.component.processor.mapper.model;
 
 import lombok.Data;
 
-import java.util.List;
-
 /**
  * Created by jingdi on 2019/7/17
  */
@@ -12,10 +10,10 @@ public class SourcePath {
 
     private String path;
 
-    private List<PathDetail> details;
+    private PathDetail detail;
 
-    public SourcePath(String path, List<PathDetail> details) {
+    public SourcePath(String path, PathDetail detail) {
         this.path = path;
-        this.details = details;
+        this.detail = detail;
     }
 }
