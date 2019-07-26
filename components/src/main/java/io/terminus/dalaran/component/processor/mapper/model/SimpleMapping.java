@@ -12,5 +12,5 @@ public class SimpleMapping {
 
     private MappingType mappingType = MappingType.MAPPING;
 
-    private MappingFunction function;
+//    private MappingFunction function;
 }
