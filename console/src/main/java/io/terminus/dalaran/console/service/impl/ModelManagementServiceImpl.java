@@ -29,7 +29,6 @@ import org.apache.commons.text.similarity.JaroWinklerDistance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-
 import javax.transaction.Transactional;
 import java.util.*;
 
@@ -102,6 +101,11 @@ public class ModelManagementServiceImpl implements ModelManagementService {
     @Override
     public ModelEntity getById(Long modelId) {
         return modelRepository.findOne(modelId);
+    }
+
+    @Override
+    public ModelEntity getByNameAndServiceId(String name, Long serviceId) {
+        return modelRepository.findByNameAndServiceId(name, serviceId);
     }
 
     @Override
@@ -346,10 +350,17 @@ public class ModelManagementServiceImpl implements ModelManagementService {
         } else {
             modelEntity.setName("Dalaran Model");
         }
-        modelEntity.setModelSchema(JSON.toJSONString(model.getModelSchema()));
+
+        Map modelSchema = model.getModelSchema();
+        if (modelSchema != null) {
+            modelEntity.setModelSchema(JSON.toJSONString(model.getModelSchema()));
+        } else {
+            modelEntity.setModelSchema(JSON.toJSONString(new HashMap<>()));
+        }
         modelEntity.setType(model.getModelType());
         modelEntity.setDescription(model.getDescription());
         modelEntity.setModuleId(model.getModuleId());
+        modelEntity.setServiceId(model.getServiceId());
         return modelEntity;
     }
 
@@ -358,8 +369,16 @@ public class ModelManagementServiceImpl implements ModelManagementService {
         model.setDescription(entity.getDescription());
         model.setModuleId(entity.getModuleId());
         model.setName(entity.getName());
-        model.setModelSchema(JSON.parseObject(entity.getModelSchema(), Map.class));
+
+        Map modelSchema = JSON.parseObject(entity.getModelSchema(), Map.class);
+        if (modelSchema != null) {
+            model.setModelSchema(JSON.parseObject(entity.getModelSchema(), Map.class));
+        } else {
+            model.setModelSchema(new HashMap<>());
+        }
+
         model.setModelType(entity.getType());
+        model.setServiceId(entity.getServiceId());
         model.setId(entity.getId());
         return model;
     }

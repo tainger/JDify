@@ -11,5 +11,7 @@ public class PathDetail {
 
     private String path;
 
+    private String indexes;
+
     private FieldType type;
 }

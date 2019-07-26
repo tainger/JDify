@@ -4,11 +4,13 @@ import io.terminus.dalaran.component.processor.mapper.model.*;
 import io.terminus.dalaran.core.component.BodySerializeType;
 import io.terminus.dalaran.core.component.DalaranProcessor;
 import io.terminus.dalaran.core.component.annotation.Processor;
+import io.terminus.dalaran.core.context.DalaranContext;
 import io.terminus.dalaran.model.FieldType;
 import io.terminus.dalaran.model.MessageModel;
 import io.terminus.dalaran.model.ModelField;
 import org.apache.camel.model.ProcessorDefinition;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,12 +29,15 @@ import java.util.Map;
 )
 public class DalaranMessageMapper implements DalaranProcessor<DalaranMapperConfig> {
 
+    @Autowired
+    private DalaranContext dalaranContext;
+
     @Override
     public void configure(ProcessorDefinition route, DalaranMapperConfig config) {
         Map<String, SimpleMapping> messageMapping = config.getMessageMapping();
         MessageModel in = config.getInModel();
         MessageModel out = config.getOutModel();
-        DalaranMapperProcessor processor = new DalaranMapperProcessor(transfer(messageMapping, in, out));
+        DalaranMapperProcessor processor = new DalaranMapperProcessor(transfer(messageMapping, in, out), dalaranContext);
         route.process(processor);
     }
 
@@ -94,8 +99,13 @@ public class DalaranMessageMapper implements DalaranProcessor<DalaranMapperConfi
     }
 
     private boolean buildMappingField(String path, Map<String, ModelField> modelField, SimpleMappingField simpleMappingField) {
-        Map<String, ModelField> child = modelField.get(MapperConstants.MODEL_ROOT).getFields();
         boolean complex = false;
+
+        ModelField root = modelField.get(MapperConstants.MODEL_ROOT);
+        if (root.getType() == FieldType.ARRAY) {
+            complex = true;
+        }
+        Map<String, ModelField> child = root.getFields();
         String[] fields = StringUtils.split(path, ".");
 
         Map<String, ModelField> temporaryField = child;

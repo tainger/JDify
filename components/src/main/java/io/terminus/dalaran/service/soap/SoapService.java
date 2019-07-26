@@ -6,7 +6,9 @@ import io.terminus.dalaran.DalaranConstants;
 import io.terminus.dalaran.component.common.HttpMethod;
 import io.terminus.dalaran.core.component.DalaranService;
 import io.terminus.dalaran.core.component.annotation.ServiceConnector;
+import io.terminus.dalaran.core.component.model.ServiceOperationModel;
 import io.terminus.dalaran.model.*;
+import io.terminus.dalaran.model.component.ServiceOperation;
 import io.terminus.dalaran.model.converter.soap.model.SoapOperationConfig;
 import io.terminus.dalaran.model.converter.soap.model.SoapSchemaOperation;
 import io.terminus.dalaran.model.schema.SoapSchema;
@@ -23,7 +25,6 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 import org.jetbrains.annotations.NotNull;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -54,11 +55,8 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
     @Override
     public SoapOperationConfig getOperationConfig(SoapServiceConfig soapServiceConfig, @NotNull String operationKey) {
         List<SoapOperationConfig> configs = soapServiceConfig.getConfigs();
-        String[] keys = operationKey.split(OPERATION_SPLIT);
-        String portType = keys[0];
-        String operationName = keys[1];
-        for (SoapOperationConfig operationConfig : configs) {
-            if (StringUtils.equalsIgnoreCase(operationConfig.getPortType(), portType) && StringUtils.equalsIgnoreCase(operationConfig.getOperation(), operationName)) {
+        for (SoapOperationConfig operationConfig: configs) {
+            if (StringUtils.equals(operationConfig.getOperationKey(), operationKey)) {
                 return operationConfig;
             }
         }
@@ -68,7 +66,7 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
     @Override
     public List<String> operations(SoapServiceConfig soapServiceConfig) {
         return soapServiceConfig.getConfigs().stream()
-                .map(config -> config.getPortType() + OPERATION_SPLIT + config.getOperation())
+                .map(ServiceOperation::getOperationKey)
                 .collect(Collectors.toList());
     }
 
@@ -90,7 +88,9 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
                 SoapSchemaOperation schemaOperation = new SoapSchemaOperation();
 
                 String operationName = operation.getName();
-                SoapOperation soapOperation = operationMap.get(portType + ":" + operationName);
+                String operationKey = bindingName + OPERATION_SPLIT + portType + OPERATION_SPLIT + operationName;
+                String subKey = portType + OPERATION_SPLIT + operationName;
+                SoapOperation soapOperation = operationMap.get(subKey);
 
                 schemaOperation.setBinding(bindingName);
                 operationConfig.setBinding(bindingName);
@@ -105,24 +105,48 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
                 schemaOperation.setInput(inputName);
                 schemaOperation.setOutPut(outputName);
                 schemaOperation.setWsdl(wsdl);
-                operationConfig.setOperationKey(portType + OPERATION_SPLIT + operationName);
+                operationConfig.setOperationKey(operationKey);
 
                 String baseDir = definitions.getBaseDir().toString();
                 operationConfig.setBaseUrl(StringUtils.substringAfter(baseDir, "://"));
                 schemaOperation.setBaseUrl(operationConfig.getBaseUrl());
                 operationConfig.setProtocol(HttpProtocol.valueOf(StringUtils.substringBefore(baseDir, "://").toUpperCase()));
                 schemaOperation.setProtocol(operationConfig.getProtocol());
-
-                MessageModel inModel = buildModel(definitions.getMessage(inputName), schemaOperation, wsdlDoc, inputName);
-                MessageModel outModel = buildModel(definitions.getMessage(outputName), schemaOperation, wsdlDoc, outputName);
-                operationConfig.setInModel(inModel);
-                operationConfig.setOutModel(outModel);
                 soapOperations.add(operationConfig);
             });
         });
         serviceConfig.setConfigs(soapOperations);
         serviceConfig.setWsdl(wsdl);
         return serviceConfig;
+    }
+
+    @Override
+    public ServiceOperationModel buildOperationModel(WSDLImportConfig wsdlImportConfig, SoapOperationConfig operationConfig) {
+        WSDLParser parser = new WSDLParser();
+        String wsdl = wsdlImportConfig.getWsdlUrl();
+        Definitions definitions = parser.parse(wsdl);
+        String wsdlDoc = getWsdlDoc(wsdl);
+        Map<String, SoapOperation> operationMap = buildOperations(definitions);
+        SoapSchemaOperation schemaOperation = new SoapSchemaOperation();
+        SoapOperation soapOperation = operationMap.get(StringUtils.substringAfter(operationConfig.getOperationKey(), OPERATION_SPLIT));
+
+        schemaOperation.setBinding(operationConfig.getBinding());
+        schemaOperation.setName(operationConfig.getOperation());
+
+        String inputName = soapOperation.getInput();
+        String outputName = soapOperation.getOutput();
+        schemaOperation.setPortType(operationConfig.getPortType());
+        schemaOperation.setInput(inputName);
+        schemaOperation.setOutPut(outputName);
+        schemaOperation.setWsdl(wsdl);
+
+        schemaOperation.setBaseUrl(operationConfig.getBaseUrl());
+        schemaOperation.setProtocol(operationConfig.getProtocol());
+
+        MessageModel inModel = buildModel(definitions.getMessage(inputName), schemaOperation, wsdlDoc, inputName);
+        MessageModel outModel = buildModel(definitions.getMessage(outputName), schemaOperation, wsdlDoc, outputName);
+
+        return new ServiceOperationModel(inModel, inputName, outModel, outputName);
     }
 
     private Map<String, SoapOperation> buildOperations(Definitions definitions) {
@@ -148,7 +172,7 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
                 }
                 soapOperation.setOutput(output);
 
-                operations.put(portName + ":" + name, soapOperation);
+                operations.put(portName + OPERATION_SPLIT + name, soapOperation);
             });
         });
         return operations;

@@ -26,6 +26,9 @@ public abstract class ModelAbstractEntity extends BasicEntity {
     @Enumerated(EnumType.STRING)
     private BodyType type;
 
+    @Column
+    private Long serviceId;
+
     @Column(nullable = false, columnDefinition = "TEXT")
     private String modelSchema;
 

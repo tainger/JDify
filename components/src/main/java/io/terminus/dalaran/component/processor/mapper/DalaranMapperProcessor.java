@@ -3,9 +3,11 @@ package io.terminus.dalaran.component.processor.mapper;
 import io.terminus.dalaran.component.processor.mapper.jsonPath.Converter;
 import io.terminus.dalaran.component.processor.mapper.model.DalaranMappingConfig;
 import io.terminus.dalaran.component.processor.mapper.model.MapperConstants;
+import io.terminus.dalaran.core.context.DalaranContext;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.Traceable;
+
 import java.util.Map;
 
 /**
@@ -15,8 +17,11 @@ public class DalaranMapperProcessor implements Processor, Traceable {
 
     private final DalaranMappingConfig mappingConfig;
 
-    public DalaranMapperProcessor(DalaranMappingConfig mappingConfig) {
+    private final DalaranContext dalaranContext;
+
+    public DalaranMapperProcessor(DalaranMappingConfig mappingConfig, DalaranContext dalaranContext) {
         this.mappingConfig = mappingConfig;
+        this.dalaranContext = dalaranContext;
     }
 
     @Override
@@ -27,7 +32,7 @@ public class DalaranMapperProcessor implements Processor, Traceable {
     }
 
     public Object convert(DalaranMappingConfig mappingConfig, Object source) {
-        Map<String, Object> destination = Converter.convert(mappingConfig, source);
+        Map<String, Object> destination = Converter.convert(mappingConfig, source, dalaranContext);
         return destination.get(MapperConstants.MODEL_ROOT);
     }
 
