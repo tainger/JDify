@@ -4,13 +4,16 @@ import io.swagger.annotations.ApiOperation;
 import io.terminus.dalaran.console.model.ReleaseRequestDTO;
 import io.terminus.dalaran.console.model.dto.ReleaseRecordDTO;
 import io.terminus.dalaran.console.model.dto.flow.TriggerFlowDTO;
+import io.terminus.dalaran.console.model.dto.trantor.TrantorModuleDTO;
 import io.terminus.dalaran.console.service.ReleaseService;
+import io.terminus.dalaran.console.service.TrantorService;
 import io.terminus.dalaran.core.config.ConnectorInfo;
 import io.terminus.dalaran.core.config.ProcessorInfo;
 import io.terminus.dalaran.core.config.ServiceInfo;
 import io.terminus.dalaran.core.config.TriggerInfo;
 import io.terminus.dalaran.core.context.DalaranContext;
 import io.terminus.dalaran.model.function.MappingFunctionInfo;
+import io.terminus.dalaran.model.trantor.DalaranTrantorModule;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,6 +29,9 @@ public class PlatformRest {
 
     @Autowired
     private ReleaseService releaseService;
+
+    @Autowired
+    private TrantorService trantorService;
 
     @ApiOperation(value = "获取某版本所有流新消息")
     @GetMapping(value = "/release")
@@ -92,5 +98,17 @@ public class PlatformRest {
     @GetMapping(value = "/service")
     private Collection<ServiceInfo> listServiceInfo() {
         return dalaranContext.getDalaranServiceContext().getAllServiceInfo();
+    }
+
+    @ApiOperation(value = "推送 Trantor 的带集成信息")
+    @PostMapping(value = "/trantor")
+    private void publishTrantorIntegrationInfo(@RequestBody DalaranTrantorModule trantorModule) {
+        trantorService.saveTrantorIntegrationInfo(trantorModule);
+    }
+
+    @ApiOperation(value = "获取所有 Trantor 模块信息, 以及其所有扩展点信息")
+    @GetMapping(value = "/trantor")
+    private List<TrantorModuleDTO> listTrantorModule() {
+        return trantorService.getAllModule();
     }
 }

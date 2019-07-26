@@ -1,6 +1,6 @@
 package io.terminus.dalaran.model.trantor;
 
-import io.terminus.dalaran.model.MessageModel;
+import io.terminus.dalaran.model.schema.JsonSchema;
 import lombok.Data;
 
 @Data
@@ -12,8 +12,8 @@ public class DalaranIntegrationPoint {
 
     private String description;
 
-    private MessageModel returnType;
+    private JsonSchema returnType;
 
-    private MessageModel paramType;
+    private JsonSchema paramType;
 
 }
