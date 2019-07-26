@@ -75,6 +75,11 @@ public class DefaultDalaranFunctionContext implements DalaranFunctionContext {
         return functionInfoMapper.values();
     }
 
+    @Override
+    public MappingFunctionInfo getFunctionByKey(String key) {
+        return functionInfoMapper.get(key);
+    }
+
     private Invocable buildScriptEngine(MappingFunctionType type, String script, List<String> params) {
         ScriptEngine engine;
         switch (type) {

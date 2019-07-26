@@ -2,6 +2,8 @@ package io.terminus.dalaran.component.processor.mapper.model;
 
 import lombok.Data;
 
+import java.util.Map;
+
 /**
  * Created by jingdi on 2019/7/18
  */
@@ -11,4 +13,6 @@ public class MappingFunction {
     private String key;
 
     private FunctionType type;
+
+    private Map<String, String> params;
 }

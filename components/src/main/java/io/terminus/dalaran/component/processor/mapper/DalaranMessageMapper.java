@@ -1,18 +1,22 @@
 package io.terminus.dalaran.component.processor.mapper;
 
+import com.alibaba.fastjson.JSON;
 import io.terminus.dalaran.component.processor.mapper.model.*;
 import io.terminus.dalaran.core.component.BodySerializeType;
 import io.terminus.dalaran.core.component.DalaranProcessor;
 import io.terminus.dalaran.core.component.annotation.Processor;
 import io.terminus.dalaran.core.context.DalaranContext;
+import io.terminus.dalaran.core.context.DalaranFunctionContext;
 import io.terminus.dalaran.model.FieldType;
 import io.terminus.dalaran.model.MessageModel;
 import io.terminus.dalaran.model.ModelField;
+import io.terminus.dalaran.model.function.MappingFunctionInfo;
 import org.apache.camel.model.ProcessorDefinition;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -65,13 +69,11 @@ public class DalaranMessageMapper implements DalaranProcessor<DalaranMapperConfi
         String destinationPath = StringUtils.substringAfter(path, MapperConstants.MODEL_ROOT + ".");
         messageMapping.setPath(destinationPath);
 
-        MappingFunction function = mapping.getFunction();
-        messageMapping.setFunction(function);
-
         MappingType mappingType = mapping.getMappingType();
         messageMapping.setMappingType(mappingType);
 
-        String[] sourcePaths = StringUtils.split(mapping.getValue().trim(), ",");
+//        String[] sourcePaths = StringUtils.split(mapping.getValue().trim(), ",");
+        List<String> sourcePaths = buildSourcePaths(mappingType, mapping.getValue(), messageMapping);
         Map<String, ModelField> inField = in.getModelSchema().getFields();
         Map<String, ModelField> outField = out.getModelSchema().getFields();
 
@@ -83,11 +85,39 @@ public class DalaranMessageMapper implements DalaranProcessor<DalaranMapperConfi
         boolean complex = false;
         for (String sourcePath : sourcePaths) {
             SourceField sourceField = new SourceField();
-            complex = buildSourceField(sourcePath, inField, sourceField);
+            if (messageMapping.getMappingType() == MappingType.DEFAULT) {
+                sourceField.setPath(sourcePath);
+            } else {
+                complex = buildSourceField(sourcePath, inField, sourceField);
+            }
             sourceFields.add(sourceField);
         }
         messageMapping.setSourceFields(sourceFields);
         messageMapping.setComplex(complex);
+    }
+
+    private List<String> buildSourcePaths(MappingType mappingType, String value, MessageMapping messageMapping) {
+        List<String> sourcePaths = new ArrayList<>();
+
+        if (mappingType == MappingType.FUNCTION) {
+            MappingFunction function = JSON.parseObject(value, MappingFunction.class);
+            messageMapping.setFunction(function);
+
+            DalaranFunctionContext functionContext = dalaranContext.getDalaranFunctionContext();
+            MappingFunctionInfo functionInfo = functionContext.getFunctionByKey(function.getKey());
+            if (functionInfo != null) {
+                String[] params = functionInfo.getParams();
+                Map<String, String> sourcePath = function.getParams();
+                for (String param: params) {
+                    String path = sourcePath.get(param);
+                    sourcePaths.add(path);
+                }
+            }
+        } else {
+            sourcePaths.add(value);
+        }
+
+        return sourcePaths;
     }
 
     private boolean buildSourceField(String sourcePath, Map<String, ModelField> in, SourceField sourceField) {

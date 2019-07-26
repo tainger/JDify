@@ -36,22 +36,33 @@ public class Converter {
     private static void buildValue(Object source, MessageMapping messageMapping, Object destination, DalaranContext dalaranContext) {
         List<Object> values = new ArrayList<>();
         List<SourceField> sourceFields = messageMapping.getSourceFields();
+        MappingType mappingType = messageMapping.getMappingType();
+
         sourceFields.forEach(sourceField -> {
-            Object value = JSONPath.eval(source, sourceField.getPath());
+            Object value = null;
+            if (mappingType == MappingType.DEFAULT) {
+                value = sourceField.getPath();
+            } else {
+                value = JSONPath.eval(source, sourceField.getPath());
+            }
             values.add(value);
         });
 
         String destinationPath = messageMapping.getPath();
         MappingFunction function = messageMapping.getFunction();
         if (function != null) {
-            if (function.getType() == FunctionType.STANDARD) {
+            if (function.getType() == FunctionType.STATIC) {
                 dalaranContext.getDalaranFunctionContext().executeStaticFunction(function.getKey(), values.toArray());
             } else {
                 dalaranContext.getDalaranFunctionContext().executeCustomFunction(Long.valueOf(function.getKey()), values.toArray());
             }
-        } else if (values.size() == 1) {
-            FieldType type = sourceFields.get(0).getField().getType();
-            JSONPath.set(destination, "$root." + destinationPath, parse(values.get(0), type));
+        } else {
+            if (mappingType == MappingType.DEFAULT) {
+                JSONPath.set(destination, "$root." + destinationPath, values.get(0));
+            } else {
+                FieldType type = sourceFields.get(0).getField().getType();
+                JSONPath.set(destination, "$root." + destinationPath, parse(values.get(0), type));
+            }
         }
     }
 
@@ -190,7 +201,7 @@ public class Converter {
 
                 Object value = null;
                 if (function != null) {
-                    if (function.getType() == FunctionType.STANDARD) {
+                    if (function.getType() == FunctionType.STATIC) {
                         value = dalaranContext.getDalaranFunctionContext().executeStaticFunction(function.getKey(), values.toArray());
                     } else {
                         value = dalaranContext.getDalaranFunctionContext().executeCustomFunction(Long.valueOf(function.getKey()), values.toArray());

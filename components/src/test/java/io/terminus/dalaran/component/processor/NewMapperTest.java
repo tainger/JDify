@@ -32,9 +32,9 @@ public class NewMapperTest extends BasicProcessorTest {
         simpleMapping1.setValue("root.models.id, root.models.name");
         simpleMapping1.setMappingType(MappingType.MAPPING);
         MappingFunction mappingFunction1 = new MappingFunction();
-        mappingFunction1.setType(FunctionType.STANDARD);
+        mappingFunction1.setType(FunctionType.STATIC);
         mappingFunction1.setKey("StringToUpper");
-        simpleMapping1.setFunction(mappingFunction1);
+//        simpleMapping1.setFunction(mappingFunction1);
         mappingList.put("root.modelList.userId", simpleMapping1);
 
         SimpleMapping simpleMapping2 = new SimpleMapping();

@@ -19,4 +19,6 @@ public interface DalaranFunctionContext {
 
     Collection<MappingFunctionInfo> allFunctionInfo();
 
+    MappingFunctionInfo getFunctionByKey(String key);
+
 }
