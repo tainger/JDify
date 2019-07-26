@@ -4,7 +4,6 @@ import com.alibaba.fastjson.JSON;
 import io.terminus.dalaran.DalaranIntegration;
 import io.terminus.dalaran.DalaranIntegrationAction;
 import io.terminus.dalaran.DalaranInvokeException;
-import io.terminus.dalaran.TrantorComponentLoader;
 import okhttp3.*;
 import org.springframework.beans.factory.FactoryBean;
 
