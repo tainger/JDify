@@ -3,5 +3,6 @@ server.port: 8888
 trantor:
   dalaran:
     runtimeUrl: http://localhost:8080
+    consoleUrl: http://localhost:8088
   module:
     scan-packages: "io.terminus.dalaran"

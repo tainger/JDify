@@ -1,6 +1,7 @@
 package io.terminus.dalaran;
 
 import io.terminus.dalaran.model.*;
+import io.terminus.dalaran.model.schema.JsonSchema;
 import io.terminus.dalaran.model.schema.ObjectSchema;
 import io.terminus.dalaran.model.trantor.DalaranIntegrationInfo;
 import io.terminus.dalaran.model.trantor.DalaranIntegrationPoint;
@@ -42,28 +43,22 @@ public class TrantorComponentLoader {
         return integrationInfo;
     }
 
-    private static MessageModel<ObjectSchema> buildReturnModel(Type type) {
-        ObjectSchema schema = new ObjectSchema();
-        MessageModel<ObjectSchema> model = new MessageModel<>();
-        model.setModelSchema(schema);
-        model.setModelType(BodyType.JSON);
+    private static JsonSchema buildReturnModel(Type type) {
+        JsonSchema schema = new JsonSchema();
         ModelField rootField = buildField(type);
         schema.setRootField(rootField);
-        return model;
+        return schema;
     }
 
-    private static MessageModel<ObjectSchema> buildParameters(Parameter[] parameters) {
-        ObjectSchema schema = new ObjectSchema();
-        MessageModel<ObjectSchema> model = new MessageModel<>();
-        model.setModelSchema(schema);
-        model.setModelType(BodyType.JSON);
+    private static JsonSchema buildParameters(Parameter[] parameters) {
+        JsonSchema schema = new JsonSchema();
         ModelField rootField = new ModelField();
         rootField.setType(FieldType.OBJECT);
         for (Parameter parameter : parameters) {
             rootField.addField(parameter.getName(), buildField(parameter.getParameterizedType()));
         }
         schema.setRootField(rootField);
-        return model;
+        return schema;
     }
 
     // TODO 这个方法简直了... 回头再细理一下吧

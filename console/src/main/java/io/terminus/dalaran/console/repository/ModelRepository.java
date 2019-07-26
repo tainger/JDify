@@ -10,4 +10,6 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 public interface ModelRepository extends JpaRepository<ModelEntity, Long>, JpaSpecificationExecutor<ModelEntity> {
 
     ModelEntity findByNameAndServiceId(String name, Long serviceId);
+
+    ModelEntity findByNameAndModuleIdIsNull(String name);
 }
