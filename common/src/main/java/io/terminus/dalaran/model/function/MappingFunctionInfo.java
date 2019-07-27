@@ -9,7 +9,7 @@ import java.lang.reflect.Method;
 @Data
 public class MappingFunctionInfo {
 
-    private String key;
+    private String name;
     private String description;
     private MappingFunctionType type;
 
