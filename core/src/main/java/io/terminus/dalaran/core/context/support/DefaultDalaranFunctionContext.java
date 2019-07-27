@@ -54,15 +54,15 @@ public class DefaultDalaranFunctionContext implements DalaranFunctionContext {
     }
 
     @Override
-    public void addStaticFunction(String key, String desc, Object bean, Method method) {
+    public void addStaticFunction(String name, String desc, Object bean, Method method) {
         MappingFunctionInfo functionInfo = new MappingFunctionInfo();
-        functionInfo.setKey(key);
+        functionInfo.setName(name);
         functionInfo.setDescription(desc);
         functionInfo.setBean(bean);
         functionInfo.setMethod(method);
         LocalVariableTableParameterNameDiscoverer u = new LocalVariableTableParameterNameDiscoverer();
         functionInfo.setParams(u.getParameterNames(method));
-        functionInfoMapper.put(key, functionInfo);
+        functionInfoMapper.put(name, functionInfo);
     }
 
     @Override
@@ -85,8 +85,6 @@ public class DefaultDalaranFunctionContext implements DalaranFunctionContext {
         switch (type) {
             case JavaScript:
                 engine = new ScriptEngineManager().getEngineByName("nashorn");
-                // TODO 这部分逻辑其实前后端通用
-                script = "function " + FUNCTION_NAME + " (" + StringUtils.join(params, ",") + ") {\n" + script + "\n}";
                 break;
             default:
                 throw new RuntimeException("unsupported script engine");
