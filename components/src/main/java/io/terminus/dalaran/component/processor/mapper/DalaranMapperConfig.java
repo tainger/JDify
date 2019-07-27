@@ -4,6 +4,7 @@ import io.terminus.dalaran.component.processor.mapper.model.SimpleMapping;
 import io.terminus.dalaran.core.component.config.OutModelConfig;
 import lombok.Data;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -11,6 +12,8 @@ import java.util.Map;
  */
 @Data
 public class DalaranMapperConfig extends OutModelConfig {
+
+    private List<SimpleMapping> noDestinationMappings;
 
     private Map<String, SimpleMapping> messageMapping;
 }
