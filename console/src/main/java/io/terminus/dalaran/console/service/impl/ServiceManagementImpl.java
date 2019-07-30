@@ -3,6 +3,7 @@ package io.terminus.dalaran.console.service.impl;
 import com.alibaba.fastjson.JSON;
 import io.terminus.dalaran.console.entity.ModelEntity;
 import io.terminus.dalaran.console.entity.ServiceEntity;
+import io.terminus.dalaran.console.model.ServiceDetail;
 import io.terminus.dalaran.console.model.dto.BasicServiceInfo;
 import io.terminus.dalaran.console.model.dto.ModelDTO;
 import io.terminus.dalaran.console.model.dto.ServiceDTO;
@@ -47,15 +48,20 @@ public class ServiceManagementImpl implements ServiceManagement {
     @Override
     @Transactional
     public Long create(ServiceDTO serviceDTO) {
-        ServiceEntity entity = toEntity(serviceDTO);
-        serviceRepository.save(entity);
-        return entity.getId();
+        ServiceDetail serviceDetail = toEntity(serviceDTO);
+        Long serviceId = serviceRepository.save(serviceDetail.getEntity()).getId();
+        serviceDetail.setServiceId(serviceId);
+        createModels(serviceDetail);
+        return serviceId;
     }
 
     @Override
     public ServiceDTO update(ServiceDTO serviceDTO) {
-        ServiceEntity entity = toEntity(serviceDTO);
+        ServiceDetail serviceDetail = toEntity(serviceDTO);
+        ServiceEntity entity = serviceDetail.getEntity();
+        serviceDetail.setServiceId(serviceDTO.getId());
         serviceRepository.save(entity);
+        createModels(serviceDetail);
         return toDTO(entity);
     }
 
@@ -104,12 +110,16 @@ public class ServiceManagementImpl implements ServiceManagement {
         return dto;
     }
 
-    private ServiceEntity toEntity(ServiceDTO dto) {
+    private ServiceDetail toEntity(ServiceDTO dto) {
+        ServiceDetail serviceDetail = new ServiceDetail();
         String type = dto.getType();
         Long moduleId = dto.getModuleId();
+        serviceDetail.setModuleId(moduleId);
         Long serviceId = dto.getId();
         ServiceEntity entity = new ServiceEntity();
-        entity.setId(serviceId);
+        if (serviceId != null) {
+            entity.setId(serviceId);
+        }
         entity.setModuleId(moduleId);
         entity.setName(dto.getName());
         entity.setType(type);
@@ -121,8 +131,22 @@ public class ServiceManagementImpl implements ServiceManagement {
         Object importConfig = JSON.parseObject(importConfigJson, importConfigType);
         DalaranService dalaranService = serviceContext.getService(dto.getType());
         Object serviceConfig = dalaranService.importConfig(importConfig);
+        entity.setServiceConfig(JSON.toJSONString(serviceConfig));
+        serviceDetail.setEntity(entity);
+        serviceDetail.setDalaranService(dalaranService);
+        serviceDetail.setImportConfig(importConfig);
+        serviceDetail.setServiceConfig(serviceConfig);
+        return serviceDetail;
+    }
 
+    private void createModels(ServiceDetail serviceDetail) {
         Map<String, Long> models = new HashMap<>();
+        ServiceEntity entity = serviceDetail.getEntity();
+        DalaranService dalaranService = serviceDetail.getDalaranService();
+        Object serviceConfig = serviceDetail.getServiceConfig();
+        Object importConfig = serviceDetail.getImportConfig();
+        Long moduleId = serviceDetail.getModuleId();
+        Long serviceId = serviceDetail.getServiceId();
         List<String> operationKeys = dalaranService.operations(serviceConfig);
         operationKeys.forEach(operationKey -> {
             ServiceOperation operation = dalaranService.getOperationConfig(serviceConfig, operationKey);
@@ -132,10 +156,10 @@ public class ServiceManagementImpl implements ServiceManagement {
             operation.setInModelId(inModelId);
             operation.setOutModelId(outModelId);
         });
-
         entity.setServiceConfig(JSON.toJSONString(serviceConfig));
-        return entity;
+        serviceRepository.save(entity);
     }
+
 
     private Long buildModel(MessageModel messageModel, String modelName, Long moduleId, Long serviceId, Map<String, Long> models) {
         if (models.containsKey(modelName)) {

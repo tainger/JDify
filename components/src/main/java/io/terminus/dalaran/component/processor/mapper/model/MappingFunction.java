@@ -12,6 +12,8 @@ public class MappingFunction {
 
     private String key;
 
+    private String temKey;
+
     private FunctionType type;
 
     private Map<String, String> params;

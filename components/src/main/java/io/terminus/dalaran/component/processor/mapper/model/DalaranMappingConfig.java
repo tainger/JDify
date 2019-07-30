@@ -2,6 +2,7 @@ package io.terminus.dalaran.component.processor.mapper.model;
 
 import lombok.Data;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -14,5 +15,5 @@ public class DalaranMappingConfig {
 
     private SimpleMappingField destinationRoot;
 
-    private List<MessageMapping> messageMappings;
+    private List<MessageMapping> messageMappings = new ArrayList<>();
 }

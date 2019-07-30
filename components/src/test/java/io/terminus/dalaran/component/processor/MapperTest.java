@@ -15,6 +15,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -25,7 +26,7 @@ public class MapperTest extends BasicProcessorTest {
     @Test
     public void testMapperProcessor() {
         DalaranMapperConfig config = new DalaranMapperConfig();
-        Map<String, SimpleMapping> messageMapping = new HashMap<>();
+        Map<String, SimpleMapping> messageMapping = new LinkedHashMap<>();
         SimpleMapping field1 = new SimpleMapping();
         field1.setMappingType(MappingType.MAPPING);
         field1.setValue("root.id");
@@ -36,7 +37,7 @@ public class MapperTest extends BasicProcessorTest {
         field2.setValue("momo");
         messageMapping.put("root.userName", field2);
 
-        config.setMessageMapping(messageMapping);
+        config.setMessageMapping((LinkedHashMap<String, SimpleMapping>) messageMapping);
 
         MessageModel in = buildInModel();
         MessageModel out = buildOutModel();

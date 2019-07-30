@@ -15,10 +15,7 @@ import org.apache.camel.model.ProcessorDefinition;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by jingdi on 2019/3/18
@@ -53,6 +50,8 @@ public class DalaranMessageMapper implements DalaranProcessor<DalaranMapperConfi
             buildMapping(messageMapping, path, mapping, in, out);
             messageMappings.add(messageMapping);
         });
+        messageMappings.sort(new MessageMappingComparator());
+
         mappingConfig.setMessageMappings(messageMappings);
         SimpleMappingField sourceRoot = new SimpleMappingField();
         sourceRoot.setType(in.getModelSchema().getFields().get(MapperConstants.MODEL_ROOT).getType());
@@ -96,27 +95,29 @@ public class DalaranMessageMapper implements DalaranProcessor<DalaranMapperConfi
         messageMapping.setComplex(complex);
     }
 
-    private List<String> buildSourcePaths(MappingType mappingType, String value, MessageMapping messageMapping) {
+    private List<String> buildSourcePaths(MappingType mappingType, Object value, MessageMapping messageMapping) {
         List<String> sourcePaths = new ArrayList<>();
 
         if (mappingType == MappingType.FUNCTION) {
-            MappingFunction function = JSON.parseObject(value, MappingFunction.class);
+            MappingFunction function = JSON.parseObject(JSON.toJSONString(value), MappingFunction.class);
             messageMapping.setFunction(function);
 
             DalaranFunctionContext functionContext = dalaranContext.getDalaranFunctionContext();
             MappingFunctionInfo functionInfo = functionContext.getFunctionByKey(function.getKey());
             if (functionInfo != null) {
                 String[] params = functionInfo.getParams();
+                String temKey = function.getTemKey();
                 Map<String, String> sourcePath = function.getParams();
                 for (String param: params) {
-                    String path = sourcePath.get(param);
-                    sourcePaths.add(path);
+                    String path = sourcePath.get(temKey + param);
+                    if (path != null) {
+                        sourcePaths.add(path);
+                    }
                 }
             }
         } else {
-            sourcePaths.add(value);
+            sourcePaths.add(value.toString());
         }
-
         return sourcePaths;
     }
 
@@ -160,5 +161,27 @@ public class DalaranMessageMapper implements DalaranProcessor<DalaranMapperConfi
             }
         }
         return complex;
+    }
+
+    private class MessageMappingComparator implements Comparator<MessageMapping> {
+        @Override
+        public int compare(MessageMapping o1, MessageMapping o2) {
+            if ((o1.getMappingType() == MappingType.DEFAULT || o1.getMappingType() == MappingType.FUNCTION) && o2.getMappingType() == MappingType.MAPPING) {
+                return 1;
+            }
+
+            if (o1.getMappingType() == MappingType.DEFAULT && o2.getMappingType() == MappingType.FUNCTION) {
+                return 1;
+            }
+
+            if (o1.getMappingType() == MappingType.FUNCTION && o2.getMappingType() == MappingType.DEFAULT) {
+                return -1;
+            }
+
+            if (o1.getMappingType() == MappingType.MAPPING && (o2.getMappingType() == MappingType.DEFAULT || o2.getMappingType() == MappingType.FUNCTION)) {
+                return -1;
+            }
+            return 0;
+        }
     }
 }

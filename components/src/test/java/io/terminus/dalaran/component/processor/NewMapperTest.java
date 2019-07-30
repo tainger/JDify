@@ -14,6 +14,7 @@ import org.apache.camel.ProducerTemplate;
 import org.junit.Test;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -26,7 +27,7 @@ public class NewMapperTest extends BasicProcessorTest {
         MessageModel in = buildIn();
         MessageModel out = buildOut();
 
-        Map<String, SimpleMapping> mappingList = new HashMap<>();
+        LinkedHashMap<String, SimpleMapping> mappingList = new LinkedHashMap<>();
 
         SimpleMapping simpleMapping1 = new SimpleMapping();
         simpleMapping1.setValue("root.models.id, root.models.name");

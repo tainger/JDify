@@ -33,42 +33,10 @@ public class Converter {
         return destination;
     }
 
-    private static void buildValue(Object source, MessageMapping messageMapping, Object destination, DalaranContext dalaranContext) {
-        List<Object> values = new ArrayList<>();
-        List<SourceField> sourceFields = messageMapping.getSourceFields();
-        MappingType mappingType = messageMapping.getMappingType();
-
-        sourceFields.forEach(sourceField -> {
-            Object value = null;
-            if (mappingType == MappingType.DEFAULT) {
-                value = sourceField.getPath();
-            } else {
-                value = JSONPath.eval(source, sourceField.getPath());
-            }
-            values.add(value);
-        });
-
-        String destinationPath = messageMapping.getPath();
-        MappingFunction function = messageMapping.getFunction();
-        if (function != null) {
-            if (function.getType() == FunctionType.STATIC) {
-                dalaranContext.getDalaranFunctionContext().executeStaticFunction(function.getKey(), values.toArray());
-            } else {
-                dalaranContext.getDalaranFunctionContext().executeCustomFunction(Long.valueOf(function.getKey()), values.toArray());
-            }
-        } else {
-            if (mappingType == MappingType.DEFAULT) {
-                JSONPath.set(destination, "$root." + destinationPath, values.get(0));
-            } else {
-                FieldType type = sourceFields.get(0).getField().getType();
-                JSONPath.set(destination, "$root." + destinationPath, parse(values.get(0), type));
-            }
-        }
-    }
-
     private static SourceFieldDetail buildSource(Object source, MessageMapping mapping, SimpleMappingField sourceRoot) {
         List<List<SourcePath>> sourcePathList = new ArrayList<>();
         List<Integer> arrayFieldSize = new ArrayList<>();
+        MappingType mappingType = mapping.getMappingType();
         Integer lastArray = 0;
         List<SourceField> fields = mapping.getSourceFields();
         if (sourceRoot.getType() == FieldType.ARRAY) {
@@ -94,10 +62,15 @@ public class Converter {
             StringBuilder indexes = new StringBuilder();
             List<SourcePath> sourcePaths = new ArrayList<>();
             for (SourceField sourceField: fields) {
-                PathDetail paths = new PathDetail();
-                buildSourcePaths(path, sourceField.getField(), arrayFieldSize, lastArray, source, paths, indexes);
-                SourcePath sourcePath = new SourcePath(sourceField.getPath(), paths);
-                sourcePaths.add(sourcePath);
+                if (mappingType == MappingType.DEFAULT) {
+                    SourcePath sourcePath = new SourcePath(sourceField.getPath(), null);
+                    sourcePaths.add(sourcePath);
+                } else {
+                    PathDetail paths = new PathDetail();
+                    buildSourcePaths(path, sourceField.getField(), arrayFieldSize, lastArray, source, paths, indexes);
+                    SourcePath sourcePath = new SourcePath(sourceField.getPath(), paths);
+                    sourcePaths.add(sourcePath);
+                }
             }
             sourcePathList.add(sourcePaths);
         }
@@ -199,21 +172,22 @@ public class Converter {
                     values.add(value);
                 }
 
+                PathDetail pathDetail = destinationPaths.get(indexes);
                 Object value = null;
                 if (function != null) {
-                    if (function.getType() == FunctionType.STATIC) {
-                        value = dalaranContext.getDalaranFunctionContext().executeStaticFunction(function.getKey(), values.toArray());
-                    } else {
-                        value = dalaranContext.getDalaranFunctionContext().executeCustomFunction(Long.valueOf(function.getKey()), values.toArray());
+                    switch (function.getType()) {
+                        case STATIC:
+                            value = dalaranContext.getDalaranFunctionContext().executeStaticFunction(function.getKey(), values.toArray());
+                            break;
+                        case CUSTOM:
+                            value = dalaranContext.getDalaranFunctionContext().executeCustomFunction(Long.valueOf(function.getKey()), values.toArray());
                     }
-                } else if (values.size() == 1) {
-                    PathDetail pathDetail = destinationPaths.get(indexes);
+                } else {
                     if (pathDetail != null) {
                         FieldType type  = pathDetail.getType();
                         value = parse(values.get(0), type);
                     }
                 }
-                PathDetail pathDetail = destinationPaths.get(indexes);
                 if (pathDetail != null && pathDetail.getPath() != null) {
                     JSONPath.set(destination, pathDetail.getPath(), value);
                 }
@@ -221,14 +195,42 @@ public class Converter {
         }
     }
 
-//    private static String getDestinationPath(String indexes, List<PathDetail> destinationPaths) {
-//        for (PathDetail pathDetail: destinationPaths) {
-//            if (StringUtils.equalsIgnoreCase(indexes, pathDetail.getIndexes())) {
-//                return pathDetail.getPath();
-//            }
-//        }
-//        return null;
-//    }
+    private static void buildValue(Object source, MessageMapping messageMapping, Object destination, DalaranContext dalaranContext) {
+        List<Object> values = new ArrayList<>();
+        List<SourceField> sourceFields = messageMapping.getSourceFields();
+        MappingType mappingType = messageMapping.getMappingType();
+
+        sourceFields.forEach(sourceField -> {
+            Object value = null;
+            if (mappingType == MappingType.DEFAULT) {
+                value = sourceField.getPath();
+            } else {
+                value = JSONPath.eval(source, sourceField.getPath());
+            }
+            values.add(value);
+        });
+
+        String destinationPath = messageMapping.getPath();
+        MappingFunction function = messageMapping.getFunction();
+        Object value = null;
+        if (function != null) {
+            switch (function.getType()) {
+                case STATIC:
+                    value = dalaranContext.getDalaranFunctionContext().executeStaticFunction(function.getKey(), values.toArray());
+                    break;
+                case CUSTOM:
+                    value = dalaranContext.getDalaranFunctionContext().executeCustomFunction(Long.valueOf(function.getKey()), values.toArray());
+            }
+        } else {
+            if (mappingType == MappingType.DEFAULT) {
+                value = values.get(0);
+            } else {
+                FieldType type = sourceFields.get(0).getField().getType();
+                value = parse(values.get(0), type);
+            }
+        }
+        JSONPath.set(destination, "$root." + destinationPath, value);
+    }
 
     private static Object parse(Object target, FieldType destination) {
         if (target == null) {
