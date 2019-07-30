@@ -14,7 +14,6 @@ public class TracingLogEntity {
     @GeneratedValue
     private Long id;
 
-    @Column(nullable = false)
     private Long moduleId;
 
     @Column(nullable = false)
