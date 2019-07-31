@@ -171,10 +171,10 @@ public class Converter {
                 if (function != null) {
                     switch (function.getType()) {
                         case STATIC:
-                            value = dalaranContext.getDalaranFunctionContext().executeStaticFunction(function.getKey(), values.toArray());
+                            value = dalaranContext.getDalaranFunctionContext().executeStaticFunction(function.getId(), values.toArray());
                             break;
                         case CUSTOM:
-                            value = dalaranContext.getDalaranFunctionContext().executeCustomFunction(Long.valueOf(function.getKey()), values.toArray());
+                            value = dalaranContext.getDalaranFunctionContext().executeCustomFunction(Long.valueOf(function.getId()), values.toArray());
                     }
                 } else {
                     if (pathDetail != null) {
@@ -210,10 +210,10 @@ public class Converter {
         if (function != null) {
             switch (function.getType()) {
                 case STATIC:
-                    value = dalaranContext.getDalaranFunctionContext().executeStaticFunction(function.getKey(), values.toArray());
+                    value = dalaranContext.getDalaranFunctionContext().executeStaticFunction(function.getId(), values.toArray());
                     break;
                 case CUSTOM:
-                    value = dalaranContext.getDalaranFunctionContext().executeCustomFunction(Long.valueOf(function.getKey()), values.toArray());
+                    value = dalaranContext.getDalaranFunctionContext().executeCustomFunction(Long.valueOf(function.getId()), values.toArray());
             }
         } else {
             if (mappingType == MappingType.DEFAULT) {

@@ -108,7 +108,7 @@ public class DalaranMessageMapper implements DalaranProcessor<DalaranMapperConfi
             messageMapping.setFunction(function);
 
             DalaranFunctionContext functionContext = dalaranContext.getDalaranFunctionContext();
-            MappingFunctionInfo functionInfo = functionContext.getFunctionByKey(function.getKey());
+            MappingFunctionInfo functionInfo = functionContext.getFunctionByKey(function.getId());
             if (functionInfo != null) {
                 String[] params = functionInfo.getParams();
                 String temKey = function.getTemKey();
