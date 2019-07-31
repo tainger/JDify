@@ -80,14 +80,17 @@ public class DefaultDalaranFunctionContext implements DalaranFunctionContext {
         return functionInfoMapper.get(key);
     }
 
+    // TODO 可以改成自动注册
     private Invocable buildScriptEngine(MappingFunctionType type, String script, List<String> params) {
         ScriptEngine engine;
         switch (type) {
             case JavaScript:
                 engine = new ScriptEngineManager().getEngineByName("nashorn");
+                script = "function " + FUNCTION_NAME + " (" + StringUtils.join(params, ",") + ") {\n" + script + "\n}";
                 break;
             case Groovy:
                 engine = new ScriptEngineManager().getEngineByName("groovy");
+                script = "def " + FUNCTION_NAME + " (" + StringUtils.join(params, ",") + ") {\n" + script + "\n}";
                 break;
             default:
                 throw new RuntimeException("unsupported script engine");

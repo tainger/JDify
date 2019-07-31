@@ -22,7 +22,10 @@ public class DalaranScript implements DalaranProcessor<DalaranScriptConfig> {
     public void configure(ProcessorDefinition route, DalaranScriptConfig config) {
         switch (config.getType()) {
             case JavaScript: {
-                String content = config.getScript() + "\nexchange.out.body = execute(request.body, request.headers, exchange.properties." + DALARAN_CONTEXT_EXCHANGE + ")";
+                String content = "function execute(body, headers, context) {\n";
+                content += config.getScript();
+                content += "\n}\n";
+                content += "exchange.out.body = execute(request.body, request.headers, exchange.properties." + DALARAN_CONTEXT_EXCHANGE + ")";
                 route.script().javaScript(content);
                 // TODO 这里很奇怪, 处理一下 array 的输出, 因为 java script 产出的数组其实也是一个 map....
                 route.process(exchange -> {
@@ -37,7 +40,10 @@ public class DalaranScript implements DalaranProcessor<DalaranScriptConfig> {
                 break;
             }
             case Groovy: {
-                String content = config.getScript() + "\nexchange.out.body = execute(request.body, request.headers, exchange.properties." + DALARAN_CONTEXT_EXCHANGE + ")";
+                String content = "def execute(Object body, Map headers, Map context) {\n";
+                content += config.getScript();
+                content += "\n}\n";
+                content += "exchange.out.body = execute(request.body, request.headers, exchange.properties." + DALARAN_CONTEXT_EXCHANGE + ")";
                 route.script().groovy(content);
                 route.end();
                 break;
