@@ -1,6 +1,7 @@
 package io.terminus.dalaran.component.processor.mapper;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.parser.DefaultJSONParser;
 import io.terminus.dalaran.component.processor.mapper.model.*;
 import io.terminus.dalaran.core.component.BodySerializeType;
 import io.terminus.dalaran.core.component.DalaranProcessor;
