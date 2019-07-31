@@ -104,10 +104,12 @@ public class TrantorComponentLoader {
                 ModelField subField = buildField(((Class) type).getComponentType());
                 field.setSubType(subField.getType());
                 field.setFields(subField.getFields());
+            } else if (((Class) type).isEnum()) {
+                field.setType(FieldType.STRING);
             } else {
                 // 无泛型且不是基本类型, 认为是模型, 读取字段
                 field.setType(FieldType.OBJECT);
-                for (Field objField : ((Class) type).getDeclaredFields()) {
+                for (Field objField : ((Class) type).getFields()) {
                     field.addField(objField.getName(), buildField(objField.getType()));
                 }
             }

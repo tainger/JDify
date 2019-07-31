@@ -86,6 +86,9 @@ public class DefaultDalaranFunctionContext implements DalaranFunctionContext {
             case JavaScript:
                 engine = new ScriptEngineManager().getEngineByName("nashorn");
                 break;
+            case Groovy:
+                engine = new ScriptEngineManager().getEngineByName("groovy");
+                break;
             default:
                 throw new RuntimeException("unsupported script engine");
         }
