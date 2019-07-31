@@ -15,10 +15,7 @@ import org.apache.camel.model.ProcessorDefinition;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by jingdi on 2019/3/18
@@ -53,6 +50,8 @@ public class DalaranMessageMapper implements DalaranProcessor<DalaranMapperConfi
             buildMapping(messageMapping, path, mapping, in, out);
             messageMappings.add(messageMapping);
         });
+        messageMappings.sort(new MessageMappingComparator());
+
         mappingConfig.setMessageMappings(messageMappings);
         SimpleMappingField sourceRoot = new SimpleMappingField();
         sourceRoot.setType(in.getModelSchema().getFields().get(MapperConstants.MODEL_ROOT).getType());
@@ -78,14 +77,19 @@ public class DalaranMessageMapper implements DalaranProcessor<DalaranMapperConfi
         Map<String, ModelField> outField = out.getModelSchema().getFields();
 
         SimpleMappingField destinationField = new SimpleMappingField();
-        buildMappingField(path, outField, destinationField);
+
+        MappingProperty mappingProperty = buildMappingField(path, outField, destinationField);
+        messageMapping.setStatus(mappingProperty.getStatus());
+        if (mappingProperty.getStatus() == MappingStatus.ERROR) {
+            return;
+        }
         messageMapping.setDestinationField(destinationField);
 
         List<SourceField> sourceFields = new ArrayList<>();
         boolean complex = false;
         for (String sourcePath : sourcePaths) {
             SourceField sourceField = new SourceField();
-            if (messageMapping.getMappingType() == MappingType.DEFAULT) {
+            if (mappingType == MappingType.DEFAULT) {
                 sourceField.setPath(sourcePath);
             } else {
                 complex = buildSourceField(sourcePath, inField, sourceField);
@@ -96,53 +100,62 @@ public class DalaranMessageMapper implements DalaranProcessor<DalaranMapperConfi
         messageMapping.setComplex(complex);
     }
 
-    private List<String> buildSourcePaths(MappingType mappingType, String value, MessageMapping messageMapping) {
+    private List<String> buildSourcePaths(MappingType mappingType, Object value, MessageMapping messageMapping) {
         List<String> sourcePaths = new ArrayList<>();
 
         if (mappingType == MappingType.FUNCTION) {
-            MappingFunction function = JSON.parseObject(value, MappingFunction.class);
+            MappingFunction function = JSON.parseObject(JSON.toJSONString(value), MappingFunction.class);
             messageMapping.setFunction(function);
 
             DalaranFunctionContext functionContext = dalaranContext.getDalaranFunctionContext();
-            MappingFunctionInfo functionInfo = functionContext.getFunctionByKey(function.getKey());
+            MappingFunctionInfo functionInfo = functionContext.getFunctionByKey(function.getId());
             if (functionInfo != null) {
                 String[] params = functionInfo.getParams();
+                String temKey = function.getTemKey();
+                if (temKey == null) {
+                    temKey = "";
+                }
                 Map<String, String> sourcePath = function.getParams();
                 for (String param: params) {
-                    String path = sourcePath.get(param);
-                    sourcePaths.add(path);
+                    String path = sourcePath.get(temKey + param);
+                    if (path != null) {
+                        sourcePaths.add(path);
+                    }
                 }
             }
         } else {
-            sourcePaths.add(value);
+            sourcePaths.add(value.toString());
         }
-
         return sourcePaths;
     }
 
     private boolean buildSourceField(String sourcePath, Map<String, ModelField> in, SourceField sourceField) {
         SimpleMappingField simpleMappingField = new SimpleMappingField();
-        boolean complex = buildMappingField(sourcePath, in, simpleMappingField);
+        MappingProperty mappingProperty = buildMappingField(sourcePath, in, simpleMappingField);
         sourceField.setField(simpleMappingField);
         sourceField.setPath(StringUtils.substringAfter(sourcePath, MapperConstants.MODEL_ROOT + "."));
-        return complex;
+        return mappingProperty.isComplex();
     }
 
-    private boolean buildMappingField(String path, Map<String, ModelField> modelField, SimpleMappingField simpleMappingField) {
+    private MappingProperty buildMappingField(String path, Map<String, ModelField> modelField, SimpleMappingField simpleMappingField) {
         boolean complex = false;
+        MappingStatus status = MappingStatus.CORRECT;
 
         ModelField root = modelField.get(MapperConstants.MODEL_ROOT);
         if (root.getType() == FieldType.ARRAY) {
             complex = true;
         }
+
         Map<String, ModelField> child = root.getFields();
         String[] fields = StringUtils.split(path, ".");
-
         Map<String, ModelField> temporaryField = child;
         SimpleMappingField temporaryMappingField = simpleMappingField;
         for (int i = 1; i < fields.length; i++) {
             String fieldName = fields[i];
             ModelField field = temporaryField.get(fieldName);
+            if (field == null) {
+                return new MappingProperty(complex, MappingStatus.ERROR);
+            }
             temporaryMappingField.setName(fieldName);
             temporaryMappingField.setType(field.getType());
 
@@ -159,6 +172,28 @@ public class DalaranMessageMapper implements DalaranProcessor<DalaranMapperConfi
                 temporaryMappingField = childField;
             }
         }
-        return complex;
+        return new MappingProperty(complex, status);
+    }
+
+    private class MessageMappingComparator implements Comparator<MessageMapping> {
+        @Override
+        public int compare(MessageMapping o1, MessageMapping o2) {
+            if ((o1.getMappingType() == MappingType.DEFAULT || o1.getMappingType() == MappingType.FUNCTION) && o2.getMappingType() == MappingType.MAPPING) {
+                return 1;
+            }
+
+            if (o1.getMappingType() == MappingType.DEFAULT && o2.getMappingType() == MappingType.FUNCTION) {
+                return 1;
+            }
+
+            if (o1.getMappingType() == MappingType.FUNCTION && o2.getMappingType() == MappingType.DEFAULT) {
+                return -1;
+            }
+
+            if (o1.getMappingType() == MappingType.MAPPING && (o2.getMappingType() == MappingType.DEFAULT || o2.getMappingType() == MappingType.FUNCTION)) {
+                return -1;
+            }
+            return 0;
+        }
     }
 }

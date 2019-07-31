@@ -8,7 +8,7 @@ import lombok.Data;
 @Data
 public class SimpleMapping {
 
-    private String value;
+    private Object value;
 
     private MappingType mappingType = MappingType.MAPPING;
 

@@ -1,7 +1,6 @@
 package io.terminus.dalaran.component.processor.mapper.model;
 
 import lombok.Data;
-
 import java.util.List;
 
 /**
@@ -16,9 +15,13 @@ public class MessageMapping {
 
     private boolean complex;
 
+    private MappingStatus status;
+
     private MappingFunction function;
 
     private SimpleMappingField destinationField;
 
     private List<SourceField> sourceFields;
+
+
 }

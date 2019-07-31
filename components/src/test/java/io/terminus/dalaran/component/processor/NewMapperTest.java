@@ -14,6 +14,7 @@ import org.apache.camel.ProducerTemplate;
 import org.junit.Test;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -26,14 +27,14 @@ public class NewMapperTest extends BasicProcessorTest {
         MessageModel in = buildIn();
         MessageModel out = buildOut();
 
-        Map<String, SimpleMapping> mappingList = new HashMap<>();
+        LinkedHashMap<String, SimpleMapping> mappingList = new LinkedHashMap<>();
 
         SimpleMapping simpleMapping1 = new SimpleMapping();
         simpleMapping1.setValue("root.models.id, root.models.name");
         simpleMapping1.setMappingType(MappingType.MAPPING);
         MappingFunction mappingFunction1 = new MappingFunction();
         mappingFunction1.setType(FunctionType.STATIC);
-        mappingFunction1.setKey("StringToUpper");
+        mappingFunction1.setId("StringToUpper");
 //        simpleMapping1.setFunction(mappingFunction1);
         mappingList.put("root.modelList.userId", simpleMapping1);
 

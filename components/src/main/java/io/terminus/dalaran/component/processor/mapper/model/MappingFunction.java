@@ -10,7 +10,9 @@ import java.util.Map;
 @Data
 public class MappingFunction {
 
-    private String key;
+    private String id;
+
+    private String temKey;
 
     private FunctionType type;
 
