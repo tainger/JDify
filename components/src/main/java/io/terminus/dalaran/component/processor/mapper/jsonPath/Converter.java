@@ -34,9 +34,8 @@ public class Converter {
     }
 
     private static SourceFieldDetail buildSource(Object source, MessageMapping mapping, SimpleMappingField sourceRoot) {
-        List<List<SourcePath>> sourcePathList = new ArrayList<>();
+        Map<String, List<SourcePath>> sourcePaths = new HashMap<>();
         List<Integer> arrayFieldSize = new ArrayList<>();
-        MappingType mappingType = mapping.getMappingType();
         Integer lastArray = 0;
         List<SourceField> fields = mapping.getSourceFields();
         if (sourceRoot.getType() == FieldType.ARRAY) {
@@ -47,37 +46,22 @@ public class Converter {
             for (int i = 0; i < bodySize; i++) {
                 String path = "$[" + i + "]";
                 StringBuilder indexes = new StringBuilder();
-                indexes.append(i);
-                List<SourcePath> sourcePaths = new ArrayList<>();
+                indexes.append(i).append(".");
                 for (SourceField sourceField: fields) {
-                    PathDetail pathDetail = new PathDetail();
-                    buildSourcePaths(path, sourceField.getField(), arrayFieldSize, level, source, pathDetail, indexes);
-                    SourcePath sourcePath = new SourcePath(sourceField.getPath(), pathDetail);
-                    sourcePaths.add(sourcePath);
+                    buildSourcePaths(path, sourceField.getField(), arrayFieldSize, level, source, sourcePaths, sourceField.getPath(), indexes);
                 }
-                sourcePathList.add(sourcePaths);
             }
         } else {
             String path = "$";
             StringBuilder indexes = new StringBuilder();
-            List<SourcePath> sourcePaths = new ArrayList<>();
             for (SourceField sourceField: fields) {
-                if (mappingType == MappingType.DEFAULT) {
-                    SourcePath sourcePath = new SourcePath(sourceField.getPath(), null);
-                    sourcePaths.add(sourcePath);
-                } else {
-                    PathDetail paths = new PathDetail();
-                    buildSourcePaths(path, sourceField.getField(), arrayFieldSize, lastArray, source, paths, indexes);
-                    SourcePath sourcePath = new SourcePath(sourceField.getPath(), paths);
-                    sourcePaths.add(sourcePath);
-                }
+                buildSourcePaths(path, sourceField.getField(), arrayFieldSize, lastArray, source, sourcePaths, sourceField.getPath(), indexes);
             }
-            sourcePathList.add(sourcePaths);
         }
-        return new SourceFieldDetail(arrayFieldSize, sourcePathList);
+        return new SourceFieldDetail(arrayFieldSize, sourcePaths);
     }
 
-    private static void buildSourcePaths(String parentPath, SimpleMappingField field, List<Integer> arrayFieldSize, Integer lastArrayLevel, Object source, PathDetail pathDetail, StringBuilder indexes) {
+    private static void buildSourcePaths(String parentPath, SimpleMappingField field, List<Integer> arrayFieldSize, Integer lastArrayLevel, Object source, Map<String, List<SourcePath>> sourcePaths, String rootPath, StringBuilder indexes) {
         String name = parentPath + "." + field.getName();
         if (field.getLocal() == FieldLocal.MIDDLE) {
             Object body = JSONPath.eval(source, name);
@@ -92,19 +76,29 @@ public class Converter {
                     for (int i = 0; i < bodySize; i++) {
                         StringBuilder index = new StringBuilder();
                         index.append(indexes);
-                        index.append(i);
+                        index.append(i).append(".");
                         String path = name + "[" + i + "]";
-                        buildSourcePaths(path, childField, arrayFieldSize, level, source, pathDetail, index);
+                        buildSourcePaths(path, childField, arrayFieldSize, level, source, sourcePaths, rootPath, index);
                     }
                 }
                 if (field.getType() == FieldType.OBJECT) {
-                    buildSourcePaths(name, childField, arrayFieldSize, lastArrayLevel, source, pathDetail, indexes);
+                    buildSourcePaths(name, childField, arrayFieldSize, lastArrayLevel, source, sourcePaths, rootPath, indexes);
                 }
             }
         } else if (field.getLocal() == FieldLocal.END) {
+            PathDetail pathDetail = new PathDetail();
+            String index = indexes.toString();
             pathDetail.setPath(name);
             pathDetail.setType(field.getType());
-            pathDetail.setIndexes(indexes.toString());
+            pathDetail.setIndexes(index);
+            SourcePath sourcePath = new SourcePath(rootPath, pathDetail);
+            if (sourcePaths.containsKey(index)) {
+                sourcePaths.get(index).add(sourcePath);
+            } else {
+                List<SourcePath> sourcePathList = new ArrayList<>();
+                sourcePathList.add(sourcePath);
+                sourcePaths.put(index, sourcePathList);
+            }
         }
     }
 
@@ -117,7 +111,7 @@ public class Converter {
             int size = arrayFieldSize.get(level++);
             for (int i = 0; i < size; i++) {
                 StringBuilder indexes = new StringBuilder();
-                indexes.append(i);
+                indexes.append(i).append(".");
                 String path = "$root[" + i + "]";
                 buildDestinationPaths(path, field, arrayFieldSize, level, paths, indexes);
             }
@@ -137,8 +131,8 @@ public class Converter {
                 int bodySize = arrayFieldSize.get(level++);
                 for (int i = 0; i < bodySize; i++) {
                     StringBuilder index = new StringBuilder();
-                    index.append(indexes.toString());
-                    index.append(i);
+                    index.append(indexes);
+                    index.append(i).append(".");
                     String path = name + "[" + i + "]";
                     buildDestinationPaths(path, child, arrayFieldSize, level, paths, index);
                 }
@@ -155,19 +149,17 @@ public class Converter {
         }
     }
 
-    private static void buildValue(Object source, List<List<SourcePath>> sourcePaths, Map<String, PathDetail> destinationPaths, MessageMapping messageMapping, Object destination, DalaranContext dalaranContext) {
+    private static void buildValue(Object source, Map<String, List<SourcePath>> sourcePaths, Map<String, PathDetail> destinationPaths, MessageMapping messageMapping, Object destination, DalaranContext dalaranContext) {
         MappingFunction function = messageMapping.getFunction();
         if (sourcePaths != null && sourcePaths.size() > 0) {
-            int size = sourcePaths.size();
-            for (int i = 0; i < size; i++) {
+            for (Map.Entry<String, List<SourcePath>> entry: sourcePaths.entrySet()) {
                 List<Object> values = new ArrayList<>();
-                String indexes = "";
-                for (SourcePath sourcePath: sourcePaths.get(i)) {
+                String indexes = entry.getKey();
+                for (SourcePath sourcePath: entry.getValue()) {
                     Object value = null;
                     PathDetail pathDetail = sourcePath.getDetail();
                     if (pathDetail != null && pathDetail.getPath() != null) {
                         value = JSONPath.eval(source, pathDetail.getPath());
-                        indexes = pathDetail.getIndexes();
                     }
                     values.add(value);
                 }
