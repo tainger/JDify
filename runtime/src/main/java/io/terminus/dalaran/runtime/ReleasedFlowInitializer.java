@@ -11,9 +11,12 @@ import io.terminus.dalaran.model.flow.FlowStatus;
 import io.terminus.dalaran.model.flow.SubFlow;
 import io.terminus.dalaran.model.flow.TriggerFlow;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.camel.CamelContext;
+import org.apache.camel.model.RouteDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 
+import javax.annotation.PostConstruct;
 import java.util.List;
 
 @Slf4j
@@ -31,11 +34,22 @@ public class ReleasedFlowInitializer {
     @Autowired
     private DalaranContext dalaranContext;
 
+    @Autowired
+    private CamelContext camelContext;
+
+    @PostConstruct
+    private void init() throws Exception {
+        RouteDefinition route = new RouteDefinition();
+        route.from("netty4-http:http://0.0.0.0:8080/__dalaran/__health?httpMethodRestrict=GET")
+                .setBody().constant("OK").end();
+        camelContext.addRouteDefinition(route);
+    }
+
     // TODO 临时每分钟 load 一下...
     // TODO 启动延时 5 秒, 因为目前 Component 的加载是根据 Spring Bean 的初始化, 有时候初始化流时, Component 还没有 ready
     // TODO 组件需要更好的加载方式, 更早加载或者有机制确保加载完成在初始化流
     @Scheduled(fixedDelay = 60 * 1000L, initialDelay = 5 * 1000L)
-    private void init() {
+    private void loadResources() {
         ReleaseRecordEntity recordEntity = releaseRecordRepository.findByEnabledTrue();
         synchronized (this) {
             if (recordEntity == null || recordEntity.getVersion().equals(resourceLoader.getVersion())) {

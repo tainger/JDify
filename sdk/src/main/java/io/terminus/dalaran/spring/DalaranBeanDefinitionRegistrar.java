@@ -33,7 +33,7 @@ public class DalaranBeanDefinitionRegistrar implements ImportBeanDefinitionRegis
                 definition.addPropertyValue("runtimeUrl", runtimeUrl);
                 definition.setAutowireMode(AbstractBeanDefinition.AUTOWIRE_BY_TYPE);
                 AbstractBeanDefinition beanDefinition = definition.getBeanDefinition();
-                BeanDefinitionHolder holder = new BeanDefinitionHolder(beanDefinition, importingClassMetadata.getClassName(), null);
+                BeanDefinitionHolder holder = new BeanDefinitionHolder(beanDefinition, component.getBeanClassName(), null);
                 BeanDefinitionReaderUtils.registerBeanDefinition(holder, registry);
             }
         }
