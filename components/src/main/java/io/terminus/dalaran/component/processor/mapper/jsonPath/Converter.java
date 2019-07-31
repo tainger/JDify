@@ -22,12 +22,14 @@ public class Converter {
         SimpleMappingField sourceRoot = mappingConfig.getSourceRoot();
         SimpleMappingField destinationRoot = mappingConfig.getDestinationRoot();
         messageMappings.forEach(messageMapping -> {
-            if (messageMapping.isComplex()) {
-                SourceFieldDetail sourceFieldDetail = buildSource(source, messageMapping, sourceRoot);
-                Map<String, PathDetail> destinationPaths = buildPathMapping(messageMapping, sourceFieldDetail.getArrayFieldSize(), destinationRoot);
-                buildValue(source, sourceFieldDetail.getSourcePaths(), destinationPaths, messageMapping, destination, dalaranContext);
-            } else {
-                buildValue(source, messageMapping, destination, dalaranContext);
+            if (messageMapping.getStatus() == MappingStatus.CORRECT) {
+                if (messageMapping.isComplex()) {
+                    SourceFieldDetail sourceFieldDetail = buildSource(source, messageMapping, sourceRoot);
+                    Map<String, PathDetail> destinationPaths = buildPathMapping(messageMapping, sourceFieldDetail.getArrayFieldSize(), destinationRoot);
+                    buildValue(source, sourceFieldDetail.getSourcePaths(), destinationPaths, messageMapping, destination, dalaranContext);
+                } else {
+                    buildValue(source, messageMapping, destination, dalaranContext);
+                }
             }
         });
         return destination;

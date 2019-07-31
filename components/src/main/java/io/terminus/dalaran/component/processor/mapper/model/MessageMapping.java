@@ -15,6 +15,8 @@ public class MessageMapping {
 
     private boolean complex;
 
+    private MappingStatus status;
+
     private MappingFunction function;
 
     private SimpleMappingField destinationField;
