@@ -10,7 +10,7 @@ import javax.persistence.Table;
 @Data
 @Entity
 @Table(name = "dalaran_released_function")
-public class FunctionReleasedEntity extends FunctionAbstractEntity {
+public class FunctionReleasedEntity extends FunctionAbstractEntity implements ReleasedEntity {
 
     @Column(nullable = false)
     private Long originId;

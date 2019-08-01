@@ -78,7 +78,6 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
         String wsdl = wsdlImportConfig.getWsdlUrl();
         Definitions definitions = parser.parse(wsdl);
         List<Binding> bindings = definitions.getBindings();
-        String wsdlDoc = getWsdlDoc(wsdl);
         Map<String, SoapOperation> operationMap = buildOperations(definitions);
         bindings.forEach(binding -> {
             String bindingName = binding.getName();

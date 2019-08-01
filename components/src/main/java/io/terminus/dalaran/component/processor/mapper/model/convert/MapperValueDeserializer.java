@@ -2,6 +2,8 @@ package io.terminus.dalaran.component.processor.mapper.model.convert;
 
 import com.alibaba.fastjson.parser.DefaultJSONParser;
 import com.alibaba.fastjson.parser.deserializer.ObjectDeserializer;
+import io.terminus.dalaran.component.processor.mapper.model.MappingFunction;
+import io.terminus.dalaran.component.processor.mapper.model.SimpleMapping;
 
 import java.lang.reflect.Type;
 
@@ -11,8 +13,15 @@ import java.lang.reflect.Type;
 public class MapperValueDeserializer implements ObjectDeserializer {
 
     @Override
-    public <T> T deserialze(DefaultJSONParser defaultJSONParser, Type type, Object o) {
-
+    public Object deserialze(DefaultJSONParser parser, Type type, Object o) {
+        if (parser.getContext().object instanceof SimpleMapping) {
+            switch (((SimpleMapping)parser.getContext().object).getMappingType()) {
+                case FUNCTION:
+                    return parser.parseObject(MappingFunction.class);
+                case MAPPING:
+                    return parser.parseObject(String.class);
+            }
+        }
         return null;
     }
 

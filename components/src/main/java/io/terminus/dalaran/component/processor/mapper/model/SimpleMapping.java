@@ -8,10 +8,10 @@ import lombok.Data;
  * Created by jingdi on 2019/5/8
  */
 @Data
-public class SimpleMapping {
+public class SimpleMapping<T> {
 
     @JSONField(deserializeUsing = MapperValueDeserializer.class)
-    private Object value;
+    private T value;
 
     private MappingType mappingType = MappingType.MAPPING;
 

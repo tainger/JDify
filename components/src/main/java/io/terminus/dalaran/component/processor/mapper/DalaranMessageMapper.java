@@ -1,22 +1,29 @@
 package io.terminus.dalaran.component.processor.mapper;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.parser.DefaultJSONParser;
 import io.terminus.dalaran.component.processor.mapper.model.*;
 import io.terminus.dalaran.core.component.BodySerializeType;
+import io.terminus.dalaran.core.component.DalaranComponentValidator;
 import io.terminus.dalaran.core.component.DalaranProcessor;
 import io.terminus.dalaran.core.component.annotation.Processor;
 import io.terminus.dalaran.core.context.DalaranContext;
 import io.terminus.dalaran.core.context.DalaranFunctionContext;
+import io.terminus.dalaran.core.flow.FlowSuggest;
+import io.terminus.dalaran.core.flow.FlowValidateMessage;
 import io.terminus.dalaran.model.FieldType;
 import io.terminus.dalaran.model.MessageModel;
 import io.terminus.dalaran.model.ModelField;
+import io.terminus.dalaran.model.flow.FlowValidation;
+import io.terminus.dalaran.model.flow.ValidateMessageType;
 import io.terminus.dalaran.model.function.MappingFunctionInfo;
 import org.apache.camel.model.ProcessorDefinition;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by jingdi on 2019/3/18
@@ -29,7 +36,7 @@ import java.util.*;
         inputSerializeType = BodySerializeType.Object,
         outputSerializeType = BodySerializeType.Object
 )
-public class DalaranMessageMapper implements DalaranProcessor<DalaranMapperConfig> {
+public class DalaranMessageMapper implements DalaranProcessor<DalaranMapperConfig>, DalaranComponentValidator<DalaranMapperConfig> {
 
     @Autowired
     private DalaranContext dalaranContext;
@@ -72,7 +79,6 @@ public class DalaranMessageMapper implements DalaranProcessor<DalaranMapperConfi
         MappingType mappingType = mapping.getMappingType();
         messageMapping.setMappingType(mappingType);
 
-//        String[] sourcePaths = StringUtils.split(mapping.getValue().trim(), ",");
         List<String> sourcePaths = buildSourcePaths(mappingType, mapping.getValue(), messageMapping);
         Map<String, ModelField> inField = in.getModelSchema().getFields();
         Map<String, ModelField> outField = out.getModelSchema().getFields();
@@ -105,7 +111,7 @@ public class DalaranMessageMapper implements DalaranProcessor<DalaranMapperConfi
         List<String> sourcePaths = new ArrayList<>();
 
         if (mappingType == MappingType.FUNCTION) {
-            MappingFunction function = JSON.parseObject(JSON.toJSONString(value), MappingFunction.class);
+            MappingFunction function = (MappingFunction) value;
             messageMapping.setFunction(function);
 
             DalaranFunctionContext functionContext = dalaranContext.getDalaranFunctionContext();
@@ -174,6 +180,103 @@ public class DalaranMessageMapper implements DalaranProcessor<DalaranMapperConfi
             }
         }
         return new MappingProperty(complex, status);
+    }
+
+    @Override
+    public List<FlowValidation> validate(DalaranMapperConfig config) {
+        List<FlowValidation> validations = new ArrayList<>();
+        MessageModel inModel = config.getInModel();
+        MessageModel outModel = config.getOutModel();
+        Map<String, SimpleMapping> mappings = config.getMessageMapping();
+        mappings.forEach((destinationPath, simpleMapping) -> {
+            if (simpleMapping.getMappingType() == MappingType.FUNCTION) {
+                MappingFunction function = (MappingFunction) simpleMapping.getValue();
+                Map<String, String> params = function.getParams();
+                params.forEach((functionParam, sourcePath) -> {
+                    if (StringUtils.isBlank(sourcePath)) {
+                        FlowValidation validation = new FlowValidation();
+                        validation.setType(ValidateMessageType.Warning);
+                        validation.setMessage(FlowValidateMessage.MAPPER_FUNCTION_PARAM_NOT_NULL);
+                        validation.setSuggest(FlowSuggest.ADD_LEFT_CONNECTION);
+                        validation.setField(destinationPath);
+                        validations.add(validation);
+                    } else {
+                        FlowValidation validation = checkArrayFields(sourcePath, inModel, destinationPath, outModel);
+                        if (validation != null) {
+                            validations.add(validation);
+                        }
+                    }
+                });
+            } else {
+                String sourcePath = simpleMapping.getValue().toString();
+                if (StringUtils.isBlank(sourcePath)) {
+                    FlowValidation validation = new FlowValidation();
+                    validation.setType(ValidateMessageType.Warning);
+                    validation.setMessage(FlowValidateMessage.MAPPER_SOURCE_PATH_NOT_NULL);
+                    validation.setSuggest(FlowSuggest.ADD_LEFT_CONNECTION);
+                    validation.setField(destinationPath);
+                    validations.add(validation);
+                } else {
+                    FlowValidation validation = checkArrayFields(sourcePath, inModel, destinationPath, outModel);
+                    if (validation != null) {
+                        validations.add(validation);
+                    }
+                }
+            }
+        });
+        return validations;
+    }
+
+    private FlowValidation checkArrayFields(String sourcePath, MessageModel inModel, String destinationPath, MessageModel outModel) {
+        if (inModel == null || outModel == null) {
+            FlowValidation validation = new FlowValidation();
+            validation.setType(ValidateMessageType.Warning);
+            validation.setMessage(FlowValidateMessage.MODEL_NOT_NULL);
+            validation.setSuggest(FlowSuggest.ADD_MODEL);
+            validation.setField(destinationPath);
+            return validation;
+        } else {
+            String[] sourcePaths = StringUtils.split(sourcePath, ".");
+            Integer sourceCount = calculateArrayCount(sourcePaths, inModel);
+            String[] destinationPaths = StringUtils.split(destinationPath, ".");
+            Integer destinationCount = calculateArrayCount(destinationPaths, outModel);
+
+            if (sourceCount == -1 || destinationCount == -1) {
+                FlowValidation validation = new FlowValidation();
+                validation.setType(ValidateMessageType.Error);
+                validation.setMessage(FlowValidateMessage.PATH_NOT_IN_MODEL);
+                validation.setSuggest(FlowSuggest.CHECK_MODEL_STRUCT);
+                validation.setField(destinationPath);
+                return validation;
+            }
+
+            if (!sourceCount.equals(destinationCount)) {
+                FlowValidation validation = new FlowValidation();
+                validation.setType(ValidateMessageType.Warning);
+                validation.setMessage(FlowValidateMessage.MAPPER_ARRAY_LEVEL_NOT_EQUALS);
+                validation.setSuggest(FlowSuggest.CHECK_CONNECTION);
+                validation.setField(destinationPath);
+                return validation;
+            }
+        }
+        return null;
+    }
+
+    private Integer calculateArrayCount(String[] paths, MessageModel model) {
+        Integer count = 0;
+        Map<String, ModelField> modelField = model.getModelSchema().getFields();
+        Map<String, ModelField> temporaryField = modelField;
+        for (String path: paths) {
+            ModelField field = temporaryField.get(path);
+            if (field == null) {
+                return -1;
+            }
+            if (field.getType() == FieldType.ARRAY) {
+                count++;
+            }
+            temporaryField = field.getFields();
+        }
+        return count;
     }
 
     private class MessageMappingComparator implements Comparator<MessageMapping> {
