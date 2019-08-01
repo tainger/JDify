@@ -33,6 +33,7 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -133,10 +134,10 @@ public class SwaggerService implements DalaranService<SwaggerImportConfig, Swagg
             ObjectMapper objectMapper = Json.mapper();
 
             Swagger swagger = objectMapper.readValue(swaggerResponse.getEntity().getContent(), Swagger.class);
-            for (Map.Entry<String, Path> entry: swagger.getPaths().entrySet()) {
+            for (Map.Entry<String, Path> entry : swagger.getPaths().entrySet()) {
                 String pathName = entry.getKey();
                 Path path = entry.getValue();
-                for (Map.Entry<io.swagger.models.HttpMethod, Operation> method: path.getOperationMap().entrySet()) {
+                for (Map.Entry<io.swagger.models.HttpMethod, Operation> method : path.getOperationMap().entrySet()) {
                     if (StringUtils.equals(swaggerOperationConfig.getPath(), pathName)
                             && swaggerOperationConfig.getMethod() == HttpMethod.valueOf(method.getKey().name())) {
                         ServiceModel inModel = buildInModel(method.getValue(), swagger.getDefinitions());
@@ -238,9 +239,11 @@ public class SwaggerService implements DalaranService<SwaggerImportConfig, Swagg
             case "object":
                 field.setType(FieldType.OBJECT);
                 if (property instanceof ObjectProperty) {
-                    ((ObjectProperty) property).getProperties().forEach((subPropertyName, subProperty) -> {
-                        field.getFields().put(subPropertyName, buildField(subProperty, definitions));
-                    });
+                    if (((ObjectProperty) property).getProperties() != null) {
+                        ((ObjectProperty) property).getProperties().forEach((subPropertyName, subProperty) -> {
+                            field.getFields().put(subPropertyName, buildField(subProperty, definitions));
+                        });
+                    }
                 }
                 break;
             case "array":
