@@ -58,6 +58,12 @@ public class ReleasedFlowInitializer {
             }
             resourceLoader.setVersion(recordEntity.getVersion());
 
+            List<FunctionReleasedEntity> functions = resourceLoader.loadAllFunctions();
+            for (FunctionReleasedEntity function : functions) {
+                dalaranContext.getDalaranFunctionContext().addCustomFunction(function.getId(), function.getType(),
+                        function.getScript(), function.getParams());
+            }
+
             List<TriggerFlowReleasedEntity> triggerFlows = resourceLoader.loadAllTriggerFlow();
             for (TriggerFlowReleasedEntity triggerFlowEntity : triggerFlows) {
                 if (triggerFlowEntity.getStatus() != FlowStatus.Error) {
@@ -78,12 +84,6 @@ public class ReleasedFlowInitializer {
                 } else {
                     log.info("can't load sub-flow [{}], because has error.", subFlowEntity.getId());
                 }
-            }
-
-            List<FunctionReleasedEntity> functions = resourceLoader.loadAllFunctions();
-            for (FunctionReleasedEntity function : functions) {
-                dalaranContext.getDalaranFunctionContext().addCustomFunction(function.getId(), function.getType(),
-                        function.getScript(), function.getParams());
             }
         }
     }

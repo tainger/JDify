@@ -3,6 +3,7 @@ package io.terminus.dalaran.core.context.support;
 import io.terminus.dalaran.core.context.DalaranFunctionContext;
 import io.terminus.dalaran.model.function.MappingFunctionInfo;
 import io.terminus.dalaran.model.function.MappingFunctionType;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
 
@@ -20,6 +21,8 @@ import java.util.Map;
 public class DefaultDalaranFunctionContext implements DalaranFunctionContext {
 
     private final Map<String, MappingFunctionInfo> functionInfoMapper = new HashMap<>();
+
+    private final Map<String, MappingFunctionInfo> scriptFunctionMapper = new HashMap<>();
 
     private final Map<Long, Invocable> scriptFunctions = new HashMap<>();
 
@@ -67,6 +70,12 @@ public class DefaultDalaranFunctionContext implements DalaranFunctionContext {
 
     @Override
     public void addCustomFunction(Long id, MappingFunctionType type, String script, List<String> params) {
+        MappingFunctionInfo functionInfo = new MappingFunctionInfo();
+        String key = String.valueOf(id);
+        functionInfo.setKey(key);
+        functionInfo.setParams(params.toArray(new String[0]));
+        functionInfo.setType(type);
+        scriptFunctionMapper.put(key, functionInfo);
         scriptFunctions.put(id, buildScriptEngine(type, script, params));
     }
 
@@ -77,7 +86,11 @@ public class DefaultDalaranFunctionContext implements DalaranFunctionContext {
 
     @Override
     public MappingFunctionInfo getFunctionByKey(String key) {
-        return functionInfoMapper.get(key);
+        MappingFunctionInfo functionInfo = functionInfoMapper.get(key);
+        if (functionInfo == null) {
+            functionInfo = scriptFunctionMapper.get(key);
+        }
+        return functionInfo;
     }
 
     // TODO 可以改成自动注册

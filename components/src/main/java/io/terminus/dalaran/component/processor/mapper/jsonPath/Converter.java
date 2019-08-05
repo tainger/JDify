@@ -22,14 +22,15 @@ public class Converter {
         SimpleMappingField sourceRoot = mappingConfig.getSourceRoot();
         SimpleMappingField destinationRoot = mappingConfig.getDestinationRoot();
         messageMappings.forEach(messageMapping -> {
-            if (messageMapping.getStatus() == MappingStatus.CORRECT) {
-                if (messageMapping.isComplex()) {
-                    SourceFieldDetail sourceFieldDetail = buildSource(source, messageMapping, sourceRoot);
-                    Map<String, PathDetail> destinationPaths = buildPathMapping(messageMapping, sourceFieldDetail.getArrayFieldSize(), destinationRoot);
-                    buildValue(source, sourceFieldDetail.getSourcePaths(), destinationPaths, messageMapping, destination, dalaranContext);
-                } else {
-                    buildValue(source, messageMapping, destination, dalaranContext);
-                }
+            if (messageMapping.getStatus() == MappingStatus.ERROR) {
+                return;
+            }
+            if (messageMapping.isComplex()) {
+                SourceFieldDetail sourceFieldDetail = buildSource(source, messageMapping, sourceRoot);
+                Map<String, PathDetail> destinationPaths = buildPathMapping(messageMapping, sourceFieldDetail.getArrayFieldSize(), destinationRoot);
+                buildValue(source, sourceFieldDetail.getSourcePaths(), destinationPaths, messageMapping, destination, dalaranContext);
+            } else {
+                buildValue(source, messageMapping, destination, dalaranContext);
             }
         });
         return destination;
@@ -107,18 +108,17 @@ public class Converter {
     private static Map<String, PathDetail> buildPathMapping(MessageMapping mapping, List<Integer> arrayFieldSize, SimpleMappingField destinationRoot) {
         int level = 0;
         Map<String, PathDetail> paths = new HashMap<>();
-//        List<PathDetail> paths = new ArrayList<>();
         SimpleMappingField field = mapping.getDestinationField();
         if (destinationRoot.getType() == FieldType.ARRAY) {
             int size = arrayFieldSize.get(level++);
             for (int i = 0; i < size; i++) {
                 StringBuilder indexes = new StringBuilder();
                 indexes.append(i).append(".");
-                String path = "$root[" + i + "]";
+                String path = "$" + MapperConstants.MODEL_ROOT + "[" + i + "]";
                 buildDestinationPaths(path, field, arrayFieldSize, level, paths, indexes);
             }
         } else {
-            String path = "$root";
+            String path = "$" + MapperConstants.MODEL_ROOT;
             StringBuilder indexes = new StringBuilder();
             buildDestinationPaths(path, field, arrayFieldSize, level, paths, indexes);
         }
@@ -195,7 +195,7 @@ public class Converter {
         MappingType mappingType = messageMapping.getMappingType();
 
         sourceFields.forEach(sourceField -> {
-            Object value = null;
+            Object value;
             if (mappingType == MappingType.DEFAULT) {
                 value = sourceField.getPath();
             } else {
@@ -223,7 +223,7 @@ public class Converter {
                 value = parse(values.get(0), type);
             }
         }
-        JSONPath.set(destination, "$root." + destinationPath, value);
+        JSONPath.set(destination, "$" + MapperConstants.MODEL_ROOT + "." + destinationPath, value);
     }
 
     private static Object parse(Object target, FieldType destination) {
