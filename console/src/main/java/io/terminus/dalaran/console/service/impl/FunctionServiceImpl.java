@@ -5,6 +5,7 @@ import io.terminus.dalaran.console.model.dto.BasicFunctionInfo;
 import io.terminus.dalaran.console.model.dto.FunctionDTO;
 import io.terminus.dalaran.console.repository.FunctionRepository;
 import io.terminus.dalaran.console.service.FunctionService;
+import io.terminus.dalaran.core.context.DalaranFunctionContext;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,15 +25,22 @@ public class FunctionServiceImpl implements FunctionService {
     @Autowired
     private EntityManager entityManager;
 
+    @Autowired
+    private DalaranFunctionContext functionContext;
+
     @Override
     public Long create(FunctionDTO functionDTO) {
-        return repository.save(toEntity(functionDTO)).getId();
+        FunctionEntity entity = toEntity(functionDTO);
+        repository.save(entity);
+        functionContext.addCustomFunction(entity.getId(), entity.getType(), entity.getScript(), entity.getParams());
+        return entity.getId();
     }
 
     @Override
     public FunctionDTO update(FunctionDTO functionDTO) {
         FunctionEntity entity = toEntity(functionDTO);
         repository.save(entity);
+        functionContext.addCustomFunction(entity.getId(), entity.getType(), entity.getScript(), entity.getParams());
         return toDTO(entity);
     }
 

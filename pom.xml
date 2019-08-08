@@ -24,6 +24,7 @@
         <module>runtime</module>
         <module>sdk</module>
         <module>common</module>
+        <module>trantor-demo</module>
     </modules>
 
     <properties>

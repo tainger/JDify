@@ -8,12 +8,12 @@ import lombok.Data;
 @Data
 public class TrantorTriggerConfig extends AllModelConfig {
 
-    @ConfigFieldInfo(label = "所属模块", inputType = FieldInputType.TrantorModule)
+    @ConfigFieldInfo(label = "所属模块", inputType = FieldInputType.Select)
     private String module;
 
-    @ConfigFieldInfo(label = "集成点", inputType = FieldInputType.TrantorIntegration)
+    @ConfigFieldInfo(label = "集成点", inputType = FieldInputType.Select)
     private String key;
 
-    @ConfigFieldInfo(label = "集成方法", inputType = FieldInputType.TrantorIntegrationPoint)
+    @ConfigFieldInfo(label = "集成方法", inputType = FieldInputType.Select)
     private String method;
 }
