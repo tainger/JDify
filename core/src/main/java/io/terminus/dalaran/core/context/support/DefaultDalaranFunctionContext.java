@@ -71,11 +71,11 @@ public class DefaultDalaranFunctionContext implements DalaranFunctionContext {
     @Override
     public void addCustomFunction(Long id, MappingFunctionType type, String script, List<String> params) {
         MappingFunctionInfo functionInfo = new MappingFunctionInfo();
-        String key = String.valueOf(id);
-        functionInfo.setKey(key);
+        String functionName = String.valueOf(id);
+        functionInfo.setName(functionName);
         functionInfo.setParams(params.toArray(new String[0]));
         functionInfo.setType(type);
-        scriptFunctionMapper.put(key, functionInfo);
+        scriptFunctionMapper.put(functionName, functionInfo);
         scriptFunctions.put(id, buildScriptEngine(type, script, params));
     }
 
