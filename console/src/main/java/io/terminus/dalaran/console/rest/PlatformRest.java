@@ -1,10 +1,12 @@
 package io.terminus.dalaran.console.rest;
 
 import io.swagger.annotations.ApiOperation;
+import io.terminus.dalaran.console.model.DalaranAccount;
 import io.terminus.dalaran.console.model.ReleaseRequestDTO;
 import io.terminus.dalaran.console.model.dto.ReleaseRecordDTO;
 import io.terminus.dalaran.console.model.dto.flow.TriggerFlowDTO;
 import io.terminus.dalaran.console.model.dto.trantor.TrantorModuleDTO;
+import io.terminus.dalaran.console.service.AuthorizeService;
 import io.terminus.dalaran.console.service.ReleaseService;
 import io.terminus.dalaran.console.service.TrantorService;
 import io.terminus.dalaran.core.config.ConnectorInfo;
@@ -32,6 +34,9 @@ public class PlatformRest {
 
     @Autowired
     private TrantorService trantorService;
+
+    @Autowired
+    private AuthorizeService authorizeService;
 
     @ApiOperation(value = "获取某版本所有流新消息")
     @GetMapping(value = "/release")
@@ -110,5 +115,17 @@ public class PlatformRest {
     @GetMapping(value = "/trantor")
     private List<TrantorModuleDTO> listTrantorModule() {
         return trantorService.getAllModule();
+    }
+
+    @ApiOperation(value = "登陆验证")
+    @PostMapping(value = "/login/auth")
+    private boolean loginAuth(@RequestBody DalaranAccount account) {
+        return authorizeService.authAccount(account);
+    }
+
+    @ApiOperation(value = "登陆")
+    @GetMapping(value = "/login")
+    private String login() {
+        return "login";
     }
 }
