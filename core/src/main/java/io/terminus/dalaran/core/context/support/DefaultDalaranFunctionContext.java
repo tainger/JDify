@@ -3,7 +3,6 @@ package io.terminus.dalaran.core.context.support;
 import io.terminus.dalaran.core.context.DalaranFunctionContext;
 import io.terminus.dalaran.model.function.MappingFunctionInfo;
 import io.terminus.dalaran.model.function.MappingFunctionType;
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
 

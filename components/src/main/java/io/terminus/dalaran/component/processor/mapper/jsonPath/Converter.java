@@ -50,14 +50,14 @@ public class Converter {
                 String path = "$[" + i + "]";
                 StringBuilder indexes = new StringBuilder();
                 indexes.append(i).append(".");
-                for (SourceField sourceField: fields) {
+                for (SourceField sourceField : fields) {
                     buildSourcePaths(path, sourceField.getField(), arrayFieldSize, level, source, sourcePaths, sourceField.getPath(), indexes);
                 }
             }
         } else {
             String path = "$";
             StringBuilder indexes = new StringBuilder();
-            for (SourceField sourceField: fields) {
+            for (SourceField sourceField : fields) {
                 buildSourcePaths(path, sourceField.getField(), arrayFieldSize, lastArray, source, sourcePaths, sourceField.getPath(), indexes);
             }
         }
@@ -154,10 +154,10 @@ public class Converter {
     private static void buildValue(Object source, Map<String, List<SourcePath>> sourcePaths, Map<String, PathDetail> destinationPaths, MessageMapping messageMapping, Object destination, DalaranContext dalaranContext) {
         MappingFunction function = messageMapping.getFunction();
         if (sourcePaths != null && sourcePaths.size() > 0) {
-            for (Map.Entry<String, List<SourcePath>> entry: sourcePaths.entrySet()) {
+            for (Map.Entry<String, List<SourcePath>> entry : sourcePaths.entrySet()) {
                 List<Object> values = new ArrayList<>();
                 String indexes = entry.getKey();
-                for (SourcePath sourcePath: entry.getValue()) {
+                for (SourcePath sourcePath : entry.getValue()) {
                     Object value = null;
                     PathDetail pathDetail = sourcePath.getDetail();
                     if (pathDetail != null && pathDetail.getPath() != null) {
@@ -178,7 +178,7 @@ public class Converter {
                     }
                 } else {
                     if (pathDetail != null) {
-                        FieldType type  = pathDetail.getType();
+                        FieldType type = pathDetail.getType();
                         value = parse(values.get(0), type);
                     }
                 }
@@ -235,17 +235,9 @@ public class Converter {
         if (destination != null) {
             switch (destination) {
                 case INTEGER:
-                    return parser.parse(input, Integer.class);
-                case LONG:
                     return parser.parse(input, Long.class);
-                case SHORT:
-                    return parser.parse(input, Short.class);
                 case FLOAT:
-                    return parser.parse(input, Float.class);
-                case DOUBLE:
                     return parser.parse(input, Double.class);
-                case NUMBER:
-                    return parser.parse(input, Number.class);
                 case BOOLEAN:
                     return parser.parse(input, Boolean.class);
                 default:

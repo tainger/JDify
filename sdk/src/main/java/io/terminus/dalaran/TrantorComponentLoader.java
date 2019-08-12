@@ -1,8 +1,8 @@
 package io.terminus.dalaran;
 
-import io.terminus.dalaran.model.*;
+import io.terminus.dalaran.model.FieldType;
+import io.terminus.dalaran.model.ModelField;
 import io.terminus.dalaran.model.schema.JsonSchema;
-import io.terminus.dalaran.model.schema.ObjectSchema;
 import io.terminus.dalaran.model.trantor.DalaranIntegrationInfo;
 import io.terminus.dalaran.model.trantor.DalaranIntegrationPoint;
 import org.springframework.util.TypeUtils;
@@ -93,8 +93,6 @@ public class TrantorComponentLoader {
                     field.setFields(subField.getFields());
                 }
             }
-        } else if (TypeUtils.isAssignable(Number.class, type)) {
-            field.setType(FieldType.NUMBER);
         } else if (TypeUtils.isAssignable(Map.class, type)) {
             field.setType(FieldType.OBJECT);
         } else if (type instanceof Class) {

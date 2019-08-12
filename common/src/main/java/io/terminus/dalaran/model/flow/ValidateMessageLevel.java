@@ -1,6 +1,6 @@
 package io.terminus.dalaran.model.flow;
 
-public enum ValidateMessageType {
+public enum ValidateMessageLevel {
 
     Warning, Error
 }

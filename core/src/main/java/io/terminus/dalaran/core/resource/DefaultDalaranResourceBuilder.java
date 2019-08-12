@@ -62,6 +62,7 @@ public class DefaultDalaranResourceBuilder implements DalaranResourceBuilder {
         TriggerFlow flow = new TriggerFlow();
         TriggerInfo triggerInfo = componentContext.getTriggerInfo(triggerFlowEntity.getTriggerType());
         buildFlow(flow, triggerFlowEntity);
+        flow.setTracing(triggerFlowEntity.isTracing());
         flow.setTriggerType(triggerFlowEntity.getTriggerType());
 
         Object config = buildConfig(triggerFlowEntity.getTriggerConfig(), triggerInfo.getConfigType());
@@ -128,8 +129,6 @@ public class DefaultDalaranResourceBuilder implements DalaranResourceBuilder {
         }
         flow.setInModel(buildModel(flowEntity.getInModel()));
         flow.setOutModel(buildModel(flowEntity.getOutModel()));
-
-        flow.setTracing(flowEntity.isTracing());
 
         List<ProcessorModel> pipeline = new ArrayList<>();
         MessageModel lastOutModel = flow.getInModel();
