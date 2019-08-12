@@ -267,7 +267,7 @@ public class SwaggerService implements DalaranService<SwaggerImportConfig, Swagg
                 field.setType(FieldType.INTEGER);
                 break;
             case "number":
-                field.setType(FieldType.NUMBER);
+                field.setType(FieldType.FLOAT);
                 break;
             case "string":
                 field.setType(FieldType.STRING);
@@ -288,7 +288,7 @@ public class SwaggerService implements DalaranService<SwaggerImportConfig, Swagg
             case "integer":
                 return FieldType.INTEGER;
             case "number":
-                return FieldType.NUMBER;
+                return FieldType.FLOAT;
             case "string":
                 return FieldType.STRING;
             case "boolean":

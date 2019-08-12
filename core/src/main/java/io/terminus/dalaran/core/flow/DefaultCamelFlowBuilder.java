@@ -23,10 +23,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static io.terminus.dalaran.DalaranConstants.TEST_FLOW_PREFIX;
+import static io.terminus.dalaran.core.flow.DefaultFlowValidateMessages.FIELD_NOT_NULL;
+import static io.terminus.dalaran.core.flow.DefaultFlowValidateMessages.MODEL_NOT_EQUALLY;
 import static io.terminus.dalaran.core.flow.FlowSuggest.ADD_MAPPER;
-import static io.terminus.dalaran.core.flow.FlowValidateMessage.FIELD_NOT_NULL;
-import static io.terminus.dalaran.core.flow.FlowValidateMessage.MODEL_NOT_EQUALLY;
-import static io.terminus.dalaran.model.flow.ValidateMessageTarget.*;
+import static io.terminus.dalaran.model.flow.ValidateMessageTarget.Processor;
+import static io.terminus.dalaran.model.flow.ValidateMessageTarget.Trigger;
 
 public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute> {
 
@@ -139,9 +140,8 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
                 processorMessageList.addAll(processorCustomMessageList);
             }
             if (lastModel != null && !lastModel.equals(processorModel.getInModel())) {
-                FlowValidation message = new FlowValidation();
-                message.setType(ValidateMessageType.Warning);
-                message.setMessage(MODEL_NOT_EQUALLY);
+                FlowValidation message = FlowValidationBuilder.newBuilder()
+                        .message(MODEL_NOT_EQUALLY).suggest(ADD_MAPPER).build();
                 processorMessageList.add(message);
             }
             processorMessageList.forEach(message -> {
@@ -166,11 +166,8 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
 
         }
         if (lastModel != null && !lastModel.equals(flow.getOutModel())) {
-            FlowValidation message = new FlowValidation();
-            message.setTargetType(FlowEnd);
-            message.setType(ValidateMessageType.Warning);
-            message.setMessage(MODEL_NOT_EQUALLY);
-            message.setSuggest(ADD_MAPPER);
+            FlowValidation message = FlowValidationBuilder.newBuilder()
+                    .flowEnd().message(MODEL_NOT_EQUALLY).suggest(ADD_MAPPER).build();
             validateMessages.add(message);
         }
         return validateMessages;
@@ -181,10 +178,8 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
         for (DalaranConfigField configField : componentInfo.getConfigFields()) {
             try {
                 if (configField.isRequired() && StringUtils.isBlank(BeanUtils.getProperty(config, configField.getName()))) {
-                    FlowValidation message = new FlowValidation();
-                    message.setType(ValidateMessageType.Error);
-                    message.setField(configField.getName());
-                    message.setMessage(FIELD_NOT_NULL);
+                    FlowValidation message = FlowValidationBuilder.newBuilder()
+                            .field(configField.getName()).message(FIELD_NOT_NULL).build();
                     validateMessages.add(message);
                 }
             } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {

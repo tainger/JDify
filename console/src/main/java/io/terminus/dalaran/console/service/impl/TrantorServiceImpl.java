@@ -11,7 +11,6 @@ import io.terminus.dalaran.console.repository.ModelRepository;
 import io.terminus.dalaran.console.repository.TrantorRepository;
 import io.terminus.dalaran.console.service.TrantorService;
 import io.terminus.dalaran.model.BodyType;
-import io.terminus.dalaran.model.MessageModel;
 import io.terminus.dalaran.model.schema.JsonSchema;
 import io.terminus.dalaran.model.trantor.DalaranIntegrationInfo;
 import io.terminus.dalaran.model.trantor.DalaranTrantorModule;

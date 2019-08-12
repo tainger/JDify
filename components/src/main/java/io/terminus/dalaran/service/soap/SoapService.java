@@ -21,10 +21,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 import org.jetbrains.annotations.NotNull;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -55,7 +55,7 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
     @Override
     public SoapOperationConfig getOperationConfig(SoapServiceConfig soapServiceConfig, @NotNull String operationKey) {
         List<SoapOperationConfig> configs = soapServiceConfig.getConfigs();
-        for (SoapOperationConfig operationConfig: configs) {
+        for (SoapOperationConfig operationConfig : configs) {
             if (StringUtils.equals(operationConfig.getOperationKey(), operationKey)) {
                 return operationConfig;
             }
@@ -355,8 +355,6 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
         switch (type) {
             case "int":
                 return FieldType.INTEGER;
-            case "number":
-                return FieldType.NUMBER;
             case "string":
                 return FieldType.STRING;
             case "boolean":

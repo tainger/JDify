@@ -1,9 +1,6 @@
 package io.terminus.dalaran.component.processor.service;
 
-import io.terminus.dalaran.core.component.BodySerializeType;
-import io.terminus.dalaran.core.component.DalaranProcessor;
-import io.terminus.dalaran.core.component.DalaranProcessorConfigCustomConverter;
-import io.terminus.dalaran.core.component.DalaranService;
+import io.terminus.dalaran.core.component.*;
 import io.terminus.dalaran.core.component.annotation.Processor;
 import io.terminus.dalaran.core.context.DalaranServiceContext;
 import io.terminus.dalaran.core.resource.DalaranResourceBuilder;
@@ -12,8 +9,16 @@ import io.terminus.dalaran.core.resource.entity.ServiceAbstractEntity;
 import io.terminus.dalaran.model.component.ComponentModel;
 import io.terminus.dalaran.model.component.ServiceOperation;
 import io.terminus.dalaran.model.flow.BasicFlow;
+import io.terminus.dalaran.model.flow.FlowValidation;
+import io.terminus.dalaran.model.flow.FlowValidationBuilder;
 import org.apache.camel.model.ProcessorDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static io.terminus.dalaran.component.processor.service.ServiceValidationMessages.OPERATION_NOT_EXIST;
+import static io.terminus.dalaran.component.processor.service.ServiceValidationMessages.SERVICE_NOT_EXIST;
 
 @Processor(
         value = "service",
@@ -23,7 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
         inputSerializeType = BodySerializeType.Serialized,
         outputSerializeType = BodySerializeType.Serialized
 )
-public class DalaranServiceProcessor implements DalaranProcessor<DalaranServiceOperation>, DalaranProcessorConfigCustomConverter<ServiceOperationConfig, DalaranServiceOperation> {
+public class DalaranServiceProcessor implements DalaranProcessor<DalaranServiceOperation>, DalaranProcessorConfigCustomConverter<ServiceOperationConfig, DalaranServiceOperation>, DalaranComponentValidator<ServiceOperationConfig> {
 
     private final DalaranServiceContext serviceContext;
 
@@ -55,5 +60,26 @@ public class DalaranServiceProcessor implements DalaranProcessor<DalaranServiceO
         serviceOperation.setInModel(resourceBuilder.buildModel((operationConfig.getInModelId())));
         serviceOperation.setOutModel(resourceBuilder.buildModel(operationConfig.getOutModelId()));
         return serviceOperation;
+    }
+
+    @Override
+    public List<FlowValidation> validate(ServiceOperationConfig config) {
+        List<FlowValidation> messages = new ArrayList<>();
+        ServiceAbstractEntity serviceEntity = resourceLoader.loadService(config.getServiceId());
+        if (serviceEntity == null) {
+            messages.add(FlowValidationBuilder.newBuilder().field("serviceId").message(SERVICE_NOT_EXIST).build());
+            return messages;
+        }
+        DalaranService dalaranService = serviceContext.getService(serviceEntity.getType());
+        Object serviceConfig = resourceBuilder.buildServiceConfig(serviceEntity);
+        ServiceOperation operationConfig = dalaranService.getOperationConfig(serviceConfig, config.getOperation());
+        if (operationConfig == null) {
+            messages.add(FlowValidationBuilder.newBuilder().field("operation").message(OPERATION_NOT_EXIST).build());
+            return messages;
+        }
+        DalaranServiceOperation serviceOperation = new DalaranServiceOperation();
+        serviceOperation.setInModel(resourceBuilder.buildModel((operationConfig.getInModelId())));
+        serviceOperation.setOutModel(resourceBuilder.buildModel(operationConfig.getOutModelId()));
+        return messages;
     }
 }

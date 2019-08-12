@@ -11,11 +11,11 @@ import io.terminus.dalaran.model.flow.TriggerFlow;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.camel.CamelContext;
 import org.apache.camel.impl.DefaultProducerTemplate;
+import org.apache.commons.lang3.RandomStringUtils;
 
 import java.util.List;
 
-import static io.terminus.dalaran.DalaranConstants.FLOW_PREFIX;
-import static io.terminus.dalaran.DalaranConstants.TEST_FLOW_DIRECT_PREFIX;
+import static io.terminus.dalaran.DalaranConstants.*;
 
 @Slf4j
 public class DefaultDalaranCamelContext implements DalaranContext<DalaranRoute> {
@@ -131,9 +131,27 @@ public class DefaultDalaranCamelContext implements DalaranContext<DalaranRoute> 
     }
 
     @Override
-    public void testFlow(Long flowId, String body, String recordId) {
-        DefaultProducerTemplate template = (DefaultProducerTemplate) camelContext.createProducerTemplate();
-        template.sendBodyAndProperty(TEST_FLOW_DIRECT_PREFIX + FLOW_PREFIX + flowId, body, DalaranConstants.TEST_FLOW_RECORD_ID_HEADER, recordId);
+    public String testFlow(Long flowId, String body) {
+        String recordId = nextRecordId();
+        try {
+            DefaultProducerTemplate template = (DefaultProducerTemplate) camelContext.createProducerTemplate();
+            template.sendBodyAndProperty(TEST_FLOW_DIRECT_PREFIX + FLOW_PREFIX + flowId, body, DalaranConstants.TEST_FLOW_RECORD_ID_HEADER, recordId);
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
+        return recordId;
+    }
+
+    @Override
+    public String testSubFlow(Long subFlowId, String body) {
+        String recordId = nextRecordId();
+        try {
+            DefaultProducerTemplate template = (DefaultProducerTemplate) camelContext.createProducerTemplate();
+            template.sendBodyAndProperty(TEST_FLOW_DIRECT_PREFIX + SUB_FLOW_PREFIX + subFlowId, body, DalaranConstants.TEST_FLOW_RECORD_ID_HEADER, recordId);
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
+        return recordId;
     }
 
     @Override
@@ -163,6 +181,11 @@ public class DefaultDalaranCamelContext implements DalaranContext<DalaranRoute> 
     @Override
     public DalaranFunctionContext getDalaranFunctionContext() {
         return functionContext;
+    }
+
+    // TODO 这里可以考虑换一下 camel 的 uuid 生成器
+    private String nextRecordId() {
+        return RandomStringUtils.randomAlphanumeric(32);
     }
 
 }
