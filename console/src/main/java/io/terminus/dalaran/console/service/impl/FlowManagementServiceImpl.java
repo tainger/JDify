@@ -23,7 +23,7 @@ import io.terminus.dalaran.core.resource.entity.common.ProcessorEntity;
 import io.terminus.dalaran.model.flow.FlowStatus;
 import io.terminus.dalaran.model.flow.FlowValidation;
 import io.terminus.dalaran.model.flow.TriggerFlow;
-import io.terminus.dalaran.model.flow.ValidateMessageType;
+import io.terminus.dalaran.model.flow.ValidateMessageLevel;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.BeanUtils;
@@ -175,7 +175,7 @@ public class FlowManagementServiceImpl implements FlowManagementService {
     private void setFlowStatus(TriggerFlowEntity flowEntity) {
         FlowStatus flowStatus = null;
         for (FlowValidation flowValidation : validateFlow(flowEntity)) {
-            if (flowValidation.getType() == ValidateMessageType.Error) {
+            if (flowValidation.getMessage().getLevel() == ValidateMessageLevel.Error) {
                 flowEntity.setStatus(FlowStatus.Error);
                 return;
             } else {

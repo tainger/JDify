@@ -29,6 +29,7 @@ import org.apache.commons.text.similarity.JaroWinklerDistance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+
 import javax.transaction.Transactional;
 import java.util.*;
 
@@ -278,14 +279,11 @@ public class ModelManagementServiceImpl implements ModelManagementService {
                 case STRING:
                     return fieldName + index;
                 case INTEGER:
-                case LONG:
-                case SHORT:
                     return index;
                 case BOOLEAN:
                     return true;
                 case DATE:
                     return new Date();
-                case DOUBLE:
                 case FLOAT:
                     return (float) index;
             }
@@ -395,9 +393,8 @@ public class ModelManagementServiceImpl implements ModelManagementService {
     private FieldType getFiledType(String type) {
         switch (type) {
             case DalaranConsoleConstants.JAVA_INTEGER:
-                return FieldType.INTEGER;
             case DalaranConsoleConstants.JAVA_LONG:
-                return FieldType.LONG;
+                return FieldType.INTEGER;
             case DalaranConsoleConstants.JAVA_STRING:
                 return FieldType.STRING;
             case DalaranConsoleConstants.JSON_OBJECT:

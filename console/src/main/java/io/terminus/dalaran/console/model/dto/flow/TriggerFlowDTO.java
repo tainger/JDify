@@ -9,6 +9,8 @@ public class TriggerFlowDTO extends BasicFlowDTO {
 
     private String triggerType;
 
+    private boolean tracing;
+
     private Map<String, Object> triggerConfig;
 
 }

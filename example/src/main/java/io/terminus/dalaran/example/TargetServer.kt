@@ -1,9 +1,6 @@
 package io.terminus.dalaran.example
 
 import io.terminus.dalaran.DalaranTrantorPublisher
-import io.terminus.dalaran.TrantorComponentLoader
-import io.terminus.dalaran.model.trantor.DalaranIntegrationInfo
-import io.terminus.dalaran.model.trantor.DalaranTrantorModule
 import io.terminus.dalaran.spring.DalaranSdkConfiguration
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.SpringApplication
@@ -13,7 +10,6 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
-import java.util.ArrayList
 import javax.servlet.http.HttpServletRequest
 import javax.xml.bind.annotation.XmlRootElement
 
