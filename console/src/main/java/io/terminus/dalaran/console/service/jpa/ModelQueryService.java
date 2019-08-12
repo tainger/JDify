@@ -1,7 +1,7 @@
 package io.terminus.dalaran.console.service.jpa;
 
 import io.terminus.dalaran.console.entity.ModelEntity;
-import io.terminus.dalaran.console.model.dto.BasicModelInfo;
+import io.terminus.dalaran.console.model.dto.basic.BasicModelInfo;
 import io.terminus.dalaran.console.model.query.ModelQuery;
 import io.terminus.dalaran.model.BodyType;
 

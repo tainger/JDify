@@ -1,4 +1,4 @@
-package io.terminus.dalaran.component.trigger.http;
+package io.terminus.dalaran.component.trigger.rest;
 
 import io.terminus.dalaran.component.common.HttpMethod;
 import io.terminus.dalaran.core.component.FieldInputType;
@@ -8,11 +8,14 @@ import io.terminus.dalaran.model.HttpProtocol;
 import lombok.Data;
 
 @Data
-public class NettyHttpConfig extends AllModelConfig {
+public class RestConfig extends AllModelConfig {
 
     // TODO load by application.yml
     @ConfigFieldInfo(label = "端口", inputType = FieldInputType.Hidden)
     private Integer port = 8080;
+
+    @ConfigFieldInfo(label = "鉴权签名", inputType = FieldInputType.Switch, defaultValue = "true")
+    private Boolean authSign = true;
 
     @ConfigFieldInfo(label = "协议", inputType = FieldInputType.Radio, defaultValue = "HTTP")
     private HttpProtocol protocol;

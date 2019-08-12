@@ -12,8 +12,8 @@ public final class DalaranConstants {
     public static final String TEST_FLOW_RECORD_ID_HEADER = "dalaran_test_flow_record_id";
     public static final String BRANCH_FLOW_NAME_HEADER = "DalaranBranchFlowName";
 
-    public static final String SCATTER_GATHER_EXCHANGE= "DalaranScatterGatherExchange";
-    public static final String DALARAN_CONTEXT_EXCHANGE= "DalaranContextExchange";
+    public static final String SCATTER_GATHER_EXCHANGE = "DalaranScatterGatherExchange";
+    public static final String DALARAN_CONTEXT_EXCHANGE = "DalaranContextExchange";
 
     public static final String MODEL_ROOT = "root";
 
@@ -30,6 +30,10 @@ public final class DalaranConstants {
     public static final String ENV_REPLACE_PREFIX = "${{";
     public static final String ENV_REPLACE_SUFFIX = "}}";
 
-    public static final String TRANTOR_EXT_POINT_METHOD = "Dalaran_Trantor_Ext_Point_Method";
+    public static final String AUTH_SIGN = "sign";
+
+    public static final String AUTH_APP_KEY = "appKey";
+
+    public static final String AUTH_APP_SECRET = "appSecret";
 
 }

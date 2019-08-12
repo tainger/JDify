@@ -45,4 +45,6 @@ public interface DalaranContext<T> {
 
     DalaranFunctionContext getDalaranFunctionContext();
 
+    DalaranClientContext getDalaranClientContext();
+
 }

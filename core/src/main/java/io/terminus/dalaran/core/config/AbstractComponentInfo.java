@@ -18,6 +18,8 @@ public abstract class AbstractComponentInfo implements ComponentInfo {
 
     private DalaranConfigField[] configFields;
 
+    private boolean main;
+
     @NotNull
     private BodyType[] allowedBodyTypes;
 

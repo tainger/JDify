@@ -12,7 +12,11 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE})
 public @interface Processor {
-    String value();
+    /**
+     * processor type, 第一个会作为主 type, 其他可以认为是曾用名, connector 的数据不通用
+     * @return
+     */
+    String[] value();
 
     String name();
 

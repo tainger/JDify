@@ -37,14 +37,10 @@ public class DalaranAutoConfiguration {
 
     @Bean
     public DalaranContext dalaranContext(
-            DalaranConverterContext converterContext,
-            DalaranComponentContext componentContext,
-            DalaranFunctionContext functionContext,
-            DalaranServiceContext serviceContext,
             DalaranFlowBuilder flowBuilder,
             CamelContext camelContext
     ) {
-        return new DefaultDalaranCamelContext(camelContext, converterContext, componentContext, functionContext, serviceContext, flowBuilder);
+        return new DefaultDalaranCamelContext(camelContext, flowBuilder);
     }
 
     @Bean
@@ -65,6 +61,12 @@ public class DalaranAutoConfiguration {
     @Bean
     public DalaranComponentContext dalaranComponentContext() {
         return new DefaultDalaranComponentContext();
+    }
+
+
+    @Bean
+    public DalaranClientContext dalaranClientContext() {
+        return new DefaultDalaranClientContext();
     }
 
     @Bean

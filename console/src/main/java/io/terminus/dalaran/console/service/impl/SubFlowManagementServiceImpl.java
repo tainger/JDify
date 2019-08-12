@@ -4,7 +4,8 @@ import com.alibaba.fastjson.JSON;
 import io.terminus.dalaran.console.TestFlowInitializer;
 import io.terminus.dalaran.console.convertor.FlowConvertor;
 import io.terminus.dalaran.console.entity.SubFlowEntity;
-import io.terminus.dalaran.console.model.dto.flow.BasicFlowInfo;
+import io.terminus.dalaran.console.model.dto.CopyFlow;
+import io.terminus.dalaran.console.model.dto.basic.BasicFlowInfo;
 import io.terminus.dalaran.console.model.dto.flow.SubFlowDTO;
 import io.terminus.dalaran.console.model.query.FlowQuery;
 import io.terminus.dalaran.console.repository.SubFlowRepository;
@@ -18,6 +19,7 @@ import io.terminus.dalaran.model.flow.FlowValidation;
 import io.terminus.dalaran.model.flow.SubFlow;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -95,9 +97,18 @@ public class SubFlowManagementServiceImpl implements SubFlowManagementService {
     }
 
     @Override
-    public Long copyFlow(Long id) {
-        // TODO
-        return null;
+    public Long copyFlow(CopyFlow copyFlow) {
+        SubFlowEntity flowEntity = subFlowRepository.findOne(copyFlow.getId());
+        if (flowEntity == null) {
+            return null;
+        }
+        SubFlowEntity newFlowEntity = new SubFlowEntity();
+
+        BeanUtils.copyProperties(flowEntity, newFlowEntity);
+        newFlowEntity.setId(null);
+        newFlowEntity.setName(copyFlow.getName());
+        subFlowRepository.save(newFlowEntity);
+        return newFlowEntity.getId();
     }
 
     @Override

@@ -1,4 +1,4 @@
-package io.terminus.dalaran.console.model.dto.flow;
+package io.terminus.dalaran.console.model.dto.basic;
 
 import io.terminus.dalaran.model.flow.FlowStatus;
 import lombok.Data;
