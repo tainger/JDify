@@ -22,5 +22,5 @@ public interface ComponentInfo {
 
     Class getConfigType();
 
-    boolean isMain();
+    boolean isOutdated();
 }

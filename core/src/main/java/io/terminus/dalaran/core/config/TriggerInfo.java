@@ -4,6 +4,4 @@ import lombok.Data;
 
 @Data
 public class TriggerInfo extends AbstractComponentInfo {
-
-    private Boolean isVoid;
 }

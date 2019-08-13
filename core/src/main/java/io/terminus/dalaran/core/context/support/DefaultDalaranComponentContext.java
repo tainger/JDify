@@ -56,7 +56,6 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext {
     @Override
     public Collection<TriggerInfo> getAllTriggerInfo() {
         return triggerInfoMapping.values().stream()
-                .filter(TriggerInfo::isMain)
                 .sorted(Comparator.comparingInt(AbstractComponentInfo::getOrder))
                 .collect(Collectors.toList());
     }
@@ -69,7 +68,6 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext {
     @Override
     public Collection<ProcessorInfo> getAllProcessorInfo() {
         return processorInfoMapping.values().stream()
-                .filter(ProcessorInfo::isMain)
                 .sorted(Comparator.comparingInt(AbstractComponentInfo::getOrder))
                 .collect(Collectors.toList());
     }
@@ -81,7 +79,7 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext {
         for (int i = 0; i < triggerAnnotation.value().length; i++) {
             String triggerType = triggerAnnotation.value()[i];
             TriggerInfo triggerInfo = new TriggerInfo();
-            triggerInfo.setMain(i == 0);
+            triggerInfo.setOutdated(i == 0);
             triggerInfo.setType(triggerType);
             triggerInfo.setName(triggerAnnotation.name());
             triggerInfo.setOrder(triggerAnnotation.order());
@@ -91,7 +89,7 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext {
             triggerInfo.setInputSerializeType(triggerAnnotation.inputSerializeType());
             triggerInfo.setOutputSerializeType(triggerAnnotation.outputSerializeType());
 
-            triggerInfo.setIsVoid(triggerAnnotation.isVoid());
+//            triggerInfo.setIsVoid(triggerAnnotation.isVoid());
 
             Class connectorType = getConnectorType(triggerAnnotation.configType());
             if (connectorType != null) {
@@ -112,7 +110,7 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext {
         for (int i = 0; i < processorAnnotation.value().length; i++) {
             String processorType = processorAnnotation.value()[i];
             ProcessorInfo processorInfo = new ProcessorInfo();
-            processorInfo.setMain(i == 0);
+            processorInfo.setOutdated(i == 0);
             processorInfo.setType(processorType);
             processorInfo.setName(processorAnnotation.name());
             processorInfo.setOrder(processorAnnotation.order());

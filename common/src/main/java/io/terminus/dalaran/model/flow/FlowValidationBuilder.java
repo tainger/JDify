@@ -18,7 +18,6 @@ public class FlowValidationBuilder {
         return this;
     }
 
-
     public FlowValidationBuilder trigger() {
         validation.setTargetType(ValidateMessageTarget.Trigger);
         return this;
