@@ -188,6 +188,14 @@ public class DalaranMessageMapper implements DalaranProcessor<DalaranMapperConfi
         MessageModel inModel = config.getInModel();
         MessageModel outModel = config.getOutModel();
         Map<String, SimpleMapping> mappings = config.getMessageMapping();
+
+        if (inModel == null || outModel == null) {
+            validations.add(FlowValidationBuilder.newBuilder()
+                    .field(MapperConstants.MAPPER_MODEL)
+                    .message(MODEL_NOT_NULL).build());
+            return validations;
+        }
+
         if (MapUtils.isEmpty(mappings)) {
             return validations;
         }
@@ -231,31 +239,25 @@ public class DalaranMessageMapper implements DalaranProcessor<DalaranMapperConfi
     }
 
     private FlowValidation checkArrayFields(String sourcePath, MessageModel inModel, String destinationPath, MessageModel outModel) {
-        if (inModel == null || outModel == null) {
-            return FlowValidationBuilder.newBuilder()
+        String[] sourcePaths = StringUtils.split(sourcePath, ".");
+        Integer sourceCount = calculateArrayCount(sourcePaths, inModel);
+        String[] destinationPaths = StringUtils.split(destinationPath, ".");
+        Integer destinationCount = calculateArrayCount(destinationPaths, outModel);
+
+        if (sourceCount == -1 || destinationCount == -1) {
+            FlowValidation validation = FlowValidationBuilder.newBuilder()
                     .field(destinationPath)
-                    .message(MODEL_NOT_NULL).build();
-        } else {
-            String[] sourcePaths = StringUtils.split(sourcePath, ".");
-            Integer sourceCount = calculateArrayCount(sourcePaths, inModel);
-            String[] destinationPaths = StringUtils.split(destinationPath, ".");
-            Integer destinationCount = calculateArrayCount(destinationPaths, outModel);
+                    .message(PATH_NOT_IN_MODEL).build();
+            validation.setField(destinationPath);
+            return validation;
+        }
 
-            if (sourceCount == -1 || destinationCount == -1) {
-                FlowValidation validation = FlowValidationBuilder.newBuilder()
-                        .field(destinationPath)
-                        .message(PATH_NOT_IN_MODEL).build();
-                validation.setField(destinationPath);
-                return validation;
-            }
-
-            if (!sourceCount.equals(destinationCount)) {
-                FlowValidation validation = FlowValidationBuilder.newBuilder()
-                        .field(destinationPath)
-                        .message(MAPPER_ARRAY_LEVEL_NOT_EQUALS).build();
-                validation.setField(destinationPath);
-                return validation;
-            }
+        if (!sourceCount.equals(destinationCount)) {
+            FlowValidation validation = FlowValidationBuilder.newBuilder()
+                    .field(destinationPath)
+                    .message(MAPPER_ARRAY_LEVEL_NOT_EQUALS).build();
+            validation.setField(destinationPath);
+            return validation;
         }
         return null;
     }
