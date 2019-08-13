@@ -1,0 +1,19 @@
+package io.terminus.dalaran.console.service;
+
+import io.terminus.dalaran.console.model.dto.ClientDTO;
+import io.terminus.dalaran.console.model.dto.basic.BasicClientInfo;
+
+import java.util.List;
+
+public interface ClientManagementService {
+
+    Long create(ClientDTO clientDTO);
+
+    ClientDTO update(ClientDTO clientDTO);
+
+    void delete(Long clientId);
+
+    ClientDTO detail(Long clientId);
+
+    List<BasicClientInfo> listBasicInfoByModuleId(Long moduleId);
+}

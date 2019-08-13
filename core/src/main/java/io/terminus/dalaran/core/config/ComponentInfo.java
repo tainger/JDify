@@ -21,4 +21,6 @@ public interface ComponentInfo {
     BodySerializeType getOutputSerializeType();
 
     Class getConfigType();
+
+    boolean isMain();
 }

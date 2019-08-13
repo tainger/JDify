@@ -2,8 +2,8 @@ package io.terminus.dalaran.console.flow;
 
 import com.alibaba.fastjson.JSON;
 import io.terminus.dalaran.console.entity.ServiceEntity;
-import io.terminus.dalaran.console.model.dto.BasicServiceInfo;
 import io.terminus.dalaran.console.model.dto.ServiceDTO;
+import io.terminus.dalaran.console.model.dto.basic.BasicServiceInfo;
 import io.terminus.dalaran.console.repository.ServiceRepository;
 import io.terminus.dalaran.console.service.ServiceManagement;
 import org.junit.Assert;

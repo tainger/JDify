@@ -5,7 +5,7 @@ import io.terminus.dalaran.console.entity.TriggerFlowEntity;
 import io.terminus.dalaran.console.model.dto.ConnectorDTO;
 import io.terminus.dalaran.console.model.dto.CopyFlow;
 import io.terminus.dalaran.console.model.dto.ProcessorDTO;
-import io.terminus.dalaran.console.model.dto.flow.BasicFlowInfo;
+import io.terminus.dalaran.console.model.dto.basic.BasicFlowInfo;
 import io.terminus.dalaran.console.model.dto.flow.TriggerFlowDTO;
 import io.terminus.dalaran.console.model.query.FlowQuery;
 import io.terminus.dalaran.console.repository.ModelRepository;

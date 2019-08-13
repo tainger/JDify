@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.camel.CamelContext;
 import org.apache.camel.impl.DefaultProducerTemplate;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
@@ -20,27 +21,24 @@ import static io.terminus.dalaran.DalaranConstants.*;
 @Slf4j
 public class DefaultDalaranCamelContext implements DalaranContext<DalaranRoute> {
 
-    private final DalaranFlowBuilder<DalaranRoute> flowBuilder;
-    private final CamelContext camelContext;
-    private final DalaranConverterContext converterContext;
-    private final DalaranComponentContext componentContext;
-    private final DalaranFunctionContext functionContext;
-    private final DalaranServiceContext serviceContext;
+    @Autowired
+    private DalaranConverterContext converterContext;
+    @Autowired
+    private DalaranComponentContext componentContext;
+    @Autowired
+    private DalaranFunctionContext functionContext;
+    @Autowired
+    private DalaranServiceContext serviceContext;
+    @Autowired
+    private DalaranClientContext clientContext;
 
-    public DefaultDalaranCamelContext(
-            CamelContext camelContext,
-            DalaranConverterContext converterContext,
-            DalaranComponentContext componentContext,
-            DalaranFunctionContext functionContext,
-            DalaranServiceContext serviceContext,
-            DalaranFlowBuilder flowBuilder
-    ) {
+    private final DalaranFlowBuilder<DalaranRoute> flowBuilder;
+
+    private final CamelContext camelContext;
+
+    public DefaultDalaranCamelContext(CamelContext camelContext, DalaranFlowBuilder flowBuilder) {
         this.camelContext = camelContext;
         this.flowBuilder = flowBuilder;
-        this.serviceContext = serviceContext;
-        this.converterContext = converterContext;
-        this.componentContext = componentContext;
-        this.functionContext = functionContext;
     }
 
     @Override
@@ -181,6 +179,11 @@ public class DefaultDalaranCamelContext implements DalaranContext<DalaranRoute> 
     @Override
     public DalaranFunctionContext getDalaranFunctionContext() {
         return functionContext;
+    }
+
+    @Override
+    public DalaranClientContext getDalaranClientContext() {
+        return clientContext;
     }
 
     // TODO 这里可以考虑换一下 camel 的 uuid 生成器

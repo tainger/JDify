@@ -1,6 +1,7 @@
 package io.terminus.dalaran.console.model.dto.flow;
 
 import io.terminus.dalaran.console.model.dto.ProcessorDTO;
+import io.terminus.dalaran.console.model.dto.basic.BasicFlowInfo;
 import lombok.Data;
 
 import java.util.List;

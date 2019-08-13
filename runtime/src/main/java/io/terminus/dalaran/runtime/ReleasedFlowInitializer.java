@@ -3,6 +3,7 @@ package io.terminus.dalaran.runtime;
 import io.terminus.dalaran.core.context.DalaranContext;
 import io.terminus.dalaran.core.resource.DalaranResourceBuilder;
 import io.terminus.dalaran.core.resource.entity.common.ReleaseRecordEntity;
+import io.terminus.dalaran.core.resource.entity.released.ClientReleasedEntity;
 import io.terminus.dalaran.core.resource.entity.released.FunctionReleasedEntity;
 import io.terminus.dalaran.core.resource.entity.released.SubFlowReleasedEntity;
 import io.terminus.dalaran.core.resource.entity.released.TriggerFlowReleasedEntity;
@@ -58,6 +59,13 @@ public class ReleasedFlowInitializer {
             }
             resourceLoader.setVersion(recordEntity.getVersion());
 
+            // load client info
+            List<ClientReleasedEntity> clients = resourceLoader.loadAllClient();
+            for (ClientReleasedEntity client : clients) {
+                dalaranContext.getDalaranClientContext().addClient(client.getClientId(), client.getSecret());
+            }
+
+            // load mapping function
             List<FunctionReleasedEntity> functions = resourceLoader.loadAllFunctions();
             for (FunctionReleasedEntity function : functions) {
                 dalaranContext.getDalaranFunctionContext().addCustomFunction(function.getId(), function.getType(),

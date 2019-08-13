@@ -1,4 +1,4 @@
-package io.terminus.dalaran.console.model.dto;
+package io.terminus.dalaran.console.model.dto.basic;
 
 import lombok.Data;
 import org.jetbrains.annotations.Nullable;

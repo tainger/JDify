@@ -1,8 +1,8 @@
 package io.terminus.dalaran.console.service.impl;
 
 import io.terminus.dalaran.console.entity.FunctionEntity;
-import io.terminus.dalaran.console.model.dto.BasicFunctionInfo;
 import io.terminus.dalaran.console.model.dto.FunctionDTO;
+import io.terminus.dalaran.console.model.dto.basic.BasicFunctionInfo;
 import io.terminus.dalaran.console.repository.FunctionRepository;
 import io.terminus.dalaran.console.service.FunctionService;
 import io.terminus.dalaran.core.context.DalaranFunctionContext;
