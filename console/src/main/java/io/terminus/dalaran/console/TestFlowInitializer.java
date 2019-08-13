@@ -42,8 +42,8 @@ public class TestFlowInitializer {
 
     public void reloadTestSubFlow(Long subFlowId) {
         SubFlowAbstractEntity subFlowEntity = resourceLoader.loadSubFlow(subFlowId);
-        BasicFlow testFlow = resourceBuilder.buildTestFlow(subFlowEntity);
-        dalaranContext.addTestFlow(testFlow);
+        SubFlow subFlow = resourceBuilder.buildSubFlow(subFlowEntity);
+        dalaranContext.addSubFlow(subFlow);
     }
 
     // TODO 延时 5 秒, 因为目前 Component 的加载是根据 Spring Bean 的初始化, 有时候初始化流时, Component 还没有 ready
@@ -71,7 +71,6 @@ public class TestFlowInitializer {
                     if (subFlowEntity.getStatus() != FlowStatus.Error) {
                         SubFlow testFlow = resourceBuilder.buildSubFlow(subFlowEntity);
                         dalaranContext.addSubFlow(testFlow);
-                        dalaranContext.addTestFlow(testFlow);
                         log.info("load test sub-flow {}", testFlow.getId());
                     } else {
                         log.info("can't load test sub-flow [{}], because has error.", subFlowEntity.getId());

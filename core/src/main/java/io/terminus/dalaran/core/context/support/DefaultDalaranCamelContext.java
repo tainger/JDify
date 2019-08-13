@@ -95,23 +95,6 @@ public class DefaultDalaranCamelContext implements DalaranContext<DalaranRoute> 
     }
 
     @Override
-    public void addTestSubFlow(BasicFlow flow) {
-        try {
-            camelContext.removeRoute(DalaranConstants.TEST_FLOW_PREFIX + flow.getRouteId());
-            DalaranRoute route = flowBuilder.buildTestFLow(flow);
-            log.info("load test flow [{}], steps: {}", route.getId(), route.getSteps());
-            camelContext.addRouteDefinition(route);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Override
-    public void addTestSubFlows(List<BasicFlow> flows) {
-
-    }
-
-    @Override
     public void addSubFlow(SubFlow flow) {
         try {
             camelContext.removeRoute(flow.getRouteId());
@@ -162,7 +145,7 @@ public class DefaultDalaranCamelContext implements DalaranContext<DalaranRoute> 
         String recordId = nextRecordId();
         try {
             DefaultProducerTemplate template = (DefaultProducerTemplate) camelContext.createProducerTemplate();
-            template.sendBodyAndProperty(TEST_FLOW_DIRECT_PREFIX + SUB_FLOW_PREFIX + subFlowId, body, DalaranConstants.TEST_FLOW_RECORD_ID_HEADER, recordId);
+            template.sendBodyAndProperty(SUB_FLOW_DIRECT_PREFIX + subFlowId, body, DalaranConstants.TEST_FLOW_RECORD_ID_HEADER, recordId);
         } catch (Throwable e) {
             e.printStackTrace();
         }
