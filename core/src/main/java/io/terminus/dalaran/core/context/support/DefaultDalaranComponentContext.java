@@ -79,7 +79,7 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext {
         for (int i = 0; i < triggerAnnotation.value().length; i++) {
             String triggerType = triggerAnnotation.value()[i];
             TriggerInfo triggerInfo = new TriggerInfo();
-            triggerInfo.setOutdated(i == 0);
+            triggerInfo.setOutdated(i != 0);
             triggerInfo.setType(triggerType);
             triggerInfo.setName(triggerAnnotation.name());
             triggerInfo.setOrder(triggerAnnotation.order());
@@ -110,7 +110,7 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext {
         for (int i = 0; i < processorAnnotation.value().length; i++) {
             String processorType = processorAnnotation.value()[i];
             ProcessorInfo processorInfo = new ProcessorInfo();
-            processorInfo.setOutdated(i == 0);
+            processorInfo.setOutdated(i != 0);
             processorInfo.setType(processorType);
             processorInfo.setName(processorAnnotation.name());
             processorInfo.setOrder(processorAnnotation.order());
