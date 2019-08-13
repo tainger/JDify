@@ -84,7 +84,9 @@ public class FlowManagementServiceImpl implements FlowManagementService {
         setFlowStatus(flowEntity);
         Long id = flowRepository.save(flowEntity).getId();
         // TODO 这里依赖 loader 有点怪 而且可以异步
-        testFlowInitializer.reloadTestTriggerFlow(flowEntity.getId());
+        if (flowEntity.getStatus() != FlowStatus.Error) {
+            testFlowInitializer.reloadTestTriggerFlow(flowEntity.getId());
+        }
         return id;
     }
 
@@ -94,7 +96,9 @@ public class FlowManagementServiceImpl implements FlowManagementService {
         setFlowStatus(flowEntity);
         Long id = flowRepository.save(flowEntity).getId();
         // TODO 这里依赖 loader 有点怪 而且可以异步
-        testFlowInitializer.reloadTestTriggerFlow(flowEntity.getId());
+        if (flowEntity.getStatus() != FlowStatus.Error) {
+            testFlowInitializer.reloadTestTriggerFlow(flowEntity.getId());
+        }
         return id;
     }
 
@@ -223,6 +227,7 @@ public class FlowManagementServiceImpl implements FlowManagementService {
         flowEntity.setInModel(triggerFlow.getInModelId());
         flowEntity.setOutModel(triggerFlow.getOutModelId());
         flowEntity.setPipeline(pipeline);
+        flowEntity.setTracing(triggerFlow.isTracing());
         flowEntity.setDescription(triggerFlow.getDescription());
 
         return flowEntity;

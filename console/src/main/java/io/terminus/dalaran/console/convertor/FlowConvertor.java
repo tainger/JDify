@@ -33,6 +33,7 @@ public class FlowConvertor {
         flowModel.setInModelId(entity.getInModel());
         flowModel.setOutModelId(entity.getInModel());
         flowModel.setPipeline(pipeline);
+        flowModel.setTracing(entity.isTracing());
         flowModel.setTriggerType(entity.getTriggerType());
         flowModel.setTriggerConfig(JSON.parseObject(entity.getTriggerConfig(), Map.class));
         return flowModel;
@@ -55,7 +56,7 @@ public class FlowConvertor {
         flowModel.setName(entity.getName());
         flowModel.setDescription(entity.getDescription());
         flowModel.setInModelId(entity.getInModel());
-        flowModel.setOutModelId(entity.getInModel());
+        flowModel.setOutModelId(entity.getOutModel());
         flowModel.setPipeline(pipeline);
         return flowModel;
     }
