@@ -11,3 +11,9 @@ spring:
   jpa:
     hibernate.ddl-auto: update
     database-platform: org.hibernate.dialect.MySQLDialect
+  security:
+    user:
+      name: ${SECURITY_USERNAME:terminus}
+      password: ${SECURITY_PASSWORD:anywhere}
+      role: ${SECURITY_ROLE:USER}
+    ant-matchers: ${ANT_MATCHERS:/**}

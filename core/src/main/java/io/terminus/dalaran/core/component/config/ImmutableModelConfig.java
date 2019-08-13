@@ -10,12 +10,12 @@ import lombok.Data;
 @Data
 public class ImmutableModelConfig {
 
-    @ConfigFieldInfo(inputType = FieldInputType.Hidden)
+    @ConfigFieldInfo(inputType = FieldInputType.Hidden, readonly = true)
     @JSONField(serialize = false)
     @JsonIgnore
     private transient MessageModel inModel;
 
-    @ConfigFieldInfo(inputType = FieldInputType.Hidden)
+    @ConfigFieldInfo(inputType = FieldInputType.Hidden, readonly = true)
     @JSONField(serialize = false)
     @JsonIgnore
     private transient MessageModel outModel;

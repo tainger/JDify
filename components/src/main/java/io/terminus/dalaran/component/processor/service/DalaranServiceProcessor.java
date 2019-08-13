@@ -65,6 +65,9 @@ public class DalaranServiceProcessor implements DalaranProcessor<DalaranServiceO
     @Override
     public List<FlowValidation> validate(ServiceOperationConfig config) {
         List<FlowValidation> messages = new ArrayList<>();
+        if (config.getServiceId() == null) {
+            return messages;
+        }
         ServiceAbstractEntity serviceEntity = resourceLoader.loadService(config.getServiceId());
         if (serviceEntity == null) {
             messages.add(FlowValidationBuilder.newBuilder().field("serviceId").message(SERVICE_NOT_EXIST).build());
