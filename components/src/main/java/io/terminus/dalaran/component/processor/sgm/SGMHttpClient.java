@@ -1,6 +1,5 @@
 package io.terminus.dalaran.component.processor.sgm;
 
-import io.terminus.dalaran.component.processor.sgm.model.SGMSignInfo;
 import io.terminus.dalaran.core.component.BodySerializeType;
 import io.terminus.dalaran.core.component.DalaranProcessor;
 import io.terminus.dalaran.core.component.annotation.Processor;
@@ -8,7 +7,6 @@ import io.terminus.dalaran.model.BodyType;
 import org.apache.camel.model.ProcessorDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.StringRedisTemplate;
 
 @Processor(
         value = "sgm-http-client",

@@ -24,8 +24,6 @@ import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.Collection;
 import java.util.List;
 
@@ -44,9 +42,6 @@ public class PlatformRest {
 
     @Autowired
     private AuthorizeService authorizeService;
-
-    @Autowired
-    private AuthenticationManager authenticationManager;
 
     @ApiOperation(value = "获取某版本所有流新消息")
     @GetMapping(value = "/release")
@@ -130,10 +125,7 @@ public class PlatformRest {
     @ApiOperation(value = "登陆验证")
     @PostMapping(value = "/login/auth")
     private boolean loginAuth(@RequestBody DalaranAccount account) {
-        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(account.getUsername(), account.getPassword(), AuthorityUtils.commaSeparatedStringToAuthorityList(""));
-        Authentication authentication = authenticationManager.authenticate(usernamePasswordAuthenticationToken);
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        return true;
+        return authorizeService.authAccount(account);
     }
 
     @ApiOperation(value = "登陆")

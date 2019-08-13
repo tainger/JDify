@@ -16,3 +16,4 @@ spring:
       name: ${SECURITY_USERNAME:terminus}
       password: ${SECURITY_PASSWORD:anywhere}
       role: ${SECURITY_ROLE:USER}
+    ant-matchers: ${ANT_MATCHERS:/**}
