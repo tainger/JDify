@@ -17,13 +17,7 @@ import io.terminus.dalaran.core.context.DalaranContext;
 import io.terminus.dalaran.model.function.MappingFunctionInfo;
 import io.terminus.dalaran.model.trantor.DalaranTrantorModule;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.authority.AuthorityUtils;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.Collection;
 import java.util.List;
 
@@ -126,11 +120,5 @@ public class PlatformRest {
     @PostMapping(value = "/login/auth")
     private boolean loginAuth(@RequestBody DalaranAccount account) {
         return authorizeService.authAccount(account);
-    }
-
-    @ApiOperation(value = "登陆")
-    @GetMapping(value = "/login")
-    private String login() {
-        return "login";
     }
 }
