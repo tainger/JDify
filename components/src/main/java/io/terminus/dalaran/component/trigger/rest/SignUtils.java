@@ -1,6 +1,5 @@
 package io.terminus.dalaran.component.trigger.rest;
 
-import com.alibaba.fastjson.JSON;
 import com.google.common.base.Charsets;
 import org.apache.camel.Exchange;
 import org.apache.commons.lang3.StringUtils;
