@@ -23,6 +23,10 @@ public interface DalaranContext<T> {
 
     void addTestFlows(List<BasicFlow> flows);
 
+    void addTestSubFlow(BasicFlow flow);
+
+    void addTestSubFlows(List<BasicFlow> flows);
+
     void addSubFlow(SubFlow flow);
 
     void addSubFlows(List<SubFlow> flows);

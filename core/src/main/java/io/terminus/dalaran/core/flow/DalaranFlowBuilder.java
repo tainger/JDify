@@ -14,6 +14,8 @@ public interface DalaranFlowBuilder<T> {
 
     T buildTestFLow(BasicFlow flow);
 
+    T buildTestSubFLow(SubFlow flow);
+
     List<FlowValidation> validateFlow(BasicFlow flow);
 
 }

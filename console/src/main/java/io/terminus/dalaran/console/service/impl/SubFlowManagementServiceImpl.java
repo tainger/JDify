@@ -52,7 +52,9 @@ public class SubFlowManagementServiceImpl implements SubFlowManagementService {
         SubFlowEntity subFlowEntity = buildEntity(flowModel);
         setFlowStatus(subFlowEntity);
         subFlowRepository.save(subFlowEntity);
-        testFlowInitializer.reloadTestSubFlow(subFlowEntity.getId());
+        if (subFlowEntity.getStatus() != FlowStatus.Error) {
+            testFlowInitializer.reloadTestSubFlow(subFlowEntity.getId());
+        }
         return subFlowEntity.getId();
     }
 
@@ -66,7 +68,9 @@ public class SubFlowManagementServiceImpl implements SubFlowManagementService {
         SubFlowEntity subFlowEntity = buildEntity(flowModel);
         setFlowStatus(subFlowEntity);
         subFlowRepository.save(subFlowEntity);
-        testFlowInitializer.reloadTestSubFlow(subFlowEntity.getId());
+        if (subFlowEntity.getStatus() != FlowStatus.Error) {
+            testFlowInitializer.reloadTestSubFlow(subFlowEntity.getId());
+        }
         return flowConvertor.toDTO(subFlowEntity);
     }
 
