@@ -6,7 +6,7 @@ import lombok.Data;
 @Data
 public class ClientDTO extends BasicClientInfo {
 
-    private String clientId;
+    private String appKey;
 
     private String secret;
 

@@ -11,9 +11,9 @@ public interface ClientManagementService {
 
     ClientDTO update(ClientDTO clientDTO);
 
-    void delete(Long clientId);
+    void delete(Long appKey);
 
-    ClientDTO detail(Long clientId);
+    ClientDTO detail(Long appKey);
 
     List<BasicClientInfo> listBasicInfoByModuleId(Long moduleId);
 }

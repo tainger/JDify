@@ -15,12 +15,12 @@ public class DefaultDalaranClientContext implements DalaranClientContext {
     }
 
     @Override
-    public String getSecret(String clientId) {
-        return clientMapper.get(clientId);
+    public String getSecret(String appKey) {
+        return clientMapper.get(appKey);
     }
 
     @Override
-    public void addClient(String clientId, String secret) {
-        clientMapper.put(clientId, secret);
+    public void addClient(String appKey, String secret) {
+        clientMapper.put(appKey, secret);
     }
 }
