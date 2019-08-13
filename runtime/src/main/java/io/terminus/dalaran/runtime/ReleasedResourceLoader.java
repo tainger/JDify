@@ -32,6 +32,9 @@ public class ReleasedResourceLoader implements DalaranResourceLoader {
     @Autowired
     private FunctionReleasedRepository functionRepository;
 
+    @Autowired
+    private ClientReleasedRepository clientRepository;
+
     @Override
     public List<TriggerFlowReleasedEntity> loadAllTriggerFlow() {
         return releasedTriggerFlowRepository.findByVersion(version);
@@ -50,6 +53,11 @@ public class ReleasedResourceLoader implements DalaranResourceLoader {
     @Override
     public List<FunctionReleasedEntity> loadAllFunctions() {
         return functionRepository.findByVersion(version);
+    }
+
+    @Override
+    public List<ClientReleasedEntity> loadAllClient() {
+        return clientRepository.findByVersion(version);
     }
 
     @Override

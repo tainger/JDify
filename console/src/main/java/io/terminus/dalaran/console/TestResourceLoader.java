@@ -34,6 +34,9 @@ public class TestResourceLoader implements DalaranResourceLoader {
     private FunctionRepository functionRepository;
 
     @Autowired
+    private ClientRepository clientRepository;
+
+    @Autowired
     private DalaranContext dalaranContext;
 
     @Override
@@ -54,6 +57,11 @@ public class TestResourceLoader implements DalaranResourceLoader {
     @Override
     public List<FunctionEntity> loadAllFunctions() {
         return functionRepository.findAll();
+    }
+
+    @Override
+    public List<ClientEntity> loadAllClient() {
+        return clientRepository.findAll();
     }
 
     @Override

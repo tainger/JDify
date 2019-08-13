@@ -1,8 +1,8 @@
 package io.terminus.dalaran.console.rest;
 
 import io.swagger.annotations.ApiOperation;
-import io.terminus.dalaran.console.model.dto.BasicConnectorInfo;
 import io.terminus.dalaran.console.model.dto.ConnectorDTO;
+import io.terminus.dalaran.console.model.dto.basic.BasicConnectorInfo;
 import io.terminus.dalaran.console.service.ConnectorService;
 import io.terminus.dalaran.core.component.ComponentType;
 import org.springframework.beans.factory.annotation.Autowired;

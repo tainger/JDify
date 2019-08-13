@@ -1,6 +1,6 @@
 package io.terminus.dalaran.console.model.dto;
 
-import io.terminus.dalaran.console.model.dto.flow.BasicFlowInfo;
+import io.terminus.dalaran.console.model.dto.basic.*;
 import lombok.Data;
 
 import java.util.List;
@@ -23,4 +23,5 @@ public class ModuleDetailDTO extends ModuleDTO {
 
     private List<BasicFunctionInfo> functions;
 
+    private List<BasicClientInfo> clients;
 }

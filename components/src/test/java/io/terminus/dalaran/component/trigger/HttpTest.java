@@ -4,8 +4,8 @@ import com.alibaba.dubbo.common.utils.IOUtils;
 import com.alibaba.dubbo.common.utils.StringUtils;
 import io.terminus.dalaran.component.BasicTriggerTest;
 import io.terminus.dalaran.component.common.HttpMethod;
-import io.terminus.dalaran.component.trigger.http.NettyHttpConfig;
-import io.terminus.dalaran.component.trigger.http.NettyHttpListener;
+import io.terminus.dalaran.component.trigger.rest.RestConfig;
+import io.terminus.dalaran.component.trigger.rest.RestListener;
 import io.terminus.dalaran.model.HttpProtocol;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -38,8 +38,8 @@ public class HttpTest extends BasicTriggerTest {
 
     @Before
     public void before() {
-        NettyHttpListener trigger = new NettyHttpListener();
-        NettyHttpConfig config = new NettyHttpConfig();
+        RestListener trigger = new RestListener();
+        RestConfig config = new RestConfig();
         config.setProtocol(HttpProtocol.HTTP);
         config.setPort(MOCK_PORT);
         config.setPath(MOCK_PATH);

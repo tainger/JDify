@@ -1,6 +1,7 @@
 package io.terminus.dalaran.console.service;
 
-import io.terminus.dalaran.console.model.dto.flow.BasicFlowInfo;
+import io.terminus.dalaran.console.model.dto.CopyFlow;
+import io.terminus.dalaran.console.model.dto.basic.BasicFlowInfo;
 import io.terminus.dalaran.console.model.dto.flow.SubFlowDTO;
 import io.terminus.dalaran.console.model.query.FlowQuery;
 import io.terminus.dalaran.model.flow.FlowValidation;
@@ -24,7 +25,7 @@ public interface SubFlowManagementService {
     @Nullable
     SubFlowDTO getById(Long flowId);
 
-    Long copyFlow(Long id);
+    Long copyFlow(CopyFlow copyForm);
 
     List<FlowValidation> validateFlow(SubFlowDTO model);
 

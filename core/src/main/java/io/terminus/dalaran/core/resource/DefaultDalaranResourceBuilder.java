@@ -65,6 +65,7 @@ public class DefaultDalaranResourceBuilder implements DalaranResourceBuilder {
         flow.setTracing(triggerFlowEntity.isTracing());
         flow.setTriggerType(triggerFlowEntity.getTriggerType());
 
+
         Object config = buildConfig(triggerFlowEntity.getTriggerConfig(), triggerInfo.getConfigType());
 
         flow.setTriggerConfig(config);

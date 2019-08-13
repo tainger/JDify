@@ -1,7 +1,7 @@
 package io.terminus.dalaran.console.service.jpa.impl;
 
 import io.terminus.dalaran.console.entity.SubFlowEntity;
-import io.terminus.dalaran.console.model.dto.flow.BasicFlowInfo;
+import io.terminus.dalaran.console.model.dto.basic.BasicFlowInfo;
 import io.terminus.dalaran.console.repository.SubFlowRepository;
 import io.terminus.dalaran.console.service.jpa.SubFlowQueryService;
 import org.springframework.beans.factory.annotation.Autowired;

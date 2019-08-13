@@ -2,7 +2,7 @@ package io.terminus.dalaran.model.flow;
 
 public class FlowValidationBuilder {
 
-    private FlowValidation validation;
+    private final FlowValidation validation = new FlowValidation();
 
     public static FlowValidationBuilder newBuilder() {
         return new FlowValidationBuilder();
@@ -17,7 +17,6 @@ public class FlowValidationBuilder {
         validation.setTargetType(targetType);
         return this;
     }
-
 
     public FlowValidationBuilder trigger() {
         validation.setTargetType(ValidateMessageTarget.Trigger);

@@ -1,5 +1,6 @@
 package io.terminus.dalaran.console.model.dto;
 
+import io.terminus.dalaran.console.model.dto.basic.BasicServiceInfo;
 import lombok.Data;
 
 import java.util.Map;

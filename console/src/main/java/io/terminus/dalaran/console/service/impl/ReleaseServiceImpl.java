@@ -65,6 +65,12 @@ public class ReleaseServiceImpl implements ReleaseService {
     @Autowired
     private FunctionReleasedRepository functionReleasedRepository;
 
+    @Autowired
+    private ClientRepository clientRepository;
+
+    @Autowired
+    private ClientReleasedRepository clientReleasedRepository;
+
     private final FlowConvertor flowConvertor = new FlowConvertor();
 
     @Override
@@ -101,6 +107,9 @@ public class ReleaseServiceImpl implements ReleaseService {
 
         List<FunctionReleasedEntity> releasedFunctionEntities = toReleasedData(functionRepository.findAll(), FunctionReleasedEntity.class, requestDTO.getVersion());
         functionReleasedRepository.save(releasedFunctionEntities);
+
+        List<ClientReleasedEntity> releasedClientEntities = toReleasedData(clientRepository.findAll(), ClientReleasedEntity.class, requestDTO.getVersion());
+        clientReleasedRepository.save(releasedClientEntities);
 
         return toDTO(recordEntity);
     }
