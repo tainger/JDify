@@ -6,4 +6,6 @@ package io.terminus.dalaran.component.processor.mapper.model;
 public class MapperConstants {
 
     public static final String MODEL_ROOT = "root";
+
+    public static final String MAPPER_MODEL = "model";
 }

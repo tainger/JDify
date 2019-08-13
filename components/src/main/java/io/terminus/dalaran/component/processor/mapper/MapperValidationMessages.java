@@ -12,10 +12,10 @@ public final class MapperValidationMessages {
             new FlowValidateMessage(ValidateMessageLevel.Warning, "Mapper.Function.Param.Not.Null", "");
 
     protected static final FlowValidateMessage MAPPER_SOURCE_PATH_NOT_NULL =
-            new FlowValidateMessage(ValidateMessageLevel.Warning, "Mapper,Function.Path.Not.Null", "");
+            new FlowValidateMessage(ValidateMessageLevel.Warning, "Mapper.Function.SourcePath.Not.Null", "");
 
     protected static final FlowValidateMessage MODEL_NOT_NULL =
-            new FlowValidateMessage(ValidateMessageLevel.Warning, "InModel.Or.OutModel.Not.Null", "");
+            new FlowValidateMessage(ValidateMessageLevel.Error, "InModel.Or.OutModel.Not.Null", "");
 
     protected static final FlowValidateMessage MAPPER_ARRAY_LEVEL_NOT_EQUALS =
             new FlowValidateMessage(ValidateMessageLevel.Warning, "Mapper.Array.Level.Not.Equals", "");
