@@ -15,7 +15,7 @@ public class RestConfig extends AllModelConfig {
     private Integer port = 8080;
 
     @ConfigFieldInfo(label = "鉴权签名", inputType = FieldInputType.Switch, defaultValue = "true")
-    private Boolean authSign = true;
+    private boolean enableSign = true;
 
     @ConfigFieldInfo(label = "协议", inputType = FieldInputType.Radio, defaultValue = "HTTP")
     private HttpProtocol protocol;

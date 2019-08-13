@@ -8,7 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.Map;
 
-public class QueryStringProcessor implements Processor {
+public class QueryStringConvertProcessor implements Processor {
     @Override
     public void process(Exchange exchange) {
         String queryString = exchange.getIn().getHeader(Exchange.HTTP_QUERY, String.class);

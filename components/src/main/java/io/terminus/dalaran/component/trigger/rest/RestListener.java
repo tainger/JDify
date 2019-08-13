@@ -30,19 +30,17 @@ public class RestListener implements DalaranTrigger<RestConfig> {
                 "?httpMethodRestrict=" + config.getMethod();
         route.from(uri);
         if (config.getMethod().isNoBody()) {
-            if (config.getAuthSign()) {
+            if (config.isEnableSign()) {
                 route.process(new QueryStringSignProcessor(clientContext.getAllClient()));
             } else {
-                route.process(new QueryStringProcessor());
+                route.process(new QueryStringConvertProcessor());
             }
             // TODO 目前会多一次序列化, 如果下个节点要求的是非序列化对象, 会有额外的性能开销
             route.marshal().json(JsonLibrary.Fastjson);
         } else {
-            if (config.getAuthSign()) {
-                route.unmarshal().json(JsonLibrary.Fastjson, SignBodyModel.class);
-                route.process(new BodySignProcessor(clientContext.getAllClient()));
-                // TODO 目前会多一次序列化, 如果下个节点要求的是非序列化对象, 会有额外的性能开销
-                route.marshal().json(JsonLibrary.Fastjson);
+            if (config.isEnableSign()) {
+                route.unmarshal().json(JsonLibrary.Fastjson);
+                route.process(new SignProcessor(clientContext.getAllClient()));
             } else {
                 // TODO Stream to string
                 route.convertBodyTo(String.class);
