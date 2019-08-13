@@ -11,10 +11,13 @@ import javax.persistence.MappedSuperclass;
 public abstract class ClientAbstractEntity extends BasicEntity {
 
     @Column(nullable = false)
+    private Long moduleId;
+
+    @Column(nullable = false)
     private String name;
 
     @Column(nullable = false)
-    private String clientId;
+    private String appKey;
 
     @Column(nullable = false)
     private String secret;

@@ -62,7 +62,7 @@ public class ReleasedFlowInitializer {
             // load client info
             List<ClientReleasedEntity> clients = resourceLoader.loadAllClient();
             for (ClientReleasedEntity client : clients) {
-                dalaranContext.getDalaranClientContext().addClient(client.getClientId(), client.getSecret());
+                dalaranContext.getDalaranClientContext().addClient(client.getAppKey(), client.getSecret());
             }
 
             // load mapping function

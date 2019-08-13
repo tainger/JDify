@@ -6,7 +6,7 @@ public interface DalaranClientContext {
 
     Map<String, String> getAllClient();
 
-    String getSecret(String clientId);
+    String getSecret(String appKey);
 
-    void addClient(String clientId, String secret);
+    void addClient(String appKey, String secret);
 }

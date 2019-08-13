@@ -43,8 +43,6 @@ public class SignUtils {
 
     public static void stopExchange(Exchange exchange, int errorCode, String message) {
         // return http status code 403
-        RestErrorResult result = new RestErrorResult(errorCode, message);
-        exchange.getOut().setBody(JSON.toJSONString(result));
         exchange.getOut().setHeader(HTTP_RESPONSE_CODE, 403);
         exchange.getOut().setHeader(CONTENT_TYPE, ContentType.TEXT_PLAIN);
         exchange.getOut().setBody(message);
