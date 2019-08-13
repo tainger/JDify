@@ -14,6 +14,7 @@ import io.terminus.dalaran.model.flow.FlowValidation;
 import io.terminus.dalaran.model.flow.FlowValidationBuilder;
 import io.terminus.dalaran.model.function.MappingFunctionInfo;
 import org.apache.camel.model.ProcessorDefinition;
+import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -187,10 +188,16 @@ public class DalaranMessageMapper implements DalaranProcessor<DalaranMapperConfi
         MessageModel inModel = config.getInModel();
         MessageModel outModel = config.getOutModel();
         Map<String, SimpleMapping> mappings = config.getMessageMapping();
+        if (MapUtils.isEmpty(mappings)) {
+            return validations;
+        }
         mappings.forEach((destinationPath, simpleMapping) -> {
             if (simpleMapping.getMappingType() == MappingType.FUNCTION) {
                 MappingFunction function = (MappingFunction) simpleMapping.getValue();
                 Map<String, String> params = function.getParams();
+                if (MapUtils.isEmpty(params)) {
+                    return;
+                }
                 params.forEach((functionParam, sourcePath) -> {
                     if (StringUtils.isBlank(sourcePath)) {
                         FlowValidation validation = FlowValidationBuilder.newBuilder()
@@ -255,8 +262,7 @@ public class DalaranMessageMapper implements DalaranProcessor<DalaranMapperConfi
 
     private Integer calculateArrayCount(String[] paths, MessageModel model) {
         Integer count = 0;
-        Map<String, ModelField> modelField = model.getModelSchema().getFields();
-        Map<String, ModelField> temporaryField = modelField;
+        Map<String, ModelField> temporaryField = model.getModelSchema().getFields();
         for (String path : paths) {
             ModelField field = temporaryField.get(path);
             if (field == null) {
@@ -270,7 +276,7 @@ public class DalaranMessageMapper implements DalaranProcessor<DalaranMapperConfi
         return count;
     }
 
-    private class MessageMappingComparator implements Comparator<MessageMapping> {
+    private static class MessageMappingComparator implements Comparator<MessageMapping> {
         @Override
         public int compare(MessageMapping o1, MessageMapping o2) {
             if ((o1.getMappingType() == MappingType.DEFAULT || o1.getMappingType() == MappingType.FUNCTION) && o2.getMappingType() == MappingType.MAPPING) {
