@@ -82,6 +82,7 @@ public class TestFlowInitializer {
                         try {
                             SubFlow testFlow = resourceBuilder.buildSubFlow(subFlowEntity);
                             dalaranContext.addSubFlow(testFlow);
+                            dalaranContext.addTestSubFLow(testFlow);
                             log.info("load sub-flow {}", testFlow.getId());
                         } catch (Throwable e) {
                             e.printStackTrace();

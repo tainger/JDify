@@ -116,7 +116,6 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
         val route = createRouteDefinition();
         route.setId(TEST_FLOW_PREFIX + flow.getRouteId());
         route.from(DalaranConstants.TEST_FLOW_DIRECT_PREFIX + flow.getRouteId());
-        flowTracer.before(route, flow.getInModel().getModelType());
         if (flow.getInModel() == null) {
             flowTracer.before(route);
         } else {
