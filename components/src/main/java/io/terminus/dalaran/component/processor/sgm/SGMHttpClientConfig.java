@@ -18,6 +18,6 @@ public class SGMHttpClientConfig extends OutModelConfig implements ConnectorConf
     @ConfigFieldInfo(label = "Http 连接器", inputType = FieldInputType.Connector, connectorType = SGMHttpClientConnector.class)
     private Long connectorId;
 
-    @ConfigFieldInfo(label = "命令", inputType = FieldInputType.String, defaultValue = "/")
+    @ConfigFieldInfo(label = "命令", inputType = FieldInputType.String, defaultValue = "1000")
     private String command;
 }
