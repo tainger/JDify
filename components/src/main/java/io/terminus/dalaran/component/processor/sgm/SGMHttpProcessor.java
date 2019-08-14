@@ -11,10 +11,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.StringRedisTemplate;
 
 import java.io.IOException;
-import java.security.Timestamp;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -26,7 +24,7 @@ public class SGMHttpProcessor implements Processor {
 
     private static final Logger logger = LoggerFactory.getLogger(SGMHttpProcessor.class);
 
-    private static final String HTTP_URI = "%s://%s:%s%s?appid=%s&ACCESS_TOKEN=%s&sno=%s";
+    private static final String HTTP_URI = "%s://%s%s?appid=%s&ACCESS_TOKEN=%s&sno=%s";
 
     public SGMHttpProcessor(SGMHttpClientConfig config, RedisTemplate<String, SGMSignInfo> redisTemplate) {
         this.config = config;
@@ -37,19 +35,20 @@ public class SGMHttpProcessor implements Processor {
     public void process(Exchange exchange) throws Exception {
         SGMHttpClientConnector connector = config.getConnector();
         String key = connector.getAppId() + "-" + connector.getSno();
-        SGMSignInfo signInfo = redisTemplate.hasKey(key) ? redisTemplate.opsForValue().get(key) : getAccessToken(connector, key);
+        String host = formatHost(connector.getHost());
+        SGMSignInfo signInfo = redisTemplate.hasKey(key) ? redisTemplate.opsForValue().get(key) : getAccessToken(connector, key, host);
         String accessToken = signInfo.getAccessToken();
         String timestamp = signInfo.getTimestamp();
         String sign = calculationSign(connector.getToken(), timestamp);
-        String uri = String.format(HTTP_URI, connector.getProtocol().name().toLowerCase(), connector.getHost(),
-                connector.getPort(), config.getPath(), connector.getAppId(), accessToken, connector.getSno());
+        String uri = String.format(HTTP_URI, SGMConstants.PROTOCOL_HTTP, host,
+                SGMConstants.COMMAND_ROOT + config.getCommand(), connector.getAppId(), accessToken, connector.getSno());
         Long timeout = connector.getTimeout();
         Object data = request(uri, timestamp, sign, exchange.getIn().getBody(), timeout);
         exchange.getOut().setBody(data);
     }
 
-    private SGMSignInfo getAccessToken(SGMHttpClientConnector connector, String key) throws IOException {
-        String url = connector.getAuthUrl() + "?appid=" + connector.getAppId() + "&secret=" + connector.getSecret() + "&sno=" + connector.getSno();
+    private SGMSignInfo getAccessToken(SGMHttpClientConnector connector, String key, String host) throws IOException {
+        String url = SGMConstants.PROTOCOL_HTTP + "://" + host + SGMConstants.GET_TOKEN + "?appid=" + connector.getAppId() + "&secret=" + connector.getSecret() + "&sno=" + connector.getSno();
         OkHttpClient okHttpClient = new OkHttpClient.Builder().build();
         Request request = new Request.Builder().url(url).build();
         Response response = okHttpClient.newCall(request).execute();
@@ -93,5 +92,12 @@ public class SGMHttpProcessor implements Processor {
         List<String> params = Arrays.asList(accessToken, timestamp);
         Collections.sort(params);
         return DigestUtils.sha1Hex(String.join("", params));
+    }
+
+    private String formatHost(String host) {
+        if (StringUtils.startsWith(host, SGMConstants.PROTOCOL_HTTP) || StringUtils.startsWith(host, SGMConstants.PROTOCOL_HTTPS)) {
+            return StringUtils.substringAfter(host, "://");
+        }
+        return host;
     }
 }

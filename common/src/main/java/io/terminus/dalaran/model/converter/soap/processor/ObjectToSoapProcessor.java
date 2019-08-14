@@ -10,6 +10,7 @@ import io.terminus.dalaran.model.ModelField;
 import io.terminus.dalaran.model.converter.soap.model.SoapSchemaOperation;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
+import org.apache.camel.Traceable;
 import org.apache.http.entity.StringEntity;
 
 import java.io.StringWriter;
@@ -20,7 +21,7 @@ import java.util.Map;
 /**
  * Created by jingdi on 2019/6/6
  */
-public class ObjectToSoapProcessor implements Processor {
+public class ObjectToSoapProcessor implements Processor, Traceable {
 
     private final Map<String, ModelField> modelFields;
 
@@ -105,5 +106,10 @@ public class ObjectToSoapProcessor implements Processor {
                 formParams.put(path, null);
             }
         });
+    }
+
+    @Override
+    public String getTraceLabel() {
+        return "SoapConvert: ObjectToSoap";
     }
 }
