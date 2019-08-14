@@ -15,7 +15,7 @@ import org.springframework.data.redis.core.RedisTemplate;
         configType = SGMHttpClientConfig.class,
         allowBodyTypes = {BodyType.JSON},
         inputSerializeType = BodySerializeType.Object,
-        outputSerializeType = BodySerializeType.Serialized
+        outputSerializeType = BodySerializeType.Object
 )
 public class SGMHttpClient implements DalaranProcessor<SGMHttpClientConfig> {
     @Autowired

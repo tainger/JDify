@@ -15,6 +15,7 @@ import io.terminus.dalaran.model.flow.*;
 import lombok.val;
 import org.apache.camel.model.ChoiceDefinition;
 import org.apache.camel.model.ProcessorDefinition;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
@@ -81,7 +82,7 @@ public class DalaranRouter implements DalaranProcessor<Map<String, String>>, Dal
             }
 
             fragment.setId(flow.getId());
-            fragment.setFragmentId(component.getId() + DELIMITER + i);
+            fragment.setFragmentId(component.getId() + DELIMITER + i + DELIMITER + RandomStringUtils.randomAlphanumeric(6));
             fragment.setPipeline(pipeline);
             fragment.setInModel(config.getInModel());
             fragment.setOutModel(fragmentLastOutModel);

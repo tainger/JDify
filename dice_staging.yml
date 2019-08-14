@@ -38,4 +38,6 @@ addons:
     plan: "terminus-roost:basic"
     options:
       version: "0.0.1"
+  redis:
+    plan: redis:basic
 envs: {}
