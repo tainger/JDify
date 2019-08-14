@@ -44,6 +44,7 @@ public class TestFlowInitializer {
         SubFlowAbstractEntity subFlowEntity = resourceLoader.loadSubFlow(subFlowId);
         SubFlow subFlow = resourceBuilder.buildSubFlow(subFlowEntity);
         dalaranContext.addSubFlow(subFlow);
+        dalaranContext.addTestSubFLow(subFlow);
     }
 
     // TODO 延时 5 秒, 因为目前 Component 的加载是根据 Spring Bean 的初始化, 有时候初始化流时, Component 还没有 ready
