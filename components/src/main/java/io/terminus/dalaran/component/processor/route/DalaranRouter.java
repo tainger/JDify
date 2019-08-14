@@ -1,6 +1,7 @@
 package io.terminus.dalaran.component.processor.route;
 
 import io.terminus.dalaran.core.component.BodySerializeType;
+import io.terminus.dalaran.core.component.DalaranComponentValidator;
 import io.terminus.dalaran.core.component.DalaranProcessor;
 import io.terminus.dalaran.core.component.DalaranProcessorConfigCustomConverter;
 import io.terminus.dalaran.core.component.annotation.Processor;
@@ -10,8 +11,7 @@ import io.terminus.dalaran.core.resource.entity.common.ProcessorEntity;
 import io.terminus.dalaran.model.MessageModel;
 import io.terminus.dalaran.model.component.ComponentModel;
 import io.terminus.dalaran.model.component.ProcessorModel;
-import io.terminus.dalaran.model.flow.BasicFlow;
-import io.terminus.dalaran.model.flow.FlowFragment;
+import io.terminus.dalaran.model.flow.*;
 import lombok.val;
 import org.apache.camel.model.ChoiceDefinition;
 import org.apache.camel.model.ProcessorDefinition;
@@ -65,6 +65,11 @@ public class DalaranRouter implements DalaranProcessor<Map<String, String>>, Dal
 
         for (int i = 0; i < routes.size(); i++) {
             val route = routes.get(i);
+
+            if (route.getPipeline().isEmpty()) {
+                continue;
+            }
+
             FlowFragment fragment = new FlowFragment();
 
             MessageModel fragmentLastOutModel = config.getInModel();
@@ -87,4 +92,5 @@ public class DalaranRouter implements DalaranProcessor<Map<String, String>>, Dal
         }
         return routeMapper;
     }
+
 }

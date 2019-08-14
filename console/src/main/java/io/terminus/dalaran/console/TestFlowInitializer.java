@@ -54,13 +54,23 @@ public class TestFlowInitializer {
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
+                List<FunctionEntity> functions = resourceLoader.loadAllFunctions();
+                for (FunctionEntity function : functions) {
+                    dalaranContext.getDalaranFunctionContext().addCustomFunction(function.getId(), function.getType(),
+                            function.getScript(), function.getParams());
+                }
                 List<TriggerFlowEntity> triggerFlows = resourceLoader.loadAllTriggerFlow();
                 for (TriggerFlowEntity triggerFlowEntity : triggerFlows) {
                     // warning 的也可以加载
                     if (triggerFlowEntity.getStatus() != FlowStatus.Error) {
-                        BasicFlow testFlow = resourceBuilder.buildTriggerFlow(triggerFlowEntity);
-                        dalaranContext.addTestFlow(testFlow);
-                        log.info("load test flow {}", testFlow.getId());
+                        try {
+                            BasicFlow testFlow = resourceBuilder.buildTriggerFlow(triggerFlowEntity);
+                            dalaranContext.addTestFlow(testFlow);
+                            log.info("load test flow [{}]", testFlow.getId());
+                        } catch (Throwable e) {
+                            e.printStackTrace();
+                            log.error("load test flow [{}] error", triggerFlowEntity.getId());
+                        }
                     } else {
                         log.info("can't load test flow [{}], because has error.", triggerFlowEntity.getId());
                     }
@@ -69,17 +79,17 @@ public class TestFlowInitializer {
                 for (SubFlowEntity subFlowEntity : subFlows) {
                     // warning 的也可以加载
                     if (subFlowEntity.getStatus() != FlowStatus.Error) {
-                        SubFlow testFlow = resourceBuilder.buildSubFlow(subFlowEntity);
-                        dalaranContext.addSubFlow(testFlow);
-                        log.info("load test sub-flow {}", testFlow.getId());
+                        try {
+                            SubFlow testFlow = resourceBuilder.buildSubFlow(subFlowEntity);
+                            dalaranContext.addSubFlow(testFlow);
+                            log.info("load sub-flow {}", testFlow.getId());
+                        } catch (Throwable e) {
+                            e.printStackTrace();
+                            log.error("load sub flow [{}] error", subFlowEntity.getId());
+                        }
                     } else {
                         log.info("can't load test sub-flow [{}], because has error.", subFlowEntity.getId());
                     }
-                }
-                List<FunctionEntity> functions = resourceLoader.loadAllFunctions();
-                for (FunctionEntity function : functions) {
-                    dalaranContext.getDalaranFunctionContext().addCustomFunction(function.getId(), function.getType(),
-                            function.getScript(), function.getParams());
                 }
             }
         }, 10 * 1000L);

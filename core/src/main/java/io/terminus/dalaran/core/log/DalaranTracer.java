@@ -12,6 +12,8 @@ import org.apache.camel.model.RouteDefinition;
 import java.io.Serializable;
 import java.util.Map;
 
+import static io.terminus.dalaran.model.BodyType.UNKNOWN;
+
 /**
  * 尝试过 InterceptStrategy 和 TraceEventHandler, 最后决定自己写前后 processor 处理
  * 主要 CamelInternalProcessorAdvice 没有可用入口, 否则直接使用也是比较合适的
@@ -58,8 +60,17 @@ public class DalaranTracer {
         route.process(this.buildBeforeProcessor(modelType));
     }
 
+    public void before(RouteDefinition route) {
+        route.process(this.buildBeforeProcessor(UNKNOWN));
+    }
+
     public void after(RouteDefinition route, BodyType modelType) {
         route.process(this.buildAfterProcessor(modelType));
+    }
+
+
+    public void after(RouteDefinition route) {
+        route.process(this.buildAfterProcessor(UNKNOWN));
     }
 
     // TODO async

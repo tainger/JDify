@@ -73,11 +73,23 @@
 ![add-processor](../images/add-processor.jpg)
 ![add-mapper](../images/add-mapper.jpg)
 
-确认后, 图上会增加一个 mapper 节点, 点击后下放会出现 Mapper 的配置, 就是一个连线映射, 只需要将左边的字段连线到右边的目标字段即可. 如果有数组之类的, 左右两边会要求有相同层级的数组, 因为需要循环完成创建赋值, 如果不同层级就会牵扯到 flat 或者 merge 等, 所以不支持.
+确认后, 图上会增加一个 mapper 节点, 点击后下放会出现 Mapper 的配置, 就是一个连线映射, 只需要将左边的字段连线到右边的目标字段即可. 
+
+如果字段相似度较高, 可以点击自动映射, 会根据字段相似度, 全层级的自动关联, 下图就是直接点击自动映射的结果.
+
+如果有数组之类的, 左右两边会要求有相同层级的数组, 因为需要循环完成创建赋值, 如果不同层级就会牵扯到 flat 或者 merge 等, 所以不支持.
 
 ![config-mapper](../images/config-mapper.jpg)
 
-连线完成后, Mapper 节点就配置完成了.
+连线完成后, Mapper 节点就配置完成了. 当简单的赋值映射不能支撑我们的场景时, 我们可以使用映射函数来完成. 只需要增加函数, 将出入参连接即可. 
+
+![add-http-client](../images/mapper-function.jpg)
+
+函数拥有两种, 一种是平台提供的标准函数, 比如字符串操作, 数字操作等;
+
+另外一种是自定义函数, 允许用户自行维护, 只需要描述入参, 并且填入实现即可. 当前支持 `JavaScript` 和 `Groovy`.
+
+![add-http-client](../images/create-mapping-function.jpg)
 
 ### 4. 创建 Client 节点访问三方接口
 

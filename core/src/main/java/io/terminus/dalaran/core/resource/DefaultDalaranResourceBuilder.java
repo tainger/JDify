@@ -59,6 +59,7 @@ public class DefaultDalaranResourceBuilder implements DalaranResourceBuilder {
 
     @Override
     public TriggerFlow buildTriggerFlow(TriggerFlowAbstractEntity triggerFlowEntity) {
+
         TriggerFlow flow = new TriggerFlow();
         TriggerInfo triggerInfo = componentContext.getTriggerInfo(triggerFlowEntity.getTriggerType());
         buildFlow(flow, triggerFlowEntity);
@@ -113,6 +114,10 @@ public class DefaultDalaranResourceBuilder implements DalaranResourceBuilder {
     @Override
     public Object buildConnectorConfig(Long connectorId, Class connectorConfigType) {
         ConnectorAbstractEntity entity = resourceLoader.loadConnector(connectorId);
+        if (entity == null) {
+            // TODO throw ConnectorNotFound
+            throw new RuntimeException("connector [" + connectorId + "] not found");
+        }
         return buildConfig(entity.getConfig(), connectorConfigType);
     }
 

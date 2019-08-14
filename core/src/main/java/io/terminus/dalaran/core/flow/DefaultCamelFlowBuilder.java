@@ -87,9 +87,19 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
     public DalaranRoute buildSubFLow(SubFlow flow) {
         val flowTracer = DalaranTracer.buildSubFlowTracer(traceLogger, flow.getId());
         val route = createRouteDefinition(flow);
-        flowTracer.before(route, flow.getInModel().getModelType());
+        if (flow.getInModel() == null) {
+            flowTracer.before(route);
+        } else {
+            flowTracer.before(route, flow.getInModel().getModelType());
+        }
+
         buildFlowRoute(route, flow, null);
-        flowTracer.after(route, flow.getOutModel().getModelType());
+
+        if (flow.getOutModel() == null) {
+            flowTracer.after(route);
+        } else {
+            flowTracer.after(route, flow.getOutModel().getModelType());
+        }
         return route;
     }
 
@@ -107,6 +117,11 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
         route.setId(TEST_FLOW_PREFIX + flow.getRouteId());
         route.from(DalaranConstants.TEST_FLOW_DIRECT_PREFIX + flow.getRouteId());
         flowTracer.before(route, flow.getInModel().getModelType());
+        if (flow.getInModel() == null) {
+            flowTracer.before(route);
+        } else {
+            flowTracer.before(route, flow.getInModel().getModelType());
+        }
 
         // TODO 测试的输入一定是序列化的, XML/Json 等都是直接扔进去, 如果入参是 Object, 前端引导输入 Json 做反序列化处理吧
 //        if (!flow.getInModel().getModelType().isSerialized()) {
@@ -123,7 +138,12 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
 
         buildFlowRoute(route, flow, true);
 
-        flowTracer.after(route, flow.getOutModel().getModelType());
+        if (flow.getOutModel() == null) {
+            flowTracer.after(route);
+        } else {
+            flowTracer.after(route, flow.getOutModel().getModelType());
+        }
+
         return route;
     }
 
@@ -210,6 +230,8 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
         // TODO in model maybe null
         if (currentBodyIsSerialized == null && currentModel != null) {
             currentBodyIsSerialized = currentModel.getModelType().isSerialized();
+        } else {
+            currentBodyIsSerialized = true;
         }
         ProcessorInfo currentProcessorInfo = null;
         for (ProcessorModel processor : processorList) {

@@ -9,7 +9,8 @@ public enum BodyType {
     XML(true),
     OBJECT(false),
     SOAP(true),
-    EXCEPTION(false);
+    EXCEPTION(false),
+    UNKNOWN(false);
 
     private boolean serialized;
 
