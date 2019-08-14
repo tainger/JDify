@@ -6,6 +6,7 @@ import io.terminus.dalaran.component.processor.sgm.model.SGMSignInfo;
 import okhttp3.*;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
+import org.apache.camel.Traceable;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -18,7 +19,7 @@ import java.security.Timestamp;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-public class SGMHttpProcessor implements Processor {
+public class SGMHttpProcessor implements Processor, Traceable {
 
     private SGMHttpClientConfig config;
 
@@ -93,5 +94,10 @@ public class SGMHttpProcessor implements Processor {
         List<String> params = Arrays.asList(accessToken, timestamp);
         Collections.sort(params);
         return DigestUtils.sha1Hex(String.join("", params));
+    }
+
+    @Override
+    public String getTraceLabel() {
+        return "SGM client";
     }
 }

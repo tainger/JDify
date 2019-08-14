@@ -32,5 +32,7 @@ addons:
     plan: mysql:basic
     options:
       create_dbs: dalaran
+  redis:
+    plan: redis:basic
   monitor:
     plan: monitor:dev

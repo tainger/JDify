@@ -227,10 +227,12 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
         List<ProcessorModel> processorList = flow.getPipeline();
         MessageModel currentModel = flow.getInModel();
         // TODO in model maybe null
-        if (currentBodyIsSerialized == null && currentModel != null) {
-            currentBodyIsSerialized = currentModel.getModelType().isSerialized();
-        } else {
-            currentBodyIsSerialized = true;
+        if (currentBodyIsSerialized == null) {
+            if (currentModel != null) {
+                currentBodyIsSerialized = currentModel.getModelType().isSerialized();
+            } else {
+                currentBodyIsSerialized = true;
+            }
         }
         ProcessorInfo currentProcessorInfo = null;
         for (ProcessorModel processor : processorList) {
