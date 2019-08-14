@@ -1,18 +1,19 @@
 package io.terminus.dalaran.component.processor.sgm;
 
-import io.terminus.dalaran.component.processor.http.HttpClientConnector;
 import io.terminus.dalaran.core.component.FieldInputType;
 import io.terminus.dalaran.core.component.annotation.ConfigFieldInfo;
 import lombok.Data;
 
 @Data
-public class SGMHttpClientConnector extends HttpClientConnector {
+public class SGMHttpClientConnector {
+    @ConfigFieldInfo(label = "服务地址", inputType = FieldInputType.String)
+    private String host;
 
-    @ConfigFieldInfo(label = "token 过期时间", inputType = FieldInputType.Integer, defaultValue = "7000")
+    @ConfigFieldInfo(label = "超时时间(ms)", inputType = FieldInputType.Integer, defaultValue = "3000")
+    private Long timeout = 3000L;
+
+    @ConfigFieldInfo(label = "token过期时间(s)", inputType = FieldInputType.Integer, defaultValue = "7000")
     private Long tokenTimeout;
-
-    @ConfigFieldInfo(label = "token 获取地址", inputType = FieldInputType.String)
-    private String authUrl;
 
     @ConfigFieldInfo(label = "应用id", inputType = FieldInputType.String)
     private String appId;

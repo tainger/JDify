@@ -7,6 +7,7 @@ import io.terminus.dalaran.model.converter.soap.jackson.DalaranXMLStreamReader;
 import io.terminus.dalaran.model.converter.soap.model.SoapSchemaOperation;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
+import org.apache.camel.Traceable;
 
 import javax.xml.stream.XMLInputFactory;
 import java.io.ByteArrayInputStream;
@@ -17,7 +18,7 @@ import java.util.Map;
 /**
  * Created by jingdi on 2019/6/6
  */
-public class SoapToObjectProcessor implements Processor {
+public class SoapToObjectProcessor implements Processor, Traceable {
 
     private final SoapSchemaOperation soapOperationConfig;
 
@@ -40,5 +41,10 @@ public class SoapToObjectProcessor implements Processor {
         Map map = (Map) xmlMapper.readValue(sr, Object.class);
         Map inputBody = (Map) map.get("Body");
         return inputBody.get(modelRoot);
+    }
+
+    @Override
+    public String getTraceLabel() {
+        return "SoapConvert: SoapToObject";
     }
 }
