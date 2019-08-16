@@ -1,5 +1,6 @@
 package io.terminus.dalaran.console.model.query;
 
+import io.terminus.dalaran.core.log.TracingType;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -16,6 +17,8 @@ public class TracingLogQuery {
 
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date endTime;
+
+    private TracingType tracingType;
 
     private Boolean successful;
 
