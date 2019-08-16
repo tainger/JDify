@@ -15,5 +15,7 @@ public class ModelDTO extends BasicModelInfo {
 
     private Long serviceId;
 
+    private boolean hidden;
+
     private String description;
 }
