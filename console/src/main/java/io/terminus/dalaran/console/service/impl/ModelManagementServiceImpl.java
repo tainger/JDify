@@ -95,6 +95,18 @@ public class ModelManagementServiceImpl implements ModelManagementService {
     }
 
     @Override
+    public List<ModelDTO> listNoHidden() {
+        List<ModelEntity> entities = modelRepository.findByHiddenIsFalse();
+        List<ModelDTO> models = new LinkedList<>();
+
+        for (ModelEntity entity : entities) {
+            models.add(buildModel(entity));
+        }
+
+        return models;
+    }
+
+    @Override
     public List<BasicModelInfo> listBasicInfoByModuleId(Long moduleId) {
         return modelQueryService.listBasicInfoByModuleId(moduleId);
     }
@@ -359,6 +371,7 @@ public class ModelManagementServiceImpl implements ModelManagementService {
         modelEntity.setDescription(model.getDescription());
         modelEntity.setModuleId(model.getModuleId());
         modelEntity.setServiceId(model.getServiceId());
+        modelEntity.setHidden(false);
         return modelEntity;
     }
 
@@ -378,6 +391,7 @@ public class ModelManagementServiceImpl implements ModelManagementService {
         model.setModelType(entity.getType());
         model.setServiceId(entity.getServiceId());
         model.setId(entity.getId());
+        model.setHidden(entity.isHidden());
         return model;
     }
 

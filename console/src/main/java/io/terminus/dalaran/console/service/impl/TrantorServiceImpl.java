@@ -81,6 +81,7 @@ public class TrantorServiceImpl implements TrantorService {
         entity.setName(name);
         entity.setType(BodyType.JSON);
         entity.setModelSchema(JSON.toJSONString(schema));
+        entity.setHidden(true);
         modelRepository.save(entity);
         return entity.getId();
     }

@@ -19,6 +19,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Value(value = "${spring.security.ant-matchers}")
     private String matchers;
 
+    private static final String SWAGGER_PATH = "/swagger*";
+
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.inMemoryAuthentication().withUser(account.getUsername()).password(account.getPassword()).roles(account.getRole());
@@ -28,6 +30,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable().authorizeRequests()
             .antMatchers(matchers).permitAll()
+            .antMatchers(SWAGGER_PATH).permitAll()
             .anyRequest().authenticated();
     }
 }

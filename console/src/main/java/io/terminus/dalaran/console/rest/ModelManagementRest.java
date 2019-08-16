@@ -55,9 +55,15 @@ public class ModelManagementRest {
         modelManagementService.deleteModel(id);
     }
 
-    @ApiOperation(value = "全量查询数据模型")
+    @ApiOperation(value = "查询全部未隐藏的数据模型")
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     public List<ModelDTO> list() {
+        return modelManagementService.listNoHidden();
+    }
+
+    @ApiOperation(value = "全量查询数据模型")
+    @RequestMapping(value = "/listAll", method = RequestMethod.GET)
+    public List<ModelDTO> listAll() {
         return modelManagementService.list();
     }
 

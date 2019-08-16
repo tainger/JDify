@@ -32,6 +32,9 @@ public abstract class ModelAbstractEntity extends BasicEntity {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String modelSchema;
 
+    @Column
+    private boolean hidden;
+
     @Column(columnDefinition = "TEXT")
     private String description;
 }
