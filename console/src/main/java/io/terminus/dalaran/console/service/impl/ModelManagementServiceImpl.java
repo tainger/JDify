@@ -96,7 +96,7 @@ public class ModelManagementServiceImpl implements ModelManagementService {
 
     @Override
     public List<ModelDTO> listNoHidden() {
-        List<ModelEntity> entities = modelRepository.findByHiddenIsNotTrue();
+        List<ModelEntity> entities = modelRepository.findByHiddenIsFalse();
         List<ModelDTO> models = new LinkedList<>();
 
         for (ModelEntity entity : entities) {
