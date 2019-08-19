@@ -2,10 +2,7 @@ package io.terminus.dalaran.core.resource;
 
 import com.alibaba.fastjson.JSON;
 import io.terminus.dalaran.DalaranConstants;
-import io.terminus.dalaran.core.component.config.AllModelConfig;
-import io.terminus.dalaran.core.component.config.ConnectorConfig;
-import io.terminus.dalaran.core.component.config.ImmutableModelConfig;
-import io.terminus.dalaran.core.component.config.OutModelConfig;
+import io.terminus.dalaran.core.component.config.*;
 import io.terminus.dalaran.core.config.ProcessorInfo;
 import io.terminus.dalaran.core.config.ServiceInfo;
 import io.terminus.dalaran.core.config.TriggerInfo;
@@ -196,6 +193,14 @@ public class DefaultDalaranResourceBuilder implements DalaranResourceBuilder {
             if (allModelConfig.getOutModelId() != null) {
                 lastOutModel = buildModel(allModelConfig.getOutModelId());
                 allModelConfig.setOutModel(lastOutModel);
+            }
+        }
+        if (config instanceof AllImmutableModelConfig) {
+            AllImmutableModelConfig allImmutableModelConfig = (AllImmutableModelConfig) config;
+            allImmutableModelConfig.setInModel(buildModel(allImmutableModelConfig.getInModelId()));
+            if (allImmutableModelConfig.getOutModelId() != null) {
+                lastOutModel = buildModel(allImmutableModelConfig.getOutModelId());
+                allImmutableModelConfig.setOutModel(lastOutModel);
             }
         }
         return lastOutModel;
