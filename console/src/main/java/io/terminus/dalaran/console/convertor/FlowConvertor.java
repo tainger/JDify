@@ -31,7 +31,7 @@ public class FlowConvertor {
         flowModel.setName(entity.getName());
         flowModel.setDescription(entity.getDescription());
         flowModel.setInModelId(entity.getInModel());
-        flowModel.setOutModelId(entity.getInModel());
+        flowModel.setOutModelId(entity.getOutModel());
         flowModel.setPipeline(pipeline);
         flowModel.setTracing(entity.isTracing());
         flowModel.setTriggerType(entity.getTriggerType());
