@@ -1,7 +1,11 @@
 package io.terminus.dalaran.console.rest;
 
+import com.alibaba.fastjson.JSON;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.models.Swagger;
 import io.terminus.dalaran.console.model.DalaranAccount;
+import io.terminus.dalaran.console.model.ErrorResult;
+import io.terminus.dalaran.console.model.ExportData;
 import io.terminus.dalaran.console.model.ReleaseRequestDTO;
 import io.terminus.dalaran.console.model.dto.ReleaseRecordDTO;
 import io.terminus.dalaran.console.model.dto.flow.TriggerFlowDTO;
@@ -16,13 +20,19 @@ import io.terminus.dalaran.core.config.TriggerInfo;
 import io.terminus.dalaran.core.context.DalaranContext;
 import io.terminus.dalaran.model.function.MappingFunctionInfo;
 import io.terminus.dalaran.model.trantor.DalaranTrantorModule;
+import org.apache.commons.lang3.time.DateFormatUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/platform")
+@RequestMapping(value = "/api/platform", produces = {"application/json; charset=UTF-8"})
 public class PlatformRest {
 
     @Autowired
@@ -102,6 +112,38 @@ public class PlatformRest {
     @GetMapping(value = "/service")
     private Collection<ServiceInfo> listServiceInfo() {
         return dalaranContext.getDalaranServiceContext().getAllServiceInfo();
+    }
+
+    @CrossOrigin
+    @ApiOperation(value = "导出 Swagger 信息")
+    @GetMapping(value = "/export/swagger")
+    private Swagger exportSwagger() {
+        return releaseService.exportSwagger();
+    }
+
+    @ApiOperation(value = "导出所有配置")
+    @GetMapping(value = "/export")
+    private ExportData exportAll(HttpServletResponse res) {
+        String currentDate = DateFormatUtils.format(new Date(), "yyyy-MM-dd HH:mm:ss");
+        res.addHeader("Content-Disposition", "attachment;filename=" + currentDate + ".dlr");
+        return releaseService.exportAll();
+    }
+
+    @ApiOperation(value = "导入所有配置, 会覆盖之前的内容")
+    @PostMapping(value = "/import")
+    private ErrorResult importAll(@RequestParam MultipartFile exportData) {
+        ExportData importData = null;
+        try {
+            importData = JSON.parseObject(exportData.getInputStream(), ExportData.class);
+        } catch (IOException e) {
+            return ErrorResult.error("配置文件读取失败, 请确认文件");
+        }
+        try {
+            releaseService.importAll(importData);
+        } catch (Throwable e) {
+            return ErrorResult.error("未知错误导致导入失败");
+        }
+        return ErrorResult.successful();
     }
 
     @ApiOperation(value = "推送 Trantor 的带集成信息")

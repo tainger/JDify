@@ -1,7 +1,5 @@
 package io.terminus.dalaran.component.processor.sgm.model;
 
-import org.apache.kafka.common.protocol.types.Field;
-
 public final class SGMConstants {
 
     public static final String ACCESS_TOKEN = "access_token";

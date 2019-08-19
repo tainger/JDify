@@ -1,0 +1,20 @@
+package io.terminus.dalaran.console.model;
+
+import io.terminus.dalaran.console.entity.*;
+import lombok.Data;
+
+import java.util.List;
+
+@Data
+public class ExportData {
+    private List<ModuleEntity> modules;
+    private List<ModelEntity> models;
+    private List<TriggerFlowEntity> triggerFlows;
+    private List<SubFlowEntity> subFlows;
+    private List<ServiceEntity> services;
+    private List<FunctionEntity> functions;
+    private List<ConnectorEntity> connectors;
+    private List<ClientEntity> clients;
+    private List<PropertyEntity> properties;
+    private List<TrantorEntity> trantorEntities;
+}
