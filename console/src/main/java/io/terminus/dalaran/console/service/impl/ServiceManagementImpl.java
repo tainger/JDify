@@ -173,6 +173,7 @@ public class ServiceManagementImpl implements ServiceManagement {
         model.setModuleId(moduleId);
         model.setServiceId(serviceId);
         model.setModelType(messageModel.getModelType());
+        model.setHidden(true);
         model.setModelSchema(JSON.parseObject(JSON.toJSONString(messageModel.getModelSchema()), Map.class));
 
         ModelEntity entity = modelManagementService.getByNameAndServiceId(modelName, serviceId);
