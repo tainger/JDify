@@ -60,7 +60,6 @@ public class SwaggerUtils {
         return parameter;
     }
 
-
     private static Property toSwaggerProperty(ApiParameter param) {
         return buildProperty(param);
     }

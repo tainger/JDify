@@ -5,6 +5,7 @@ import io.swagger.models.Swagger;
 import io.terminus.dalaran.component.trigger.rest.RestConfig;
 import io.terminus.dalaran.console.TestFlowInitializer;
 import io.terminus.dalaran.console.entity.ModelEntity;
+import io.terminus.dalaran.console.entity.ModuleEntity;
 import io.terminus.dalaran.console.entity.TriggerFlowEntity;
 import io.terminus.dalaran.console.model.ExportData;
 import io.terminus.dalaran.console.model.api.ApiInfo;
@@ -127,8 +128,10 @@ public class ExportServiceImpl implements ExportService {
     private List<ApiInfo> getExportApiInfoList() {
         List<TriggerFlowEntity> restFlowList = triggerFlowRepository.findByStatusNotAndTriggerType(FlowStatus.Error, "http-rest-listener");
         return restFlowList.stream().map(flowEntity -> {
+            ModuleEntity module = moduleRepository.findOne(flowEntity.getModuleId());
             RestConfig restConfig = JSON.parseObject(flowEntity.getTriggerConfig(), RestConfig.class);
             ApiInfo api = new ApiInfo();
+            api.setModuleName(module.getName());
             api.setName(flowEntity.getName());
             api.setDescription(flowEntity.getDescription());
             api.setPath(restConfig.getPath());
