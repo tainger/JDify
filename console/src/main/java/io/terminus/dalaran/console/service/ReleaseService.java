@@ -1,7 +1,5 @@
 package io.terminus.dalaran.console.service;
 
-import io.swagger.models.Swagger;
-import io.terminus.dalaran.console.model.ExportData;
 import io.terminus.dalaran.console.model.ReleaseRequestDTO;
 import io.terminus.dalaran.console.model.dto.ReleaseRecordDTO;
 import io.terminus.dalaran.console.model.dto.flow.TriggerFlowDTO;
@@ -30,9 +28,4 @@ public interface ReleaseService {
 
     List<ReleaseRecordDTO> listReleaseRecordDTO();
 
-    void importAll(ExportData exportData);
-
-    ExportData exportAll();
-
-    Swagger exportSwagger();
 }
