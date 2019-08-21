@@ -1,4 +1,4 @@
-package io.terminus.dalaran.console.entity;
+package io.terminus.dalaran.core.resource.entity.common;
 
 import io.terminus.dalaran.core.resource.converter.ListToJsonConverter;
 import io.terminus.dalaran.core.resource.entity.basic.BasicEntity;

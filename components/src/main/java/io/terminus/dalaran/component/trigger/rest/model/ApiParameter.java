@@ -1,4 +1,4 @@
-package io.terminus.dalaran.console.model.api;
+package io.terminus.dalaran.component.trigger.rest.model;
 
 import io.terminus.dalaran.model.FieldType;
 import lombok.Data;

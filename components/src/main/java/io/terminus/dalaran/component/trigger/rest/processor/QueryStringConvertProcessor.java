@@ -1,4 +1,4 @@
-package io.terminus.dalaran.component.trigger.rest;
+package io.terminus.dalaran.component.trigger.rest.processor;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.Maps;

@@ -1,4 +1,4 @@
-package io.terminus.dalaran.component.trigger.rest;
+package io.terminus.dalaran.component.trigger.rest.processor;
 
 import com.google.common.base.Splitter;
 import org.apache.camel.Exchange;
@@ -6,11 +6,11 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.Map;
 
-import static io.terminus.dalaran.component.trigger.rest.SignUtils.stopExchangeOnMissingAppKey;
+import static io.terminus.dalaran.component.trigger.rest.utils.SignUtils.stopExchangeOnMissingAppKey;
 
 public class QueryStringSignProcessor extends SignProcessor {
 
-    QueryStringSignProcessor(Map<String, String> clientMapper) {
+    public QueryStringSignProcessor(Map<String, String> clientMapper) {
         super(clientMapper);
     }
 

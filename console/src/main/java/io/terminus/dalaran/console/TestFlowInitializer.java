@@ -9,7 +9,6 @@ import io.terminus.dalaran.core.resource.entity.SubFlowAbstractEntity;
 import io.terminus.dalaran.core.resource.entity.TriggerFlowAbstractEntity;
 import io.terminus.dalaran.core.resource.repository.ReleaseRecordRepository;
 import io.terminus.dalaran.model.flow.BasicFlow;
-import io.terminus.dalaran.model.flow.FlowStatus;
 import io.terminus.dalaran.model.flow.SubFlow;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,37 +65,27 @@ public class TestFlowInitializer {
             dalaranContext.getDalaranFunctionContext().addCustomFunction(function.getId(), function.getType(),
                     function.getScript(), function.getParams());
         }
-        List<TriggerFlowEntity> triggerFlows = resourceLoader.loadAllTriggerFlow();
+        List<TriggerFlowEntity> triggerFlows = resourceLoader.loadAvailableTriggerFlow();
         for (TriggerFlowEntity triggerFlowEntity : triggerFlows) {
-            // warning 的也可以加载
-            if (triggerFlowEntity.getStatus() != FlowStatus.Error) {
-                try {
-                    BasicFlow testFlow = resourceBuilder.buildTriggerFlow(triggerFlowEntity);
-                    dalaranContext.addTestFlow(testFlow);
-                    log.info("load test flow [{}]", testFlow.getId());
-                } catch (Throwable e) {
-                    e.printStackTrace();
-                    log.error("load test flow [{}] error", triggerFlowEntity.getId());
-                }
-            } else {
-                log.info("can't load test flow [{}], because has error.", triggerFlowEntity.getId());
+            try {
+                BasicFlow testFlow = resourceBuilder.buildTriggerFlow(triggerFlowEntity);
+                dalaranContext.addTestFlow(testFlow);
+                log.info("load test flow [{}]", testFlow.getId());
+            } catch (Throwable e) {
+                e.printStackTrace();
+                log.error("load test flow [{}] error", triggerFlowEntity.getId());
             }
         }
-        List<SubFlowEntity> subFlows = resourceLoader.loadAllSubFlow();
+        List<SubFlowEntity> subFlows = resourceLoader.loadAvailableSubFlow();
         for (SubFlowEntity subFlowEntity : subFlows) {
-            // warning 的也可以加载
-            if (subFlowEntity.getStatus() != FlowStatus.Error) {
-                try {
-                    SubFlow testFlow = resourceBuilder.buildSubFlow(subFlowEntity);
-                    dalaranContext.addSubFlow(testFlow);
-                    dalaranContext.addTestSubFLow(testFlow);
-                    log.info("load sub-flow {}", testFlow.getId());
-                } catch (Throwable e) {
-                    e.printStackTrace();
-                    log.error("load sub flow [{}] error", subFlowEntity.getId());
-                }
-            } else {
-                log.info("can't load test sub-flow [{}], because has error.", subFlowEntity.getId());
+            try {
+                SubFlow testFlow = resourceBuilder.buildSubFlow(subFlowEntity);
+                dalaranContext.addSubFlow(testFlow);
+                dalaranContext.addTestSubFLow(testFlow);
+                log.info("load sub-flow {}", testFlow.getId());
+            } catch (Throwable e) {
+                e.printStackTrace();
+                log.error("load sub flow [{}] error", subFlowEntity.getId());
             }
         }
     }

@@ -1,4 +1,4 @@
-package io.terminus.dalaran.component.trigger.rest;
+package io.terminus.dalaran.component.trigger.rest.utils;
 
 import com.google.common.base.Charsets;
 import org.apache.camel.Exchange;

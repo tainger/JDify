@@ -1,5 +1,6 @@
-package io.terminus.dalaran.component.trigger.rest;
+package io.terminus.dalaran.component.trigger.rest.processor;
 
+import io.terminus.dalaran.component.trigger.rest.utils.SignUtils;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.commons.lang3.StringUtils;
@@ -10,12 +11,12 @@ import java.util.stream.Collectors;
 
 import static io.terminus.dalaran.DalaranConstants.AUTH_APP_KEY;
 import static io.terminus.dalaran.DalaranConstants.AUTH_SIGN;
-import static io.terminus.dalaran.component.trigger.rest.SignUtils.*;
+import static io.terminus.dalaran.component.trigger.rest.utils.SignUtils.*;
 
 public class SignProcessor implements Processor {
     private Map<String, String> clientMapper;
 
-    SignProcessor(Map<String, String> clientMapper) {
+    public SignProcessor(Map<String, String> clientMapper) {
         this.clientMapper = clientMapper;
     }
 
