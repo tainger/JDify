@@ -3,20 +3,19 @@ package io.terminus.dalaran.console.service.impl;
 import com.alibaba.fastjson.JSON;
 import io.swagger.models.Swagger;
 import io.terminus.dalaran.component.trigger.rest.RestConfig;
+import io.terminus.dalaran.component.trigger.rest.model.ApiInfo;
+import io.terminus.dalaran.component.trigger.rest.utils.SwaggerUtils;
 import io.terminus.dalaran.console.TestFlowInitializer;
 import io.terminus.dalaran.console.entity.ModelEntity;
-import io.terminus.dalaran.console.entity.ModuleEntity;
 import io.terminus.dalaran.console.entity.TriggerFlowEntity;
 import io.terminus.dalaran.console.model.ExportData;
-import io.terminus.dalaran.console.model.api.ApiInfo;
-import io.terminus.dalaran.console.model.api.ApiParameter;
 import io.terminus.dalaran.console.repository.*;
 import io.terminus.dalaran.console.service.ExportService;
-import io.terminus.dalaran.console.util.SwaggerUtils;
 import io.terminus.dalaran.console.util.WordUtils;
 import io.terminus.dalaran.core.context.DalaranConverterContext;
+import io.terminus.dalaran.core.resource.entity.common.ModuleEntity;
+import io.terminus.dalaran.core.resource.repository.ModuleRepository;
 import io.terminus.dalaran.model.DalaranModelSchema;
-import io.terminus.dalaran.model.ModelField;
 import io.terminus.dalaran.model.flow.FlowStatus;
 import org.hibernate.Session;
 import org.hibernate.metadata.ClassMetadata;
@@ -29,8 +28,6 @@ import java.io.File;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import static io.terminus.dalaran.DalaranConstants.MODEL_ROOT;
 
 @Service
 public class ExportServiceImpl implements ExportService {
@@ -125,71 +122,6 @@ public class ExportServiceImpl implements ExportService {
         return WordUtils.buildWordFile(apiInfoList);
     }
 
-    private List<ApiInfo> getExportApiInfoList() {
-        List<TriggerFlowEntity> restFlowList = triggerFlowRepository.findByStatusNotAndTriggerType(FlowStatus.Error, "http-rest-listener");
-        return restFlowList.stream().map(flowEntity -> {
-            ModuleEntity module = moduleRepository.findOne(flowEntity.getModuleId());
-            RestConfig restConfig = JSON.parseObject(flowEntity.getTriggerConfig(), RestConfig.class);
-            ApiInfo api = new ApiInfo();
-            api.setModuleName(module.getName());
-            api.setName(flowEntity.getName());
-            api.setDescription(flowEntity.getDescription());
-            api.setPath(restConfig.getPath());
-            api.setMethod(restConfig.getMethod());
-            api.setInput(buildApiParam(flowEntity.getInModel(), api));
-            api.setOutput(buildApiParam(flowEntity.getOutModel(), api));
-            return api;
-        }).collect(Collectors.toList());
-    }
-
-    private ApiParameter buildApiParam(Long modelId, ApiInfo api) {
-        ModelField inModelRootField = getRootField(modelId);
-        ApiParameter rootParam = new ApiParameter();
-        rootParam.setType(inModelRootField.getType());
-        rootParam.setDescription(inModelRootField.getDescription());
-        if (!inModelRootField.getType().isBasicType()) {
-            inModelRootField.getFields().forEach((name, subField) -> rootParam.getSubParameter().put(name, buildParameters(subField, 1, api)));
-        }
-        return rootParam;
-
-    }
-
-    private ApiParameter buildParameters(ModelField field, int level, ApiInfo api) {
-        if (level > api.getParamLevel()) {
-            api.setParamLevel(level);
-        }
-        ApiParameter param = new ApiParameter();
-        param.setType(field.getType());
-        param.setDescription(field.getDescription());
-        switch (field.getType()) {
-            case ARRAY: {
-                if (field.getSubType().isBasicType()) {
-                    ApiParameter subParam = new ApiParameter();
-                    subParam.setType(field.getSubType());
-                    subParam.setDescription(field.getDescription());
-                    param.getSubParameter().put("", subParam);
-                    break;
-                }
-            }
-            case OBJECT: {
-                field.getFields().forEach((subFieldName, subField) -> {
-                    ApiParameter subParam = buildParameters(subField, level + 1, api);
-                    param.getSubParameter().put(subFieldName, subParam);
-                });
-                break;
-            }
-        }
-        return param;
-    }
-
-    private ModelField getRootField(Long modelId) {
-        ModelEntity modelEntity = modelRepository.findOne(modelId);
-        Class<? extends DalaranModelSchema> schemaType = converterContext.getSchemaType(modelEntity.getType());
-        DalaranModelSchema modelSchema = JSON.parseObject(modelEntity.getModelSchema(), schemaType);
-        ModelField rootField = modelSchema.getFields().get(MODEL_ROOT);
-        return rootField;
-    }
-
     // TODO 比较暴力, 但是需要重置 ID 自增, 否则 Json 内的依赖可能会有问题
     private void truncateTable() {
         Session session = entityManager.unwrap(Session.class);
@@ -198,4 +130,22 @@ public class ExportServiceImpl implements ExportService {
             entityManager.createNativeQuery("TRUNCATE TABLE " + tableName).executeUpdate();
         });
     }
+
+    private List<ApiInfo> getExportApiInfoList() {
+        List<TriggerFlowEntity> restFlowList = triggerFlowRepository.findByStatusNotAndTriggerType(FlowStatus.Error, "http-rest-listener");
+        return restFlowList.stream().map(flowEntity -> {
+            ModuleEntity module = moduleRepository.findOne(flowEntity.getModuleId());
+            RestConfig restConfig = JSON.parseObject(flowEntity.getTriggerConfig(), RestConfig.class);
+            DalaranModelSchema inSchema = getModelSchema(flowEntity.getInModel());
+            DalaranModelSchema outSchema = getModelSchema(flowEntity.getOutModel());
+            return new ApiInfo(module.getName(), restConfig, flowEntity, inSchema, outSchema);
+        }).collect(Collectors.toList());
+    }
+
+    private DalaranModelSchema getModelSchema(Long modelId) {
+        ModelEntity modelEntity = modelRepository.findOne(modelId);
+        Class<? extends DalaranModelSchema> schemaType = converterContext.getSchemaType(modelEntity.getType());
+        return JSON.parseObject(modelEntity.getModelSchema(), schemaType);
+    }
+
 }

@@ -1,6 +1,7 @@
 package io.terminus.dalaran.console.model;
 
 import io.terminus.dalaran.console.entity.*;
+import io.terminus.dalaran.core.resource.entity.common.ModuleEntity;
 import lombok.Data;
 
 import java.util.List;

@@ -1,4 +1,4 @@
-package io.terminus.dalaran.component.trigger.rest;
+package io.terminus.dalaran.component.trigger.rest.model;
 
 import lombok.Data;
 

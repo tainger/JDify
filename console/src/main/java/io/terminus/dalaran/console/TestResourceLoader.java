@@ -4,6 +4,7 @@ import io.terminus.dalaran.console.entity.*;
 import io.terminus.dalaran.console.repository.*;
 import io.terminus.dalaran.core.context.DalaranContext;
 import io.terminus.dalaran.core.resource.DalaranResourceLoader;
+import io.terminus.dalaran.model.flow.FlowStatus;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -47,6 +48,21 @@ public class TestResourceLoader implements DalaranResourceLoader {
     @Override
     public List<SubFlowEntity> loadAllSubFlow() {
         return subFlowRepository.findAll();
+    }
+
+    @Override
+    public List<TriggerFlowEntity> loadAvailableTriggerFlow() {
+        return triggerFlowRepository.findByStatusNot(FlowStatus.Error);
+    }
+
+    @Override
+    public List<SubFlowEntity> loadAvailableSubFlow() {
+        return subFlowRepository.findByStatusNot(FlowStatus.Error);
+    }
+
+    @Override
+    public List<TriggerFlowEntity> loadAvailableTriggerFlowByTriggerType(String triggerType) {
+        return triggerFlowRepository.findByStatusNotAndTriggerType(FlowStatus.Error, triggerType);
     }
 
     @Override

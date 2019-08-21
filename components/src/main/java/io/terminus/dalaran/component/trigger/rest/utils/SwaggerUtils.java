@@ -1,12 +1,12 @@
-package io.terminus.dalaran.console.util;
+package io.terminus.dalaran.component.trigger.rest.utils;
 
 import io.swagger.models.*;
 import io.swagger.models.parameters.BodyParameter;
 import io.swagger.models.parameters.Parameter;
 import io.swagger.models.parameters.QueryParameter;
 import io.swagger.models.properties.*;
-import io.terminus.dalaran.console.model.api.ApiInfo;
-import io.terminus.dalaran.console.model.api.ApiParameter;
+import io.terminus.dalaran.component.trigger.rest.model.ApiInfo;
+import io.terminus.dalaran.component.trigger.rest.model.ApiParameter;
 
 import java.util.*;
 

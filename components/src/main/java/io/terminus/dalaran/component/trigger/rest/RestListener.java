@@ -1,5 +1,8 @@
 package io.terminus.dalaran.component.trigger.rest;
 
+import io.terminus.dalaran.component.trigger.rest.processor.QueryStringConvertProcessor;
+import io.terminus.dalaran.component.trigger.rest.processor.QueryStringSignProcessor;
+import io.terminus.dalaran.component.trigger.rest.processor.SignProcessor;
 import io.terminus.dalaran.core.component.BodySerializeType;
 import io.terminus.dalaran.core.component.DalaranTrigger;
 import io.terminus.dalaran.core.component.annotation.Trigger;

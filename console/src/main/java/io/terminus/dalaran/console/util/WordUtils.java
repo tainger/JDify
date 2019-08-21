@@ -1,7 +1,7 @@
 package io.terminus.dalaran.console.util;
 
-import io.terminus.dalaran.console.model.api.ApiInfo;
-import io.terminus.dalaran.console.model.api.ApiParameter;
+import io.terminus.dalaran.component.trigger.rest.model.ApiInfo;
+import io.terminus.dalaran.component.trigger.rest.model.ApiParameter;
 import lombok.val;
 import org.apache.poi.xwpf.usermodel.*;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.*;
