@@ -107,6 +107,30 @@ public class ModelManagementServiceImpl implements ModelManagementService {
     }
 
     @Override
+    public List<ModelDTO> listByModuleId(Long moduleId) {
+        List<ModelEntity> entities = modelRepository.findByModuleId(moduleId);
+        List<ModelDTO> models = new LinkedList<>();
+
+        for (ModelEntity entity : entities) {
+            models.add(buildModel(entity));
+        }
+
+        return models;
+    }
+
+    @Override
+    public List<ModelDTO> listNotHiddenByModuleId(Long moduleId) {
+        List<ModelEntity> entities = modelRepository.findByModuleIdAndHiddenIsFalse(moduleId);
+        List<ModelDTO> models = new LinkedList<>();
+
+        for (ModelEntity entity : entities) {
+            models.add(buildModel(entity));
+        }
+
+        return models;
+    }
+
+    @Override
     public List<BasicModelInfo> listBasicInfoByModuleId(Long moduleId) {
         return modelQueryService.listBasicInfoByModuleId(moduleId);
     }

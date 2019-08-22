@@ -16,4 +16,8 @@ public interface ModelRepository extends JpaRepository<ModelEntity, Long>, JpaSp
     ModelEntity findByNameAndModuleIdIsNull(String name);
 
     List<ModelEntity> findByHiddenIsFalse();
+
+    List<ModelEntity> findByModuleId(Long moduleId);
+
+    List<ModelEntity> findByModuleIdAndHiddenIsFalse(Long moduleId);
 }

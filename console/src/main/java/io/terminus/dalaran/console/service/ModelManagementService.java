@@ -28,7 +28,11 @@ public interface ModelManagementService {
 
     List<ModelDTO> list();
 
+    List<ModelDTO> listByModuleId(Long moduleId);
+
     List<ModelDTO> listNoHidden();
+
+    List<ModelDTO> listNotHiddenByModuleId(Long moduleId);
 
     List<BasicModelInfo> listBasicInfoByModuleId(Long moduleId);
 
