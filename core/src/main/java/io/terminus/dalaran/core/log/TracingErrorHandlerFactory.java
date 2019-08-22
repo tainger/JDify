@@ -7,6 +7,7 @@ import org.apache.camel.processor.DefaultErrorHandler;
 import org.apache.camel.processor.RedeliveryPolicy;
 import org.apache.camel.processor.exceptionpolicy.ExceptionPolicyStrategy;
 import org.apache.camel.spi.RouteContext;
+import org.apache.camel.util.AsyncProcessorHelper;
 import org.apache.camel.util.CamelLogger;
 
 import java.util.concurrent.ScheduledExecutorService;
@@ -55,8 +56,13 @@ public class TracingErrorHandlerFactory extends DefaultErrorHandlerBuilder imple
 
         @Override
         public void process(Exchange exchange) throws Exception {
+            AsyncProcessorHelper.process(this, exchange);
+        }
+
+        @Override
+        public boolean process(Exchange exchange, AsyncCallback callback) {
             // TODO 理论上可以在这里做 tracing, 这样就不需要包前后的 processor 了, 回头可以看一下可行性
-            super.process(exchange);
+            super.process(exchange, callback);
             // TODO 当执行发成异常时, 记录未持久化的日志
             if (exchange.getException() != null) {
                 String body = exchange.getException().toString();
@@ -64,6 +70,8 @@ public class TracingErrorHandlerFactory extends DefaultErrorHandlerBuilder imple
                 log(exchange, TEST_FLOW_TRACING_LOG, body);
                 log(exchange, PROCESSOR_TRACING_LOG, body);
             }
+            callback.done(true);
+            return true;
         }
 
         private void log(Exchange exchange, String tracingKey, String body) {
