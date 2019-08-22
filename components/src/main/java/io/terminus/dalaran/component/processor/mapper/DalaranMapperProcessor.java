@@ -7,6 +7,8 @@ import io.terminus.dalaran.core.context.DalaranContext;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.Traceable;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.ListUtils;
 
 import java.util.Map;
 
@@ -27,7 +29,7 @@ public class DalaranMapperProcessor implements Processor, Traceable {
     @Override
     public void process(Exchange exchange) {
         Object source = exchange.getIn().getBody();
-        Object destination = convert(mappingConfig, source);
+        Object destination = (mappingConfig == null || CollectionUtils.isEmpty(mappingConfig.getMessageMappings())) ? source : convert(mappingConfig, source);
         exchange.getOut().setBody(destination);
     }
 

@@ -1,18 +1,25 @@
-package io.terminus.dalaran.component.processor;
+package io.terminus.dalaran.test.processor;
 
 import com.alibaba.fastjson.JSON;
-import io.terminus.dalaran.component.BasicProcessorTest;
 import io.terminus.dalaran.component.processor.mapper.DalaranMapperConfig;
 import io.terminus.dalaran.component.processor.mapper.DalaranMapperProcessor;
 import io.terminus.dalaran.component.processor.mapper.DalaranMessageMapper;
+import io.terminus.dalaran.component.processor.mapper.jsonPath.Converter;
 import io.terminus.dalaran.component.processor.mapper.model.*;
+import io.terminus.dalaran.core.context.DalaranContext;
 import io.terminus.dalaran.model.FieldType;
 import io.terminus.dalaran.model.MessageModel;
 import io.terminus.dalaran.model.ModelField;
 import io.terminus.dalaran.model.schema.JsonSchema;
+import io.terminus.dalaran.test.BasicProcessorTest;
+import io.terminus.dalaran.test.TestApplication;
 import org.apache.camel.ProducerTemplate;
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -23,7 +30,12 @@ import java.util.stream.Stream;
 /**
  * Created by jingdi on 2019/7/18
  */
+@SpringBootTest(classes = TestApplication.class)
+@RunWith(SpringRunner.class)
 public class MapperTest extends BasicProcessorTest {
+
+    @Autowired
+    private DalaranContext dalaranContext;
 
     @Test
     public void complexArrayMapper() {
@@ -82,10 +94,14 @@ public class MapperTest extends BasicProcessorTest {
         dalaranMapperConfig.setMessageMapping(mappingList);
 
         DalaranMessageMapper mapper = new DalaranMessageMapper();
-        ProducerTemplate template = getProcessorTemplate(mapper, dalaranMapperConfig);
-        Object source = JSON.parseObject("[{\"user\":{\"id\":2, \"name\":\"momo\", \"phone\":\"10086\", \"address\":\"mmmmmm\", \"wechat\":\"9999\"}, \"order\":{\"id\":\"11001\", \"time\":\"00:00\", \"detail\":\"asdfghjkl\", \"user\":\"momo\", \"address\":[{\"addr1\":\"mmmm\", \"addr2\":\"llllll\", \"list\":[{\"itemA\":\"11111\", \"itemB\":\"2222222\"}]}, {\"addr1\":\"pppppp\"}]}}]");
-        Object result = template.requestBody(source);
-        Assert.assertNotNull(result);
+        if (mapper.getDalaranContext() == null) {
+            mapper.setDalaranContext(dalaranContext);
+        }
+        DalaranMappingConfig mappingConfig = mapper.transfer(mappingList, in, out);
+
+        Object source = JSON.parseObject("[{\"user\":{\"id\":2, \"name\":\"momo\", \"phone\":\"10086\", \"address\":\"mmmmmm\", \"wechat\":\"9999\"}, \"order\":{\"id\":\"11001\", \"time\":\"00:00\", \"detail\":\"asdfghjkl\", \"user\":\"momo\", \"address\":[{\"addr1\":\"mmmm\", \"addr2\":\"llllll\", \"list\":[{\"itemA\":\"11111\", \"itemB\":\"2222222\"}]}, {\"addr1\":\"pppppp\"}]}}]", Object.class);
+        Object dest = Converter.convert(mappingConfig, source, dalaranContext);
+        Assert.assertNotNull(dest);
     }
 
     @Test
