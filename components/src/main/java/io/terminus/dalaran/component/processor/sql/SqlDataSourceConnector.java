@@ -7,6 +7,9 @@ import lombok.Data;
 @Data
 public class SqlDataSourceConnector {
 
+    @ConfigFieldInfo(label = "节点名称", inputType = FieldInputType.String)
+    private String name;
+
     @ConfigFieldInfo(label = "数据库类型", inputType = FieldInputType.Select, defaultValue = "MYSQL")
     private Database databaseType;
 

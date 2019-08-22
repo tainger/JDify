@@ -2,6 +2,7 @@ package io.terminus.dalaran.console.rest;
 
 import io.swagger.annotations.ApiOperation;
 import io.terminus.dalaran.component.processor.mapper.model.SimpleMapping;
+import io.terminus.dalaran.console.model.ClassificationModel;
 import io.terminus.dalaran.console.model.dto.DataTemplate;
 import io.terminus.dalaran.console.model.dto.ModelDTO;
 import io.terminus.dalaran.console.model.query.ModelQuery;
@@ -77,6 +78,12 @@ public class ModelManagementRest {
     @RequestMapping(value = "/list/{moduleId}/public", method = RequestMethod.GET)
     public List<ModelDTO> listNoHiddenByModuleId(@PathVariable Long moduleId) {
         return modelManagementService.listNotHiddenByModuleId(moduleId);
+    }
+
+    @ApiOperation(value = "全量查询某模块内的分类数据模型")
+    @RequestMapping(value = "/list/classification/{moduleId}/", method = RequestMethod.GET)
+    public List<ClassificationModel> listClassificationByModuleId(@PathVariable Long moduleId) {
+        return modelManagementService.listClassificationModels(moduleId);
     }
 
     @ApiOperation(value = "根据模型匹配自动生成建议的映射")

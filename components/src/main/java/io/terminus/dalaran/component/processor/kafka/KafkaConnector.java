@@ -10,6 +10,9 @@ import lombok.Data;
 @Data
 public class KafkaConnector {
 
+    @ConfigFieldInfo(label = "节点名称", inputType = FieldInputType.String)
+    private String name;
+
     @ConfigFieldInfo(label = "集群地址", inputType = FieldInputType.String)
     private String brokers;
 }

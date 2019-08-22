@@ -7,12 +7,16 @@ import io.terminus.dalaran.component.processor.mapper.model.MapperConstants;
 import io.terminus.dalaran.component.processor.mapper.model.MappingType;
 import io.terminus.dalaran.component.processor.mapper.model.SimpleMapping;
 import io.terminus.dalaran.console.entity.ModelEntity;
+import io.terminus.dalaran.console.entity.ServiceEntity;
+import io.terminus.dalaran.console.model.ClassificationModel;
 import io.terminus.dalaran.console.model.DalaranConsoleConstants;
+import io.terminus.dalaran.console.model.ServiceType;
 import io.terminus.dalaran.console.model.dto.DataTemplate;
 import io.terminus.dalaran.console.model.dto.ModelDTO;
 import io.terminus.dalaran.console.model.dto.basic.BasicModelInfo;
 import io.terminus.dalaran.console.model.query.ModelQuery;
 import io.terminus.dalaran.console.repository.ModelRepository;
+import io.terminus.dalaran.console.repository.ServiceRepository;
 import io.terminus.dalaran.console.service.ModelManagementService;
 import io.terminus.dalaran.console.service.jpa.ModelQueryService;
 import io.terminus.dalaran.console.util.ExcelUtils;
@@ -24,6 +28,7 @@ import io.terminus.dalaran.model.FieldType;
 import io.terminus.dalaran.model.ModelField;
 import io.terminus.dalaran.model.schema.JsonSchema;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.similarity.JaroWinklerDistance;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,7 +55,12 @@ public class ModelManagementServiceImpl implements ModelManagementService {
     private ModuleRepository moduleRepository;
 
     @Autowired
+    private ServiceRepository serviceRepository;
+
+    @Autowired
     private DalaranContext dalaranContext;
+
+    private static final String COMMON_MODEL = "common";
 
     private JaroWinklerDistance jd = new JaroWinklerDistance();
 
@@ -133,6 +143,16 @@ public class ModelManagementServiceImpl implements ModelManagementService {
     @Override
     public List<BasicModelInfo> listBasicInfoByModuleId(Long moduleId) {
         return modelQueryService.listBasicInfoByModuleId(moduleId);
+    }
+
+    @Override
+    public List<ClassificationModel> listClassificationModels(Long moduleId) {
+        List<ModelEntity> entities = modelRepository.findByModuleId(moduleId);
+        List<ModelDTO> models = new LinkedList<>();
+        for (ModelEntity entity : entities) {
+            models.add(buildModel(entity));
+        }
+        return buildClassificationModel(models);
     }
 
     @Override
@@ -417,6 +437,38 @@ public class ModelManagementServiceImpl implements ModelManagementService {
         model.setId(entity.getId());
         model.setHidden(entity.isHidden());
         return model;
+    }
+
+    private List<ClassificationModel> buildClassificationModel(List<ModelDTO> models) {
+        List<ClassificationModel> classificationModels = new ArrayList<>();
+        Map<String, ClassificationModel> typeModels = new HashMap<>();
+        models.forEach(model -> {
+            Long serviceId = model.getServiceId();
+            if (serviceId != null) {
+                ServiceEntity serviceEntity = serviceRepository.findOne(model.getServiceId());
+                String serviceName = serviceEntity.getName();
+                ClassificationModel classificationModel = typeModels.containsKey(serviceName)? new ClassificationModel(): typeModels.get(serviceName);
+                List<ModelDTO> modelList = CollectionUtils.isEmpty(classificationModel.getModels())? new ArrayList<>(): classificationModel.getModels();
+                modelList.add(model);
+                classificationModel.setModels(modelList);
+                classificationModel.setName(serviceName);
+                ServiceType serviceType = serviceEntity.getType().equals(DalaranConsoleConstants.SOAP_CONNECTOR) ? ServiceType.SOAP: ServiceType.SWAGGER;
+                classificationModel.setServiceType(serviceType);
+                typeModels.put(serviceName, classificationModel);
+            } else {
+                ClassificationModel classificationModel = typeModels.containsKey(COMMON_MODEL)? new ClassificationModel(): typeModels.get(COMMON_MODEL);
+                List<ModelDTO> modelList = CollectionUtils.isEmpty(classificationModel.getModels())? new ArrayList<>(): classificationModel.getModels();
+                modelList.add(model);
+                classificationModel.setModels(modelList);
+                classificationModel.setName(COMMON_MODEL);
+                classificationModel.setServiceType(ServiceType.COMMON);
+                typeModels.put(COMMON_MODEL, classificationModel);
+            }
+        });
+        typeModels.forEach((type, model) -> {
+            classificationModels.add(model);
+        });
+        return classificationModels;
     }
 
     private boolean isComplexType(String type) {

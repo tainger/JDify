@@ -12,6 +12,9 @@ import lombok.Data;
 @Data
 public class DubboProviderConfig extends AllModelConfig implements ConnectorConfig<DubboRegistryConnector> {
 
+    @ConfigFieldInfo(label = "节点名称", inputType = FieldInputType.String)
+    private String name;
+
     @ConfigFieldInfo(label = "注册中心", inputType = FieldInputType.Connector, connectorType = DubboRegistryConnector.class)
     private Long connectorId;
 

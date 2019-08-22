@@ -1,6 +1,8 @@
 package io.terminus.dalaran.component.processor.mapper;
 
 import io.terminus.dalaran.component.processor.mapper.model.SimpleMapping;
+import io.terminus.dalaran.core.component.FieldInputType;
+import io.terminus.dalaran.core.component.annotation.ConfigFieldInfo;
 import io.terminus.dalaran.core.component.config.ImmutableInModelConfig;
 import lombok.Data;
 
@@ -12,6 +14,9 @@ import java.util.List;
  */
 @Data
 public class DalaranMapperConfig extends ImmutableInModelConfig {
+
+    @ConfigFieldInfo(label = "节点名称", inputType = FieldInputType.String)
+    private String name;
 
     private List<SimpleMapping> noDestinationMappings;
 

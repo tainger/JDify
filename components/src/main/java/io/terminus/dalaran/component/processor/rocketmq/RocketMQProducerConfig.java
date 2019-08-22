@@ -14,6 +14,9 @@ import lombok.Data;
 @Data
 public class RocketMQProducerConfig extends OutModelConfig implements ConnectorConfig<RocketMQConnector> {
 
+    @ConfigFieldInfo(label = "节点名称", inputType = FieldInputType.String)
+    private String name;
+
     @ConfigFieldInfo(inputType = FieldInputType.Hidden)
     @JSONField(serialize = false)
     @JsonIgnore

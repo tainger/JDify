@@ -7,6 +7,10 @@ import lombok.Data;
 
 @Data
 public class HttpClientConnector {
+
+    @ConfigFieldInfo(label = "节点名称", inputType = FieldInputType.String)
+    private String name;
+
     @ConfigFieldInfo(label = "服务地址", inputType = FieldInputType.String)
     private String host;
 

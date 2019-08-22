@@ -8,6 +8,9 @@ import lombok.Data;
 @Data
 public class TrantorTriggerConfig extends AllImmutableModelConfig {
 
+    @ConfigFieldInfo(label = "节点名称", inputType = FieldInputType.String)
+    private String name;
+
     @ConfigFieldInfo(label = "所属模块", inputType = FieldInputType.Select)
     private String module;
 
