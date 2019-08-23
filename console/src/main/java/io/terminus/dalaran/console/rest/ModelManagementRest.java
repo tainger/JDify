@@ -107,8 +107,10 @@ public class ModelManagementRest {
 
     @ApiOperation(value = "根据模型结构生成数据样例")
     @RequestMapping(value = "/{id}/build/data-template", method = RequestMethod.POST)
-    public String buildRequestTemplate(@RequestBody JsonSchema schema, @PathVariable long id) {
-        return modelManagementService.buildDataTemplate(schema, id);
+    public DataTemplate buildRequestTemplate(@RequestBody JsonSchema schema, @PathVariable long id) {
+        DataTemplate template = new DataTemplate();
+        template.setDataTemplate(modelManagementService.buildDataTemplate(schema, id));
+        return template;
     }
 
     // TODO 待开发
