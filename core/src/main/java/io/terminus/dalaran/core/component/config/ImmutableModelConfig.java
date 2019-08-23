@@ -8,7 +8,7 @@ import io.terminus.dalaran.model.MessageModel;
 import lombok.Data;
 
 @Data
-public class ImmutableModelConfig extends ComponentBasicConfig {
+public class ImmutableModelConfig {
 
     @ConfigFieldInfo(inputType = FieldInputType.Hidden, readonly = true)
     @JSONField(serialize = false)

@@ -2,7 +2,6 @@ package io.terminus.dalaran.component.processor.soap;
 
 import io.terminus.dalaran.core.component.FieldInputType;
 import io.terminus.dalaran.core.component.annotation.ConfigFieldInfo;
-import io.terminus.dalaran.core.component.config.ComponentBasicConfig;
 import io.terminus.dalaran.model.HttpProtocol;
 import lombok.Data;
 
@@ -10,7 +9,7 @@ import lombok.Data;
  * Created by jingdi on 2019/6/10
  */
 @Data
-public class SoapClientConnector extends ComponentBasicConfig {
+public class SoapClientConnector {
 
     @ConfigFieldInfo(label = "服务地址", inputType = FieldInputType.String)
     private String host;
