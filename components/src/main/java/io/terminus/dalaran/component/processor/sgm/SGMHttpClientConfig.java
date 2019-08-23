@@ -10,6 +10,7 @@ import lombok.Data;
 
 @Data
 public class SGMHttpClientConfig extends OutModelConfig implements ConnectorConfig<SGMHttpClientConnector> {
+
     @ConfigFieldInfo(inputType = FieldInputType.Hidden)
     @JSONField(serialize = false)
     @JsonIgnore

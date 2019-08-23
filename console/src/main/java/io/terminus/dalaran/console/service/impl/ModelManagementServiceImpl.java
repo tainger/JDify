@@ -7,12 +7,16 @@ import io.terminus.dalaran.component.processor.mapper.model.MapperConstants;
 import io.terminus.dalaran.component.processor.mapper.model.MappingType;
 import io.terminus.dalaran.component.processor.mapper.model.SimpleMapping;
 import io.terminus.dalaran.console.entity.ModelEntity;
+import io.terminus.dalaran.console.entity.ServiceEntity;
+import io.terminus.dalaran.console.model.ClassificationModel;
 import io.terminus.dalaran.console.model.DalaranConsoleConstants;
+import io.terminus.dalaran.console.model.ServiceType;
 import io.terminus.dalaran.console.model.dto.DataTemplate;
 import io.terminus.dalaran.console.model.dto.ModelDTO;
 import io.terminus.dalaran.console.model.dto.basic.BasicModelInfo;
 import io.terminus.dalaran.console.model.query.ModelQuery;
 import io.terminus.dalaran.console.repository.ModelRepository;
+import io.terminus.dalaran.console.repository.ServiceRepository;
 import io.terminus.dalaran.console.service.ModelManagementService;
 import io.terminus.dalaran.console.service.jpa.ModelQueryService;
 import io.terminus.dalaran.console.util.ExcelUtils;
@@ -24,6 +28,7 @@ import io.terminus.dalaran.model.FieldType;
 import io.terminus.dalaran.model.ModelField;
 import io.terminus.dalaran.model.schema.JsonSchema;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.similarity.JaroWinklerDistance;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +37,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by jingdi on 2019/3/29
@@ -50,7 +56,12 @@ public class ModelManagementServiceImpl implements ModelManagementService {
     private ModuleRepository moduleRepository;
 
     @Autowired
+    private ServiceRepository serviceRepository;
+
+    @Autowired
     private DalaranContext dalaranContext;
+
+    private static final String COMMON_MODEL = "common";
 
     private JaroWinklerDistance jd = new JaroWinklerDistance();
 
@@ -73,42 +84,43 @@ public class ModelManagementServiceImpl implements ModelManagementService {
     @Override
     public List<ModelDTO> queryModels(ModelQuery query) {
         List<ModelEntity> entities = modelQueryService.query(query);
-        List<ModelDTO> models = new LinkedList<>();
-
-        for (ModelEntity entity : entities) {
-            models.add(buildModel(entity));
-        }
-
-        return models;
+        return entities.stream().map(this::buildModel).collect(Collectors.toList());
     }
 
     @Override
     public List<ModelDTO> list() {
         List<ModelEntity> entities = modelRepository.findAll();
-        List<ModelDTO> models = new LinkedList<>();
-
-        for (ModelEntity entity : entities) {
-            models.add(buildModel(entity));
-        }
-
-        return models;
+        return entities.stream().map(this::buildModel).collect(Collectors.toList());
     }
 
     @Override
     public List<ModelDTO> listNoHidden() {
         List<ModelEntity> entities = modelRepository.findByHiddenIsFalse();
-        List<ModelDTO> models = new LinkedList<>();
+        return entities.stream().map(this::buildModel).collect(Collectors.toList());
+    }
 
-        for (ModelEntity entity : entities) {
-            models.add(buildModel(entity));
-        }
+    @Override
+    public List<ModelDTO> listByModuleId(Long moduleId) {
+        List<ModelEntity> entities = modelRepository.findByModuleId(moduleId);
+        return entities.stream().map(this::buildModel).collect(Collectors.toList());
+    }
 
-        return models;
+    @Override
+    public List<ModelDTO> listNotHiddenByModuleId(Long moduleId) {
+        List<ModelEntity> entities = modelRepository.findByModuleIdAndHiddenIsFalse(moduleId);
+        return entities.stream().map(this::buildModel).collect(Collectors.toList());
     }
 
     @Override
     public List<BasicModelInfo> listBasicInfoByModuleId(Long moduleId) {
         return modelQueryService.listBasicInfoByModuleId(moduleId);
+    }
+
+    @Override
+    public Map<String, ClassificationModel> listClassificationModels(Long moduleId) {
+        List<ModelEntity> entities = modelRepository.findByModuleId(moduleId);
+        List<ModelDTO> models = entities.stream().map(this::buildModel).collect(Collectors.toList());
+        return buildClassificationModel(models);
     }
 
     @Override
@@ -393,6 +405,34 @@ public class ModelManagementServiceImpl implements ModelManagementService {
         model.setId(entity.getId());
         model.setHidden(entity.isHidden());
         return model;
+    }
+
+    private Map<String, ClassificationModel> buildClassificationModel(List<ModelDTO> models) {
+        Map<String, ClassificationModel> classificationModels = new HashMap<>();
+        models.forEach(model -> {
+            Long serviceId = model.getServiceId();
+            if (serviceId != null) {
+                ServiceEntity serviceEntity = serviceRepository.findOne(model.getServiceId());
+                String serviceName = serviceEntity.getName();
+                ClassificationModel classificationModel = classificationModels.containsKey(serviceName)? new ClassificationModel(): classificationModels.get(serviceName);
+                List<ModelDTO> modelList = CollectionUtils.isEmpty(classificationModel.getModels())? new ArrayList<>(): classificationModel.getModels();
+                modelList.add(model);
+                classificationModel.setModels(modelList);
+                classificationModel.setName(serviceName);
+                ServiceType serviceType = serviceEntity.getType().equals(DalaranConsoleConstants.SOAP_CONNECTOR) ? ServiceType.SOAP: ServiceType.SWAGGER;
+                classificationModel.setServiceType(serviceType);
+                classificationModels.put(serviceName, classificationModel);
+            } else {
+                ClassificationModel classificationModel = classificationModels.containsKey(COMMON_MODEL)? new ClassificationModel(): classificationModels.get(COMMON_MODEL);
+                List<ModelDTO> modelList = CollectionUtils.isEmpty(classificationModel.getModels())? new ArrayList<>(): classificationModel.getModels();
+                modelList.add(model);
+                classificationModel.setModels(modelList);
+                classificationModel.setName(COMMON_MODEL);
+                classificationModel.setServiceType(ServiceType.COMMON);
+                classificationModels.put(COMMON_MODEL, classificationModel);
+            }
+        });
+        return classificationModels;
     }
 
     private boolean isComplexType(String type) {

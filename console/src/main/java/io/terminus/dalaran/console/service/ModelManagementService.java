@@ -2,6 +2,7 @@ package io.terminus.dalaran.console.service;
 
 import io.terminus.dalaran.component.processor.mapper.model.SimpleMapping;
 import io.terminus.dalaran.console.entity.ModelEntity;
+import io.terminus.dalaran.console.model.ClassificationModel;
 import io.terminus.dalaran.console.model.dto.DataTemplate;
 import io.terminus.dalaran.console.model.dto.ModelDTO;
 import io.terminus.dalaran.console.model.dto.basic.BasicModelInfo;
@@ -28,9 +29,15 @@ public interface ModelManagementService {
 
     List<ModelDTO> list();
 
+    List<ModelDTO> listByModuleId(Long moduleId);
+
     List<ModelDTO> listNoHidden();
 
+    List<ModelDTO> listNotHiddenByModuleId(Long moduleId);
+
     List<BasicModelInfo> listBasicInfoByModuleId(Long moduleId);
+
+    Map<String, ClassificationModel> listClassificationModels(Long moduleId);
 
     ModelEntity getById(Long modelId);
 

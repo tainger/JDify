@@ -6,6 +6,7 @@ import lombok.Data;
 
 @Data
 public class SGMHttpClientConnector {
+
     @ConfigFieldInfo(label = "服务地址", inputType = FieldInputType.String)
     private String host;
 

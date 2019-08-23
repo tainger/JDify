@@ -74,7 +74,7 @@ public class ModelQueryServiceImpl implements ModelQueryService {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<BasicModelInfo> criteriaQuery = builder.createQuery(BasicModelInfo.class);
         Root<ModelEntity> root = criteriaQuery.from(ModelEntity.class);
-        criteriaQuery.multiselect(root.get("id"), root.get("moduleId"), root.get("name"), root.get("type")).where(builder.equal(root.get("moduleId"), moduleId));
+        criteriaQuery.multiselect(root.get("id"), root.get("moduleId"), root.get("name"), root.get("type")).where(builder.equal(root.get("moduleId"), moduleId), builder.equal(root.get("hidden"), false));
         return entityManager.createQuery(criteriaQuery).getResultList();
     }
 }

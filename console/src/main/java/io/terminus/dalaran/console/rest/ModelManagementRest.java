@@ -2,6 +2,7 @@ package io.terminus.dalaran.console.rest;
 
 import io.swagger.annotations.ApiOperation;
 import io.terminus.dalaran.component.processor.mapper.model.SimpleMapping;
+import io.terminus.dalaran.console.model.ClassificationModel;
 import io.terminus.dalaran.console.model.dto.DataTemplate;
 import io.terminus.dalaran.console.model.dto.ModelDTO;
 import io.terminus.dalaran.console.model.query.ModelQuery;
@@ -55,16 +56,34 @@ public class ModelManagementRest {
         modelManagementService.deleteModel(id);
     }
 
-    @ApiOperation(value = "查询全部未隐藏的数据模型")
+    @ApiOperation(value = "查询全部的数据模型")
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     public List<ModelDTO> list() {
+        return modelManagementService.list();
+    }
+
+    @ApiOperation(value = "全量查询某模块内的数据模型")
+    @RequestMapping(value = "/list/{moduleId}", method = RequestMethod.GET)
+    public List<ModelDTO> listByModuleId(@PathVariable Long moduleId) {
+        return modelManagementService.listByModuleId(moduleId);
+    }
+
+    @ApiOperation(value = "查询全部未隐藏的数据模型")
+    @RequestMapping(value = "/list/public", method = RequestMethod.GET)
+    public List<ModelDTO> listNoHidden() {
         return modelManagementService.listNoHidden();
     }
 
-    @ApiOperation(value = "全量查询数据模型")
-    @RequestMapping(value = "/listAll", method = RequestMethod.GET)
-    public List<ModelDTO> listAll() {
-        return modelManagementService.list();
+    @ApiOperation(value = "查询某模块内未隐藏的数据模型")
+    @RequestMapping(value = "/list/{moduleId}/public", method = RequestMethod.GET)
+    public List<ModelDTO> listNoHiddenByModuleId(@PathVariable Long moduleId) {
+        return modelManagementService.listNotHiddenByModuleId(moduleId);
+    }
+
+    @ApiOperation(value = "全量查询某模块内的分类数据模型")
+    @RequestMapping(value = "/list/classification/{moduleId}/", method = RequestMethod.GET)
+    public Map<String, ClassificationModel> listClassificationByModuleId(@PathVariable Long moduleId) {
+        return modelManagementService.listClassificationModels(moduleId);
     }
 
     @ApiOperation(value = "根据模型匹配自动生成建议的映射")
