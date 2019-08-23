@@ -2,13 +2,11 @@ package io.terminus.dalaran.component.processor.sgm;
 
 import io.terminus.dalaran.core.component.FieldInputType;
 import io.terminus.dalaran.core.component.annotation.ConfigFieldInfo;
+import io.terminus.dalaran.core.component.config.ComponentBasicConfig;
 import lombok.Data;
 
 @Data
-public class SGMHttpClientConnector {
-
-    @ConfigFieldInfo(label = "节点名称", inputType = FieldInputType.String)
-    private String name;
+public class SGMHttpClientConnector extends ComponentBasicConfig {
 
     @ConfigFieldInfo(label = "服务地址", inputType = FieldInputType.String)
     private String host;

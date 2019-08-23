@@ -37,7 +37,7 @@ public interface ModelManagementService {
 
     List<BasicModelInfo> listBasicInfoByModuleId(Long moduleId);
 
-    List<ClassificationModel> listClassificationModels(Long moduleId);
+    Map<String, ClassificationModel> listClassificationModels(Long moduleId);
 
     ModelEntity getById(Long modelId);
 

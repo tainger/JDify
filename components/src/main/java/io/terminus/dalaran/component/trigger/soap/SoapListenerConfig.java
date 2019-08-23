@@ -13,9 +13,6 @@ import lombok.Data;
 @Data
 public class SoapListenerConfig extends AllModelConfig {
 
-    @ConfigFieldInfo(label = "节点名称", inputType = FieldInputType.String)
-    private String name;
-
     @ConfigFieldInfo(label = "端口", inputType = FieldInputType.Hidden)
     private Integer port = 8080;
 

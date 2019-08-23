@@ -37,6 +37,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by jingdi on 2019/3/29
@@ -83,61 +84,31 @@ public class ModelManagementServiceImpl implements ModelManagementService {
     @Override
     public List<ModelDTO> queryModels(ModelQuery query) {
         List<ModelEntity> entities = modelQueryService.query(query);
-        List<ModelDTO> models = new LinkedList<>();
-
-        for (ModelEntity entity : entities) {
-            models.add(buildModel(entity));
-        }
-
-        return models;
+        return entities.stream().map(this::buildModel).collect(Collectors.toList());
     }
 
     @Override
     public List<ModelDTO> list() {
         List<ModelEntity> entities = modelRepository.findAll();
-        List<ModelDTO> models = new LinkedList<>();
-
-        for (ModelEntity entity : entities) {
-            models.add(buildModel(entity));
-        }
-
-        return models;
+        return entities.stream().map(this::buildModel).collect(Collectors.toList());
     }
 
     @Override
     public List<ModelDTO> listNoHidden() {
         List<ModelEntity> entities = modelRepository.findByHiddenIsFalse();
-        List<ModelDTO> models = new LinkedList<>();
-
-        for (ModelEntity entity : entities) {
-            models.add(buildModel(entity));
-        }
-
-        return models;
+        return entities.stream().map(this::buildModel).collect(Collectors.toList());
     }
 
     @Override
     public List<ModelDTO> listByModuleId(Long moduleId) {
         List<ModelEntity> entities = modelRepository.findByModuleId(moduleId);
-        List<ModelDTO> models = new LinkedList<>();
-
-        for (ModelEntity entity : entities) {
-            models.add(buildModel(entity));
-        }
-
-        return models;
+        return entities.stream().map(this::buildModel).collect(Collectors.toList());
     }
 
     @Override
     public List<ModelDTO> listNotHiddenByModuleId(Long moduleId) {
         List<ModelEntity> entities = modelRepository.findByModuleIdAndHiddenIsFalse(moduleId);
-        List<ModelDTO> models = new LinkedList<>();
-
-        for (ModelEntity entity : entities) {
-            models.add(buildModel(entity));
-        }
-
-        return models;
+        return entities.stream().map(this::buildModel).collect(Collectors.toList());
     }
 
     @Override
@@ -146,12 +117,9 @@ public class ModelManagementServiceImpl implements ModelManagementService {
     }
 
     @Override
-    public List<ClassificationModel> listClassificationModels(Long moduleId) {
+    public Map<String, ClassificationModel> listClassificationModels(Long moduleId) {
         List<ModelEntity> entities = modelRepository.findByModuleId(moduleId);
-        List<ModelDTO> models = new LinkedList<>();
-        for (ModelEntity entity : entities) {
-            models.add(buildModel(entity));
-        }
+        List<ModelDTO> models = entities.stream().map(this::buildModel).collect(Collectors.toList());
         return buildClassificationModel(models);
     }
 
@@ -439,34 +407,30 @@ public class ModelManagementServiceImpl implements ModelManagementService {
         return model;
     }
 
-    private List<ClassificationModel> buildClassificationModel(List<ModelDTO> models) {
-        List<ClassificationModel> classificationModels = new ArrayList<>();
-        Map<String, ClassificationModel> typeModels = new HashMap<>();
+    private Map<String, ClassificationModel> buildClassificationModel(List<ModelDTO> models) {
+        Map<String, ClassificationModel> classificationModels = new HashMap<>();
         models.forEach(model -> {
             Long serviceId = model.getServiceId();
             if (serviceId != null) {
                 ServiceEntity serviceEntity = serviceRepository.findOne(model.getServiceId());
                 String serviceName = serviceEntity.getName();
-                ClassificationModel classificationModel = typeModels.containsKey(serviceName)? new ClassificationModel(): typeModels.get(serviceName);
+                ClassificationModel classificationModel = classificationModels.containsKey(serviceName)? new ClassificationModel(): classificationModels.get(serviceName);
                 List<ModelDTO> modelList = CollectionUtils.isEmpty(classificationModel.getModels())? new ArrayList<>(): classificationModel.getModels();
                 modelList.add(model);
                 classificationModel.setModels(modelList);
                 classificationModel.setName(serviceName);
                 ServiceType serviceType = serviceEntity.getType().equals(DalaranConsoleConstants.SOAP_CONNECTOR) ? ServiceType.SOAP: ServiceType.SWAGGER;
                 classificationModel.setServiceType(serviceType);
-                typeModels.put(serviceName, classificationModel);
+                classificationModels.put(serviceName, classificationModel);
             } else {
-                ClassificationModel classificationModel = typeModels.containsKey(COMMON_MODEL)? new ClassificationModel(): typeModels.get(COMMON_MODEL);
+                ClassificationModel classificationModel = classificationModels.containsKey(COMMON_MODEL)? new ClassificationModel(): classificationModels.get(COMMON_MODEL);
                 List<ModelDTO> modelList = CollectionUtils.isEmpty(classificationModel.getModels())? new ArrayList<>(): classificationModel.getModels();
                 modelList.add(model);
                 classificationModel.setModels(modelList);
                 classificationModel.setName(COMMON_MODEL);
                 classificationModel.setServiceType(ServiceType.COMMON);
-                typeModels.put(COMMON_MODEL, classificationModel);
+                classificationModels.put(COMMON_MODEL, classificationModel);
             }
-        });
-        typeModels.forEach((type, model) -> {
-            classificationModels.add(model);
         });
         return classificationModels;
     }

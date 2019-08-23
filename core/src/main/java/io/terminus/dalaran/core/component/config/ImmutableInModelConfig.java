@@ -8,7 +8,7 @@ import io.terminus.dalaran.model.MessageModel;
 import lombok.Data;
 
 @Data
-public class ImmutableInModelConfig {
+public class ImmutableInModelConfig extends ComponentBasicConfig {
 
     @ConfigFieldInfo(label = "输入结构", inputType = FieldInputType.Model, readonly = true)
     private Long inModelId;

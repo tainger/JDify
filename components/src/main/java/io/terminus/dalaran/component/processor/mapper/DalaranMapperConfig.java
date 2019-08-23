@@ -15,9 +15,6 @@ import java.util.List;
 @Data
 public class DalaranMapperConfig extends ImmutableInModelConfig {
 
-    @ConfigFieldInfo(label = "节点名称", inputType = FieldInputType.String)
-    private String name;
-
     private List<SimpleMapping> noDestinationMappings;
 
     private HashMap<String, SimpleMapping> messageMapping;
