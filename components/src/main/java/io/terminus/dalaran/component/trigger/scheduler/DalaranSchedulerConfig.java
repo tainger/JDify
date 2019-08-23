@@ -7,6 +7,9 @@ import lombok.Data;
 @Data
 public class DalaranSchedulerConfig {
 
+    @ConfigFieldInfo(label = "调度任务名", inputType = FieldInputType.String)
+    private String name;
+
     @ConfigFieldInfo(label = "Cron 表达式", inputType = FieldInputType.String)
     private String cron;
 }

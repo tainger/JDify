@@ -82,7 +82,7 @@ public class ModelManagementRest {
 
     @ApiOperation(value = "全量查询某模块内的分类数据模型")
     @RequestMapping(value = "/list/classification/{moduleId}/", method = RequestMethod.GET)
-    public List<ClassificationModel> listClassificationByModuleId(@PathVariable Long moduleId) {
+    public Map<String, ClassificationModel> listClassificationByModuleId(@PathVariable Long moduleId) {
         return modelManagementService.listClassificationModels(moduleId);
     }
 
