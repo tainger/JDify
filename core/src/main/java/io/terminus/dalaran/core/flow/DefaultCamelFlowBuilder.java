@@ -11,6 +11,7 @@ import io.terminus.dalaran.core.context.DalaranConverterContext;
 import io.terminus.dalaran.core.log.DalaranTraceLogger;
 import io.terminus.dalaran.core.log.DalaranTracer;
 import io.terminus.dalaran.core.log.TracingErrorHandlerFactory;
+import io.terminus.dalaran.model.BodyType;
 import io.terminus.dalaran.model.MessageModel;
 import io.terminus.dalaran.model.component.ProcessorModel;
 import io.terminus.dalaran.model.flow.*;
@@ -18,6 +19,8 @@ import lombok.val;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
@@ -112,6 +115,8 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
 
     @Override
     public DalaranRoute buildTestFLow(BasicFlow flow) {
+        // enable tracing on test mode
+        flow.setTracing(true);
         val flowTracer = DalaranTracer.buildTestFlowTracer(traceLogger, flow.getId());
         val route = createRouteDefinition();
         route.setId(TEST_FLOW_PREFIX + flow.getRouteId());
@@ -123,19 +128,17 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
         }
 
         // TODO 测试的输入一定是序列化的, XML/Json 等都是直接扔进去, 如果入参是 Object, 前端引导输入 Json 做反序列化处理吧
-//        if (!flow.getInModel().getModelType().isSerialized()) {
-//            route.process(exchange -> {
-//                String bodyString = exchange.getIn().getBody(String.class);
-//                InputStream input = new ByteArrayInputStream(bodyString.getBytes());
-//                exchange.getOut().setBody(input);
-//            });
-//            converterContext.toObject(route, BodyType.JSON);
-//        }
-
-        // enable tracing on test mode
-        flow.setTracing(true);
-
-        buildFlowRoute(route, flow, true);
+        if (!flow.getInModel().getModelType().isSerialized()) {
+            route.process(exchange -> {
+                String bodyString = exchange.getIn().getBody(String.class);
+                InputStream input = new ByteArrayInputStream(bodyString.getBytes());
+                exchange.getOut().setBody(input);
+            });
+            converterContext.toObject(route, BodyType.JSON);
+            buildFlowRoute(route, flow, false);
+        } else {
+            buildFlowRoute(route, flow, true);
+        }
 
         if (flow.getOutModel() == null) {
             flowTracer.after(route);
