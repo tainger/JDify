@@ -37,7 +37,7 @@ public class SGMHttpProcessor implements Processor, Traceable {
         SGMHttpClientConnector connector = config.getConnector();
         String key = connector.getAppId() + "-" + connector.getSno();
         String host = formatHost(connector.getHost());
-        SGMSignInfo signInfo = !redisTemplate.hasKey(key) || redisTemplate.expire(key, connector.getTokenTimeout(), TimeUnit.SECONDS) ? getAccessToken(connector, key, host) : redisTemplate.opsForValue().get(key);
+        SGMSignInfo signInfo = redisTemplate.hasKey(key) ? redisTemplate.opsForValue().get(key) : getAccessToken(connector, key, host);
         String accessToken = signInfo.getAccessToken();
         String timestamp = signInfo.getTimestamp();
         String sign = calculationSign(connector.getToken(), timestamp);
@@ -60,7 +60,7 @@ public class SGMHttpProcessor implements Processor, Traceable {
                 String accessToken = rst.get(SGMConstants.ACCESS_TOKEN).toString();
                 String timestamp = rst.get(SGMConstants.TIMESTAMP).toString();
                 SGMSignInfo signInfo = new SGMSignInfo(accessToken, timestamp);
-                redisTemplate.opsForValue().set(key, signInfo, connector.getTokenTimeout(), TimeUnit.SECONDS);
+                redisTemplate.opsForValue().set(key, signInfo, 60, TimeUnit.SECONDS);
                 logger.info("get access token success!");
                 return signInfo;
             }
