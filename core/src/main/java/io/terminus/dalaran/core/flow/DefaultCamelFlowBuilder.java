@@ -17,6 +17,7 @@ import io.terminus.dalaran.model.component.ProcessorModel;
 import io.terminus.dalaran.model.flow.*;
 import lombok.val;
 import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.beanutils.BeanUtilsBean;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.ByteArrayInputStream;
@@ -128,7 +129,7 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
         }
 
         // TODO 测试的输入一定是序列化的, XML/Json 等都是直接扔进去, 如果入参是 Object, 前端引导输入 Json 做反序列化处理吧
-        if (!flow.getInModel().getModelType().isSerialized()) {
+        if (flow.getInModel() != null && !flow.getInModel().getModelType().isSerialized()) {
             route.process(exchange -> {
                 String bodyString = exchange.getIn().getBody(String.class);
                 InputStream input = new ByteArrayInputStream(bodyString.getBytes());
