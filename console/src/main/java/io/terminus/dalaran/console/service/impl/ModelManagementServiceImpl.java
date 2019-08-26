@@ -28,14 +28,22 @@ import io.terminus.dalaran.model.FieldType;
 import io.terminus.dalaran.model.ModelField;
 import io.terminus.dalaran.model.schema.JsonSchema;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.similarity.JaroWinklerDistance;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
+import java.io.File;
+import java.io.FileInputStream;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -217,6 +225,22 @@ public class ModelManagementServiceImpl implements ModelManagementService {
         Map<String, SimpleMapping> mappings = new HashMap<>();
         deepBuildSuggest(sourceModelSchema.getFields(), targetModelSchema.getFields(), new ArrayList<>(), new ArrayList<>(), mappings);
         return mappings;
+    }
+
+    @Override
+    public ResponseEntity<Resource> downloadExcelTemplate() {
+        Resource resource = new ClassPathResource("excel-model-template.xlsx");
+        try {
+            File file = resource.getFile();
+            InputStreamResource inputStreamResource = new InputStreamResource(new FileInputStream(file));
+            return ResponseEntity.ok().contentLength(file.length())
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
+                    .contentType(MediaType.parseMediaType("application/octet-stream"))
+                    .body(inputStreamResource);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     private void deepBuildSuggest(Map<String, ModelField> sourceFields, Map<String, ModelField> targetFields,

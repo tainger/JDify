@@ -12,9 +12,12 @@ import io.terminus.dalaran.model.BodyType;
 import io.terminus.dalaran.model.ModelField;
 import io.terminus.dalaran.model.schema.JsonSchema;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -114,7 +117,7 @@ public class ModelManagementRest {
     }
 
     // TODO 待开发
-    @ApiOperation(value = "导入数据模板更新模型结构")
+    @ApiOperation(value = "导入模型类信息更新模型结构")
     @RequestMapping(value = "/{id}/import/code-template", method = RequestMethod.POST)
     public Map<String, ModelField> importCodeTemplate(@RequestBody String codeTemplate, @PathVariable long id) {
         return new HashMap<>();
@@ -127,5 +130,9 @@ public class ModelManagementRest {
         return modelManagementService.multiImportExcel(file, type);
     }
 
-
+    @ApiOperation(value = "下载数据模型Excel模板样例")
+    @RequestMapping(value = "/download/excel-template", method = RequestMethod.GET)
+    public ResponseEntity<Resource> downloadExcelTemplate() {
+        return modelManagementService.downloadExcelTemplate();
+    }
 }

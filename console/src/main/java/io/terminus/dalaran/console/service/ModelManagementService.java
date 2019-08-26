@@ -9,6 +9,8 @@ import io.terminus.dalaran.console.model.dto.basic.BasicModelInfo;
 import io.terminus.dalaran.console.model.query.ModelQuery;
 import io.terminus.dalaran.model.BodyType;
 import io.terminus.dalaran.model.schema.JsonSchema;
+import org.springframework.core.io.Resource;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -52,4 +54,6 @@ public interface ModelManagementService {
     String buildDataTemplate(JsonSchema schema, Long id);
 
     Map<String, SimpleMapping> suggestMapping(Long sourceId, Long targetId);
+
+    ResponseEntity<Resource> downloadExcelTemplate();
 }

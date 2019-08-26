@@ -37,7 +37,7 @@ public class SGMHttpProcessor implements Processor, Traceable {
         SGMHttpClientConnector connector = config.getConnector();
         String key = connector.getAppId() + "-" + connector.getSno();
         String host = formatHost(connector.getHost());
-        SGMSignInfo signInfo = redisTemplate.hasKey(key) ? redisTemplate.opsForValue().get(key) : getAccessToken(connector, key, host);
+        SGMSignInfo signInfo = !redisTemplate.hasKey(key) || redisTemplate.expire(key, connector.getTokenTimeout(), TimeUnit.SECONDS) ? getAccessToken(connector, key, host) : redisTemplate.opsForValue().get(key);
         String accessToken = signInfo.getAccessToken();
         String timestamp = signInfo.getTimestamp();
         String sign = calculationSign(connector.getToken(), timestamp);
