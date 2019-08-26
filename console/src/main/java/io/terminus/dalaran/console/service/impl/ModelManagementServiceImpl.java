@@ -479,6 +479,8 @@ public class ModelManagementServiceImpl implements ModelManagementService {
                 return FieldType.OBJECT;
             case DalaranConsoleConstants.JSON_ARRAY:
                 return FieldType.ARRAY;
+            case DalaranConsoleConstants.JAVA_FLOAT:
+                return FieldType.FLOAT;
         }
         return FieldType.STRING;
     }
