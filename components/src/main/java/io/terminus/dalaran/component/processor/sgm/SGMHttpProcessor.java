@@ -60,7 +60,7 @@ public class SGMHttpProcessor implements Processor, Traceable {
                 String accessToken = rst.get(SGMConstants.ACCESS_TOKEN).toString();
                 String timestamp = rst.get(SGMConstants.TIMESTAMP).toString();
                 SGMSignInfo signInfo = new SGMSignInfo(accessToken, timestamp);
-                redisTemplate.opsForValue().set(key, signInfo, 60, TimeUnit.SECONDS);
+                redisTemplate.opsForValue().set(key, signInfo, connector.getTokenTimeout(), TimeUnit.SECONDS);
                 logger.info("get access token success!");
                 return signInfo;
             }
