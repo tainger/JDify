@@ -12,6 +12,9 @@ public class MappingProperty {
 
     private MappingStatus status;
 
+    public MappingProperty() {
+    }
+
     public MappingProperty(boolean complex, MappingStatus status) {
         this.complex = complex;
         this.status = status;

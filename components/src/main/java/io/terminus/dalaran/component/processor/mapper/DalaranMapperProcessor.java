@@ -27,7 +27,7 @@ public class DalaranMapperProcessor implements Processor, Traceable {
     @Override
     public void process(Exchange exchange) {
         Object source = exchange.getIn().getBody();
-        Object destination = convert(mappingConfig, source);
+        Object destination = mappingConfig == null ? source : convert(mappingConfig, source);
         exchange.getOut().setBody(destination);
     }
 
