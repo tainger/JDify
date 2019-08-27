@@ -248,8 +248,12 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
             currentProcessorInfo = componentContext.getProcessorInfo(processor.getType());
 
             // TODO no model
-            if (spanTracer != null && currentModel != null) {
-                spanTracer.before(route, currentModel.getModelType());
+            if (spanTracer != null) {
+                if (currentModel == null) {
+                    spanTracer.before(route);
+                } else {
+                    spanTracer.before(route, currentModel.getModelType());
+                }
             }
             // TODO 这里还是比较奇怪, 有点绕, 而且有些特殊场景没有考虑到
 //                currentBodyIsSerialized = currentModel.getModelType().isSerialized();
@@ -295,8 +299,12 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
             if (outModel != null) {
                 currentModel = outModel;
             }
-            if (spanTracer != null && currentModel != null) {
-                spanTracer.after(route, currentModel.getModelType());
+            if (spanTracer != null) {
+                if (currentModel == null) {
+                    spanTracer.after(route);
+                } else {
+                    spanTracer.after(route, currentModel.getModelType());
+                }
             }
         }
 
