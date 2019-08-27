@@ -60,11 +60,6 @@ public class TracingLogServiceImpl implements TracingLogService {
         return (root, query1, builder) -> {
             List<Predicate> predicates = new ArrayList<>();
             predicates.add(builder.equal(root.get("main"), Boolean.TRUE));
-            if (query.isTestFlow()) {
-                predicates.add(builder.equal(root.get("tracingType"), TracingType.TestFlow));
-            } else {
-                predicates.add(builder.equal(root.get("tracingType"), TracingType.Flow));
-            }
             if (query.getSuccessful() != null) {
                 predicates.add(builder.equal(root.get("successful"), query.getSuccessful()));
             }
