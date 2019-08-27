@@ -45,6 +45,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.transaction.Transactional;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.InputStream;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -232,11 +233,11 @@ public class ModelManagementServiceImpl implements ModelManagementService {
     public ResponseEntity<Resource> downloadExcelTemplate() {
         Resource resource = new ClassPathResource("excel-model-template.xlsx");
         try {
-            File file = resource.getFile();
-            InputStreamResource inputStreamResource = new InputStreamResource(new FileInputStream(file));
-            return ResponseEntity.ok().contentLength(file.length())
+            InputStream inputStream = resource.getInputStream();
+            InputStreamResource inputStreamResource = new InputStreamResource(inputStream);
+            return ResponseEntity.ok().contentLength(resource.contentLength())
                     .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
-                    .contentType(MediaType.parseMediaType("application/octet-stream"))
+                    .contentType(MediaType.APPLICATION_OCTET_STREAM)
                     .body(inputStreamResource);
         } catch (Exception e) {
             e.printStackTrace();
