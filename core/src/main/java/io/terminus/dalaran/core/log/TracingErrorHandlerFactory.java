@@ -68,6 +68,7 @@ public class TracingErrorHandlerFactory extends DefaultErrorHandlerBuilder imple
                 String body = exchange.getException().toString();
                 log(exchange, FLOW_TRACING_LOG, body);
                 log(exchange, TEST_FLOW_TRACING_LOG, body);
+                log(exchange, TEST_SUB_FLOW_TRACING_LOG, body);
                 log(exchange, PROCESSOR_TRACING_LOG, body);
             }
             callback.done(true);

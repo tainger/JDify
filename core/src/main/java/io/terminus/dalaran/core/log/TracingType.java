@@ -5,5 +5,6 @@ public enum TracingType {
     SubFlow,
     Processor,
     TestFlow,
+    TestSubFlow,
     Convert
 }

@@ -86,6 +86,7 @@ public class DalaranRouter implements DalaranProcessor<Map<String, String>>, Dal
             fragment.setPipeline(pipeline);
             fragment.setInModel(config.getInModel());
             fragment.setOutModel(fragmentLastOutModel);
+            fragment.setTracing(flow.isTracing());
 
             dalaranContext.addFragmentFlow(fragment);
 

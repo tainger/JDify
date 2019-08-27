@@ -26,8 +26,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static io.terminus.dalaran.DalaranConstants.TEST_FLOW_PREFIX;
-import static io.terminus.dalaran.DalaranConstants.TEST_SUB_FLOW_PREFIX;
+import static io.terminus.dalaran.DalaranConstants.*;
 import static io.terminus.dalaran.core.flow.DefaultFlowValidateMessages.FIELD_NOT_NULL;
 import static io.terminus.dalaran.core.flow.DefaultFlowValidateMessages.MODEL_NOT_EQUALLY;
 import static io.terminus.dalaran.core.flow.FlowSuggest.ADD_MAPPER;
@@ -62,7 +61,7 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
 
         DalaranTracer flowTracer = null;
         if (flow.isTracing()) {
-            flowTracer = DalaranTracer.buildFlowTracer(traceLogger, flow.getId());
+            flowTracer = DalaranTracer.buildFlowTracer(traceLogger);
         }
         DalaranTrigger triggerBean = componentContext.getTrigger(flow.getTriggerType());
         Object triggerConfig = flow.getTriggerConfig();
@@ -72,6 +71,7 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
 
         val route = createRouteDefinition();
         route.setId(flow.getRouteId());
+        route.setProperty(TRACING_FLOW_ID).constant(flow.getId());
         triggerComponent.buildFromRoute(route, triggerConfig);
         if (flowTracer != null) {
             flowTracer.before(route, flow.getInModel().getModelType());
@@ -89,8 +89,9 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
 
     @Override
     public DalaranRoute buildSubFLow(SubFlow flow) {
-        val flowTracer = DalaranTracer.buildSubFlowTracer(traceLogger, flow.getId());
+        val flowTracer = DalaranTracer.buildSubFlowTracer(traceLogger);
         val route = createRouteDefinition(flow);
+        route.setProperty(TRACING_FLOW_ID).constant(flow.getId());
         if (flow.getInModel() == null) {
             flowTracer.before(route);
         } else {
@@ -118,9 +119,15 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
     public DalaranRoute buildTestFLow(BasicFlow flow) {
         // enable tracing on test mode
         flow.setTracing(true);
-        val flowTracer = DalaranTracer.buildTestFlowTracer(traceLogger, flow.getId());
+        DalaranTracer flowTracer;
+        if (flow instanceof SubFlow) {
+            flowTracer = DalaranTracer.buildTestSubFlowTracer(traceLogger);
+        } else {
+            flowTracer = DalaranTracer.buildTestFlowTracer(traceLogger);
+        }
         val route = createRouteDefinition();
         route.setId(TEST_FLOW_PREFIX + flow.getRouteId());
+        route.setProperty(TRACING_FLOW_ID).constant(flow.getId());
         route.from(DalaranConstants.TEST_FLOW_DIRECT_PREFIX + flow.getRouteId());
         if (flow.getInModel() == null) {
             flowTracer.before(route);
@@ -152,9 +159,10 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
 
     @Override
     public DalaranRoute buildTestSubFLow(SubFlow flow) {
-        val flowTracer = DalaranTracer.buildTestFlowTracer(traceLogger, flow.getId());
+        val flowTracer = DalaranTracer.buildTestFlowTracer(traceLogger);
         val route = createRouteDefinition();
         route.setId(TEST_SUB_FLOW_PREFIX + flow.getRouteId());
+        route.setProperty(TRACING_FLOW_ID).constant(flow.getId());
         route.from(DalaranConstants.TEST_SUB_FLOW_DIRECT_PREFIX + flow.getRouteId());
         flowTracer.before(route, flow.getInModel().getModelType());
         flow.setTracing(true);
@@ -242,7 +250,7 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
         for (ProcessorModel processor : processorList) {
             DalaranTracer spanTracer = null;
             if (flow.isTracing()) {
-                spanTracer = DalaranTracer.buildFlowSpanTracer(traceLogger, flow.getId(), processor.getId());
+                spanTracer = DalaranTracer.buildFlowSpanTracer(traceLogger, processor.getId());
             }
             DalaranProcessor processorComponent = componentContext.getProcessor(processor.getType());
             currentProcessorInfo = componentContext.getProcessorInfo(processor.getType());
