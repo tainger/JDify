@@ -13,6 +13,8 @@ public class DalaranConsoleConstants {
 
     public static final String JAVA_FLOAT = "java.lang.Float";
 
+    public static final String JAVA_DOUBLE = "java.lang.Double";
+
     public static final String JAVA_NUMBER = "java.lang.Number";
 
     public static final String JSON_OBJECT = "com.alibaba.fastjson.JSONObject";
