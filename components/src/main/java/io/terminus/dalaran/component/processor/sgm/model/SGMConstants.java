@@ -11,6 +11,10 @@ public final class SGMConstants {
     public static final String SIGN = "sign";
 
     public static final String RESPONSE_DATA = "data";
+    public static final String RESPONSE_CODE = "code";
+    public static final String RESPONSE_MESSAGE = "msg";
+
+    public static final String SUCCESSFUL_CODE = "0";
 
     public static final String APP_ID = "appid";
 
