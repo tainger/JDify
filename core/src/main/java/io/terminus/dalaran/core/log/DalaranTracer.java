@@ -134,7 +134,7 @@ public class DalaranTracer {
             exchange.getOut().copyFrom(exchange.getIn());
 
             DalaranTracingLog tracingLog = new DalaranTracingLog();
-            boolean isMainFlow = TracingType.Flow == tracingType || TracingType.TestFlow == tracingType;
+            boolean isMainFlow = TracingType.Flow == tracingType || TracingType.TestFlow == tracingType || TracingType.TestSubFlow == tracingType;
             tracingLog.setMain(isMainFlow);
             exchange.setProperty(getTracingLogPropertyKey(), tracingLog);
             String testRecordId = exchange.getProperty(DalaranConstants.TEST_FLOW_RECORD_ID_HEADER, String.class);
