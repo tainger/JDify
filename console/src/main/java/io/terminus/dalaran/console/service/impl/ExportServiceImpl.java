@@ -24,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
+import javax.persistence.Transient;
 import java.io.File;
 import java.util.List;
 import java.util.Map;
@@ -73,6 +74,7 @@ public class ExportServiceImpl implements ExportService {
 
     // TODO 数据量暴多可能炸内存, 而且会涉及到清表, 所以事务也是个问题
     @Override
+    @Transient
     public void importAll(ExportData exportData) {
         truncateTable();
 
