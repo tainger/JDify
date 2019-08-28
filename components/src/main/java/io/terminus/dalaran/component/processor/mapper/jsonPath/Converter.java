@@ -233,7 +233,7 @@ public class Converter {
                 } catch (Exception e) {
                     e.printStackTrace();
                     String fields = sourceFields.stream().map(SourceField::getPath).collect(Collectors.toList()).toString();
-                    throw new FieldParseException(fields, values, " Field value parse error! Destination field: " + destinationPath + ", type: " + type);
+                    throw new FieldParseException(fields, values.get(0), " Field value parse error! Destination field: " + destinationPath + ", type: " + type);
                 }
             }
         }
