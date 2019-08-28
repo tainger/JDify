@@ -9,6 +9,7 @@ import io.terminus.dalaran.console.model.dto.basic.BasicModelInfo;
 import io.terminus.dalaran.console.model.query.ModelQuery;
 import io.terminus.dalaran.model.BodyType;
 import io.terminus.dalaran.model.schema.JsonSchema;
+import io.terminus.dalaran.model.schema.ObjectSchema;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
@@ -50,6 +51,8 @@ public interface ModelManagementService {
     Map<Long, Map<String, JsonSchema>> multiImportExcel(MultipartFile file, BodyType type);
 
     JsonSchema importDataTemplate(DataTemplate dataTemplate, Long id);
+
+    ObjectSchema importDalaranSchema(ObjectSchema schema, Long id);
 
     String buildDataTemplate(JsonSchema schema, Long id);
 

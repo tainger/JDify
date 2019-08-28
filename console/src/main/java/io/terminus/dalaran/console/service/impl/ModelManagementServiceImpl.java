@@ -27,6 +27,7 @@ import io.terminus.dalaran.model.DalaranModelSchema;
 import io.terminus.dalaran.model.FieldType;
 import io.terminus.dalaran.model.ModelField;
 import io.terminus.dalaran.model.schema.JsonSchema;
+import io.terminus.dalaran.model.schema.ObjectSchema;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -198,6 +199,14 @@ public class ModelManagementServiceImpl implements ModelManagementService {
         }
         JsonSchema schema = new JsonSchema();
         schema.setFields(root);
+        ModelEntity model = modelRepository.findOne(id);
+        model.setModelSchema(JSON.toJSONString(schema));
+        modelRepository.save(model);
+        return schema;
+    }
+
+    @Override
+    public ObjectSchema importDalaranSchema(ObjectSchema schema, Long id) {
         ModelEntity model = modelRepository.findOne(id);
         model.setModelSchema(JSON.toJSONString(schema));
         modelRepository.save(model);

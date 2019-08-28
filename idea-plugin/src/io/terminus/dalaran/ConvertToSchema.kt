@@ -7,6 +7,7 @@ import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.ide.CopyPasteManager
 import com.intellij.psi.PsiArrayType
 import com.intellij.psi.PsiClass
+import com.intellij.psi.PsiField
 import com.intellij.psi.PsiType
 import com.intellij.psi.impl.source.PsiClassReferenceType
 import com.intellij.util.text.DateFormatUtil
@@ -17,21 +18,25 @@ import java.util.*
 private const val COLLECTION = "java.util.Collection"
 private const val MAP = "java.util.Map"
 
-private enum class FieldType {
-    STRING, INTEGER, FLOAT, DATE, BOOLEAN, ARRAY, OBJECT;
+private enum class FieldType(
+        val basicType: Boolean = true
+) {
+    STRING, INTEGER, FLOAT, DATE, BOOLEAN, ARRAY(false), OBJECT(false);
 }
 
 private class Field {
     var type: FieldType = FieldType.STRING
-    var description: String = ""
     var nullable: Boolean = false
+    var description: String? = null
     var subType: FieldType? = null
-    var fields: Map<String, Field> = hashMapOf()
+    var fields: Map<String, Field> = emptyMap()
 }
 
-private data class Model(
-        val root: Field
-)
+private class Model(
+        root: Field
+) {
+    val fields = mapOf("root" to root)
+}
 
 class ConvertToSchema : AnAction() {
 
@@ -57,10 +62,7 @@ class ConvertToSchema : AnAction() {
 
     private fun buildFields(psiClass: PsiClass, usedClasses: HashSet<PsiClass>) = psiClass.allFields.filter {
         it.modifierList?.hasModifierProperty("static") != true
-    }.map {
-        val comment = it.docComment?.descriptionElements?.map { it.text?.trim() }?.joinToString("")?.trim()
-        it.name to buildField(it.type, comment, usedClasses)
-    }.toMap()
+    }.map { it.buildDalaranField(usedClasses) }.toMap()
 
     private fun getResolveClass(type: PsiType?): PsiClass? {
         if (type is PsiClassReferenceType) {
@@ -69,7 +71,16 @@ class ConvertToSchema : AnAction() {
         return null
     }
 
-    private fun buildField(type: PsiType, comment: String?, usedClasses: HashSet<PsiClass>): Field {
+    private fun PsiField.buildDalaranField(usedClasses: HashSet<PsiClass>): Pair<String, Field> {
+        val field = buildField(this.type, usedClasses)
+        this.docComment?.descriptionElements?.map { it.text?.trim() }?.joinToString("")?.trim()?.let {
+            field.description = it
+        }
+        field.nullable = !this.hasAnnotation("org.jetbrains.annotations.NotNull")
+        return this.name to field
+    }
+
+    private fun buildField(type: PsiType, usedClasses: HashSet<PsiClass>): Field {
         val field = Field()
         field.type = when (type.canonicalText) {
             "byte", "short", "int", "long", "java.lang.Byte", "java.lang.Short", "java.lang.Integer", "java.lang.Long" -> FieldType.INTEGER
@@ -88,29 +99,36 @@ class ConvertToSchema : AnAction() {
                 } else if (type is PsiClassReferenceType) {
                     val resolveClass = type.resolve()
                     if (resolveClass != null) {
-                        if (resolveClass.isEnum) {
-                            FieldType.STRING
-                        } else if (isCollection(resolveClass)) {
-                            getResolveClass(type.parameters[0])?.let {
-                                buildFields(it, usedClasses)
-                            }?.let {
-                                field.fields = it
+                        when {
+                            resolveClass.isEnum -> FieldType.STRING
+                            isCollection(resolveClass) -> {
+                                val subField = buildField(type.parameters[0], usedClasses)
+                                field.subType = subField.type
+                                if (!subField.type.basicType) {
+                                    field.fields = subField.fields
+                                }
+                                FieldType.ARRAY
                             }
-                            FieldType.ARRAY
-                        } else if (isMap(resolveClass)) {
-                            FieldType.OBJECT
-                        } else {
-                            field.fields = buildFields(resolveClass, usedClasses)
-                            FieldType.OBJECT
+                            isMap(resolveClass) -> FieldType.OBJECT
+                            else -> {
+                                // 避免循环引用导致无限循环调用
+                                if (!usedClasses.contains(resolveClass)) {
+                                    usedClasses.add(resolveClass)
+                                    field.fields = buildFields(resolveClass, usedClasses)
+                                }
+                                FieldType.OBJECT
+                            }
                         }
+                    } else {
+                        FieldType.STRING
                     }
+                } else {
+                    FieldType.STRING
                 }
-                FieldType.STRING
             }
         }
         return field
     }
-
 
     private fun isCollection(resolveClass: PsiClass?): Boolean {
         resolveClass ?: return false
