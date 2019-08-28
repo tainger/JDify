@@ -85,7 +85,7 @@ public class DalaranMessageMapper implements DalaranProcessor<DalaranMapperConfi
 
         SimpleMappingField destinationField = new SimpleMappingField();
 
-        MappingProperty mappingProperty = buildMappingField(path, outField, destinationField);
+        MappingProperty mappingProperty = buildMappingField(path, outField, destinationField, false);
         messageMapping.setStatus(mappingProperty.getStatus());
         if (mappingProperty.getStatus() == MappingStatus.ERROR) {
             return;
@@ -93,18 +93,22 @@ public class DalaranMessageMapper implements DalaranProcessor<DalaranMapperConfi
         messageMapping.setDestinationField(destinationField);
 
         List<SourceField> sourceFields = new ArrayList<>();
-        boolean complex = false;
+        MappingProperty property = new MappingProperty();
         for (String sourcePath : sourcePaths) {
             SourceField sourceField = new SourceField();
             if (mappingType == MappingType.DEFAULT) {
                 sourceField.setPath(sourcePath);
             } else {
-                complex = buildSourceField(sourcePath, inField, sourceField);
+                property = buildSourceField(sourcePath, inField, sourceField, mappingProperty.isComplex());
+                if (property.getStatus() == MappingStatus.ERROR) {
+                    break;
+                }
             }
             sourceFields.add(sourceField);
         }
         messageMapping.setSourceFields(sourceFields);
-        messageMapping.setComplex(complex);
+        messageMapping.setComplex(property.isComplex());
+        messageMapping.setStatus(property.getStatus());
     }
 
     private List<String> buildSourcePaths(MappingType mappingType, Object value, MessageMapping messageMapping) {
@@ -136,16 +140,15 @@ public class DalaranMessageMapper implements DalaranProcessor<DalaranMapperConfi
         return sourcePaths;
     }
 
-    private boolean buildSourceField(String sourcePath, Map<String, ModelField> in, SourceField sourceField) {
+    private MappingProperty buildSourceField(String sourcePath, Map<String, ModelField> in, SourceField sourceField, boolean complex) {
         SimpleMappingField simpleMappingField = new SimpleMappingField();
-        MappingProperty mappingProperty = buildMappingField(sourcePath, in, simpleMappingField);
+        MappingProperty mappingProperty = buildMappingField(sourcePath, in, simpleMappingField, complex);
         sourceField.setField(simpleMappingField);
         sourceField.setPath(StringUtils.substringAfter(sourcePath, MapperConstants.MODEL_ROOT + "."));
-        return mappingProperty.isComplex();
+        return mappingProperty;
     }
 
-    private MappingProperty buildMappingField(String path, Map<String, ModelField> modelField, SimpleMappingField simpleMappingField) {
-        boolean complex = false;
+    private MappingProperty buildMappingField(String path, Map<String, ModelField> modelField, SimpleMappingField simpleMappingField, boolean complex) {
         MappingStatus status = MappingStatus.CORRECT;
 
         ModelField root = modelField.get(MapperConstants.MODEL_ROOT);

@@ -11,6 +11,10 @@ public class DalaranConsoleConstants {
 
     public static final String JAVA_LONG = "java.lang.Long";
 
+    public static final String JAVA_FLOAT = "java.lang.Float";
+
+    public static final String JAVA_DOUBLE = "java.lang.Double";
+
     public static final String JAVA_NUMBER = "java.lang.Number";
 
     public static final String JSON_OBJECT = "com.alibaba.fastjson.JSONObject";
@@ -19,7 +23,7 @@ public class DalaranConsoleConstants {
 
     public static final String MODEL_FIELD_ROOT = "root";
 
-    public static final int MODEL_ARRAY_SIZE = 2;
+    public static final int MODEL_ARRAY_SIZE = 1;
 
     public static final String SOAP_CONNECTOR = "soap-connector";
 

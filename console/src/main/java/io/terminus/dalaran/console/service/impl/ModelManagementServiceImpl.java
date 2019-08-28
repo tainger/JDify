@@ -28,6 +28,7 @@ import io.terminus.dalaran.model.FieldType;
 import io.terminus.dalaran.model.ModelField;
 import io.terminus.dalaran.model.schema.JsonSchema;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.similarity.JaroWinklerDistance;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +45,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.transaction.Transactional;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.InputStream;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -186,7 +188,7 @@ public class ModelManagementServiceImpl implements ModelManagementService {
 
     @Override
     public JsonSchema importDataTemplate(DataTemplate dataTemplate, Long id) {
-        Map<String, ModelField> root = new HashMap<>();
+        SortedMap<String, ModelField> root = new TreeMap<>();
         ModelField modelField = new ModelField();
         root.put(MapperConstants.MODEL_ROOT, modelField);
         Object body = JSON.parse(dataTemplate.getDataTemplate());
@@ -231,11 +233,11 @@ public class ModelManagementServiceImpl implements ModelManagementService {
     public ResponseEntity<Resource> downloadExcelTemplate() {
         Resource resource = new ClassPathResource("excel-model-template.xlsx");
         try {
-            File file = resource.getFile();
-            InputStreamResource inputStreamResource = new InputStreamResource(new FileInputStream(file));
-            return ResponseEntity.ok().contentLength(file.length())
+            InputStream inputStream = resource.getInputStream();
+            InputStreamResource inputStreamResource = new InputStreamResource(inputStream);
+            return ResponseEntity.ok().contentLength(resource.contentLength())
                     .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
-                    .contentType(MediaType.parseMediaType("application/octet-stream"))
+                    .contentType(MediaType.APPLICATION_OCTET_STREAM)
                     .body(inputStreamResource);
         } catch (Exception e) {
             e.printStackTrace();
@@ -340,7 +342,7 @@ public class ModelManagementServiceImpl implements ModelManagementService {
     }
 
     private void buildModel(Object body, String type, ModelField modelField) {
-        Map<String, ModelField> child = new HashMap<>();
+        SortedMap<String, ModelField> child = new TreeMap<>();
         modelField.setFields(child);
         if (type.equalsIgnoreCase(DalaranConsoleConstants.JSON_OBJECT)) {
             modelField.setType(FieldType.OBJECT);
@@ -349,12 +351,6 @@ public class ModelManagementServiceImpl implements ModelManagementService {
             modelField.setType(FieldType.ARRAY);
             JSONArray jsonArray = (JSONArray) body;
             if (CollectionUtils.isNotEmpty(jsonArray)) {
-//                Object element = jsonArray.get(0);
-//                String elementType = element.getClass().getTypeName();
-//                modelField.setSubType(getFiledType(elementType));
-//                if (isComplexType(elementType) && elementType.equalsIgnoreCase(DalaranConsoleConstants.JSON_OBJECT)) {
-//                    buildChildren(element, child);
-//                }
                 jsonArray.forEach(element -> {
                     String elementType = element.getClass().getTypeName();
                     modelField.setSubType(getFiledType(elementType));
@@ -366,7 +362,7 @@ public class ModelManagementServiceImpl implements ModelManagementService {
         }
     }
 
-    private void buildChildren(Object element, Map<String, ModelField> child) {
+    private void buildChildren(Object element, SortedMap<String, ModelField> child) {
         JSONObject jsonObject = (JSONObject) element;
         jsonObject.forEach((name, value) -> {
             ModelField field = new ModelField();
@@ -479,6 +475,9 @@ public class ModelManagementServiceImpl implements ModelManagementService {
                 return FieldType.OBJECT;
             case DalaranConsoleConstants.JSON_ARRAY:
                 return FieldType.ARRAY;
+            case DalaranConsoleConstants.JAVA_FLOAT:
+            case DalaranConsoleConstants.JAVA_DOUBLE:
+                return FieldType.FLOAT;
         }
         return FieldType.STRING;
     }
