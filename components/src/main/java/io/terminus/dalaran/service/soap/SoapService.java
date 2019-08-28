@@ -360,7 +360,7 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
             case "boolean":
                 return FieldType.BOOLEAN;
         }
-        return null;
+        return FieldType.STRING;
     }
 
     private String getWsdlDoc(String url) {
