@@ -2,6 +2,7 @@ package io.terminus.dalaran.component.processor.mapper.jsonPath;
 
 import com.alibaba.fastjson.JSONPath;
 import com.github.drapostolos.typeparser.TypeParser;
+import io.terminus.dalaran.component.common.exception.FieldParseException;
 import io.terminus.dalaran.component.processor.mapper.model.*;
 import io.terminus.dalaran.core.context.DalaranContext;
 import io.terminus.dalaran.model.FieldType;
@@ -10,6 +11,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Created by jingdi on 2019/7/16
@@ -179,7 +181,13 @@ public class Converter {
                 } else {
                     if (pathDetail != null) {
                         FieldType type = pathDetail.getType();
-                        value = parse(values.get(0), type);
+                        try {
+                            value = parse(values.get(0), type);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            String fields = entry.getValue().stream().map(SourcePath::getPath).collect(Collectors.toList()).toString();
+                            throw new FieldParseException(fields, values.get(0), " Field value parse error! Destination field: " + pathDetail.getPath() + ", type: " + type);
+                        }
                     }
                 }
                 if (pathDetail != null && pathDetail.getPath() != null) {
@@ -220,7 +228,13 @@ public class Converter {
                 value = values.get(0);
             } else {
                 FieldType type = sourceFields.get(0).getField().getType();
-                value = parse(values.get(0), type);
+                try {
+                    value = parse(values.get(0), type);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    String fields = sourceFields.stream().map(SourceField::getPath).collect(Collectors.toList()).toString();
+                    throw new FieldParseException(fields, values, " Field value parse error! Destination field: " + destinationPath + ", type: " + type);
+                }
             }
         }
         JSONPath.set(destination, "$" + MapperConstants.MODEL_ROOT + "." + destinationPath, value);
