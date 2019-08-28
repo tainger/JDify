@@ -179,18 +179,20 @@ public class Converter {
                             value = dalaranContext.getDalaranFunctionContext().executeCustomFunction(Long.valueOf(function.getId()), values.toArray());
                     }
                 } else {
-                    if (pathDetail != null) {
-                        FieldType type = pathDetail.getType();
-                        Object originValue = values.get(0);
-                        try {
-                            value = parse(originValue, type);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            String fields = entry.getValue().stream().map(SourcePath::getPath).collect(Collectors.toList()).toString();
-                            throw new FieldParseException(fields, originValue, " Field value parse error! Destination field: " + pathDetail.getPath() + ", type: " + type);
-                        }
+                    value = values.get(0);
+                }
+
+                if (pathDetail != null) {
+                    FieldType type = pathDetail.getType();
+                    try {
+                        value = parse(value, type);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        String fields = entry.getValue().stream().map(SourcePath::getPath).collect(Collectors.toList()).toString();
+                        throw new FieldParseException(fields, value, " Field value parse error! Destination field: " + pathDetail.getPath() + ", type: " + type);
                     }
                 }
+
                 if (pathDetail != null && pathDetail.getPath() != null) {
                     JSONPath.set(destination, pathDetail.getPath(), value);
                 }
@@ -225,20 +227,18 @@ public class Converter {
                     value = dalaranContext.getDalaranFunctionContext().executeCustomFunction(Long.valueOf(function.getId()), values.toArray());
             }
         } else {
-            Object originValue = values.get(0);
-            if (mappingType == MappingType.DEFAULT) {
-                value = originValue;
-            } else {
-                FieldType type = sourceFields.get(0).getField().getType();
-                try {
-                    value = parse(originValue, type);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    String fields = sourceFields.stream().map(SourceField::getPath).collect(Collectors.toList()).toString();
-                    throw new FieldParseException(fields, originValue, " Field value parse error! Destination field: " + destinationPath + ", type: " + type);
-                }
-            }
+            value = values.get(0);
         }
+
+        FieldType type = messageMapping.getType();
+        try {
+            value = parse(value, type);
+        } catch (Exception e) {
+            e.printStackTrace();
+            String fields = sourceFields.stream().map(SourceField::getPath).collect(Collectors.toList()).toString();
+            throw new FieldParseException(fields, value, " Field value parse error! Destination field: " + destinationPath + ", type: " + type);
+        }
+
         JSONPath.set(destination, "$" + MapperConstants.MODEL_ROOT + "." + destinationPath, value);
     }
 
