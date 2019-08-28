@@ -184,13 +184,7 @@ public class Converter {
 
                 if (pathDetail != null) {
                     FieldType type = pathDetail.getType();
-                    try {
-                        value = parse(value, type);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        String fields = entry.getValue().stream().map(SourcePath::getPath).collect(Collectors.toList()).toString();
-                        throw new FieldParseException(fields, value, " Field value parse error! Destination field: " + pathDetail.getPath() + ", type: " + type);
-                    }
+                    value = parse(value, type, entry.getValue(), pathDetail.getPath());
                 }
 
                 if (pathDetail != null && pathDetail.getPath() != null) {
@@ -204,6 +198,7 @@ public class Converter {
         List<Object> values = new ArrayList<>();
         List<SourceField> sourceFields = messageMapping.getSourceFields();
         MappingType mappingType = messageMapping.getMappingType();
+        List<SourcePath> sourcePaths = new ArrayList<>();
 
         sourceFields.forEach(sourceField -> {
             Object value;
@@ -213,6 +208,7 @@ public class Converter {
                 value = JSONPath.eval(source, sourceField.getPath());
             }
             values.add(value);
+            sourcePaths.add(new SourcePath(sourceField.getPath(), null));
         });
 
         String destinationPath = messageMapping.getPath();
@@ -231,15 +227,19 @@ public class Converter {
         }
 
         FieldType type = messageMapping.getType();
+        value = parse(value, type, sourcePaths, destinationPath);
+        JSONPath.set(destination, "$" + MapperConstants.MODEL_ROOT + "." + destinationPath, value);
+    }
+
+    private static Object parse(Object value, FieldType type, List<SourcePath> sourcePaths, String destinationPath) {
         try {
             value = parse(value, type);
+            return value;
         } catch (Exception e) {
             e.printStackTrace();
-            String fields = sourceFields.stream().map(SourceField::getPath).collect(Collectors.toList()).toString();
+            String fields = sourcePaths.stream().map(SourcePath::getPath).collect(Collectors.toList()).toString();
             throw new FieldParseException(fields, value, " Field value parse error! Destination field: " + destinationPath + ", type: " + type);
         }
-
-        JSONPath.set(destination, "$" + MapperConstants.MODEL_ROOT + "." + destinationPath, value);
     }
 
     private static Object parse(Object target, FieldType destination) {
