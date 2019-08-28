@@ -24,7 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
-import javax.persistence.Transient;
+import javax.transaction.Transactional;
 import java.io.File;
 import java.util.List;
 import java.util.Map;
@@ -74,7 +74,7 @@ public class ExportServiceImpl implements ExportService {
 
     // TODO 数据量暴多可能炸内存, 而且会涉及到清表, 所以事务也是个问题
     @Override
-    @Transient
+    @Transactional
     public void importAll(ExportData exportData) {
         truncateTable();
 
@@ -126,12 +126,12 @@ public class ExportServiceImpl implements ExportService {
 
     // TODO 比较暴力, 但是需要重置 ID 自增, 否则 Json 内的依赖可能会有问题
     private void truncateTable() {
-        entityManager.joinTransaction();
         Session session = entityManager.unwrap(Session.class);
         Map<String, ClassMetadata> hibernateMetadata = session.getSessionFactory().getAllClassMetadata();
-        hibernateMetadata.values().stream().map(classMetadata -> ((AbstractEntityPersister) classMetadata).getTableName()).forEach(tableName -> {
+        for (ClassMetadata classMetadata : hibernateMetadata.values()) {
+            String tableName = ((AbstractEntityPersister) classMetadata).getTableName();
             entityManager.createNativeQuery("TRUNCATE TABLE " + tableName).executeUpdate();
-        });
+        }
     }
 
     private List<ApiInfo> getExportApiInfoList() {

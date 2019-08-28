@@ -14,8 +14,13 @@ public class ErrorResult {
     private boolean successful;
 
     public static ErrorResult successful() {
+        return successful(null);
+    }
+
+    public static ErrorResult successful(String message) {
         ErrorResult result = new ErrorResult();
         result.setSuccessful(true);
+        result.setMessage(message);
         return result;
     }
 

@@ -50,7 +50,9 @@ public class DalaranRouter implements DalaranProcessor<Map<String, String>>, Dal
             } else {
                 choiceDefinition.when().mvel(routeItem.getKey());
             }
-            choiceDefinition.to(routeItem.getValue());
+            if (routeItem.getValue() != null) {
+                choiceDefinition.to(routeItem.getValue());
+            }
         }
         choiceDefinition.end();
     }
@@ -68,6 +70,7 @@ public class DalaranRouter implements DalaranProcessor<Map<String, String>>, Dal
             val route = routes.get(i);
 
             if (route.getPipeline().isEmpty()) {
+                routeMapper.put(route.getExpression(), null);
                 continue;
             }
 

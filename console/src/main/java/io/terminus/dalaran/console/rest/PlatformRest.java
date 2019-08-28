@@ -151,7 +151,7 @@ public class PlatformRest {
     @ApiOperation(value = "导入所有配置, 会覆盖之前的内容")
     @PostMapping(value = "/import")
     private ErrorResult importAll(@RequestParam MultipartFile exportData) {
-        ExportData importData = null;
+        ExportData importData;
         try {
             importData = JSON.parseObject(exportData.getInputStream(), ExportData.class);
         } catch (IOException e) {
@@ -163,7 +163,7 @@ public class PlatformRest {
             e.printStackTrace();
             return ErrorResult.error("未知错误导致导入失败");
         }
-        return ErrorResult.successful();
+        return ErrorResult.successful("导入成功");
     }
 
     @ApiOperation(value = "推送 Trantor 的带集成信息")
