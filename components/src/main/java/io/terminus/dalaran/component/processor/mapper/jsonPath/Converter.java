@@ -181,12 +181,13 @@ public class Converter {
                 } else {
                     if (pathDetail != null) {
                         FieldType type = pathDetail.getType();
+                        Object originValue = values.get(0);
                         try {
-                            value = parse(values.get(0), type);
+                            value = parse(originValue, type);
                         } catch (Exception e) {
                             e.printStackTrace();
                             String fields = entry.getValue().stream().map(SourcePath::getPath).collect(Collectors.toList()).toString();
-                            throw new FieldParseException(fields, values.get(0), " Field value parse error! Destination field: " + pathDetail.getPath() + ", type: " + type);
+                            throw new FieldParseException(fields, originValue, " Field value parse error! Destination field: " + pathDetail.getPath() + ", type: " + type);
                         }
                     }
                 }
@@ -224,16 +225,17 @@ public class Converter {
                     value = dalaranContext.getDalaranFunctionContext().executeCustomFunction(Long.valueOf(function.getId()), values.toArray());
             }
         } else {
+            Object originValue = values.get(0);
             if (mappingType == MappingType.DEFAULT) {
-                value = values.get(0);
+                value = originValue;
             } else {
                 FieldType type = sourceFields.get(0).getField().getType();
                 try {
-                    value = parse(values.get(0), type);
+                    value = parse(originValue, type);
                 } catch (Exception e) {
                     e.printStackTrace();
                     String fields = sourceFields.stream().map(SourceField::getPath).collect(Collectors.toList()).toString();
-                    throw new FieldParseException(fields, values.get(0), " Field value parse error! Destination field: " + destinationPath + ", type: " + type);
+                    throw new FieldParseException(fields, originValue, " Field value parse error! Destination field: " + destinationPath + ", type: " + type);
                 }
             }
         }
