@@ -126,6 +126,7 @@ public class ExportServiceImpl implements ExportService {
 
     // TODO 比较暴力, 但是需要重置 ID 自增, 否则 Json 内的依赖可能会有问题
     private void truncateTable() {
+        entityManager.joinTransaction();
         Session session = entityManager.unwrap(Session.class);
         Map<String, ClassMetadata> hibernateMetadata = session.getSessionFactory().getAllClassMetadata();
         hibernateMetadata.values().stream().map(classMetadata -> ((AbstractEntityPersister) classMetadata).getTableName()).forEach(tableName -> {
