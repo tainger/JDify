@@ -11,6 +11,7 @@ import io.terminus.dalaran.console.service.ModelManagementService;
 import io.terminus.dalaran.model.BodyType;
 import io.terminus.dalaran.model.ModelField;
 import io.terminus.dalaran.model.schema.JsonSchema;
+import io.terminus.dalaran.model.schema.ObjectSchema;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
@@ -105,6 +106,13 @@ public class ModelManagementRest {
     @RequestMapping(value = "/{id}/import/data-template", method = RequestMethod.POST)
     public Map<String, ModelField> importDataTemplate(@RequestBody DataTemplate dataTemplate, @PathVariable long id) {
         JsonSchema schema = modelManagementService.importDataTemplate(dataTemplate, id);
+        return schema.getFields();
+    }
+
+    @ApiOperation(value = "导入数据模板更新模型结构")
+    @RequestMapping(value = "/{id}/import/dalaran-schema", method = RequestMethod.POST)
+    public Map<String, ModelField> importDalaranSchema(@RequestBody ObjectSchema objectSchema, @PathVariable long id) {
+        ObjectSchema schema = modelManagementService.importDalaranSchema(objectSchema, id);
         return schema.getFields();
     }
 

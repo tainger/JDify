@@ -160,6 +160,7 @@ public class PlatformRest {
         try {
             exportService.importAll(importData);
         } catch (Throwable e) {
+            e.printStackTrace();
             return ErrorResult.error("未知错误导致导入失败");
         }
         return ErrorResult.successful();

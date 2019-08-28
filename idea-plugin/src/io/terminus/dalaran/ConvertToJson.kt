@@ -17,7 +17,7 @@ import java.util.*
 private const val COLLECTION = "java.util.Collection"
 private const val MAP = "java.util.Map"
 
-class ConvertJavaToJson : AnAction() {
+class ConvertToJson : AnAction() {
 
     private val gson = Gson()
 
