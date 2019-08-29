@@ -13,6 +13,7 @@ import io.terminus.dalaran.model.ModelField;
 import io.terminus.dalaran.model.flow.FlowValidation;
 import io.terminus.dalaran.model.flow.FlowValidationBuilder;
 import io.terminus.dalaran.model.function.MappingFunctionInfo;
+import lombok.Data;
 import org.apache.camel.model.ProcessorDefinition;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -36,6 +37,7 @@ import static io.terminus.dalaran.component.processor.mapper.MapperValidationMes
         inputSerializeType = BodySerializeType.Object,
         outputSerializeType = BodySerializeType.Object
 )
+@Data
 public class DalaranMessageMapper implements DalaranProcessor<DalaranMapperConfig>, DalaranComponentValidator<DalaranMapperConfig> {
 
     @Autowired
@@ -52,6 +54,9 @@ public class DalaranMessageMapper implements DalaranProcessor<DalaranMapperConfi
 
     public DalaranMappingConfig transfer(Map<String, SimpleMapping> simpleMapping, MessageModel in, MessageModel out) {
         DalaranMappingConfig mappingConfig = new DalaranMappingConfig();
+        if (MapUtils.isEmpty(simpleMapping)) {
+            return mappingConfig;
+        }
         List<MessageMapping> messageMappings = new ArrayList<>();
         simpleMapping.forEach((path, mapping) -> {
             MessageMapping messageMapping = new MessageMapping();
