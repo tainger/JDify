@@ -1,5 +1,6 @@
 package io.terminus.dalaran.component.processor.mapper.model;
 
+import io.terminus.dalaran.model.FieldType;
 import lombok.Data;
 
 import java.util.List;
@@ -13,6 +14,8 @@ public class MessageMapping {
     private String path;
 
     private MappingType mappingType;
+
+    private FieldType type;
 
     private boolean complex;
 

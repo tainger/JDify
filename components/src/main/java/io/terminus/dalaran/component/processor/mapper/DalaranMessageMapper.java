@@ -84,8 +84,8 @@ public class DalaranMessageMapper implements DalaranProcessor<DalaranMapperConfi
         Map<String, ModelField> outField = out.getModelSchema().getFields();
 
         SimpleMappingField destinationField = new SimpleMappingField();
-
         MappingProperty mappingProperty = buildMappingField(path, outField, destinationField, false);
+        FieldType destinationType = mappingProperty.getFieldType();
         messageMapping.setStatus(mappingProperty.getStatus());
         if (mappingProperty.getStatus() == MappingStatus.ERROR) {
             return;
@@ -109,6 +109,7 @@ public class DalaranMessageMapper implements DalaranProcessor<DalaranMapperConfi
         messageMapping.setSourceFields(sourceFields);
         messageMapping.setComplex(property.isComplex());
         messageMapping.setStatus(property.getStatus());
+        messageMapping.setType(destinationType);
     }
 
     private List<String> buildSourcePaths(MappingType mappingType, Object value, MessageMapping messageMapping) {
@@ -150,7 +151,7 @@ public class DalaranMessageMapper implements DalaranProcessor<DalaranMapperConfi
 
     private MappingProperty buildMappingField(String path, Map<String, ModelField> modelField, SimpleMappingField simpleMappingField, boolean complex) {
         MappingStatus status = MappingStatus.CORRECT;
-
+        FieldType type = null;
         ModelField root = modelField.get(MapperConstants.MODEL_ROOT);
         if (root.getType() == FieldType.ARRAY) {
             complex = true;
@@ -164,13 +165,14 @@ public class DalaranMessageMapper implements DalaranProcessor<DalaranMapperConfi
             String fieldName = fields[i];
             ModelField field = temporaryField.get(fieldName);
             if (field == null) {
-                return new MappingProperty(complex, MappingStatus.ERROR);
+                return new MappingProperty(complex, MappingStatus.ERROR, type);
             }
             temporaryMappingField.setName(fieldName);
             temporaryMappingField.setType(field.getType());
 
             if (i == fields.length - 1) {
                 temporaryMappingField.setLocal(FieldLocal.END);
+                type = field.getType();
             } else {
                 if (field.getType() == FieldType.ARRAY) {
                     complex = true;
@@ -182,7 +184,7 @@ public class DalaranMessageMapper implements DalaranProcessor<DalaranMapperConfi
                 temporaryMappingField = childField;
             }
         }
-        return new MappingProperty(complex, status);
+        return new MappingProperty(complex, status, type);
     }
 
     @Override

@@ -1,5 +1,6 @@
 package io.terminus.dalaran.component.processor.mapper.model;
 
+import io.terminus.dalaran.model.FieldType;
 import lombok.Data;
 
 /**
@@ -12,11 +13,14 @@ public class MappingProperty {
 
     private MappingStatus status;
 
+    private FieldType fieldType;
+
     public MappingProperty() {
     }
 
-    public MappingProperty(boolean complex, MappingStatus status) {
+    public MappingProperty(boolean complex, MappingStatus status, FieldType fieldType) {
         this.complex = complex;
         this.status = status;
+        this.fieldType = fieldType;
     }
 }
