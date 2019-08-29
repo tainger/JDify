@@ -50,7 +50,6 @@ public class ModelConvert {
     public void basicConvert() {
         MessageModel jsonModel = buildModel(BodyType.JSON);
         MessageModel objectModel = buildModel(BodyType.OBJECT);
-        MessageModel xmlModel = buildModel(BodyType.XML);
 
         BasicFlow basicFlow = new BasicFlow();
         basicFlow.setInModel(objectModel);
@@ -80,7 +79,6 @@ public class ModelConvert {
     @Test
     public void xmlConvert() {
         MessageModel jsonModel = buildModel(BodyType.JSON);
-        MessageModel objectModel = buildModel(BodyType.OBJECT);
         MessageModel xmlModel = buildModel(BodyType.XML);
 
         BasicFlow basicFlow = new BasicFlow();
