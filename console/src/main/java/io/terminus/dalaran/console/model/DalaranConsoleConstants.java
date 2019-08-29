@@ -28,4 +28,6 @@ public class DalaranConsoleConstants {
     public static final String SOAP_CONNECTOR = "soap-connector";
 
     public static final String SWAGGER_CONNECTOR = "swagger-connector";
+
+    public static final String MODEL_EXCEL_TEMPLATE = "excel-model-template.xlsx";
 }

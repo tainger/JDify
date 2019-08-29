@@ -3,14 +3,12 @@ package io.terminus.dalaran.component.processor.mapper.jsonPath;
 import com.alibaba.fastjson.JSONPath;
 import com.github.drapostolos.typeparser.TypeParser;
 import io.terminus.dalaran.component.common.exception.FieldParseException;
+import io.terminus.dalaran.component.common.exception.MapperFunctionExecuteException;
 import io.terminus.dalaran.component.processor.mapper.model.*;
 import io.terminus.dalaran.core.context.DalaranContext;
 import io.terminus.dalaran.model.FieldType;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -171,12 +169,17 @@ public class Converter {
                 PathDetail pathDetail = destinationPaths.get(indexes);
                 Object value = null;
                 if (function != null) {
-                    switch (function.getType()) {
-                        case STATIC:
-                            value = dalaranContext.getDalaranFunctionContext().executeStaticFunction(function.getId(), values.toArray());
-                            break;
-                        case CUSTOM:
-                            value = dalaranContext.getDalaranFunctionContext().executeCustomFunction(Long.valueOf(function.getId()), values.toArray());
+                    try {
+                        switch (function.getType()) {
+                            case STATIC:
+                                value = dalaranContext.getDalaranFunctionContext().executeStaticFunction(function.getId(), values.toArray());
+                                break;
+                            case CUSTOM:
+                                value = dalaranContext.getDalaranFunctionContext().executeCustomFunction(Long.valueOf(function.getId()), values.toArray());
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        throw new MapperFunctionExecuteException("Mapper function execute error. function: " + function.getId() + ", params: " + Arrays.toString(values.toArray()) + ", message: " + e.getMessage());
                     }
                 } else {
                     value = values.get(0);
@@ -215,12 +218,17 @@ public class Converter {
         MappingFunction function = messageMapping.getFunction();
         Object value = null;
         if (function != null) {
-            switch (function.getType()) {
-                case STATIC:
-                    value = dalaranContext.getDalaranFunctionContext().executeStaticFunction(function.getId(), values.toArray());
-                    break;
-                case CUSTOM:
-                    value = dalaranContext.getDalaranFunctionContext().executeCustomFunction(Long.valueOf(function.getId()), values.toArray());
+            try {
+                switch (function.getType()) {
+                    case STATIC:
+                        value = dalaranContext.getDalaranFunctionContext().executeStaticFunction(function.getId(), values.toArray());
+                        break;
+                    case CUSTOM:
+                        value = dalaranContext.getDalaranFunctionContext().executeCustomFunction(Long.valueOf(function.getId()), values.toArray());
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw new MapperFunctionExecuteException("Mapper function execute error. function: " + function.getId() + ", params: " + Arrays.toString(values.toArray()) + ", message: " + e.getMessage());
             }
         } else {
             value = values.get(0);
