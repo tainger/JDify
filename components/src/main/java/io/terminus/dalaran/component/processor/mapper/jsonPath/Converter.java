@@ -218,12 +218,17 @@ public class Converter {
         MappingFunction function = messageMapping.getFunction();
         Object value = null;
         if (function != null) {
-            switch (function.getType()) {
-                case STATIC:
-                    value = dalaranContext.getDalaranFunctionContext().executeStaticFunction(function.getId(), values.toArray());
-                    break;
-                case CUSTOM:
-                    value = dalaranContext.getDalaranFunctionContext().executeCustomFunction(Long.valueOf(function.getId()), values.toArray());
+            try {
+                switch (function.getType()) {
+                    case STATIC:
+                        value = dalaranContext.getDalaranFunctionContext().executeStaticFunction(function.getId(), values.toArray());
+                        break;
+                    case CUSTOM:
+                        value = dalaranContext.getDalaranFunctionContext().executeCustomFunction(Long.valueOf(function.getId()), values.toArray());
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw new MapperFunctionExecuteException("Mapper function execute error. function: " + function.getId() + ", params: " + Arrays.toString(values.toArray()) + ", message: " + e.getMessage());
             }
         } else {
             value = values.get(0);
