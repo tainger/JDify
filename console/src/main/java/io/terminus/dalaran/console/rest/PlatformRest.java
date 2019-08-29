@@ -11,6 +11,7 @@ import io.terminus.dalaran.console.model.dto.ReleaseRecordDTO;
 import io.terminus.dalaran.console.model.dto.flow.TriggerFlowDTO;
 import io.terminus.dalaran.console.model.dto.trantor.TrantorModuleDTO;
 import io.terminus.dalaran.console.service.AuthorizeService;
+import io.terminus.dalaran.console.service.ExportService;
 import io.terminus.dalaran.console.service.ReleaseService;
 import io.terminus.dalaran.console.service.TrantorService;
 import io.terminus.dalaran.core.config.ConnectorInfo;
@@ -22,10 +23,14 @@ import io.terminus.dalaran.model.function.MappingFunctionInfo;
 import io.terminus.dalaran.model.trantor.DalaranTrantorModule;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
+import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Date;
@@ -46,6 +51,9 @@ public class PlatformRest {
 
     @Autowired
     private AuthorizeService authorizeService;
+
+    @Autowired
+    private ExportService exportService;
 
     @ApiOperation(value = "获取某版本所有流新消息")
     @GetMapping(value = "/release")
@@ -118,7 +126,18 @@ public class PlatformRest {
     @ApiOperation(value = "导出 Swagger 信息")
     @GetMapping(value = "/export/swagger")
     private Swagger exportSwagger() {
-        return releaseService.exportSwagger();
+        return exportService.exportSwagger();
+    }
+
+    @ApiOperation(value = "导出 Swagger 信息")
+    @GetMapping(value = "/export/word")
+    private ResponseEntity exportWord() {
+        File file = exportService.exportWord();
+        String currentDate = DateFormatUtils.format(new Date(), "yyyy-MM-dd HH:mm:ss");
+        FileSystemResource fileResource = new FileSystemResource(file);
+        return ResponseEntity.ok()
+                .header("Content-Disposition", "attachment; filename=dalaran-api-docs" + currentDate + ".docx")
+                .contentType(MediaType.APPLICATION_OCTET_STREAM).body(fileResource);
     }
 
     @ApiOperation(value = "导出所有配置")
@@ -126,24 +145,25 @@ public class PlatformRest {
     private ExportData exportAll(HttpServletResponse res) {
         String currentDate = DateFormatUtils.format(new Date(), "yyyy-MM-dd HH:mm:ss");
         res.addHeader("Content-Disposition", "attachment;filename=" + currentDate + ".dlr");
-        return releaseService.exportAll();
+        return exportService.exportAll();
     }
 
     @ApiOperation(value = "导入所有配置, 会覆盖之前的内容")
     @PostMapping(value = "/import")
     private ErrorResult importAll(@RequestParam MultipartFile exportData) {
-        ExportData importData = null;
+        ExportData importData;
         try {
             importData = JSON.parseObject(exportData.getInputStream(), ExportData.class);
         } catch (IOException e) {
             return ErrorResult.error("配置文件读取失败, 请确认文件");
         }
         try {
-            releaseService.importAll(importData);
+            exportService.importAll(importData);
         } catch (Throwable e) {
+            e.printStackTrace();
             return ErrorResult.error("未知错误导致导入失败");
         }
-        return ErrorResult.successful();
+        return ErrorResult.successful("导入成功");
     }
 
     @ApiOperation(value = "推送 Trantor 的带集成信息")

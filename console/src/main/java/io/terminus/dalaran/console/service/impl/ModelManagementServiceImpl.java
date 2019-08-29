@@ -7,31 +7,48 @@ import io.terminus.dalaran.component.processor.mapper.model.MapperConstants;
 import io.terminus.dalaran.component.processor.mapper.model.MappingType;
 import io.terminus.dalaran.component.processor.mapper.model.SimpleMapping;
 import io.terminus.dalaran.console.entity.ModelEntity;
+import io.terminus.dalaran.console.entity.ServiceEntity;
+import io.terminus.dalaran.console.model.ClassificationModel;
 import io.terminus.dalaran.console.model.DalaranConsoleConstants;
+import io.terminus.dalaran.console.model.ServiceType;
 import io.terminus.dalaran.console.model.dto.DataTemplate;
 import io.terminus.dalaran.console.model.dto.ModelDTO;
 import io.terminus.dalaran.console.model.dto.basic.BasicModelInfo;
 import io.terminus.dalaran.console.model.query.ModelQuery;
 import io.terminus.dalaran.console.repository.ModelRepository;
-import io.terminus.dalaran.console.repository.ModuleRepository;
+import io.terminus.dalaran.console.repository.ServiceRepository;
 import io.terminus.dalaran.console.service.ModelManagementService;
 import io.terminus.dalaran.console.service.jpa.ModelQueryService;
 import io.terminus.dalaran.console.util.ExcelUtils;
 import io.terminus.dalaran.core.context.DalaranContext;
+import io.terminus.dalaran.core.resource.repository.ModuleRepository;
 import io.terminus.dalaran.model.BodyType;
 import io.terminus.dalaran.model.DalaranModelSchema;
 import io.terminus.dalaran.model.FieldType;
 import io.terminus.dalaran.model.ModelField;
 import io.terminus.dalaran.model.schema.JsonSchema;
+import io.terminus.dalaran.model.schema.ObjectSchema;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.similarity.JaroWinklerDistance;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by jingdi on 2019/3/29
@@ -50,7 +67,12 @@ public class ModelManagementServiceImpl implements ModelManagementService {
     private ModuleRepository moduleRepository;
 
     @Autowired
+    private ServiceRepository serviceRepository;
+
+    @Autowired
     private DalaranContext dalaranContext;
+
+    private static final String COMMON_MODEL = "common";
 
     private JaroWinklerDistance jd = new JaroWinklerDistance();
 
@@ -73,42 +95,43 @@ public class ModelManagementServiceImpl implements ModelManagementService {
     @Override
     public List<ModelDTO> queryModels(ModelQuery query) {
         List<ModelEntity> entities = modelQueryService.query(query);
-        List<ModelDTO> models = new LinkedList<>();
-
-        for (ModelEntity entity : entities) {
-            models.add(buildModel(entity));
-        }
-
-        return models;
+        return entities.stream().map(this::buildModel).collect(Collectors.toList());
     }
 
     @Override
     public List<ModelDTO> list() {
         List<ModelEntity> entities = modelRepository.findAll();
-        List<ModelDTO> models = new LinkedList<>();
-
-        for (ModelEntity entity : entities) {
-            models.add(buildModel(entity));
-        }
-
-        return models;
+        return entities.stream().map(this::buildModel).collect(Collectors.toList());
     }
 
     @Override
     public List<ModelDTO> listNoHidden() {
         List<ModelEntity> entities = modelRepository.findByHiddenIsFalse();
-        List<ModelDTO> models = new LinkedList<>();
+        return entities.stream().map(this::buildModel).collect(Collectors.toList());
+    }
 
-        for (ModelEntity entity : entities) {
-            models.add(buildModel(entity));
-        }
+    @Override
+    public List<ModelDTO> listByModuleId(Long moduleId) {
+        List<ModelEntity> entities = modelRepository.findByModuleId(moduleId);
+        return entities.stream().map(this::buildModel).collect(Collectors.toList());
+    }
 
-        return models;
+    @Override
+    public List<ModelDTO> listNotHiddenByModuleId(Long moduleId) {
+        List<ModelEntity> entities = modelRepository.findByModuleIdAndHiddenIsFalse(moduleId);
+        return entities.stream().map(this::buildModel).collect(Collectors.toList());
     }
 
     @Override
     public List<BasicModelInfo> listBasicInfoByModuleId(Long moduleId) {
         return modelQueryService.listBasicInfoByModuleId(moduleId);
+    }
+
+    @Override
+    public Map<String, ClassificationModel> listClassificationModels(Long moduleId) {
+        List<ModelEntity> entities = modelRepository.findByModuleId(moduleId);
+        List<ModelDTO> models = entities.stream().map(this::buildModel).collect(Collectors.toList());
+        return buildClassificationModel(models);
     }
 
     @Override
@@ -166,7 +189,7 @@ public class ModelManagementServiceImpl implements ModelManagementService {
 
     @Override
     public JsonSchema importDataTemplate(DataTemplate dataTemplate, Long id) {
-        Map<String, ModelField> root = new HashMap<>();
+        SortedMap<String, ModelField> root = new TreeMap<>();
         ModelField modelField = new ModelField();
         root.put(MapperConstants.MODEL_ROOT, modelField);
         Object body = JSON.parse(dataTemplate.getDataTemplate());
@@ -176,6 +199,14 @@ public class ModelManagementServiceImpl implements ModelManagementService {
         }
         JsonSchema schema = new JsonSchema();
         schema.setFields(root);
+        ModelEntity model = modelRepository.findOne(id);
+        model.setModelSchema(JSON.toJSONString(schema));
+        modelRepository.save(model);
+        return schema;
+    }
+
+    @Override
+    public ObjectSchema importDalaranSchema(ObjectSchema schema, Long id) {
         ModelEntity model = modelRepository.findOne(id);
         model.setModelSchema(JSON.toJSONString(schema));
         modelRepository.save(model);
@@ -205,6 +236,22 @@ public class ModelManagementServiceImpl implements ModelManagementService {
         Map<String, SimpleMapping> mappings = new HashMap<>();
         deepBuildSuggest(sourceModelSchema.getFields(), targetModelSchema.getFields(), new ArrayList<>(), new ArrayList<>(), mappings);
         return mappings;
+    }
+
+    @Override
+    public ResponseEntity<Resource> downloadExcelTemplate() {
+        Resource resource = new ClassPathResource("excel-model-template.xlsx");
+        try {
+            InputStream inputStream = resource.getInputStream();
+            InputStreamResource inputStreamResource = new InputStreamResource(inputStream);
+            return ResponseEntity.ok().contentLength(resource.contentLength())
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
+                    .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                    .body(inputStreamResource);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     private void deepBuildSuggest(Map<String, ModelField> sourceFields, Map<String, ModelField> targetFields,
@@ -304,7 +351,7 @@ public class ModelManagementServiceImpl implements ModelManagementService {
     }
 
     private void buildModel(Object body, String type, ModelField modelField) {
-        Map<String, ModelField> child = new HashMap<>();
+        SortedMap<String, ModelField> child = new TreeMap<>();
         modelField.setFields(child);
         if (type.equalsIgnoreCase(DalaranConsoleConstants.JSON_OBJECT)) {
             modelField.setType(FieldType.OBJECT);
@@ -313,12 +360,6 @@ public class ModelManagementServiceImpl implements ModelManagementService {
             modelField.setType(FieldType.ARRAY);
             JSONArray jsonArray = (JSONArray) body;
             if (CollectionUtils.isNotEmpty(jsonArray)) {
-//                Object element = jsonArray.get(0);
-//                String elementType = element.getClass().getTypeName();
-//                modelField.setSubType(getFiledType(elementType));
-//                if (isComplexType(elementType) && elementType.equalsIgnoreCase(DalaranConsoleConstants.JSON_OBJECT)) {
-//                    buildChildren(element, child);
-//                }
                 jsonArray.forEach(element -> {
                     String elementType = element.getClass().getTypeName();
                     modelField.setSubType(getFiledType(elementType));
@@ -330,7 +371,7 @@ public class ModelManagementServiceImpl implements ModelManagementService {
         }
     }
 
-    private void buildChildren(Object element, Map<String, ModelField> child) {
+    private void buildChildren(Object element, SortedMap<String, ModelField> child) {
         JSONObject jsonObject = (JSONObject) element;
         jsonObject.forEach((name, value) -> {
             ModelField field = new ModelField();
@@ -395,6 +436,34 @@ public class ModelManagementServiceImpl implements ModelManagementService {
         return model;
     }
 
+    private Map<String, ClassificationModel> buildClassificationModel(List<ModelDTO> models) {
+        Map<String, ClassificationModel> classificationModels = new HashMap<>();
+        models.forEach(model -> {
+            Long serviceId = model.getServiceId();
+            if (serviceId != null) {
+                ServiceEntity serviceEntity = serviceRepository.findOne(model.getServiceId());
+                String serviceName = serviceEntity.getName();
+                ClassificationModel classificationModel = classificationModels.containsKey(serviceName)? new ClassificationModel(): classificationModels.get(serviceName);
+                List<ModelDTO> modelList = CollectionUtils.isEmpty(classificationModel.getModels())? new ArrayList<>(): classificationModel.getModels();
+                modelList.add(model);
+                classificationModel.setModels(modelList);
+                classificationModel.setName(serviceName);
+                ServiceType serviceType = serviceEntity.getType().equals(DalaranConsoleConstants.SOAP_CONNECTOR) ? ServiceType.SOAP: ServiceType.SWAGGER;
+                classificationModel.setServiceType(serviceType);
+                classificationModels.put(serviceName, classificationModel);
+            } else {
+                ClassificationModel classificationModel = classificationModels.containsKey(COMMON_MODEL)? new ClassificationModel(): classificationModels.get(COMMON_MODEL);
+                List<ModelDTO> modelList = CollectionUtils.isEmpty(classificationModel.getModels())? new ArrayList<>(): classificationModel.getModels();
+                modelList.add(model);
+                classificationModel.setModels(modelList);
+                classificationModel.setName(COMMON_MODEL);
+                classificationModel.setServiceType(ServiceType.COMMON);
+                classificationModels.put(COMMON_MODEL, classificationModel);
+            }
+        });
+        return classificationModels;
+    }
+
     private boolean isComplexType(String type) {
         switch (type) {
             case DalaranConsoleConstants.JSON_OBJECT:
@@ -415,6 +484,9 @@ public class ModelManagementServiceImpl implements ModelManagementService {
                 return FieldType.OBJECT;
             case DalaranConsoleConstants.JSON_ARRAY:
                 return FieldType.ARRAY;
+            case DalaranConsoleConstants.JAVA_FLOAT:
+            case DalaranConsoleConstants.JAVA_DOUBLE:
+                return FieldType.FLOAT;
         }
         return FieldType.STRING;
     }

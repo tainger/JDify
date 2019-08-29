@@ -12,6 +12,7 @@ import org.apache.camel.model.RouteDefinition;
 import java.io.Serializable;
 import java.util.Map;
 
+import static io.terminus.dalaran.DalaranConstants.TRACING_FLOW_ID;
 import static io.terminus.dalaran.model.BodyType.UNKNOWN;
 
 /**
@@ -25,35 +26,36 @@ public class DalaranTracer {
 
     private final TracingType tracingType;
 
-    private final Long flowId;
-
     private final String processorId;
 
-    private DalaranTracer(DalaranTraceLogger logger, TracingType tracingType, Long flowId, String processorId) {
+    private DalaranTracer(DalaranTraceLogger logger, TracingType tracingType, String processorId) {
         this.logger = logger;
         this.tracingType = tracingType;
-        this.flowId = flowId;
         this.processorId = processorId;
     }
 
-    public static DalaranTracer buildTestFlowTracer(DalaranTraceLogger logger, Long flowId) {
-        return new DalaranTracer(logger, TracingType.TestFlow, flowId, null);
+    public static DalaranTracer buildTestSubFlowTracer(DalaranTraceLogger logger) {
+        return new DalaranTracer(logger, TracingType.TestSubFlow, null);
     }
 
-    public static DalaranTracer buildFlowTracer(DalaranTraceLogger logger, Long flowId) {
-        return new DalaranTracer(logger, TracingType.Flow, flowId, null);
+    public static DalaranTracer buildTestFlowTracer(DalaranTraceLogger logger) {
+        return new DalaranTracer(logger, TracingType.TestFlow, null);
     }
 
-    public static DalaranTracer buildFlowSpanTracer(DalaranTraceLogger logger, Long flowId, String processorId) {
-        return new DalaranTracer(logger, TracingType.Processor, flowId, processorId);
+    public static DalaranTracer buildFlowTracer(DalaranTraceLogger logger) {
+        return new DalaranTracer(logger, TracingType.Flow, null);
     }
 
-    public static DalaranTracer buildConvertTracer(DalaranTraceLogger logger, Long flowId, String processorId) {
-        return new DalaranTracer(logger, TracingType.Convert, flowId, processorId);
+    public static DalaranTracer buildFlowSpanTracer(DalaranTraceLogger logger, String processorId) {
+        return new DalaranTracer(logger, TracingType.Processor, processorId);
     }
 
-    public static DalaranTracer buildSubFlowTracer(DalaranTraceLogger logger, Long flowId) {
-        return new DalaranTracer(logger, TracingType.SubFlow, flowId, null);
+    public static DalaranTracer buildConvertTracer(DalaranTraceLogger logger, String processorId) {
+        return new DalaranTracer(logger, TracingType.Convert, processorId);
+    }
+
+    public static DalaranTracer buildSubFlowTracer(DalaranTraceLogger logger) {
+        return new DalaranTracer(logger, TracingType.SubFlow, null);
     }
 
     public void before(RouteDefinition route, BodyType modelType) {
@@ -89,6 +91,8 @@ public class DalaranTracer {
                 return DalaranConstants.FLOW_TRACING_LOG;
             case TestFlow:
                 return DalaranConstants.TEST_FLOW_TRACING_LOG;
+            case TestSubFlow:
+                return DalaranConstants.TEST_SUB_FLOW_TRACING_LOG;
             case Processor:
                 return DalaranConstants.PROCESSOR_TRACING_LOG;
             case Convert:
@@ -130,7 +134,7 @@ public class DalaranTracer {
             exchange.getOut().copyFrom(exchange.getIn());
 
             DalaranTracingLog tracingLog = new DalaranTracingLog();
-            Boolean isMainFlow = TracingType.Flow == tracingType || TracingType.TestFlow == tracingType;
+            boolean isMainFlow = TracingType.Flow == tracingType || TracingType.TestFlow == tracingType || TracingType.TestSubFlow == tracingType;
             tracingLog.setMain(isMainFlow);
             exchange.setProperty(getTracingLogPropertyKey(), tracingLog);
             String testRecordId = exchange.getProperty(DalaranConstants.TEST_FLOW_RECORD_ID_HEADER, String.class);
@@ -140,7 +144,7 @@ public class DalaranTracer {
                 tracingLog.setRecordId(exchange.getExchangeId());
             }
             tracingLog.setTracingType(tracingType);
-            tracingLog.setFlowId(flowId);
+            tracingLog.setFlowId(exchange.getProperty(TRACING_FLOW_ID, Long.class));
             tracingLog.setProcessorId(processorId);
             tracingLog.setTimestamp(System.currentTimeMillis());
             tracingLog.setInputBody(extractBody(exchange.getIn().getBody()));
@@ -151,15 +155,15 @@ public class DalaranTracer {
         public String getTraceLabel() {
             switch (tracingType) {
                 case Flow:
-                    return "flow tracing before[flow(" + flowId + ")]";
+                    return "flow tracing before";
                 case TestFlow:
-                    return "test flow tracing before[testFlow(" + flowId + ")]";
+                    return "test flow tracing before";
                 case SubFlow:
-                    return "sub flow tracing before[testFlow(" + flowId + ")]";
+                    return "sub flow tracing before";
                 case Processor:
-                    return "processor tracing before[testFlow(" + flowId + ") -> processor(" + processorId + ")]";
+                    return "processor tracing before[processor(" + processorId + ")]";
                 case Convert:
-                    return "convert tracing before[testFlow(" + flowId + ") -> processor(" + processorId + ")]";
+                    return "convert tracing before[processor(" + processorId + ")]";
                 default:
                     return "DalaranTraceBefore";
             }
@@ -202,15 +206,15 @@ public class DalaranTracer {
         public String getTraceLabel() {
             switch (tracingType) {
                 case Flow:
-                    return "flow tracing after[flow(" + flowId + ")]";
+                    return "flow tracing after";
                 case TestFlow:
-                    return "test flow tracing after[testFlow(" + flowId + ")]";
+                    return "test flow tracing after";
                 case SubFlow:
-                    return "sub flow tracing after[testFlow(" + flowId + ")]";
+                    return "sub flow tracing after";
                 case Processor:
-                    return "processor tracing after[testFlow(" + flowId + ") -> processor(" + processorId + ")]";
+                    return "processor tracing after[processor(" + processorId + ")]";
                 case Convert:
-                    return "convert tracing after[testFlow(" + flowId + ") -> processor(" + processorId + ")]";
+                    return "convert tracing after[processor(" + processorId + ")]";
                 default:
                     return "DalaranTraceAfter";
             }

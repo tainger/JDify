@@ -1,14 +1,21 @@
 package io.terminus.dalaran.runtime;
 
+import com.alibaba.fastjson.JSON;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.swagger.models.Swagger;
+import io.terminus.dalaran.component.trigger.rest.RestConfig;
+import io.terminus.dalaran.component.trigger.rest.model.ApiInfo;
+import io.terminus.dalaran.component.trigger.rest.utils.SwaggerUtils;
 import io.terminus.dalaran.core.context.DalaranContext;
 import io.terminus.dalaran.core.resource.DalaranResourceBuilder;
+import io.terminus.dalaran.core.resource.entity.common.ModuleEntity;
 import io.terminus.dalaran.core.resource.entity.common.ReleaseRecordEntity;
-import io.terminus.dalaran.core.resource.entity.released.ClientReleasedEntity;
-import io.terminus.dalaran.core.resource.entity.released.FunctionReleasedEntity;
-import io.terminus.dalaran.core.resource.entity.released.SubFlowReleasedEntity;
-import io.terminus.dalaran.core.resource.entity.released.TriggerFlowReleasedEntity;
+import io.terminus.dalaran.core.resource.entity.released.*;
+import io.terminus.dalaran.core.resource.repository.ModuleRepository;
 import io.terminus.dalaran.core.resource.repository.ReleaseRecordRepository;
-import io.terminus.dalaran.model.flow.FlowStatus;
+import io.terminus.dalaran.model.DalaranModelSchema;
 import io.terminus.dalaran.model.flow.SubFlow;
 import io.terminus.dalaran.model.flow.TriggerFlow;
 import lombok.extern.slf4j.Slf4j;
@@ -19,9 +26,13 @@ import org.springframework.scheduling.annotation.Scheduled;
 
 import javax.annotation.PostConstruct;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 public class ReleasedFlowInitializer {
+
+    @Autowired
+    private ModuleRepository moduleRepository;
 
     @Autowired
     private ReleaseRecordRepository releaseRecordRepository;
@@ -38,12 +49,25 @@ public class ReleasedFlowInitializer {
     @Autowired
     private CamelContext camelContext;
 
+    private Swagger swagger;
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
     @PostConstruct
     private void init() throws Exception {
-        RouteDefinition route = new RouteDefinition();
-        route.from("netty4-http:http://0.0.0.0:8080/__dalaran/__health?httpMethodRestrict=GET")
-                .setBody().constant("OK").end();
-        camelContext.addRouteDefinition(route);
+        objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        RouteDefinition swaggerJsonRoute = new RouteDefinition();
+        swaggerJsonRoute.from("netty4-http:http://0.0.0.0:8080/__dalaran/swagger.json?httpMethodRestrict=GET")
+                .setBody().method(this, "getSwaggerJson").end();
+        camelContext.addRouteDefinition(swaggerJsonRoute);
+        RouteDefinition swaggerRoute = new RouteDefinition();
+        swaggerRoute.from("netty4-http:http://0.0.0.0:8080/__dalaran/swagger?httpMethodRestrict=GET")
+                .setBody().constant("<html><head><script src=\"//unpkg.com/swagger-ui-dist@3/swagger-ui-bundle.js\">" +
+                "</script><link href=\"https://unpkg.com/swagger-ui-dist@3.23.5/swagger-ui.css\"  rel=\"stylesheet\"></head>" +
+                "<body><div id=\"swagger-ui\"/></body>" +
+                "<script>SwaggerUIBundle({url:\"/__dalaran/swagger.json\",dom_id:'#swagger-ui',presets:[SwaggerUIBundle.presets.apis,SwaggerUIBundle.SwaggerUIStandalonePreset]})</script>" +
+                "</html>").end();
+        camelContext.addRouteDefinition(swaggerRoute);
     }
 
     // TODO 临时每分钟 load 一下...
@@ -72,27 +96,43 @@ public class ReleasedFlowInitializer {
                         function.getScript(), function.getParams());
             }
 
-            List<TriggerFlowReleasedEntity> triggerFlows = resourceLoader.loadAllTriggerFlow();
+            List<TriggerFlowReleasedEntity> triggerFlows = resourceLoader.loadAvailableTriggerFlow();
             for (TriggerFlowReleasedEntity triggerFlowEntity : triggerFlows) {
-                if (triggerFlowEntity.getStatus() != FlowStatus.Error) {
-                    TriggerFlow triggerFlow = resourceBuilder.buildTriggerFlow(triggerFlowEntity);
-                    dalaranContext.addTriggerFlow(triggerFlow);
-                    log.info("load released flow [{}]", triggerFlow.getId());
-                } else {
-                    log.info("can't load flow [{}], because has error.", triggerFlowEntity.getId());
-                }
+                TriggerFlow triggerFlow = resourceBuilder.buildTriggerFlow(triggerFlowEntity);
+                dalaranContext.addTriggerFlow(triggerFlow);
+                log.info("load released flow [{}]", triggerFlow.getId());
             }
 
-            List<SubFlowReleasedEntity> subFLows = resourceLoader.loadAllSubFlow();
+            List<SubFlowReleasedEntity> subFLows = resourceLoader.loadAvailableSubFlow();
             for (SubFlowReleasedEntity subFlowEntity : subFLows) {
-                if (subFlowEntity.getStatus() != FlowStatus.Error) {
-                    SubFlow subFlow = resourceBuilder.buildSubFlow(subFlowEntity);
-                    dalaranContext.addSubFlow(subFlow);
-                    log.info("load released sub-flow {}", subFlow.getId());
-                } else {
-                    log.info("can't load sub-flow [{}], because has error.", subFlowEntity.getId());
-                }
+                SubFlow subFlow = resourceBuilder.buildSubFlow(subFlowEntity);
+                dalaranContext.addSubFlow(subFlow);
+                log.info("load released sub-flow {}", subFlow.getId());
             }
+
+            List<ApiInfo> apiInfoList = getExportApiInfoList();
+            swagger = SwaggerUtils.buildSwagger(apiInfoList);
         }
+    }
+
+    private List<ApiInfo> getExportApiInfoList() {
+        List<TriggerFlowReleasedEntity> restFlowList = resourceLoader.loadAvailableTriggerFlowByTriggerType("http-rest-listener");
+        return restFlowList.stream().map(flowEntity -> {
+            ModuleEntity module = moduleRepository.findOne(flowEntity.getModuleId());
+            RestConfig restConfig = JSON.parseObject(flowEntity.getTriggerConfig(), RestConfig.class);
+            DalaranModelSchema inSchema = getModelSchema(flowEntity.getInModel());
+            DalaranModelSchema outSchema = getModelSchema(flowEntity.getOutModel());
+            return new ApiInfo(module.getName(), restConfig, flowEntity, inSchema, outSchema);
+        }).collect(Collectors.toList());
+    }
+
+    private DalaranModelSchema getModelSchema(Long modelId) {
+        ModelReleasedEntity modelEntity = resourceLoader.loadModel(modelId);
+        Class<? extends DalaranModelSchema> schemaType = dalaranContext.getDalaranConverterContext().getSchemaType(modelEntity.getType());
+        return JSON.parseObject(modelEntity.getModelSchema(), schemaType);
+    }
+
+    public String getSwaggerJson() throws JsonProcessingException {
+        return objectMapper.writeValueAsString(swagger);
     }
 }

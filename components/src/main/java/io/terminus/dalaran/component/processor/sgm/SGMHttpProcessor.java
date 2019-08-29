@@ -17,6 +17,8 @@ import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
+import static io.terminus.dalaran.component.processor.sgm.model.SGMConstants.SUCCESSFUL_CODE;
+
 public class SGMHttpProcessor implements Processor, Traceable {
 
     private SGMHttpClientConfig config;
@@ -82,11 +84,15 @@ public class SGMHttpProcessor implements Processor, Traceable {
             ResponseBody responseBody = response.body();
             if (responseBody != null) {
                 Map<String, Object> rst = JSON.parseObject(responseBody.string(), Map.class);
-                return rst.get(SGMConstants.RESPONSE_DATA);
+                Object code = rst.get(SGMConstants.RESPONSE_CODE);
+                if (SUCCESSFUL_CODE.equals(code)) {
+                    return rst.get(SGMConstants.RESPONSE_DATA);
+                }
+                throw new SGMHttpClientException("SGM business error code [" + code + "], message: " + rst.get(SGMConstants.RESPONSE_MESSAGE));
             }
         }
         logger.warn("response body is null!");
-        return null;
+        throw new SGMHttpClientException("GSM client request error");
     }
 
     private String calculationSign(String accessToken, String timestamp) {

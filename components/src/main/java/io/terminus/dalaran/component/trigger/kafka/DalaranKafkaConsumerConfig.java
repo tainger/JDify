@@ -14,6 +14,7 @@ import lombok.Data;
  */
 @Data
 public class DalaranKafkaConsumerConfig extends AllModelConfig implements ConnectorConfig<KafkaConnector> {
+
     @ConfigFieldInfo(inputType = FieldInputType.Hidden)
     @JSONField(serialize = false)
     @JsonIgnore

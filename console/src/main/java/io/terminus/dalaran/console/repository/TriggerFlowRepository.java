@@ -10,4 +10,6 @@ import java.util.List;
 public interface TriggerFlowRepository extends JpaRepository<TriggerFlowEntity, Long>, JpaSpecificationExecutor<TriggerFlowEntity> {
 
     List<TriggerFlowEntity> findByStatusNotAndTriggerType(FlowStatus status, String triggerType);
+
+    List<TriggerFlowEntity> findByStatusNot(FlowStatus status);
 }

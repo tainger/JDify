@@ -2,6 +2,7 @@ package io.terminus.dalaran.console.rest;
 
 import io.swagger.annotations.ApiOperation;
 import io.terminus.dalaran.component.processor.mapper.model.SimpleMapping;
+import io.terminus.dalaran.console.model.ClassificationModel;
 import io.terminus.dalaran.console.model.dto.DataTemplate;
 import io.terminus.dalaran.console.model.dto.ModelDTO;
 import io.terminus.dalaran.console.model.query.ModelQuery;
@@ -10,10 +11,14 @@ import io.terminus.dalaran.console.service.ModelManagementService;
 import io.terminus.dalaran.model.BodyType;
 import io.terminus.dalaran.model.ModelField;
 import io.terminus.dalaran.model.schema.JsonSchema;
+import io.terminus.dalaran.model.schema.ObjectSchema;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,16 +60,34 @@ public class ModelManagementRest {
         modelManagementService.deleteModel(id);
     }
 
-    @ApiOperation(value = "查询全部未隐藏的数据模型")
+    @ApiOperation(value = "查询全部的数据模型")
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     public List<ModelDTO> list() {
+        return modelManagementService.list();
+    }
+
+    @ApiOperation(value = "全量查询某模块内的数据模型")
+    @RequestMapping(value = "/list/{moduleId}", method = RequestMethod.GET)
+    public List<ModelDTO> listByModuleId(@PathVariable Long moduleId) {
+        return modelManagementService.listByModuleId(moduleId);
+    }
+
+    @ApiOperation(value = "查询全部未隐藏的数据模型")
+    @RequestMapping(value = "/list/public", method = RequestMethod.GET)
+    public List<ModelDTO> listNoHidden() {
         return modelManagementService.listNoHidden();
     }
 
-    @ApiOperation(value = "全量查询数据模型")
-    @RequestMapping(value = "/listAll", method = RequestMethod.GET)
-    public List<ModelDTO> listAll() {
-        return modelManagementService.list();
+    @ApiOperation(value = "查询某模块内未隐藏的数据模型")
+    @RequestMapping(value = "/list/{moduleId}/public", method = RequestMethod.GET)
+    public List<ModelDTO> listNoHiddenByModuleId(@PathVariable Long moduleId) {
+        return modelManagementService.listNotHiddenByModuleId(moduleId);
+    }
+
+    @ApiOperation(value = "全量查询某模块内的分类数据模型")
+    @RequestMapping(value = "/list/classification/{moduleId}/", method = RequestMethod.GET)
+    public Map<String, ClassificationModel> listClassificationByModuleId(@PathVariable Long moduleId) {
+        return modelManagementService.listClassificationModels(moduleId);
     }
 
     @ApiOperation(value = "根据模型匹配自动生成建议的映射")
@@ -86,14 +109,23 @@ public class ModelManagementRest {
         return schema.getFields();
     }
 
+    @ApiOperation(value = "导入数据模板更新模型结构")
+    @RequestMapping(value = "/{id}/import/dalaran-schema", method = RequestMethod.POST)
+    public Map<String, ModelField> importDalaranSchema(@RequestBody ObjectSchema objectSchema, @PathVariable long id) {
+        ObjectSchema schema = modelManagementService.importDalaranSchema(objectSchema, id);
+        return schema.getFields();
+    }
+
     @ApiOperation(value = "根据模型结构生成数据样例")
     @RequestMapping(value = "/{id}/build/data-template", method = RequestMethod.POST)
-    public String buildRequestTemplate(@RequestBody JsonSchema schema, @PathVariable long id) {
-        return modelManagementService.buildDataTemplate(schema, id);
+    public DataTemplate buildRequestTemplate(@RequestBody JsonSchema schema, @PathVariable long id) {
+        DataTemplate template = new DataTemplate();
+        template.setDataTemplate(modelManagementService.buildDataTemplate(schema, id));
+        return template;
     }
 
     // TODO 待开发
-    @ApiOperation(value = "导入数据模板更新模型结构")
+    @ApiOperation(value = "导入模型类信息更新模型结构")
     @RequestMapping(value = "/{id}/import/code-template", method = RequestMethod.POST)
     public Map<String, ModelField> importCodeTemplate(@RequestBody String codeTemplate, @PathVariable long id) {
         return new HashMap<>();
@@ -106,5 +138,9 @@ public class ModelManagementRest {
         return modelManagementService.multiImportExcel(file, type);
     }
 
-
+    @ApiOperation(value = "下载数据模型Excel模板样例")
+    @RequestMapping(value = "/download/excel-template", method = RequestMethod.GET)
+    public ResponseEntity<Resource> downloadExcelTemplate() {
+        return modelManagementService.downloadExcelTemplate();
+    }
 }

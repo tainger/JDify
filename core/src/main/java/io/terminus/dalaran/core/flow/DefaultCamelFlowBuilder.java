@@ -11,19 +11,22 @@ import io.terminus.dalaran.core.context.DalaranConverterContext;
 import io.terminus.dalaran.core.log.DalaranTraceLogger;
 import io.terminus.dalaran.core.log.DalaranTracer;
 import io.terminus.dalaran.core.log.TracingErrorHandlerFactory;
+import io.terminus.dalaran.model.BodyType;
 import io.terminus.dalaran.model.MessageModel;
 import io.terminus.dalaran.model.component.ProcessorModel;
 import io.terminus.dalaran.model.flow.*;
 import lombok.val;
 import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.beanutils.BeanUtilsBean;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static io.terminus.dalaran.DalaranConstants.TEST_FLOW_PREFIX;
-import static io.terminus.dalaran.DalaranConstants.TEST_SUB_FLOW_PREFIX;
+import static io.terminus.dalaran.DalaranConstants.*;
 import static io.terminus.dalaran.core.flow.DefaultFlowValidateMessages.FIELD_NOT_NULL;
 import static io.terminus.dalaran.core.flow.DefaultFlowValidateMessages.MODEL_NOT_EQUALLY;
 import static io.terminus.dalaran.core.flow.FlowSuggest.ADD_MAPPER;
@@ -58,7 +61,7 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
 
         DalaranTracer flowTracer = null;
         if (flow.isTracing()) {
-            flowTracer = DalaranTracer.buildFlowTracer(traceLogger, flow.getId());
+            flowTracer = DalaranTracer.buildFlowTracer(traceLogger);
         }
         DalaranTrigger triggerBean = componentContext.getTrigger(flow.getTriggerType());
         Object triggerConfig = flow.getTriggerConfig();
@@ -68,6 +71,7 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
 
         val route = createRouteDefinition();
         route.setId(flow.getRouteId());
+        route.setProperty(TRACING_FLOW_ID).constant(flow.getId());
         triggerComponent.buildFromRoute(route, triggerConfig);
         if (flowTracer != null) {
             flowTracer.before(route, flow.getInModel().getModelType());
@@ -85,8 +89,9 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
 
     @Override
     public DalaranRoute buildSubFLow(SubFlow flow) {
-        val flowTracer = DalaranTracer.buildSubFlowTracer(traceLogger, flow.getId());
+        val flowTracer = DalaranTracer.buildSubFlowTracer(traceLogger);
         val route = createRouteDefinition(flow);
+        route.setProperty(TRACING_FLOW_ID).constant(flow.getId());
         if (flow.getInModel() == null) {
             flowTracer.before(route);
         } else {
@@ -112,9 +117,17 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
 
     @Override
     public DalaranRoute buildTestFLow(BasicFlow flow) {
-        val flowTracer = DalaranTracer.buildTestFlowTracer(traceLogger, flow.getId());
+        // enable tracing on test mode
+        flow.setTracing(true);
+        DalaranTracer flowTracer;
+        if (flow instanceof SubFlow) {
+            flowTracer = DalaranTracer.buildTestSubFlowTracer(traceLogger);
+        } else {
+            flowTracer = DalaranTracer.buildTestFlowTracer(traceLogger);
+        }
         val route = createRouteDefinition();
         route.setId(TEST_FLOW_PREFIX + flow.getRouteId());
+        route.setProperty(TRACING_FLOW_ID).constant(flow.getId());
         route.from(DalaranConstants.TEST_FLOW_DIRECT_PREFIX + flow.getRouteId());
         if (flow.getInModel() == null) {
             flowTracer.before(route);
@@ -123,19 +136,17 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
         }
 
         // TODO 测试的输入一定是序列化的, XML/Json 等都是直接扔进去, 如果入参是 Object, 前端引导输入 Json 做反序列化处理吧
-//        if (!flow.getInModel().getModelType().isSerialized()) {
-//            route.process(exchange -> {
-//                String bodyString = exchange.getIn().getBody(String.class);
-//                InputStream input = new ByteArrayInputStream(bodyString.getBytes());
-//                exchange.getOut().setBody(input);
-//            });
-//            converterContext.toObject(route, BodyType.JSON);
-//        }
-
-        // enable tracing on test mode
-        flow.setTracing(true);
-
-        buildFlowRoute(route, flow, true);
+        if (flow.getInModel() != null && !flow.getInModel().getModelType().isSerialized()) {
+            route.process(exchange -> {
+                String bodyString = exchange.getIn().getBody(String.class);
+                InputStream input = new ByteArrayInputStream(bodyString.getBytes());
+                exchange.getOut().setBody(input);
+            });
+            converterContext.toObject(route, BodyType.JSON);
+            buildFlowRoute(route, flow, false);
+        } else {
+            buildFlowRoute(route, flow, true);
+        }
 
         if (flow.getOutModel() == null) {
             flowTracer.after(route);
@@ -148,9 +159,10 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
 
     @Override
     public DalaranRoute buildTestSubFLow(SubFlow flow) {
-        val flowTracer = DalaranTracer.buildTestFlowTracer(traceLogger, flow.getId());
+        val flowTracer = DalaranTracer.buildTestFlowTracer(traceLogger);
         val route = createRouteDefinition();
         route.setId(TEST_SUB_FLOW_PREFIX + flow.getRouteId());
+        route.setProperty(TRACING_FLOW_ID).constant(flow.getId());
         route.from(DalaranConstants.TEST_SUB_FLOW_DIRECT_PREFIX + flow.getRouteId());
         flowTracer.before(route, flow.getInModel().getModelType());
         flow.setTracing(true);
@@ -238,14 +250,18 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
         for (ProcessorModel processor : processorList) {
             DalaranTracer spanTracer = null;
             if (flow.isTracing()) {
-                spanTracer = DalaranTracer.buildFlowSpanTracer(traceLogger, flow.getId(), processor.getId());
+                spanTracer = DalaranTracer.buildFlowSpanTracer(traceLogger, processor.getId());
             }
             DalaranProcessor processorComponent = componentContext.getProcessor(processor.getType());
             currentProcessorInfo = componentContext.getProcessorInfo(processor.getType());
 
             // TODO no model
-            if (spanTracer != null && currentModel != null) {
-                spanTracer.before(route, currentModel.getModelType());
+            if (spanTracer != null) {
+                if (currentModel == null) {
+                    spanTracer.before(route);
+                } else {
+                    spanTracer.before(route, currentModel.getModelType());
+                }
             }
             // TODO 这里还是比较奇怪, 有点绕, 而且有些特殊场景没有考虑到
 //                currentBodyIsSerialized = currentModel.getModelType().isSerialized();
@@ -291,8 +307,12 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
             if (outModel != null) {
                 currentModel = outModel;
             }
-            if (spanTracer != null && currentModel != null) {
-                spanTracer.after(route, currentModel.getModelType());
+            if (spanTracer != null) {
+                if (currentModel == null) {
+                    spanTracer.after(route);
+                } else {
+                    spanTracer.after(route, currentModel.getModelType());
+                }
             }
         }
 

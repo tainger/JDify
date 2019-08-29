@@ -58,6 +58,10 @@ public class DubboEndpoint extends ProcessorEndpoint {
             reference.setGeneric(true);
             ReferenceConfigCache cache = ReferenceConfigCache.getCache();
             genericService = cache.get(reference);
+            if (genericService == null) {
+                cache.destroy(reference);
+                genericService = cache.get(reference);
+            }
         }
         return this.genericService;
     }

@@ -17,6 +17,7 @@ import io.terminus.dalaran.core.resource.entity.common.ProcessorEntity;
 import io.terminus.dalaran.model.flow.FlowStatus;
 import io.terminus.dalaran.model.flow.FlowValidation;
 import io.terminus.dalaran.model.flow.SubFlow;
+import io.terminus.dalaran.model.flow.ValidateMessageLevel;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.BeanUtils;
@@ -127,11 +128,15 @@ public class SubFlowManagementServiceImpl implements SubFlowManagementService {
     }
 
     private void setFlowStatus(SubFlowEntity flowEntity) {
-        FlowStatus flowStatus;
-        if (validateFlow(flowEntity).isEmpty()) {
-            flowStatus = FlowStatus.Available;
-        } else {
-            flowStatus = FlowStatus.Error;
+        FlowStatus flowStatus = FlowStatus.Available;
+        for (FlowValidation flowValidation : validateFlow(flowEntity)) {
+            if (flowValidation.getMessage().getLevel() == ValidateMessageLevel.Error) {
+                flowStatus = FlowStatus.Error;
+                break;
+            }
+            if (flowStatus == FlowStatus.Available) {
+                flowStatus = FlowStatus.Warning;
+            }
         }
         flowEntity.setStatus(flowStatus);
     }

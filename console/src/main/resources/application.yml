@@ -1,7 +1,7 @@
 server:
   port: 8088
-  sesstion:
-    timeout: 120m
+  session:
+    timeout: 10400
 spring:
   application:
     name: dalaran-console

@@ -203,6 +203,14 @@ public class DefaultDalaranResourceBuilder implements DalaranResourceBuilder {
                 allImmutableModelConfig.setOutModel(lastOutModel);
             }
         }
+        if (config instanceof ImmutableInModelConfig) {
+            ImmutableInModelConfig immutableInModelConfig = (ImmutableInModelConfig) config;
+            immutableInModelConfig.setInModel(buildModel(immutableInModelConfig.getInModelId()));
+            if (immutableInModelConfig.getOutModelId() != null) {
+                lastOutModel = buildModel(immutableInModelConfig.getOutModelId());
+                immutableInModelConfig.setOutModel(lastOutModel);
+            }
+        }
         return lastOutModel;
     }
 

@@ -3,6 +3,7 @@ package io.terminus.dalaran.runtime;
 import io.terminus.dalaran.core.resource.DalaranResourceLoader;
 import io.terminus.dalaran.core.resource.entity.released.*;
 import io.terminus.dalaran.core.resource.repository.*;
+import io.terminus.dalaran.model.flow.FlowStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
@@ -43,6 +44,21 @@ public class ReleasedResourceLoader implements DalaranResourceLoader {
     @Override
     public List<SubFlowReleasedEntity> loadAllSubFlow() {
         return releasedSubFlowRepository.findByVersion(version);
+    }
+
+    @Override
+    public List<TriggerFlowReleasedEntity> loadAvailableTriggerFlow() {
+        return releasedTriggerFlowRepository.findByVersionAndStatusNot(version, FlowStatus.Error);
+    }
+
+    @Override
+    public List<SubFlowReleasedEntity> loadAvailableSubFlow() {
+        return releasedSubFlowRepository.findByVersionAndStatusNot(version, FlowStatus.Error);
+    }
+
+    @Override
+    public List<TriggerFlowReleasedEntity> loadAvailableTriggerFlowByTriggerType(String triggerType) {
+        return releasedTriggerFlowRepository.findByVersionAndStatusNotAndTriggerType(version, FlowStatus.Error, triggerType);
     }
 
     @Override
