@@ -150,7 +150,6 @@ public class ModelManagementServiceImpl implements ModelManagementService {
             Map<String, ModelField> fields = ExcelUtils.parseFirstSheet(file.getInputStream());
             JsonSchema schema = new JsonSchema();
             schema.setFields(fields);
-            // TODO 这些应该扔到 service 里
             ModelEntity model = modelRepository.findOne(id);
             model.setModelSchema(JSON.toJSONString(schema));
             modelRepository.save(model);
@@ -166,7 +165,6 @@ public class ModelManagementServiceImpl implements ModelManagementService {
         try {
             Map<Long, Map<String, JsonSchema>> modelSchema = new HashMap<>();
             Map<String, Map<String, ModelField>> schemas = ExcelUtils.parseAllSheet(file.getInputStream());
-            // TODO 这些应该扔到 service 里
             for (Map.Entry<String, Map<String, ModelField>> entry : schemas.entrySet()) {
                 ModelEntity model = new ModelEntity();
                 JsonSchema schema = new JsonSchema();
@@ -240,7 +238,7 @@ public class ModelManagementServiceImpl implements ModelManagementService {
 
     @Override
     public ResponseEntity<Resource> downloadExcelTemplate() {
-        Resource resource = new ClassPathResource("excel-model-template.xlsx");
+        Resource resource = new ClassPathResource(DalaranConsoleConstants.MODEL_EXCEL_TEMPLATE);
         try {
             InputStream inputStream = resource.getInputStream();
             InputStreamResource inputStreamResource = new InputStreamResource(inputStream);

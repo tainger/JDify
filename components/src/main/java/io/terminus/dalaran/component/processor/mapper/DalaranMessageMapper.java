@@ -16,6 +16,7 @@ import io.terminus.dalaran.model.function.MappingFunctionInfo;
 import lombok.Data;
 import org.apache.camel.model.ProcessorDefinition;
 import org.apache.commons.collections.MapUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -250,9 +251,9 @@ public class DalaranMessageMapper implements DalaranProcessor<DalaranMapperConfi
 
     private FlowValidation checkArrayFields(String sourcePath, MessageModel inModel, String destinationPath, MessageModel outModel) {
         String[] sourcePaths = StringUtils.split(sourcePath, ".");
-        Integer sourceCount = calculateArrayCount(sourcePaths, inModel);
+        Integer sourceCount = calculateArrayCount(ArrayUtils.subarray(sourcePaths, 0, sourcePaths.length -1), inModel);
         String[] destinationPaths = StringUtils.split(destinationPath, ".");
-        Integer destinationCount = calculateArrayCount(destinationPaths, outModel);
+        Integer destinationCount = calculateArrayCount(ArrayUtils.subarray(destinationPaths, 0, destinationPaths.length - 1), outModel);
 
         if (sourceCount == -1 || destinationCount == -1) {
             FlowValidation validation = FlowValidationBuilder.newBuilder()
