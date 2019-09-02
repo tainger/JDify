@@ -9,16 +9,14 @@ import io.terminus.dalaran.core.context.DalaranConverterContext;
 import io.terminus.dalaran.core.flow.DalaranFlowBuilder;
 import io.terminus.dalaran.core.flow.DalaranRoute;
 import io.terminus.dalaran.core.resource.DalaranResourceBuilder;
-import io.terminus.dalaran.core.resource.entity.common.ProcessorEntity;
-import io.terminus.dalaran.model.MessageModel;
 import io.terminus.dalaran.model.component.ComponentModel;
-import io.terminus.dalaran.model.component.ProcessorModel;
 import io.terminus.dalaran.model.flow.BasicFlow;
 import io.terminus.dalaran.model.flow.FlowFragment;
 import lombok.val;
 import org.apache.camel.builder.Builder;
 import org.apache.camel.model.MulticastDefinition;
 import org.apache.camel.model.ProcessorDefinition;
+import org.apache.commons.lang.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
@@ -67,24 +65,9 @@ public class ScatterGather implements DalaranProcessor<List<String>>, DalaranPro
 
         for (int i = 0; i < branches.size(); i++) {
             val branch = branches.get(i);
-            FlowFragment fragment = new FlowFragment();
-
-            MessageModel fragmentLastOutModel = config.getInModel();
-            List<ProcessorModel> pipeline = new ArrayList<>();
-            for (ProcessorEntity processorEntity : branch.getPipeline()) {
-                val processorModel = resourceBuilder.buildProcessorModel(processorEntity, fragmentLastOutModel, flow);
-                fragmentLastOutModel = processorModel.getOutModel();
-                pipeline.add(processorModel);
-            }
-
-            fragment.setId(flow.getId());
-            fragment.setFragmentId(component.getId() + DELIMITER + i);
-            fragment.setPipeline(pipeline);
-            fragment.setInModel(config.getInModel());
-            fragment.setOutModel(fragmentLastOutModel);
-            fragment.setTracing(flow.isTracing());
-
-
+            String fragmentId = component.getId() + DELIMITER + i + DELIMITER + RandomStringUtils.randomAlphanumeric(6);
+            FlowFragment fragment = resourceBuilder.buildFlowFragment(branch.getPipeline(), component.getInModel(),
+                    component.getOutModel(), flow.getId(), fragmentId, flow.isTracing());
             DalaranRoute fragmentRoute = flowBuilder.buildFlowFragment(fragment);
 
             // 因为后面会有一个聚合处理, 所以一定要输出为 Object, 否则 Mapper 不好处理

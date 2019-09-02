@@ -17,7 +17,6 @@ import io.terminus.dalaran.model.component.ProcessorModel;
 import io.terminus.dalaran.model.flow.*;
 import lombok.val;
 import org.apache.commons.beanutils.BeanUtils;
-import org.apache.commons.beanutils.BeanUtilsBean;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.ByteArrayInputStream;

@@ -6,10 +6,7 @@ import io.terminus.dalaran.core.component.DalaranProcessorConfigCustomConverter;
 import io.terminus.dalaran.core.component.annotation.Processor;
 import io.terminus.dalaran.core.context.DalaranContext;
 import io.terminus.dalaran.core.resource.DalaranResourceBuilder;
-import io.terminus.dalaran.core.resource.entity.common.ProcessorEntity;
-import io.terminus.dalaran.model.MessageModel;
 import io.terminus.dalaran.model.component.ComponentModel;
-import io.terminus.dalaran.model.component.ProcessorModel;
 import io.terminus.dalaran.model.flow.BasicFlow;
 import io.terminus.dalaran.model.flow.FlowFragment;
 import lombok.val;
@@ -18,7 +15,6 @@ import org.apache.camel.model.ProcessorDefinition;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -74,23 +70,9 @@ public class DalaranRouter implements DalaranProcessor<Map<String, String>>, Dal
                 continue;
             }
 
-            FlowFragment fragment = new FlowFragment();
-
-            MessageModel fragmentLastOutModel = config.getInModel();
-            List<ProcessorModel> pipeline = new ArrayList<>();
-            for (ProcessorEntity processorEntity : route.getPipeline()) {
-                val processorModel = resourceBuilder.buildProcessorModel(processorEntity, fragmentLastOutModel, flow);
-                fragmentLastOutModel = processorModel.getOutModel();
-                pipeline.add(processorModel);
-            }
-
-            fragment.setId(flow.getId());
-            fragment.setFragmentId(component.getId() + DELIMITER + i + DELIMITER + RandomStringUtils.randomAlphanumeric(6));
-            fragment.setPipeline(pipeline);
-            fragment.setInModel(config.getInModel());
-            fragment.setOutModel(fragmentLastOutModel);
-            fragment.setTracing(flow.isTracing());
-
+            String fragmentId = component.getId() + DELIMITER + i + DELIMITER + RandomStringUtils.randomAlphanumeric(6);
+            FlowFragment fragment = resourceBuilder.buildFlowFragment(route.getPipeline(), component.getInModel(),
+                    component.getOutModel(), flow.getId(), fragmentId, flow.isTracing());
             dalaranContext.addFragmentFlow(fragment);
 
             routeMapper.put(route.getExpression(), fragment.getDirectRouteUri());

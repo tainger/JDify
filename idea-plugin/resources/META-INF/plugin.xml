@@ -30,16 +30,25 @@
 
     <actions>
         <!-- Add your actions here -->
-        <action id="Dalaran.ConvertJson" class="io.terminus.dalaran.ConvertToJson" text="Convert JSON"
+        <action id="Dalaran.ConvertJson" class="io.terminus.dalaran.action.ConvertToJson" text="Convert JSON"
                 description="Convert java class to JSON">
             <add-to-group group-id="EditorPopupMenu" anchor="first"/>
             <keyboard-shortcut keymap="$default" first-keystroke="meta alt J"/>
         </action>
-        <action id="Dalaran.ConvertDalaranSchema" class="io.terminus.dalaran.ConvertToSchema"
-                text="Convert dalaran schema"
-                description="Convert java class to dalaran schema">
+        <action id="Dalaran.ConvertDalaranSchema" class="io.terminus.dalaran.action.ConvertToSchema"
+                text="Convert Model Schema"
+                description="Convert java class to dalaran model schema">
+            <add-to-group group-id="EditorPopupMenu" anchor="first"/>
+        </action>
+        <action id="Dalaran.ConvertDubboTrigger" class="io.terminus.dalaran.action.ConvertDubboTrigger"
+                text="Convert Dubbo Trigger"
+                description="Convert dalaran dubbo trigger">
+            <add-to-group group-id="EditorPopupMenu" anchor="first"/>
+        </action>
+        <action id="Dalaran.ConvertDubboProcessor" class="io.terminus.dalaran.action.ConvertDubboProcessor"
+                text="Convert Dubbo Processor"
+                description="Convert dalaran dubbo processor">
             <add-to-group group-id="EditorPopupMenu" anchor="first"/>
         </action>
     </actions>
-
 </idea-plugin>

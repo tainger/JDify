@@ -7,18 +7,11 @@ import io.terminus.dalaran.core.context.DalaranContext;
 import io.terminus.dalaran.core.flow.DalaranFlowBuilder;
 import io.terminus.dalaran.core.flow.DalaranRoute;
 import io.terminus.dalaran.core.resource.DalaranResourceBuilder;
-import io.terminus.dalaran.core.resource.entity.common.ProcessorEntity;
-import io.terminus.dalaran.model.MessageModel;
 import io.terminus.dalaran.model.component.ComponentModel;
-import io.terminus.dalaran.model.component.ProcessorModel;
 import io.terminus.dalaran.model.flow.BasicFlow;
 import io.terminus.dalaran.model.flow.FlowFragment;
-import lombok.val;
 import org.apache.camel.model.ProcessorDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Processor(
         value = "retry",
@@ -43,26 +36,11 @@ public class Retry implements DalaranProcessor<String>, DalaranProcessorConfigCu
 
     @Override
     public String convert(RetryConfig config, ComponentModel component, BasicFlow flow) {
-        MessageModel fragmentLastOutModel = component.getOutModel();
-        List<ProcessorModel> pipeline = new ArrayList<>();
-        for (ProcessorEntity processorEntity : config.getPipeline()) {
-            val processorModel = resourceBuilder.buildProcessorModel(processorEntity, fragmentLastOutModel, flow);
-            fragmentLastOutModel = processorModel.getOutModel();
-            pipeline.add(processorModel);
-        }
-
-        FlowFragment fragment = new FlowFragment();
-        fragment.setId(flow.getId());
-        fragment.setFragmentId(component.getId());
-        fragment.setPipeline(pipeline);
-        fragment.setInModel(component.getInModel());
-        fragment.setOutModel(fragmentLastOutModel);
-        fragment.setTracing(flow.isTracing());
-
+        FlowFragment fragment = resourceBuilder.buildFlowFragment(config.getPipeline(), component.getInModel(),
+                component.getOutModel(), flow.getId(), component.getId(), flow.isTracing());
         DalaranRoute retryRoute = flowBuilder.buildFlowFragment(fragment);
         retryRoute.onException(Throwable.class).maximumRedeliveries(config.getMaxRetry()).redeliveryDelay(config.getRetryDelay());
         dalaranContext.addRoute(retryRoute);
-
         return fragment.getDirectRouteUri();
     }
 }

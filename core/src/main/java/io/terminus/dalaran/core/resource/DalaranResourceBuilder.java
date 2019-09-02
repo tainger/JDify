@@ -9,8 +9,11 @@ import io.terminus.dalaran.core.resource.entity.common.ProcessorEntity;
 import io.terminus.dalaran.model.MessageModel;
 import io.terminus.dalaran.model.component.ProcessorModel;
 import io.terminus.dalaran.model.flow.BasicFlow;
+import io.terminus.dalaran.model.flow.FlowFragment;
 import io.terminus.dalaran.model.flow.SubFlow;
 import io.terminus.dalaran.model.flow.TriggerFlow;
+
+import java.util.List;
 
 public interface DalaranResourceBuilder {
 
@@ -20,11 +23,13 @@ public interface DalaranResourceBuilder {
 
     SubFlow buildSubFlow(SubFlowAbstractEntity subFlowEntity);
 
+    FlowFragment buildFlowFragment(List<ProcessorEntity> pipelineEntityList, MessageModel inModel, MessageModel outModel, Long flowId, String fragmentId, Boolean tracing);
+
     MessageModel buildModel(Long modelId);
 
     MessageModel buildModel(ModelAbstractEntity modelEntity);
 
-    ProcessorModel buildProcessorModel(ProcessorEntity processorEntity, MessageModel lastOutModel, BasicFlow flow);
+    ProcessorModel buildProcessorModel(ProcessorEntity processorEntity, MessageModel lastOutModel);
 
     Object buildConnectorConfig(Long connectorId, Class connectorConfigType);
 
