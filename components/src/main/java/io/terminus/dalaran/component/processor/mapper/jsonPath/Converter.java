@@ -7,6 +7,9 @@ import io.terminus.dalaran.component.common.exception.MapperFunctionExecuteExcep
 import io.terminus.dalaran.component.processor.mapper.model.*;
 import io.terminus.dalaran.core.context.DalaranContext;
 import io.terminus.dalaran.model.FieldType;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.MapUtils;
+import org.apache.kafka.common.protocol.types.Field;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -51,7 +54,9 @@ public class Converter {
                 StringBuilder indexes = new StringBuilder();
                 indexes.append(i).append(".");
                 for (SourceField sourceField : fields) {
-                    buildSourcePaths(path, sourceField.getField(), arrayFieldSize, level, source, sourcePaths, sourceField.getPath(), indexes);
+                    if (sourceField.getParamType() == ParamType.DYNAMIC) {
+                        buildSourcePaths(path, sourceField.getField(), arrayFieldSize, level, source, sourcePaths, sourceField.getPath(), indexes);
+                    }
                 }
             }
         } else {
@@ -153,17 +158,47 @@ public class Converter {
 
     private static void buildValue(Object source, Map<String, List<SourcePath>> sourcePaths, Map<String, PathDetail> destinationPaths, MessageMapping messageMapping, Object destination, DalaranContext dalaranContext) {
         MappingFunction function = messageMapping.getFunction();
+        Map<String, FunctionParam> functionParams = new LinkedHashMap<>();
+        List<String> paths = new ArrayList<>();
+        if (function != null && MapUtils.isNotEmpty(function.getParams())) {
+            function.getParams().forEach((k, v) -> {
+                functionParams.put(v.getValue(), v);
+                paths.add(v.getValue());
+            });
+        }
+
         if (sourcePaths != null && sourcePaths.size() > 0) {
             for (Map.Entry<String, List<SourcePath>> entry : sourcePaths.entrySet()) {
                 List<Object> values = new ArrayList<>();
                 String indexes = entry.getKey();
-                for (SourcePath sourcePath : entry.getValue()) {
-                    Object value = null;
-                    PathDetail pathDetail = sourcePath.getDetail();
-                    if (pathDetail != null && pathDetail.getPath() != null) {
-                        value = JSONPath.eval(source, pathDetail.getPath());
-                    }
-                    values.add(value);
+                Map<String, SourcePath> dynamicParams = new HashMap<>();
+                entry.getValue().forEach(path -> {
+                    dynamicParams.put(path.getPath(), path);
+                });
+                if (function != null && CollectionUtils.isNotEmpty(paths)) {
+                    paths.forEach(path -> {
+                        Object value = null;
+                        if (dynamicParams.containsKey(path)) {
+                            SourcePath sourcePath = dynamicParams.get(path);
+                            PathDetail pathDetail = sourcePath.getDetail();
+                            if (pathDetail != null && pathDetail.getPath() != null) {
+                                value = JSONPath.eval(source, pathDetail.getPath());
+                            }
+                        } else {
+                            FunctionParam functionParam = functionParams.get(path);
+                            value = functionParam.getValue();
+                        }
+                        values.add(value);
+                    });
+                } else {
+                    entry.getValue().forEach(v -> {
+                        Object value = null;
+                        PathDetail pathDetail = v.getDetail();
+                        if (pathDetail != null && pathDetail.getPath() != null) {
+                            value = JSONPath.eval(source, pathDetail.getPath());
+                        }
+                        values.add(value);
+                    });
                 }
 
                 PathDetail pathDetail = destinationPaths.get(indexes);
@@ -200,12 +235,11 @@ public class Converter {
     private static void buildValue(Object source, MessageMapping messageMapping, Object destination, DalaranContext dalaranContext) {
         List<Object> values = new ArrayList<>();
         List<SourceField> sourceFields = messageMapping.getSourceFields();
-        MappingType mappingType = messageMapping.getMappingType();
         List<SourcePath> sourcePaths = new ArrayList<>();
 
         sourceFields.forEach(sourceField -> {
             Object value;
-            if (mappingType == MappingType.DEFAULT) {
+            if (sourceField.getParamType() == ParamType.STATIC) {
                 value = sourceField.getPath();
             } else {
                 value = JSONPath.eval(source, sourceField.getPath());

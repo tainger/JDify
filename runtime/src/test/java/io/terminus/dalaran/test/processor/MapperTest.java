@@ -73,7 +73,12 @@ public class MapperTest extends BasicProcessorTest {
         MappingFunction mappingFunction1 = new MappingFunction();
         mappingFunction1.setId("StringToUpper");
         mappingFunction1.setType(FunctionType.STATIC);
-        mappingFunction1.setParams(Stream.of(new String[][] {{"str", "root.user.address"}}).collect(Collectors.toMap(data -> data[0], data -> data[1])));
+        FunctionParam functionParam1 = new FunctionParam();
+        functionParam1.setValue("root.user.address");
+        functionParam1.setType(ParamType.DYNAMIC);
+        Map<String, FunctionParam> paramMap1 = new HashMap<>();
+        paramMap1.put("str", functionParam1);
+        mappingFunction1.setParams(paramMap1);
         simpleMapping1.setValue(mappingFunction1);
         mappingList.put("root.user.address", simpleMapping1);
 
@@ -85,6 +90,8 @@ public class MapperTest extends BasicProcessorTest {
         simpleMapping3.setValue("root.order.address.list.itemA");
         mappingList.put("root.order.address.list.item1", simpleMapping3);
 
+        System.out.println(JSON.toJSONString(mappingList));
+
         DalaranMapperConfig dalaranMapperConfig = new DalaranMapperConfig();
         dalaranMapperConfig.setInModel(in);
         dalaranMapperConfig.setOutModel(out);
@@ -95,6 +102,7 @@ public class MapperTest extends BasicProcessorTest {
             mapper.setDalaranContext(dalaranContext);
         }
         DalaranMappingConfig mappingConfig = mapper.transfer(mappingList, in, out);
+
 
         Object source = JSON.parseObject("[{\"user\":{\"id\":2, \"name\":\"momo\", \"phone\":\"10086\", \"address\":\"mmmmmm\", \"wechat\":\"9999\"}, \"order\":{\"id\":\"11001\", \"time\":\"10.00\", \"detail\":\"asdfghjkl\", \"user\":\"momo\", \"address\":[{\"addr1\":\"mmmm\", \"addr2\":\"llllll\", \"list\":[{\"itemA\":\"true\", \"itemB\":\"2222222\"}]}, {\"addr1\":\"pppppp\"}]}}]", Object.class);
         Object dest = Converter.convert(mappingConfig, source, dalaranContext);

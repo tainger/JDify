@@ -62,6 +62,7 @@ public class DalaranMessageMapper implements DalaranProcessor<DalaranMapperConfi
         simpleMapping.forEach((path, mapping) -> {
             MessageMapping messageMapping = new MessageMapping();
             buildMapping(messageMapping, path, mapping, in, out);
+
             messageMappings.add(messageMapping);
         });
         messageMappings.sort(new MessageMappingComparator());
@@ -85,7 +86,7 @@ public class DalaranMessageMapper implements DalaranProcessor<DalaranMapperConfi
         MappingType mappingType = mapping.getMappingType();
         messageMapping.setMappingType(mappingType);
 
-        List<String> sourcePaths = buildSourcePaths(mappingType, mapping.getValue(), messageMapping);
+        List<TemporarySourcePath> sourcePaths = buildSourcePaths(mappingType, mapping.getValue(), messageMapping);
         Map<String, ModelField> inField = in.getModelSchema().getFields();
         Map<String, ModelField> outField = out.getModelSchema().getFields();
 
@@ -100,15 +101,17 @@ public class DalaranMessageMapper implements DalaranProcessor<DalaranMapperConfi
 
         List<SourceField> sourceFields = new ArrayList<>();
         MappingProperty property = new MappingProperty();
-        for (String sourcePath : sourcePaths) {
+        for (TemporarySourcePath sourcePath : sourcePaths) {
             SourceField sourceField = new SourceField();
-            if (mappingType == MappingType.DEFAULT) {
-                sourceField.setPath(sourcePath);
+            if (sourcePath.getType() == ParamType.STATIC) {
+                sourceField.setPath(sourcePath.getValue());
+                sourceField.setParamType(ParamType.STATIC);
             } else {
-                property = buildSourceField(sourcePath, inField, sourceField, mappingProperty.isComplex());
+                property = buildSourceField(sourcePath.getValue(), inField, sourceField, mappingProperty.isComplex());
                 if (property.getStatus() == MappingStatus.ERROR) {
                     break;
                 }
+                sourceField.setParamType(ParamType.DYNAMIC);
             }
             sourceFields.add(sourceField);
         }
@@ -118,8 +121,8 @@ public class DalaranMessageMapper implements DalaranProcessor<DalaranMapperConfi
         messageMapping.setType(destinationType);
     }
 
-    private List<String> buildSourcePaths(MappingType mappingType, Object value, MessageMapping messageMapping) {
-        List<String> sourcePaths = new ArrayList<>();
+    private List<TemporarySourcePath> buildSourcePaths(MappingType mappingType, Object value, MessageMapping messageMapping) {
+        List<TemporarySourcePath> sourcePaths = new ArrayList<>();
 
         if (mappingType == MappingType.FUNCTION) {
             MappingFunction function = (MappingFunction) value;
@@ -133,16 +136,27 @@ public class DalaranMessageMapper implements DalaranProcessor<DalaranMapperConfi
                 if (temKey == null) {
                     temKey = "";
                 }
-                Map<String, String> sourcePath = function.getParams();
+                Map<String, FunctionParam> sourcePath = function.getParams();
                 for (String param : params) {
-                    String path = sourcePath.get(temKey + param);
-                    if (path != null) {
-                        sourcePaths.add(path);
+                    FunctionParam functionParam = sourcePath.get(temKey + param);
+                    if (functionParam == null) {
+                        continue;
                     }
+                    TemporarySourcePath temporarySourcePath = new TemporarySourcePath();
+                    temporarySourcePath.setValue(functionParam.getValue());
+                    if (functionParam.getType() == ParamType.STATIC) {
+                        temporarySourcePath.setType(ParamType.STATIC);
+                    } else {
+                        temporarySourcePath.setType(ParamType.DYNAMIC);
+                    }
+                    sourcePaths.add(temporarySourcePath);
                 }
             }
         } else {
-            sourcePaths.add(value.toString());
+            TemporarySourcePath temporarySourcePath = new TemporarySourcePath();
+            temporarySourcePath.setType(ParamType.DYNAMIC);
+            temporarySourcePath.setValue(value.toString());
+            sourcePaths.add(temporarySourcePath);
         }
         return sourcePaths;
     }
@@ -213,18 +227,21 @@ public class DalaranMessageMapper implements DalaranProcessor<DalaranMapperConfi
         mappings.forEach((destinationPath, simpleMapping) -> {
             if (simpleMapping.getMappingType() == MappingType.FUNCTION) {
                 MappingFunction function = (MappingFunction) simpleMapping.getValue();
-                Map<String, String> params = function.getParams();
+                Map<String, FunctionParam> params = function.getParams();
                 if (MapUtils.isEmpty(params)) {
                     return;
                 }
-                params.forEach((functionParam, sourcePath) -> {
-                    if (StringUtils.isBlank(sourcePath)) {
+                params.forEach((functionParam, param) -> {
+                    if (param.getType() == ParamType.STATIC) {
+                        return;
+                    }
+                    if (param.getValue() == null) {
                         FlowValidation validation = FlowValidationBuilder.newBuilder()
                                 .field(destinationPath)
                                 .message(MAPPER_FUNCTION_PARAM_NOT_NULL).build();
                         validations.add(validation);
                     } else {
-                        FlowValidation validation = checkArrayFields(sourcePath, inModel, destinationPath, outModel);
+                        FlowValidation validation = checkArrayFields(param.getValue().toString(), inModel, destinationPath, outModel);
                         if (validation != null) {
                             validations.add(validation);
                         }
