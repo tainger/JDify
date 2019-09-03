@@ -7,7 +7,6 @@ import io.terminus.dalaran.component.common.exception.MapperFunctionExecuteExcep
 import io.terminus.dalaran.component.processor.mapper.model.*;
 import io.terminus.dalaran.core.context.DalaranContext;
 import io.terminus.dalaran.model.FieldType;
-
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -167,20 +166,9 @@ public class Converter {
                 }
 
                 PathDetail pathDetail = destinationPaths.get(indexes);
-                Object value = null;
+                Object value;
                 if (function != null) {
-                    try {
-                        switch (function.getType()) {
-                            case STATIC:
-                                value = dalaranContext.getDalaranFunctionContext().executeStaticFunction(function.getId(), values.toArray());
-                                break;
-                            case CUSTOM:
-                                value = dalaranContext.getDalaranFunctionContext().executeCustomFunction(Long.valueOf(function.getId()), values.toArray());
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        throw new MapperFunctionExecuteException("Mapper function execute error. function: " + function.getId() + ", params: " + Arrays.toString(values.toArray()) + ", message: " + e.getMessage());
-                    }
+                    value = execute(dalaranContext, function, values);
                 } else {
                     value = values.get(0);
                 }
@@ -216,24 +204,12 @@ public class Converter {
 
         String destinationPath = messageMapping.getPath();
         MappingFunction function = messageMapping.getFunction();
-        Object value = null;
+        Object value;
         if (function != null) {
-            try {
-                switch (function.getType()) {
-                    case STATIC:
-                        value = dalaranContext.getDalaranFunctionContext().executeStaticFunction(function.getId(), values.toArray());
-                        break;
-                    case CUSTOM:
-                        value = dalaranContext.getDalaranFunctionContext().executeCustomFunction(Long.valueOf(function.getId()), values.toArray());
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-                throw new MapperFunctionExecuteException("Mapper function execute error. function: " + function.getId() + ", params: " + Arrays.toString(values.toArray()) + ", message: " + e.getMessage());
-            }
+            value = execute(dalaranContext, function, values);
         } else {
             value = values.get(0);
         }
-
         FieldType type = messageMapping.getType();
         value = parse(value, type, sourcePaths, destinationPath);
         JSONPath.set(destination, "$" + MapperConstants.MODEL_ROOT + "." + destinationPath, value);
@@ -269,5 +245,20 @@ public class Converter {
             }
         }
         return target;
+    }
+
+    private static Object execute(DalaranContext dalaranContext, MappingFunction function, List<Object> values) {
+        try {
+            switch (function.getType()) {
+                case STATIC:
+                    return dalaranContext.getDalaranFunctionContext().executeStaticFunction(function.getId(), values.toArray());
+                case CUSTOM:
+                    return dalaranContext.getDalaranFunctionContext().executeCustomFunction(Long.valueOf(function.getId()), values.toArray());
+            }
+            return null;
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new MapperFunctionExecuteException("Mapper function execute error. function: " + function.getId() + ", params: " + Arrays.toString(values.toArray()) + ", message: " + e.getMessage());
+        }
     }
 }

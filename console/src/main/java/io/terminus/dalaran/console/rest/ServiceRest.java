@@ -1,12 +1,12 @@
 package io.terminus.dalaran.console.rest;
 
 import io.swagger.annotations.ApiOperation;
+import io.terminus.common.model.Response;
+import io.terminus.dalaran.console.model.ResponseMessage;
 import io.terminus.dalaran.console.model.dto.ServiceDTO;
 import io.terminus.dalaran.console.service.ServiceManagement;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/service")
@@ -17,37 +17,68 @@ public class ServiceRest {
 
     @PostMapping
     @ApiOperation("新增服务")
-    private Long create(@RequestBody ServiceDTO serviceDTO) {
-        return serviceManagement.create(serviceDTO);
+    private Response create(@RequestBody ServiceDTO serviceDTO) {
+        try {
+            return Response.ok(serviceManagement.create(serviceDTO));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Response.fail(ResponseMessage.SERVICE_CREATE_ERROR);
+        }
     }
 
     @PutMapping
     @ApiOperation("更新服务")
-    private ServiceDTO update(@RequestBody ServiceDTO serviceDTO) {
-        return serviceManagement.update(serviceDTO);
+    private Response update(@RequestBody ServiceDTO serviceDTO) {
+        try {
+            return Response.ok(serviceManagement.update(serviceDTO));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Response.fail(ResponseMessage.SERVICE_UPDATE_ERROR);
+        }
     }
 
     @DeleteMapping("/{id}")
     @ApiOperation("删除服务")
-    private void create(@PathVariable Long id) {
-        serviceManagement.delete(id);
+    private Response create(@PathVariable Long id) {
+        try {
+            serviceManagement.delete(id);
+            return Response.ok();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Response.fail(ResponseMessage.SERVICE_DELETE_ERROR);
+        }
     }
 
     @GetMapping("/{id}")
     @ApiOperation("获取服务详情")
-    private ServiceDTO detail(@PathVariable Long id) {
-        return serviceManagement.detail(id);
+    private Response detail(@PathVariable Long id) {
+        try {
+            return Response.ok(serviceManagement.detail(id));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Response.fail(ResponseMessage.SERVICE_QUERY_ERROR);
+        }
     }
 
     @GetMapping
     @ApiOperation("获取所有服务")
-    private List<ServiceDTO> list() {
-        return serviceManagement.list();
+    private Response list() {
+        try {
+            return Response.ok(serviceManagement.list());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Response.fail(ResponseMessage.SERVICE_QUERY_ERROR);
+        }
     }
 
     @GetMapping("/{id}/operation")
     @ApiOperation("获取服务可选项")
-    private List<String> operations(@PathVariable Long id) {
-        return serviceManagement.listOperation(id);
+    private Response operations(@PathVariable Long id) {
+        try {
+            return Response.ok(serviceManagement.listOperation(id));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Response.fail(ResponseMessage.SERVICE_QUERY_ERROR);
+        }
     }
 }
