@@ -70,7 +70,7 @@ public class DalaranRouter implements DalaranProcessor<Map<String, String>>, Dal
                 continue;
             }
 
-            String fragmentId = component.getId() + DELIMITER + i + DELIMITER + RandomStringUtils.randomAlphanumeric(6);
+            String fragmentId = component.getId() + DELIMITER + i;
             FlowFragment fragment = resourceBuilder.buildFlowFragment(route.getPipeline(), component.getInModel(),
                     component.getOutModel(), flow.getId(), fragmentId, flow.isTracing());
             dalaranContext.addFragmentFlow(fragment);
