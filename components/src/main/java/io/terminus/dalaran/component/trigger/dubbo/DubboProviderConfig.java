@@ -25,6 +25,8 @@ public class DubboProviderConfig extends AllModelConfig implements ConnectorConf
     private String serviceId;
     @ConfigFieldInfo(label = "服务方法", inputType = FieldInputType.String)
     private String method;
-    @ConfigFieldInfo(label = "服务版本", inputType = FieldInputType.String)
+    @ConfigFieldInfo(label = "服务版本", inputType = FieldInputType.String, defaultValue = "1.0.0")
     private String version;
+    @ConfigFieldInfo(label = "超时时间(ms)", inputType = FieldInputType.Integer, defaultValue = "500")
+    private Integer timeout;
 }

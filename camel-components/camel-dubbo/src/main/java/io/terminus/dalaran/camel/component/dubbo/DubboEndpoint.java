@@ -30,6 +30,8 @@ public class DubboEndpoint extends ProcessorEndpoint {
     private String method;
     @UriParam(defaultValue = "1.0.0", description = "Dubbo service version", javaType = "java.lang.String")
     private String version;
+    @UriParam(defaultValue = "1.0.0", description = "Dubbo service timeout", javaType = "java.lang.Integer")
+    private Integer timeout;
     @UriParam(label = "parameterType", description = "Dubbo service parameter type", javaType = "java.lang.String")
     private String parameterType;
 
@@ -54,7 +56,9 @@ public class DubboEndpoint extends ProcessorEndpoint {
             reference.setApplication(applicationConfig);
             reference.setRegistry(new RegistryConfig(registryAddress));
             reference.setVersion(version);
+            reference.setTimeout(timeout);
             reference.setInterface(serviceId);
+            reference.setCheck(false);
             reference.setGeneric(true);
             ReferenceConfigCache cache = ReferenceConfigCache.getCache();
             genericService = cache.get(reference);
@@ -129,6 +133,14 @@ public class DubboEndpoint extends ProcessorEndpoint {
 
     public void setVersion(String version) {
         this.version = version;
+    }
+
+    public Integer getTimeout() {
+        return timeout;
+    }
+
+    public void setTimeout(Integer timeout) {
+        this.timeout = timeout;
     }
 
     public String getParameterType() {

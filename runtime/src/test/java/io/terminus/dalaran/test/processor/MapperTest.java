@@ -2,18 +2,15 @@ package io.terminus.dalaran.test.processor;
 
 import com.alibaba.fastjson.JSON;
 import io.terminus.dalaran.component.processor.mapper.DalaranMapperConfig;
-import io.terminus.dalaran.component.processor.mapper.DalaranMapperProcessor;
 import io.terminus.dalaran.component.processor.mapper.DalaranMessageMapper;
 import io.terminus.dalaran.component.processor.mapper.jsonPath.Converter;
 import io.terminus.dalaran.component.processor.mapper.model.*;
 import io.terminus.dalaran.core.context.DalaranContext;
-import io.terminus.dalaran.model.FieldType;
 import io.terminus.dalaran.model.MessageModel;
 import io.terminus.dalaran.model.ModelField;
 import io.terminus.dalaran.model.schema.JsonSchema;
 import io.terminus.dalaran.test.BasicProcessorTest;
 import io.terminus.dalaran.test.TestApplication;
-import org.apache.camel.ProducerTemplate;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
