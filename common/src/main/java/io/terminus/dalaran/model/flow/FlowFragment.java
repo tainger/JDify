@@ -2,6 +2,9 @@ package io.terminus.dalaran.model.flow;
 
 import lombok.Data;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import static io.terminus.dalaran.DalaranConstants.FLOW_FRAGMENT_PREFIX;
 import static io.terminus.dalaran.DalaranConstants.FLOW_PREFIX;
 
@@ -9,6 +12,8 @@ import static io.terminus.dalaran.DalaranConstants.FLOW_PREFIX;
 public class FlowFragment extends BasicFlow {
 
     private String fragmentId;
+
+    private final Map<String,Object> properties = new HashMap<>();
 
     @Override
     public String getRouteId() {

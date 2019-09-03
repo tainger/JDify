@@ -18,7 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
         name = "失败重试",
         configType = ErrorCatchConfig.class
 )
-public class ErrorCatch implements DalaranProcessor<ErrorCatch.ErrorCatchRoutes>, DalaranProcessorConfigCustomConverter<ErrorCatchConfig, ErrorCatch.ErrorCatchRoutes> {
+public class ErrorCatch implements DalaranProcessor<String>, DalaranProcessorConfigCustomConverter<ErrorCatchConfig, String> {
 
     @Autowired
     private DalaranContext<DalaranRoute> dalaranContext;
@@ -30,27 +30,21 @@ public class ErrorCatch implements DalaranProcessor<ErrorCatch.ErrorCatchRoutes>
     private DalaranResourceBuilder resourceBuilder;
 
     @Override
-    public void configure(ProcessorDefinition route, ErrorCatchRoutes routes) {
-        route.to(routes.pipelineUri).onException(Throwable.class).to(routes.onErrorUri);
+    public void configure(ProcessorDefinition route, String routeUrl) {
+        route.to(routeUrl);
     }
 
     @Override
-    public ErrorCatchRoutes convert(ErrorCatchConfig config, ComponentModel component, BasicFlow flow) {
-        ErrorCatchRoutes routes = new ErrorCatchRoutes();
-        FlowFragment pipeline = resourceBuilder.buildFlowFragment(config.getPipeline(), component.getInModel(),
-                component.getOutModel(), flow.getId(), component.getId(), flow.isTracing());
-        FlowFragment onErrorPipeline = resourceBuilder.buildFlowFragment(config.getPipeline(), component.getInModel(),
-                component.getOutModel(), flow.getId(), component.getId(), flow.isTracing());
-        dalaranContext.addFragmentFlow(pipeline);
+    public String convert(ErrorCatchConfig config, ComponentModel component, BasicFlow flow) {
+        FlowFragment onErrorPipeline = resourceBuilder.buildFlowFragment(config.getOnErrorPipeline(), component.getInModel(),
+                component.getOutModel(), flow.getId(), component.getId() + "-on-error", flow.isTracing());
         dalaranContext.addFragmentFlow(onErrorPipeline);
-        routes.pipelineUri = pipeline.getDirectRouteUri();
-        routes.onErrorUri = onErrorPipeline.getDirectRouteUri();
-        return routes;
-    }
 
-    static class ErrorCatchRoutes {
-        String pipelineUri;
-        String onErrorUri;
+        FlowFragment fragment = resourceBuilder.buildFlowFragment(config.getPipeline(), component.getInModel(),
+                component.getOutModel(), flow.getId(), component.getId(), flow.isTracing());
+        DalaranRoute tryRoute = flowBuilder.buildFlowFragment(fragment);
+        tryRoute.onException(Throwable.class).to(onErrorPipeline.getDirectRouteUri()).continued(true);
+        dalaranContext.addRoute(tryRoute);
+        return fragment.getDirectRouteUri();
     }
-
 }

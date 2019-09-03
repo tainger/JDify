@@ -31,6 +31,7 @@ import static io.terminus.dalaran.core.flow.DefaultFlowValidateMessages.MODEL_NO
 import static io.terminus.dalaran.core.flow.FlowSuggest.ADD_MAPPER;
 import static io.terminus.dalaran.model.flow.ValidateMessageTarget.Processor;
 import static io.terminus.dalaran.model.flow.ValidateMessageTarget.Trigger;
+import static org.apache.camel.builder.Builder.constant;
 
 public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute> {
 
@@ -110,6 +111,7 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
     @Override
     public DalaranRoute buildFlowFragment(FlowFragment fragment) {
         val route = createRouteDefinition(fragment);
+        fragment.getProperties().forEach((key, value) -> route.setProperty(key, constant(value)));
         buildFlowRoute(route, fragment, false);
         return route;
     }

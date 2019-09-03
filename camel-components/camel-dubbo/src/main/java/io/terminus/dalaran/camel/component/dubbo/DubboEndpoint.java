@@ -58,6 +58,7 @@ public class DubboEndpoint extends ProcessorEndpoint {
             reference.setVersion(version);
             reference.setTimeout(timeout);
             reference.setInterface(serviceId);
+            reference.setCheck(false);
             reference.setGeneric(true);
             ReferenceConfigCache cache = ReferenceConfigCache.getCache();
             genericService = cache.get(reference);
