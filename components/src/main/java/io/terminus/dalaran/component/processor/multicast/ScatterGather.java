@@ -65,7 +65,7 @@ public class ScatterGather implements DalaranProcessor<List<String>>, DalaranPro
 
         for (int i = 0; i < branches.size(); i++) {
             val branch = branches.get(i);
-            String fragmentId = component.getId() + DELIMITER + i + DELIMITER + RandomStringUtils.randomAlphanumeric(6);
+            String fragmentId = component.getId() + DELIMITER + i;
             FlowFragment fragment = resourceBuilder.buildFlowFragment(branch.getPipeline(), component.getInModel(),
                     component.getOutModel(), flow.getId(), fragmentId, flow.isTracing());
             DalaranRoute fragmentRoute = flowBuilder.buildFlowFragment(fragment);
