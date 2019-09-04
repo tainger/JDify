@@ -7,6 +7,7 @@ import io.terminus.dalaran.component.common.exception.MapperFunctionExecuteExcep
 import io.terminus.dalaran.component.processor.mapper.model.*;
 import io.terminus.dalaran.core.context.DalaranContext;
 import io.terminus.dalaran.model.FieldType;
+import org.apache.commons.beanutils.ConvertUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -279,16 +280,16 @@ public class Converter {
         if (target == null) {
             return null;
         }
-        String input = target.toString();
-        TypeParser parser = TypeParser.newBuilder().build();
         if (destination != null) {
             switch (destination) {
                 case INTEGER:
-                    return parser.parse(input, Long.class);
+                    return ConvertUtils.convert(target, Long.class);
                 case FLOAT:
-                    return parser.parse(input, Double.class);
+                    return ConvertUtils.convert(target, Double.class);
                 case BOOLEAN:
-                    return parser.parse(input, Boolean.class);
+                    return ConvertUtils.convert(target, Boolean.class);
+                case STRING:
+                    return ConvertUtils.convert(target, String.class);
                 default:
                     return target;
             }
