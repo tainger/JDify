@@ -18,12 +18,10 @@ import org.apache.camel.model.ProcessorDefinition;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.kafka.common.protocol.types.Field;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static io.terminus.dalaran.component.processor.mapper.MapperValidationMessages.*;
 
@@ -126,6 +124,7 @@ public class DalaranMessageMapper implements DalaranProcessor<DalaranMapperConfi
 
         if (mappingType == MappingType.FUNCTION) {
             MappingFunction function = (MappingFunction) value;
+            function.setSourcePaths(buildFunctionSourcePaths(function));
             messageMapping.setFunction(function);
 
             DalaranFunctionContext functionContext = dalaranContext.getDalaranFunctionContext();
@@ -136,9 +135,9 @@ public class DalaranMessageMapper implements DalaranProcessor<DalaranMapperConfi
                 if (temKey == null) {
                     temKey = "";
                 }
-                Map<String, FunctionParam> sourcePath = function.getParams();
+                Map<String, FunctionParam> functionParams = function.getParams();
                 for (String param : params) {
-                    FunctionParam functionParam = sourcePath.get(temKey + param);
+                    FunctionParam functionParam = functionParams.get(temKey + param);
                     if (functionParam == null) {
                         continue;
                     }
@@ -205,6 +204,16 @@ public class DalaranMessageMapper implements DalaranProcessor<DalaranMapperConfi
             }
         }
         return new MappingProperty(complex, status, type);
+    }
+
+    private Map<String, FunctionParam> buildFunctionSourcePaths(MappingFunction mappingFunction) {
+        Map<String, FunctionParam> sourcePaths = new HashMap<>();
+        if (mappingFunction != null && MapUtils.isNotEmpty(mappingFunction.getParams())) {
+            mappingFunction.getParams().forEach((k, v) -> {
+                sourcePaths.put(v.getValue(), v);
+            });
+        }
+        return sourcePaths;
     }
 
     @Override

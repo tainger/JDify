@@ -17,4 +17,6 @@ public class MappingFunction {
     private FunctionType type;
 
     private Map<String, FunctionParam> params;
+
+    private Map<String, FunctionParam> sourcePaths;
 }

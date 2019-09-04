@@ -159,16 +159,15 @@ public class Converter {
     private static void buildValue(Object source, Map<String, List<SourcePath>> sourcePaths, Map<String, PathDetail> destinationPaths, MessageMapping messageMapping, Object destination, DalaranContext dalaranContext) {
         MappingFunction function = messageMapping.getFunction();
         Map<String, FunctionParam> functionParams = new LinkedHashMap<>();
-        List<String> paths = new ArrayList<>();
         if (function != null && MapUtils.isNotEmpty(function.getParams())) {
             function.getParams().forEach((k, v) -> {
                 functionParams.put(v.getValue(), v);
-                paths.add(v.getValue());
             });
         }
 
         if (sourcePaths != null && sourcePaths.size() > 0) {
             for (Map.Entry<String, List<SourcePath>> entry : sourcePaths.entrySet()) {
+                Set<String> paths = functionParams.keySet();
                 List<Object> values = new ArrayList<>();
                 String indexes = entry.getKey();
                 Map<String, SourcePath> dynamicParams = new HashMap<>();

@@ -71,13 +71,20 @@ public class MapperTest extends BasicProcessorTest {
         SimpleMapping<MappingFunction> simpleMapping1 = new SimpleMapping<>();
         simpleMapping1.setMappingType(MappingType.FUNCTION);
         MappingFunction mappingFunction1 = new MappingFunction();
-        mappingFunction1.setId("StringToUpper");
+        mappingFunction1.setId("StringAppend");
         mappingFunction1.setType(FunctionType.STATIC);
         FunctionParam functionParam1 = new FunctionParam();
-        functionParam1.setValue("root.user.address");
-        functionParam1.setType(ParamType.DYNAMIC);
+        functionParam1.setValue("lalalalalal");
+        functionParam1.setType(ParamType.STATIC);
+
+        FunctionParam functionParam2 = new FunctionParam();
+        functionParam2.setValue("root.user.address");
+        functionParam2.setType(ParamType.DYNAMIC);
+
         Map<String, FunctionParam> paramMap1 = new HashMap<>();
-        paramMap1.put("str", functionParam1);
+        paramMap1.put("str1", functionParam1);
+        paramMap1.put("str2", functionParam2);
+
         mappingFunction1.setParams(paramMap1);
         simpleMapping1.setValue(mappingFunction1);
         mappingList.put("root.user.address", simpleMapping1);
