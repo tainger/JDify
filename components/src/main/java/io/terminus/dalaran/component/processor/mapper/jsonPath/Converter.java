@@ -1,14 +1,12 @@
 package io.terminus.dalaran.component.processor.mapper.jsonPath;
 
 import com.alibaba.fastjson.JSONPath;
-import com.github.drapostolos.typeparser.TypeParser;
 import io.terminus.dalaran.component.common.exception.FieldParseException;
 import io.terminus.dalaran.component.common.exception.MapperFunctionExecuteException;
 import io.terminus.dalaran.component.processor.mapper.model.*;
 import io.terminus.dalaran.core.context.DalaranContext;
 import io.terminus.dalaran.model.FieldType;
 import org.apache.commons.beanutils.ConvertUtils;
-
 import java.util.*;
 import java.util.stream.Collectors;
 
