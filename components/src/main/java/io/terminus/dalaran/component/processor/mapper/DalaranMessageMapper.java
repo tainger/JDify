@@ -60,7 +60,6 @@ public class DalaranMessageMapper implements DalaranProcessor<DalaranMapperConfi
         simpleMapping.forEach((path, mapping) -> {
             MessageMapping messageMapping = new MessageMapping();
             buildMapping(messageMapping, path, mapping, in, out);
-
             messageMappings.add(messageMapping);
         });
         messageMappings.sort(new MessageMappingComparator());
@@ -210,7 +209,12 @@ public class DalaranMessageMapper implements DalaranProcessor<DalaranMapperConfi
         Map<String, FunctionParam> sourcePaths = new HashMap<>();
         if (mappingFunction != null && MapUtils.isNotEmpty(mappingFunction.getParams())) {
             mappingFunction.getParams().forEach((k, v) -> {
-                sourcePaths.put(v.getValue(), v);
+                if (v.getType() == ParamType.DYNAMIC) {
+                    String path = StringUtils.substringAfter(v.getValue(), MapperConstants.MODEL_ROOT + ".");
+                    sourcePaths.put(path, v);
+                } else {
+                    sourcePaths.put(v.getValue(), v);
+                }
             });
         }
         return sourcePaths;

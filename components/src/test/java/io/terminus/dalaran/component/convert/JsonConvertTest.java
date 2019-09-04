@@ -1,16 +1,13 @@
 package io.terminus.dalaran.component.convert;
 
-import com.github.drapostolos.typeparser.TypeParser;
 import io.terminus.dalaran.component.BasicConvertTest;
 import io.terminus.dalaran.component.processor.mapper.DalaranMapperConfig;
 import io.terminus.dalaran.component.processor.mapper.DalaranMessageMapper;
 import io.terminus.dalaran.model.BodyType;
-import io.terminus.dalaran.model.FieldType;
 import io.terminus.dalaran.model.MessageModel;
 import io.terminus.dalaran.model.schema.JsonSchema;
 import io.terminus.dalaran.model.schema.XMLSchema;
 import org.apache.camel.ProducerTemplate;
-import org.apache.commons.beanutils.ConvertUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -22,13 +19,6 @@ public class JsonConvertTest extends BasicConvertTest {
 
     @Test
     public void convert() {
-
-        Object o1 = parse(2000000.0, FieldType.INTEGER);
-        Object o2 = parse(2000000, FieldType.FLOAT);
-        Object o3 = parse(2000000.0, FieldType.STRING);
-        Object o4 = parse("false", FieldType.BOOLEAN);
-
-
         List<TestProcessor> processors = new ArrayList<>();
         MessageModel jsonModel = buildJsonModel();
         MessageModel xmlModel = buildXMLModel();
@@ -73,24 +63,5 @@ public class JsonConvertTest extends BasicConvertTest {
         schema.setRoot("test");
         model.setModelSchema(schema);
         return model;
-    }
-
-    private  Object parse(Object target, FieldType destination) {
-        if (target == null) {
-            return null;
-        }
-        if (destination != null) {
-            switch (destination) {
-                case INTEGER:
-                    return ConvertUtils.convert(target, Long.class);
-                case FLOAT:
-                    return ConvertUtils.convert(target, Double.class);
-                case BOOLEAN:
-                    return ConvertUtils.convert(target, Boolean.class);
-                default:
-                    return target;
-            }
-        }
-        return target;
     }
 }

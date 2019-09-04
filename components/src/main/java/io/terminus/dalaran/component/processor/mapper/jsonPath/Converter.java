@@ -7,9 +7,6 @@ import io.terminus.dalaran.component.common.exception.MapperFunctionExecuteExcep
 import io.terminus.dalaran.component.processor.mapper.model.*;
 import io.terminus.dalaran.core.context.DalaranContext;
 import io.terminus.dalaran.model.FieldType;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.MapUtils;
-import org.apache.kafka.common.protocol.types.Field;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -158,23 +155,18 @@ public class Converter {
 
     private static void buildValue(Object source, Map<String, List<SourcePath>> sourcePaths, Map<String, PathDetail> destinationPaths, MessageMapping messageMapping, Object destination, DalaranContext dalaranContext) {
         MappingFunction function = messageMapping.getFunction();
-        Map<String, FunctionParam> functionParams = new LinkedHashMap<>();
-        if (function != null && MapUtils.isNotEmpty(function.getParams())) {
-            function.getParams().forEach((k, v) -> {
-                functionParams.put(v.getValue(), v);
-            });
-        }
 
         if (sourcePaths != null && sourcePaths.size() > 0) {
             for (Map.Entry<String, List<SourcePath>> entry : sourcePaths.entrySet()) {
-                Set<String> paths = functionParams.keySet();
                 List<Object> values = new ArrayList<>();
                 String indexes = entry.getKey();
                 Map<String, SourcePath> dynamicParams = new HashMap<>();
                 entry.getValue().forEach(path -> {
                     dynamicParams.put(path.getPath(), path);
                 });
-                if (function != null && CollectionUtils.isNotEmpty(paths)) {
+                if (function != null) {
+                    Map<String, FunctionParam> functionParams = messageMapping.getFunction().getSourcePaths();
+                    Set<String> paths = functionParams.keySet();
                     paths.forEach(path -> {
                         Object value = null;
                         if (dynamicParams.containsKey(path)) {
