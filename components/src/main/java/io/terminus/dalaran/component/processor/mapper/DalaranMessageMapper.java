@@ -206,7 +206,7 @@ public class DalaranMessageMapper implements DalaranProcessor<DalaranMapperConfi
     }
 
     private Map<String, FunctionParam> buildFunctionSourcePaths(MappingFunction mappingFunction) {
-        Map<String, FunctionParam> sourcePaths = new HashMap<>();
+        Map<String, FunctionParam> sourcePaths = new LinkedHashMap<>();
         if (mappingFunction != null && MapUtils.isNotEmpty(mappingFunction.getParams())) {
             mappingFunction.getParams().forEach((k, v) -> {
                 if (v.getType() == ParamType.DYNAMIC) {

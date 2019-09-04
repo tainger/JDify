@@ -59,7 +59,9 @@ public class Converter {
             String path = "$";
             StringBuilder indexes = new StringBuilder();
             for (SourceField sourceField : fields) {
-                buildSourcePaths(path, sourceField.getField(), arrayFieldSize, lastArray, source, sourcePaths, sourceField.getPath(), indexes);
+                if (sourceField.getParamType() == ParamType.DYNAMIC) {
+                    buildSourcePaths(path, sourceField.getField(), arrayFieldSize, lastArray, source, sourcePaths, sourceField.getPath(), indexes);
+                }
             }
         }
         return new SourceFieldDetail(arrayFieldSize, sourcePaths);
@@ -69,25 +71,26 @@ public class Converter {
         String name = parentPath + "." + field.getName();
         if (field.getLocal() == FieldLocal.MIDDLE) {
             Object body = JSONPath.eval(source, name);
-            if (body != null) {
-                SimpleMappingField childField = field.getChild();
-                if (field.getType() == FieldType.ARRAY) {
-                    List<Object> child = (List) body;
-                    int bodySize = child.size();
-                    Integer level = lastArrayLevel + 1;
-                    arrayFieldSize.add(bodySize);
+            if (body == null) {
+                return;
+            }
+            SimpleMappingField childField = field.getChild();
+            if (field.getType() == FieldType.ARRAY) {
+                List<Object> child = (List) body;
+                int bodySize = child.size();
+                Integer level = lastArrayLevel + 1;
+                arrayFieldSize.add(bodySize);
 
-                    for (int i = 0; i < bodySize; i++) {
-                        StringBuilder index = new StringBuilder();
-                        index.append(indexes);
-                        index.append(i).append(".");
-                        String path = name + "[" + i + "]";
-                        buildSourcePaths(path, childField, arrayFieldSize, level, source, sourcePaths, rootPath, index);
-                    }
+                for (int i = 0; i < bodySize; i++) {
+                    StringBuilder index = new StringBuilder();
+                    index.append(indexes);
+                    index.append(i).append(".");
+                    String path = name + "[" + i + "]";
+                    buildSourcePaths(path, childField, arrayFieldSize, level, source, sourcePaths, rootPath, index);
                 }
-                if (field.getType() == FieldType.OBJECT) {
-                    buildSourcePaths(name, childField, arrayFieldSize, lastArrayLevel, source, sourcePaths, rootPath, indexes);
-                }
+            }
+            if (field.getType() == FieldType.OBJECT) {
+                buildSourcePaths(name, childField, arrayFieldSize, lastArrayLevel, source, sourcePaths, rootPath, indexes);
             }
         } else if (field.getLocal() == FieldLocal.END) {
             PathDetail pathDetail = new PathDetail();
@@ -153,71 +156,73 @@ public class Converter {
     }
 
     private static void buildValue(Object source, Map<String, List<SourcePath>> sourcePaths, Map<String, PathDetail> destinationPaths, MessageMapping messageMapping, Object destination, DalaranContext dalaranContext) {
-        MappingFunction function = messageMapping.getFunction();
+        if (sourcePaths == null || sourcePaths.size() == 0) {
+            return;
+        }
 
-        if (sourcePaths != null && sourcePaths.size() > 0) {
-            for (Map.Entry<String, List<SourcePath>> entry : sourcePaths.entrySet()) {
-                List<Object> values = new ArrayList<>();
-                String indexes = entry.getKey();
-                Map<String, SourcePath> dynamicParams = new HashMap<>();
-                entry.getValue().forEach(path -> {
-                    dynamicParams.put(path.getPath(), path);
-                });
-                if (function != null) {
-                    Map<String, FunctionParam> functionParams = messageMapping.getFunction().getSourcePaths();
-                    Set<String> paths = functionParams.keySet();
-                    paths.forEach(path -> {
-                        Object value = null;
-                        if (dynamicParams.containsKey(path)) {
-                            SourcePath sourcePath = dynamicParams.get(path);
-                            PathDetail pathDetail = sourcePath.getDetail();
-                            if (pathDetail != null && pathDetail.getPath() != null) {
-                                value = JSONPath.eval(source, pathDetail.getPath());
-                            }
-                        } else {
-                            FunctionParam functionParam = functionParams.get(path);
-                            value = functionParam.getValue();
-                        }
-                        values.add(value);
-                    });
-                } else {
-                    entry.getValue().forEach(v -> {
-                        Object value = null;
-                        PathDetail pathDetail = v.getDetail();
+        for (Map.Entry<String, List<SourcePath>> entry : sourcePaths.entrySet()) {
+            List<Object> values = new ArrayList<>();
+            String indexes = entry.getKey();
+            Map<String, SourcePath> dynamicParams = new HashMap<>();
+            entry.getValue().forEach(path -> {
+                dynamicParams.put(path.getPath(), path);
+            });
+
+            MappingFunction function = messageMapping.getFunction();
+            if (function != null) {
+                Map<String, FunctionParam> functionParams = function.getSourcePaths();
+                Set<String> paths = functionParams.keySet();
+                paths.forEach(path -> {
+                    Object value = null;
+                    if (dynamicParams.containsKey(path)) {
+                        SourcePath sourcePath = dynamicParams.get(path);
+                        PathDetail pathDetail = sourcePath.getDetail();
                         if (pathDetail != null && pathDetail.getPath() != null) {
                             value = JSONPath.eval(source, pathDetail.getPath());
                         }
-                        values.add(value);
-                    });
-                }
-
-                PathDetail pathDetail = destinationPaths.get(indexes);
-                Object value = null;
-                if (function != null) {
-                    try {
-                        switch (function.getType()) {
-                            case STATIC:
-                                value = dalaranContext.getDalaranFunctionContext().executeStaticFunction(function.getId(), values.toArray());
-                                break;
-                            case CUSTOM:
-                                value = dalaranContext.getDalaranFunctionContext().executeCustomFunction(Long.valueOf(function.getId()), values.toArray());
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        throw new MapperFunctionExecuteException("Mapper function execute error. function: " + function.getId() + ", params: " + Arrays.toString(values.toArray()) + ", message: " + e.getMessage());
+                    } else {
+                        FunctionParam functionParam = functionParams.get(path);
+                        value = functionParam.getValue();
                     }
-                } else {
-                    value = values.get(0);
-                }
+                    values.add(value);
+                });
+            } else {
+                entry.getValue().forEach(v -> {
+                    Object value = null;
+                    PathDetail pathDetail = v.getDetail();
+                    if (pathDetail != null && pathDetail.getPath() != null) {
+                        value = JSONPath.eval(source, pathDetail.getPath());
+                    }
+                    values.add(value);
+                });
+            }
 
-                if (pathDetail != null) {
-                    FieldType type = pathDetail.getType();
-                    value = parse(value, type, entry.getValue(), pathDetail.getPath());
+            PathDetail pathDetail = destinationPaths.get(indexes);
+            Object value = null;
+            if (function != null) {
+                try {
+                    switch (function.getType()) {
+                        case STATIC:
+                            value = dalaranContext.getDalaranFunctionContext().executeStaticFunction(function.getId(), values.toArray());
+                            break;
+                        case CUSTOM:
+                            value = dalaranContext.getDalaranFunctionContext().executeCustomFunction(Long.valueOf(function.getId()), values.toArray());
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    throw new MapperFunctionExecuteException("Mapper function execute error. function: " + function.getId() + ", params: " + Arrays.toString(values.toArray()) + ", message: " + e.getMessage());
                 }
+            } else {
+                value = values.get(0);
+            }
 
-                if (pathDetail != null && pathDetail.getPath() != null) {
-                    JSONPath.set(destination, pathDetail.getPath(), value);
-                }
+            if (pathDetail != null) {
+                FieldType type = pathDetail.getType();
+                value = parse(value, type, entry.getValue(), pathDetail.getPath());
+            }
+
+            if (pathDetail != null && pathDetail.getPath() != null) {
+                JSONPath.set(destination, pathDetail.getPath(), value);
             }
         }
     }
