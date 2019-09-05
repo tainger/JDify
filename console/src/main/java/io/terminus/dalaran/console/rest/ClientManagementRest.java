@@ -1,6 +1,8 @@
 package io.terminus.dalaran.console.rest;
 
 import io.swagger.annotations.ApiOperation;
+import io.terminus.common.model.Response;
+import io.terminus.dalaran.console.model.ResponseMessage;
 import io.terminus.dalaran.console.model.dto.ClientDTO;
 import io.terminus.dalaran.console.service.ClientManagementService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,26 +17,46 @@ public class ClientManagementRest {
 
     @PostMapping
     @ApiOperation("新增客户端")
-    private Long create(@RequestBody ClientDTO clientDTO) {
-        return service.create(clientDTO);
+    private Response create(@RequestBody ClientDTO clientDTO) {
+        try {
+            return Response.ok(service.create(clientDTO));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Response.fail(ResponseMessage.CLIENT_CREATE_ERROR);
+        }
     }
 
     @PutMapping
     @ApiOperation("更新客户端")
-    private ClientDTO update(@RequestBody ClientDTO clientDTO) {
-        return service.update(clientDTO);
+    private Response update(@RequestBody ClientDTO clientDTO) {
+        try {
+            return Response.ok(service.update(clientDTO));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Response.fail(ResponseMessage.CLIENT_UPDATE_ERROR);
+        }
     }
 
     @DeleteMapping("/{id}")
     @ApiOperation("删除客户端")
-    private void create(@PathVariable Long id) {
-        service.delete(id);
+    private Response create(@PathVariable Long id) {
+        try {
+            service.delete(id);
+            return Response.ok();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Response.fail(ResponseMessage.CLIENT_DELETE_ERROR);
+        }
     }
 
     @GetMapping("/{id}")
     @ApiOperation("获取客户端详情")
-    private ClientDTO detail(@PathVariable Long id) {
-        return service.detail(id);
+    private Response detail(@PathVariable Long id) {
+        try {
+            return Response.ok(service.detail(id));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Response.fail(ResponseMessage.CLIENT_QUERY_ERROR);
+        }
     }
-
 }
