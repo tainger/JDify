@@ -9,9 +9,11 @@ import java.util.List;
 
 @Data
 public class ErrorCatchConfig {
-    @ConfigFieldInfo(inputType = FieldInputType.Pipeline)
-    private List<ProcessorEntity> pipeline;
+    @ConfigFieldInfo(inputType = FieldInputType.ErrorCatch)
+    private List<Route> routes;
 
-    @ConfigFieldInfo(inputType = FieldInputType.Pipeline)
-    private List<ProcessorEntity> onErrorPipeline;
+    @Data
+    class Route {
+        private List<ProcessorEntity> pipeline;
+    }
 }

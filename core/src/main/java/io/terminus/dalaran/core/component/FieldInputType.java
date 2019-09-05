@@ -5,5 +5,5 @@ public enum FieldInputType {
     String, Integer, Password, Select, Radio, Switch, CheckBox,
     Script, SQL, Expression,
     Connector, Model, SubFlow, Service, ServiceOperation,
-    Routes, Pipeline, Branches, TrantorModule, TrantorIntegration, TrantorIntegrationPoint
+    Routes, Pipeline, Branches, ErrorCatch, TrantorModule, TrantorIntegration, TrantorIntegrationPoint
 }

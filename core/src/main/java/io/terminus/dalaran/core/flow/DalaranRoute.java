@@ -20,6 +20,13 @@ public class DalaranRoute extends RouteDefinition {
 
     private MessageModel lastOutModel;
 
+    @Override
+    public RouteDefinition process(Processor processor) {
+        DalaranProcessDefinition answer = new DalaranProcessDefinition(processor);
+        addOutput(answer);
+        return this;
+    }
+
     public List<String> getSteps() {
         List<String> steps = new ArrayList<>();
         for (FromDefinition input : getInputs()) {
