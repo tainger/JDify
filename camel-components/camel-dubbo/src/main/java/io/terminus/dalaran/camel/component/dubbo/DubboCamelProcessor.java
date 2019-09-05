@@ -1,7 +1,6 @@
 package io.terminus.dalaran.camel.component.dubbo;
 
 import com.alibaba.dubbo.common.utils.StringUtils;
-import com.alibaba.dubbo.rpc.service.GenericService;
 import org.apache.camel.Exchange;
 import org.apache.camel.impl.DefaultProducer;
 

@@ -80,6 +80,7 @@ public class TestFlowInitializer {
         for (SubFlowEntity subFlowEntity : subFlows) {
             try {
                 SubFlow testFlow = resourceBuilder.buildSubFlow(subFlowEntity);
+                // TODO 子流程内的片段会重复加载
                 dalaranContext.addSubFlow(testFlow);
                 dalaranContext.addTestSubFLow(testFlow);
                 log.info("load sub-flow {}", testFlow.getId());

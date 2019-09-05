@@ -17,6 +17,7 @@ import io.terminus.dalaran.model.DalaranModelSchema;
 import io.terminus.dalaran.model.MessageModel;
 import io.terminus.dalaran.model.component.ProcessorModel;
 import io.terminus.dalaran.model.flow.BasicFlow;
+import io.terminus.dalaran.model.flow.FlowFragment;
 import io.terminus.dalaran.model.flow.SubFlow;
 import io.terminus.dalaran.model.flow.TriggerFlow;
 import lombok.val;
@@ -87,6 +88,26 @@ public class DefaultDalaranResourceBuilder implements DalaranResourceBuilder {
     }
 
     @Override
+    public FlowFragment buildFlowFragment(List<ProcessorEntity> pipelineEntityList, MessageModel inModel, MessageModel outModel, Long flowId, String fragmentId, Boolean tracing) {
+        MessageModel fragmentLastOutModel = outModel;
+        List<ProcessorModel> pipeline = new ArrayList<>();
+        for (ProcessorEntity processorEntity : pipelineEntityList) {
+            val processorModel = buildProcessorModel(processorEntity, fragmentLastOutModel);
+            fragmentLastOutModel = processorModel.getOutModel();
+            pipeline.add(processorModel);
+        }
+
+        FlowFragment fragment = new FlowFragment();
+        fragment.setId(flowId);
+        fragment.setFragmentId(fragmentId);
+        fragment.setPipeline(pipeline);
+        fragment.setInModel(inModel);
+        fragment.setOutModel(fragmentLastOutModel);
+        fragment.setTracing(tracing);
+        return fragment;
+    }
+
+    @Override
     public MessageModel buildModel(Long modelId) {
         if (modelId != null) {
             return buildModel(resourceLoader.loadModel(modelId));
@@ -136,7 +157,7 @@ public class DefaultDalaranResourceBuilder implements DalaranResourceBuilder {
         List<ProcessorModel> pipeline = new ArrayList<>();
         MessageModel lastOutModel = flow.getInModel();
         for (ProcessorEntity processorEntity : flowEntity.getPipeline()) {
-            ProcessorModel processor = buildProcessorModel(processorEntity, lastOutModel, flow);
+            ProcessorModel processor = buildProcessorModel(processorEntity, lastOutModel);
             pipeline.add(processor);
             if (processor.getOutModel() != null) {
                 lastOutModel = processor.getOutModel();
@@ -146,7 +167,7 @@ public class DefaultDalaranResourceBuilder implements DalaranResourceBuilder {
     }
 
     @Override
-    public ProcessorModel buildProcessorModel(ProcessorEntity processorEntity, MessageModel lastOutModel, BasicFlow flow) {
+    public ProcessorModel buildProcessorModel(ProcessorEntity processorEntity, MessageModel lastOutModel) {
         ProcessorModel processor = new ProcessorModel();
         processor.setId(processorEntity.getId());
         processor.setType(processorEntity.getType());

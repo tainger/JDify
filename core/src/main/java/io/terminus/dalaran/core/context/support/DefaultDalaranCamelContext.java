@@ -141,11 +141,6 @@ public class DefaultDalaranCamelContext implements DalaranContext<DalaranRoute> 
     }
 
     @Override
-    public void addFragmentFlows(List<FlowFragment> flows) {
-        flows.forEach(this::addFragmentFlow);
-    }
-
-    @Override
     public String testFlow(Long flowId, String body) {
         String recordId = nextRecordId();
         try {

@@ -33,8 +33,6 @@ public interface DalaranContext<T> {
 
     void addFragmentFlow(FlowFragment flow);
 
-    void addFragmentFlows(List<FlowFragment> flows);
-
     String testFlow(Long flowId, String body);
 
     String testSubFlow(Long subFlowId, String body);
