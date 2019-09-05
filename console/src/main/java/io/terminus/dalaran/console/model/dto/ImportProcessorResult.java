@@ -1,4 +1,8 @@
 package io.terminus.dalaran.console.model.dto;
 
-public class ImportProcessorResult {
+import lombok.Data;
+
+@Data
+public class ImportProcessorResult extends ImportResult {
+    private ProcessorDTO processor;
 }

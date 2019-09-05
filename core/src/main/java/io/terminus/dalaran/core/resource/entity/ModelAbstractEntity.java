@@ -2,6 +2,7 @@ package io.terminus.dalaran.core.resource.entity;
 
 import io.terminus.dalaran.core.resource.entity.basic.BasicEntity;
 import io.terminus.dalaran.model.BodyType;
+import io.terminus.dalaran.model.ModelTargetType;
 import lombok.Data;
 
 import javax.persistence.Column;
@@ -19,6 +20,9 @@ public abstract class ModelAbstractEntity extends BasicEntity {
     @Column
     private Long moduleId;
 
+    @Column
+    private String modelKey;
+
     @Column(nullable = false, length = 64)
     private String name;
 
@@ -27,13 +31,14 @@ public abstract class ModelAbstractEntity extends BasicEntity {
     private BodyType type;
 
     @Column
-    private Long serviceId;
+    private String targetId;
+
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private ModelTargetType targetType;
 
     @Column(nullable = false, columnDefinition = "TEXT")
     private String modelSchema;
-
-    @Column
-    private boolean hidden;
 
     @Column(columnDefinition = "TEXT")
     private String description;

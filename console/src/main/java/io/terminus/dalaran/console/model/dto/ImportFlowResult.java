@@ -1,4 +1,8 @@
 package io.terminus.dalaran.console.model.dto;
 
-public class ImportFlowResult {
+import lombok.Data;
+
+@Data
+public class ImportFlowResult extends ImportResult {
+    private Long flowId;
 }

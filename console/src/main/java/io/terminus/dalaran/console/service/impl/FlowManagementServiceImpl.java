@@ -5,15 +5,17 @@ import io.terminus.dalaran.console.TestFlowInitializer;
 import io.terminus.dalaran.console.convertor.FlowConvertor;
 import io.terminus.dalaran.console.entity.ModelEntity;
 import io.terminus.dalaran.console.entity.TriggerFlowEntity;
-import io.terminus.dalaran.console.model.dto.CopyFlow;
-import io.terminus.dalaran.console.model.dto.ModelDTO;
+import io.terminus.dalaran.console.model.ModelImportMode;
+import io.terminus.dalaran.console.model.dto.*;
 import io.terminus.dalaran.console.model.dto.basic.BasicFlowInfo;
+import io.terminus.dalaran.console.model.dto.flow.ImportFlowDTO;
 import io.terminus.dalaran.console.model.dto.flow.TriggerFlowDTO;
 import io.terminus.dalaran.console.model.query.FlowQuery;
 import io.terminus.dalaran.console.repository.ModelRepository;
 import io.terminus.dalaran.console.repository.PropertyRepository;
 import io.terminus.dalaran.console.repository.TriggerFlowRepository;
 import io.terminus.dalaran.console.service.FlowManagementService;
+import io.terminus.dalaran.console.service.ModelManagementService;
 import io.terminus.dalaran.console.service.jpa.FlowQueryService;
 import io.terminus.dalaran.core.context.DalaranContext;
 import io.terminus.dalaran.core.flow.DalaranFlowBuilder;
@@ -24,6 +26,7 @@ import io.terminus.dalaran.model.flow.FlowStatus;
 import io.terminus.dalaran.model.flow.FlowValidation;
 import io.terminus.dalaran.model.flow.TriggerFlow;
 import io.terminus.dalaran.model.flow.ValidateMessageLevel;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.BeanUtils;
@@ -31,10 +34,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import static io.terminus.dalaran.console.model.ModelImportMode.Overwrite;
+import static io.terminus.dalaran.console.model.ModelImportMode.Rename;
 
 @Service
 @Transactional
@@ -66,6 +73,9 @@ public class FlowManagementServiceImpl implements FlowManagementService {
 
     @Autowired
     private DalaranResourceBuilder resourceBuilder;
+
+    @Autowired
+    private ModelManagementService modelService;
 
     private final FlowConvertor flowConvertor = new FlowConvertor();
 
@@ -100,6 +110,113 @@ public class FlowManagementServiceImpl implements FlowManagementService {
             testFlowInitializer.reloadTestTriggerFlow(flowEntity.getId());
         }
         return id;
+    }
+
+    // TODO 很多重复内容 逻辑也比较尴尬, 先测试一波, 有时间改改
+    @Override
+    public ImportFlowResult importFlow(ImportFlowDTO importInfo) {
+        ImportFlowResult result = new ImportFlowResult();
+        Map<String, Object> config = importInfo.getTriggerConfig();
+        List<String> existModels = checkExistModels(importInfo);
+        if (!existModels.isEmpty()) {
+            result.setFlowId(-1L);
+            return result;
+        }
+        TriggerFlowDTO triggerFlowDTO = new TriggerFlowDTO();
+
+        ModelDTO inModel = importInfo.getInModel();
+        if (inModel != null) {
+            inModel.setModuleId(importInfo.getModuleId());
+            Long modelId = importModel(inModel, importInfo.getImportMode());
+            config.put("inModelId", modelId);
+            triggerFlowDTO.setInModelId(modelId);
+        }
+        ModelDTO outModel = importInfo.getOutModel();
+        if (outModel != null) {
+            outModel.setModuleId(importInfo.getModuleId());
+            Long modelId = importModel(outModel, importInfo.getImportMode());
+            config.put("outModelId", modelId);
+            triggerFlowDTO.setOutModelId(modelId);
+        }
+
+        triggerFlowDTO.setTriggerType(importInfo.getTriggerType());
+        triggerFlowDTO.setTriggerConfig(importInfo.getTriggerConfig());
+        triggerFlowDTO.setModuleId(importInfo.getModuleId());
+        triggerFlowDTO.setName(importInfo.getName());
+        triggerFlowDTO.setDescription(importInfo.getDescription());
+        triggerFlowDTO.setPipeline(new ArrayList<>());
+        Long flowId = createFlow(triggerFlowDTO);
+        result.setFlowId(flowId);
+        return result;
+    }
+
+    @Override
+    public ImportProcessorResult importProcessor(ImportProcessorDTO importInfo) {
+        ImportProcessorResult result = new ImportProcessorResult();
+        Map<String, Object> config = importInfo.getProcessorConfig();
+        List<String> existModels = checkExistModels(importInfo);
+        if (!existModels.isEmpty()) {
+            result.setExistModels(existModels);
+            return result;
+        }
+        ModelDTO inModel = importInfo.getInModel();
+        if (inModel != null) {
+            inModel.setModuleId(importInfo.getModuleId());
+            Long modelId = importModel(inModel, importInfo.getImportMode());
+            config.put("inModelId", modelId);
+        }
+        ModelDTO outModel = importInfo.getOutModel();
+        if (outModel != null) {
+            outModel.setModuleId(importInfo.getModuleId());
+            Long modelId = importModel(outModel, importInfo.getImportMode());
+            config.put("outModelId", modelId);
+        }
+        ProcessorDTO processor = new ProcessorDTO();
+        processor.setConfig(config);
+        processor.setType(importInfo.getProcessorType());
+        result.setProcessor(processor);
+        return result;
+    }
+
+    private List<String> checkExistModels(ImportInfo importInfo) {
+        List<String> existModels = new ArrayList<>();
+        if (importInfo.getImportMode() != null) {
+            return existModels;
+        }
+        ModelDTO inModel = importInfo.getInModel();
+        if (inModel != null) {
+            inModel.setModuleId(importInfo.getModuleId());
+            ModelEntity inModelEntity = modelRepository.findByModuleIdAndModelKey(importInfo.getModuleId(), inModel.getModelKey());
+            if (inModelEntity != null) {
+                existModels.add(inModelEntity.getModelKey());
+            }
+        }
+        ModelDTO outModel = importInfo.getOutModel();
+        if (outModel != null) {
+            outModel.setModuleId(importInfo.getModuleId());
+            ModelEntity outModelEntity = modelRepository.findByModuleIdAndModelKey(importInfo.getModuleId(), outModel.getModelKey());
+            if (outModelEntity != null) {
+                existModels.add(outModelEntity.getModelKey());
+            }
+        }
+        return existModels;
+    }
+
+    private Long importModel(ModelDTO model, ModelImportMode importMode) {
+        ModelEntity outModelEntity = modelRepository.findByModuleIdAndModelKey(model.getModuleId(), model.getModelKey());
+        if (outModelEntity == null) {
+            return modelService.createModel(model);
+        } else if (importMode == Overwrite) {
+            model.setId(outModelEntity.getId());
+            modelService.updateModel(model);
+            return model.getId();
+        } else if (importMode == Rename) {
+            String randomId = RandomStringUtils.randomAlphanumeric(6);
+            model.setName(model.getName() + "-" + randomId);
+            model.setModelKey(model.getModelKey() + "-" + randomId);
+            return modelService.createModel(model);
+        }
+        return null;
     }
 
     @Override
