@@ -17,6 +17,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -100,22 +101,22 @@ public class ModelManagementRest {
         }
     }
 
-    @ApiOperation(value = "查询全部未隐藏的数据模型")
+    @ApiOperation(value = "查询全部可编辑的数据模型")
     @RequestMapping(value = "/list/public", method = RequestMethod.GET)
-    public Response listNoHidden() {
+    public Response listEditable() {
         try {
-            return Response.ok(modelManagementService.listNoHidden());
+            return Response.ok(modelManagementService.listEditableModel());
         } catch (Exception e) {
             e.printStackTrace();
             return Response.fail(ResponseMessage.MODEL_QUERY_ERROR);
         }
     }
 
-    @ApiOperation(value = "查询某模块内未隐藏的数据模型")
+    @ApiOperation(value = "查询某模块内可编辑的数据模型")
     @RequestMapping(value = "/list/{moduleId}/public", method = RequestMethod.GET)
-    public Response listNoHiddenByModuleId(@PathVariable Long moduleId) {
+    public Response listEditableByModuleId(@PathVariable Long moduleId) {
         try {
-            return Response.ok(modelManagementService.listNotHiddenByModuleId(moduleId));
+            return Response.ok(modelManagementService.listEditableModelByModuleId(moduleId));
         } catch (Exception e) {
             e.printStackTrace();
             return Response.fail(ResponseMessage.MODEL_QUERY_ERROR);

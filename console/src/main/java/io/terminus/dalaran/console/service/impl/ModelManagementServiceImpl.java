@@ -22,10 +22,7 @@ import io.terminus.dalaran.console.service.jpa.ModelQueryService;
 import io.terminus.dalaran.console.util.ExcelUtils;
 import io.terminus.dalaran.core.context.DalaranContext;
 import io.terminus.dalaran.core.resource.repository.ModuleRepository;
-import io.terminus.dalaran.model.BodyType;
-import io.terminus.dalaran.model.DalaranModelSchema;
-import io.terminus.dalaran.model.FieldType;
-import io.terminus.dalaran.model.ModelField;
+import io.terminus.dalaran.model.*;
 import io.terminus.dalaran.model.schema.JsonSchema;
 import io.terminus.dalaran.model.schema.ObjectSchema;
 import org.apache.commons.collections.CollectionUtils;
@@ -101,20 +98,20 @@ public class ModelManagementServiceImpl implements ModelManagementService {
     }
 
     @Override
-    public List<ModelDTO> listNoHidden() {
-        List<ModelEntity> entities = modelRepository.findByHiddenIsFalse();
-        return entities.stream().map(this::buildModel).collect(Collectors.toList());
-    }
-
-    @Override
     public List<ModelDTO> listByModuleId(Long moduleId) {
         List<ModelEntity> entities = modelRepository.findByModuleId(moduleId);
         return entities.stream().map(this::buildModel).collect(Collectors.toList());
     }
 
     @Override
-    public List<ModelDTO> listNotHiddenByModuleId(Long moduleId) {
-        List<ModelEntity> entities = modelRepository.findByModuleIdAndHiddenIsFalse(moduleId);
+    public List<ModelDTO> listEditableModel() {
+        List<ModelEntity> entities = modelRepository.findByTargetTypeIn(ModelTargetType.editableTypes());
+        return entities.stream().map(this::buildModel).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ModelDTO> listEditableModelByModuleId(Long moduleId) {
+        List<ModelEntity> entities = modelRepository.findByTargetTypeInAndModuleId(ModelTargetType.editableTypes(), moduleId);
         return entities.stream().map(this::buildModel).collect(Collectors.toList());
     }
 
@@ -137,7 +134,7 @@ public class ModelManagementServiceImpl implements ModelManagementService {
 
     @Override
     public ModelEntity getByNameAndServiceId(String name, Long serviceId) {
-        return modelRepository.findByNameAndServiceId(name, serviceId);
+        return modelRepository.findByNameAndTargetTypeAndTargetId(name, ModelTargetType.Service, serviceId);
     }
 
     @Override
@@ -403,10 +400,11 @@ public class ModelManagementServiceImpl implements ModelManagementService {
             modelEntity.setModelSchema(JSON.toJSONString(new HashMap<>()));
         }
         modelEntity.setType(model.getModelType());
+        modelEntity.setModelKey(model.getModelKey());
         modelEntity.setDescription(model.getDescription());
         modelEntity.setModuleId(model.getModuleId());
-        modelEntity.setServiceId(model.getServiceId());
-        modelEntity.setHidden(false);
+        modelEntity.setTargetId(model.getTargetId());
+        modelEntity.setTargetType(model.getTargetType());
         return modelEntity;
     }
 
@@ -424,30 +422,30 @@ public class ModelManagementServiceImpl implements ModelManagementService {
         }
 
         model.setModelType(entity.getType());
-        model.setServiceId(entity.getServiceId());
+        model.setModelKey(entity.getModelKey());
+        model.setTargetId(entity.getTargetId());
+        model.setTargetType(entity.getTargetType());
         model.setId(entity.getId());
-        model.setHidden(entity.isHidden());
         return model;
     }
 
     private Map<String, ClassificationModel> buildClassificationModel(List<ModelDTO> models) {
         Map<String, ClassificationModel> classificationModels = new HashMap<>();
         models.forEach(model -> {
-            Long serviceId = model.getServiceId();
-            if (serviceId != null) {
-                ServiceEntity serviceEntity = serviceRepository.findOne(model.getServiceId());
+            if (model.getTargetType() == ModelTargetType.Service && model.getTargetId() != null) {
+                ServiceEntity serviceEntity = serviceRepository.findOne(Long.valueOf(model.getTargetId()));
                 String serviceName = serviceEntity.getName();
-                ClassificationModel classificationModel = classificationModels.containsKey(serviceName)? new ClassificationModel(): classificationModels.get(serviceName);
-                List<ModelDTO> modelList = CollectionUtils.isEmpty(classificationModel.getModels())? new ArrayList<>(): classificationModel.getModels();
+                ClassificationModel classificationModel = classificationModels.containsKey(serviceName) ? new ClassificationModel() : classificationModels.get(serviceName);
+                List<ModelDTO> modelList = CollectionUtils.isEmpty(classificationModel.getModels()) ? new ArrayList<>() : classificationModel.getModels();
                 modelList.add(model);
                 classificationModel.setModels(modelList);
                 classificationModel.setName(serviceName);
-                ServiceType serviceType = serviceEntity.getType().equals(DalaranConsoleConstants.SOAP_CONNECTOR) ? ServiceType.SOAP: ServiceType.SWAGGER;
+                ServiceType serviceType = serviceEntity.getType().equals(DalaranConsoleConstants.SOAP_CONNECTOR) ? ServiceType.SOAP : ServiceType.SWAGGER;
                 classificationModel.setServiceType(serviceType);
                 classificationModels.put(serviceName, classificationModel);
             } else {
-                ClassificationModel classificationModel = classificationModels.containsKey(COMMON_MODEL)? new ClassificationModel(): classificationModels.get(COMMON_MODEL);
-                List<ModelDTO> modelList = CollectionUtils.isEmpty(classificationModel.getModels())? new ArrayList<>(): classificationModel.getModels();
+                ClassificationModel classificationModel = classificationModels.containsKey(COMMON_MODEL) ? new ClassificationModel() : classificationModels.get(COMMON_MODEL);
+                List<ModelDTO> modelList = CollectionUtils.isEmpty(classificationModel.getModels()) ? new ArrayList<>() : classificationModel.getModels();
                 modelList.add(model);
                 classificationModel.setModels(modelList);
                 classificationModel.setName(COMMON_MODEL);

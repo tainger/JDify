@@ -2,7 +2,11 @@ package io.terminus.dalaran.console.service;
 
 import io.terminus.dalaran.console.entity.TriggerFlowEntity;
 import io.terminus.dalaran.console.model.dto.CopyFlow;
+import io.terminus.dalaran.console.model.dto.ImportFlowResult;
+import io.terminus.dalaran.console.model.dto.ImportProcessorDTO;
+import io.terminus.dalaran.console.model.dto.ImportProcessorResult;
 import io.terminus.dalaran.console.model.dto.basic.BasicFlowInfo;
+import io.terminus.dalaran.console.model.dto.flow.ImportFlowDTO;
 import io.terminus.dalaran.console.model.dto.flow.TriggerFlowDTO;
 import io.terminus.dalaran.console.model.query.FlowQuery;
 import io.terminus.dalaran.model.flow.FlowValidation;
@@ -15,6 +19,10 @@ public interface FlowManagementService {
     Long saveFlow(TriggerFlowEntity flowEntity);
 
     Long createFlow(TriggerFlowDTO flowModel);
+
+    ImportFlowResult importFlow(ImportFlowDTO flowModel);
+
+    ImportProcessorResult importProcessor(ImportProcessorDTO model);
 
     void deleteFlow(Long flowId);
 
