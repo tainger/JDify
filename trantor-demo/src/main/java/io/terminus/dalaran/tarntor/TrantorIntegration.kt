@@ -5,7 +5,6 @@ import io.terminus.trantor.annotation.BaseModel
 import io.terminus.trantor.annotation.TModel
 import io.terminus.trantor.annotation.TModelField
 import io.terminus.trantor.annotation.TModelFieldType
-import io.terminus.trantor.annotation.typemeta.EnumLabel
 import io.terminus.trantor.annotation.typemeta.EnumMeta
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.SpringApplication
@@ -27,7 +26,7 @@ class UserQuery {
 }
 
 @TModel(desc = "用户", mainField = "username")
-class User : BaseModel() {
+class User {
     @TModelField(desc = "用户名", name = "用户名", unique = true, nullable = false)
     var username: String? = null
 
@@ -41,7 +40,6 @@ class User : BaseModel() {
     var age: Int? = null
 
     @TModelField(desc = "性别", name = "性别")
-    @EnumMeta(labels = [EnumLabel(name = "man", value = "男"), EnumLabel(name = "woman", value = "女")])
     var sex: Sex? = null
 
     @TModelField(desc = "是否锁定", name = "锁定")
