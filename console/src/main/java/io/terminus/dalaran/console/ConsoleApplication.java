@@ -46,7 +46,7 @@ public class ConsoleApplication {
     @Bean
     @ConditionalOnMissingBean(LogRetentionPolicy.class)
     @ConditionalOnProperty(value = "terminus.dalaran.log.policy", havingValue = "delete")
-    public LogRetentionPolicy logRetentionPolicy(@Value("${terminus.dalaran.log.duration: 168}") Integer duration) {
+    public LogRetentionPolicy logRetentionPolicy(@Value("${terminus.dalaran.log.duration: 14}") Integer duration) {
         return new DeleteLogRetentionPolicy(duration);
     }
 

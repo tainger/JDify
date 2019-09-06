@@ -21,7 +21,7 @@ public class DeleteLogRetentionPolicy implements LogRetentionPolicy {
     @Transactional
     public void processing() {
         Calendar now = Calendar.getInstance();
-        now.add(Calendar.HOUR_OF_DAY, -duration);
+        now.add(Calendar.DAY_OF_MONTH, -duration);
         repository.deleteByCreatedAtBefore(now.getTime());
     }
 }
