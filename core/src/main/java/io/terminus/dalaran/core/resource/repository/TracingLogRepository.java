@@ -5,6 +5,7 @@ import io.terminus.dalaran.core.resource.entity.common.TracingLogEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
+import java.util.Date;
 import java.util.List;
 
 public interface TracingLogRepository extends JpaRepository<TracingLogEntity, Long>, JpaSpecificationExecutor<TracingLogEntity> {
@@ -16,4 +17,6 @@ public interface TracingLogRepository extends JpaRepository<TracingLogEntity, Lo
     TracingLogEntity findOneByRecordIdAndTracingType(String recordId, TracingType tracingType);
 
     TracingLogEntity findByRecordIdAndMainTrue(String recordId);
+
+    void deleteByCreatedAtBefore(Date datetime);
 }
