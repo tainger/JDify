@@ -119,6 +119,7 @@ public class FlowManagementServiceImpl implements FlowManagementService {
         Map<String, Object> config = importInfo.getTriggerConfig();
         List<String> existModels = checkExistModels(importInfo);
         if (!existModels.isEmpty()) {
+            result.setExistModels(existModels);
             result.setFlowId(-1L);
             return result;
         }
