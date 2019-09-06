@@ -4,7 +4,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 
 public class LogRetentionPolicyExecutor {
 
-    private static final Long HOUR_MILLISECOND = 60 * 60 * 1000L;
+    private static final long HOUR_MILLISECOND = 60 * 60 * 1000L;
 
     private final LogRetentionPolicy logRetentionPolicy;
 
@@ -12,7 +12,7 @@ public class LogRetentionPolicyExecutor {
         this.logRetentionPolicy = logRetentionPolicy;
     }
 
-    @Scheduled(fixedDelay = 60 * 1000L, initialDelay = 60 * 1000L)
+    @Scheduled(fixedDelay = HOUR_MILLISECOND, initialDelay = HOUR_MILLISECOND)
     private void execute() {
         logRetentionPolicy.processing();
     }
