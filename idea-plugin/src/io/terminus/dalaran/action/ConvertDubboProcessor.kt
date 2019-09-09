@@ -6,7 +6,10 @@ import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.impl.source.PsiClassReferenceType
-import io.terminus.dalaran.*
+import io.terminus.dalaran.DUBBO_PROVIDER_TYPE
+import io.terminus.dalaran.ProcessorInfo
+import io.terminus.dalaran.buildSchema
+import io.terminus.dalaran.setCopyPasteContent
 
 class ConvertDubboProcessor : AnAction() {
     override fun actionPerformed(e: AnActionEvent) {

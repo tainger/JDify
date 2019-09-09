@@ -16,7 +16,6 @@ import lombok.val;
 import org.apache.camel.builder.Builder;
 import org.apache.camel.model.MulticastDefinition;
 import org.apache.camel.model.ProcessorDefinition;
-import org.apache.commons.lang.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;

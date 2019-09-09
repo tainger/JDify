@@ -16,6 +16,7 @@ import io.terminus.dalaran.core.component.model.ServiceOperationModel;
 import io.terminus.dalaran.core.config.ServiceInfo;
 import io.terminus.dalaran.core.context.DalaranServiceContext;
 import io.terminus.dalaran.model.MessageModel;
+import io.terminus.dalaran.model.ModelTargetType;
 import io.terminus.dalaran.model.component.ServiceOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -169,14 +170,15 @@ public class ServiceManagementImpl implements ServiceManagement {
             return models.get(modelName);
         }
         ModelDTO model = new ModelDTO();
+        String targetId = serviceId.toString();
         model.setName(modelName);
         model.setModuleId(moduleId);
-        model.setServiceId(serviceId);
+        model.setTargetId(targetId);
+        model.setTargetType(ModelTargetType.Service);
         model.setModelType(messageModel.getModelType());
-        model.setHidden(true);
         model.setModelSchema(JSON.parseObject(JSON.toJSONString(messageModel.getModelSchema()), Map.class));
 
-        ModelEntity entity = modelManagementService.getByNameAndServiceId(modelName, serviceId);
+        ModelEntity entity = modelManagementService.getByNameAndServiceId(modelName, targetId);
         if (entity == null) {
             Long id = modelManagementService.createModel(model);
             models.put(modelName, id);

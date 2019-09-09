@@ -7,11 +7,5 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE})
 public @interface DalaranIntegration {
-
-    String key();
-
-    String name();
-
-    String description() default "";
-
+    String key() default "";
 }

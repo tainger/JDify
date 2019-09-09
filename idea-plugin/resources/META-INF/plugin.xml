@@ -1,17 +1,19 @@
 <idea-plugin>
-    <id>com.your.company.unique.plugin.id</id>
-    <name>Plugin display name here</name>
-    <version>1.0</version>
-    <vendor email="support@yourcompany.com" url="http://www.yourcompany.com">YourCompany</vendor>
+    <id>io.terminus.dalaran</id>
+    <name>集成平台插件(Dalaran)</name>
+    <version>0.0.1</version>
+    <vendor email="gr.gengrong@alibaba-inc.com" url="http://dalaran.terminus.io">Terminus</vendor>
 
     <description><![CDATA[
-      Enter short description for your plugin here.<br>
-      <em>most HTML tags may be used</em>
+      配合端点集成平台使用, 主要有以下功能:
+      1. 快速生成 Json
+      2. 快速生成 ModelSchema
+      3. 快速创建 Trigger
+      4. 快速创建 Processor
     ]]></description>
 
     <change-notes><![CDATA[
-      Add change notes here.<br>
-      <em>most HTML tags may be used</em>
+      0.0.1: first release.
     ]]>
     </change-notes>
 

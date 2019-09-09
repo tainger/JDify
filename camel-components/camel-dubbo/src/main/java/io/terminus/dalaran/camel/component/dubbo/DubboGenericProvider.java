@@ -23,6 +23,7 @@ public class DubboGenericProvider implements GenericService {
     public DubboGenericProvider(DubboEndpoint endpoint) {
         this.providerConfig = new ServiceConfig();
         providerConfig.setRegistry(new RegistryConfig(endpoint.getRegistryAddress()));
+        providerConfig.setTimeout(endpoint.getTimeout());
         providerConfig.setApplication(endpoint.getApplicationConfig());
         providerConfig.setVersion(endpoint.getVersion());
         providerConfig.setInterface(endpoint.getServiceId());

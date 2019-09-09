@@ -92,7 +92,7 @@ public class SGMHttpProcessor implements Processor, Traceable {
             }
         }
         logger.warn("response body is null!");
-        throw new SGMHttpClientException("GSM client request error");
+        throw new SGMHttpClientException("SGM client request error");
     }
 
     private String calculationSign(String accessToken, String timestamp) {
