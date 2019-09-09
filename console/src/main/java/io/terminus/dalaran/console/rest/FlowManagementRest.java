@@ -5,6 +5,8 @@ import io.terminus.common.model.Response;
 import io.terminus.dalaran.console.model.ResponseMessage;
 import io.terminus.dalaran.console.model.TestRequestDTO;
 import io.terminus.dalaran.console.model.dto.CopyFlow;
+import io.terminus.dalaran.console.model.dto.ImportProcessorDTO;
+import io.terminus.dalaran.console.model.dto.flow.ImportFlowDTO;
 import io.terminus.dalaran.console.model.dto.flow.TriggerFlowDTO;
 import io.terminus.dalaran.console.model.query.FlowQuery;
 import io.terminus.dalaran.console.repository.PropertyRepository;
@@ -53,6 +55,28 @@ public class FlowManagementRest {
         } catch (Exception e) {
             e.printStackTrace();
             return Response.fail(ResponseMessage.FLOW_UPDATE_ERROR);
+        }
+    }
+
+    @ApiOperation(value = "快速创建集成流")
+    @PostMapping(value = "/import")
+    public Response importTriggerFlow(@RequestBody ImportFlowDTO model) {
+        try {
+            return Response.ok(flowManagementService.importFlow(model));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Response.fail(ResponseMessage.FLOW_CREATE_ERROR);
+        }
+    }
+
+    @ApiOperation(value = "快速创建处理器")
+    @PostMapping(value = "/importProcessor")
+    public Response importProcessor(@RequestBody ImportProcessorDTO model) {
+        try {
+            return Response.ok(flowManagementService.importProcessor(model));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Response.fail(ResponseMessage.FLOW_CREATE_ERROR);
         }
     }
 

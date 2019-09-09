@@ -30,7 +30,7 @@ public class DubboEndpoint extends ProcessorEndpoint {
     private String method;
     @UriParam(defaultValue = "1.0.0", description = "Dubbo service version", javaType = "java.lang.String")
     private String version;
-    @UriParam(defaultValue = "1.0.0", description = "Dubbo service timeout", javaType = "java.lang.Integer")
+    @UriParam(defaultValue = "500", description = "Dubbo service timeout", javaType = "java.lang.Integer")
     private Integer timeout;
     @UriParam(label = "parameterType", description = "Dubbo service parameter type", javaType = "java.lang.String")
     private String parameterType;

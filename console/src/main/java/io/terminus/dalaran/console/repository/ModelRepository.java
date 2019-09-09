@@ -1,6 +1,7 @@
 package io.terminus.dalaran.console.repository;
 
 import io.terminus.dalaran.console.entity.ModelEntity;
+import io.terminus.dalaran.model.ModelTargetType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
@@ -11,13 +12,15 @@ import java.util.List;
  */
 public interface ModelRepository extends JpaRepository<ModelEntity, Long>, JpaSpecificationExecutor<ModelEntity> {
 
-    ModelEntity findByNameAndServiceId(String name, Long serviceId);
+    ModelEntity findByNameAndTargetTypeAndTargetId(String name, ModelTargetType targetType, String targetId);
+
+    ModelEntity findByModuleIdAndModelKey(Long moduleId, String modelKey);
 
     ModelEntity findByNameAndModuleIdIsNull(String name);
 
-    List<ModelEntity> findByHiddenIsFalse();
+    List<ModelEntity> findByTargetTypeIn(List<ModelTargetType> types);
+
+    List<ModelEntity> findByTargetTypeInAndModuleId(List<ModelTargetType> types, Long moduleId);
 
     List<ModelEntity> findByModuleId(Long moduleId);
-
-    List<ModelEntity> findByModuleIdAndHiddenIsFalse(Long moduleId);
 }

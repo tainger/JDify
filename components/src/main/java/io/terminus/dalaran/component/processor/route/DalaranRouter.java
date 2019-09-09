@@ -12,7 +12,6 @@ import io.terminus.dalaran.model.flow.FlowFragment;
 import lombok.val;
 import org.apache.camel.model.ChoiceDefinition;
 import org.apache.camel.model.ProcessorDefinition;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.HashMap;

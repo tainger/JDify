@@ -1,6 +1,7 @@
 package io.terminus.dalaran.console.model.dto;
 
 import io.terminus.dalaran.console.model.dto.basic.BasicModelInfo;
+import io.terminus.dalaran.model.ModelTargetType;
 import lombok.Data;
 
 import java.util.Map;
@@ -13,9 +14,11 @@ public class ModelDTO extends BasicModelInfo {
 
     private Map<String, Object> modelSchema;
 
-    private Long serviceId;
+    private String modelKey;
 
-    private boolean hidden;
+    private String targetId;
+
+    private ModelTargetType targetType = ModelTargetType.Normal;
 
     private String description;
 }

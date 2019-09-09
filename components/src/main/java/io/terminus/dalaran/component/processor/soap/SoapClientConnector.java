@@ -20,4 +20,9 @@ public class SoapClientConnector {
     @ConfigFieldInfo(label = "协议", inputType = FieldInputType.Radio, defaultValue = "HTTP")
     private HttpProtocol protocol;
 
+    @ConfigFieldInfo(label = "用户名", inputType = FieldInputType.String, required = false)
+    private String username;
+
+    @ConfigFieldInfo(label = "密码", inputType = FieldInputType.String, required = false)
+    private String password;
 }
