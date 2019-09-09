@@ -44,7 +44,7 @@ public interface ModelManagementService {
 
     ModelEntity getById(Long modelId);
 
-    ModelEntity getByNameAndServiceId(String name, Long serviceId);
+    ModelEntity getByNameAndServiceId(String name, String serviceId);
 
     JsonSchema importExcel(MultipartFile file, Long id);
 

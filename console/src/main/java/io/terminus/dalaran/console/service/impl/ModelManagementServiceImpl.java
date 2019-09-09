@@ -28,6 +28,7 @@ import io.terminus.dalaran.model.schema.ObjectSchema;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.similarity.JaroWinklerDistance;
+import org.apache.kafka.common.protocol.types.Field;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.InputStreamResource;
@@ -133,7 +134,7 @@ public class ModelManagementServiceImpl implements ModelManagementService {
     }
 
     @Override
-    public ModelEntity getByNameAndServiceId(String name, Long serviceId) {
+    public ModelEntity getByNameAndServiceId(String name, String serviceId) {
         return modelRepository.findByNameAndTargetTypeAndTargetId(name, ModelTargetType.Service, serviceId);
     }
 
