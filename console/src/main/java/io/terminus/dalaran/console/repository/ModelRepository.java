@@ -12,7 +12,7 @@ import java.util.List;
  */
 public interface ModelRepository extends JpaRepository<ModelEntity, Long>, JpaSpecificationExecutor<ModelEntity> {
 
-    ModelEntity findByNameAndTargetTypeAndTargetId(String name, ModelTargetType targetType, Long targetId);
+    ModelEntity findByNameAndTargetTypeAndTargetId(String name, ModelTargetType targetType, String targetId);
 
     ModelEntity findByModuleIdAndModelKey(Long moduleId, String modelKey);
 
