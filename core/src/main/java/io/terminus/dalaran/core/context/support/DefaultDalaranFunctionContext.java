@@ -3,6 +3,7 @@ package io.terminus.dalaran.core.context.support;
 import io.terminus.dalaran.core.context.DalaranFunctionContext;
 import io.terminus.dalaran.model.function.MappingFunctionInfo;
 import io.terminus.dalaran.model.function.MappingFunctionType;
+import jdk.nashorn.api.scripting.ScriptObjectMirror;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
 
@@ -47,7 +48,12 @@ public class DefaultDalaranFunctionContext implements DalaranFunctionContext {
     public Object executeCustomFunction(Long id, Object[] params) {
         try {
             // TODO function not found exception
-            return scriptFunctions.get(id).invokeFunction(FUNCTION_NAME, params);
+            Object result = scriptFunctions.get(id).invokeFunction(FUNCTION_NAME, params);
+            if (result instanceof ScriptObjectMirror && ((ScriptObjectMirror) result).isArray()) {
+                return ((ScriptObjectMirror) result).values();
+            } else {
+                return result;
+            }
         } catch (ScriptException | NoSuchMethodException e) {
             e.printStackTrace();
             // TODO throw function execute error
