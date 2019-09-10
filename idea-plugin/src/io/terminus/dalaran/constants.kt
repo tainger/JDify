@@ -6,3 +6,4 @@ const val ROOT_FIELD = "root"
 
 const val DUBBO_TRIGGER_TYPE = "dubbo-provider"
 const val DUBBO_PROVIDER_TYPE = "dubbo-consumer"
+const val REST_TRIGGER_TYPE = "http-rest-listener"

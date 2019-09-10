@@ -26,7 +26,8 @@ fun ModelInfo.buildTemplateData(): Any {
 
 fun buildSchema(type: PsiType): ModelInfo {
     val rootField = buildField(type, hashSetOf())
-    return ModelInfo(rootField, type.presentableText, type.canonicalText, type.canonicalText)
+    val modelSchema = ModelSchema(rootField)
+    return ModelInfo(modelSchema, type.presentableText, type.canonicalText, type.canonicalText)
 }
 
 fun buildSchema(psiClass: PsiClass): ModelInfo {
@@ -41,7 +42,8 @@ fun buildSchema(psiClass: PsiClass): ModelInfo {
     }
     val modelName = psiClass.docComment?.descriptionElements?.map { it.text?.trim() }?.joinToString("")?.trim()
             ?: psiClass.qualifiedName
-    return ModelInfo(rootField, psiClass.name, modelName, psiClass.qualifiedName)
+    val modelSchema = ModelSchema(rootField)
+    return ModelInfo(modelSchema, psiClass.name, modelName, psiClass.qualifiedName)
 }
 
 private fun Field.getTemplateValue(): Any {
