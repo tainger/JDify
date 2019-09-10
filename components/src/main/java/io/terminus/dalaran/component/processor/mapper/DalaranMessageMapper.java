@@ -140,21 +140,11 @@ public class DalaranMessageMapper implements DalaranProcessor<DalaranMapperConfi
                     if (functionParam == null) {
                         continue;
                     }
-                    TemporarySourcePath temporarySourcePath = new TemporarySourcePath();
-                    temporarySourcePath.setValue(functionParam.getValue());
-                    if (functionParam.getType() == ParamType.STATIC) {
-                        temporarySourcePath.setType(ParamType.STATIC);
-                    } else {
-                        temporarySourcePath.setType(ParamType.DYNAMIC);
-                    }
-                    sourcePaths.add(temporarySourcePath);
+                    sourcePaths.add(new TemporarySourcePath(functionParam.getType(), functionParam.getValue()));
                 }
             }
         } else {
-            TemporarySourcePath temporarySourcePath = new TemporarySourcePath();
-            temporarySourcePath.setType(ParamType.DYNAMIC);
-            temporarySourcePath.setValue(value.toString());
-            sourcePaths.add(temporarySourcePath);
+            sourcePaths.add(new TemporarySourcePath(ParamType.DYNAMIC, value.toString()));
         }
         return sourcePaths;
     }
