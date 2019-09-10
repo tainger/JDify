@@ -18,12 +18,10 @@ import org.apache.camel.model.ProcessorDefinition;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.kafka.common.protocol.types.Field;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static io.terminus.dalaran.component.processor.mapper.MapperValidationMessages.*;
 
@@ -85,7 +83,7 @@ public class DalaranMessageMapper implements DalaranProcessor<DalaranMapperConfi
         MappingType mappingType = mapping.getMappingType();
         messageMapping.setMappingType(mappingType);
 
-        List<String> sourcePaths = buildSourcePaths(mappingType, mapping.getValue(), messageMapping);
+        List<TemporarySourcePath> sourcePaths = buildSourcePaths(mappingType, mapping.getValue(), messageMapping);
         Map<String, ModelField> inField = in.getModelSchema().getFields();
         Map<String, ModelField> outField = out.getModelSchema().getFields();
 
@@ -100,15 +98,17 @@ public class DalaranMessageMapper implements DalaranProcessor<DalaranMapperConfi
 
         List<SourceField> sourceFields = new ArrayList<>();
         MappingProperty property = new MappingProperty();
-        for (String sourcePath : sourcePaths) {
+        for (TemporarySourcePath sourcePath : sourcePaths) {
             SourceField sourceField = new SourceField();
-            if (mappingType == MappingType.DEFAULT) {
-                sourceField.setPath(sourcePath);
+            if (sourcePath.getType() == ParamType.STATIC) {
+                sourceField.setPath(sourcePath.getValue());
+                sourceField.setParamType(ParamType.STATIC);
             } else {
-                property = buildSourceField(sourcePath, inField, sourceField, mappingProperty.isComplex());
+                property = buildSourceField(sourcePath.getValue(), inField, sourceField, mappingProperty.isComplex());
                 if (property.getStatus() == MappingStatus.ERROR) {
                     break;
                 }
+                sourceField.setParamType(ParamType.DYNAMIC);
             }
             sourceFields.add(sourceField);
         }
@@ -118,11 +118,12 @@ public class DalaranMessageMapper implements DalaranProcessor<DalaranMapperConfi
         messageMapping.setType(destinationType);
     }
 
-    private List<String> buildSourcePaths(MappingType mappingType, Object value, MessageMapping messageMapping) {
-        List<String> sourcePaths = new ArrayList<>();
+    private List<TemporarySourcePath> buildSourcePaths(MappingType mappingType, Object value, MessageMapping messageMapping) {
+        List<TemporarySourcePath> sourcePaths = new ArrayList<>();
 
         if (mappingType == MappingType.FUNCTION) {
             MappingFunction function = (MappingFunction) value;
+            function.setSourcePaths(buildFunctionSourcePaths(function));
             messageMapping.setFunction(function);
 
             DalaranFunctionContext functionContext = dalaranContext.getDalaranFunctionContext();
@@ -133,16 +134,27 @@ public class DalaranMessageMapper implements DalaranProcessor<DalaranMapperConfi
                 if (temKey == null) {
                     temKey = "";
                 }
-                Map<String, String> sourcePath = function.getParams();
+                Map<String, FunctionParam> functionParams = function.getParams();
                 for (String param : params) {
-                    String path = sourcePath.get(temKey + param);
-                    if (path != null) {
-                        sourcePaths.add(path);
+                    FunctionParam functionParam = functionParams.get(temKey + param);
+                    if (functionParam == null) {
+                        continue;
                     }
+                    TemporarySourcePath temporarySourcePath = new TemporarySourcePath();
+                    temporarySourcePath.setValue(functionParam.getValue());
+                    if (functionParam.getType() == ParamType.STATIC) {
+                        temporarySourcePath.setType(ParamType.STATIC);
+                    } else {
+                        temporarySourcePath.setType(ParamType.DYNAMIC);
+                    }
+                    sourcePaths.add(temporarySourcePath);
                 }
             }
         } else {
-            sourcePaths.add(value.toString());
+            TemporarySourcePath temporarySourcePath = new TemporarySourcePath();
+            temporarySourcePath.setType(ParamType.DYNAMIC);
+            temporarySourcePath.setValue(value.toString());
+            sourcePaths.add(temporarySourcePath);
         }
         return sourcePaths;
     }
@@ -193,6 +205,21 @@ public class DalaranMessageMapper implements DalaranProcessor<DalaranMapperConfi
         return new MappingProperty(complex, status, type);
     }
 
+    private Map<String, FunctionParam> buildFunctionSourcePaths(MappingFunction mappingFunction) {
+        Map<String, FunctionParam> sourcePaths = new LinkedHashMap<>();
+        if (mappingFunction != null && MapUtils.isNotEmpty(mappingFunction.getParams())) {
+            mappingFunction.getParams().forEach((k, v) -> {
+                if (v.getType() == ParamType.DYNAMIC) {
+                    String path = StringUtils.substringAfter(v.getValue(), MapperConstants.MODEL_ROOT + ".");
+                    sourcePaths.put(path, v);
+                } else {
+                    sourcePaths.put(v.getValue(), v);
+                }
+            });
+        }
+        return sourcePaths;
+    }
+
     @Override
     public List<FlowValidation> validate(DalaranMapperConfig config) {
         List<FlowValidation> validations = new ArrayList<>();
@@ -213,18 +240,21 @@ public class DalaranMessageMapper implements DalaranProcessor<DalaranMapperConfi
         mappings.forEach((destinationPath, simpleMapping) -> {
             if (simpleMapping.getMappingType() == MappingType.FUNCTION) {
                 MappingFunction function = (MappingFunction) simpleMapping.getValue();
-                Map<String, String> params = function.getParams();
+                Map<String, FunctionParam> params = function.getParams();
                 if (MapUtils.isEmpty(params)) {
                     return;
                 }
-                params.forEach((functionParam, sourcePath) -> {
-                    if (StringUtils.isBlank(sourcePath)) {
+                params.forEach((functionParam, param) -> {
+                    if (param.getType() == ParamType.STATIC) {
+                        return;
+                    }
+                    if (param.getValue() == null) {
                         FlowValidation validation = FlowValidationBuilder.newBuilder()
                                 .field(destinationPath)
                                 .message(MAPPER_FUNCTION_PARAM_NOT_NULL).build();
                         validations.add(validation);
                     } else {
-                        FlowValidation validation = checkArrayFields(sourcePath, inModel, destinationPath, outModel);
+                        FlowValidation validation = checkArrayFields(param.getValue().toString(), inModel, destinationPath, outModel);
                         if (validation != null) {
                             validations.add(validation);
                         }

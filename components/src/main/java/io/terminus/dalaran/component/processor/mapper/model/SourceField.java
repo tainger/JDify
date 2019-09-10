@@ -10,5 +10,7 @@ public class SourceField {
 
     private String path;
 
+    private ParamType paramType;
+
     private SimpleMappingField field;
 }

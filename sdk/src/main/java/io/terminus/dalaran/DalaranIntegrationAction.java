@@ -8,9 +8,9 @@ import java.lang.annotation.*;
 @Target({ElementType.METHOD})
 public @interface DalaranIntegrationAction {
 
-    String key();
-
     String name();
+
+    String key() default "";
 
     String description() default "";
 

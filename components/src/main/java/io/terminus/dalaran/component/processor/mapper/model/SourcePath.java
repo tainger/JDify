@@ -10,6 +10,8 @@ public class SourcePath {
 
     private String path;
 
+    private String originPath;
+
     private PathDetail detail;
 
     public SourcePath(String path, PathDetail detail) {
