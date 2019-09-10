@@ -78,40 +78,43 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
         String wsdl = wsdlImportConfig.getWsdlUrl();
         Definitions definitions = parser.parse(wsdl);
         List<Binding> bindings = definitions.getBindings();
+        Map<String, List<SoapOperationConfig>> soapOperationConfigMap = new HashMap<>();
         Map<String, SoapOperation> operationMap = buildOperations(definitions);
         bindings.forEach(binding -> {
             String bindingName = binding.getName();
             String portType = binding.getType().getLocalPart();
             binding.getOperations().forEach(operation -> {
                 SoapOperationConfig operationConfig = new SoapOperationConfig();
-                SoapSchemaOperation schemaOperation = new SoapSchemaOperation();
-
                 String operationName = operation.getName();
                 String operationKey = bindingName + OPERATION_SPLIT + portType + OPERATION_SPLIT + operationName;
                 String subKey = portType + OPERATION_SPLIT + operationName;
                 SoapOperation soapOperation = operationMap.get(subKey);
-
-                schemaOperation.setBinding(bindingName);
                 operationConfig.setBinding(bindingName);
-                schemaOperation.setName(operationName);
                 operationConfig.setOperation(operationName);
-
-                String inputName = soapOperation.getInput();
-                String outputName = soapOperation.getOutput();
                 operationConfig.setPortType(portType);
-                schemaOperation.setPortType(portType);
-
-                schemaOperation.setInput(inputName);
-                schemaOperation.setOutPut(outputName);
-                schemaOperation.setWsdl(wsdl);
                 operationConfig.setOperationKey(operationKey);
-
-                String baseDir = definitions.getBaseDir().toString();
-                operationConfig.setBaseUrl(StringUtils.substringAfter(baseDir, "://"));
-                schemaOperation.setBaseUrl(operationConfig.getBaseUrl());
-                operationConfig.setProtocol(HttpProtocol.valueOf(StringUtils.substringBefore(baseDir, "://").toUpperCase()));
-                schemaOperation.setProtocol(operationConfig.getProtocol());
                 soapOperations.add(operationConfig);
+                if (soapOperationConfigMap.containsKey(bindingName)) {
+                    soapOperationConfigMap.get(bindingName).add(operationConfig);
+                } else {
+                    List<SoapOperationConfig> operationConfigs = new ArrayList<>();
+                    operationConfigs.add(operationConfig);
+                    soapOperationConfigMap.put(bindingName, operationConfigs);
+                }
+            });
+        });
+        definitions.getServices().forEach(service -> {
+            service.getPorts().forEach(port -> {
+                String baseUrl = port.getAddress().getLocation();
+                if (wsdlImportConfig.getUsername() != null && wsdlImportConfig.getPassword() != null) {
+                    baseUrl = baseUrl + "&authMethod=Basic&authUsername=" + wsdlImportConfig.getUsername() + "&authPassword=" + wsdlImportConfig.getPassword();
+                }
+                List<SoapOperationConfig> operations = soapOperationConfigMap.get(port.getBindingPN().getLocalName());
+                String operationUrl = baseUrl;
+                operations.forEach(operation -> {
+                    operation.setBaseUrl(operationUrl);
+                    operation.setProtocol(HttpProtocol.valueOf(StringUtils.substringBefore(operationUrl, "://").toUpperCase()));
+                });
             });
         });
         serviceConfig.setConfigs(soapOperations);
