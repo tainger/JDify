@@ -34,10 +34,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static io.terminus.dalaran.console.model.ModelImportMode.Overwrite;
@@ -112,7 +109,7 @@ public class FlowManagementServiceImpl implements FlowManagementService {
         return id;
     }
 
-    // TODO 很多重复内容 逻辑也比较尴尬, 先测试一波, 有时间改改
+    // TODO 很多重复内容 逻辑也比较尴尬, 各种 magic, 先测试一波, 有时间改改
     @Override
     public ImportFlowResult importFlow(ImportFlowDTO importInfo) {
         ImportFlowResult result = new ImportFlowResult();
@@ -145,7 +142,47 @@ public class FlowManagementServiceImpl implements FlowManagementService {
         triggerFlowDTO.setModuleId(importInfo.getModuleId());
         triggerFlowDTO.setName(importInfo.getName());
         triggerFlowDTO.setDescription(importInfo.getDescription());
-        triggerFlowDTO.setPipeline(new ArrayList<>());
+        List<ProcessorDTO> pipeline = new ArrayList<>();
+        if (StringUtils.isNotBlank(importInfo.getProcessorType())) {
+            ProcessorDTO processor = new ProcessorDTO();
+            processor.setId(RandomStringUtils.randomAlphanumeric(6));
+            processor.setType(importInfo.getProcessorType());
+            processor.setConfig(importInfo.getProcessorConfig());
+            ModelDTO processorInModel = importInfo.getProcessorInModel();
+            if (processorInModel != null) {
+                processorInModel.setModuleId(importInfo.getModuleId());
+                Long modelId = importModel(processorInModel, importInfo.getImportMode());
+                processor.getConfig().put("inModelId", modelId);
+                if (inModel != null) {
+                    ProcessorDTO inMapper = new ProcessorDTO();
+                    inMapper.setId(RandomStringUtils.randomAlphanumeric(6));
+                    inMapper.setType("mapper-convert");
+                    inMapper.setConfig(new HashMap<>());
+                    inMapper.getConfig().put("inModelId", inModel.getId());
+                    inMapper.getConfig().put("outModelId", modelId);
+                    inMapper.getConfig().put("messageMapping", new HashMap<>());
+                    pipeline.add(inMapper);
+                }
+            }
+            pipeline.add(processor);
+            ModelDTO processorOutModel = importInfo.getProcessorOutModel();
+            if (processorOutModel != null) {
+                processorOutModel.setModuleId(importInfo.getModuleId());
+                Long modelId = importModel(processorOutModel, importInfo.getImportMode());
+                processor.getConfig().put("outModelId", modelId);
+                if (outModel != null) {
+                    ProcessorDTO outMapper = new ProcessorDTO();
+                    outMapper.setId(RandomStringUtils.randomAlphanumeric(6));
+                    outMapper.setType("mapper-convert");
+                    outMapper.setConfig(new HashMap<>());
+                    outMapper.getConfig().put("inModelId", modelId);
+                    outMapper.getConfig().put("outModelId", outModel.getId());
+                    outMapper.getConfig().put("messageMapping", new HashMap<>());
+                    pipeline.add(outMapper);
+                }
+            }
+        }
+        triggerFlowDTO.setPipeline(pipeline);
         Long flowId = createFlow(triggerFlowDTO);
         result.setFlowId(flowId);
         return result;

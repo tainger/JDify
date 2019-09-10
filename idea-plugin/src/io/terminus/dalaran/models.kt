@@ -15,14 +15,12 @@ class Field {
 }
 
 class ModelInfo(
-        root: Field,
+        val modelSchema: ModelSchema,
         val name: String?,
         val description: String?,
         val modelKey: String?,
         val modelType: String = "OBJECT"
-) {
-    val modelSchema = ModelSchema(root)
-}
+)
 
 class ModelSchema(
         root: Field
@@ -30,13 +28,26 @@ class ModelSchema(
     val fields = mapOf(ROOT_FIELD to root)
 }
 
-class TriggerInfo(
-        val id: String,
+open class TriggerInfo(
+        val name: String,
         val description: String?,
         val triggerType: String,
         val triggerConfig: Map<String, Any>,
         val inModel: ModelInfo?,
         val outModel: ModelInfo?
+)
+
+class ProcessorTriggerInfo(
+        val name: String,
+        val description: String?,
+        val triggerType: String,
+        val triggerConfig: Map<String, Any>,
+        val inModel: ModelInfo?,
+        val outModel: ModelInfo?,
+        val processorType: String?,
+        val processorConfig: Map<String, Any>,
+        val processorInModel: ModelInfo?,
+        val processorOutModel: ModelInfo?
 )
 
 class ProcessorInfo(
