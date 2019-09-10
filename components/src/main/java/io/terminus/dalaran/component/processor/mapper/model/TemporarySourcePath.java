@@ -9,4 +9,9 @@ public class TemporarySourcePath {
     private ParamType type;
 
     private String value;
+
+    public TemporarySourcePath(ParamType type, String value) {
+        this.type = type;
+        this.value = value;
+    }
 }

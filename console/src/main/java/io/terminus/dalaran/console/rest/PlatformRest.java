@@ -1,6 +1,10 @@
 package io.terminus.dalaran.console.rest;
 
 import com.alibaba.fastjson.JSON;
+import com.predic8.wsdl.Definitions;
+import com.predic8.wsdl.creator.WSDLCreator;
+import com.predic8.wsdl.creator.WSDLCreatorContext;
+import groovy.xml.MarkupBuilder;
 import io.swagger.annotations.ApiOperation;
 import io.terminus.common.model.Response;
 import io.terminus.dalaran.console.model.DalaranAccount;
@@ -24,6 +28,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
+import java.io.StringWriter;
 import java.util.Date;
 
 @RestController
@@ -188,6 +193,23 @@ public class PlatformRest {
         return ResponseEntity.ok()
                 .header("Content-Disposition", "attachment; filename=dalaran-api-docs" + currentDate + ".docx")
                 .contentType(MediaType.APPLICATION_OCTET_STREAM).body(fileResource);
+    }
+
+    @CrossOrigin
+    @ApiOperation(value = "导出 WSDL 信息")
+    @GetMapping(value = "/export/WSDL")
+    private Response exportWSDL() {
+        try {
+            StringWriter stringWriter = new StringWriter();
+            WSDLCreator creator = new WSDLCreator();
+            creator.setBuilder(new MarkupBuilder(stringWriter));
+            Definitions definitions = exportService.exportWSDL();
+            definitions.create(creator, new WSDLCreatorContext());
+            return Response.ok(stringWriter);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Response.fail("");
+        }
     }
 
     @ApiOperation(value = "导出所有配置")

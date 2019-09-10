@@ -105,7 +105,7 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
         });
         definitions.getServices().forEach(service -> {
             service.getPorts().forEach(port -> {
-                String baseUrl = port.getAddress().getLocation();
+                String baseUrl = StringUtils.substringAfter(port.getAddress().getLocation(), "://");
                 if (wsdlImportConfig.getUsername() != null && wsdlImportConfig.getPassword() != null) {
                     baseUrl = baseUrl + "&authMethod=Basic&authUsername=" + wsdlImportConfig.getUsername() + "&authPassword=" + wsdlImportConfig.getPassword();
                 }
