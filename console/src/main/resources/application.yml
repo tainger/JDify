@@ -7,9 +7,9 @@ spring:
     name: dalaran-console
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://${MYSQL_HOST:9.154.22.168}:${MYSQL_PORT:3306}/${MYSQL_DATABASE:dalaran}?useUnicode=true&characterEncoding=utf-8&useSSL=false
-    username: ${MYSQL_USERNAME:mysql}
-    password: ${MYSQL_PASSWORD:14e7b9bcadc54a36b6bcec899d452f1d}
+    url: jdbc:mysql://${MYSQL_HOST:127.0.0.1}:${MYSQL_PORT:3306}/${MYSQL_DATABASE:dalaran}?useUnicode=true&characterEncoding=utf-8&useSSL=false
+    username: ${MYSQL_USERNAME:root}
+    password: ${MYSQL_PASSWORD:secret}
   jpa:
     hibernate.ddl-auto: update
     database-platform: org.hibernate.dialect.MySQLDialect
@@ -22,7 +22,7 @@ spring:
       name: ${SECURITY_USERNAME:terminus}
       password: ${SECURITY_PASSWORD:anywhere}
       role: ${SECURITY_ROLE:USER}
-    ant-matchers: ${ANT_MATCHERS:/**}
+    ant-matchers: ${ANT_MATCHERS:/api/platform/login/auth}
 
 terminus:
   dalaran:
