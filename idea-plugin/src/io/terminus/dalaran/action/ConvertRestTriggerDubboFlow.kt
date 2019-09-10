@@ -13,6 +13,7 @@ class ConvertRestTriggerDubboFlow : AnAction() {
     override fun actionPerformed(e: AnActionEvent) {
         val method = e.getData(CommonDataKeys.PSI_ELEMENT) as PsiMethod
         val triggerConfig = mapOf(
+                "protocol" to "HTTP",
                 "method" to "POST",
                 "path" to "/${method.containingClass!!.qualifiedName!!}"
         )
