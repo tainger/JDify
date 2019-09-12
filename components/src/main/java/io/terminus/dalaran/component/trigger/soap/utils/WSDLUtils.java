@@ -40,6 +40,7 @@ public class WSDLUtils {
             operations.add(operation);
         });
 
+
         /**
          * schema + message
          */
@@ -71,6 +72,7 @@ public class WSDLUtils {
          *
          */
         Binding binding = new Binding();
+
 //        Binding binding = definitions.newBinding(SoapConstants.BINDING);
         binding.setPortType(pt);
         soapApiInfos.forEach(apiInfo -> {

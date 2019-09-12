@@ -64,10 +64,8 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
     }
 
     @Override
-    public List<String> operations(SoapServiceConfig soapServiceConfig) {
-        return soapServiceConfig.getConfigs().stream()
-                .map(ServiceOperation::getOperationKey)
-                .collect(Collectors.toList());
+    public List<SoapOperationConfig> operations(SoapServiceConfig soapServiceConfig) {
+        return soapServiceConfig.getConfigs();
     }
 
     @Override
