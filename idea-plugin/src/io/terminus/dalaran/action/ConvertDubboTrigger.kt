@@ -17,13 +17,15 @@ class ConvertDubboTrigger : AnAction() {
         val method = e.getData(CommonDataKeys.PSI_ELEMENT) as PsiMethod
         val triggerConfig = mapOf(
                 "serviceId" to method.containingClass!!.qualifiedName!!,
-                "method" to method.name
-                // TODO version
+                "method" to method.name,
+                "version" to "1.0.0"
         )
         val triggerId = "${method.containingClass!!.qualifiedName!!}#${method.name}"
         val inModel = method.parameters.firstOrNull()?.let { buildSchema(it.type as PsiClassReferenceType) }
         val outModel = method.returnType?.let { buildSchema(it) }
-        TriggerInfo(triggerId, DUBBO_TRIGGER_TYPE, triggerConfig, inModel, outModel).setCopyPasteContent()
+        val desc = method.docComment?.descriptionElements?.map { it.text?.trim() }?.joinToString("\n")?.trim()
+
+        TriggerInfo(triggerId, desc, DUBBO_TRIGGER_TYPE, triggerConfig, inModel, outModel).setCopyPasteContent()
     }
 
     override fun update(e: AnActionEvent) {

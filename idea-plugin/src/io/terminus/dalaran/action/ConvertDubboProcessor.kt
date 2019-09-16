@@ -6,15 +6,18 @@ import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.impl.source.PsiClassReferenceType
-import io.terminus.dalaran.*
+import io.terminus.dalaran.DUBBO_PROVIDER_TYPE
+import io.terminus.dalaran.ProcessorInfo
+import io.terminus.dalaran.buildSchema
+import io.terminus.dalaran.setCopyPasteContent
 
 class ConvertDubboProcessor : AnAction() {
     override fun actionPerformed(e: AnActionEvent) {
         val method = e.getData(CommonDataKeys.PSI_ELEMENT) as PsiMethod
         val processorConfig = mapOf(
                 "serviceId" to method.containingClass!!.qualifiedName!!,
-                "method" to method.name
-                // TODO version
+                "method" to method.name,
+                "version" to "1.0.0"
         )
         val processorId = "${method.containingClass!!.qualifiedName!!}#${method.name}"
         val inModel = method.parameters.firstOrNull()?.let { buildSchema(it.type as PsiClassReferenceType) }

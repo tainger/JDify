@@ -1,6 +1,6 @@
 package io.terminus.dalaran
 
-import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 import com.intellij.openapi.ide.CopyPasteManager
 import com.intellij.psi.PsiArrayType
 import com.intellij.psi.PsiClass
@@ -11,23 +11,26 @@ import org.apache.commons.lang3.RandomStringUtils
 import java.awt.datatransfer.StringSelection
 import java.util.*
 
-private val gson = Gson()
+private val gson = GsonBuilder().apply {
+    this.setPrettyPrinting()
+}.create()
 
 fun Any.setCopyPasteContent() {
     CopyPasteManager.getInstance().setContents(StringSelection(gson.toJson(this)))
 }
 
-fun ModelSchema.buildTemplateData(): Any {
-    val rootField = this.fields[ROOT_FIELD] ?: return emptyMap<String, Any>()
+fun ModelInfo.buildTemplateData(): Any {
+    val rootField = this.modelSchema.fields[ROOT_FIELD] ?: return emptyMap<String, Any>()
     return rootField.getTemplateValue()
 }
 
-fun buildSchema(type: PsiType): ModelSchema {
+fun buildSchema(type: PsiType): ModelInfo {
     val rootField = buildField(type, hashSetOf())
-    return ModelSchema(rootField)
+    val modelSchema = ModelSchema(rootField)
+    return ModelInfo(modelSchema, type.presentableText, type.canonicalText, type.canonicalText)
 }
 
-fun buildSchema(psiClass: PsiClass): ModelSchema {
+fun buildSchema(psiClass: PsiClass): ModelInfo {
     val usedClasses = hashSetOf<PsiClass>()
     val fields = psiClass.allFields.filter {
         it.modifierList?.hasModifierProperty("static") != true
@@ -37,7 +40,10 @@ fun buildSchema(psiClass: PsiClass): ModelSchema {
         this.type = FieldType.OBJECT
         this.description = "数据根节点"
     }
-    return ModelSchema(rootField)
+    val modelName = psiClass.docComment?.descriptionElements?.map { it.text?.trim() }?.joinToString("")?.trim()
+            ?: psiClass.qualifiedName
+    val modelSchema = ModelSchema(rootField)
+    return ModelInfo(modelSchema, psiClass.name, modelName, psiClass.qualifiedName)
 }
 
 private fun Field.getTemplateValue(): Any {

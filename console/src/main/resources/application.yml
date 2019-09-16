@@ -23,3 +23,11 @@ spring:
       password: ${SECURITY_PASSWORD:anywhere}
       role: ${SECURITY_ROLE:USER}
     ant-matchers: ${ANT_MATCHERS:/api/platform/login/auth}
+
+terminus:
+  dalaran:
+    log:
+      # 目前只支持定时删除
+      policy: delete
+      # 日志留存时间(h)
+      duration: ${DALARAN_DURATION_DAY:14}

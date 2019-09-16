@@ -3,6 +3,7 @@ package io.terminus.dalaran.model.converter.soap.processor;
 import com.predic8.wsdl.Definitions;
 import com.predic8.wstool.creator.RequestCreator;
 import com.predic8.wstool.creator.SOARequestCreator;
+import com.predic8.xml.util.BasicAuthenticationResolver;
 import groovy.xml.MarkupBuilder;
 import io.terminus.dalaran.DalaranConstants;
 import io.terminus.dalaran.model.FieldType;

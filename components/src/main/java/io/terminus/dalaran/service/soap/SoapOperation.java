@@ -1,5 +1,6 @@
 package io.terminus.dalaran.service.soap;
 
+import io.terminus.dalaran.component.common.HttpMethod;
 import lombok.Data;
 
 /**
@@ -15,4 +16,8 @@ public class SoapOperation {
     private String input;
 
     private String output;
+
+    private String path;
+
+    private HttpMethod method;
 }

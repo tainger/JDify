@@ -3,8 +3,10 @@ package io.terminus.dalaran.core.resource.entity.common;
 import io.terminus.dalaran.core.log.TracingType;
 import io.terminus.dalaran.model.BodyType;
 import lombok.Data;
+import org.springframework.data.annotation.CreatedDate;
 
 import javax.persistence.*;
+import java.util.Date;
 
 @Data
 @Entity
@@ -54,4 +56,8 @@ public class TracingLogEntity {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private BodyType outputBodyType;
+
+    @CreatedDate
+    @Column(columnDefinition = "timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP")
+    private Date createdAt;
 }

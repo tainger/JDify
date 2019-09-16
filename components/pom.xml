@@ -104,12 +104,6 @@
         </dependency>
 
         <!-- mapper processor-->
-        <dependency>
-            <groupId>com.github.drapostolos</groupId>
-            <artifactId>type-parser</artifactId>
-            <version>RELEASE</version>
-            <scope>compile</scope>
-        </dependency>
 
         <!-- route processor-->
         <dependency>

@@ -18,13 +18,11 @@
     <modules>
         <module>core</module>
         <module>components</module>
-        <module>example</module>
         <module>camel-components</module>
         <module>console</module>
         <module>runtime</module>
         <module>sdk</module>
         <module>common</module>
-        <module>trantor-demo</module>
     </modules>
 
     <properties>

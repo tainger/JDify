@@ -14,6 +14,4 @@ public class SimpleMapping<T> {
     private T value;
 
     private MappingType mappingType = MappingType.MAPPING;
-
-//    private MappingFunction function;
 }

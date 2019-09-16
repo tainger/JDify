@@ -1,5 +1,6 @@
 package io.terminus.dalaran.console.service;
 
+import com.predic8.wsdl.Definitions;
 import io.swagger.models.Swagger;
 import io.terminus.dalaran.console.model.ExportData;
 
@@ -12,6 +13,8 @@ public interface ExportService {
     ExportData exportAll();
 
     Swagger exportSwagger();
+
+    Definitions exportWSDL();
 
     File exportWord();
 

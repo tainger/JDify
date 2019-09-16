@@ -1,10 +1,15 @@
 package io.terminus.dalaran.console.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.predic8.wsdl.Definitions;
 import io.swagger.models.Swagger;
 import io.terminus.dalaran.component.trigger.rest.RestConfig;
 import io.terminus.dalaran.component.trigger.rest.model.ApiInfo;
 import io.terminus.dalaran.component.trigger.rest.utils.SwaggerUtils;
+import io.terminus.dalaran.component.trigger.soap.SoapListenerConfig;
+import io.terminus.dalaran.component.trigger.soap.model.SoapApiInfo;
+import io.terminus.dalaran.component.trigger.soap.model.SoapModel;
+import io.terminus.dalaran.component.trigger.soap.utils.WSDLUtils;
 import io.terminus.dalaran.console.TestFlowInitializer;
 import io.terminus.dalaran.console.entity.ModelEntity;
 import io.terminus.dalaran.console.entity.TriggerFlowEntity;
@@ -124,6 +129,12 @@ public class ExportServiceImpl implements ExportService {
         return WordUtils.buildWordFile(apiInfoList);
     }
 
+    @Override
+    public Definitions exportWSDL() {
+        List<SoapApiInfo> soapApiList = getExportSoapListeners();
+        return WSDLUtils.buildDefinitions(soapApiList);
+    }
+
     // TODO 比较暴力, 但是需要重置 ID 自增, 否则 Json 内的依赖可能会有问题
     private void truncateTable() {
         Session session = entityManager.unwrap(Session.class);
@@ -143,6 +154,23 @@ public class ExportServiceImpl implements ExportService {
             DalaranModelSchema outSchema = getModelSchema(flowEntity.getOutModel());
             return new ApiInfo(module.getName(), restConfig, flowEntity, inSchema, outSchema);
         }).collect(Collectors.toList());
+    }
+
+    private List<SoapApiInfo> getExportSoapListeners() {
+        List<TriggerFlowEntity> soapFlowList = triggerFlowRepository.findByStatusNotAndTriggerType(FlowStatus.Error, "soap-listener");
+        return soapFlowList.stream().map(flowEntity -> {
+            ModuleEntity module = moduleRepository.findOne(flowEntity.getModuleId());
+            SoapListenerConfig soapListenerConfig = JSON.parseObject(flowEntity.getTriggerConfig(), SoapListenerConfig.class);
+            SoapModel inModel = getSoapModel(flowEntity.getInModel());
+            SoapModel outModel = getSoapModel(flowEntity.getOutModel());
+            return new SoapApiInfo(flowEntity.getName(), soapListenerConfig, inModel, outModel);
+        }).collect(Collectors.toList());
+    }
+
+    private SoapModel getSoapModel(Long modelId) {
+        DalaranModelSchema schema = getModelSchema(modelId);
+        String name = modelRepository.findOne(modelId).getName();
+        return new SoapModel(name, schema);
     }
 
     private DalaranModelSchema getModelSchema(Long modelId) {
