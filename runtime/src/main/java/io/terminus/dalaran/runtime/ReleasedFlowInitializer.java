@@ -92,7 +92,7 @@ public class ReleasedFlowInitializer {
             // load mapping function
             List<FunctionReleasedEntity> functions = resourceLoader.loadAllFunctions();
             for (FunctionReleasedEntity function : functions) {
-                dalaranContext.getDalaranFunctionContext().addCustomFunction(function.getId(), function.getType(),
+                dalaranContext.getDalaranFunctionContext().addCustomFunction(function.getOriginId(), function.getType(),
                         function.getScript(), function.getParams());
             }
 

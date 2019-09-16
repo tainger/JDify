@@ -3,7 +3,6 @@ package io.terminus.dalaran.camel.component.dubbo;
 import com.alibaba.dubbo.config.ApplicationConfig;
 import com.alibaba.dubbo.config.ReferenceConfig;
 import com.alibaba.dubbo.config.RegistryConfig;
-import com.alibaba.dubbo.config.utils.ReferenceConfigCache;
 import com.alibaba.dubbo.rpc.service.GenericService;
 import org.apache.camel.Consumer;
 import org.apache.camel.Processor;
@@ -60,12 +59,7 @@ public class DubboEndpoint extends ProcessorEndpoint {
             reference.setInterface(serviceId);
             reference.setCheck(false);
             reference.setGeneric(true);
-            ReferenceConfigCache cache = ReferenceConfigCache.getCache();
-            genericService = cache.get(reference);
-            if (genericService == null) {
-                cache.destroy(reference);
-                genericService = cache.get(reference);
-            }
+            genericService = reference.get();
         }
         return this.genericService;
     }
