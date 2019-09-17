@@ -1,10 +1,15 @@
 package io.terminus.dalaran.console.flow;
 
 import com.alibaba.fastjson.JSON;
+import com.predic8.wsdl.Definitions;
+import com.predic8.wsdl.creator.WSDLCreator;
+import com.predic8.wsdl.creator.WSDLCreatorContext;
+import groovy.xml.MarkupBuilder;
 import io.terminus.dalaran.console.entity.ServiceEntity;
 import io.terminus.dalaran.console.model.dto.ServiceDTO;
 import io.terminus.dalaran.console.model.dto.basic.BasicServiceInfo;
 import io.terminus.dalaran.console.repository.ServiceRepository;
+import io.terminus.dalaran.console.service.ExportService;
 import io.terminus.dalaran.console.service.ServiceManagement;
 import org.junit.Assert;
 import org.junit.Test;
@@ -14,6 +19,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.io.StringWriter;
 import java.util.List;
 import java.util.Map;
 
@@ -30,6 +36,19 @@ public class ServiceManagementServiceTest {
 
     @Autowired
     private ServiceRepository serviceRepository;
+
+    @Autowired
+    private ExportService exportService;
+
+    @Test
+    public void exportSoapService() {
+        StringWriter stringWriter = new StringWriter();
+        WSDLCreator creator = new WSDLCreator();
+        creator.setBuilder(new MarkupBuilder(stringWriter));
+        Definitions definitions = exportService.exportWSDL();
+        definitions.create(creator, new WSDLCreatorContext());
+        Assert.assertNotNull(stringWriter);
+    }
 
     @Test
     public void create() {

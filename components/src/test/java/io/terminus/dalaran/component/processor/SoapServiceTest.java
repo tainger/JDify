@@ -25,6 +25,11 @@ import java.util.Map;
 public class SoapServiceTest extends BasicServiceTest {
 
     @Test
+    public void WSDLUtils() {
+
+    }
+
+    @Test
     public void testSoapService() {
         SoapService service = new SoapService();
 
