@@ -1,5 +1,7 @@
 package io.terminus.dalaran.console.model;
 
+import org.apache.kafka.common.protocol.types.Field;
+
 /**
  * Created by jingdi on 2019/6/24
  */
@@ -16,6 +18,8 @@ public class DalaranConsoleConstants {
     public static final String JAVA_DOUBLE = "java.lang.Double";
 
     public static final String JAVA_NUMBER = "java.lang.Number";
+
+    public static final String JAVA_BOOLEAN = "java.lang.Boolean";
 
     public static final String JSON_OBJECT = "com.alibaba.fastjson.JSONObject";
 
