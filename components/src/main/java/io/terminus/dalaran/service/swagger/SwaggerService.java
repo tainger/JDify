@@ -81,11 +81,8 @@ public class SwaggerService implements DalaranService<SwaggerImportConfig, Swagg
     }
 
     @Override
-    public List<String> operations(SwaggerServiceConfig swaggerServiceConfig) {
-        return swaggerServiceConfig
-                .getConfigs()
-                .stream().map(ServiceOperation::getOperationKey)
-                .collect(Collectors.toList());
+    public List<SwaggerOperationConfig> operations(SwaggerServiceConfig swaggerServiceConfig) {
+        return swaggerServiceConfig.getConfigs();
     }
 
     @Override

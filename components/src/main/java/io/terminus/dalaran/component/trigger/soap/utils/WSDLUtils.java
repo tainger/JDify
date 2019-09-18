@@ -4,8 +4,9 @@ import com.predic8.schema.Element;
 import com.predic8.schema.Schema;
 import com.predic8.schema.Sequence;
 import com.predic8.wsdl.*;
-import com.predic8.wsdl.soap11.SOAPBody;
+import com.predic8.wsdl.soap11.SOAPBinding;
 import com.predic8.wsdl.soap11.SOAPOperation;
+import com.predic8.xml.util.PrefixedName;
 import groovy.xml.QName;
 import io.terminus.dalaran.component.processor.mapper.model.MapperConstants;
 import io.terminus.dalaran.component.trigger.soap.model.SoapApiInfo;
@@ -22,10 +23,58 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.predic8.schema.Schema.INT;
+
 public class WSDLUtils {
 
+    public static void main(String[] args) {
+
+        WSDLParser parser = new WSDLParser();
+        Definitions definitions = parser.parse("http://piqas.shimaogroup.com:50000/dir/wsdl?p=sa/2578ce33cd913812bbef5120fdee2c23");
+
+        Schema schema = new Schema("http://schemas.xmlsoap.org/wsdl");
+
+        Element add = schema.newElement("add");
+        add.setType(new QName("", "sss", "tns"));
+        Sequence sequence = add.newComplexType().newSequence();
+        Element child = sequence.newElement("summand", INT);
+        child.setMaxOccurs("unbounded");
+        child.setType(new QName("", "int", "xsd"));
+
+        schema.newElement("addResponse").newComplexType().newSequence().newElement("number", INT);
+
+        Definitions wsdl = new Definitions("http://schemas.xmlsoap.org/wsdl", "AddService");
+        wsdl.addSchema(schema);
+        schema.setDefinitions(wsdl);
+
+        PortType pt = wsdl.newPortType("AddPortType");
+        Operation op = pt.newOperation("add");
+
+        Input input = op.newInput("add");
+        input.setMessagePrefixedName(new PrefixedName("tns", "add"));
+        Message message = input.newMessage("add");
+        Part part = message.newPart("add", "tns:add");
+        part.setElementPN(new PrefixedName("tns", "add"));
+        part.setParent(message);
+
+        op.newOutput("addResponse").newMessage("addResponse").newPart("addResponse", "tns:addResponse").setElementPN(new PrefixedName("tns", "addResponse"));
+
+        Port port = wsdl.newService("AddService").newPort("AddServiceSOAP11Port");
+        Binding bnd = port.newBinding("AddServiceSOAP11Binding");
+        bnd.setType(pt);
+        SOAPBinding soapBinding = bnd.newSOAP11Binding();
+        soapBinding.setBinding(bnd);
+
+        BindingOperation bo = bnd.newBindingOperation("add");
+        bo.newSOAP11Operation();
+        bo.newInput().newSOAP11Body();
+        bo.newOutput().newSOAP11Body();
+
+        port.newSOAP11Address(SoapConstants.SERVER_ADDRESS);
+    }
+
     public static Definitions buildDefinitions(List<SoapApiInfo> soapApiInfos) {
-        Definitions definitions = new Definitions();
+        Definitions definitions = new Definitions("http://schemas.xmlsoap.org/wsdl", "Dalaran");
         Map<String, SoapModel> models = new HashMap<>();
         List<SoapOperation> operations = new ArrayList<>();
         soapApiInfos.forEach(soapApiInfo -> {
@@ -43,24 +92,26 @@ public class WSDLUtils {
         /**
          * schema + message
          */
-        Schema schema = new Schema();
+        Schema schema = new Schema("http://schemas.xmlsoap.org/wsdl");
+        definitions.addSchema(schema);
+        schema.setDefinitions(definitions);
         models.forEach((name, model) -> {
             Element element = schema.newElement(name);
+//            element.setType();
             DalaranModelSchema modelSchema = model.getSchema();
             ModelField modelField = modelSchema.getFields().get(MapperConstants.MODEL_ROOT);
             buildTypes(element, modelField, schema);
             Message message = definitions.newMessage(name);
-            message.newPart(name, element);
+//            message.newPart(name, element);
+            Part part = message.newPart(name, element);
+            part.setElementPN(new PrefixedName("tns", name));
+            part.setParent(message);
         });
-        definitions.addSchema(schema);
-
 
         /**
          * port type + binding
          */
-
         PortType pt = definitions.newPortType(SoapConstants.PORT_TYPE);
-
         soapApiInfos.forEach(apiInfo -> {
             Operation op = pt.newOperation(apiInfo.getName());
             op.newInput(apiInfo.getInput().getName()).setMessage(definitions.getMessage(apiInfo.getInput().getName()));
@@ -70,9 +121,11 @@ public class WSDLUtils {
         /**
          *
          */
-        Binding binding = new Binding();
-//        Binding binding = definitions.newBinding(SoapConstants.BINDING);
-        binding.setPortType(pt);
+        Port port = definitions.newService(SoapConstants.SERVICE_NAME).newPort(SoapConstants.SERVICE_PORT);
+        Binding binding = port.newBinding(SoapConstants.BINDING);
+        binding.setType(pt);
+        SOAPBinding soapBinding = binding.newSOAP11Binding();
+        soapBinding.setBinding(binding);
         soapApiInfos.forEach(apiInfo -> {
             BindingOperation bindingOperation = binding.newBindingOperation(apiInfo.getName());
             SOAPOperation soapOperation = bindingOperation.newSOAP11Operation();
@@ -87,18 +140,12 @@ public class WSDLUtils {
 //            SOAPBody outputBody = bindingOutput.newSOAP11Body();
 //            outputBody.setUse("literal");
         });
-        List<Binding> bindings = new ArrayList<>();
-        bindings.add(binding);
-        definitions.setLocalBindings(bindings);
 
         /**
          * service
          */
-        Service service = definitions.newService(SoapConstants.SERVICE_NAME);
-        Port port = service.newPort(SoapConstants.BINDING);
-        port.setBinding(binding);
         port.newSOAP11Address(SoapConstants.SERVER_ADDRESS);
-
+        System.out.println(definitions.getAsString());
         return definitions;
     }
 
@@ -121,17 +168,19 @@ public class WSDLUtils {
             } else {
                 e.setMaxOccurs("1");
             }
-            buildChildrenType(name, field, schema, e);
+            buildChildrenType(name, field, schema, e, sequence);
         });
     }
 
-    private static void buildChildrenType(String name, ModelField modelField, Schema schema, Element parent) {
+    private static void buildChildrenType(String name, ModelField modelField, Schema schema, Element parent, Sequence parentSequence) {
         if (modelField.getType() != FieldType.OBJECT && !(modelField.getType() == FieldType.ARRAY && modelField.getSubType() == FieldType.OBJECT)) {
-            parent.setType(new QName(getFieldType(modelField.getType())));
+            parent.setType(new QName("http://www.w3.org/2001/XMLSchema", getFieldType(modelField.getType()), "xsd"));
+            parent.setParent(parentSequence);
             return;
         }
 
-        parent.setType(new QName(name));
+        parent.setType(new QName("", name, "tns"));
+        parent.setParent(parentSequence);
         Sequence sequence = schema.newComplexType(name).newSequence();
         if (MapUtils.isEmpty(modelField.getFields())) {
             return;
@@ -143,7 +192,7 @@ public class WSDLUtils {
             } else {
                 e.setMaxOccurs("1");
             }
-            buildChildrenType(fieldName, field, schema, e);
+            buildChildrenType(fieldName, field, schema, e, sequence);
         });
     }
 
