@@ -197,7 +197,7 @@ public class PlatformRest {
 
     @CrossOrigin
     @ApiOperation(value = "导出 WSDL 信息")
-    @GetMapping(value = "/export/WSDL")
+    @GetMapping(value = "/export/WSDL", produces = "text/xml;charset=UTF-8")
     private String exportWSDL() {
         try {
             StringWriter stringWriter = new StringWriter();
