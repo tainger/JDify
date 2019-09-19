@@ -73,20 +73,23 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
         route.setId(flow.getRouteId());
         route.setProperty(TRACING_FLOW_ID).constant(flow.getId());
         triggerComponent.buildFromRoute(route, triggerConfig);
-        if (flow.getInModel() == null) {
-            flowTracer.before(route);
-        } else {
-            flowTracer.before(route, flow.getInModel().getModelType());
+        if (flowTracer != null) {
+            if (flow.getInModel() == null) {
+                flowTracer.before(route);
+            } else {
+                flowTracer.before(route, flow.getInModel().getModelType());
+            }
         }
-
         buildFlowRoute(route, flow, null);
         // TODO 流程最后不可得知触发器的出模型, 所以无法判断做格式转换, 最保险的方式是固定转为 Object, 在 trigger 端在根据要求做一次序列化, 但是会有性能损耗
         // TODO 另外这里也不好判断是否是最后的节点, 因为存在分支, 暂时将最后节点作为流输出节点
         // TODO 也可以考虑加一个动态节点, 根据上下文判断如何做处理, 这样就没办法用 camel DSL 了
-        if (flow.getOutModel() == null) {
-            flowTracer.after(route);
-        } else {
-            flowTracer.after(route, flow.getOutModel().getModelType());
+        if (flowTracer != null) {
+            if (flow.getOutModel() == null) {
+                flowTracer.after(route);
+            } else {
+                flowTracer.after(route, flow.getOutModel().getModelType());
+            }
         }
         return route;
     }
