@@ -5,6 +5,7 @@ import com.predic8.schema.Schema;
 import com.predic8.schema.Sequence;
 import com.predic8.wsdl.*;
 import com.predic8.wsdl.soap11.SOAPBinding;
+import com.predic8.wsdl.soap11.SOAPBody;
 import com.predic8.wsdl.soap11.SOAPOperation;
 import com.predic8.xml.util.PrefixedName;
 import groovy.xml.QName;
@@ -86,12 +87,12 @@ public class WSDLUtils {
             soapOperation.setSoapAction(SoapConstants.SERVER_ADDRESS + apiInfo.getPath());
             BindingInput bindingInput = bindingOperation.newInput();
             bindingInput.setName(apiInfo.getInput().getName());
-//            SOAPBody inputBody = bindingInput.newSOAP11Body();
-//            inputBody.setUse("literal");
+            SOAPBody inputBody = bindingInput.newSOAP11Body();
+            inputBody.setUse("literal");
             BindingOutput bindingOutput = bindingOperation.newOutput();
             bindingOutput.setName(apiInfo.getOutput().getName());
-//            SOAPBody outputBody = bindingOutput.newSOAP11Body();
-//            outputBody.setUse("literal");
+            SOAPBody outputBody = bindingOutput.newSOAP11Body();
+            outputBody.setUse("literal");
         });
 
         /**
