@@ -2,6 +2,7 @@ package io.terminus.dalaran.console.rest;
 
 import io.swagger.annotations.ApiOperation;
 import io.terminus.common.model.Response;
+import io.terminus.dalaran.console.exception.DalaranException;
 import io.terminus.dalaran.console.model.ResponseMessage;
 import io.terminus.dalaran.console.model.dto.ClientDTO;
 import io.terminus.dalaran.console.service.ClientManagementService;
@@ -17,46 +18,29 @@ public class ClientManagementRest {
 
     @PostMapping
     @ApiOperation("新增客户端")
-    private Response create(@RequestBody ClientDTO clientDTO) {
-        try {
-            return Response.ok(service.create(clientDTO));
-        } catch (Exception e) {
-            e.printStackTrace();
-            return Response.fail(ResponseMessage.CLIENT_CREATE_ERROR);
-        }
+    @DalaranException(value = ResponseMessage.CLIENT_CREATE_ERROR)
+    public Long create(@RequestBody ClientDTO clientDTO) {
+        return service.create(clientDTO);
     }
 
     @PutMapping
     @ApiOperation("更新客户端")
-    private Response update(@RequestBody ClientDTO clientDTO) {
-        try {
-            return Response.ok(service.update(clientDTO));
-        } catch (Exception e) {
-            e.printStackTrace();
-            return Response.fail(ResponseMessage.CLIENT_UPDATE_ERROR);
-        }
+    @DalaranException(value = ResponseMessage.CLIENT_UPDATE_ERROR)
+    private ClientDTO update(@RequestBody ClientDTO clientDTO) {
+        return service.update(clientDTO);
     }
 
     @DeleteMapping("/{id}")
     @ApiOperation("删除客户端")
-    private Response create(@PathVariable Long id) {
-        try {
-            service.delete(id);
-            return Response.ok();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return Response.fail(ResponseMessage.CLIENT_DELETE_ERROR);
-        }
+    @DalaranException(value = ResponseMessage.CLIENT_DELETE_ERROR)
+    private void create(@PathVariable Long id) {
+        service.delete(id);
     }
 
     @GetMapping("/{id}")
     @ApiOperation("获取客户端详情")
-    private Response detail(@PathVariable Long id) {
-        try {
-            return Response.ok(service.detail(id));
-        } catch (Exception e) {
-            e.printStackTrace();
-            return Response.fail(ResponseMessage.CLIENT_QUERY_ERROR);
-        }
+    @DalaranException(value = ResponseMessage.CLIENT_QUERY_ERROR)
+    private ClientDTO detail(@PathVariable Long id) {
+        return service.detail(id);
     }
 }

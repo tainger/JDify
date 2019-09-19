@@ -2,10 +2,13 @@ package io.terminus.dalaran.console.rest;
 
 import io.swagger.annotations.ApiOperation;
 import io.terminus.common.model.Response;
+import io.terminus.dalaran.console.exception.DalaranException;
 import io.terminus.dalaran.console.model.ResponseMessage;
 import io.terminus.dalaran.console.model.TestRequestDTO;
 import io.terminus.dalaran.console.model.dto.CopyFlow;
+import io.terminus.dalaran.console.model.dto.ImportFlowResult;
 import io.terminus.dalaran.console.model.dto.ImportProcessorDTO;
+import io.terminus.dalaran.console.model.dto.ImportProcessorResult;
 import io.terminus.dalaran.console.model.dto.flow.ImportFlowDTO;
 import io.terminus.dalaran.console.model.dto.flow.TriggerFlowDTO;
 import io.terminus.dalaran.console.model.query.FlowQuery;
@@ -38,46 +41,30 @@ public class FlowManagementRest {
 
     @ApiOperation(value = "创建集成流")
     @PostMapping(value = "/create")
-    public Response create(@RequestBody TriggerFlowDTO model) {
-        try {
-            return Response.ok(flowManagementService.createFlow(model));
-        } catch (Exception e) {
-            e.printStackTrace();
-            return Response.fail(ResponseMessage.FLOW_CREATE_ERROR);
-        }
+    @DalaranException(value = ResponseMessage.FLOW_CREATE_ERROR)
+    public Long create(@RequestBody TriggerFlowDTO model) {
+        return flowManagementService.createFlow(model);
     }
 
     @ApiOperation(value = "更新集成流")
     @PostMapping(value = "/update")
-    public Response update(@RequestBody TriggerFlowDTO model) {
-        try {
-            return Response.ok(flowManagementService.updateFlow(model));
-        } catch (Exception e) {
-            e.printStackTrace();
-            return Response.fail(ResponseMessage.FLOW_UPDATE_ERROR);
-        }
+    @DalaranException(value = ResponseMessage.FLOW_UPDATE_ERROR)
+    public TriggerFlowDTO update(@RequestBody TriggerFlowDTO model) {
+        return flowManagementService.updateFlow(model);
     }
 
     @ApiOperation(value = "快速创建集成流")
     @PostMapping(value = "/import")
-    public Response importTriggerFlow(@RequestBody ImportFlowDTO model) {
-        try {
-            return Response.ok(flowManagementService.importFlow(model));
-        } catch (Exception e) {
-            e.printStackTrace();
-            return Response.fail(ResponseMessage.FLOW_CREATE_ERROR);
-        }
+    @DalaranException(value = ResponseMessage.FLOW_CREATE_ERROR)
+    public ImportFlowResult importTriggerFlow(@RequestBody ImportFlowDTO model) {
+        return flowManagementService.importFlow(model);
     }
 
     @ApiOperation(value = "快速创建处理器")
     @PostMapping(value = "/importProcessor")
-    public Response importProcessor(@RequestBody ImportProcessorDTO model) {
-        try {
-            return Response.ok(flowManagementService.importProcessor(model));
-        } catch (Exception e) {
-            e.printStackTrace();
-            return Response.fail(ResponseMessage.FLOW_CREATE_ERROR);
-        }
+    @DalaranException(value = ResponseMessage.FLOW_CREATE_ERROR)
+    public ImportProcessorResult importProcessor(@RequestBody ImportProcessorDTO model) {
+        return flowManagementService.importProcessor(model);
     }
 
     @ApiOperation(value = "删除集成流")

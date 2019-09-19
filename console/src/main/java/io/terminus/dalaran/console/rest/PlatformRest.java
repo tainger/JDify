@@ -7,6 +7,7 @@ import com.predic8.wsdl.creator.WSDLCreatorContext;
 import groovy.xml.MarkupBuilder;
 import io.swagger.annotations.ApiOperation;
 import io.terminus.common.model.Response;
+import io.terminus.dalaran.console.exception.DalaranException;
 import io.terminus.dalaran.console.model.DalaranAccount;
 import io.terminus.dalaran.console.model.ExportData;
 import io.terminus.dalaran.console.model.ReleaseRequestDTO;
@@ -263,12 +264,14 @@ public class PlatformRest {
 
     @ApiOperation(value = "登陆验证")
     @PostMapping(value = "/login/auth")
-    private Response loginAuth(@RequestBody DalaranAccount account) {
-        try {
-            return Response.ok(authorizeService.authAccount(account));
-        } catch (Exception e) {
-            e.printStackTrace();
-            return Response.fail(ResponseMessage.LOGIN_ERROR);
-        }
+    @DalaranException(value = ResponseMessage.LOGIN_ERROR)
+    public Response loginAuth(@RequestBody DalaranAccount account) {
+//        try {
+//            return Response.ok(authorizeService.authAccount(account));
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            return Response.fail(ResponseMessage.LOGIN_ERROR);
+//        }
+        return Response.ok(authorizeService.authAccount(account));
     }
 }
