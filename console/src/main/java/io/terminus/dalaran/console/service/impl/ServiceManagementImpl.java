@@ -151,9 +151,8 @@ public class ServiceManagementImpl implements ServiceManagement {
         Object importConfig = serviceDetail.getImportConfig();
         Long moduleId = serviceDetail.getModuleId();
         Long serviceId = serviceDetail.getServiceId();
-        List<String> operationKeys = dalaranService.operations(serviceConfig);
-        operationKeys.forEach(operationKey -> {
-            ServiceOperation operation = dalaranService.getOperationConfig(serviceConfig, operationKey);
+        List<ServiceOperation> operations = dalaranService.operations(serviceConfig);
+        operations.forEach(operation -> {
             ServiceOperationModel operationModel = dalaranService.buildOperationModel(importConfig, operation);
             Long inModelId = buildModel(operationModel.getInModel(), operationModel.getInputName(), moduleId, serviceId, models);
             Long outModelId = buildModel(operationModel.getOutModel(), operationModel.getOutputName(), moduleId, serviceId, models);
@@ -163,7 +162,6 @@ public class ServiceManagementImpl implements ServiceManagement {
         entity.setServiceConfig(JSON.toJSONString(serviceConfig));
         serviceRepository.save(entity);
     }
-
 
     private Long buildModel(MessageModel messageModel, String modelName, Long moduleId, Long serviceId, Map<String, Long> models) {
         if (models.containsKey(modelName)) {
