@@ -19,8 +19,6 @@ public class TrantorComponentLoader {
         }
         DalaranIntegrationInfo integrationInfo = new DalaranIntegrationInfo();
         integrationInfo.setKey(dalaranIntegration.key());
-        integrationInfo.setName(dalaranIntegration.name());
-        integrationInfo.setDescription(dalaranIntegration.description());
 
         List<DalaranIntegrationPoint> actions = new ArrayList<>();
         integrationInfo.setIntegrationPoints(actions);

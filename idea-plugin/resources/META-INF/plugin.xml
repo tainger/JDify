@@ -47,6 +47,11 @@
                 description="Convert dalaran dubbo trigger">
             <add-to-group group-id="EditorPopupMenu" anchor="first"/>
         </action>
+        <action id="Dalaran.ConvertRestTriggerDubboFlow" class="io.terminus.dalaran.action.ConvertRestTriggerDubboFlow"
+                text="Convert Rest Trigger Call This Dubbo API"
+                description="Convert rest trigger call this dubbo API">
+            <add-to-group group-id="EditorPopupMenu" anchor="first"/>
+        </action>
         <action id="Dalaran.ConvertDubboProcessor" class="io.terminus.dalaran.action.ConvertDubboProcessor"
                 text="Convert Dubbo Processor"
                 description="Convert dalaran dubbo processor">

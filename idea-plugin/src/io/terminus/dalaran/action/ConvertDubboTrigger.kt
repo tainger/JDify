@@ -17,8 +17,8 @@ class ConvertDubboTrigger : AnAction() {
         val method = e.getData(CommonDataKeys.PSI_ELEMENT) as PsiMethod
         val triggerConfig = mapOf(
                 "serviceId" to method.containingClass!!.qualifiedName!!,
-                "method" to method.name
-                // TODO version
+                "method" to method.name,
+                "version" to "1.0.0"
         )
         val triggerId = "${method.containingClass!!.qualifiedName!!}#${method.name}"
         val inModel = method.parameters.firstOrNull()?.let { buildSchema(it.type as PsiClassReferenceType) }
