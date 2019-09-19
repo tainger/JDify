@@ -29,10 +29,7 @@ import static com.predic8.schema.Schema.INT;
 
 public class WSDLUtils {
 
-    @Value("")
-    private String RUNTIME_LOCATION;
-
-    public static Definitions buildDefinitions(List<SoapApiInfo> soapApiInfos) {
+    public static Definitions buildDefinitions(List<SoapApiInfo> soapApiInfos, String runtimeLocation) {
         Definitions definitions = new Definitions("http://schemas.xmlsoap.org/wsdl", "Dalaran");
         Map<String, SoapModel> models = new HashMap<>();
         List<SoapOperation> operations = new ArrayList<>();
@@ -70,26 +67,22 @@ public class WSDLUtils {
         /**
          * port type + binding
          */
-        PortType pt = definitions.newPortType(SoapConstants.PORT_TYPE);
         soapApiInfos.forEach(apiInfo -> {
+            PortType pt = definitions.newPortType(SoapConstants.PORT_TYPE + apiInfo.getName());
             Operation op = pt.newOperation(apiInfo.getName());
             op.newInput(apiInfo.getInput().getName()).setMessage(definitions.getMessage(apiInfo.getInput().getName()));
             op.newOutput(apiInfo.getOutput().getName()).setMessage(definitions.getMessage(apiInfo.getOutput().getName()));
-        });
 
-        /**
-         *
-         */
-        Port port = definitions.newService(SoapConstants.SERVICE_NAME).newPort(SoapConstants.SERVICE_PORT);
-        Binding binding = port.newBinding(SoapConstants.BINDING);
-        binding.setType(pt);
-        SOAPBinding soapBinding = binding.newSOAP11Binding();
-        soapBinding.setBinding(binding);
-        soapApiInfos.forEach(apiInfo -> {
+            Port port = definitions.newService(SoapConstants.SERVICE_NAME + apiInfo.getName()).newPort(SoapConstants.SERVICE_PORT + apiInfo.getName());
+            Binding binding = port.newBinding(SoapConstants.BINDING + apiInfo.getName());
+            binding.setType(pt);
+            SOAPBinding soapBinding = binding.newSOAP11Binding();
+            soapBinding.setBinding(binding);
+
             BindingOperation bindingOperation = binding.newBindingOperation(apiInfo.getName());
             SOAPOperation soapOperation = bindingOperation.newSOAP11Operation();
             soapOperation.setName(apiInfo.getName());
-            soapOperation.setSoapAction(SoapConstants.SERVER_ADDRESS + apiInfo.getPath());
+            soapOperation.setSoapAction(runtimeLocation + apiInfo.getPath());
             BindingInput bindingInput = bindingOperation.newInput();
             bindingInput.setName(apiInfo.getInput().getName());
             SOAPBody inputBody = bindingInput.newSOAP11Body();
@@ -98,12 +91,20 @@ public class WSDLUtils {
             bindingOutput.setName(apiInfo.getOutput().getName());
             SOAPBody outputBody = bindingOutput.newSOAP11Body();
             outputBody.setUse("literal");
+            port.newSOAP11Address(runtimeLocation + apiInfo.getPath());
+        });
+
+        /**
+         *
+         */
+
+        soapApiInfos.forEach(apiInfo -> {
+
         });
 
         /**
          * service
          */
-        port.newSOAP11Address(SoapConstants.SERVER_ADDRESS);
         return definitions;
     }
 
