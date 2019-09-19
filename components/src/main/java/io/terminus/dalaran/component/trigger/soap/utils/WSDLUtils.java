@@ -26,53 +26,6 @@ import java.util.Map;
 import static com.predic8.schema.Schema.INT;
 
 public class WSDLUtils {
-
-    public static void main(String[] args) {
-
-        WSDLParser parser = new WSDLParser();
-        Definitions definitions = parser.parse("http://piqas.shimaogroup.com:50000/dir/wsdl?p=sa/2578ce33cd913812bbef5120fdee2c23");
-
-        Schema schema = new Schema("http://schemas.xmlsoap.org/wsdl");
-
-        Element add = schema.newElement("add");
-        add.setType(new QName("", "sss", "tns"));
-        Sequence sequence = add.newComplexType().newSequence();
-        Element child = sequence.newElement("summand", INT);
-        child.setMaxOccurs("unbounded");
-        child.setType(new QName("", "int", "xsd"));
-
-        schema.newElement("addResponse").newComplexType().newSequence().newElement("number", INT);
-
-        Definitions wsdl = new Definitions("http://schemas.xmlsoap.org/wsdl", "AddService");
-        wsdl.addSchema(schema);
-        schema.setDefinitions(wsdl);
-
-        PortType pt = wsdl.newPortType("AddPortType");
-        Operation op = pt.newOperation("add");
-
-        Input input = op.newInput("add");
-        input.setMessagePrefixedName(new PrefixedName("tns", "add"));
-        Message message = input.newMessage("add");
-        Part part = message.newPart("add", "tns:add");
-        part.setElementPN(new PrefixedName("tns", "add"));
-        part.setParent(message);
-
-        op.newOutput("addResponse").newMessage("addResponse").newPart("addResponse", "tns:addResponse").setElementPN(new PrefixedName("tns", "addResponse"));
-
-        Port port = wsdl.newService("AddService").newPort("AddServiceSOAP11Port");
-        Binding bnd = port.newBinding("AddServiceSOAP11Binding");
-        bnd.setType(pt);
-        SOAPBinding soapBinding = bnd.newSOAP11Binding();
-        soapBinding.setBinding(bnd);
-
-        BindingOperation bo = bnd.newBindingOperation("add");
-        bo.newSOAP11Operation();
-        bo.newInput().newSOAP11Body();
-        bo.newOutput().newSOAP11Body();
-
-        port.newSOAP11Address(SoapConstants.SERVER_ADDRESS);
-    }
-
     public static Definitions buildDefinitions(List<SoapApiInfo> soapApiInfos) {
         Definitions definitions = new Definitions("http://schemas.xmlsoap.org/wsdl", "Dalaran");
         Map<String, SoapModel> models = new HashMap<>();
@@ -145,7 +98,6 @@ public class WSDLUtils {
          * service
          */
         port.newSOAP11Address(SoapConstants.SERVER_ADDRESS);
-        System.out.println(definitions.getAsString());
         return definitions;
     }
 
