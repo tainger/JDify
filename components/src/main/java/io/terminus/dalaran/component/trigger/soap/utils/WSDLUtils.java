@@ -107,6 +107,7 @@ public class WSDLUtils {
         }
         element.setMaxOccurs(maxOccurs);
         Sequence sequence = element.newComplexType().newSequence();
+        sequence.setParent(element);
 
         modelField.getFields().forEach((name, field) -> {
             Element e = sequence.newElement(name);
@@ -126,7 +127,7 @@ public class WSDLUtils {
             return;
         }
 
-        parent.setType(new QName("", name, "tns"));
+        parent.setType(new QName("http://schemas.xmlsoap.org/wsdl", name, "tns"));
         parent.setParent(parentSequence);
         Sequence sequence = schema.newComplexType(name).newSequence();
         if (MapUtils.isEmpty(modelField.getFields())) {
