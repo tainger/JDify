@@ -84,7 +84,7 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
             binding.getOperations().forEach(operation -> {
                 SoapOperationConfig operationConfig = new SoapOperationConfig();
                 String operationName = operation.getName();
-                String operationKey = bindingName + OPERATION_SPLIT + portType + OPERATION_SPLIT + operationName;
+                String operationKey = operationName + bindingName + OPERATION_SPLIT + portType + OPERATION_SPLIT;
                 String subKey = portType + OPERATION_SPLIT + operationName;
                 SoapOperation soapOperation = operationMap.get(subKey);
                 operationConfig.setBinding(bindingName);

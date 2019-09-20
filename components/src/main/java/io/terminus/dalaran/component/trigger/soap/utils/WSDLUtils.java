@@ -93,18 +93,6 @@ public class WSDLUtils {
             outputBody.setUse("literal");
             port.newSOAP11Address(runtimeLocation + apiInfo.getPath());
         });
-
-        /**
-         *
-         */
-
-        soapApiInfos.forEach(apiInfo -> {
-
-        });
-
-        /**
-         * service
-         */
         return definitions;
     }
 
