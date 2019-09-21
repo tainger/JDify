@@ -11,7 +11,7 @@ class ConvertToSchema : AnAction() {
 
     override fun actionPerformed(e: AnActionEvent) {
         val psiClass = e.getData(CommonDataKeys.PSI_ELEMENT) as PsiClass
-        buildSchema(psiClass).setCopyPasteContent()
+        buildSchema(psiClass).modelSchema.setCopyPasteContent()
     }
 
     override fun update(e: AnActionEvent) {

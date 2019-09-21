@@ -197,18 +197,20 @@ public class PlatformRest {
 
     @CrossOrigin
     @ApiOperation(value = "导出 WSDL 信息")
-    @GetMapping(value = "/export/WSDL")
-    private Response exportWSDL() {
+    @GetMapping(value = "/export/WSDL", produces = "text/xml;charset=UTF-8")
+    private String exportWSDL() {
         try {
             StringWriter stringWriter = new StringWriter();
             WSDLCreator creator = new WSDLCreator();
             creator.setBuilder(new MarkupBuilder(stringWriter));
             Definitions definitions = exportService.exportWSDL();
             definitions.create(creator, new WSDLCreatorContext());
-            return Response.ok(stringWriter);
+            return definitions.getAsString();
+//            return Response.ok(stringWriter);
         } catch (Exception e) {
             e.printStackTrace();
-            return Response.fail("");
+//            return Response.fail("");
+            return null;
         }
     }
 
