@@ -26,21 +26,21 @@ public class ClientManagementRest {
     @PutMapping
     @ApiOperation("更新客户端")
     @DalaranException(value = ResponseMessage.CLIENT_UPDATE_ERROR)
-    private ClientDTO update(@RequestBody ClientDTO clientDTO) {
+    public ClientDTO update(@RequestBody ClientDTO clientDTO) {
         return service.update(clientDTO);
     }
 
     @DeleteMapping("/{id}")
     @ApiOperation("删除客户端")
     @DalaranException(value = ResponseMessage.CLIENT_DELETE_ERROR)
-    private void create(@PathVariable Long id) {
+    public void create(@PathVariable Long id) {
         service.delete(id);
     }
 
     @GetMapping("/{id}")
     @ApiOperation("获取客户端详情")
     @DalaranException(value = ResponseMessage.CLIENT_QUERY_ERROR)
-    private ClientDTO detail(@PathVariable Long id) {
+    public ClientDTO detail(@PathVariable Long id) {
         return service.detail(id);
     }
 }

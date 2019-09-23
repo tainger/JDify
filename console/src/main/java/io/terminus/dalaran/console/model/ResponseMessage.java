@@ -128,6 +128,10 @@ public class ResponseMessage {
 
     public static final String WSDL_EXPORT_ERROR = "wsdl导出异常";
 
+    public static final String CONFIG_EXPORT_ERROR = "配置导出异常";
+
+    public static final String CONFIG_IMPORT_ERROR = "配置导入异常";
+
     public static final String LOGIN_ERROR = "登陆失败";
 
     public static final String TRACE_QUERY_ERROR = "日志查询异常";

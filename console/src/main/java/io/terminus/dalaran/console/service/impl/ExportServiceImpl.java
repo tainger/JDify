@@ -28,10 +28,12 @@ import org.hibernate.persister.entity.AbstractEntityPersister;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -84,19 +86,20 @@ public class ExportServiceImpl implements ExportService {
     // TODO 数据量暴多可能炸内存, 而且会涉及到清表, 所以事务也是个问题
     @Override
     @Transactional
-    public void importAll(ExportData exportData) {
+    public void importAll(MultipartFile exportData) throws IOException {
         truncateTable();
 
-        moduleRepository.save(exportData.getModules());
-        modelRepository.save(exportData.getModels());
-        triggerFlowRepository.save(exportData.getTriggerFlows());
-        subFlowRepository.save(exportData.getSubFlows());
-        serviceRepository.save(exportData.getServices());
-        functionRepository.save(exportData.getFunctions());
-        connectorRepository.save(exportData.getConnectors());
-        clientRepository.save(exportData.getClients());
-        propertyRepository.save(exportData.getProperties());
-        trantorRepository.save(exportData.getTrantorEntities());
+        ExportData importData = JSON.parseObject(exportData.getInputStream(), ExportData.class);
+        moduleRepository.save(importData.getModules());
+        modelRepository.save(importData.getModels());
+        triggerFlowRepository.save(importData.getTriggerFlows());
+        subFlowRepository.save(importData.getSubFlows());
+        serviceRepository.save(importData.getServices());
+        functionRepository.save(importData.getFunctions());
+        connectorRepository.save(importData.getConnectors());
+        clientRepository.save(importData.getClients());
+        propertyRepository.save(importData.getProperties());
+        trantorRepository.save(importData.getTrantorEntities());
 
         // load test flow
         testFlowInitializer.loadResources();
