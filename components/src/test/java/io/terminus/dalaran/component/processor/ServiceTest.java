@@ -2,6 +2,7 @@ package io.terminus.dalaran.component.processor;
 
 import com.alibaba.fastjson.JSON;
 import com.predic8.wsdl.Definitions;
+import com.predic8.wsdl.WSDLParser;
 import io.terminus.dalaran.component.trigger.soap.model.SoapApiInfo;
 import io.terminus.dalaran.component.trigger.soap.model.SoapModel;
 import io.terminus.dalaran.component.trigger.soap.utils.WSDLUtils;
@@ -33,6 +34,14 @@ public class ServiceTest {
 
         Definitions definitions =  WSDLUtils.buildDefinitions(list, "======");
         System.out.println(definitions.getAsString());
+        Assert.assertNotNull(definitions);
+    }
+
+    @Test
+    public void parseWSDL() {
+        WSDLParser parser = new WSDLParser();
+        Definitions definitions = parser.parse("https://soap-service-test.captain.terminus.io/ws/weather.wsdl");
+        Definitions complex = parser.parse("http://www.webxml.com.cn/WebServices/IpAddressSearchWebService.asmx?wsdl");
         Assert.assertNotNull(definitions);
     }
 }
