@@ -28,10 +28,12 @@ import org.hibernate.persister.entity.AbstractEntityPersister;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -84,7 +86,7 @@ public class ExportServiceImpl implements ExportService {
     // TODO 数据量暴多可能炸内存, 而且会涉及到清表, 所以事务也是个问题
     @Override
     @Transactional
-    public void importAll(ExportData exportData) {
+    public void importAll(ExportData exportData) throws IOException {
         truncateTable();
 
         moduleRepository.saveAll(exportData.getModules());

@@ -19,6 +19,8 @@ public class ResponseMessage {
 
     public static final String BUILD_MAPPING_SUGGEST_ERROR = "获取Mapping建议异常";
 
+    public static final String TEMPLATE_DOWNLOAD_ERROR = "模板下载异常";
+
     // 集成流处理异常
     public static final String FLOW_CREATE_ERROR = "集成流创建异常";
 
@@ -127,6 +129,10 @@ public class ResponseMessage {
     public static final String WSDL_IMPORT_ERROR = "wsdl导入异常";
 
     public static final String WSDL_EXPORT_ERROR = "wsdl导出异常";
+
+    public static final String CONFIG_EXPORT_ERROR = "配置导出异常";
+
+    public static final String CONFIG_IMPORT_ERROR = "配置导入异常";
 
     public static final String LOGIN_ERROR = "登陆失败";
 
