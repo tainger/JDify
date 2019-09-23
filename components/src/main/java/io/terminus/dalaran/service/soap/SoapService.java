@@ -8,7 +8,6 @@ import io.terminus.dalaran.core.component.DalaranService;
 import io.terminus.dalaran.core.component.annotation.ServiceConnector;
 import io.terminus.dalaran.core.component.model.ServiceOperationModel;
 import io.terminus.dalaran.model.*;
-import io.terminus.dalaran.model.component.ServiceOperation;
 import io.terminus.dalaran.model.converter.soap.model.SoapOperationConfig;
 import io.terminus.dalaran.model.converter.soap.model.SoapSchemaOperation;
 import io.terminus.dalaran.model.schema.SoapSchema;
@@ -30,7 +29,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * Created by jingdi on 2019/5/27
@@ -242,7 +240,8 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
                 buildWithoutRootPath(child, schema, type);
             } else {
                 FieldType fieldType = getFieldType(type);
-                if (element.getArrayType() == null) {
+                if (element.getArrayType() == null
+                        && (StringUtils.equalsIgnoreCase(element.getMaxOccurs(), "0") || StringUtils.equalsIgnoreCase(element.getMaxOccurs(), "1"))) {
                     parent.setType(fieldType);
                 } else {
                     parent.setType(FieldType.ARRAY);
@@ -250,7 +249,7 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
                 }
             }
         } else {
-            buildByEmbeddedTypeWithoutRootPath(child, element, schema);
+            buildByEmbeddedTypeWithoutRootPath(child, element, schema, parent);
         }
     }
 
@@ -284,7 +283,8 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
             buildWithoutRootPath(child, schema, elementType);
         } else {
             FieldType fieldType = getFieldType(elementType);
-            if (element.getArrayType() == null && (StringUtils.equalsIgnoreCase(element.getMaxOccurs(), "0") || StringUtils.equalsIgnoreCase(element.getMaxOccurs(), "1"))) {
+            if (element.getArrayType() == null
+                    && (StringUtils.equalsIgnoreCase(element.getMaxOccurs(), "0") || StringUtils.equalsIgnoreCase(element.getMaxOccurs(), "1"))) {
                 modelField.setType(fieldType);
             } else {
                 modelField.setType(FieldType.ARRAY);
@@ -294,15 +294,21 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
         parent.put(name, modelField);
     }
 
-    private void buildByEmbeddedTypeWithoutRootPath(Map<String, ModelField> parent, Element element, Schema schema) {
+    private void buildByEmbeddedTypeWithoutRootPath(Map<String, ModelField> current, Element element, Schema schema, ModelField parent) {
         ComplexType complexType = (ComplexType) element.getEmbeddedType();
         Sequence sequence;
         if (complexType != null && (sequence = (Sequence) complexType.getModel()) != null) {
             List<SchemaComponent> particles = sequence.getParticles();
             String maxOccurs = sequence.getMaxOccurs().toString();
+            if (StringUtils.equalsIgnoreCase(maxOccurs, "0") || StringUtils.equalsIgnoreCase(maxOccurs, "1")) {
+                parent.setType(FieldType.OBJECT);
+            } else {
+                parent.setType(FieldType.ARRAY);
+                parent.setSubType(FieldType.OBJECT);
+            }
             if (CollectionUtils.isNotEmpty(particles)) {
                 particles.forEach(p -> {
-                    handleSchemaComponent(p, element, schema, maxOccurs, parent);
+                    handleSchemaComponent(p, element, schema, maxOccurs, current);
                 });
             }
         }
@@ -312,6 +318,9 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
         ModelField modelField = new ModelField();
         Element e = (Element) p;
         String name = e.getName();
+        if (StringUtils.isNotBlank(e.getMaxOccurs())) {
+            maxOccurs = e.getMaxOccurs();
+        }
         String elementType = e.getType().getLocalPart();
         if (containsComplexType(elementType, schema) && !containsSimpleType(elementType, schema)) {
             if (element.getArrayType() == null
