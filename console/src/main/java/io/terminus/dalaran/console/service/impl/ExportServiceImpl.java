@@ -26,6 +26,7 @@ import org.hibernate.Session;
 import org.hibernate.metadata.ClassMetadata;
 import org.hibernate.persister.entity.AbstractEntityPersister;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
@@ -76,6 +77,9 @@ public class ExportServiceImpl implements ExportService {
 
     @Autowired
     private ClientRepository clientRepository;
+
+    @Value("${terminus.dalaran.runtime-location}")
+    private String runtimeLocation;
 
     // TODO 数据量暴多可能炸内存, 而且会涉及到清表, 所以事务也是个问题
     @Override
@@ -132,7 +136,7 @@ public class ExportServiceImpl implements ExportService {
     @Override
     public Definitions exportWSDL() {
         List<SoapApiInfo> soapApiList = getExportSoapListeners();
-        return WSDLUtils.buildDefinitions(soapApiList);
+        return WSDLUtils.buildDefinitions(soapApiList, runtimeLocation);
     }
 
     // TODO 比较暴力, 但是需要重置 ID 自增, 否则 Json 内的依赖可能会有问题

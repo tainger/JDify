@@ -480,6 +480,8 @@ public class ModelManagementServiceImpl implements ModelManagementService {
             case DalaranConsoleConstants.JAVA_FLOAT:
             case DalaranConsoleConstants.JAVA_DOUBLE:
                 return FieldType.FLOAT;
+            case DalaranConsoleConstants.JAVA_BOOLEAN:
+                return FieldType.BOOLEAN;
         }
         return FieldType.STRING;
     }

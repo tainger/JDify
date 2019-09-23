@@ -8,8 +8,14 @@ import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.Traceable;
 import org.apache.camel.model.RouteDefinition;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.http.entity.StringEntity;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
+import java.util.List;
 import java.util.Map;
 
 import static io.terminus.dalaran.DalaranConstants.TRACING_FLOW_ID;
@@ -116,6 +122,16 @@ public class DalaranTracer {
         }
         if (body instanceof Map || body instanceof Iterable || body instanceof Serializable) {
             return JSON.toJSONString(body);
+        }
+        if (body instanceof StringEntity) {
+            try {
+                InputStream inputStream = ((StringEntity) body).getContent();
+                List<String> data = IOUtils.readLines(inputStream);
+                return StringUtils.join(data, "\n");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
         }
         return body.toString();
     }

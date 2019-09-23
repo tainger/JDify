@@ -13,7 +13,7 @@ public interface DalaranService<ImportConfig, ServiceConfig, OperationConfig ext
 
     OperationConfig getOperationConfig(ServiceConfig serviceConfig, @NotNull String operationKey);
 
-    List<String> operations(ServiceConfig serviceConfig);
+    List<OperationConfig> operations(ServiceConfig serviceConfig);
 
     ServiceConfig importConfig(ImportConfig config);
 

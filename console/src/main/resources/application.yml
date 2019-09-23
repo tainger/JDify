@@ -29,6 +29,7 @@ spring:
 
 terminus:
   dalaran:
+    runtime-location: ${RUNTIME_LOCATION:http://127.0.0.1:8080}
     log:
       # 目前只支持定时删除
       policy: delete
