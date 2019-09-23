@@ -153,6 +153,7 @@ public class ModelManagementRest {
 
     @ApiOperation(value = "下载数据模型Excel模板样例")
     @RequestMapping(value = "/download/excel-template", method = RequestMethod.GET)
+    @DalaranException(value = ResponseMessage.TEMPLATE_DOWNLOAD_ERROR)
     public ResponseEntity<Resource> downloadExcelTemplate() {
         return modelManagementService.downloadExcelTemplate();
     }
