@@ -284,7 +284,7 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
             buildWithoutRootPath(child, schema, elementType);
         } else {
             FieldType fieldType = getFieldType(elementType);
-            if (element.getArrayType() == null) {
+            if (element.getArrayType() == null && (StringUtils.equalsIgnoreCase(element.getMaxOccurs(), "0") || StringUtils.equalsIgnoreCase(element.getMaxOccurs(), "1"))) {
                 modelField.setType(fieldType);
             } else {
                 modelField.setType(FieldType.ARRAY);
