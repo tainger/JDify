@@ -5,6 +5,9 @@ server:
 spring:
   application:
     name: dalaran-console
+  aop:
+    proxy-target-class: true
+    auto: true
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
     url: jdbc:mysql://${MYSQL_HOST:127.0.0.1}:${MYSQL_PORT:3306}/${MYSQL_DATABASE:dalaran}?useUnicode=true&characterEncoding=utf-8&useSSL=false
