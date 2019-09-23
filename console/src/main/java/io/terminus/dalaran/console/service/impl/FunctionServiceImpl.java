@@ -46,12 +46,12 @@ public class FunctionServiceImpl implements FunctionService {
 
     @Override
     public void delete(Long functionId) {
-        repository.delete(functionId);
+        repository.deleteById(functionId);
     }
 
     @Override
     public FunctionDTO detail(Long functionId) {
-        FunctionEntity entity = repository.findOne(functionId);
+        FunctionEntity entity = repository.findById(functionId).get();
         return toDTO(entity);
     }
 

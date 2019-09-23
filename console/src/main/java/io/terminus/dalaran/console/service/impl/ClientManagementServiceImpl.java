@@ -40,12 +40,12 @@ public class ClientManagementServiceImpl implements ClientManagementService {
 
     @Override
     public void delete(Long appKey) {
-        repository.delete(appKey);
+        repository.deleteById(appKey);
     }
 
     @Override
     public ClientDTO detail(Long appKey) {
-        ClientEntity entity = repository.findOne(appKey);
+        ClientEntity entity = repository.findById(appKey).get();
         if (entity != null) {
             return toDTO(entity);
         }

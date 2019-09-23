@@ -57,7 +57,7 @@ public class ModuleManagementServiceImpl implements ModuleManagementService {
 
     @Override
     public void deleteModule(Long moduleId) {
-        moduleRepository.delete(moduleId);
+        moduleRepository.deleteById(moduleId);
     }
 
     @Override
@@ -92,7 +92,7 @@ public class ModuleManagementServiceImpl implements ModuleManagementService {
 
     @Override
     public ModuleDetailDTO getModuleDetail(Long moduleId) {
-        ModuleEntity moduleEntity = moduleRepository.findOne(moduleId);
+        ModuleEntity moduleEntity = moduleRepository.findById(moduleId).get();
         if (moduleEntity == null) {
             return null;
         }
@@ -114,7 +114,7 @@ public class ModuleManagementServiceImpl implements ModuleManagementService {
 
     @Override
     public String getModuleName(@NotNull Long moduleId) {
-        ModuleEntity entity = moduleRepository.findOne(moduleId);
+        ModuleEntity entity = moduleRepository.findById(moduleId).get();
         if (entity == null) {
             return null;
         }
@@ -127,7 +127,7 @@ public class ModuleManagementServiceImpl implements ModuleManagementService {
         if (id == null) {
             moduleEntity = new ModuleEntity();
         } else {
-            moduleEntity = moduleRepository.findOne(id);
+            moduleEntity = moduleRepository.findById(id).get();
         }
         String name = model.getName();
         if (StringUtils.isNoneBlank(name)) {

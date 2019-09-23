@@ -36,7 +36,7 @@ public class ModuleManagementServiceTest {
         ModuleDTO module = new ModuleDTO();
         module.setName("test-module");
         Long id = moduleManagementService.createModule(module);
-        ModuleEntity entity = moduleRepository.findOne(id);
+        ModuleEntity entity = moduleRepository.findById(id).get();
         Assert.assertEquals(entity.getName(), module.getName());
     }
 
@@ -68,14 +68,14 @@ public class ModuleManagementServiceTest {
     @Test
     public void getModuleDetail() {
         ModuleDetailDTO moduleDetail = moduleManagementService.getModuleDetail(1L);
-        ModuleEntity entity = moduleRepository.findOne(1L);
+        ModuleEntity entity = moduleRepository.findById(1L).get();
         Assert.assertEquals(moduleDetail.getName(), entity.getName());
     }
 
     @Test
     public void getModuleName() {
         String name = moduleManagementService.getModuleName(1L);
-        ModuleEntity entity = moduleRepository.findOne(1L);
+        ModuleEntity entity = moduleRepository.findById(1L).get();
         Assert.assertEquals(name, entity.getName());
     }
 }

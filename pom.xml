@@ -4,11 +4,10 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-
     <parent>
         <groupId>io.terminus</groupId>
         <artifactId>parent-pom</artifactId>
-        <version>1.5.14.2.RELEASE</version>
+        <version>2.1.1.RELEASE</version>
     </parent>
 
     <artifactId>dalaran-parent</artifactId>
@@ -26,7 +25,7 @@
     </modules>
 
     <properties>
-        <camel.version>2.21.5</camel.version>
+        <camel.version>2.24.2</camel.version>
         <dubbo.version>2.6.2</dubbo.version>
         <rocketmq.version>4.5.1</rocketmq.version>
         <spring.version>4.3.18.RELEASE</spring.version>

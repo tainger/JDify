@@ -104,11 +104,11 @@ public class TracingLogServiceImpl implements TracingLogService {
             switch (log.getTracingType()) {
                 case Flow:
                 case TestFlow:
-                    flowEntity = flowRepository.findOne(log.getFlowId());
+                    flowEntity = flowRepository.findById(log.getFlowId()).get();
                     break;
                 case SubFlow:
                 case TestSubFlow:
-                    flowEntity = subFlowRepository.findOne(log.getFlowId());
+                    flowEntity = subFlowRepository.findById(log.getFlowId()).get();
                     break;
             }
             if (flowEntity != null) {
@@ -134,7 +134,7 @@ public class TracingLogServiceImpl implements TracingLogService {
 
         tracingLog.setProcessorId(log.getProcessorId());
         tracingLog.setFlowId(log.getFlowId());
-        TriggerFlowEntity flowEntity = flowRepository.findOne(log.getFlowId());
+        TriggerFlowEntity flowEntity = flowRepository.findById(log.getFlowId()).get();
         if (flowEntity != null) {
             tracingLog.setFlowName(flowEntity.getName());
         }

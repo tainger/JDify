@@ -61,7 +61,7 @@ public class FlowManagementServiceTest {
     public void create() {
         TriggerFlowDTO triggerFlow = buildTriggerFlowDTO();
         Long id = flowManagementService.createFlow(triggerFlow);
-        TriggerFlowEntity entity = flowRepository.findOne(id);
+        TriggerFlowEntity entity = flowRepository.findById(id).get();
         Assert.assertEquals(triggerFlow.getName(), entity.getName());
     }
 
@@ -69,7 +69,7 @@ public class FlowManagementServiceTest {
     public void save() {
         TriggerFlowEntity entity = buildEntity(buildTriggerFlowDTO());
         Long id = flowManagementService.saveFlow(entity);
-        TriggerFlowEntity triggerFlow = triggerFlowRepository.findOne(id);
+        TriggerFlowEntity triggerFlow = triggerFlowRepository.findById(id).get();
         Assert.assertEquals(entity.getName(), triggerFlow.getName());
     }
 
@@ -93,8 +93,8 @@ public class FlowManagementServiceTest {
         copyFlow.setId(4L);
         copyFlow.setName("new flow from 4L");
         Long id = flowManagementService.copyFlow(copyFlow);
-        TriggerFlowEntity origin = flowRepository.findOne(4L);
-        TriggerFlowEntity copy = flowRepository.findOne(id);
+        TriggerFlowEntity origin = flowRepository.findById(4L).get();
+        TriggerFlowEntity copy = flowRepository.findById(id).get();
         Assert.assertEquals(origin.getPipeline(), copy.getPipeline());
     }
 
@@ -127,7 +127,7 @@ public class FlowManagementServiceTest {
     @Test
     public void getById() {
         TriggerFlowDTO flow = flowManagementService.getById(4L);
-        TriggerFlowEntity entity = triggerFlowRepository.findOne(4L);
+        TriggerFlowEntity entity = triggerFlowRepository.findById(4L).get();
         Assert.assertEquals(flow.getName(), entity.getName());
     }
 
@@ -176,7 +176,7 @@ public class FlowManagementServiceTest {
         TriggerFlowEntity flowEntity;
         Long id = model.getId();
         if (id != null) {
-            flowEntity = flowRepository.findOne(id);
+            flowEntity = flowRepository.findById(id).get();
         } else {
             flowEntity = new TriggerFlowEntity();
         }

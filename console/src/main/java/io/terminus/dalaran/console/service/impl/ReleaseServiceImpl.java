@@ -91,25 +91,25 @@ public class ReleaseServiceImpl implements ReleaseService {
         releaseRecordRepository.save(recordEntity);
 
         List<TriggerFlowReleasedEntity> releasedTriggerFlowEntities = toReleasedData(triggerFlowRepository.findAll(), TriggerFlowReleasedEntity.class, requestDTO.getVersion());
-        triggerFlowReleasedRepository.save(releasedTriggerFlowEntities);
+        triggerFlowReleasedRepository.saveAll(releasedTriggerFlowEntities);
 
         List<SubFlowReleasedEntity> releasedSubFlowEntities = toReleasedData(subFlowRepository.findAll(), SubFlowReleasedEntity.class, requestDTO.getVersion());
-        subFlowReleasedRepository.save(releasedSubFlowEntities);
+        subFlowReleasedRepository.saveAll(releasedSubFlowEntities);
 
         List<ModelReleasedEntity> releasedModelEntities = toReleasedData(modelRepository.findAll(), ModelReleasedEntity.class, requestDTO.getVersion());
-        modelReleasedRepository.save(releasedModelEntities);
+        modelReleasedRepository.saveAll(releasedModelEntities);
 
         List<ConnectorReleasedEntity> releasedConnectorEntities = toReleasedData(connectorRepository.findAll(), ConnectorReleasedEntity.class, requestDTO.getVersion());
-        connectorReleasedRepository.save(releasedConnectorEntities);
+        connectorReleasedRepository.saveAll(releasedConnectorEntities);
 
         List<PropertyReleasedEntity> releasedPropertyEntities = toReleasedData(propertyRepository.findAll(), PropertyReleasedEntity.class, requestDTO.getVersion());
-        propertyReleasedRepository.save(releasedPropertyEntities);
+        propertyReleasedRepository.saveAll(releasedPropertyEntities);
 
         List<FunctionReleasedEntity> releasedFunctionEntities = toReleasedData(functionRepository.findAll(), FunctionReleasedEntity.class, requestDTO.getVersion());
-        functionReleasedRepository.save(releasedFunctionEntities);
+        functionReleasedRepository.saveAll(releasedFunctionEntities);
 
         List<ClientReleasedEntity> releasedClientEntities = toReleasedData(clientRepository.findAll(), ClientReleasedEntity.class, requestDTO.getVersion());
-        clientReleasedRepository.save(releasedClientEntities);
+        clientReleasedRepository.saveAll(releasedClientEntities);
 
         return toDTO(recordEntity);
     }

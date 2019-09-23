@@ -54,7 +54,7 @@ public class ServiceManagementServiceTest {
     public void create() {
         ServiceDTO service = buildService();
         Long id = serviceManagement.create(service);
-        ServiceEntity entity = serviceRepository.findOne(id);
+        ServiceEntity entity = serviceRepository.findById(id).get();
         Assert.assertEquals(service.getName(), entity.getName());
     }
 
@@ -75,7 +75,7 @@ public class ServiceManagementServiceTest {
     @Test
     public void detail() {
         ServiceDTO service = serviceManagement.detail(1L);
-        ServiceEntity entity = serviceRepository.findOne(1L);
+        ServiceEntity entity = serviceRepository.findById(1L).get();
         Assert.assertEquals(service.getName(), entity.getName());
     }
 

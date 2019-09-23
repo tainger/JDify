@@ -36,7 +36,7 @@ public class ConnectorManagementServiceTest {
     public void create() {
         ConnectorDTO connector = buildConnector();
         Long id = connectorService.create(connector);
-        ConnectorEntity entity = connectorRepository.findOne(id);
+        ConnectorEntity entity = connectorRepository.findById(id).get();
         Assert.assertEquals(connector.getName(), entity.getName());
     }
 
@@ -51,7 +51,7 @@ public class ConnectorManagementServiceTest {
     @Test
     public void detail() {
         ConnectorDTO connector = connectorService.detail(1L);
-        ConnectorEntity entity = connectorRepository.findOne(1L);
+        ConnectorEntity entity = connectorRepository.findById(1L).get();
         Assert.assertEquals(connector.getName(), entity.getName());
     }
 

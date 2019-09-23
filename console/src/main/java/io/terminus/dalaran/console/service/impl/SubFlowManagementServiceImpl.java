@@ -61,7 +61,7 @@ public class SubFlowManagementServiceImpl implements SubFlowManagementService {
 
     @Override
     public void deleteFlow(Long flowId) {
-        subFlowRepository.delete(flowId);
+        subFlowRepository.deleteById(flowId);
     }
 
     @Override
@@ -94,7 +94,7 @@ public class SubFlowManagementServiceImpl implements SubFlowManagementService {
     @Nullable
     @Override
     public SubFlowDTO getById(Long flowId) {
-        SubFlowEntity flowEntity = subFlowRepository.findOne(flowId);
+        SubFlowEntity flowEntity = subFlowRepository.findById(flowId).get();
         if (flowEntity == null) {
             return null;
         }
@@ -103,7 +103,7 @@ public class SubFlowManagementServiceImpl implements SubFlowManagementService {
 
     @Override
     public Long copyFlow(CopyFlow copyFlow) {
-        SubFlowEntity flowEntity = subFlowRepository.findOne(copyFlow.getId());
+        SubFlowEntity flowEntity = subFlowRepository.findById(copyFlow.getId()).get();
         if (flowEntity == null) {
             return null;
         }
@@ -150,7 +150,7 @@ public class SubFlowManagementServiceImpl implements SubFlowManagementService {
         SubFlowEntity flowEntity;
         Long id = model.getId();
         if (id != null) {
-            flowEntity = subFlowRepository.findOne(id);
+            flowEntity = subFlowRepository.findById(id).get();
         } else {
             flowEntity = new SubFlowEntity();
         }

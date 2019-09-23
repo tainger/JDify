@@ -77,7 +77,7 @@ public class ModelManagementServiceImpl implements ModelManagementService {
 
     @Override
     public void deleteModel(Long modelId) {
-        modelRepository.delete(modelId);
+        modelRepository.deleteById(modelId);
     }
 
     @Override
@@ -130,7 +130,7 @@ public class ModelManagementServiceImpl implements ModelManagementService {
 
     @Override
     public ModelEntity getById(Long modelId) {
-        return modelRepository.findOne(modelId);
+        return modelRepository.findById(modelId).get();
     }
 
     @Override
@@ -144,7 +144,7 @@ public class ModelManagementServiceImpl implements ModelManagementService {
             Map<String, ModelField> fields = ExcelUtils.parseFirstSheet(file.getInputStream());
             JsonSchema schema = new JsonSchema();
             schema.setFields(fields);
-            ModelEntity model = modelRepository.findOne(id);
+            ModelEntity model = modelRepository.findById(id).get();
             model.setModelSchema(JSON.toJSONString(schema));
             modelRepository.save(model);
             return schema;
@@ -191,7 +191,7 @@ public class ModelManagementServiceImpl implements ModelManagementService {
         }
         JsonSchema schema = new JsonSchema();
         schema.setFields(root);
-        ModelEntity model = modelRepository.findOne(id);
+        ModelEntity model = modelRepository.findById(id).get();
         model.setModelSchema(JSON.toJSONString(schema));
         modelRepository.save(model);
         return schema;
@@ -199,7 +199,7 @@ public class ModelManagementServiceImpl implements ModelManagementService {
 
     @Override
     public ObjectSchema importDalaranSchema(ObjectSchema schema, Long id) {
-        ModelEntity model = modelRepository.findOne(id);
+        ModelEntity model = modelRepository.findById(id).get();
         model.setModelSchema(JSON.toJSONString(schema));
         modelRepository.save(model);
         return schema;
@@ -218,11 +218,11 @@ public class ModelManagementServiceImpl implements ModelManagementService {
 
     @Override
     public Map<String, SimpleMapping> suggestMapping(Long sourceId, Long targetId) {
-        ModelEntity sourceEntity = modelRepository.findOne(sourceId);
+        ModelEntity sourceEntity = modelRepository.findById(sourceId).get();
         Class<? extends DalaranModelSchema> sourceSchemaType = dalaranContext.getDalaranConverterContext().getSchemaType(sourceEntity.getType());
         DalaranModelSchema sourceModelSchema = JSON.parseObject(sourceEntity.getModelSchema(), sourceSchemaType);
 
-        ModelEntity targetEntity = modelRepository.findOne(targetId);
+        ModelEntity targetEntity = modelRepository.findById(targetId).get();
         Class<? extends DalaranModelSchema> targetSchemaType = dalaranContext.getDalaranConverterContext().getSchemaType(targetEntity.getType());
         DalaranModelSchema targetModelSchema = JSON.parseObject(targetEntity.getModelSchema(), targetSchemaType);
         Map<String, SimpleMapping> mappings = new HashMap<>();
@@ -385,7 +385,7 @@ public class ModelManagementServiceImpl implements ModelManagementService {
         if (id == null) {
             modelEntity = new ModelEntity();
         } else {
-            modelEntity = modelRepository.findOne(id);
+            modelEntity = modelRepository.findById(id).get();
         }
         String name = model.getName();
         if (StringUtils.isNoneBlank(name)) {
@@ -434,7 +434,7 @@ public class ModelManagementServiceImpl implements ModelManagementService {
         Map<String, ClassificationModel> classificationModels = new HashMap<>();
         models.forEach(model -> {
             if (model.getTargetType() == ModelTargetType.Service && model.getTargetId() != null) {
-                ServiceEntity serviceEntity = serviceRepository.findOne(Long.valueOf(model.getTargetId()));
+                ServiceEntity serviceEntity = serviceRepository.findById(Long.valueOf(model.getTargetId())).get();
                 String serviceName = serviceEntity.getName();
                 ClassificationModel classificationModel = classificationModels.containsKey(serviceName) ? new ClassificationModel() : classificationModels.get(serviceName);
                 List<ModelDTO> modelList = CollectionUtils.isEmpty(classificationModel.getModels()) ? new ArrayList<>() : classificationModel.getModels();

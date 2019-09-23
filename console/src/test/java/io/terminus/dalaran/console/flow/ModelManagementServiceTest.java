@@ -52,7 +52,7 @@ public class ModelManagementServiceTest {
         model.setModelType(BodyType.JSON);
         model.setModuleId(1L);
         Long id = modelManagementService.createModel(model);
-        ModelEntity entity = modelRepository.findOne(id);
+        ModelEntity entity = modelRepository.findById(id).get();
         Assert.assertEquals(entity.getName(), model.getName());
     }
 

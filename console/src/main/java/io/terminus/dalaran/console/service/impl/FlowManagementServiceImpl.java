@@ -259,7 +259,7 @@ public class FlowManagementServiceImpl implements FlowManagementService {
 
     @Override
     public void deleteFlow(Long flowId) {
-        flowRepository.delete(flowId);
+        flowRepository.deleteById(flowId);
     }
 
     @Override
@@ -302,7 +302,7 @@ public class FlowManagementServiceImpl implements FlowManagementService {
     @Nullable
     @Override
     public TriggerFlowDTO getById(Long flowId) {
-        TriggerFlowEntity flowEntity = flowRepository.findOne(flowId);
+        TriggerFlowEntity flowEntity = flowRepository.findById(flowId).get();
         if (flowEntity == null) {
             return null;
         }
@@ -311,7 +311,7 @@ public class FlowManagementServiceImpl implements FlowManagementService {
 
     @Override
     public Long copyFlow(CopyFlow copyFlow) {
-        TriggerFlowEntity flowEntity = flowRepository.findOne(copyFlow.getId());
+        TriggerFlowEntity flowEntity = flowRepository.findById(copyFlow.getId()).get();
         if (flowEntity == null) {
             return null;
         }
@@ -356,7 +356,7 @@ public class FlowManagementServiceImpl implements FlowManagementService {
         TriggerFlowEntity flowEntity;
         Long id = triggerFlow.getId();
         if (id != null) {
-            flowEntity = flowRepository.findOne(id);
+            flowEntity = flowRepository.findById(id).get();
         } else {
             flowEntity = new TriggerFlowEntity();
         }

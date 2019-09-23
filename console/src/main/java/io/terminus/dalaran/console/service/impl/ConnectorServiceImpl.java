@@ -43,12 +43,12 @@ public class ConnectorServiceImpl implements ConnectorService {
 
     @Override
     public void delete(Long connectorId) {
-        connectorRepository.delete(connectorId);
+        connectorRepository.deleteById(connectorId);
     }
 
     @Override
     public ConnectorDTO detail(Long connectorId) {
-        ConnectorEntity entity = connectorRepository.findOne(connectorId);
+        ConnectorEntity entity = connectorRepository.findById(connectorId).get();
         if (entity != null) {
             return toDTO(entity);
         }

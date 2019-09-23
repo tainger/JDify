@@ -71,12 +71,12 @@ public class ServiceManagementImpl implements ServiceManagement {
 
     @Override
     public void delete(Long serviceId) {
-        serviceRepository.delete(serviceId);
+        serviceRepository.deleteById(serviceId);
     }
 
     @Override
     public ServiceDTO detail(Long serviceId) {
-        return toDTO(serviceRepository.findOne(serviceId));
+        return toDTO(serviceRepository.findById(serviceId).get());
     }
 
     @Override
@@ -86,7 +86,7 @@ public class ServiceManagementImpl implements ServiceManagement {
 
     @Override
     public List<String> listOperation(Long serviceId) {
-        ServiceEntity entity = serviceRepository.findOne(serviceId);
+        ServiceEntity entity = serviceRepository.findById(serviceId).get();
         ServiceInfo serviceInfo = serviceContext.getServiceInfo(entity.getType());
         Object serviceConfig = JSON.parseObject(entity.getServiceConfig(), serviceInfo.getServiceConfigType());
         return serviceContext.getService(entity.getType()).operations(serviceConfig);

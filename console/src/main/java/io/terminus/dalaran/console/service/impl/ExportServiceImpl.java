@@ -87,16 +87,16 @@ public class ExportServiceImpl implements ExportService {
     public void importAll(ExportData exportData) {
         truncateTable();
 
-        moduleRepository.save(exportData.getModules());
-        modelRepository.save(exportData.getModels());
-        triggerFlowRepository.save(exportData.getTriggerFlows());
-        subFlowRepository.save(exportData.getSubFlows());
-        serviceRepository.save(exportData.getServices());
-        functionRepository.save(exportData.getFunctions());
-        connectorRepository.save(exportData.getConnectors());
-        clientRepository.save(exportData.getClients());
-        propertyRepository.save(exportData.getProperties());
-        trantorRepository.save(exportData.getTrantorEntities());
+        moduleRepository.saveAll(exportData.getModules());
+        modelRepository.saveAll(exportData.getModels());
+        triggerFlowRepository.saveAll(exportData.getTriggerFlows());
+        subFlowRepository.saveAll(exportData.getSubFlows());
+        serviceRepository.saveAll(exportData.getServices());
+        functionRepository.saveAll(exportData.getFunctions());
+        connectorRepository.saveAll(exportData.getConnectors());
+        clientRepository.saveAll(exportData.getClients());
+        propertyRepository.saveAll(exportData.getProperties());
+        trantorRepository.saveAll(exportData.getTrantorEntities());
 
         // load test flow
         testFlowInitializer.loadResources();
@@ -152,7 +152,7 @@ public class ExportServiceImpl implements ExportService {
     private List<ApiInfo> getExportApiInfoList() {
         List<TriggerFlowEntity> restFlowList = triggerFlowRepository.findByStatusNotAndTriggerType(FlowStatus.Error, "http-rest-listener");
         return restFlowList.stream().map(flowEntity -> {
-            ModuleEntity module = moduleRepository.findOne(flowEntity.getModuleId());
+            ModuleEntity module = moduleRepository.findById(flowEntity.getModuleId()).get();
             RestConfig restConfig = JSON.parseObject(flowEntity.getTriggerConfig(), RestConfig.class);
             DalaranModelSchema inSchema = getModelSchema(flowEntity.getInModel());
             DalaranModelSchema outSchema = getModelSchema(flowEntity.getOutModel());
@@ -163,7 +163,7 @@ public class ExportServiceImpl implements ExportService {
     private List<SoapApiInfo> getExportSoapListeners() {
         List<TriggerFlowEntity> soapFlowList = triggerFlowRepository.findByStatusNotAndTriggerType(FlowStatus.Error, "soap-listener");
         return soapFlowList.stream().map(flowEntity -> {
-            ModuleEntity module = moduleRepository.findOne(flowEntity.getModuleId());
+            ModuleEntity module = moduleRepository.findById(flowEntity.getModuleId()).get();
             SoapListenerConfig soapListenerConfig = JSON.parseObject(flowEntity.getTriggerConfig(), SoapListenerConfig.class);
             SoapModel inModel = getSoapModel(flowEntity.getInModel());
             SoapModel outModel = getSoapModel(flowEntity.getOutModel());
@@ -173,12 +173,12 @@ public class ExportServiceImpl implements ExportService {
 
     private SoapModel getSoapModel(Long modelId) {
         DalaranModelSchema schema = getModelSchema(modelId);
-        String name = modelRepository.findOne(modelId).getName();
+        String name = modelRepository.findById(modelId).get().getName();
         return new SoapModel(name, schema);
     }
 
     private DalaranModelSchema getModelSchema(Long modelId) {
-        ModelEntity modelEntity = modelRepository.findOne(modelId);
+        ModelEntity modelEntity = modelRepository.findById(modelId).get();
         Class<? extends DalaranModelSchema> schemaType = converterContext.getSchemaType(modelEntity.getType());
         return JSON.parseObject(modelEntity.getModelSchema(), schemaType);
     }

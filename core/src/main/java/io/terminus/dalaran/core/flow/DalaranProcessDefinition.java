@@ -44,6 +44,11 @@ public class DalaranProcessDefinition extends NoOutputDefinition<ProcessDefiniti
     }
 
     @Override
+    public String getShortName() {
+        return toString();
+    }
+
+    @Override
     public String getLabel() {
         return toString();
     }

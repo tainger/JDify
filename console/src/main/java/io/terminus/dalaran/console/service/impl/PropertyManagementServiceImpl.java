@@ -40,7 +40,7 @@ public class PropertyManagementServiceImpl implements PropertyManagementService 
 
     @Override
     public void deleteProperty(Long id) {
-        propertyRepository.delete(id);
+        propertyRepository.deleteById(id);
     }
 
     @Override
@@ -78,7 +78,7 @@ public class PropertyManagementServiceImpl implements PropertyManagementService 
         if (id == null) {
             propertyEntity = new PropertyEntity();
         } else {
-            propertyEntity = propertyRepository.findOne(id);
+            propertyEntity = propertyRepository.findById(id).get();
         }
         String name = model.getName();
         if (StringUtils.isNoneBlank(name)) {
