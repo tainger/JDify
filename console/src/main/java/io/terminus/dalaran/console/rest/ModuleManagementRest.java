@@ -1,13 +1,12 @@
 package io.terminus.dalaran.console.rest;
 
 import io.swagger.annotations.ApiOperation;
-import io.terminus.common.model.Response;
+import io.terminus.dalaran.console.ResponseMessage;
 import io.terminus.dalaran.console.exception.DalaranException;
-import io.terminus.dalaran.console.model.ResponseMessage;
-import io.terminus.dalaran.console.model.dto.ModuleDTO;
-import io.terminus.dalaran.console.model.dto.ModuleDetailDTO;
-import io.terminus.dalaran.console.model.query.ModuleQuery;
 import io.terminus.dalaran.console.service.ModuleManagementService;
+import io.terminus.dalaran.model.dto.ModuleDTO;
+import io.terminus.dalaran.model.dto.ModuleDetailDTO;
+import io.terminus.dalaran.model.query.ModuleQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

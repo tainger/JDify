@@ -25,8 +25,28 @@
 
     <dependencies>
         <dependency>
+            <groupId>com.fasterxml.jackson.dataformat</groupId>
+            <artifactId>jackson-dataformat-xml</artifactId>
+            <version>2.9.6</version>
+        </dependency>
+        <dependency>
+            <groupId>com.predic8</groupId>
+            <artifactId>soa-model-core</artifactId>
+            <version>1.6.0</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.5</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.camel</groupId>
+            <artifactId>camel-fastjson</artifactId>
+            <version>${camel.version}</version>
+        </dependency>
+        <dependency>
             <groupId>io.terminus</groupId>
-            <artifactId>dalaran-common</artifactId>
+            <artifactId>dalaran-model</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

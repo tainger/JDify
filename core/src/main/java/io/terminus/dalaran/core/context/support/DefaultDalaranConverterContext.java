@@ -1,13 +1,13 @@
 package io.terminus.dalaran.core.context.support;
 
 import io.terminus.dalaran.core.context.DalaranConverterContext;
+import io.terminus.dalaran.core.converter.DalaranConverter;
+import io.terminus.dalaran.core.converter.JsonConverter;
+import io.terminus.dalaran.core.converter.XMLConverter;
+import io.terminus.dalaran.core.converter.soap.SoapConverter;
 import io.terminus.dalaran.model.BodyType;
-import io.terminus.dalaran.model.DalaranConverter;
 import io.terminus.dalaran.model.DalaranModelSchema;
 import io.terminus.dalaran.model.MessageModel;
-import io.terminus.dalaran.model.converter.JsonConverter;
-import io.terminus.dalaran.model.converter.XMLConverter;
-import io.terminus.dalaran.model.converter.soap.SoapConverter;
 import io.terminus.dalaran.model.schema.JsonSchema;
 import io.terminus.dalaran.model.schema.ObjectSchema;
 import io.terminus.dalaran.model.schema.SoapSchema;

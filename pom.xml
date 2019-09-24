@@ -22,6 +22,8 @@
         <module>runtime</module>
         <module>sdk</module>
         <module>common</module>
+        <module>api</module>
+        <module>model</module>
     </modules>
 
     <properties>

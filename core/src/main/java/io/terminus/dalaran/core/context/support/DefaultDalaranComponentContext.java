@@ -1,12 +1,12 @@
 package io.terminus.dalaran.core.context.support;
 
-import io.terminus.dalaran.core.component.ComponentType;
+import io.terminus.dalaran.ComponentType;
+import io.terminus.dalaran.config.*;
 import io.terminus.dalaran.core.component.DalaranProcessor;
 import io.terminus.dalaran.core.component.DalaranTrigger;
 import io.terminus.dalaran.core.component.annotation.Processor;
 import io.terminus.dalaran.core.component.annotation.Trigger;
 import io.terminus.dalaran.core.component.config.ConnectorConfig;
-import io.terminus.dalaran.core.config.*;
 import io.terminus.dalaran.core.context.DalaranComponentContext;
 import io.terminus.dalaran.core.util.ConfigFieldUtils;
 import lombok.extern.slf4j.Slf4j;

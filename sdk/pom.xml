@@ -14,8 +14,13 @@
     <dependencies>
         <dependency>
             <groupId>io.terminus</groupId>
-            <artifactId>dalaran-common</artifactId>
+            <artifactId>dalaran-model</artifactId>
             <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.camel</groupId>
+            <artifactId>camel-fastjson</artifactId>
+            <version>${camel.version}</version>
         </dependency>
         <dependency>
             <groupId>com.squareup.okhttp3</groupId>

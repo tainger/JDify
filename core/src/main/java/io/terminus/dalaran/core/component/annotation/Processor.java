@@ -1,6 +1,6 @@
 package io.terminus.dalaran.core.component.annotation;
 
-import io.terminus.dalaran.core.component.BodySerializeType;
+import io.terminus.dalaran.BodySerializeType;
 import io.terminus.dalaran.model.BodyType;
 import org.springframework.stereotype.Component;
 

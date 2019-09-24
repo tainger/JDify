@@ -19,7 +19,6 @@ import io.terminus.dalaran.model.BodyType;
 import io.terminus.dalaran.model.FieldType;
 import io.terminus.dalaran.model.MessageModel;
 import io.terminus.dalaran.model.ModelField;
-import io.terminus.dalaran.model.component.ServiceOperation;
 import io.terminus.dalaran.model.schema.JsonSchema;
 import io.terminus.dalaran.service.soap.SoapService;
 import org.apache.camel.builder.Builder;

@@ -1,5 +1,8 @@
 package io.terminus.dalaran.console;
 
+import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.alibaba.fastjson.support.config.FastJsonConfig;
+import com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter;
 import io.terminus.dalaran.console.log.DeleteLogRetentionPolicy;
 import io.terminus.dalaran.console.log.LogRetentionPolicy;
 import io.terminus.dalaran.console.log.LogRetentionPolicyExecutor;
@@ -7,15 +10,16 @@ import io.terminus.dalaran.core.log.DalaranTraceLogger;
 import io.terminus.dalaran.core.resource.repository.TracingLogRepository;
 import io.terminus.dalaran.core.spring.DalaranAutoConfiguration;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.boot.autoconfigure.http.HttpMessageConverters;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
@@ -53,5 +57,15 @@ public class DalaranConsoleConfigure {
     @ConditionalOnBean(LogRetentionPolicy.class)
     public LogRetentionPolicyExecutor logRetentionPolicyExecutor(LogRetentionPolicy logRetentionPolicy) {
         return new LogRetentionPolicyExecutor(logRetentionPolicy);
+    }
+
+    @Bean
+    public HttpMessageConverters fastJsonHttpMessageConverters() {
+        FastJsonHttpMessageConverter fastConverter = new FastJsonHttpMessageConverter();
+        FastJsonConfig fastJsonConfig = new FastJsonConfig();
+        fastJsonConfig.setSerializerFeatures(SerializerFeature.PrettyFormat);
+        fastConverter.setFastJsonConfig(fastJsonConfig);
+        HttpMessageConverter<?> converter = fastConverter;
+        return new HttpMessageConverters(converter);
     }
 }

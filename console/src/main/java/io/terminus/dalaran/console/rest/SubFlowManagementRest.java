@@ -1,26 +1,27 @@
 package io.terminus.dalaran.console.rest;
 
-import io.swagger.annotations.ApiOperation;
-import io.terminus.common.model.Response;
+import io.terminus.dalaran.api.rest.SubFlowRestAPI;
+import io.terminus.dalaran.console.ResponseMessage;
 import io.terminus.dalaran.console.exception.DalaranException;
-import io.terminus.dalaran.console.model.ResponseMessage;
-import io.terminus.dalaran.console.model.TestRequestDTO;
-import io.terminus.dalaran.console.model.dto.CopyFlow;
-import io.terminus.dalaran.console.model.dto.flow.SubFlowDTO;
-import io.terminus.dalaran.console.model.dto.log.MainLogDTO;
-import io.terminus.dalaran.console.model.query.FlowQuery;
 import io.terminus.dalaran.console.service.SubFlowManagementService;
 import io.terminus.dalaran.console.service.TracingLogService;
 import io.terminus.dalaran.core.context.DalaranContext;
+import io.terminus.dalaran.model.dto.CopyFlow;
+import io.terminus.dalaran.model.dto.TestRequestDTO;
+import io.terminus.dalaran.model.dto.flow.SubFlowDTO;
+import io.terminus.dalaran.model.dto.log.MainLogDTO;
 import io.terminus.dalaran.model.flow.FlowValidation;
+import io.terminus.dalaran.model.query.FlowQuery;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/sub-flow")
-public class SubFlowManagementRest {
+public class SubFlowManagementRest implements SubFlowRestAPI {
 
     @Autowired
     private SubFlowManagementService service;
@@ -31,64 +32,58 @@ public class SubFlowManagementRest {
     @Autowired
     private DalaranContext dalaranContext;
 
-    @ApiOperation(value = "创建子流程")
-    @PostMapping(value = "/create")
+    @Override
     @DalaranException(value = ResponseMessage.SUBFLOW_CREATE_ERROR)
     public Long create(@RequestBody SubFlowDTO model) {
         return service.createFlow(model);
     }
 
-    @ApiOperation(value = "更新子流程")
-    @PostMapping(value = "/update")
+    @Override
     @DalaranException(value = ResponseMessage.SUBFLOW_UPDATE_ERROR)
     public SubFlowDTO update(@RequestBody SubFlowDTO model) {
         return service.updateFlow(model);
     }
 
-    @ApiOperation(value = "删除子流程")
-    @DeleteMapping(value = "/delete")
+    @Override
     @DalaranException(value = ResponseMessage.SUBFLOW_DELETE_ERROR)
     public void delete(@RequestParam Long id) {
         service.deleteFlow(id);
     }
 
-    @ApiOperation(value = "复制子流程")
-    @PostMapping(value = "/copy")
+    @Override
     @DalaranException(value = ResponseMessage.SUBFLOW_COPY_ERROR)
     public Long copy(@RequestBody CopyFlow copyFlow) {
         return service.copyFlow(copyFlow);
     }
 
-    @ApiOperation(value = "根据 ID 获取子流程")
-    @GetMapping(value = "/{id}")
+    @Override
     @DalaranException(value = ResponseMessage.SUBFLOW_QUERY_ERROR)
     public SubFlowDTO getById(@PathVariable Long id) {
         return service.getById(id);
     }
 
-    @ApiOperation(value = "条件查询子流程")
-    @GetMapping(value = "/query")
+    @Override
     @DalaranException(value = ResponseMessage.SUBFLOW_QUERY_ERROR)
     public List<SubFlowDTO> query(FlowQuery query) {
         return service.queryFlows(query);
     }
 
-    @ApiOperation(value = "全量查询子流程")
-    @GetMapping(value = "/list")
+
+    @Override
     @DalaranException(value = ResponseMessage.SUBFLOW_QUERY_ERROR)
     public List<SubFlowDTO> list() {
         return service.list();
     }
 
-    @ApiOperation(value = "检查子流程")
-    @PostMapping(value = "/validate")
+
+    @Override
     @DalaranException(value = ResponseMessage.SUBFLOW_CHECK_ERROR)
     public List<FlowValidation> validate(@RequestBody SubFlowDTO model) {
         return service.validateFlow(model);
     }
 
-    @ApiOperation(value = "测试子流程")
-    @PostMapping("/test")
+
+    @Override
     @DalaranException(value = ResponseMessage.SUBFLOW_TEST_ERROR)
     public MainLogDTO doSubFlowTest(@RequestBody TestRequestDTO request) {
         SubFlowDTO flow = service.getById(request.getFlowId());

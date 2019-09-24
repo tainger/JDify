@@ -1,15 +1,15 @@
 package io.terminus.dalaran.console.service;
 
 import io.terminus.dalaran.console.entity.TriggerFlowEntity;
-import io.terminus.dalaran.console.model.dto.CopyFlow;
-import io.terminus.dalaran.console.model.dto.ImportFlowResult;
-import io.terminus.dalaran.console.model.dto.ImportProcessorDTO;
-import io.terminus.dalaran.console.model.dto.ImportProcessorResult;
-import io.terminus.dalaran.console.model.dto.basic.BasicFlowInfo;
-import io.terminus.dalaran.console.model.dto.flow.ImportFlowDTO;
-import io.terminus.dalaran.console.model.dto.flow.TriggerFlowDTO;
-import io.terminus.dalaran.console.model.query.FlowQuery;
+import io.terminus.dalaran.model.dto.CopyFlow;
+import io.terminus.dalaran.model.dto.ImportFlowResult;
+import io.terminus.dalaran.model.dto.ImportProcessorDTO;
+import io.terminus.dalaran.model.dto.ImportProcessorResult;
+import io.terminus.dalaran.model.dto.basic.BasicFlowInfo;
+import io.terminus.dalaran.model.dto.flow.ImportFlowDTO;
+import io.terminus.dalaran.model.dto.flow.TriggerFlowDTO;
 import io.terminus.dalaran.model.flow.FlowValidation;
+import io.terminus.dalaran.model.query.FlowQuery;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;

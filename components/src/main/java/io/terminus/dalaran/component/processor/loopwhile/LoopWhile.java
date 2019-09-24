@@ -1,10 +1,10 @@
 package io.terminus.dalaran.component.processor.loopwhile;
 
-import io.terminus.dalaran.core.component.BodySerializeType;
+import io.terminus.dalaran.BodySerializeType;
+import io.terminus.dalaran.config.ProcessorInfo;
 import io.terminus.dalaran.core.component.DalaranProcessor;
 import io.terminus.dalaran.core.component.DalaranProcessorConfigCustomConverter;
 import io.terminus.dalaran.core.component.annotation.Processor;
-import io.terminus.dalaran.core.config.ProcessorInfo;
 import io.terminus.dalaran.core.context.DalaranContext;
 import io.terminus.dalaran.core.flow.DalaranRoute;
 import io.terminus.dalaran.core.resource.DalaranResourceBuilder;

@@ -2,8 +2,8 @@ package io.terminus.dalaran.component.trigger.rocketmq;
 
 import com.alibaba.fastjson.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.terminus.dalaran.FieldInputType;
 import io.terminus.dalaran.component.processor.rocketmq.RocketMQConnector;
-import io.terminus.dalaran.core.component.FieldInputType;
 import io.terminus.dalaran.core.component.annotation.ConfigFieldInfo;
 import lombok.Data;
 

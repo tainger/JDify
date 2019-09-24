@@ -5,12 +5,6 @@ import io.terminus.dalaran.console.TestFlowInitializer;
 import io.terminus.dalaran.console.convertor.FlowConvertor;
 import io.terminus.dalaran.console.entity.ModelEntity;
 import io.terminus.dalaran.console.entity.TriggerFlowEntity;
-import io.terminus.dalaran.console.model.ModelImportMode;
-import io.terminus.dalaran.console.model.dto.*;
-import io.terminus.dalaran.console.model.dto.basic.BasicFlowInfo;
-import io.terminus.dalaran.console.model.dto.flow.ImportFlowDTO;
-import io.terminus.dalaran.console.model.dto.flow.TriggerFlowDTO;
-import io.terminus.dalaran.console.model.query.FlowQuery;
 import io.terminus.dalaran.console.repository.ModelRepository;
 import io.terminus.dalaran.console.repository.PropertyRepository;
 import io.terminus.dalaran.console.repository.TriggerFlowRepository;
@@ -22,10 +16,16 @@ import io.terminus.dalaran.core.flow.DalaranFlowBuilder;
 import io.terminus.dalaran.core.resource.DalaranResourceBuilder;
 import io.terminus.dalaran.core.resource.entity.common.ProcessorEntity;
 import io.terminus.dalaran.core.resource.repository.ModuleRepository;
+import io.terminus.dalaran.model.ModelImportMode;
+import io.terminus.dalaran.model.dto.*;
+import io.terminus.dalaran.model.dto.basic.BasicFlowInfo;
+import io.terminus.dalaran.model.dto.flow.ImportFlowDTO;
+import io.terminus.dalaran.model.dto.flow.TriggerFlowDTO;
 import io.terminus.dalaran.model.flow.FlowStatus;
 import io.terminus.dalaran.model.flow.FlowValidation;
 import io.terminus.dalaran.model.flow.TriggerFlow;
 import io.terminus.dalaran.model.flow.ValidateMessageLevel;
+import io.terminus.dalaran.model.query.FlowQuery;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
@@ -36,9 +36,6 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.util.*;
 import java.util.stream.Collectors;
-
-import static io.terminus.dalaran.console.model.ModelImportMode.Overwrite;
-import static io.terminus.dalaran.console.model.ModelImportMode.Rename;
 
 @Service
 @Transactional
@@ -244,11 +241,11 @@ public class FlowManagementServiceImpl implements FlowManagementService {
         ModelEntity outModelEntity = modelRepository.findByModuleIdAndModelKey(model.getModuleId(), model.getModelKey());
         if (outModelEntity == null) {
             return modelService.createModel(model);
-        } else if (importMode == Overwrite) {
+        } else if (importMode == ModelImportMode.Overwrite) {
             model.setId(outModelEntity.getId());
             modelService.updateModel(model);
             return model.getId();
-        } else if (importMode == Rename) {
+        } else if (importMode == ModelImportMode.Rename) {
             String randomId = RandomStringUtils.randomAlphanumeric(6);
             model.setName(model.getName() + "-" + randomId);
             model.setModelKey(model.getModelKey() + "-" + randomId);

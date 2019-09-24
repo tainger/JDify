@@ -1,8 +1,8 @@
 package io.terminus.dalaran.console.flow;
 
-import io.terminus.dalaran.console.model.ReleaseRequestDTO;
-import io.terminus.dalaran.console.model.dto.ReleaseRecordDTO;
 import io.terminus.dalaran.console.service.ReleaseService;
+import io.terminus.dalaran.model.dto.ReleaseRecordDTO;
+import io.terminus.dalaran.model.dto.ReleaseRequestDTO;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;

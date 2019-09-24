@@ -1,11 +1,11 @@
 package io.terminus.dalaran.console.flow;
 
-import io.terminus.dalaran.console.model.dto.ModuleDTO;
-import io.terminus.dalaran.console.model.dto.ModuleDetailDTO;
-import io.terminus.dalaran.console.model.query.ModuleQuery;
 import io.terminus.dalaran.console.service.ModuleManagementService;
 import io.terminus.dalaran.core.resource.entity.common.ModuleEntity;
 import io.terminus.dalaran.core.resource.repository.ModuleRepository;
+import io.terminus.dalaran.model.dto.ModuleDTO;
+import io.terminus.dalaran.model.dto.ModuleDetailDTO;
+import io.terminus.dalaran.model.query.ModuleQuery;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;

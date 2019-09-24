@@ -1,10 +1,10 @@
 package io.terminus.dalaran.console.service.impl;
 
 import io.terminus.dalaran.console.entity.ClientEntity;
-import io.terminus.dalaran.console.model.dto.ClientDTO;
-import io.terminus.dalaran.console.model.dto.basic.BasicClientInfo;
 import io.terminus.dalaran.console.repository.ClientRepository;
 import io.terminus.dalaran.console.service.ClientManagementService;
+import io.terminus.dalaran.model.dto.ClientDTO;
+import io.terminus.dalaran.model.dto.basic.BasicClientInfo;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

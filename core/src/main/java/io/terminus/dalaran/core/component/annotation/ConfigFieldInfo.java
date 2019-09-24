@@ -1,6 +1,6 @@
 package io.terminus.dalaran.core.component.annotation;
 
-import io.terminus.dalaran.core.component.FieldInputType;
+import io.terminus.dalaran.FieldInputType;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

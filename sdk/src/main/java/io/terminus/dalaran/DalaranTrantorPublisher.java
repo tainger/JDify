@@ -2,7 +2,6 @@ package io.terminus.dalaran;
 
 import com.alibaba.fastjson.JSON;
 import io.terminus.dalaran.model.trantor.DalaranTrantorModule;
-import lombok.extern.log4j.Log4j;
 import okhttp3.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -10,7 +9,6 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
-@Log4j
 @Component
 public class DalaranTrantorPublisher {
 
@@ -25,10 +23,10 @@ public class DalaranTrantorPublisher {
                 .build();
         Call call = okHttpClient.newCall(request);
         Response response = call.execute();
-        if (response.isSuccessful()) {
-            log.info("Publish dalaran integration info");
-        } else {
-            log.error("Publish dalaran integration info fail, message: " + response.message());
-        }
+//        if (response.isSuccessful()) {
+//            log.info("Publish dalaran integration info");
+//        } else {
+//            log.error("Publish dalaran integration info fail, message: " + response.message());
+//        }
     }
 }

@@ -2,7 +2,7 @@ package io.terminus.dalaran.component.processor.sql;
 
 import com.alibaba.fastjson.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import io.terminus.dalaran.core.component.FieldInputType;
+import io.terminus.dalaran.FieldInputType;
 import io.terminus.dalaran.core.component.annotation.ConfigFieldInfo;
 import io.terminus.dalaran.core.component.config.ConnectorConfig;
 import lombok.Data;
