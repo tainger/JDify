@@ -15,7 +15,7 @@ spring:
     password: ${MYSQL_PASSWORD:secret}
   jpa:
     hibernate.ddl-auto: update
-    database-platform: org.hibernate.dialect.MySQLDialect
+    database-platform: org.hibernate.dialect.MySQL57Dialect
   redis:
     host: ${REDIS_HOST:localhost}
     port: ${REDIS_PORT:6379}
@@ -34,4 +34,4 @@ terminus:
       # 目前只支持定时删除
       policy: delete
       # 日志留存时间(h)
-      duration: ${DALARAN_DURATION_DAY:14}
+      duration: ${DALARAN_DURATION_DAY:7}

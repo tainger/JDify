@@ -10,7 +10,7 @@ spring:
     password: anywhere
   jpa:
     hibernate.ddl-auto: update
-    database-platform: org.hibernate.dialect.H2Dialect
+    database-platform: org.hibernate.dialect.MySQL57Dialect
 #spring:
 #  application:
 #    name: dalaran-runtime

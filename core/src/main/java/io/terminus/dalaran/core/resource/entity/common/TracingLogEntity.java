@@ -13,7 +13,7 @@ import java.util.Date;
 @Table(name = "dalaran_tracing_log")
 public class TracingLogEntity {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private Long moduleId;

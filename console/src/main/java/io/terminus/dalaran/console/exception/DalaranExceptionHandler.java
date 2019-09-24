@@ -19,6 +19,7 @@ public class DalaranExceptionHandler {
         try {
             return joinPoint.proceed();
         } catch (Exception e) {
+            e.printStackTrace();
             throw new ServiceHandleException(exception.value(), e.getMessage());
         }
     }
