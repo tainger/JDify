@@ -130,7 +130,7 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
         String wsdlDoc = getWsdlDoc(wsdl);
         Map<String, SoapOperation> operationMap = buildOperations(definitions);
         SoapSchemaOperation schemaOperation = new SoapSchemaOperation();
-        SoapOperation soapOperation = operationMap.get(StringUtils.substringAfter(StringUtils.substringAfter(operationConfig.getOperationKey(), OPERATION_SPLIT), OPERATION_SPLIT));
+        SoapOperation soapOperation = operationMap.get(StringUtils.substringBeforeLast(operationConfig.getOperationKey(), OPERATION_SPLIT));
 
         schemaOperation.setBinding(operationConfig.getBinding());
         schemaOperation.setName(operationConfig.getOperation());
@@ -173,7 +173,7 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
                     output = operation.getOutput().getMessagePrefixedName().getLocalName();
                 }
                 soapOperation.setOutput(output);
-                operations.put( name + OPERATION_SPLIT + portName, soapOperation);
+                operations.put(name + OPERATION_SPLIT + portName, soapOperation);
             });
         });
 
@@ -207,10 +207,11 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
         if (message != null) {
             List<Part> parts = message.getParts();
             if (CollectionUtils.isNotEmpty(parts)) {
+                parent.setType(FieldType.OBJECT);
                 parts.forEach(part -> {
                     Element element = part.getElement();
                     if (element != null) {
-                        handleElement(element, parent, child);
+                        handleElement(element, child);
                     }
                 });
             }
@@ -218,7 +219,7 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
         parent.setFields(child);
     }
 
-    private void handleElement(Element element, ModelField parent, Map<String, ModelField> child) {
+    private void handleElement(Element element, Map<String, ModelField> child) {
         Schema schema = element.getSchema();
         ModelField field = new ModelField();
         String type;
@@ -244,7 +245,7 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
                 }
             }
         } else {
-            buildByEmbeddedTypeWithoutRootPath(field, element, schema, parent);
+            buildByEmbeddedTypeWithoutRootPath(field, element, schema);
         }
         child.put(element.getName(), field);
     }
@@ -290,17 +291,17 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
         current.put(name, modelField);
     }
 
-    private void buildByEmbeddedTypeWithoutRootPath(ModelField field, Element element, Schema schema, ModelField parent) {
+    private void buildByEmbeddedTypeWithoutRootPath(ModelField field, Element element, Schema schema) {
         ComplexType complexType = (ComplexType) element.getEmbeddedType();
         Sequence sequence;
         if (complexType != null && (sequence = (Sequence) complexType.getModel()) != null) {
             List<SchemaComponent> particles = sequence.getParticles();
             String maxOccurs = sequence.getMaxOccurs().toString();
             if (StringUtils.equalsIgnoreCase(maxOccurs, "0") || StringUtils.equalsIgnoreCase(maxOccurs, "1")) {
-                parent.setType(FieldType.OBJECT);
+                field.setType(FieldType.OBJECT);
             } else {
-                parent.setType(FieldType.ARRAY);
-                parent.setSubType(FieldType.OBJECT);
+                field.setType(FieldType.ARRAY);
+                field.setSubType(FieldType.OBJECT);
             }
             if (CollectionUtils.isNotEmpty(particles)) {
                 Map<String, ModelField> current = new HashMap<>();
