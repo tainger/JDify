@@ -39,8 +39,7 @@ public class SoapToObjectProcessor implements Processor, Traceable {
         XmlMapper xmlMapper = new XmlMapper();
         xmlMapper.registerModule(new SimpleModule().addDeserializer(Object.class, new DalaranObjectDeserializer()));
         Map map = (Map) xmlMapper.readValue(sr, Object.class);
-        Map inputBody = (Map) map.get("Body");
-        return inputBody.get(modelRoot);
+        return map.get("Body");
     }
 
     @Override
