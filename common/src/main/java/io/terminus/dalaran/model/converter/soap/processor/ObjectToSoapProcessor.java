@@ -41,7 +41,7 @@ public class ObjectToSoapProcessor implements Processor, Traceable {
     @Override
     public void process(Exchange exchange) throws Exception {
         Object body = exchange.getIn().getBody();
-        Object requestParams = buildRequestParams(modelFields, body, XPATH + "/" + soapOperationConfig.getInput());
+        Object requestParams = buildRequestParams(modelFields, body);
 
         StringWriter stringWriter = new StringWriter();
         RequestCreator requestCreator = new RequestCreator();
@@ -54,7 +54,7 @@ public class ObjectToSoapProcessor implements Processor, Traceable {
         exchange.getOut().setBody(stringEntity);
     }
 
-    private Map<String, Object> buildRequestParams(Map<String, ModelField> modelFields, Object body, String rootPath) {
+    private Map<String, Object> buildRequestParams(Map<String, ModelField> modelFields, Object body) {
         ModelField root = modelFields.get(DalaranConstants.MODEL_ROOT);
         Map<String, ModelField> rootField = root.getFields();
         Map<String, Object> formParams = new HashMap<>();
@@ -62,10 +62,10 @@ public class ObjectToSoapProcessor implements Processor, Traceable {
             List list = (List) body;
             for (int i = 0; i < list.size(); i++) {
                 Object data = list.get(i);
-                buildPaths(rootField, data, i, rootPath, formParams);
+                buildPaths(rootField, data, i, XPATH, formParams);
             }
         } else {
-            buildPaths(rootField, body, -1, rootPath, formParams);
+            buildPaths(rootField, body, -1, XPATH, formParams);
         }
         return formParams;
     }
