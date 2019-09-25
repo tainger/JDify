@@ -21,7 +21,7 @@
         <dependency>
             <groupId>org.apache.camel</groupId>
             <artifactId>camel-kafka</artifactId>
-            <version>${camel.version}</version>
+
         </dependency>
 
         <!-- RocketMQ Component -->
@@ -35,7 +35,7 @@
         <dependency>
             <groupId>org.apache.camel</groupId>
             <artifactId>camel-quartz2</artifactId>
-            <version>${camel.version}</version>
+
         </dependency>
 
         <!-- dubbo trigger -->
@@ -48,7 +48,7 @@
         <dependency>
             <groupId>org.apache.camel</groupId>
             <artifactId>camel-netty4-http</artifactId>
-            <version>${camel.version}</version>
+
             <exclusions>
                 <exclusion>
                     <groupId>javax.servlet</groupId>
@@ -61,7 +61,6 @@
         <dependency>
             <groupId>org.apache.camel</groupId>
             <artifactId>camel-sql</artifactId>
-            <version>${camel.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.tomcat</groupId>
@@ -77,19 +76,19 @@
         <dependency>
             <groupId>org.apache.camel</groupId>
             <artifactId>camel-script</artifactId>
-            <version>${camel.version}</version>
+
         </dependency>
         <dependency>
             <groupId>org.apache.camel</groupId>
             <artifactId>camel-groovy</artifactId>
-            <version>${camel.version}</version>
+
         </dependency>
 
         <!-- http processor -->
         <dependency>
             <groupId>org.apache.camel</groupId>
             <artifactId>camel-http4</artifactId>
-            <version>${camel.version}</version>
+
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
@@ -109,7 +108,7 @@
         <dependency>
             <groupId>org.apache.camel</groupId>
             <artifactId>camel-mvel</artifactId>
-            <version>${camel.version}</version>
+
         </dependency>
 
         <!-- test -->

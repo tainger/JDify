@@ -20,7 +20,7 @@
         <dependency>
             <groupId>org.apache.camel</groupId>
             <artifactId>camel-fastjson</artifactId>
-            <version>${camel.version}</version>
+
         </dependency>
         <dependency>
             <groupId>com.squareup.okhttp3</groupId>

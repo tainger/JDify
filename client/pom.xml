@@ -9,18 +9,18 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>camel-components</artifactId>
-    <packaging>pom</packaging>
-    <modules>
-        <module>camel-dubbo</module>
-        <module>camel-rocketmq</module>
-    </modules>
+    <artifactId>dalaran-client</artifactId>
 
     <dependencies>
         <dependency>
-            <groupId>org.apache.camel</groupId>
-            <artifactId>camel-core</artifactId>
-
+            <groupId>io.terminus</groupId>
+            <artifactId>dalaran-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-openfeign</artifactId>
+            <version>${spring.cloud.version}</version>
         </dependency>
     </dependencies>
 

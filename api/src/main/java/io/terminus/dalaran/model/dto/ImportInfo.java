@@ -1,6 +1,6 @@
 package io.terminus.dalaran.model.dto;
 
-import io.terminus.dalaran.model.ModelImportMode;
+import io.terminus.dalaran.ModelImportMode;
 import lombok.Data;
 
 @Data

@@ -1,4 +1,4 @@
-package io.terminus.dalaran.model;
+package io.terminus.dalaran;
 
 public enum ModelImportMode {
 

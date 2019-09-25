@@ -1,4 +1,4 @@
-package io.terminus.dalaran.model;
+package io.terminus.dalaran;
 
 /**
  * Created by jingdi on 2019/6/24

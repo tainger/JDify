@@ -1,5 +1,6 @@
 package io.terminus.dalaran.model;
 
+import io.terminus.dalaran.ServiceType;
 import io.terminus.dalaran.model.dto.ModelDTO;
 import lombok.Data;
 
