@@ -1,7 +1,6 @@
-package io.terminus.dalaran.api.rest;
+package io.terminus.dalaran.rest.read;
 
 import io.swagger.annotations.ApiOperation;
-import io.terminus.dalaran.model.dto.CopyFlow;
 import io.terminus.dalaran.model.dto.TestRequestDTO;
 import io.terminus.dalaran.model.dto.flow.SubFlowDTO;
 import io.terminus.dalaran.model.dto.log.MainLogDTO;
@@ -12,23 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RequestMapping(value = "/api/sub-flow", produces = {"application/json; charset=UTF-8"})
-public interface SubFlowRestAPI {
-
-    @ApiOperation(value = "创建子流程")
-    @PostMapping(value = "/create")
-    Long create(@RequestBody SubFlowDTO model);
-
-    @ApiOperation(value = "更新子流程")
-    @PostMapping(value = "/update")
-    SubFlowDTO update(@RequestBody SubFlowDTO model);
-
-    @ApiOperation(value = "删除子流程")
-    @DeleteMapping(value = "/delete")
-    void delete(@RequestParam Long id);
-
-    @ApiOperation(value = "复制子流程")
-    @PostMapping(value = "/copy")
-    Long copy(@RequestBody CopyFlow copyFlow);
+public interface SubFlowReadAPI {
 
     @ApiOperation(value = "根据 ID 获取子流程")
     @GetMapping(value = "/{id}")

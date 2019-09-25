@@ -1,8 +1,7 @@
 package io.terminus.dalaran.console.rest;
 
-import io.terminus.dalaran.api.rest.ModelRestAPI;
 import io.terminus.dalaran.console.ResponseMessage;
-import io.terminus.dalaran.console.exception.DalaranException;
+import io.terminus.dalaran.console.exception.OnExceptionMessage;
 import io.terminus.dalaran.console.repository.ModelRepository;
 import io.terminus.dalaran.console.service.ModelManagementService;
 import io.terminus.dalaran.model.BodyType;
@@ -13,6 +12,9 @@ import io.terminus.dalaran.model.dto.ModelDTO;
 import io.terminus.dalaran.model.query.ModelQuery;
 import io.terminus.dalaran.model.schema.JsonSchema;
 import io.terminus.dalaran.model.schema.ObjectSchema;
+import io.terminus.dalaran.rest.read.ModelReadAPI;
+import io.terminus.dalaran.rest.write.ModelImportAPI;
+import io.terminus.dalaran.rest.write.ModelWriteAPI;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
@@ -27,7 +29,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-public class ModelManagementRest implements ModelRestAPI {
+public class ModelManagementRest implements ModelReadAPI, ModelWriteAPI, ModelImportAPI {
 
     @Autowired
     private ModelManagementService modelManagementService;
@@ -36,90 +38,89 @@ public class ModelManagementRest implements ModelRestAPI {
     private ModelRepository modelRepository;
 
     @Override
-    @DalaranException(value = ResponseMessage.MODEL_QUERY_ERROR)
+    @OnExceptionMessage(value = ResponseMessage.MODEL_QUERY_ERROR)
     public List<ModelDTO> query(ModelQuery query) {
         return modelManagementService.queryModels(query);
     }
 
     @Override
-    @DalaranException(value = ResponseMessage.MODEL_CREATE_ERROR)
+    @OnExceptionMessage(value = ResponseMessage.MODEL_CREATE_ERROR)
     public Long create(@RequestBody ModelDTO model) {
         return modelManagementService.createModel(model);
     }
 
     @Override
-    @DalaranException(value = ResponseMessage.MODEL_UPDATE_ERROR)
+    @OnExceptionMessage(value = ResponseMessage.MODEL_UPDATE_ERROR)
     public ModelDTO update(@RequestBody ModelDTO model) {
         return modelManagementService.updateModel(model);
     }
 
 
     @Override
-    @DalaranException(value = ResponseMessage.MODEL_DELETE_ERROR)
-    public void delete(@RequestParam Long id) {
+    @OnExceptionMessage(value = ResponseMessage.MODEL_DELETE_ERROR)
+    public void deleteById(@RequestParam Long id) {
         modelManagementService.deleteModel(id);
     }
 
     @Override
-    @DalaranException(value = ResponseMessage.MODEL_QUERY_ERROR)
+    @OnExceptionMessage(value = ResponseMessage.MODEL_QUERY_ERROR)
     public List<ModelDTO> list() {
         return modelManagementService.list();
     }
 
     @Override
-    @DalaranException(value = ResponseMessage.MODEL_QUERY_ERROR)
+    @OnExceptionMessage(value = ResponseMessage.MODEL_QUERY_ERROR)
     public List<ModelDTO> listByModuleId(@PathVariable Long moduleId) {
         return modelManagementService.listByModuleId(moduleId);
     }
 
     @Override
-    @DalaranException(value = ResponseMessage.MODEL_QUERY_ERROR)
+    @OnExceptionMessage(value = ResponseMessage.MODEL_QUERY_ERROR)
     public List<ModelDTO> listEditable() {
         return modelManagementService.listEditableModel();
     }
 
     @Override
-    @DalaranException(value = ResponseMessage.MODEL_QUERY_ERROR)
+    @OnExceptionMessage(value = ResponseMessage.MODEL_QUERY_ERROR)
     public List<ModelDTO> listEditableByModuleId(@PathVariable Long moduleId) {
         return modelManagementService.listEditableModelByModuleId(moduleId);
     }
 
     @Override
-    @DalaranException(value = ResponseMessage.MODEL_QUERY_ERROR)
+    @OnExceptionMessage(value = ResponseMessage.MODEL_QUERY_ERROR)
     public Map<String, ClassificationModel> listClassificationByModuleId(@PathVariable Long moduleId) {
         return modelManagementService.listClassificationModels(moduleId);
     }
 
     @Override
-    @DalaranException(value = ResponseMessage.BUILD_MAPPING_SUGGEST_ERROR)
+    @OnExceptionMessage(value = ResponseMessage.BUILD_MAPPING_SUGGEST_ERROR)
     public Map<String, String> suggestMapping(@RequestParam Long sourceId, @RequestParam Long targetId) {
         return modelManagementService.suggestMapping(sourceId, targetId);
     }
 
     @Override
-    @DalaranException(value = ResponseMessage.EXCEL_PARSE_ERROR)
+    @OnExceptionMessage(value = ResponseMessage.EXCEL_PARSE_ERROR)
     public JsonSchema importExcel(@RequestParam MultipartFile file, @PathVariable long id) {
         return modelManagementService.importExcel(file, id);
     }
 
     @Override
-    @DalaranException(value = ResponseMessage.DATA_TEMPLATE_PARSE_ERROR)
+    @OnExceptionMessage(value = ResponseMessage.DATA_TEMPLATE_PARSE_ERROR)
     public JsonSchema importDataTemplate(@RequestBody DataTemplate dataTemplate, @PathVariable long id) {
         return modelManagementService.importDataTemplate(dataTemplate, id);
     }
 
     @Override
-    @DalaranException(value = ResponseMessage.DATA_TEMPLATE_PARSE_ERROR)
+    @OnExceptionMessage(value = ResponseMessage.DATA_TEMPLATE_PARSE_ERROR)
     public ObjectSchema importDalaranSchema(@RequestBody ObjectSchema objectSchema, @PathVariable long id) {
         return modelManagementService.importDalaranSchema(objectSchema, id);
     }
 
     @Override
-    @DalaranException(value = ResponseMessage.MODEL_EXAMPLE_BUILD_ERROR)
+    @OnExceptionMessage(value = ResponseMessage.MODEL_EXAMPLE_BUILD_ERROR)
     public String buildRequestTemplate(@RequestBody JsonSchema schema, @PathVariable long id) {
         return modelManagementService.buildDataTemplate(schema, id);
     }
-
 
     // TODO 待开发
     @Override
@@ -129,14 +130,13 @@ public class ModelManagementRest implements ModelRestAPI {
 
     // TODO 其实意义不大
     @Override
-    @DalaranException(value = ResponseMessage.EXCEL_PARSE_ERROR)
+    @OnExceptionMessage(value = ResponseMessage.EXCEL_PARSE_ERROR)
     public Map<Long, Map<String, JsonSchema>> multiImportExcel(@RequestParam MultipartFile file, @RequestParam BodyType type) {
         return modelManagementService.multiImportExcel(file, type);
     }
 
-
     @Override
-    @DalaranException(value = ResponseMessage.TEMPLATE_DOWNLOAD_ERROR)
+    @OnExceptionMessage(value = ResponseMessage.TEMPLATE_DOWNLOAD_ERROR)
     public ResponseEntity<Resource> downloadExcelTemplate() {
         return modelManagementService.downloadExcelTemplate();
     }

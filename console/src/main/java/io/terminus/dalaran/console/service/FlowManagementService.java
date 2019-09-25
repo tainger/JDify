@@ -1,6 +1,7 @@
 package io.terminus.dalaran.console.service;
 
 import io.terminus.dalaran.console.entity.TriggerFlowEntity;
+import io.terminus.dalaran.exception.flow.FlowNotExistException;
 import io.terminus.dalaran.model.dto.CopyFlow;
 import io.terminus.dalaran.model.dto.ImportFlowResult;
 import io.terminus.dalaran.model.dto.ImportProcessorDTO;
@@ -26,7 +27,7 @@ public interface FlowManagementService {
 
     void deleteFlow(Long flowId);
 
-    TriggerFlowDTO updateFlow(TriggerFlowDTO flowModel);
+    TriggerFlowDTO updateFlow(TriggerFlowDTO flowModel) throws FlowNotExistException;
 
     List<TriggerFlowDTO> queryFlows(FlowQuery query);
 
@@ -39,7 +40,7 @@ public interface FlowManagementService {
     @Nullable
     TriggerFlowDTO getById(Long flowId);
 
-    Long copyFlow(CopyFlow copyFlow);
+    Long copyFlow(CopyFlow copyFlow) throws FlowNotExistException;
 
     List<FlowValidation> validateFlow(TriggerFlowDTO model);
 }

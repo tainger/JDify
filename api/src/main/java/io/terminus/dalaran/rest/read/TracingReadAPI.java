@@ -1,4 +1,4 @@
-package io.terminus.dalaran.api.rest;
+package io.terminus.dalaran.rest.read;
 
 import io.terminus.dalaran.model.dto.log.MainLogDTO;
 import io.terminus.dalaran.model.query.TracingLogQuery;
@@ -9,11 +9,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import java.util.List;
 
 @RequestMapping(value = "/api/log", produces = {"application/json; charset=UTF-8"})
-public interface TracingRestAPI {
+public interface TracingReadAPI {
 
     @GetMapping
-    public List<MainLogDTO> query(TracingLogQuery query);
+    List<MainLogDTO> query(TracingLogQuery query);
 
     @GetMapping("/{recordId}")
-    public MainLogDTO logDetail(@PathVariable String recordId);
+    MainLogDTO logDetail(@PathVariable String recordId);
 }

@@ -1,11 +1,11 @@
-package io.terminus.dalaran.api.rest;
+package io.terminus.dalaran.rest.write;
 
 import io.swagger.annotations.ApiOperation;
 import io.terminus.dalaran.model.dto.ClientDTO;
 import org.springframework.web.bind.annotation.*;
 
 @RequestMapping(value = "/api/client", produces = {"application/json; charset=UTF-8"})
-public interface ClientRestAPI {
+public interface ClientWriteAPI {
 
     @PostMapping
     @ApiOperation("新增客户端")
@@ -17,9 +17,5 @@ public interface ClientRestAPI {
 
     @DeleteMapping("/{id}")
     @ApiOperation("删除客户端")
-    void create(@PathVariable Long id);
-
-    @GetMapping("/{id}")
-    @ApiOperation("获取客户端详情")
-    ClientDTO detail(@PathVariable Long id);
+    void deleteById(@PathVariable Long id);
 }

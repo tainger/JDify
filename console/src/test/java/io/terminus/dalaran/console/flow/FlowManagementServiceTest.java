@@ -9,6 +9,7 @@ import io.terminus.dalaran.console.service.FlowManagementService;
 import io.terminus.dalaran.core.flow.DalaranFlowBuilder;
 import io.terminus.dalaran.core.resource.DalaranResourceBuilder;
 import io.terminus.dalaran.core.resource.entity.common.ProcessorEntity;
+import io.terminus.dalaran.exception.flow.FlowNotExistException;
 import io.terminus.dalaran.model.dto.ConnectorDTO;
 import io.terminus.dalaran.model.dto.CopyFlow;
 import io.terminus.dalaran.model.dto.ProcessorDTO;
@@ -77,8 +78,13 @@ public class FlowManagementServiceTest {
     public void update() {
         TriggerFlowDTO triggerFlow = buildTriggerFlowDTO();
         triggerFlow.setId(4L);
-        TriggerFlowDTO newFlow = flowManagementService.updateFlow(triggerFlow);
-        Assert.assertEquals(newFlow.getName(), triggerFlow.getName());
+        TriggerFlowDTO newFlow = null;
+        try {
+            newFlow = flowManagementService.updateFlow(triggerFlow);
+            Assert.assertEquals(newFlow.getName(), triggerFlow.getName());
+        } catch (FlowNotExistException e) {
+            Assert.fail(e.getMessage());
+        }
     }
 
     @Test
@@ -92,10 +98,15 @@ public class FlowManagementServiceTest {
         CopyFlow copyFlow = new CopyFlow();
         copyFlow.setId(4L);
         copyFlow.setName("new flow from 4L");
-        Long id = flowManagementService.copyFlow(copyFlow);
-        TriggerFlowEntity origin = flowRepository.findById(4L).get();
-        TriggerFlowEntity copy = flowRepository.findById(id).get();
-        Assert.assertEquals(origin.getPipeline(), copy.getPipeline());
+        Long id = null;
+        try {
+            id = flowManagementService.copyFlow(copyFlow);
+            TriggerFlowEntity origin = flowRepository.findById(4L).get();
+            TriggerFlowEntity copy = flowRepository.findById(id).get();
+            Assert.assertEquals(origin.getPipeline(), copy.getPipeline());
+        } catch (FlowNotExistException e) {
+            Assert.fail(e.getMessage());
+        }
     }
 
     @Test

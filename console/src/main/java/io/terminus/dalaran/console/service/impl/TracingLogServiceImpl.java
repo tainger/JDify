@@ -1,11 +1,11 @@
 package io.terminus.dalaran.console.service.impl;
 
+import io.terminus.dalaran.TracingType;
 import io.terminus.dalaran.console.entity.TriggerFlowEntity;
 import io.terminus.dalaran.console.repository.SubFlowRepository;
 import io.terminus.dalaran.console.repository.TriggerFlowRepository;
 import io.terminus.dalaran.console.service.ModuleManagementService;
 import io.terminus.dalaran.console.service.TracingLogService;
-import io.terminus.dalaran.core.log.TracingType;
 import io.terminus.dalaran.core.resource.entity.basic.BasicFlowEntity;
 import io.terminus.dalaran.core.resource.entity.common.TracingLogEntity;
 import io.terminus.dalaran.core.resource.repository.TracingLogRepository;

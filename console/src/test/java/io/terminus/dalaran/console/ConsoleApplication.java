@@ -8,6 +8,6 @@ import org.springframework.test.context.ActiveProfiles;
 @SpringBootApplication
 public class ConsoleApplication {
     public static void main(String[] args) {
-        SpringApplication.run(ConsoleApplication.class);
+        SpringApplication.run(ConsoleApplication.class, args);
     }
 }

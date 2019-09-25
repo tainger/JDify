@@ -15,7 +15,7 @@ public class DalaranExceptionHandler {
     }
 
     @Around("pointcut() && @annotation(exception)")
-    public Object execute(ProceedingJoinPoint joinPoint, DalaranException exception) throws Throwable {
+    public Object execute(ProceedingJoinPoint joinPoint, OnExceptionMessage exception) throws Throwable {
         try {
             return joinPoint.proceed();
         } catch (Exception e) {

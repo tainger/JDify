@@ -1,11 +1,11 @@
-package io.terminus.dalaran.api.rest;
+package io.terminus.dalaran.rest.write;
 
 import io.swagger.annotations.ApiOperation;
 import io.terminus.dalaran.model.dto.FunctionDTO;
 import org.springframework.web.bind.annotation.*;
 
 @RequestMapping(value = "/api/function", produces = {"application/json; charset=UTF-8"})
-public interface FunctionRestAPI {
+public interface FunctionWriteAPI {
 
     @PostMapping
     @ApiOperation("新增函数")
@@ -17,9 +17,5 @@ public interface FunctionRestAPI {
 
     @DeleteMapping("/{id}")
     @ApiOperation("删除函数")
-    void delete(@PathVariable Long id);
-
-    @GetMapping("/{id}")
-    @ApiOperation("获取函数详情")
-    FunctionDTO detail(@PathVariable Long id);
+    void deleteById(@PathVariable Long id);
 }

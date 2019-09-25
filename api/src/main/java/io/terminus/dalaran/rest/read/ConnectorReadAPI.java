@@ -1,27 +1,18 @@
-package io.terminus.dalaran.api.rest;
+package io.terminus.dalaran.rest.read;
 
 import io.swagger.annotations.ApiOperation;
 import io.terminus.dalaran.ComponentType;
 import io.terminus.dalaran.model.dto.ConnectorDTO;
 import io.terminus.dalaran.model.dto.basic.BasicConnectorInfo;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
 @RequestMapping(value = "/api/connector", produces = {"application/json; charset=UTF-8"})
-public interface ConnectorRestAPI {
-
-    @PostMapping
-    @ApiOperation("新增连接器")
-    Long create(@RequestBody ConnectorDTO connectorDTO);
-
-    @PutMapping
-    @ApiOperation("更新连接器")
-    ConnectorDTO update(@RequestBody ConnectorDTO connectorDTO);
-
-    @DeleteMapping("/{id}")
-    @ApiOperation("删除连接器")
-    void create(@PathVariable Long id);
+public interface ConnectorReadAPI {
 
     @GetMapping("/{id}")
     @ApiOperation("获取连接器详情")

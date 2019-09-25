@@ -40,7 +40,7 @@ public class DalaranHttpClient implements DalaranProcessor<HttpClientConfig>, Da
         if (!config.getMethod().isNoBody()) {
             return true;
         }
-        if (bodyIsSerialized && config.getInModel().getModelType().isSerialized()) {
+        if (bodyIsSerialized && config.getInModel() != null &&config.getInModel().getModelType().isSerialized()) {
             converterContext.toObject(route, config.getInModel());
         }
         route.setHeader(HTTP_QUERY).method(this, "buildQueryString");
