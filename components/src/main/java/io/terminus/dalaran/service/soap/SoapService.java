@@ -38,13 +38,14 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
 
     private static final String OPERATION_SPLIT = "::";
 
-    private static final String HTTP_URI = "%s4://%s";
+    private static final String HTTP_URI = "%s4://%s&bridgeEndpoint=true";
 
     @Override
     public void configure(ProcessorDefinition route, SoapOperationConfig soapOperationConfig) {
         String uri = String.format(HTTP_URI, "http", soapOperationConfig.getBaseUrl());
         route.setHeader(Exchange.HTTP_METHOD, Builder.constant(HttpMethod.POST));
-        route.setHeader(Exchange.CONTENT_TYPE, Builder.constant("text/xml"));
+        route.setHeader(Exchange.CONTENT_TYPE, Builder.constant("application/xml"));
+//        route.setHeader("SOAPAction", Builder.constant("http://sap.com/xi/WebService/soap1.1"));
         route.to(uri);
         // TODO Stream to string
         route.convertBodyTo(String.class);
@@ -74,6 +75,7 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
         Definitions definitions = parser.parse(wsdl);
         List<Binding> bindings = definitions.getBindings();
         Map<String, List<SoapOperationConfig>> soapOperationConfigMap = new HashMap<>();
+        String targetNamespace = definitions.getTargetNamespace();
         bindings.forEach(binding -> {
             String bindingName = binding.getName();
             String portType = binding.getType().getLocalPart();
@@ -85,6 +87,7 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
                 operationConfig.setOperation(operationName);
                 operationConfig.setPortType(portType);
                 operationConfig.setOperationKey(operationKey);
+                operationConfig.setTargetNamespace(targetNamespace);
                 if (soapOperationConfigMap.containsKey(bindingName)) {
                     soapOperationConfigMap.get(bindingName).add(operationConfig);
                 } else {
@@ -127,7 +130,6 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
         WSDLParser parser = new WSDLParser();
         String wsdl = wsdlImportConfig.getWsdlUrl();
         Definitions definitions = parser.parse(wsdl);
-        String wsdlDoc = getWsdlDoc(wsdl);
         Map<String, SoapOperation> operationMap = buildOperations(definitions);
         SoapSchemaOperation schemaOperation = new SoapSchemaOperation();
         SoapOperation soapOperation = operationMap.get(StringUtils.substringBeforeLast(operationConfig.getOperationKey(), OPERATION_SPLIT));
@@ -140,13 +142,12 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
         schemaOperation.setPortType(operationConfig.getPortType());
         schemaOperation.setInput(inputName);
         schemaOperation.setOutPut(outputName);
-        schemaOperation.setWsdl(wsdl);
 
-        schemaOperation.setBaseUrl(operationConfig.getBaseUrl());
         schemaOperation.setProtocol(operationConfig.getProtocol());
+        schemaOperation.setTargetNamespace(operationConfig.getTargetNamespace());
 
-        MessageModel inModel = buildModel(definitions.getMessage(inputName), schemaOperation, wsdlDoc, inputName);
-        MessageModel outModel = buildModel(definitions.getMessage(outputName), schemaOperation, wsdlDoc, outputName);
+        MessageModel inModel = buildModel(definitions.getMessage(inputName), schemaOperation, inputName);
+        MessageModel outModel = buildModel(definitions.getMessage(outputName), schemaOperation, outputName);
 
         return new ServiceOperationModel(inModel, inputName, outModel, outputName);
     }
@@ -180,7 +181,7 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
         return operations;
     }
 
-    public MessageModel buildModel(Message message, SoapSchemaOperation operationConfig, String wsdlDoc, String modelRoot) {
+    public MessageModel buildModel(Message message, SoapSchemaOperation operationConfig, String modelRoot) {
         MessageModel model = new MessageModel();
         SoapSchema soapSchema = new SoapSchema();
         try {
@@ -191,7 +192,6 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
         } catch (Exception e) {
             e.printStackTrace();
         }
-        soapSchema.setWsdlDoc(wsdlDoc);
         model.setModelSchema(soapSchema);
         model.setModelType(BodyType.SOAP);
         Map<String, ModelField> fields = new HashMap<>();

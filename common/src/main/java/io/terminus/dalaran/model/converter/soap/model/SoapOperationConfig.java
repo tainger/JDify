@@ -21,4 +21,6 @@ public class SoapOperationConfig extends ServiceOperation {
     private String binding;
 
     private String servicePort;
+
+    private String targetNamespace;
 }

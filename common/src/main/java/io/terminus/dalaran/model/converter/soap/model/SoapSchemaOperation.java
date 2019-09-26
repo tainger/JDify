@@ -19,11 +19,13 @@ public class SoapSchemaOperation {
 
     private String outPut;
 
-    private String wsdl;
-
-    private String baseUrl;
+    private String location;
 
     private String modelRoot;
 
     private HttpProtocol protocol;
+
+    private String targetNamespace;
+
+    private String soapAction;
 }

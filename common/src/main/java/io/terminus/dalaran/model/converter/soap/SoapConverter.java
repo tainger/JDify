@@ -22,14 +22,7 @@ public class SoapConverter implements DalaranConverter<SoapSchema> {
 
     @Override
     public void fromObject(ProcessorDefinition route, SoapSchema schema) {
-        WSDLParser parser = new WSDLParser();
-        Definitions definitions = new Definitions();
-        try {
-            definitions = parser.parse(IOUtils.toInputStream(schema.getWsdlDoc(), "utf-8"));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        ObjectToSoapProcessor processor = new ObjectToSoapProcessor(schema.getFields(), schema.getOperationConfig(), definitions);
+        ObjectToSoapProcessor processor = new ObjectToSoapProcessor(schema.getFields(), schema.getOperationConfig());
         route.process(processor);
     }
 }
