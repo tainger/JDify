@@ -9,21 +9,5 @@ import lombok.Data;
 @Data
 public class SoapSchemaOperation {
 
-    private String name;
-
-    private String portType;
-
-    private String binding;
-
-    private String input;
-
-    private String outPut;
-
-    private String wsdl;
-
-    private String baseUrl;
-
-    private String modelRoot;
-
-    private HttpProtocol protocol;
+    private String targetNamespace;
 }

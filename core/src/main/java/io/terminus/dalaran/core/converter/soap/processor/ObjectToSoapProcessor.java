@@ -3,6 +3,8 @@ package io.terminus.dalaran.core.converter.soap.processor;
 import com.predic8.wsdl.Definitions;
 import com.predic8.wstool.creator.RequestCreator;
 import com.predic8.wstool.creator.SOARequestCreator;
+import com.predic8.xml.util.BasicAuthenticationResolver;
+import com.sun.org.apache.xpath.internal.operations.Mod;
 import groovy.xml.MarkupBuilder;
 import io.terminus.dalaran.DalaranConstants;
 import io.terminus.dalaran.model.FieldType;
@@ -11,9 +13,22 @@ import io.terminus.dalaran.model.schema.SoapSchemaOperation;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.Traceable;
+import org.apache.commons.collections.MapUtils;
 import org.apache.http.entity.StringEntity;
+import org.apache.xml.serialize.OutputFormat;
+import org.apache.xml.serialize.XMLSerializer;
+import org.w3c.dom.Document;
+import org.xml.sax.InputSource;
 
-import java.io.StringWriter;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.soap.*;
+import javax.xml.transform.Source;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import java.io.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,85 +42,84 @@ public class ObjectToSoapProcessor implements Processor, Traceable {
 
     private final SoapSchemaOperation soapOperationConfig;
 
-    private final Definitions definitions;
-
     private static final String XPATH = "xpath:";
 
-    public ObjectToSoapProcessor(Map<String, ModelField> modelFields, SoapSchemaOperation soapOperationConfig, Definitions definitions) {
+    private static final String PREFIX = "dalaran";
+
+    public ObjectToSoapProcessor(Map<String, ModelField> modelFields, SoapSchemaOperation soapOperationConfig) {
         this.modelFields = modelFields;
         this.soapOperationConfig = soapOperationConfig;
-        this.definitions = definitions;
     }
 
     @Override
     public void process(Exchange exchange) throws Exception {
         Object body = exchange.getIn().getBody();
-        Object requestParams = buildRequestParams(modelFields, body, XPATH + "/" + soapOperationConfig.getInput());
-
-        StringWriter stringWriter = new StringWriter();
-        RequestCreator requestCreator = new RequestCreator();
-        MarkupBuilder markupBuilder = new MarkupBuilder(stringWriter);
-        SOARequestCreator creator = new SOARequestCreator(definitions, requestCreator, markupBuilder);
-        creator.setFormParams(requestParams);
-        creator.createRequest(soapOperationConfig.getPortType(), soapOperationConfig.getName(), soapOperationConfig.getBinding());
-        StringEntity stringEntity = new StringEntity(stringWriter.toString());
+        Object rst = buildRequest(modelFields.get(DalaranConstants.MODEL_ROOT), body);
+        StringEntity stringEntity = new StringEntity(rst.toString());
         stringEntity.setContentType("text/xml");
         exchange.getOut().setBody(stringEntity);
     }
 
-    private Map<String, Object> buildRequestParams(Map<String, ModelField> modelFields, Object body, String rootPath) {
-        ModelField root = modelFields.get(DalaranConstants.MODEL_ROOT);
-        Map<String, ModelField> rootField = root.getFields();
-        Map<String, Object> formParams = new HashMap<>();
-        if (root.getType() == FieldType.ARRAY) {
-            List list = (List) body;
-            for (int i = 0; i < list.size(); i++) {
-                Object data = list.get(i);
-                buildPaths(rootField, data, i, rootPath, formParams);
-            }
-        } else {
-            buildPaths(rootField, body, -1, rootPath, formParams);
-        }
-        return formParams;
+    private Object buildRequest(ModelField modelField, Object body) throws Exception {
+        MessageFactory messageFactory = MessageFactory.newInstance();
+        SOAPMessage message = messageFactory.createMessage();
+        SOAPPart soapPart = message.getSOAPPart();
+        SOAPEnvelope soapEnvelope = soapPart.getEnvelope();
+        soapEnvelope.addNamespaceDeclaration(PREFIX, soapOperationConfig.getTargetNamespace());
+        SOAPBody soapBody = soapEnvelope.getBody();
+        buildBody(modelField.getFields(), body, soapBody);
+        message.saveChanges();
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        message.writeTo(stream);
+        ByteArrayOutputStream data = new ByteArrayOutputStream();
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder builder;
+        builder = factory.newDocumentBuilder();
+        Document document = builder.parse(new InputSource(new StringReader(stream.toString())));
+        OutputFormat format = new OutputFormat(document);
+        format.setIndenting(true);
+        XMLSerializer serializer = new XMLSerializer(data, format);
+        serializer.serialize(document);
+        return data;
     }
 
-    private void buildPaths(Map<String, ModelField> parentField, Object body, int index, String parentPath, Map<String, Object> formParams) {
-        parentField.forEach((name, field) -> {
-            Object subBody = ((Map) body).get(name);
-            String path;
-            if (index == -1) {
-                path = parentPath + "/" + name;
-            } else {
-                path = parentPath + "[" + index + "]" + "/" + name;
-            }
+    private void buildBody(Map<String, ModelField> modelField, Object body, SOAPElement soapElement) throws Exception {
+        if (MapUtils.isEmpty(modelField)) {
+            return;
+        }
+        for (Map.Entry<String, ModelField> entry : modelField.entrySet()) {
+            String name = entry.getKey();
+            ModelField field = entry.getValue();
+            FieldType type = field.getType();
+            Object ob = ((Map) body).get(name);
 
-            if (subBody != null) {
-                Map<String, ModelField> child = field.getFields();
-                FieldType type = field.getType();
-                FieldType subType = field.getSubType();
-                if (type == FieldType.ARRAY) {
-                    List data = (List) subBody;
-                    if (subType == FieldType.OBJECT) {
-                        for (int i = 0; i < data.size(); i++) {
-                            Object ob = data.get(i);
-                            buildPaths(child, ob, i, path, formParams);
-                        }
-                    } else {
-                        for (int i = 0; i < data.size(); i++) {
-                            Object ob = data.get(i);
-                            String subPath = path + "[" + i + "]";
-                            formParams.put(subPath, ob);
-                        }
-                    }
-                } else if (type == FieldType.OBJECT) {
-                    buildPaths(child, subBody, -1, path, formParams);
-                } else {
-                    formParams.put(path, subBody);
-                }
-            } else {
-                formParams.put(path, null);
+            if (ob == null) {
+                continue;
             }
-        });
+            if (type == FieldType.ARRAY) {
+                List subBody = (List) ob;
+                FieldType subType = field.getSubType();
+                if (subType == FieldType.OBJECT) {
+                    for (Object data: subBody) {
+                        SOAPElement element = soapElement.addChildElement(name, PREFIX);
+                        Map<String, ModelField> child = field.getFields();
+                        buildBody(child, data, element);
+                    }
+                } else {
+                    for (Object data: subBody) {
+                        SOAPElement element = soapElement.addChildElement(name, PREFIX);
+                        element.addTextNode(data.toString());
+                    }
+                }
+            } else if (type == FieldType.OBJECT) {
+                SOAPElement element = soapElement.addChildElement(name, PREFIX);
+                Map<String, ModelField> child = field.getFields();
+                buildBody(child, ob, element);
+            } else {
+                SOAPElement element = soapElement.addChildElement(name);
+                element.addTextNode(ob.toString());
+            }
+        }
     }
 
     @Override

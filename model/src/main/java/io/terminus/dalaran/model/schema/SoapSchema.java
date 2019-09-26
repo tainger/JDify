@@ -10,6 +10,4 @@ import lombok.Data;
 public class SoapSchema extends DalaranModelSchema {
 
     private SoapSchemaOperation operationConfig;
-
-    private String wsdlDoc;
 }
