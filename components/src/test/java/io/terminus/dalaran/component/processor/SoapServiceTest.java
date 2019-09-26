@@ -2,7 +2,6 @@ package io.terminus.dalaran.component.processor;
 
 import com.alibaba.fastjson.JSON;
 import io.terminus.dalaran.component.BasicServiceTest;
-import io.terminus.dalaran.component.trigger.soap.model.SoapModel;
 import io.terminus.dalaran.core.converter.soap.model.SoapOperationConfig;
 import io.terminus.dalaran.core.converter.soap.processor.ObjectToSoapProcessor;
 import io.terminus.dalaran.core.converter.soap.processor.SoapToObjectProcessor;
@@ -27,7 +26,6 @@ public class SoapServiceTest extends BasicServiceTest {
     @Test
     public void SMObject2Soap() {
         SoapSchema schema1 = JSON.parseObject("{\"operationConfig\":{\"input\":\"MT_COMMON_REQ\",\"outPut\":\"MT_COMMON_RES\",\"portType\":\"SI_COMMON_S_OUT\",\"baseUrl\":\"piqas.shimaogroup.com:50000/XISOAPAdapter/MessageServlet?senderParty=&senderService=BS_HYPERSMART&receiverParty=&receiverService=&interface=SI_COMMON_S_OUT&interfaceNamespace=urn%3A%3Ashimaogroup.com%3AI_HYPERSMART%3AECC\",\"protocol\":\"HTTP\",\"wsdl\":\"http://piqas.shimaogroup.com:50000/dir/wsdl?p=sa/2578ce33cd913812bbef5120fdee2c23\",\"name\":\"SI_COMMON_S_OUT\",\"binding\":\"SI_COMMON_S_OUTBinding\",\"modelRoot\":\"MT_COMMON_REQ\"},\"fields\":{\"root\":{\"nullable\":false,\"fields\":{\"MT_COMMON_REQ\":{\"type\":\"OBJECT\",\"fields\":{\"XMLDATA\":{\"nullable\":false,\"fields\":{},\"type\":\"STRING\"},\"TYPE\":{\"nullable\":false,\"fields\":{},\"type\":\"STRING\"}}}},\"type\":\"OBJECT\"}}}", SoapSchema.class);
-        schema1.getOperationConfig().setLocation("http://piqas.shimaogroup.com:50000/XISOAPAdapter/MessageServlet?senderParty=&senderService=BS_HYPERSMART&receiverParty=&receiverService=&interface=SI_COMMON_S_OUT&interfaceNamespace=urn%3A%3Ashimaogroup.com%3AI_HYPERSMART%3AECC&authMethod=Basic&authUsername=HYPERS_PI&authPassword=HYPERS_PI2019");
         schema1.getOperationConfig().setTargetNamespace("urn::shimaogroup.com:I_HYPERSMART:ECC");
 
         Map<String, Object> requestBody = new HashMap<>();
@@ -81,11 +79,6 @@ public class SoapServiceTest extends BasicServiceTest {
         MessageModel<SoapSchema> model = new MessageModel<>();
 
         SoapSchemaOperation schemaOperation = new SoapSchemaOperation();
-        schemaOperation.setProtocol(HttpProtocol.HTTP);
-        schemaOperation.setPortType("getCountryRequest");
-        schemaOperation.setName("getCountry");
-        schemaOperation.setBinding("CountriesPortSoap11");
-
         SoapSchema schema = new SoapSchema();
         schema.setOperationConfig(schemaOperation);
         schema.setFields(buildFields());

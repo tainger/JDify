@@ -134,14 +134,8 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
         SoapSchemaOperation schemaOperation = new SoapSchemaOperation();
         SoapOperation soapOperation = operationMap.get(StringUtils.substringBeforeLast(operationConfig.getOperationKey(), OPERATION_SPLIT));
 
-        schemaOperation.setBinding(operationConfig.getBinding());
-        schemaOperation.setName(operationConfig.getOperation());
-
         String inputName = soapOperation.getInput();
         String outputName = soapOperation.getOutput();
-        schemaOperation.setPortType(operationConfig.getPortType());
-
-        schemaOperation.setProtocol(operationConfig.getProtocol());
         schemaOperation.setTargetNamespace(operationConfig.getTargetNamespace());
 
         MessageModel inModel = buildModel(definitions.getMessage(inputName), schemaOperation, inputName);

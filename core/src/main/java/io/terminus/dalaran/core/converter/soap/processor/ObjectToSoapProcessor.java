@@ -68,8 +68,6 @@ public class ObjectToSoapProcessor implements Processor, Traceable {
         soapEnvelope.addNamespaceDeclaration(PREFIX, soapOperationConfig.getTargetNamespace());
         SOAPBody soapBody = soapEnvelope.getBody();
         buildBody(modelField.getFields(), body, soapBody);
-//        MimeHeaders hd = message.getMimeHeaders();
-//        hd.addHeader("SOAPAction", "http://sap.com/xi/WebService/soap1.1");
         message.saveChanges();
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         message.writeTo(stream);
@@ -83,39 +81,6 @@ public class ObjectToSoapProcessor implements Processor, Traceable {
         XMLSerializer serializer = new XMLSerializer(data, format);
         serializer.serialize(document);
         return data;
-    }
-
-    public Object request(Object body) throws Exception {
-        SOAPMessage request = buildRequestMessage(modelFields.get(DalaranConstants.MODEL_ROOT), body);
-        SOAPConnectionFactory connectionFactory = SOAPConnectionFactory.newInstance();
-        SOAPConnection connection = connectionFactory.createConnection();
-        SOAPMessage response = connection.call(request, soapOperationConfig.getLocation());
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        response.writeTo(stream);
-        TransformerFactory transformerFactory = TransformerFactory.newInstance();
-        Transformer transformer = transformerFactory.newTransformer();
-        Source source = response.getSOAPPart().getContent();
-        StreamResult result = new StreamResult(System.out);
-        transformer.transform(source, result);
-        return new String(stream.toByteArray());
-    }
-
-    private SOAPMessage buildRequestMessage(ModelField modelField, Object body) throws Exception {
-        MessageFactory messageFactory = MessageFactory.newInstance();
-        SOAPMessage message = messageFactory.createMessage();
-        SOAPPart soapPart = message.getSOAPPart();
-        SOAPEnvelope soapEnvelope = soapPart.getEnvelope();
-        soapEnvelope.addNamespaceDeclaration(PREFIX, soapOperationConfig.getTargetNamespace());
-        SOAPBody soapBody = soapEnvelope.getBody();
-        buildBody(modelField.getFields(), body, soapBody);
-//        String authorization = new sun.misc.BASE64Encoder().encode(("HYPERS_PI" + ":" + "HYPERS_PI2019").getBytes());
-        MimeHeaders hd = message.getMimeHeaders();
-//        hd.addHeader("Authorization", "Basic " + authorization);
-        hd.addHeader("SOAPAction", "http://sap.com/xi/WebService/soap1.1");
-        message.saveChanges();
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        message.writeTo(stream);
-        return message;
     }
 
     private void buildBody(Map<String, ModelField> modelField, Object body, SOAPElement soapElement) throws Exception {
