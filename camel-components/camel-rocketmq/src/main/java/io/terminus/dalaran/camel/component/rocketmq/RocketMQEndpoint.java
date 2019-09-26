@@ -23,6 +23,9 @@ public class RocketMQEndpoint extends ProcessorEndpoint {
     @UriParam(description = "consumer/producer group", javaType = "java.lang.String")
     private String groupId;
 
+    @UriParam(description = "consumer/producer tags", javaType = "java.lang.String")
+    private String tags;
+
     private RocketMQContext context;
 
     public RocketMQEndpoint(RocketMQContext context) {
@@ -43,7 +46,7 @@ public class RocketMQEndpoint extends ProcessorEndpoint {
 
     @Override
     protected String createEndpointUri() {
-        return "rocketmq://" + topic + "." + nameServer + "." + groupId;
+        return "rocketmq://" + topic + "." + tags + "." + nameServer + "." + groupId;
     }
 
     public Exchange createRocketMQExchange(byte[] body) {
@@ -83,5 +86,13 @@ public class RocketMQEndpoint extends ProcessorEndpoint {
 
     public void setContext(RocketMQContext context) {
         this.context = context;
+    }
+
+    public String getTags() {
+        return tags;
+    }
+
+    public void setTags(String tags) {
+        this.tags = tags;
     }
 }
