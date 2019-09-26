@@ -1,12 +1,12 @@
 package io.terminus.dalaran.console.flow;
 
 import com.alibaba.fastjson.JSON;
+import io.terminus.dalaran.ComponentType;
 import io.terminus.dalaran.console.entity.ConnectorEntity;
-import io.terminus.dalaran.console.model.dto.ConnectorDTO;
-import io.terminus.dalaran.console.model.dto.basic.BasicConnectorInfo;
 import io.terminus.dalaran.console.repository.ConnectorRepository;
 import io.terminus.dalaran.console.service.ConnectorService;
-import io.terminus.dalaran.core.component.ComponentType;
+import io.terminus.dalaran.model.dto.ConnectorDTO;
+import io.terminus.dalaran.model.dto.basic.BasicConnectorInfo;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;

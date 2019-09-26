@@ -1,7 +1,7 @@
 package io.terminus.dalaran.console.service.impl;
 
-import io.terminus.dalaran.console.model.DalaranAccount;
 import io.terminus.dalaran.console.service.AuthorizeService;
+import io.terminus.dalaran.model.DalaranAccount;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

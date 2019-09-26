@@ -2,6 +2,7 @@ package io.terminus.dalaran.core.log;
 
 import com.alibaba.fastjson.JSON;
 import io.terminus.dalaran.DalaranConstants;
+import io.terminus.dalaran.TracingType;
 import io.terminus.dalaran.model.BodyType;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.camel.Exchange;

@@ -5,12 +5,6 @@ import io.terminus.dalaran.console.TestFlowInitializer;
 import io.terminus.dalaran.console.convertor.FlowConvertor;
 import io.terminus.dalaran.console.entity.ModelEntity;
 import io.terminus.dalaran.console.entity.TriggerFlowEntity;
-import io.terminus.dalaran.console.model.ModelImportMode;
-import io.terminus.dalaran.console.model.dto.*;
-import io.terminus.dalaran.console.model.dto.basic.BasicFlowInfo;
-import io.terminus.dalaran.console.model.dto.flow.ImportFlowDTO;
-import io.terminus.dalaran.console.model.dto.flow.TriggerFlowDTO;
-import io.terminus.dalaran.console.model.query.FlowQuery;
 import io.terminus.dalaran.console.repository.ModelRepository;
 import io.terminus.dalaran.console.repository.PropertyRepository;
 import io.terminus.dalaran.console.repository.TriggerFlowRepository;
@@ -22,10 +16,17 @@ import io.terminus.dalaran.core.flow.DalaranFlowBuilder;
 import io.terminus.dalaran.core.resource.DalaranResourceBuilder;
 import io.terminus.dalaran.core.resource.entity.common.ProcessorEntity;
 import io.terminus.dalaran.core.resource.repository.ModuleRepository;
+import io.terminus.dalaran.exception.flow.FlowNotExistException;
+import io.terminus.dalaran.ModelImportMode;
+import io.terminus.dalaran.model.dto.*;
+import io.terminus.dalaran.model.dto.basic.BasicFlowInfo;
+import io.terminus.dalaran.model.dto.flow.ImportFlowDTO;
+import io.terminus.dalaran.model.dto.flow.TriggerFlowDTO;
 import io.terminus.dalaran.model.flow.FlowStatus;
 import io.terminus.dalaran.model.flow.FlowValidation;
 import io.terminus.dalaran.model.flow.TriggerFlow;
 import io.terminus.dalaran.model.flow.ValidateMessageLevel;
+import io.terminus.dalaran.model.query.FlowQuery;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
@@ -36,9 +37,6 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.util.*;
 import java.util.stream.Collectors;
-
-import static io.terminus.dalaran.console.model.ModelImportMode.Overwrite;
-import static io.terminus.dalaran.console.model.ModelImportMode.Rename;
 
 @Service
 @Transactional
@@ -99,7 +97,8 @@ public class FlowManagementServiceImpl implements FlowManagementService {
 
     @Override
     public Long createFlow(TriggerFlowDTO flowModel) {
-        TriggerFlowEntity flowEntity = buildEntity(flowModel);
+        TriggerFlowEntity flowEntity = new TriggerFlowEntity();
+        buildEntity(flowModel, flowEntity);
         setFlowStatus(flowEntity);
         Long id = flowRepository.save(flowEntity).getId();
         // TODO 这里依赖 loader 有点怪 而且可以异步
@@ -244,11 +243,11 @@ public class FlowManagementServiceImpl implements FlowManagementService {
         ModelEntity outModelEntity = modelRepository.findByModuleIdAndModelKey(model.getModuleId(), model.getModelKey());
         if (outModelEntity == null) {
             return modelService.createModel(model);
-        } else if (importMode == Overwrite) {
+        } else if (importMode == ModelImportMode.Overwrite) {
             model.setId(outModelEntity.getId());
             modelService.updateModel(model);
             return model.getId();
-        } else if (importMode == Rename) {
+        } else if (importMode == ModelImportMode.Rename) {
             String randomId = RandomStringUtils.randomAlphanumeric(6);
             model.setName(model.getName() + "-" + randomId);
             model.setModelKey(model.getModelKey() + "-" + randomId);
@@ -263,8 +262,16 @@ public class FlowManagementServiceImpl implements FlowManagementService {
     }
 
     @Override
-    public TriggerFlowDTO updateFlow(TriggerFlowDTO flowModel) {
-        TriggerFlowEntity flowEntity = buildEntity(flowModel);
+    public TriggerFlowDTO updateFlow(TriggerFlowDTO flowModel) throws FlowNotExistException {
+        if (flowModel.getId() == null) {
+            throw new FlowNotExistException("Trigger flow id can not be null.");
+        }
+        Optional<TriggerFlowEntity> flowEntityOptional = flowRepository.findById(flowModel.getId());
+        if (!flowEntityOptional.isPresent()) {
+            throw new FlowNotExistException("TriggerFlow[" + flowModel.getId() + "] not exist.");
+        }
+        TriggerFlowEntity flowEntity = flowEntityOptional.get();
+        buildEntity(flowModel, flowEntity);
         setFlowStatus(flowEntity);
         flowRepository.save(flowEntity);
         // TODO 这里依赖 loader 有点怪 而且可以异步
@@ -302,22 +309,18 @@ public class FlowManagementServiceImpl implements FlowManagementService {
     @Nullable
     @Override
     public TriggerFlowDTO getById(Long flowId) {
-        TriggerFlowEntity flowEntity = flowRepository.findById(flowId).get();
-        if (flowEntity == null) {
-            return null;
-        }
-        return flowConvertor.toDTO(flowEntity);
+        Optional<TriggerFlowEntity> flowEntityOptional = flowRepository.findById(flowId);
+        return flowEntityOptional.map(flowConvertor::toDTO).orElse(null);
     }
 
     @Override
-    public Long copyFlow(CopyFlow copyFlow) {
-        TriggerFlowEntity flowEntity = flowRepository.findById(copyFlow.getId()).get();
-        if (flowEntity == null) {
-            return null;
+    public Long copyFlow(CopyFlow copyFlow) throws FlowNotExistException {
+        Optional<TriggerFlowEntity> flowEntityOptional = flowRepository.findById(copyFlow.getId());
+        if (!flowEntityOptional.isPresent()) {
+            throw new FlowNotExistException("TriggerFlow[" + copyFlow.getId() + "] not exist.");
         }
         TriggerFlowEntity newFlowEntity = new TriggerFlowEntity();
-
-        BeanUtils.copyProperties(flowEntity, newFlowEntity);
+        BeanUtils.copyProperties(flowEntityOptional.get(), newFlowEntity);
         newFlowEntity.setId(null);
         newFlowEntity.setName(copyFlow.getName());
         flowRepository.save(newFlowEntity);
@@ -327,7 +330,8 @@ public class FlowManagementServiceImpl implements FlowManagementService {
     @Override
     public List<FlowValidation> validateFlow(TriggerFlowDTO model) {
         model.setId(null);
-        TriggerFlowEntity entity = buildEntity(model);
+        TriggerFlowEntity entity = new TriggerFlowEntity();
+        buildEntity(model, entity);
         return validateFlow(entity);
     }
 
@@ -352,15 +356,7 @@ public class FlowManagementServiceImpl implements FlowManagementService {
         return flowBuilder.validateFlow(triggerFlow);
     }
 
-    private TriggerFlowEntity buildEntity(TriggerFlowDTO triggerFlow) {
-        TriggerFlowEntity flowEntity;
-        Long id = triggerFlow.getId();
-        if (id != null) {
-            flowEntity = flowRepository.findById(id).get();
-        } else {
-            flowEntity = new TriggerFlowEntity();
-        }
-
+    private void buildEntity(TriggerFlowDTO triggerFlow, TriggerFlowEntity flowEntity) {
         List<ProcessorEntity> pipeline = triggerFlow.getPipeline().stream().map(processor -> {
             ProcessorEntity processorEntity = new ProcessorEntity();
             processorEntity.setId(processor.getId());
@@ -384,8 +380,6 @@ public class FlowManagementServiceImpl implements FlowManagementService {
         flowEntity.setPipeline(pipeline);
         flowEntity.setTracing(triggerFlow.isTracing());
         flowEntity.setDescription(triggerFlow.getDescription());
-
-        return flowEntity;
     }
 
     private ModelDTO buildModelEntity(ModelEntity entity) {

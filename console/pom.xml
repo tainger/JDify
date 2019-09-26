@@ -14,6 +14,11 @@
     <dependencies>
         <dependency>
             <groupId>io.terminus</groupId>
+            <artifactId>dalaran-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.terminus</groupId>
             <artifactId>dalaran-components</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -29,12 +34,6 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
-        <dependency>
-            <groupId>io.terminus</groupId>
-            <artifactId>terminus-common</artifactId>
-            <version>2.2.RELEASE</version>
-        </dependency>
-
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-test</artifactId>
@@ -55,6 +54,12 @@
             <groupId>io.springfox</groupId>
             <artifactId>springfox-swagger2</artifactId>
             <version>2.7.0</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>net.bytebuddy</groupId>
+                    <artifactId>byte-buddy</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>io.springfox</groupId>

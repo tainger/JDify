@@ -1,10 +1,10 @@
 package io.terminus.dalaran.core.context;
 
+import io.terminus.dalaran.config.ConnectorInfo;
+import io.terminus.dalaran.config.ProcessorInfo;
+import io.terminus.dalaran.config.TriggerInfo;
 import io.terminus.dalaran.core.component.DalaranProcessor;
 import io.terminus.dalaran.core.component.DalaranTrigger;
-import io.terminus.dalaran.core.config.ConnectorInfo;
-import io.terminus.dalaran.core.config.ProcessorInfo;
-import io.terminus.dalaran.core.config.TriggerInfo;
 
 import java.util.Collection;
 

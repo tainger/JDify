@@ -1,13 +1,12 @@
 package io.terminus.dalaran.console.service;
 
-import io.terminus.dalaran.component.processor.mapper.model.SimpleMapping;
 import io.terminus.dalaran.console.entity.ModelEntity;
-import io.terminus.dalaran.console.model.ClassificationModel;
-import io.terminus.dalaran.console.model.dto.DataTemplate;
-import io.terminus.dalaran.console.model.dto.ModelDTO;
-import io.terminus.dalaran.console.model.dto.basic.BasicModelInfo;
-import io.terminus.dalaran.console.model.query.ModelQuery;
 import io.terminus.dalaran.model.BodyType;
+import io.terminus.dalaran.model.ClassificationModel;
+import io.terminus.dalaran.model.dto.DataTemplate;
+import io.terminus.dalaran.model.dto.ModelDTO;
+import io.terminus.dalaran.model.dto.basic.BasicModelInfo;
+import io.terminus.dalaran.model.query.ModelQuery;
 import io.terminus.dalaran.model.schema.JsonSchema;
 import io.terminus.dalaran.model.schema.ObjectSchema;
 import org.springframework.core.io.Resource;
@@ -56,7 +55,7 @@ public interface ModelManagementService {
 
     String buildDataTemplate(JsonSchema schema, Long id);
 
-    Map<String, SimpleMapping> suggestMapping(Long sourceId, Long targetId);
+    Map<String, String> suggestMapping(Long sourceId, Long targetId);
 
     ResponseEntity<Resource> downloadExcelTemplate();
 }

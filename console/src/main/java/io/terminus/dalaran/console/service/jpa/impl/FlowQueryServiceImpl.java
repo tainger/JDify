@@ -1,10 +1,10 @@
 package io.terminus.dalaran.console.service.jpa.impl;
 
 import io.terminus.dalaran.console.entity.TriggerFlowEntity;
-import io.terminus.dalaran.console.model.dto.basic.BasicFlowInfo;
-import io.terminus.dalaran.console.model.query.FlowQuery;
 import io.terminus.dalaran.console.repository.TriggerFlowRepository;
 import io.terminus.dalaran.console.service.jpa.FlowQueryService;
+import io.terminus.dalaran.model.dto.basic.BasicFlowInfo;
+import io.terminus.dalaran.model.query.FlowQuery;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;

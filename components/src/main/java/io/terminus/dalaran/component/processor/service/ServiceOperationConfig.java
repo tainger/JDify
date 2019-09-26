@@ -1,6 +1,6 @@
 package io.terminus.dalaran.component.processor.service;
 
-import io.terminus.dalaran.core.component.FieldInputType;
+import io.terminus.dalaran.FieldInputType;
 import io.terminus.dalaran.core.component.annotation.ConfigFieldInfo;
 import io.terminus.dalaran.core.component.config.ImmutableModelConfig;
 import lombok.Data;

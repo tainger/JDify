@@ -2,7 +2,6 @@ package io.terminus.dalaran.component.trigger.soap.model;
 
 import io.terminus.dalaran.component.common.HttpMethod;
 import io.terminus.dalaran.component.trigger.soap.SoapListenerConfig;
-import io.terminus.dalaran.core.resource.entity.ModelAbstractEntity;
 import lombok.Data;
 
 @Data

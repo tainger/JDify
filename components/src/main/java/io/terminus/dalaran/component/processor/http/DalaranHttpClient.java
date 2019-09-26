@@ -3,7 +3,7 @@ package io.terminus.dalaran.component.processor.http;
 import com.google.common.base.Joiner;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Maps;
-import io.terminus.dalaran.core.component.BodySerializeType;
+import io.terminus.dalaran.BodySerializeType;
 import io.terminus.dalaran.core.component.DalaranMessageBodyCustomConverter;
 import io.terminus.dalaran.core.component.DalaranProcessor;
 import io.terminus.dalaran.core.component.annotation.Processor;
@@ -40,7 +40,7 @@ public class DalaranHttpClient implements DalaranProcessor<HttpClientConfig>, Da
         if (!config.getMethod().isNoBody()) {
             return true;
         }
-        if (bodyIsSerialized && config.getInModel().getModelType().isSerialized()) {
+        if (bodyIsSerialized && config.getInModel() != null &&config.getInModel().getModelType().isSerialized()) {
             converterContext.toObject(route, config.getInModel());
         }
         route.setHeader(HTTP_QUERY).method(this, "buildQueryString");

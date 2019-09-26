@@ -18,14 +18,11 @@ import io.terminus.dalaran.model.FieldType;
 import io.terminus.dalaran.model.ModelField;
 import io.terminus.dalaran.service.soap.SoapOperation;
 import org.apache.commons.collections.MapUtils;
-import org.springframework.beans.factory.annotation.Value;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static com.predic8.schema.Schema.INT;
 
 public class WSDLUtils {
 

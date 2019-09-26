@@ -7,11 +7,10 @@ import io.terminus.dalaran.component.common.HttpMethod;
 import io.terminus.dalaran.core.component.DalaranService;
 import io.terminus.dalaran.core.component.annotation.ServiceConnector;
 import io.terminus.dalaran.core.component.model.ServiceOperationModel;
+import io.terminus.dalaran.core.converter.soap.model.SoapOperationConfig;
 import io.terminus.dalaran.model.*;
-import io.terminus.dalaran.model.component.ServiceOperation;
-import io.terminus.dalaran.model.converter.soap.model.SoapOperationConfig;
-import io.terminus.dalaran.model.converter.soap.model.SoapSchemaOperation;
 import io.terminus.dalaran.model.schema.SoapSchema;
+import io.terminus.dalaran.model.schema.SoapSchemaOperation;
 import org.apache.camel.Exchange;
 import org.apache.camel.builder.Builder;
 import org.apache.camel.model.ProcessorDefinition;
@@ -30,7 +29,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * Created by jingdi on 2019/5/27
