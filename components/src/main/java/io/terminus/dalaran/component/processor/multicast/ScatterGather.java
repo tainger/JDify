@@ -1,6 +1,6 @@
 package io.terminus.dalaran.component.processor.multicast;
 
-import io.terminus.dalaran.core.component.BodySerializeType;
+import io.terminus.dalaran.BodySerializeType;
 import io.terminus.dalaran.core.component.DalaranProcessor;
 import io.terminus.dalaran.core.component.DalaranProcessorConfigCustomConverter;
 import io.terminus.dalaran.core.component.annotation.Processor;

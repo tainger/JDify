@@ -1,12 +1,12 @@
 package io.terminus.dalaran.console.flow;
 
 import com.alibaba.fastjson.JSON;
+import io.terminus.dalaran.ComponentType;
 import io.terminus.dalaran.console.entity.ConnectorEntity;
-import io.terminus.dalaran.console.model.dto.ConnectorDTO;
-import io.terminus.dalaran.console.model.dto.basic.BasicConnectorInfo;
 import io.terminus.dalaran.console.repository.ConnectorRepository;
 import io.terminus.dalaran.console.service.ConnectorService;
-import io.terminus.dalaran.core.component.ComponentType;
+import io.terminus.dalaran.model.dto.ConnectorDTO;
+import io.terminus.dalaran.model.dto.basic.BasicConnectorInfo;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -36,7 +36,7 @@ public class ConnectorManagementServiceTest {
     public void create() {
         ConnectorDTO connector = buildConnector();
         Long id = connectorService.create(connector);
-        ConnectorEntity entity = connectorRepository.findOne(id);
+        ConnectorEntity entity = connectorRepository.findById(id).get();
         Assert.assertEquals(connector.getName(), entity.getName());
     }
 
@@ -51,7 +51,7 @@ public class ConnectorManagementServiceTest {
     @Test
     public void detail() {
         ConnectorDTO connector = connectorService.detail(1L);
-        ConnectorEntity entity = connectorRepository.findOne(1L);
+        ConnectorEntity entity = connectorRepository.findById(1L).get();
         Assert.assertEquals(connector.getName(), entity.getName());
     }
 

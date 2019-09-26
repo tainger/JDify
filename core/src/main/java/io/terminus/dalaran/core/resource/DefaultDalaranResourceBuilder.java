@@ -2,10 +2,10 @@ package io.terminus.dalaran.core.resource;
 
 import com.alibaba.fastjson.JSON;
 import io.terminus.dalaran.DalaranConstants;
+import io.terminus.dalaran.config.ProcessorInfo;
+import io.terminus.dalaran.config.ServiceInfo;
+import io.terminus.dalaran.config.TriggerInfo;
 import io.terminus.dalaran.core.component.config.*;
-import io.terminus.dalaran.core.config.ProcessorInfo;
-import io.terminus.dalaran.core.config.ServiceInfo;
-import io.terminus.dalaran.core.config.TriggerInfo;
 import io.terminus.dalaran.core.context.DalaranComponentContext;
 import io.terminus.dalaran.core.context.DalaranConverterContext;
 import io.terminus.dalaran.core.context.DalaranServiceContext;

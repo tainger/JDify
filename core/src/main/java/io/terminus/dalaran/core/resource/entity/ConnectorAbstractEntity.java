@@ -1,6 +1,6 @@
 package io.terminus.dalaran.core.resource.entity;
 
-import io.terminus.dalaran.core.component.ComponentType;
+import io.terminus.dalaran.ComponentType;
 import io.terminus.dalaran.core.resource.entity.basic.BasicEntity;
 import lombok.Data;
 

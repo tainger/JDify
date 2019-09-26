@@ -10,10 +10,10 @@ import io.terminus.dalaran.component.trigger.soap.SoapListenerConfig;
 import io.terminus.dalaran.component.trigger.soap.model.SoapApiInfo;
 import io.terminus.dalaran.component.trigger.soap.model.SoapModel;
 import io.terminus.dalaran.component.trigger.soap.utils.WSDLUtils;
+import io.terminus.dalaran.console.ExportData;
 import io.terminus.dalaran.console.TestFlowInitializer;
 import io.terminus.dalaran.console.entity.ModelEntity;
 import io.terminus.dalaran.console.entity.TriggerFlowEntity;
-import io.terminus.dalaran.console.model.ExportData;
 import io.terminus.dalaran.console.repository.*;
 import io.terminus.dalaran.console.service.ExportService;
 import io.terminus.dalaran.console.util.WordUtils;
@@ -32,6 +32,7 @@ import org.springframework.stereotype.Service;
 import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -84,19 +85,19 @@ public class ExportServiceImpl implements ExportService {
     // TODO 数据量暴多可能炸内存, 而且会涉及到清表, 所以事务也是个问题
     @Override
     @Transactional
-    public void importAll(ExportData exportData) {
+    public void importAll(ExportData exportData) throws IOException {
         truncateTable();
 
-        moduleRepository.save(exportData.getModules());
-        modelRepository.save(exportData.getModels());
-        triggerFlowRepository.save(exportData.getTriggerFlows());
-        subFlowRepository.save(exportData.getSubFlows());
-        serviceRepository.save(exportData.getServices());
-        functionRepository.save(exportData.getFunctions());
-        connectorRepository.save(exportData.getConnectors());
-        clientRepository.save(exportData.getClients());
-        propertyRepository.save(exportData.getProperties());
-        trantorRepository.save(exportData.getTrantorEntities());
+        moduleRepository.saveAll(exportData.getModules());
+        modelRepository.saveAll(exportData.getModels());
+        triggerFlowRepository.saveAll(exportData.getTriggerFlows());
+        subFlowRepository.saveAll(exportData.getSubFlows());
+        serviceRepository.saveAll(exportData.getServices());
+        functionRepository.saveAll(exportData.getFunctions());
+        connectorRepository.saveAll(exportData.getConnectors());
+        clientRepository.saveAll(exportData.getClients());
+        propertyRepository.saveAll(exportData.getProperties());
+        trantorRepository.saveAll(exportData.getTrantorEntities());
 
         // load test flow
         testFlowInitializer.loadResources();
@@ -152,7 +153,7 @@ public class ExportServiceImpl implements ExportService {
     private List<ApiInfo> getExportApiInfoList() {
         List<TriggerFlowEntity> restFlowList = triggerFlowRepository.findByStatusNotAndTriggerType(FlowStatus.Error, "http-rest-listener");
         return restFlowList.stream().map(flowEntity -> {
-            ModuleEntity module = moduleRepository.findOne(flowEntity.getModuleId());
+            ModuleEntity module = moduleRepository.findById(flowEntity.getModuleId()).get();
             RestConfig restConfig = JSON.parseObject(flowEntity.getTriggerConfig(), RestConfig.class);
             DalaranModelSchema inSchema = getModelSchema(flowEntity.getInModel());
             DalaranModelSchema outSchema = getModelSchema(flowEntity.getOutModel());
@@ -163,7 +164,7 @@ public class ExportServiceImpl implements ExportService {
     private List<SoapApiInfo> getExportSoapListeners() {
         List<TriggerFlowEntity> soapFlowList = triggerFlowRepository.findByStatusNotAndTriggerType(FlowStatus.Error, "soap-listener");
         return soapFlowList.stream().map(flowEntity -> {
-            ModuleEntity module = moduleRepository.findOne(flowEntity.getModuleId());
+            ModuleEntity module = moduleRepository.findById(flowEntity.getModuleId()).get();
             SoapListenerConfig soapListenerConfig = JSON.parseObject(flowEntity.getTriggerConfig(), SoapListenerConfig.class);
             SoapModel inModel = getSoapModel(flowEntity.getInModel());
             SoapModel outModel = getSoapModel(flowEntity.getOutModel());
@@ -173,12 +174,12 @@ public class ExportServiceImpl implements ExportService {
 
     private SoapModel getSoapModel(Long modelId) {
         DalaranModelSchema schema = getModelSchema(modelId);
-        String name = modelRepository.findOne(modelId).getName();
+        String name = modelRepository.findById(modelId).get().getName();
         return new SoapModel(name, schema);
     }
 
     private DalaranModelSchema getModelSchema(Long modelId) {
-        ModelEntity modelEntity = modelRepository.findOne(modelId);
+        ModelEntity modelEntity = modelRepository.findById(modelId).get();
         Class<? extends DalaranModelSchema> schemaType = converterContext.getSchemaType(modelEntity.getType());
         return JSON.parseObject(modelEntity.getModelSchema(), schemaType);
     }

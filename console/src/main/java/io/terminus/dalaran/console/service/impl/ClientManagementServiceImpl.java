@@ -1,10 +1,10 @@
 package io.terminus.dalaran.console.service.impl;
 
 import io.terminus.dalaran.console.entity.ClientEntity;
-import io.terminus.dalaran.console.model.dto.ClientDTO;
-import io.terminus.dalaran.console.model.dto.basic.BasicClientInfo;
 import io.terminus.dalaran.console.repository.ClientRepository;
 import io.terminus.dalaran.console.service.ClientManagementService;
+import io.terminus.dalaran.model.dto.ClientDTO;
+import io.terminus.dalaran.model.dto.basic.BasicClientInfo;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -40,12 +40,12 @@ public class ClientManagementServiceImpl implements ClientManagementService {
 
     @Override
     public void delete(Long appKey) {
-        repository.delete(appKey);
+        repository.deleteById(appKey);
     }
 
     @Override
     public ClientDTO detail(Long appKey) {
-        ClientEntity entity = repository.findOne(appKey);
+        ClientEntity entity = repository.findById(appKey).get();
         if (entity != null) {
             return toDTO(entity);
         }

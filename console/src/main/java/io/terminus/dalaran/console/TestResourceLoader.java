@@ -82,26 +82,26 @@ public class TestResourceLoader implements DalaranResourceLoader {
 
     @Override
     public TriggerFlowEntity loadTriggerFlow(Long triggerFlowId) {
-        return triggerFlowRepository.findOne(triggerFlowId);
+        return triggerFlowRepository.findById(triggerFlowId).get();
     }
 
     @Override
     public SubFlowEntity loadSubFlow(Long subFlowId) {
-        return subFlowRepository.findOne(subFlowId);
+        return subFlowRepository.findById(subFlowId).get();
     }
 
     @Override
     public ModelEntity loadModel(Long modelId) {
-        return modelRepository.findOne(modelId);
+        return modelRepository.findById(modelId).get();
     }
 
     @Override
     public ConnectorEntity loadConnector(Long connectorId) {
-        return connectorRepository.findOne(connectorId);
+        return connectorRepository.findById(connectorId).get();
     }
 
     @Override
     public ServiceEntity loadService(Long serviceId) {
-        return serviceRepository.findOne(serviceId);
+        return serviceRepository.findById(serviceId).get();
     }
 }

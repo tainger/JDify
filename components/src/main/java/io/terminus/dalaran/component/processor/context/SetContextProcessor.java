@@ -1,6 +1,6 @@
 package io.terminus.dalaran.component.processor.context;
 
-import io.terminus.dalaran.core.component.BodySerializeType;
+import io.terminus.dalaran.BodySerializeType;
 import io.terminus.dalaran.core.component.DalaranProcessor;
 import io.terminus.dalaran.core.component.annotation.Processor;
 import org.apache.camel.model.ProcessorDefinition;

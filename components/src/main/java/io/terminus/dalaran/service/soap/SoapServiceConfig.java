@@ -1,6 +1,6 @@
 package io.terminus.dalaran.service.soap;
 
-import io.terminus.dalaran.model.converter.soap.model.SoapOperationConfig;
+import io.terminus.dalaran.core.converter.soap.model.SoapOperationConfig;
 import lombok.Data;
 
 import java.util.List;

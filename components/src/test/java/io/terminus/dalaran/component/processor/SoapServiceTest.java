@@ -5,12 +5,12 @@ import com.predic8.wsdl.Definitions;
 import com.predic8.wsdl.WSDLParser;
 import io.terminus.dalaran.component.BasicServiceTest;
 import io.terminus.dalaran.component.trigger.soap.model.SoapModel;
+import io.terminus.dalaran.core.converter.soap.model.SoapOperationConfig;
+import io.terminus.dalaran.core.converter.soap.processor.ObjectToSoapProcessor;
+import io.terminus.dalaran.core.converter.soap.processor.SoapToObjectProcessor;
 import io.terminus.dalaran.model.*;
-import io.terminus.dalaran.model.converter.soap.model.SoapOperationConfig;
-import io.terminus.dalaran.model.converter.soap.model.SoapSchemaOperation;
-import io.terminus.dalaran.model.converter.soap.processor.ObjectToSoapProcessor;
-import io.terminus.dalaran.model.converter.soap.processor.SoapToObjectProcessor;
 import io.terminus.dalaran.model.schema.SoapSchema;
+import io.terminus.dalaran.model.schema.SoapSchemaOperation;
 import io.terminus.dalaran.service.soap.SoapService;
 import org.apache.camel.ProducerTemplate;
 import org.junit.Assert;
@@ -111,13 +111,11 @@ public class SoapServiceTest extends BasicServiceTest {
 
         SoapSchemaOperation schemaOperation = new SoapSchemaOperation();
         schemaOperation.setProtocol(HttpProtocol.HTTP);
-        schemaOperation.setBaseUrl("127.0.0.1:8081/ws");
         schemaOperation.setPortType("getCountryRequest");
         schemaOperation.setName("getCountry");
         schemaOperation.setInput("getCountryRequest");
         schemaOperation.setOutPut("getCountryResponse");
         schemaOperation.setBinding("CountriesPortSoap11");
-        schemaOperation.setWsdl("http://127.0.0.1:8081/ws/countries.wsdl");
 
         SoapSchema schema = new SoapSchema();
         schema.setOperationConfig(schemaOperation);

@@ -1,6 +1,6 @@
 package io.terminus.dalaran.core.resource.entity.common;
 
-import io.terminus.dalaran.core.log.TracingType;
+import io.terminus.dalaran.TracingType;
 import io.terminus.dalaran.model.BodyType;
 import lombok.Data;
 import org.springframework.data.annotation.CreatedDate;
@@ -13,7 +13,7 @@ import java.util.Date;
 @Table(name = "dalaran_tracing_log")
 public class TracingLogEntity {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private Long moduleId;

@@ -8,7 +8,7 @@ spring:
     password: ${MYSQL_PASSWORD:anywhere}
   jpa:
     hibernate.ddl-auto: update
-    database-platform: org.hibernate.dialect.MySQLDialect
+    database-platform: org.hibernate.dialect.MySQL57Dialect
   redis:
     host: ${REDIS_HOST:localhost}
     port: ${REDIS_PORT:6379}

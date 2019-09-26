@@ -198,6 +198,11 @@ public class DefaultDalaranCamelContext implements DalaranContext<DalaranRoute> 
         return clientContext;
     }
 
+    @Override
+    public DalaranFlowBuilder<DalaranRoute> getDalaranFlowBuilder() {
+        return flowBuilder;
+    }
+
     // TODO 这里可以考虑换一下 camel 的 uuid 生成器
     private String nextRecordId() {
         return RandomStringUtils.randomAlphanumeric(32);

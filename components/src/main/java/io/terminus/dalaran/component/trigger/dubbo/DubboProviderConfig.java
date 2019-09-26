@@ -2,8 +2,8 @@ package io.terminus.dalaran.component.trigger.dubbo;
 
 import com.alibaba.fastjson.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.terminus.dalaran.FieldInputType;
 import io.terminus.dalaran.component.common.DubboRegistryConnector;
-import io.terminus.dalaran.core.component.FieldInputType;
 import io.terminus.dalaran.core.component.annotation.ConfigFieldInfo;
 import io.terminus.dalaran.core.component.config.AllModelConfig;
 import io.terminus.dalaran.core.component.config.ConnectorConfig;

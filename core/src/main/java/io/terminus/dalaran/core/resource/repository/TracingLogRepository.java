@@ -1,6 +1,6 @@
 package io.terminus.dalaran.core.resource.repository;
 
-import io.terminus.dalaran.core.log.TracingType;
+import io.terminus.dalaran.TracingType;
 import io.terminus.dalaran.core.resource.entity.common.TracingLogEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;

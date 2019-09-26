@@ -1,5 +1,7 @@
 package io.terminus.dalaran.core.context;
 
+import io.terminus.dalaran.core.flow.DalaranFlowBuilder;
+import io.terminus.dalaran.core.flow.DalaranRoute;
 import io.terminus.dalaran.model.flow.BasicFlow;
 import io.terminus.dalaran.model.flow.FlowFragment;
 import io.terminus.dalaran.model.flow.SubFlow;
@@ -49,4 +51,5 @@ public interface DalaranContext<T> {
 
     DalaranClientContext getDalaranClientContext();
 
+    DalaranFlowBuilder<DalaranRoute> getDalaranFlowBuilder();
 }

@@ -1,12 +1,12 @@
 package io.terminus.dalaran.console.service.jpa.impl;
 
 import io.terminus.dalaran.console.entity.ModelEntity;
-import io.terminus.dalaran.console.model.dto.basic.BasicModelInfo;
-import io.terminus.dalaran.console.model.query.ModelQuery;
 import io.terminus.dalaran.console.repository.ModelRepository;
 import io.terminus.dalaran.console.service.jpa.ModelQueryService;
 import io.terminus.dalaran.model.BodyType;
 import io.terminus.dalaran.model.ModelTargetType;
+import io.terminus.dalaran.model.dto.basic.BasicModelInfo;
+import io.terminus.dalaran.model.query.ModelQuery;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;

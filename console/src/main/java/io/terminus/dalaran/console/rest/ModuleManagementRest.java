@@ -1,88 +1,61 @@
 package io.terminus.dalaran.console.rest;
 
-import io.swagger.annotations.ApiOperation;
-import io.terminus.common.model.Response;
-import io.terminus.dalaran.console.model.ResponseMessage;
-import io.terminus.dalaran.console.model.dto.ModuleDTO;
-import io.terminus.dalaran.console.model.query.ModuleQuery;
+import io.terminus.dalaran.console.ResponseMessage;
+import io.terminus.dalaran.console.exception.OnExceptionMessage;
 import io.terminus.dalaran.console.service.ModuleManagementService;
+import io.terminus.dalaran.model.dto.ModuleDTO;
+import io.terminus.dalaran.model.dto.ModuleDetailDTO;
+import io.terminus.dalaran.model.query.ModuleQuery;
+import io.terminus.dalaran.rest.read.ModuleReadAPI;
+import io.terminus.dalaran.rest.write.ModuleWriteAPI;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * Created by jingdi on 2019/4/1
  */
 @RestController
 @RequestMapping("/api/module")
-public class ModuleManagementRest {
+public class ModuleManagementRest implements ModuleReadAPI, ModuleWriteAPI {
 
     @Autowired
     private ModuleManagementService moduleManagementService;
 
-    @ApiOperation(value = "条件查询模块")
-    @RequestMapping(value = "/query", method = RequestMethod.GET)
-    public Response query(ModuleQuery query) {
-        try {
-            return Response.ok(moduleManagementService.queryModules(query));
-        } catch (Exception e) {
-            e.printStackTrace();
-            return Response.fail(ResponseMessage.MODULE_QUERY_ERROR);
-        }
+    @Override
+    @OnExceptionMessage(value = ResponseMessage.MODULE_QUERY_ERROR)
+    public List<ModuleDTO> query(ModuleQuery query) {
+        return moduleManagementService.queryModules(query);
     }
 
-    @ApiOperation(value = "创建模块")
-    @RequestMapping(value = "/create", method = RequestMethod.POST)
-    public Response create(@RequestBody ModuleDTO model) {
-        try {
-            return Response.ok(moduleManagementService.createModule(model));
-        } catch (Exception e) {
-            e.printStackTrace();
-            return Response.fail(ResponseMessage.MODULE_CREATE_ERROR);
-        }
+    @Override
+    @OnExceptionMessage(value = ResponseMessage.MODULE_CREATE_ERROR)
+    public Long create(@RequestBody ModuleDTO model) {
+        return moduleManagementService.createModule(model);
     }
 
-    @ApiOperation(value = "更新模块")
-    @RequestMapping(value = "/update", method = RequestMethod.POST)
-    public Response update(@RequestBody ModuleDTO model) {
-        try {
-            return Response.ok(moduleManagementService.updateModule(model));
-        } catch (Exception e) {
-            e.printStackTrace();
-            return Response.fail(ResponseMessage.MODULE_UPDATE_ERROR);
-        }
+    @Override
+    @OnExceptionMessage(value = ResponseMessage.MODULE_UPDATE_ERROR)
+    public ModuleDTO update(@RequestBody ModuleDTO model) {
+        return moduleManagementService.updateModule(model);
     }
 
-    @ApiOperation(value = "删除模块")
-    @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
-    public Response delete(@RequestParam Long id) {
-        try {
-            moduleManagementService.deleteModule(id);
-            return Response.ok();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return Response.fail(ResponseMessage.MODULE_DELETE_ERROR);
-        }
+    @Override
+    @OnExceptionMessage(value = ResponseMessage.MODULE_DELETE_ERROR)
+    public void deleteById(@RequestParam Long id) {
+        moduleManagementService.deleteModule(id);
     }
 
-    @ApiOperation(value = "全量查询模块")
-    @RequestMapping(value = "/list", method = RequestMethod.GET)
-    public Response list() {
-        try {
-            return Response.ok(moduleManagementService.list());
-        } catch (Exception e) {
-            e.printStackTrace();
-            return Response.fail(ResponseMessage.MODULE_QUERY_ERROR);
-        }
+    @Override
+    @OnExceptionMessage(value = ResponseMessage.MODULE_QUERY_ERROR)
+    public List<ModuleDTO> list() {
+        return moduleManagementService.list();
     }
 
-    @ApiOperation(value = "获取模块的详情, 包括所有组件的基本信息")
-    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-    public Response listComponent(@PathVariable Long id) {
-        try {
-            return Response.ok(moduleManagementService.getModuleDetail(id));
-        } catch (Exception e) {
-            e.printStackTrace();
-            return Response.fail(ResponseMessage.MODULE_QUERY_ERROR);
-        }
+    @Override
+    @OnExceptionMessage(value = ResponseMessage.MODULE_QUERY_ERROR)
+    public ModuleDetailDTO moduleDetail(@PathVariable Long id) {
+        return moduleManagementService.getModuleDetail(id);
     }
 }

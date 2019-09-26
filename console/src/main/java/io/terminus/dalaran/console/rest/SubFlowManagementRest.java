@@ -1,21 +1,28 @@
 package io.terminus.dalaran.console.rest;
 
-import io.swagger.annotations.ApiOperation;
-import io.terminus.common.model.Response;
-import io.terminus.dalaran.console.model.ResponseMessage;
-import io.terminus.dalaran.console.model.TestRequestDTO;
-import io.terminus.dalaran.console.model.dto.CopyFlow;
-import io.terminus.dalaran.console.model.dto.flow.SubFlowDTO;
-import io.terminus.dalaran.console.model.query.FlowQuery;
+import io.terminus.dalaran.console.ResponseMessage;
+import io.terminus.dalaran.console.exception.OnExceptionMessage;
 import io.terminus.dalaran.console.service.SubFlowManagementService;
 import io.terminus.dalaran.console.service.TracingLogService;
 import io.terminus.dalaran.core.context.DalaranContext;
+import io.terminus.dalaran.model.dto.CopyFlow;
+import io.terminus.dalaran.model.dto.TestRequestDTO;
+import io.terminus.dalaran.model.dto.flow.SubFlowDTO;
+import io.terminus.dalaran.model.dto.log.MainLogDTO;
+import io.terminus.dalaran.model.flow.FlowValidation;
+import io.terminus.dalaran.model.query.FlowQuery;
+import io.terminus.dalaran.rest.read.SubFlowReadAPI;
+import io.terminus.dalaran.rest.write.SubFlowWriteAPI;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
-@RequestMapping("/api/sub-flow")
-public class SubFlowManagementRest {
+public class SubFlowManagementRest implements SubFlowReadAPI, SubFlowWriteAPI {
 
     @Autowired
     private SubFlowManagementService service;
@@ -26,109 +33,66 @@ public class SubFlowManagementRest {
     @Autowired
     private DalaranContext dalaranContext;
 
-    @ApiOperation(value = "创建子流程")
-    @PostMapping(value = "/create")
-    public Response create(@RequestBody SubFlowDTO model) {
-        try {
-            return Response.ok(service.createFlow(model));
-        } catch (Exception e) {
-            e.printStackTrace();
-            return Response.fail(ResponseMessage.SUBFLOW_CREATE_ERROR);
-        }
+    @Override
+    @OnExceptionMessage(value = ResponseMessage.SUBFLOW_CREATE_ERROR)
+    public Long create(@RequestBody SubFlowDTO model) {
+        return service.createFlow(model);
     }
 
-    @ApiOperation(value = "更新子流程")
-    @PostMapping(value = "/update")
-    public Response update(@RequestBody SubFlowDTO model) {
-        try {
-            return Response.ok(service.updateFlow(model));
-        } catch (Exception e) {
-            e.printStackTrace();
-            return Response.fail(ResponseMessage.SUBFLOW_UPDATE_ERROR);
-        }
+    @Override
+    @OnExceptionMessage(value = ResponseMessage.SUBFLOW_UPDATE_ERROR)
+    public SubFlowDTO update(@RequestBody SubFlowDTO model) {
+        return service.updateFlow(model);
     }
 
-    @ApiOperation(value = "删除子流程")
-    @DeleteMapping(value = "/delete")
-    public Response delete(@RequestParam Long id) {
-        try {
-            service.deleteFlow(id);
-            return Response.ok();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return Response.fail(ResponseMessage.SUBFLOW_DELETE_ERROR);
-        }
+    @Override
+    @OnExceptionMessage(value = ResponseMessage.SUBFLOW_DELETE_ERROR)
+    public void deleteById(@RequestParam Long id) {
+        service.deleteFlow(id);
     }
 
-    @ApiOperation(value = "复制子流程")
-    @PostMapping(value = "/copy")
-    public Response copy(@RequestBody CopyFlow copyFlow) {
-        try {
-            return Response.ok(service.copyFlow(copyFlow));
-        } catch (Exception e) {
-            e.printStackTrace();
-            return Response.fail(ResponseMessage.SUBFLOW_COPY_ERROR);
-        }
+    @Override
+    @OnExceptionMessage(value = ResponseMessage.SUBFLOW_COPY_ERROR)
+    public Long copy(@RequestBody CopyFlow copyFlow) {
+        return service.copyFlow(copyFlow);
     }
 
-    @ApiOperation(value = "根据 ID 获取子流程")
-    @GetMapping(value = "/{id}")
-    public Response getById(@PathVariable Long id) {
-        try {
-            return Response.ok(service.getById(id));
-        } catch (Exception e) {
-            e.printStackTrace();
-            return Response.fail(ResponseMessage.SUBFLOW_QUERY_ERROR);
-        }
+    @Override
+    @OnExceptionMessage(value = ResponseMessage.SUBFLOW_QUERY_ERROR)
+    public SubFlowDTO getById(@PathVariable Long id) {
+        return service.getById(id);
     }
 
-    @ApiOperation(value = "条件查询子流程")
-    @GetMapping(value = "/query")
-    public Response query(FlowQuery query) {
-        try {
-            return Response.ok(service.queryFlows(query));
-        } catch (Exception e) {
-            e.printStackTrace();
-            return Response.fail(ResponseMessage.SUBFLOW_QUERY_ERROR);
-        }
+    @Override
+    @OnExceptionMessage(value = ResponseMessage.SUBFLOW_QUERY_ERROR)
+    public List<SubFlowDTO> query(FlowQuery query) {
+        return service.queryFlows(query);
     }
 
-    @ApiOperation(value = "全量查询子流程")
-    @GetMapping(value = "/list")
-    public Response list() {
-        try {
-            return Response.ok(service.list());
-        } catch (Exception e) {
-            e.printStackTrace();
-            return Response.fail(ResponseMessage.SUBFLOW_QUERY_ERROR);
-        }
+
+    @Override
+    @OnExceptionMessage(value = ResponseMessage.SUBFLOW_QUERY_ERROR)
+    public List<SubFlowDTO> list() {
+        return service.list();
     }
 
-    @ApiOperation(value = "检查子流程")
-    @PostMapping(value = "/validate")
-    public Response validate(@RequestBody SubFlowDTO model) {
-        try {
-            return Response.ok(service.validateFlow(model));
-        } catch (Exception e) {
-            e.printStackTrace();
-            return Response.fail(ResponseMessage.SUBFLOW_CHECK_ERROR);
-        }
+
+    @Override
+    @OnExceptionMessage(value = ResponseMessage.SUBFLOW_CHECK_ERROR)
+    public List<FlowValidation> validate(@RequestBody SubFlowDTO model) {
+        return service.validateFlow(model);
     }
 
-    @ApiOperation(value = "测试子流程")
-    @PostMapping("/test")
-    private Response doSubFlowTest(@RequestBody TestRequestDTO request) {
-        try {
-            SubFlowDTO flow = service.getById(request.getFlowId());
-            if (flow == null) {
-                // TODO throw flow not found
-                return null;
-            }
-            String recordId = dalaranContext.testSubFlow(request.getFlowId(), request.getBody());
-            return Response.ok(tracingLogService.getRecordDetail(recordId));
-        } catch (Exception e) {
-            e.printStackTrace();
-            return Response.fail(ResponseMessage.SUBFLOW_TEST_ERROR);
+
+    @Override
+    @OnExceptionMessage(value = ResponseMessage.SUBFLOW_TEST_ERROR)
+    public MainLogDTO doSubFlowTest(@RequestBody TestRequestDTO request) {
+        SubFlowDTO flow = service.getById(request.getFlowId());
+        if (flow == null) {
+            // TODO throw flow not found
+            return null;
         }
+        String recordId = dalaranContext.testSubFlow(request.getFlowId(), request.getBody());
+        return tracingLogService.getRecordDetail(recordId);
     }
 }

@@ -1,12 +1,12 @@
 package io.terminus.dalaran.console.service.impl;
 
-import io.terminus.dalaran.console.model.dto.ModuleDTO;
-import io.terminus.dalaran.console.model.dto.ModuleDetailDTO;
-import io.terminus.dalaran.console.model.query.ModuleQuery;
 import io.terminus.dalaran.console.service.*;
 import io.terminus.dalaran.console.service.jpa.ModuleQueryService;
 import io.terminus.dalaran.core.resource.entity.common.ModuleEntity;
 import io.terminus.dalaran.core.resource.repository.ModuleRepository;
+import io.terminus.dalaran.model.dto.ModuleDTO;
+import io.terminus.dalaran.model.dto.ModuleDetailDTO;
+import io.terminus.dalaran.model.query.ModuleQuery;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,7 +57,7 @@ public class ModuleManagementServiceImpl implements ModuleManagementService {
 
     @Override
     public void deleteModule(Long moduleId) {
-        moduleRepository.delete(moduleId);
+        moduleRepository.deleteById(moduleId);
     }
 
     @Override
@@ -92,7 +92,7 @@ public class ModuleManagementServiceImpl implements ModuleManagementService {
 
     @Override
     public ModuleDetailDTO getModuleDetail(Long moduleId) {
-        ModuleEntity moduleEntity = moduleRepository.findOne(moduleId);
+        ModuleEntity moduleEntity = moduleRepository.findById(moduleId).get();
         if (moduleEntity == null) {
             return null;
         }
@@ -114,7 +114,7 @@ public class ModuleManagementServiceImpl implements ModuleManagementService {
 
     @Override
     public String getModuleName(@NotNull Long moduleId) {
-        ModuleEntity entity = moduleRepository.findOne(moduleId);
+        ModuleEntity entity = moduleRepository.findById(moduleId).get();
         if (entity == null) {
             return null;
         }
@@ -127,7 +127,7 @@ public class ModuleManagementServiceImpl implements ModuleManagementService {
         if (id == null) {
             moduleEntity = new ModuleEntity();
         } else {
-            moduleEntity = moduleRepository.findOne(id);
+            moduleEntity = moduleRepository.findById(id).get();
         }
         String name = model.getName();
         if (StringUtils.isNoneBlank(name)) {

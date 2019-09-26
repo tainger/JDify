@@ -7,7 +7,6 @@ import io.terminus.dalaran.core.log.DalaranTraceLogger;
 import io.terminus.dalaran.core.resource.repository.TracingLogRepository;
 import io.terminus.dalaran.core.spring.DalaranAutoConfiguration;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;

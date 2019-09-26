@@ -8,4 +8,4 @@ spring:
     password: ${MYSQL_PASSWORD:secret}
   jpa:
     hibernate.ddl-auto: update
-    database-platform: org.hibernate.dialect.MySQLDialect
+    database-platform: org.hibernate.dialect.MySQL57Dialect

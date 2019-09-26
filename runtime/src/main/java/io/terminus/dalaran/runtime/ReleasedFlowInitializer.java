@@ -118,7 +118,7 @@ public class ReleasedFlowInitializer {
     private List<ApiInfo> getExportApiInfoList() {
         List<TriggerFlowReleasedEntity> restFlowList = resourceLoader.loadAvailableTriggerFlowByTriggerType("http-rest-listener");
         return restFlowList.stream().map(flowEntity -> {
-            ModuleEntity module = moduleRepository.findOne(flowEntity.getModuleId());
+            ModuleEntity module = moduleRepository.findById(flowEntity.getModuleId()).get();
             RestConfig restConfig = JSON.parseObject(flowEntity.getTriggerConfig(), RestConfig.class);
             DalaranModelSchema inSchema = getModelSchema(flowEntity.getInModel());
             DalaranModelSchema outSchema = getModelSchema(flowEntity.getOutModel());

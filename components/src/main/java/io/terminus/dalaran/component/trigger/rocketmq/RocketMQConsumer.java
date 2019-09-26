@@ -1,6 +1,6 @@
 package io.terminus.dalaran.component.trigger.rocketmq;
 
-import io.terminus.dalaran.core.component.BodySerializeType;
+import io.terminus.dalaran.BodySerializeType;
 import io.terminus.dalaran.core.component.DalaranTrigger;
 import io.terminus.dalaran.core.component.annotation.Trigger;
 import io.terminus.dalaran.model.BodyType;

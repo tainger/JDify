@@ -1,7 +1,7 @@
 package io.terminus.dalaran.console.service;
 
-import io.terminus.dalaran.console.model.dto.PropertyDTO;
-import io.terminus.dalaran.console.model.query.PropertyQuery;
+import io.terminus.dalaran.model.dto.PropertyDTO;
+import io.terminus.dalaran.model.query.PropertyQuery;
 
 import java.util.List;
 

@@ -2,8 +2,8 @@ package io.terminus.dalaran.component.processor.http;
 
 import com.alibaba.fastjson.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.terminus.dalaran.FieldInputType;
 import io.terminus.dalaran.component.common.HttpMethod;
-import io.terminus.dalaran.core.component.FieldInputType;
 import io.terminus.dalaran.core.component.annotation.ConfigFieldInfo;
 import io.terminus.dalaran.core.component.config.ConnectorConfig;
 import io.terminus.dalaran.core.component.config.OutModelConfig;

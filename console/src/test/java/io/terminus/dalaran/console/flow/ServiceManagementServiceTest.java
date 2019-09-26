@@ -6,11 +6,11 @@ import com.predic8.wsdl.creator.WSDLCreator;
 import com.predic8.wsdl.creator.WSDLCreatorContext;
 import groovy.xml.MarkupBuilder;
 import io.terminus.dalaran.console.entity.ServiceEntity;
-import io.terminus.dalaran.console.model.dto.ServiceDTO;
-import io.terminus.dalaran.console.model.dto.basic.BasicServiceInfo;
 import io.terminus.dalaran.console.repository.ServiceRepository;
 import io.terminus.dalaran.console.service.ExportService;
 import io.terminus.dalaran.console.service.ServiceManagement;
+import io.terminus.dalaran.model.dto.ServiceDTO;
+import io.terminus.dalaran.model.dto.basic.BasicServiceInfo;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -54,7 +54,7 @@ public class ServiceManagementServiceTest {
     public void create() {
         ServiceDTO service = buildService();
         Long id = serviceManagement.create(service);
-        ServiceEntity entity = serviceRepository.findOne(id);
+        ServiceEntity entity = serviceRepository.findById(id).get();
         Assert.assertEquals(service.getName(), entity.getName());
     }
 
@@ -75,7 +75,7 @@ public class ServiceManagementServiceTest {
     @Test
     public void detail() {
         ServiceDTO service = serviceManagement.detail(1L);
-        ServiceEntity entity = serviceRepository.findOne(1L);
+        ServiceEntity entity = serviceRepository.findById(1L).get();
         Assert.assertEquals(service.getName(), entity.getName());
     }
 

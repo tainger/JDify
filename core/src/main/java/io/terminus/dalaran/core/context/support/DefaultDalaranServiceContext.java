@@ -1,9 +1,9 @@
 package io.terminus.dalaran.core.context.support;
 
+import io.terminus.dalaran.config.DalaranConfigField;
+import io.terminus.dalaran.config.ServiceInfo;
 import io.terminus.dalaran.core.component.DalaranService;
 import io.terminus.dalaran.core.component.annotation.ServiceConnector;
-import io.terminus.dalaran.core.config.DalaranConfigField;
-import io.terminus.dalaran.core.config.ServiceInfo;
 import io.terminus.dalaran.core.context.DalaranServiceContext;
 import io.terminus.dalaran.core.util.ConfigFieldUtils;
 import org.springframework.beans.BeansException;

@@ -1,7 +1,7 @@
 package io.terminus.dalaran.component.trigger.rest;
 
+import io.terminus.dalaran.FieldInputType;
 import io.terminus.dalaran.component.common.HttpMethod;
-import io.terminus.dalaran.core.component.FieldInputType;
 import io.terminus.dalaran.core.component.annotation.ConfigFieldInfo;
 import io.terminus.dalaran.core.component.config.AllModelConfig;
 import io.terminus.dalaran.model.HttpProtocol;

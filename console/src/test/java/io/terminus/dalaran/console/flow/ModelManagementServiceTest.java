@@ -2,14 +2,14 @@ package io.terminus.dalaran.console.flow;
 
 import com.alibaba.fastjson.JSON;
 import io.terminus.dalaran.console.entity.ModelEntity;
-import io.terminus.dalaran.console.model.dto.DataTemplate;
-import io.terminus.dalaran.console.model.dto.ModelDTO;
-import io.terminus.dalaran.console.model.query.ModelQuery;
 import io.terminus.dalaran.console.repository.ModelRepository;
 import io.terminus.dalaran.console.service.ModelManagementService;
 import io.terminus.dalaran.model.BodyType;
 import io.terminus.dalaran.model.FieldType;
 import io.terminus.dalaran.model.ModelField;
+import io.terminus.dalaran.model.dto.DataTemplate;
+import io.terminus.dalaran.model.dto.ModelDTO;
+import io.terminus.dalaran.model.query.ModelQuery;
 import io.terminus.dalaran.model.schema.JsonSchema;
 import org.apache.http.entity.ContentType;
 import org.junit.Assert;
@@ -52,7 +52,7 @@ public class ModelManagementServiceTest {
         model.setModelType(BodyType.JSON);
         model.setModuleId(1L);
         Long id = modelManagementService.createModel(model);
-        ModelEntity entity = modelRepository.findOne(id);
+        ModelEntity entity = modelRepository.findById(id).get();
         Assert.assertEquals(entity.getName(), model.getName());
     }
 

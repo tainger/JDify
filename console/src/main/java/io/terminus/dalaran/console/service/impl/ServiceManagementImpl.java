@@ -1,23 +1,23 @@
 package io.terminus.dalaran.console.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import io.terminus.dalaran.config.ServiceInfo;
+import io.terminus.dalaran.console.ServiceDetail;
 import io.terminus.dalaran.console.entity.ModelEntity;
 import io.terminus.dalaran.console.entity.ServiceEntity;
-import io.terminus.dalaran.console.model.ServiceDetail;
-import io.terminus.dalaran.console.model.dto.ModelDTO;
-import io.terminus.dalaran.console.model.dto.ServiceDTO;
-import io.terminus.dalaran.console.model.dto.basic.BasicServiceInfo;
 import io.terminus.dalaran.console.repository.ModelRepository;
 import io.terminus.dalaran.console.repository.ServiceRepository;
 import io.terminus.dalaran.console.service.ModelManagementService;
 import io.terminus.dalaran.console.service.ServiceManagement;
 import io.terminus.dalaran.core.component.DalaranService;
 import io.terminus.dalaran.core.component.model.ServiceOperationModel;
-import io.terminus.dalaran.core.config.ServiceInfo;
 import io.terminus.dalaran.core.context.DalaranServiceContext;
 import io.terminus.dalaran.model.MessageModel;
 import io.terminus.dalaran.model.ModelTargetType;
 import io.terminus.dalaran.model.component.ServiceOperation;
+import io.terminus.dalaran.model.dto.ModelDTO;
+import io.terminus.dalaran.model.dto.ServiceDTO;
+import io.terminus.dalaran.model.dto.basic.BasicServiceInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -71,12 +71,12 @@ public class ServiceManagementImpl implements ServiceManagement {
 
     @Override
     public void delete(Long serviceId) {
-        serviceRepository.delete(serviceId);
+        serviceRepository.deleteById(serviceId);
     }
 
     @Override
     public ServiceDTO detail(Long serviceId) {
-        return toDTO(serviceRepository.findOne(serviceId));
+        return toDTO(serviceRepository.findById(serviceId).get());
     }
 
     @Override
@@ -86,7 +86,7 @@ public class ServiceManagementImpl implements ServiceManagement {
 
     @Override
     public List<String> listOperation(Long serviceId) {
-        ServiceEntity entity = serviceRepository.findOne(serviceId);
+        ServiceEntity entity = serviceRepository.findById(serviceId).get();
         ServiceInfo serviceInfo = serviceContext.getServiceInfo(entity.getType());
         Object serviceConfig = JSON.parseObject(entity.getServiceConfig(), serviceInfo.getServiceConfigType());
         return serviceContext.getService(entity.getType()).operations(serviceConfig);

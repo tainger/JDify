@@ -4,20 +4,20 @@ import com.alibaba.fastjson.JSON;
 import io.terminus.dalaran.console.TestFlowInitializer;
 import io.terminus.dalaran.console.convertor.FlowConvertor;
 import io.terminus.dalaran.console.entity.SubFlowEntity;
-import io.terminus.dalaran.console.model.dto.CopyFlow;
-import io.terminus.dalaran.console.model.dto.basic.BasicFlowInfo;
-import io.terminus.dalaran.console.model.dto.flow.SubFlowDTO;
-import io.terminus.dalaran.console.model.query.FlowQuery;
 import io.terminus.dalaran.console.repository.SubFlowRepository;
 import io.terminus.dalaran.console.service.SubFlowManagementService;
 import io.terminus.dalaran.console.service.jpa.SubFlowQueryService;
 import io.terminus.dalaran.core.flow.DalaranFlowBuilder;
 import io.terminus.dalaran.core.resource.DalaranResourceBuilder;
 import io.terminus.dalaran.core.resource.entity.common.ProcessorEntity;
+import io.terminus.dalaran.model.dto.CopyFlow;
+import io.terminus.dalaran.model.dto.basic.BasicFlowInfo;
+import io.terminus.dalaran.model.dto.flow.SubFlowDTO;
 import io.terminus.dalaran.model.flow.FlowStatus;
 import io.terminus.dalaran.model.flow.FlowValidation;
 import io.terminus.dalaran.model.flow.SubFlow;
 import io.terminus.dalaran.model.flow.ValidateMessageLevel;
+import io.terminus.dalaran.model.query.FlowQuery;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.BeanUtils;
@@ -61,7 +61,7 @@ public class SubFlowManagementServiceImpl implements SubFlowManagementService {
 
     @Override
     public void deleteFlow(Long flowId) {
-        subFlowRepository.delete(flowId);
+        subFlowRepository.deleteById(flowId);
     }
 
     @Override
@@ -94,7 +94,7 @@ public class SubFlowManagementServiceImpl implements SubFlowManagementService {
     @Nullable
     @Override
     public SubFlowDTO getById(Long flowId) {
-        SubFlowEntity flowEntity = subFlowRepository.findOne(flowId);
+        SubFlowEntity flowEntity = subFlowRepository.findById(flowId).get();
         if (flowEntity == null) {
             return null;
         }
@@ -103,7 +103,7 @@ public class SubFlowManagementServiceImpl implements SubFlowManagementService {
 
     @Override
     public Long copyFlow(CopyFlow copyFlow) {
-        SubFlowEntity flowEntity = subFlowRepository.findOne(copyFlow.getId());
+        SubFlowEntity flowEntity = subFlowRepository.findById(copyFlow.getId()).get();
         if (flowEntity == null) {
             return null;
         }
@@ -150,7 +150,7 @@ public class SubFlowManagementServiceImpl implements SubFlowManagementService {
         SubFlowEntity flowEntity;
         Long id = model.getId();
         if (id != null) {
-            flowEntity = subFlowRepository.findOne(id);
+            flowEntity = subFlowRepository.findById(id).get();
         } else {
             flowEntity = new SubFlowEntity();
         }
