@@ -90,8 +90,6 @@ public class SoapServiceTest extends BasicServiceTest {
         schemaOperation.setProtocol(HttpProtocol.HTTP);
         schemaOperation.setPortType("getCountryRequest");
         schemaOperation.setName("getCountry");
-        schemaOperation.setInput("getCountryRequest");
-        schemaOperation.setOutPut("getCountryResponse");
         schemaOperation.setBinding("CountriesPortSoap11");
 
         SoapSchema schema = new SoapSchema();

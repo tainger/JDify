@@ -140,8 +140,6 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
         String inputName = soapOperation.getInput();
         String outputName = soapOperation.getOutput();
         schemaOperation.setPortType(operationConfig.getPortType());
-        schemaOperation.setInput(inputName);
-        schemaOperation.setOutPut(outputName);
 
         schemaOperation.setProtocol(operationConfig.getProtocol());
         schemaOperation.setTargetNamespace(operationConfig.getTargetNamespace());
@@ -187,7 +185,6 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
         try {
             SoapSchemaOperation schemaOperation = new SoapSchemaOperation();
             BeanUtils.copyProperties(schemaOperation, operationConfig);
-            schemaOperation.setModelRoot(modelRoot);
             soapSchema.setOperationConfig(schemaOperation);
         } catch (Exception e) {
             e.printStackTrace();
