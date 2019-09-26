@@ -2,7 +2,7 @@ package io.terminus.dalaran.component.convert;
 
 import com.alibaba.fastjson.JSON;
 import io.terminus.dalaran.component.trigger.soap.model.SoapModel;
-import io.terminus.dalaran.model.converter.soap.processor.ObjectToSoapProcessor;
+import io.terminus.dalaran.core.converter.soap.processor.ObjectToSoapProcessor;
 import io.terminus.dalaran.model.schema.SoapSchema;
 import org.junit.Test;
 
