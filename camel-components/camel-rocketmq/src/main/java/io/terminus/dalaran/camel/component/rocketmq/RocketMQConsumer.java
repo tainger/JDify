@@ -38,7 +38,7 @@ public class RocketMQConsumer extends DefaultConsumer {
     protected void doStart() throws Exception {
         super.doStart();
         DefaultMQPushConsumer consumer = new DefaultMQPushConsumer(endpoint.getGroupId());
-        consumer.subscribe(endpoint.getTopic(), "*");
+        consumer.subscribe(endpoint.getTopic(), endpoint.getTags());
         consumer.setNamesrvAddr(endpoint.getNameServer());
         consumer.setVipChannelEnabled(false);
         consumer.setMessageListener(new MessageListenerConcurrently() {
