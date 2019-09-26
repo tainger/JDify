@@ -45,7 +45,6 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
         String uri = String.format(HTTP_URI, "http", soapOperationConfig.getBaseUrl());
         route.setHeader(Exchange.HTTP_METHOD, Builder.constant(HttpMethod.POST));
         route.setHeader(Exchange.CONTENT_TYPE, Builder.constant("application/xml"));
-//        route.setHeader("SOAPAction", Builder.constant("http://sap.com/xi/WebService/soap1.1"));
         route.to(uri);
         // TODO Stream to string
         route.convertBodyTo(String.class);

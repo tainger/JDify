@@ -1,11 +1,5 @@
 package io.terminus.dalaran.core.converter.soap.processor;
 
-import com.predic8.wsdl.Definitions;
-import com.predic8.wstool.creator.RequestCreator;
-import com.predic8.wstool.creator.SOARequestCreator;
-import com.predic8.xml.util.BasicAuthenticationResolver;
-import com.sun.org.apache.xpath.internal.operations.Mod;
-import groovy.xml.MarkupBuilder;
 import io.terminus.dalaran.DalaranConstants;
 import io.terminus.dalaran.model.FieldType;
 import io.terminus.dalaran.model.ModelField;
@@ -23,13 +17,8 @@ import org.xml.sax.InputSource;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.soap.*;
-import javax.xml.transform.Source;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-import java.io.*;
-import java.util.HashMap;
+import java.io.ByteArrayOutputStream;
+import java.io.StringReader;
 import java.util.List;
 import java.util.Map;
 
@@ -55,9 +44,7 @@ public class ObjectToSoapProcessor implements Processor, Traceable {
     public void process(Exchange exchange) throws Exception {
         Object body = exchange.getIn().getBody();
         Object rst = buildRequest(modelFields.get(DalaranConstants.MODEL_ROOT), body);
-        StringEntity stringEntity = new StringEntity(rst.toString());
-        stringEntity.setContentType("text/xml");
-        exchange.getOut().setBody(stringEntity);
+        exchange.getOut().setBody(rst);
     }
 
     private Object buildRequest(ModelField modelField, Object body) throws Exception {
@@ -80,7 +67,7 @@ public class ObjectToSoapProcessor implements Processor, Traceable {
         format.setIndenting(true);
         XMLSerializer serializer = new XMLSerializer(data, format);
         serializer.serialize(document);
-        return data;
+        return data.toString();
     }
 
     private void buildBody(Map<String, ModelField> modelField, Object body, SOAPElement soapElement) throws Exception {
