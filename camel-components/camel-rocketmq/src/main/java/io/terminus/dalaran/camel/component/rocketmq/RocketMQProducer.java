@@ -2,6 +2,7 @@ package io.terminus.dalaran.camel.component.rocketmq;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.impl.DefaultProducer;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.rocketmq.client.producer.DefaultMQProducer;
 import org.apache.rocketmq.client.producer.SendCallback;
 import org.apache.rocketmq.client.producer.SendResult;
@@ -56,10 +57,10 @@ public class RocketMQProducer extends DefaultProducer {
         Message msg = new Message();
         org.apache.camel.Message camelMsg = exchange.getIn();
         msg.setTopic(endpoint.getTopic());
-//        String tags = camelMsg.getHeader("TAGS", String.class);
-//        if (StringUtils.isNotBlank(tags)) {
-//            msg.setTags(tags);
-//        }
+        String tags = endpoint.getTags();
+        if (StringUtils.isNotBlank(tags)) {
+            msg.setTags(endpoint.getTags());
+        }
         Object body = camelMsg.getBody();
         if (body != null) {
             msg.setBody(body.toString().getBytes());

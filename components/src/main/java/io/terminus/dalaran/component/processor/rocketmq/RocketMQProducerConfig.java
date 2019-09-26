@@ -27,4 +27,7 @@ public class RocketMQProducerConfig extends OutModelConfig implements ConnectorC
 
     @ConfigFieldInfo(label = "生产者组", inputType = FieldInputType.String)
     private String producerGroup;
+
+    @ConfigFieldInfo(label = "tag", inputType = FieldInputType.String)
+    private String tags;
 }

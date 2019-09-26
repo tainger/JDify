@@ -24,7 +24,7 @@ public class RocketMQProducer implements DalaranProcessor<RocketMQProducerConfig
         String uri = "rocketmq:"
                 + "?nameServer=" + config.getConnector().getNameServer()
                 + "&groupId=" + config.getProducerGroup()
-                + "&topic=" + config.getTopic();
+                + "&topic=" + config.getTopic() + "&tags=" + config.getTags();
         route.to(uri);
     }
 }
