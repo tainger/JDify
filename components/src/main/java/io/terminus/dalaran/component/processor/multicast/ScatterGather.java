@@ -1,6 +1,5 @@
 package io.terminus.dalaran.component.processor.multicast;
 
-import io.terminus.dalaran.BodySerializeType;
 import io.terminus.dalaran.core.component.DalaranProcessor;
 import io.terminus.dalaran.core.component.DalaranProcessorConfigCustomConverter;
 import io.terminus.dalaran.core.component.annotation.Processor;
@@ -9,6 +8,7 @@ import io.terminus.dalaran.core.context.DalaranConverterContext;
 import io.terminus.dalaran.core.flow.DalaranFlowBuilder;
 import io.terminus.dalaran.core.flow.DalaranRoute;
 import io.terminus.dalaran.core.resource.DalaranResourceBuilder;
+import io.terminus.dalaran.model.BodyType;
 import io.terminus.dalaran.model.component.ComponentModel;
 import io.terminus.dalaran.model.flow.BasicFlow;
 import io.terminus.dalaran.model.flow.FlowFragment;
@@ -27,8 +27,7 @@ import static io.terminus.dalaran.DalaranConstants.DELIMITER;
 @Processor(
         value = "scatter-gather",
         name = "并行/聚合",
-        configType = ScatterGatherConfig.class,
-        outputSerializeType = BodySerializeType.Object
+        configType = ScatterGatherConfig.class
 )
 public class ScatterGather implements DalaranProcessor<List<String>>, DalaranProcessorConfigCustomConverter<ScatterGatherConfig, List<String>> {
 
@@ -70,7 +69,7 @@ public class ScatterGather implements DalaranProcessor<List<String>>, DalaranPro
             DalaranRoute fragmentRoute = flowBuilder.buildFlowFragment(fragment);
 
             // 因为后面会有一个聚合处理, 所以一定要输出为 Object, 否则 Mapper 不好处理
-            if (fragmentRoute.isSerializedBody()) {
+            if (fragmentRoute.getLastBodyType() != BodyType.OBJECT) {
                 converterContext.toObject(fragmentRoute, fragmentRoute.getLastOutModel());
             }
 

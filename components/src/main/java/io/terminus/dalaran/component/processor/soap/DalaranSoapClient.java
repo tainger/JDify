@@ -1,6 +1,5 @@
 package io.terminus.dalaran.component.processor.soap;
 
-import io.terminus.dalaran.BodySerializeType;
 import io.terminus.dalaran.core.component.DalaranProcessor;
 import io.terminus.dalaran.core.component.annotation.Processor;
 import io.terminus.dalaran.model.BodyType;
@@ -17,9 +16,7 @@ import org.apache.commons.lang3.StringUtils;
         name = "Soap 调用器",
         order = 11,
         configType = SoapClientConfig.class,
-        allowBodyTypes = {BodyType.JSON, BodyType.XML},
-        inputSerializeType = BodySerializeType.Serialized,
-        outputSerializeType = BodySerializeType.Serialized
+        bodyType = BodyType.SOAP
 )
 public class DalaranSoapClient implements DalaranProcessor<SoapClientConfig> {
 

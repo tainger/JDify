@@ -1,6 +1,5 @@
 package io.terminus.dalaran.component.trigger.rest;
 
-import io.terminus.dalaran.BodySerializeType;
 import io.terminus.dalaran.component.trigger.rest.processor.QueryStringConvertProcessor;
 import io.terminus.dalaran.component.trigger.rest.processor.QueryStringSignProcessor;
 import io.terminus.dalaran.component.trigger.rest.processor.SignProcessor;
@@ -17,9 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
         name = "Rest 监听器",
         order = 10,
         configType = RestConfig.class,
-        allowBodyTypes = {BodyType.JSON, BodyType.XML},
-        inputSerializeType = BodySerializeType.Serialized,
-        outputSerializeType = BodySerializeType.Serialized
+        bodyType = BodyType.JSON
 )
 public class RestListener implements DalaranTrigger<RestConfig> {
 

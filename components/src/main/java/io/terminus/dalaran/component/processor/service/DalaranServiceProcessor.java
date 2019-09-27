@@ -1,6 +1,5 @@
 package io.terminus.dalaran.component.processor.service;
 
-import io.terminus.dalaran.BodySerializeType;
 import io.terminus.dalaran.core.component.DalaranComponentValidator;
 import io.terminus.dalaran.core.component.DalaranProcessor;
 import io.terminus.dalaran.core.component.DalaranProcessorConfigCustomConverter;
@@ -28,9 +27,7 @@ import static io.terminus.dalaran.component.processor.service.ServiceValidationM
         value = "service",
         name = "服务调用器",
         order = 11,
-        configType = ServiceOperationConfig.class,
-        inputSerializeType = BodySerializeType.Serialized,
-        outputSerializeType = BodySerializeType.Serialized
+        configType = ServiceOperationConfig.class
 )
 public class DalaranServiceProcessor implements DalaranProcessor<DalaranServiceOperation>, DalaranProcessorConfigCustomConverter<ServiceOperationConfig, DalaranServiceOperation>, DalaranComponentValidator<ServiceOperationConfig> {
 

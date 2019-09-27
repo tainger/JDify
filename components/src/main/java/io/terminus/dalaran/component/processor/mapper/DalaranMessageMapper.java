@@ -1,6 +1,5 @@
 package io.terminus.dalaran.component.processor.mapper;
 
-import io.terminus.dalaran.BodySerializeType;
 import io.terminus.dalaran.component.processor.mapper.model.*;
 import io.terminus.dalaran.core.component.DalaranComponentValidator;
 import io.terminus.dalaran.core.component.DalaranProcessor;
@@ -31,9 +30,7 @@ import static io.terminus.dalaran.component.processor.mapper.MapperValidationMes
         value = "mapper-convert",
         name = "数据映射",
         order = 10,
-        configType = DalaranMapperConfig.class,
-        inputSerializeType = BodySerializeType.Object,
-        outputSerializeType = BodySerializeType.Object
+        configType = DalaranMapperConfig.class
 )
 @Data
 public class DalaranMessageMapper implements DalaranProcessor<DalaranMapperConfig>, DalaranComponentValidator<DalaranMapperConfig> {

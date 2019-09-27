@@ -46,6 +46,7 @@ public class RocketMQProducer extends DefaultProducer {
             public void onSuccess(SendResult sendResult) {
                 exchange.getOut().setBody(sendResult);
             }
+
             @Override
             public void onException(Throwable e) {
                 e.printStackTrace();
@@ -59,7 +60,7 @@ public class RocketMQProducer extends DefaultProducer {
         msg.setTopic(endpoint.getTopic());
         String tags = endpoint.getTags();
         if (StringUtils.isNotBlank(tags)) {
-            msg.setTags(endpoint.getTags());
+            msg.setTags(tags);
         }
         Object body = camelMsg.getBody();
         if (body != null) {

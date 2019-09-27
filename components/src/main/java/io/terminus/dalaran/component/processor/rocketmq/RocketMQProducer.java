@@ -1,9 +1,7 @@
 package io.terminus.dalaran.component.processor.rocketmq;
 
-import io.terminus.dalaran.BodySerializeType;
 import io.terminus.dalaran.core.component.DalaranProcessor;
 import io.terminus.dalaran.core.component.annotation.Processor;
-import io.terminus.dalaran.model.BodyType;
 import org.apache.camel.model.ProcessorDefinition;
 
 /**
@@ -13,10 +11,8 @@ import org.apache.camel.model.ProcessorDefinition;
         value = "rocketmq-producer",
         name = "RocketMQ 消息发送器",
         order = 13,
-        configType = RocketMQProducerConfig.class,
-        inputSerializeType = BodySerializeType.Object,
-        outputSerializeType = BodySerializeType.Object,
-        allowBodyTypes = {BodyType.JSON, BodyType.XML})
+        configType = RocketMQProducerConfig.class
+)
 public class RocketMQProducer implements DalaranProcessor<RocketMQProducerConfig> {
 
     @Override

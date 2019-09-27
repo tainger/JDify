@@ -3,6 +3,7 @@ package io.terminus.dalaran.camel.component.rocketmq;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.impl.DefaultConsumer;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.rocketmq.client.consumer.DefaultMQPushConsumer;
 import org.apache.rocketmq.client.consumer.listener.ConsumeConcurrentlyContext;
 import org.apache.rocketmq.client.consumer.listener.ConsumeConcurrentlyStatus;
@@ -38,7 +39,11 @@ public class RocketMQConsumer extends DefaultConsumer {
     protected void doStart() throws Exception {
         super.doStart();
         DefaultMQPushConsumer consumer = new DefaultMQPushConsumer(endpoint.getGroupId());
-        consumer.subscribe(endpoint.getTopic(), endpoint.getTags());
+        if (StringUtils.isNotBlank(endpoint.getTags())) {
+            consumer.subscribe(endpoint.getTopic(), endpoint.getTags());
+        } else {
+            consumer.subscribe(endpoint.getTopic(), "*");
+        }
         consumer.setNamesrvAddr(endpoint.getNameServer());
         consumer.setVipChannelEnabled(false);
         consumer.setMessageListener(new MessageListenerConcurrently() {

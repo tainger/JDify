@@ -14,7 +14,6 @@ import io.terminus.dalaran.component.common.HttpMethod;
 import io.terminus.dalaran.core.component.DalaranService;
 import io.terminus.dalaran.core.component.annotation.ServiceConnector;
 import io.terminus.dalaran.core.component.model.ServiceOperationModel;
-import io.terminus.dalaran.core.model.ServiceModel;
 import io.terminus.dalaran.model.BodyType;
 import io.terminus.dalaran.model.FieldType;
 import io.terminus.dalaran.model.MessageModel;

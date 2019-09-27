@@ -41,6 +41,10 @@ public class DalaranTracer {
         this.processorId = processorId;
     }
 
+    public static DalaranTracer buildTracer(DalaranTraceLogger logger, TracingType tracingType) {
+        return new DalaranTracer(logger, tracingType, null);
+    }
+
     public static DalaranTracer buildTestSubFlowTracer(DalaranTraceLogger logger) {
         return new DalaranTracer(logger, TracingType.TestSubFlow, null);
     }

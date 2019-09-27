@@ -13,6 +13,8 @@ import io.terminus.dalaran.model.schema.ObjectSchema;
 import io.terminus.dalaran.model.schema.SoapSchema;
 import io.terminus.dalaran.model.schema.XMLSchema;
 import org.apache.camel.model.ProcessorDefinition;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -38,31 +40,45 @@ public class DefaultDalaranConverterContext implements DalaranConverterContext {
     }
 
     @Override
-    public Class<? extends DalaranModelSchema> getSchemaType(BodyType modelType) {
+    public Class<? extends DalaranModelSchema> getSchemaType(@NotNull BodyType modelType) {
         return converterSchemaMapping.get(modelType);
     }
 
     @Override
-    public void fromObject(ProcessorDefinition route, MessageModel model) {
-        if (model != null) {
-            converterMapping.get(model.getModelType()).fromObject(route, model.getModelSchema());
+    public void fromObject(@NotNull ProcessorDefinition route, @Nullable MessageModel model, @NotNull BodyType modelType) {
+        if (model == null) {
+            fromObject(route, modelType);
+        } else {
+            fromObject(route, model);
         }
     }
 
     @Override
-    public void toObject(ProcessorDefinition route, MessageModel model) {
-        if (model != null && model.getModelType() != BodyType.OBJECT) {
-            converterMapping.get(model.getModelType()).toObject(route, model.getModelSchema());
+    public void toObject(@NotNull ProcessorDefinition route, @Nullable MessageModel model, @NotNull BodyType modelType) {
+        if (model == null) {
+            toObject(route, modelType);
+        } else {
+            toObject(route, model);
         }
     }
 
     @Override
-    public void fromObject(ProcessorDefinition route, BodyType modelType) {
+    public void fromObject(@NotNull ProcessorDefinition route, @NotNull MessageModel model) {
+        converterMapping.get(model.getModelType()).fromObject(route, model.getModelSchema());
+    }
+
+    @Override
+    public void toObject(@NotNull ProcessorDefinition route, @NotNull MessageModel model) {
+        converterMapping.get(model.getModelType()).toObject(route, model.getModelSchema());
+    }
+
+    @Override
+    public void fromObject(@NotNull ProcessorDefinition route, @NotNull BodyType modelType) {
         converterMapping.get(modelType).fromObject(route, null);
     }
 
     @Override
-    public void toObject(ProcessorDefinition route, BodyType modelType) {
+    public void toObject(@NotNull ProcessorDefinition route, @NotNull BodyType modelType) {
         converterMapping.get(modelType).toObject(route, null);
     }
 }
