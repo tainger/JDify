@@ -66,22 +66,25 @@ public class WSDLUtils {
         /**
          * port type + binding
          */
+
+        PortType pt = definitions.newPortType(SoapConstants.PORT_TYPE);
+
         soapApiInfos.forEach(apiInfo -> {
-            PortType pt = definitions.newPortType(SoapConstants.PORT_TYPE + apiInfo.getName());
             Operation op = pt.newOperation(apiInfo.getName());
             op.newInput(apiInfo.getInput().getName()).setMessage(definitions.getMessage(apiInfo.getInput().getName()));
             op.newOutput(apiInfo.getOutput().getName()).setMessage(definitions.getMessage(apiInfo.getOutput().getName()));
+        });
 
-            Port port = definitions.newService(SoapConstants.SERVICE_NAME + apiInfo.getName()).newPort(SoapConstants.SERVICE_PORT + apiInfo.getName());
-            Binding binding = port.newBinding(SoapConstants.BINDING + apiInfo.getName());
-            binding.setType(pt);
-            SOAPBinding soapBinding = binding.newSOAP11Binding();
-            soapBinding.setBinding(binding);
-
+        Binding binding = definitions.newBinding(SoapConstants.BINDING);
+        binding.setType(pt);
+        SOAPBinding soapBinding = binding.newSOAP11Binding();
+        soapBinding.setBinding(binding);
+        soapApiInfos.forEach(apiInfo -> {
             BindingOperation bindingOperation = binding.newBindingOperation(apiInfo.getName());
             SOAPOperation soapOperation = bindingOperation.newSOAP11Operation();
             soapOperation.setName(apiInfo.getName());
-            soapOperation.setSoapAction(runtimeLocation + apiInfo.getPath());
+            soapOperation.setSoapAction(TNS + apiInfo.getPath());
+
             BindingInput bindingInput = bindingOperation.newInput();
             bindingInput.setName(apiInfo.getInput().getName());
             SOAPBody inputBody = bindingInput.newSOAP11Body();
@@ -90,8 +93,16 @@ public class WSDLUtils {
             bindingOutput.setName(apiInfo.getOutput().getName());
             SOAPBody outputBody = bindingOutput.newSOAP11Body();
             outputBody.setUse("literal");
-            port.newSOAP11Address(runtimeLocation + apiInfo.getPath());
         });
+        List<Binding> bindings = new ArrayList<>();
+        bindings.add(binding);
+        definitions.setLocalBindings(bindings);
+
+        Service service = definitions.newService(SoapConstants.SERVICE_NAME);
+        Port port = service.newPort(SoapConstants.BINDING);
+        port.setBinding(binding);
+        port.newSOAP11Address(runtimeLocation);
+
         return definitions;
     }
 

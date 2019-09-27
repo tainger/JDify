@@ -36,7 +36,7 @@ public class SoapServiceTest extends BasicServiceTest {
 
         SoapOperationConfig operationConfig = new SoapOperationConfig();
         operationConfig.setProtocol(HttpProtocol.HTTP);
-        operationConfig.setBaseUrl("piqas.shimaogroup.com:50000/XISOAPAdapter/MessageServlet?senderParty=&senderService=BS_HYPERSMART&receiverParty=&receiverService=&interface=SI_COMMON_S_OUT&interfaceNamespace=urn%3A%3Ashimaogroup.com%3AI_HYPERSMART%3AECC&authMethod=Basic&authUsername=HYPERS_PI&authPassword=HYPERS_PI2019");
+        operationConfig.setLocation("piqas.shimaogroup.com:50000/XISOAPAdapter/MessageServlet?senderParty=&senderService=BS_HYPERSMART&receiverParty=&receiverService=&interface=SI_COMMON_S_OUT&interfaceNamespace=urn%3A%3Ashimaogroup.com%3AI_HYPERSMART%3AECC&authMethod=Basic&authUsername=HYPERS_PI&authPassword=HYPERS_PI2019");
 
         SoapService service = new SoapService();
         ObjectToSoapProcessor objectToSoapProcessor = new ObjectToSoapProcessor(schema1.getFields(), schema1.getOperationConfig());
@@ -56,7 +56,7 @@ public class SoapServiceTest extends BasicServiceTest {
 
         SoapOperationConfig operationConfig = new SoapOperationConfig();
         operationConfig.setProtocol(HttpProtocol.HTTP);
-        operationConfig.setBaseUrl("127.0.0.1:8081/ws");
+        operationConfig.setLocation("127.0.0.1:8081/ws");
 //        operationConfig.setInModel(model);
 //        operationConfig.setOutModel(model);
 

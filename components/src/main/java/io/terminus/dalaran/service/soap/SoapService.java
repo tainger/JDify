@@ -42,7 +42,7 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
 
     @Override
     public void configure(ProcessorDefinition route, SoapOperationConfig soapOperationConfig) {
-        String uri = String.format(HTTP_URI, "http", soapOperationConfig.getBaseUrl());
+        String uri = String.format(HTTP_URI, "http", soapOperationConfig.getLocation());
         route.setHeader(Exchange.HTTP_METHOD, Builder.constant(HttpMethod.POST));
         route.setHeader(Exchange.CONTENT_TYPE, Builder.constant("application/xml"));
         route.to(uri);
@@ -100,15 +100,15 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
         definitions.getServices().forEach(service -> {
             service.getPorts().forEach(port -> {
                 List<SoapOperationConfig> operations = soapOperationConfigMap.get(port.getBindingPN().getLocalName());
-                String baseUrl = StringUtils.substringAfter(port.getAddress().getLocation(), "://");
+                String location = StringUtils.substringAfter(port.getAddress().getLocation(), "://");
                 if (StringUtils.isNotBlank(wsdlImportConfig.getUsername()) && StringUtils.isNotBlank(wsdlImportConfig.getPassword())) {
-                    baseUrl = baseUrl + "&authMethod=Basic&authUsername=" + wsdlImportConfig.getUsername() + "&authPassword=" + wsdlImportConfig.getPassword();
+                    location = location + "&authMethod=Basic&authUsername=" + wsdlImportConfig.getUsername() + "&authPassword=" + wsdlImportConfig.getPassword();
                 }
-                String operationUrl = baseUrl;
+                String operationUrl = location;
                 operations.forEach(operation -> {
                     try {
                         SoapOperationConfig newOperation = (SoapOperationConfig) BeanUtils.cloneBean(operation);
-                        newOperation.setBaseUrl(operationUrl);
+                        newOperation.setLocation(operationUrl);
                         newOperation.setProtocol(HttpProtocol.valueOf(StringUtils.substringBefore(port.getAddress().getLocation(), "://").toUpperCase()));
                         newOperation.setServicePort(port.getName());
                         newOperation.setOperationKey(operation.getOperationKey());
@@ -173,7 +173,7 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
     }
 
     public MessageModel buildModel(Message message, SoapSchemaOperation operationConfig, String modelRoot) {
-        MessageModel model = new MessageModel();
+        MessageModel<SoapSchema> model = new MessageModel<>();
         SoapSchema soapSchema = new SoapSchema();
         try {
             SoapSchemaOperation schemaOperation = new SoapSchemaOperation();
@@ -305,8 +305,18 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
 
     private void handleSchemaComponent(SchemaComponent p, Element element, Schema schema, String maxOccurs, Map<String, ModelField> parent) {
         ModelField modelField = new ModelField();
+        if (p instanceof Any) {
+            return;
+        }
         Element e = (Element) p;
         String name = e.getName();
+        if (StringUtils.isBlank(name)) {
+            return;
+        }
+        if (e.getType() == null) {
+            parent.put(name, modelField);
+            return;
+        }
         if (StringUtils.isNotBlank(e.getMaxOccurs())) {
             maxOccurs = e.getMaxOccurs();
         }
