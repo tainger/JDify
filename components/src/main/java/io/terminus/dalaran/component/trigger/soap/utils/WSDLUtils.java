@@ -26,8 +26,12 @@ import java.util.Map;
 
 public class WSDLUtils {
 
+    private static final String TNS = "http://schemas.xmlsoap.org/wsdl";
+
+    private static final String XSD = "http://www.w3.org/2001/XMLSchema";
+
     public static Definitions buildDefinitions(List<SoapApiInfo> soapApiInfos, String runtimeLocation) {
-        Definitions definitions = new Definitions("http://schemas.xmlsoap.org/wsdl", "Dalaran");
+        Definitions definitions = new Definitions(TNS, "Dalaran");
         Map<String, SoapModel> models = new HashMap<>();
         List<SoapOperation> operations = new ArrayList<>();
         soapApiInfos.forEach(soapApiInfo -> {
@@ -45,17 +49,15 @@ public class WSDLUtils {
         /**
          * schema + message
          */
-        Schema schema = new Schema("http://schemas.xmlsoap.org/wsdl");
+        Schema schema = new Schema(TNS);
         definitions.addSchema(schema);
         schema.setDefinitions(definitions);
         models.forEach((name, model) -> {
             Element element = schema.newElement(name);
-//            element.setType();
             DalaranModelSchema modelSchema = model.getSchema();
             ModelField modelField = modelSchema.getFields().get(MapperConstants.MODEL_ROOT);
             buildTypes(element, modelField, schema);
             Message message = definitions.newMessage(name);
-//            message.newPart(name, element);
             Part part = message.newPart(name, element);
             part.setElementPN(new PrefixedName("tns", name));
             part.setParent(message);
@@ -90,18 +92,6 @@ public class WSDLUtils {
             outputBody.setUse("literal");
             port.newSOAP11Address(runtimeLocation + apiInfo.getPath());
         });
-
-        /**
-         *
-         */
-
-        soapApiInfos.forEach(apiInfo -> {
-
-        });
-
-        /**
-         * service
-         */
         return definitions;
     }
 
@@ -116,6 +106,7 @@ public class WSDLUtils {
         }
         element.setMaxOccurs(maxOccurs);
         Sequence sequence = element.newComplexType().newSequence();
+        sequence.setParent(element);
 
         modelField.getFields().forEach((name, field) -> {
             Element e = sequence.newElement(name);
@@ -130,12 +121,12 @@ public class WSDLUtils {
 
     private static void buildChildrenType(String name, ModelField modelField, Schema schema, Element parent, Sequence parentSequence) {
         if (modelField.getType() != FieldType.OBJECT && !(modelField.getType() == FieldType.ARRAY && modelField.getSubType() == FieldType.OBJECT)) {
-            parent.setType(new QName("http://www.w3.org/2001/XMLSchema", getFieldType(modelField.getType()), "xsd"));
+            parent.setType(new QName(XSD, getFieldType(modelField.getType()), "xsd"));
             parent.setParent(parentSequence);
             return;
         }
 
-        parent.setType(new QName("", name, "tns"));
+        parent.setType(new QName(TNS, name, "tns"));
         parent.setParent(parentSequence);
         Sequence sequence = schema.newComplexType(name).newSequence();
         if (MapUtils.isEmpty(modelField.getFields())) {

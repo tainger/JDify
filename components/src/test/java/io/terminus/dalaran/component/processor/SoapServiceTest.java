@@ -1,7 +1,6 @@
 package io.terminus.dalaran.component.processor;
 
-import com.predic8.wsdl.Definitions;
-import com.predic8.wsdl.WSDLParser;
+import com.alibaba.fastjson.JSON;
 import io.terminus.dalaran.component.BasicServiceTest;
 import io.terminus.dalaran.core.component.model.support.soap.model.SoapOperationConfig;
 import io.terminus.dalaran.core.component.model.support.soap.processor.ObjectToSoapProcessor;
@@ -28,8 +27,28 @@ import java.util.Map;
 public class SoapServiceTest extends BasicServiceTest {
 
     @Test
-    public void WSDLUtils() {
+    public void SMObject2Soap() {
+        SoapSchema schema1 = JSON.parseObject("{\"operationConfig\":{\"input\":\"MT_COMMON_REQ\",\"outPut\":\"MT_COMMON_RES\",\"portType\":\"SI_COMMON_S_OUT\",\"baseUrl\":\"piqas.shimaogroup.com:50000/XISOAPAdapter/MessageServlet?senderParty=&senderService=BS_HYPERSMART&receiverParty=&receiverService=&interface=SI_COMMON_S_OUT&interfaceNamespace=urn%3A%3Ashimaogroup.com%3AI_HYPERSMART%3AECC\",\"protocol\":\"HTTP\",\"wsdl\":\"http://piqas.shimaogroup.com:50000/dir/wsdl?p=sa/2578ce33cd913812bbef5120fdee2c23\",\"name\":\"SI_COMMON_S_OUT\",\"binding\":\"SI_COMMON_S_OUTBinding\",\"modelRoot\":\"MT_COMMON_REQ\"},\"fields\":{\"root\":{\"nullable\":false,\"fields\":{\"MT_COMMON_REQ\":{\"type\":\"OBJECT\",\"fields\":{\"XMLDATA\":{\"nullable\":false,\"fields\":{},\"type\":\"STRING\"},\"TYPE\":{\"nullable\":false,\"fields\":{},\"type\":\"STRING\"}}}},\"type\":\"OBJECT\"}}}", SoapSchema.class);
+        schema1.getOperationConfig().setTargetNamespace("urn::shimaogroup.com:I_HYPERSMART:ECC");
 
+        Map<String, Object> requestBody = new HashMap<>();
+        Map<String, Object> child = new HashMap<>();
+        child.put("XMLDATA", "");
+        child.put("TYPE", "MM_WM");
+        requestBody.put("MT_COMMON_REQ", child);
+
+        SoapOperationConfig operationConfig = new SoapOperationConfig();
+        operationConfig.setProtocol(HttpProtocol.HTTP);
+        operationConfig.setBaseUrl("piqas.shimaogroup.com:50000/XISOAPAdapter/MessageServlet?senderParty=&senderService=BS_HYPERSMART&receiverParty=&receiverService=&interface=SI_COMMON_S_OUT&interfaceNamespace=urn%3A%3Ashimaogroup.com%3AI_HYPERSMART%3AECC&authMethod=Basic&authUsername=HYPERS_PI&authPassword=HYPERS_PI2019");
+
+        SoapService service = new SoapService();
+        ObjectToSoapProcessor objectToSoapProcessor = new ObjectToSoapProcessor(schema1.getFields(), schema1.getOperationConfig());
+        SoapToObjectProcessor soapToObjectProcessor = new SoapToObjectProcessor(schema1.getOperationConfig());
+        ProducerTemplate template = getProcessorTemplate(service, operationConfig, objectToSoapProcessor, soapToObjectProcessor);
+
+        Object result = template.requestBody(requestBody);
+
+        Assert.assertNotNull(result);
     }
 
     @Test
@@ -50,15 +69,7 @@ public class SoapServiceTest extends BasicServiceTest {
         list.add("Spain");
         requestBody.put("name", list);
 
-        WSDLParser parser = new WSDLParser();
-        Definitions definitions = new Definitions();
-        try {
-            definitions = parser.parse(model.getModelSchema().getOperationConfig().getWsdl());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        ObjectToSoapProcessor objectToSoapProcessor = new ObjectToSoapProcessor(model.getModelSchema().getFields(), model.getModelSchema().getOperationConfig(), definitions);
+        ObjectToSoapProcessor objectToSoapProcessor = new ObjectToSoapProcessor(model.getModelSchema().getFields(), model.getModelSchema().getOperationConfig());
         SoapToObjectProcessor soapToObjectProcessor = new SoapToObjectProcessor(model.getModelSchema().getOperationConfig());
         ProducerTemplate template = getProcessorTemplate(service, operationConfig, objectToSoapProcessor, soapToObjectProcessor);
         Assert.assertNotNull(template);
@@ -71,18 +82,8 @@ public class SoapServiceTest extends BasicServiceTest {
         MessageModel<SoapSchema> model = new MessageModel<>();
 
         SoapSchemaOperation schemaOperation = new SoapSchemaOperation();
-        schemaOperation.setProtocol(HttpProtocol.HTTP);
-        schemaOperation.setBaseUrl("127.0.0.1:8081/ws");
-        schemaOperation.setPortType("getCountryRequest");
-        schemaOperation.setName("getCountry");
-        schemaOperation.setInput("getCountryRequest");
-        schemaOperation.setOutPut("getCountryResponse");
-        schemaOperation.setBinding("CountriesPortSoap11");
-        schemaOperation.setWsdl("http://127.0.0.1:8081/ws/countries.wsdl");
-
         SoapSchema schema = new SoapSchema();
         schema.setOperationConfig(schemaOperation);
-        schema.setWsdlDoc("http://127.0.0.1:8081/ws/countries.wsdl");
         schema.setFields(buildFields());
 
         model.setModelType("SOAP");
