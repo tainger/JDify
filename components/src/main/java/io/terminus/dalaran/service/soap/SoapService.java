@@ -173,7 +173,7 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
     }
 
     public MessageModel buildModel(Message message, SoapSchemaOperation operationConfig, String modelRoot) {
-        MessageModel model = new MessageModel();
+        MessageModel<SoapSchema> model = new MessageModel<>();
         SoapSchema soapSchema = new SoapSchema();
         try {
             SoapSchemaOperation schemaOperation = new SoapSchemaOperation();
@@ -305,8 +305,18 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
 
     private void handleSchemaComponent(SchemaComponent p, Element element, Schema schema, String maxOccurs, Map<String, ModelField> parent) {
         ModelField modelField = new ModelField();
+        if (p instanceof Any) {
+            return;
+        }
         Element e = (Element) p;
         String name = e.getName();
+        if (StringUtils.isBlank(name)) {
+            return;
+        }
+        if (e.getType() == null) {
+            parent.put(name, modelField);
+            return;
+        }
         if (StringUtils.isNotBlank(e.getMaxOccurs())) {
             maxOccurs = e.getMaxOccurs();
         }
