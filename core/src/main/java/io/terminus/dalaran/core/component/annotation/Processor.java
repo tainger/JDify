@@ -1,6 +1,7 @@
 package io.terminus.dalaran.core.component.annotation;
 
 
+import io.terminus.dalaran.DalaranConstants;
 import org.springframework.stereotype.Component;
 
 import java.lang.annotation.*;
@@ -22,7 +23,7 @@ public @interface Processor {
 
     int order() default Short.MAX_VALUE;
 
-    String bodyType() default "OBJECT";
+    String bodyType() default DalaranConstants.OBJECT_MODEL_TYPE;
 
     Class configType() default Void.class;
 }

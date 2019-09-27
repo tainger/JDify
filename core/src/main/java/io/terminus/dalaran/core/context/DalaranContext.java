@@ -43,7 +43,7 @@ public interface DalaranContext<T> {
 
     DalaranComponentContext getDalaranComponentContext();
 
-    DalaranModelTypeContext getDalaranConverterContext();
+    DalaranModelTypeContext getDalaranModelTypeContext();
 
     DalaranServiceContext getDalaranServiceContext();
 

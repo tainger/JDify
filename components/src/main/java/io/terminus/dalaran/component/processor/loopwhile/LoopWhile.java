@@ -1,5 +1,6 @@
 package io.terminus.dalaran.component.processor.loopwhile;
 
+import io.terminus.dalaran.DalaranConstants;
 import io.terminus.dalaran.config.ProcessorInfo;
 import io.terminus.dalaran.core.component.DalaranProcessor;
 import io.terminus.dalaran.core.component.DalaranProcessorConfigCustomConverter;
@@ -42,9 +43,9 @@ public class LoopWhile implements DalaranProcessor<LoopWhileFragmentInfo>, Dalar
         if (!fragment.getPipeline().isEmpty()) {
             ProcessorModel lastProcessor = fragment.getPipeline().get(fragment.getPipeline().size() - 1);
             ProcessorInfo lastProcessorInfo = dalaranContext.getDalaranComponentContext().getProcessorInfo(lastProcessor.getType());
-            if (lastProcessorInfo.getBodyType() != "OBJECT" && lastProcessor.getOutModel() != null) {
+            if (!DalaranConstants.OBJECT_MODEL_TYPE.equalsIgnoreCase(lastProcessorInfo.getBodyType()) && lastProcessor.getOutModel() != null) {
                 DalaranRoute route = dalaranContext.getDalaranFlowBuilder().buildFlowFragment(fragment);
-                dalaranContext.getDalaranConverterContext().toObject(route, lastProcessor.getOutModel(), lastProcessorInfo.getBodyType());
+                dalaranContext.getDalaranModelTypeContext().toObject(route, lastProcessor.getOutModel(), lastProcessorInfo.getBodyType());
                 try {
                     dalaranContext.removeFlow(fragment.getRouteId());
                     dalaranContext.addRoute(route);

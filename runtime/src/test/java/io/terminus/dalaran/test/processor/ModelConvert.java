@@ -48,7 +48,7 @@ public class ModelConvert {
     @Test
     public void basicConvert() {
         MessageModel jsonModel = buildModel("JSON");
-        MessageModel objectModel = buildModel("OBJECT");
+        MessageModel objectModel = buildModel(DalaranConstants.OBJECT_MODEL_TYPE);
 
         BasicFlow basicFlow = new BasicFlow();
         basicFlow.setInModel(objectModel);
@@ -189,7 +189,7 @@ public class ModelConvert {
             case "SOAP":
                 schema = new SoapSchema();
                 break;
-            case "OBJECT":
+            case DalaranConstants.OBJECT_MODEL_TYPE:
                 schema = new ObjectSchema();
                 break;
             default:

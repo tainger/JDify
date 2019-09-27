@@ -215,11 +215,11 @@ public class ModelManagementServiceImpl implements ModelManagementService {
     @Override
     public Map<String, String> suggestMapping(Long sourceId, Long targetId) {
         ModelEntity sourceEntity = modelRepository.findById(sourceId).get();
-        Class<? extends DalaranModelSchema> sourceSchemaType = dalaranContext.getDalaranConverterContext().getModelSchema(sourceEntity.getType());
+        Class<? extends DalaranModelSchema> sourceSchemaType = dalaranContext.getDalaranModelTypeContext().getModelSchema(sourceEntity.getType());
         DalaranModelSchema sourceModelSchema = JSON.parseObject(sourceEntity.getModelSchema(), sourceSchemaType);
 
         ModelEntity targetEntity = modelRepository.findById(targetId).get();
-        Class<? extends DalaranModelSchema> targetSchemaType = dalaranContext.getDalaranConverterContext().getModelSchema(targetEntity.getType());
+        Class<? extends DalaranModelSchema> targetSchemaType = dalaranContext.getDalaranModelTypeContext().getModelSchema(targetEntity.getType());
         DalaranModelSchema targetModelSchema = JSON.parseObject(targetEntity.getModelSchema(), targetSchemaType);
         Map<String, String> mappings = new HashMap<>();
         deepBuildSuggest(sourceModelSchema.getFields(), targetModelSchema.getFields(), new ArrayList<>(), new ArrayList<>(), mappings);

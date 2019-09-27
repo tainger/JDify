@@ -1,5 +1,6 @@
 package io.terminus.dalaran.component.processor.multicast;
 
+import io.terminus.dalaran.DalaranConstants;
 import io.terminus.dalaran.core.component.DalaranProcessor;
 import io.terminus.dalaran.core.component.DalaranProcessorConfigCustomConverter;
 import io.terminus.dalaran.core.component.annotation.Processor;
@@ -68,7 +69,7 @@ public class ScatterGather implements DalaranProcessor<List<String>>, DalaranPro
             DalaranRoute fragmentRoute = flowBuilder.buildFlowFragment(fragment);
 
             // 因为后面会有一个聚合处理, 所以一定要输出为 Object, 否则 Mapper 不好处理
-            if (fragmentRoute.getLastBodyType() != "OBJECT") {
+            if (DalaranConstants.OBJECT_MODEL_TYPE.equalsIgnoreCase(fragmentRoute.getLastBodyType())) {
                 converterContext.toObject(fragmentRoute, fragmentRoute.getLastOutModel());
             }
 
