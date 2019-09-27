@@ -1,7 +1,6 @@
 package io.terminus.dalaran.core.resource.entity;
 
 import io.terminus.dalaran.core.resource.entity.basic.BasicEntity;
-
 import io.terminus.dalaran.model.ModelTargetType;
 import lombok.Data;
 

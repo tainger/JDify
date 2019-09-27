@@ -4,7 +4,6 @@ import io.terminus.dalaran.console.ResponseMessage;
 import io.terminus.dalaran.console.exception.OnExceptionMessage;
 import io.terminus.dalaran.console.repository.ModelRepository;
 import io.terminus.dalaran.console.service.ModelManagementService;
-
 import io.terminus.dalaran.model.ClassificationModel;
 import io.terminus.dalaran.model.ModelField;
 import io.terminus.dalaran.model.dto.DataTemplate;

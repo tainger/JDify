@@ -1,7 +1,6 @@
 package io.terminus.dalaran.core.resource.entity.common;
 
 import io.terminus.dalaran.TracingType;
-
 import lombok.Data;
 import org.springframework.data.annotation.CreatedDate;
 

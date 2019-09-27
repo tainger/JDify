@@ -6,7 +6,6 @@ import io.terminus.dalaran.component.trigger.rest.processor.SignProcessor;
 import io.terminus.dalaran.core.component.DalaranTrigger;
 import io.terminus.dalaran.core.component.annotation.Trigger;
 import io.terminus.dalaran.core.context.DalaranClientContext;
-
 import org.apache.camel.model.RouteDefinition;
 import org.apache.camel.model.dataformat.JsonLibrary;
 import org.springframework.beans.factory.annotation.Autowired;

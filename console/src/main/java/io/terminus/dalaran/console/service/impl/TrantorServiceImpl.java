@@ -7,7 +7,6 @@ import io.terminus.dalaran.console.entity.TrantorEntity;
 import io.terminus.dalaran.console.repository.ModelRepository;
 import io.terminus.dalaran.console.repository.TrantorRepository;
 import io.terminus.dalaran.console.service.TrantorService;
-
 import io.terminus.dalaran.model.dto.trantor.IntegrationInfoDTO;
 import io.terminus.dalaran.model.dto.trantor.IntegrationPointDTO;
 import io.terminus.dalaran.model.dto.trantor.TrantorModuleDTO;

@@ -1,7 +1,6 @@
 package io.terminus.dalaran.core.log;
 
 import io.terminus.dalaran.TracingType;
-
 import lombok.Data;
 
 @Data

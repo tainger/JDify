@@ -6,7 +6,6 @@ import io.terminus.dalaran.DalaranConstants;
 import io.terminus.dalaran.component.common.HttpMethod;
 import io.terminus.dalaran.core.component.DalaranService;
 import io.terminus.dalaran.core.component.annotation.ServiceConnector;
-import io.terminus.dalaran.model.ServiceOperationModel;
 import io.terminus.dalaran.core.component.model.support.soap.model.SoapOperationConfig;
 import io.terminus.dalaran.model.*;
 import io.terminus.dalaran.model.schema.SoapSchema;

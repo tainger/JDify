@@ -1,7 +1,6 @@
 package io.terminus.dalaran.config;
 
 import com.alibaba.fastjson.annotation.JSONField;
-
 import lombok.Data;
 import org.jetbrains.annotations.NotNull;
 

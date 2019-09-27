@@ -4,7 +4,6 @@ import com.alibaba.fastjson.JSON;
 import io.terminus.dalaran.console.entity.ModelEntity;
 import io.terminus.dalaran.console.repository.ModelRepository;
 import io.terminus.dalaran.console.service.ModelManagementService;
-
 import io.terminus.dalaran.model.FieldType;
 import io.terminus.dalaran.model.ModelField;
 import io.terminus.dalaran.model.dto.DataTemplate;

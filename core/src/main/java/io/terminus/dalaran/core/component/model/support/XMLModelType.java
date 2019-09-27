@@ -2,7 +2,6 @@ package io.terminus.dalaran.core.component.model.support;
 
 import io.terminus.dalaran.core.component.annotation.ModelType;
 import io.terminus.dalaran.core.component.model.DalaranModelType;
-import io.terminus.dalaran.model.schema.JsonSchema;
 import io.terminus.dalaran.model.schema.XMLSchema;
 import org.apache.camel.model.ProcessorDefinition;
 import org.apache.camel.model.dataformat.JsonLibrary;

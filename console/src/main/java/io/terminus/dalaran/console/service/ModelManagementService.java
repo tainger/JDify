@@ -1,7 +1,6 @@
 package io.terminus.dalaran.console.service;
 
 import io.terminus.dalaran.console.entity.ModelEntity;
-
 import io.terminus.dalaran.model.ClassificationModel;
 import io.terminus.dalaran.model.dto.DataTemplate;
 import io.terminus.dalaran.model.dto.ModelDTO;

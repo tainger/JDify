@@ -1,6 +1,5 @@
 package io.terminus.dalaran.model;
 
-import io.terminus.dalaran.model.MessageModel;
 import lombok.Data;
 
 /**

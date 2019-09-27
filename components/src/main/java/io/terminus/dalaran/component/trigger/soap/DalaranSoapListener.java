@@ -2,7 +2,6 @@ package io.terminus.dalaran.component.trigger.soap;
 
 import io.terminus.dalaran.core.component.DalaranTrigger;
 import io.terminus.dalaran.core.component.annotation.Trigger;
-
 import org.apache.camel.model.RouteDefinition;
 
 /**

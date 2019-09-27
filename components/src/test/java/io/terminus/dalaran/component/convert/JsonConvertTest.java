@@ -3,7 +3,6 @@ package io.terminus.dalaran.component.convert;
 import io.terminus.dalaran.component.BasicConvertTest;
 import io.terminus.dalaran.component.processor.mapper.DalaranMapperConfig;
 import io.terminus.dalaran.component.processor.mapper.DalaranMessageMapper;
-
 import io.terminus.dalaran.model.MessageModel;
 import io.terminus.dalaran.model.schema.JsonSchema;
 import io.terminus.dalaran.model.schema.XMLSchema;

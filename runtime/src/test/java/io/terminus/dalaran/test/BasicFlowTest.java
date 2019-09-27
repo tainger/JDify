@@ -3,7 +3,6 @@ package io.terminus.dalaran.test;
 import io.terminus.dalaran.component.processor.script.DalaranScriptConfig;
 import io.terminus.dalaran.component.processor.script.DalaranScriptType;
 import io.terminus.dalaran.core.context.DalaranContext;
-
 import io.terminus.dalaran.model.MessageModel;
 import io.terminus.dalaran.model.component.ProcessorModel;
 import io.terminus.dalaran.model.schema.JsonSchema;

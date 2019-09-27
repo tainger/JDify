@@ -1,7 +1,6 @@
 package io.terminus.dalaran.core.context;
 
 import io.terminus.dalaran.core.component.model.DalaranModelType;
-
 import io.terminus.dalaran.model.DalaranModelSchema;
 import io.terminus.dalaran.model.MessageModel;
 import org.apache.camel.model.ProcessorDefinition;
