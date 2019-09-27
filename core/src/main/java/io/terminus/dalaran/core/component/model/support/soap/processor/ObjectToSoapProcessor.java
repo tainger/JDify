@@ -1,4 +1,4 @@
-package io.terminus.dalaran.core.converter.soap.processor;
+package io.terminus.dalaran.core.component.model.support.soap.processor;
 
 import com.predic8.wsdl.Definitions;
 import com.predic8.wstool.creator.RequestCreator;

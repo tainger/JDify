@@ -1,6 +1,6 @@
 package io.terminus.dalaran.model.dto.basic;
 
-import io.terminus.dalaran.model.BodyType;
+
 import lombok.Data;
 import org.jetbrains.annotations.Nullable;
 
@@ -17,12 +17,12 @@ public class BasicModelInfo {
 
     private String name;
 
-    private BodyType modelType;
+    private String modelType;
 
     public BasicModelInfo() {
     }
 
-    public BasicModelInfo(@Nullable Long id, Long moduleId, String name, BodyType modelType) {
+    public BasicModelInfo(@Nullable Long id, Long moduleId, String name, String modelType) {
         this.id = id;
         this.moduleId = moduleId;
         this.name = name;

@@ -1,7 +1,7 @@
 package io.terminus.dalaran.rest.write;
 
 import io.swagger.annotations.ApiOperation;
-import io.terminus.dalaran.model.BodyType;
+
 import io.terminus.dalaran.model.ModelField;
 import io.terminus.dalaran.model.dto.DataTemplate;
 import io.terminus.dalaran.model.schema.JsonSchema;
@@ -34,6 +34,6 @@ public interface ModelImportAPI {
     // TODO 其实意义不大
     @ApiOperation(value = "批量导入 Excel 创建模型结构")
     @PostMapping(value = "/multi-import/excel")
-    Map<Long, Map<String, JsonSchema>> multiImportExcel(@RequestParam MultipartFile file, @RequestParam BodyType type);
+    Map<Long, Map<String, JsonSchema>> multiImportExcel(@RequestParam MultipartFile file, @RequestParam String modelType);
 
 }

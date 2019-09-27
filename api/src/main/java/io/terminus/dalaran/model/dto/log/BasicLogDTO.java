@@ -1,6 +1,6 @@
 package io.terminus.dalaran.model.dto.log;
 
-import io.terminus.dalaran.model.BodyType;
+
 import lombok.Data;
 
 import java.util.Date;
@@ -21,9 +21,9 @@ public class BasicLogDTO {
 
     private Long elapsed;
 
-    private BodyType inputBodyType;
+    private String inputBodyType;
 
-    private BodyType outputBodyType;
+    private String outputBodyType;
 
     private String inputBody;
 

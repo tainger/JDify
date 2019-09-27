@@ -13,8 +13,8 @@ import io.swagger.util.Json;
 import io.terminus.dalaran.component.common.HttpMethod;
 import io.terminus.dalaran.core.component.DalaranService;
 import io.terminus.dalaran.core.component.annotation.ServiceConnector;
-import io.terminus.dalaran.core.component.model.ServiceOperationModel;
-import io.terminus.dalaran.model.BodyType;
+import io.terminus.dalaran.model.ServiceOperationModel;
+
 import io.terminus.dalaran.model.FieldType;
 import io.terminus.dalaran.model.MessageModel;
 import io.terminus.dalaran.model.ModelField;
@@ -151,7 +151,7 @@ public class SwaggerService implements DalaranService<SwaggerImportConfig, Swagg
         ServiceModel serviceModel = new ServiceModel();
         JsonSchema outSchema = new JsonSchema();
         MessageModel outModel = new MessageModel<>();
-        outModel.setModelType(BodyType.JSON);
+        outModel.setModelType("JSON");
         outModel.setModelSchema(outSchema);
         Response response = operation.getResponses().get(SUCCESSFUL_RESPONSE_CODE);
         Property property = response.getSchema();
@@ -171,7 +171,7 @@ public class SwaggerService implements DalaranService<SwaggerImportConfig, Swagg
         ServiceModel serviceModel = new ServiceModel();
         JsonSchema inSchema = new JsonSchema();
         MessageModel inModel = new MessageModel<>();
-        inModel.setModelType(BodyType.JSON);
+        inModel.setModelType("JSON");
         inModel.setModelSchema(inSchema);
         Map<String, ModelField> inRootFields = Maps.newHashMap();
         inSchema.setFields(inRootFields);

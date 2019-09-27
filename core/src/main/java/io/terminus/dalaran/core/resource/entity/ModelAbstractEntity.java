@@ -1,7 +1,7 @@
 package io.terminus.dalaran.core.resource.entity;
 
 import io.terminus.dalaran.core.resource.entity.basic.BasicEntity;
-import io.terminus.dalaran.model.BodyType;
+
 import io.terminus.dalaran.model.ModelTargetType;
 import lombok.Data;
 
@@ -27,8 +27,7 @@ public abstract class ModelAbstractEntity extends BasicEntity {
     private String name;
 
     @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
-    private BodyType type;
+    private String type;
 
     @Column
     private String targetId;

@@ -2,7 +2,7 @@ package io.terminus.dalaran.component.trigger.soap;
 
 import io.terminus.dalaran.core.component.DalaranTrigger;
 import io.terminus.dalaran.core.component.annotation.Trigger;
-import io.terminus.dalaran.model.BodyType;
+
 import org.apache.camel.model.RouteDefinition;
 
 /**
@@ -13,7 +13,7 @@ import org.apache.camel.model.RouteDefinition;
         name = "Soap 监听器",
         order = 13,
         configType = SoapListenerConfig.class,
-        bodyType = BodyType.SOAP
+        bodyType = "SOAP"
 )
 public class DalaranSoapListener implements DalaranTrigger<SoapListenerConfig> {
 

@@ -1,6 +1,6 @@
 package io.terminus.dalaran.model.flow;
 
-import io.terminus.dalaran.model.BodyType;
+
 import lombok.Data;
 
 import java.util.HashMap;
@@ -14,7 +14,7 @@ public class FlowFragment extends BasicFlow {
 
     private String fragmentId;
 
-    private BodyType inModelType = BodyType.OBJECT;
+    private String inModelType = "OBJECT";
 
     private final Map<String, Object> properties = new HashMap<>();
 

@@ -7,7 +7,7 @@ import io.terminus.dalaran.core.component.annotation.Processor;
 import io.terminus.dalaran.core.context.DalaranContext;
 import io.terminus.dalaran.core.flow.DalaranRoute;
 import io.terminus.dalaran.core.resource.DalaranResourceBuilder;
-import io.terminus.dalaran.model.BodyType;
+
 import io.terminus.dalaran.model.component.ComponentModel;
 import io.terminus.dalaran.model.component.ProcessorModel;
 import io.terminus.dalaran.model.flow.BasicFlow;
@@ -43,7 +43,7 @@ public class LoopWhile implements DalaranProcessor<LoopWhileFragmentInfo>, Dalar
         if (!fragment.getPipeline().isEmpty()) {
             ProcessorModel lastProcessor = fragment.getPipeline().get(fragment.getPipeline().size() - 1);
             ProcessorInfo lastProcessorInfo = dalaranContext.getDalaranComponentContext().getProcessorInfo(lastProcessor.getType());
-            if (lastProcessorInfo.getBodyType() != BodyType.OBJECT && lastProcessor.getOutModel() != null) {
+            if (lastProcessorInfo.getBodyType() != "OBJECT" && lastProcessor.getOutModel() != null) {
                 DalaranRoute route = dalaranContext.getDalaranFlowBuilder().buildFlowFragment(fragment);
                 dalaranContext.getDalaranConverterContext().toObject(route, lastProcessor.getOutModel(), lastProcessorInfo.getBodyType());
                 try {

@@ -3,7 +3,7 @@ package io.terminus.dalaran.component.convert;
 import io.terminus.dalaran.component.BasicConvertTest;
 import io.terminus.dalaran.component.processor.mapper.DalaranMapperConfig;
 import io.terminus.dalaran.component.processor.mapper.DalaranMessageMapper;
-import io.terminus.dalaran.model.BodyType;
+
 import io.terminus.dalaran.model.MessageModel;
 import io.terminus.dalaran.model.schema.JsonSchema;
 import io.terminus.dalaran.model.schema.XMLSchema;
@@ -52,13 +52,13 @@ public class JsonConvertTest extends BasicConvertTest {
 
     private MessageModel<JsonSchema> buildJsonModel() {
         MessageModel<JsonSchema> model = new MessageModel<>();
-        model.setModelType(BodyType.JSON);
+        model.setModelType("JSON");
         return model;
     }
 
     private MessageModel<XMLSchema> buildXMLModel() {
         MessageModel<XMLSchema> model = new MessageModel<>();
-        model.setModelType(BodyType.XML);
+        model.setModelType("XML");
         XMLSchema schema = new XMLSchema();
         schema.setRoot("test");
         model.setModelSchema(schema);

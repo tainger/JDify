@@ -10,7 +10,7 @@ import io.terminus.dalaran.console.repository.ServiceRepository;
 import io.terminus.dalaran.console.service.ModelManagementService;
 import io.terminus.dalaran.console.service.ServiceManagement;
 import io.terminus.dalaran.core.component.DalaranService;
-import io.terminus.dalaran.core.component.model.ServiceOperationModel;
+import io.terminus.dalaran.model.ServiceOperationModel;
 import io.terminus.dalaran.core.context.DalaranServiceContext;
 import io.terminus.dalaran.model.MessageModel;
 import io.terminus.dalaran.model.ModelTargetType;

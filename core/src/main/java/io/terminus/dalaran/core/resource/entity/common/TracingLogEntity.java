@@ -1,7 +1,7 @@
 package io.terminus.dalaran.core.resource.entity.common;
 
 import io.terminus.dalaran.TracingType;
-import io.terminus.dalaran.model.BodyType;
+
 import lombok.Data;
 import org.springframework.data.annotation.CreatedDate;
 
@@ -46,16 +46,14 @@ public class TracingLogEntity {
     @Column(columnDefinition = "LONGTEXT")
     private String inputBody;
 
-    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private BodyType inputBodyType;
+    private String inputBodyType;
 
     @Column(columnDefinition = "LONGTEXT")
     private String outputBody;
 
-    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private BodyType outputBodyType;
+    private String outputBodyType;
 
     @CreatedDate
     @Column(columnDefinition = "timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP")

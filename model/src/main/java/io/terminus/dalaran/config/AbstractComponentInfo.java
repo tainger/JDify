@@ -1,7 +1,7 @@
 package io.terminus.dalaran.config;
 
 import com.alibaba.fastjson.annotation.JSONField;
-import io.terminus.dalaran.model.BodyType;
+
 import lombok.Data;
 import org.jetbrains.annotations.NotNull;
 
@@ -19,8 +19,7 @@ public abstract class AbstractComponentInfo implements ComponentInfo {
     private boolean outdated;
 
     @NotNull
-    @JSONField(serialize = false)
-    private BodyType bodyType;
+    private String bodyType;
 
     @JSONField(serialize = false)
     private ConnectorInfo connectorInfo;

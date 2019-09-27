@@ -3,9 +3,9 @@ package io.terminus.dalaran.component.processor;
 import com.predic8.wsdl.Definitions;
 import com.predic8.wsdl.WSDLParser;
 import io.terminus.dalaran.component.BasicServiceTest;
-import io.terminus.dalaran.core.converter.soap.model.SoapOperationConfig;
-import io.terminus.dalaran.core.converter.soap.processor.ObjectToSoapProcessor;
-import io.terminus.dalaran.core.converter.soap.processor.SoapToObjectProcessor;
+import io.terminus.dalaran.core.component.model.support.soap.model.SoapOperationConfig;
+import io.terminus.dalaran.core.component.model.support.soap.processor.ObjectToSoapProcessor;
+import io.terminus.dalaran.core.component.model.support.soap.processor.SoapToObjectProcessor;
 import io.terminus.dalaran.model.*;
 import io.terminus.dalaran.model.schema.SoapSchema;
 import io.terminus.dalaran.model.schema.SoapSchemaOperation;
@@ -82,7 +82,7 @@ public class SoapServiceTest extends BasicServiceTest {
         schema.setWsdlDoc("http://127.0.0.1:8081/ws/countries.wsdl");
         schema.setFields(buildFields());
 
-        model.setModelType(BodyType.SOAP);
+        model.setModelType("SOAP");
         model.setModelSchema(schema);
 
         return model;

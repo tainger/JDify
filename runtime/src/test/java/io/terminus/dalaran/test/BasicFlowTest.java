@@ -3,7 +3,7 @@ package io.terminus.dalaran.test;
 import io.terminus.dalaran.component.processor.script.DalaranScriptConfig;
 import io.terminus.dalaran.component.processor.script.DalaranScriptType;
 import io.terminus.dalaran.core.context.DalaranContext;
-import io.terminus.dalaran.model.BodyType;
+
 import io.terminus.dalaran.model.MessageModel;
 import io.terminus.dalaran.model.component.ProcessorModel;
 import io.terminus.dalaran.model.schema.JsonSchema;
@@ -50,11 +50,11 @@ public class BasicFlowTest {
         xmlSchema.setRoot("DalaranTest");
 
         MessageModel xmlModel = new MessageModel();
-        xmlModel.setModelType(BodyType.XML);
+        xmlModel.setModelType("XML");
         xmlModel.setModelSchema(xmlSchema);
 
         MessageModel jsonModel = new MessageModel();
-        jsonModel.setModelType(BodyType.JSON);
+        jsonModel.setModelType("JSON");
         jsonModel.setModelSchema(new JsonSchema());
 
 //        BasicFlow flow = new BasicFlow();
