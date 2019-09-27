@@ -18,7 +18,7 @@ public abstract class AbstractComponentInfo implements ComponentInfo {
     private boolean outdated;
 
     @NotNull
-    private String bodyType;
+    private String modelType;
 
     @JSONField(serialize = false)
     private ConnectorInfo connectorInfo;

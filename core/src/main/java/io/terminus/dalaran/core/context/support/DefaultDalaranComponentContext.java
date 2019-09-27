@@ -85,7 +85,7 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext {
             triggerInfo.setOrder(triggerAnnotation.order());
             triggerInfo.setConfigFields(configFields);
             triggerInfo.setConfigType(triggerAnnotation.configType());
-            triggerInfo.setBodyType(triggerAnnotation.bodyType());
+            triggerInfo.setModelType(triggerAnnotation.bodyType());
 
 //            triggerInfo.setIsVoid(triggerAnnotation.isVoid());
 
@@ -114,7 +114,7 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext {
             processorInfo.setOrder(processorAnnotation.order());
             processorInfo.setConfigFields(configFields);
             processorInfo.setConfigType(processorAnnotation.configType());
-            processorInfo.setBodyType(processorAnnotation.bodyType());
+            processorInfo.setModelType(processorAnnotation.bodyType());
 
             Class connectorType = getConnectorType(processorAnnotation.configType());
             if (connectorType != null) {

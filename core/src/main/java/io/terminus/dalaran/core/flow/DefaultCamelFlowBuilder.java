@@ -227,14 +227,14 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
             if (processorComponent instanceof DalaranMessageBodyCustomConverter) {
                 needConvert = ((DalaranMessageBodyCustomConverter) processorComponent).customBodyConvert(route, processor.getConfig(), currentBodyType);
             }
-            if (!UNKNOWN_MODEL_TYPE.equalsIgnoreCase(currentBodyType) && needConvert && currentProcessorInfo.getBodyType() != currentBodyType) {
+            if (!UNKNOWN_MODEL_TYPE.equalsIgnoreCase(currentBodyType) && needConvert && currentProcessorInfo.getModelType() != currentBodyType) {
                 if (DalaranConstants.OBJECT_MODEL_TYPE.equalsIgnoreCase(currentBodyType)) {
-                    converterContext.fromObject(route, currentModel, currentProcessorInfo.getBodyType());
-                } else if (DalaranConstants.OBJECT_MODEL_TYPE.equalsIgnoreCase(currentProcessorInfo.getBodyType())) {
+                    converterContext.fromObject(route, currentModel, currentProcessorInfo.getModelType());
+                } else if (DalaranConstants.OBJECT_MODEL_TYPE.equalsIgnoreCase(currentProcessorInfo.getModelType())) {
                     converterContext.toObject(route, currentBodyType);
                 } else {
                     converterContext.toObject(route, currentBodyType);
-                    converterContext.fromObject(route, currentModel, currentProcessorInfo.getBodyType());
+                    converterContext.fromObject(route, currentModel, currentProcessorInfo.getModelType());
                 }
             }
 

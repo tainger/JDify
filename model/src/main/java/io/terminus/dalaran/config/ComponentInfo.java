@@ -10,7 +10,7 @@ public interface ComponentInfo {
 
     DalaranConfigField[] getConfigFields();
 
-    String getBodyType();
+    String getModelType();
 
     ConnectorInfo getConnectorInfo();
 
