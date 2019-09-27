@@ -151,7 +151,7 @@ public class ModelManagementServiceImpl implements ModelManagementService {
     }
 
     @Override
-    public Map<Long, Map<String, JsonSchema>> multiImportExcel(MultipartFile file, BodyType type) {
+    public Map<Long, Map<String, JsonSchema>> multiImportExcel(MultipartFile file,String modelType) {
         try {
             Map<Long, Map<String, JsonSchema>> modelSchema = new HashMap<>();
             Map<String, Map<String, ModelField>> schemas = ExcelUtils.parseAllSheet(file.getInputStream());
@@ -161,7 +161,7 @@ public class ModelManagementServiceImpl implements ModelManagementService {
                 schema.setFields(entry.getValue());
                 model.setModelSchema(JSON.toJSONString(schema));
                 model.setName(entry.getKey());
-                model.setType(type);
+                model.setType(modelType);
                 modelRepository.save(model);
                 Map<String, JsonSchema> singleSchema = new HashMap<>();
                 singleSchema.put(entry.getKey(), schema);
@@ -215,11 +215,11 @@ public class ModelManagementServiceImpl implements ModelManagementService {
     @Override
     public Map<String, String> suggestMapping(Long sourceId, Long targetId) {
         ModelEntity sourceEntity = modelRepository.findById(sourceId).get();
-        Class<? extends DalaranModelSchema> sourceSchemaType = dalaranContext.getDalaranConverterContext().getSchemaType(sourceEntity.getType());
+        Class<? extends DalaranModelSchema> sourceSchemaType = dalaranContext.getDalaranModelTypeContext().getModelSchema(sourceEntity.getType());
         DalaranModelSchema sourceModelSchema = JSON.parseObject(sourceEntity.getModelSchema(), sourceSchemaType);
 
         ModelEntity targetEntity = modelRepository.findById(targetId).get();
-        Class<? extends DalaranModelSchema> targetSchemaType = dalaranContext.getDalaranConverterContext().getSchemaType(targetEntity.getType());
+        Class<? extends DalaranModelSchema> targetSchemaType = dalaranContext.getDalaranModelTypeContext().getModelSchema(targetEntity.getType());
         DalaranModelSchema targetModelSchema = JSON.parseObject(targetEntity.getModelSchema(), targetSchemaType);
         Map<String, String> mappings = new HashMap<>();
         deepBuildSuggest(sourceModelSchema.getFields(), targetModelSchema.getFields(), new ArrayList<>(), new ArrayList<>(), mappings);

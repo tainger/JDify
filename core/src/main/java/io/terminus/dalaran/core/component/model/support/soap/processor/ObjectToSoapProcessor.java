@@ -1,4 +1,4 @@
-package io.terminus.dalaran.core.converter.soap.processor;
+package io.terminus.dalaran.core.component.model.support.soap.processor;
 
 import io.terminus.dalaran.DalaranConstants;
 import io.terminus.dalaran.model.FieldType;
@@ -8,7 +8,6 @@ import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.Traceable;
 import org.apache.commons.collections.MapUtils;
-import org.apache.http.entity.StringEntity;
 import org.apache.xml.serialize.OutputFormat;
 import org.apache.xml.serialize.XMLSerializer;
 import org.w3c.dom.Document;

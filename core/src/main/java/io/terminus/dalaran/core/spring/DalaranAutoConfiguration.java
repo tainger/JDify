@@ -47,15 +47,19 @@ public class DalaranAutoConfiguration {
     public DalaranResourceBuilder dalaranResourceBuilder(
             DalaranResourceLoader resourceLoader,
             DalaranComponentContext componentContext,
-            DalaranConverterContext converterContext,
+            DalaranModelTypeContext converterContext,
             DalaranServiceContext serviceContext
     ) {
         return new DefaultDalaranResourceBuilder(resourceLoader, componentContext, converterContext, serviceContext);
     }
 
     @Bean("component-loader")
-    public BeanPostProcessor beanPostProcessor(DalaranComponentContext dalaranComponentContext, DalaranFunctionContext dalaranFunctionContext) {
-        return new DalaranComponentLoader(dalaranComponentContext, dalaranFunctionContext);
+    public BeanPostProcessor beanPostProcessor(
+            DalaranComponentContext dalaranComponentContext,
+            DalaranFunctionContext dalaranFunctionContext,
+            DalaranModelTypeContext dalaranModelTypeContext
+    ) {
+        return new DalaranComponentLoader(dalaranComponentContext, dalaranFunctionContext, dalaranModelTypeContext);
     }
 
     @Bean
@@ -75,8 +79,8 @@ public class DalaranAutoConfiguration {
     }
 
     @Bean
-    public DalaranConverterContext dalaranConverterContext() {
-        return new DefaultDalaranConverterContext();
+    public DalaranModelTypeContext dalaranConverterContext() {
+        return new DefaultDalaranModelTypeContext();
     }
 
     @Bean
@@ -93,7 +97,7 @@ public class DalaranAutoConfiguration {
     public DalaranFlowBuilder flowBuilder(
             DalaranTraceLogger traceLogger,
             TracingErrorHandlerFactory errorHandlerFactory,
-            DalaranConverterContext converterContext,
+            DalaranModelTypeContext converterContext,
             DalaranComponentContext componentContext
     ) {
         return new DefaultCamelFlowBuilder(traceLogger, errorHandlerFactory, converterContext, componentContext);

@@ -3,8 +3,11 @@ package io.terminus.dalaran.core.spring;
 import io.terminus.dalaran.core.component.DalaranProcessor;
 import io.terminus.dalaran.core.component.DalaranTrigger;
 import io.terminus.dalaran.core.component.annotation.MappingFunction;
+import io.terminus.dalaran.core.component.annotation.ModelType;
+import io.terminus.dalaran.core.component.model.DalaranModelType;
 import io.terminus.dalaran.core.context.DalaranComponentContext;
 import io.terminus.dalaran.core.context.DalaranFunctionContext;
+import io.terminus.dalaran.core.context.DalaranModelTypeContext;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 
@@ -14,10 +17,12 @@ public class DalaranComponentLoader implements BeanPostProcessor {
 
     private DalaranComponentContext componentContext;
     private DalaranFunctionContext functionContext;
+    private DalaranModelTypeContext modelTypeContext;
 
-    public DalaranComponentLoader(DalaranComponentContext componentContext, DalaranFunctionContext functionContext) {
+    public DalaranComponentLoader(DalaranComponentContext componentContext, DalaranFunctionContext functionContext, DalaranModelTypeContext modelTypeContext) {
         this.componentContext = componentContext;
         this.functionContext = functionContext;
+        this.modelTypeContext = modelTypeContext;
     }
 
     @Override
@@ -32,6 +37,10 @@ public class DalaranComponentLoader implements BeanPostProcessor {
         }
         if (bean instanceof DalaranTrigger) {
             componentContext.addTrigger((DalaranTrigger) bean);
+        }
+        ModelType modelType = bean.getClass().getAnnotation(ModelType.class);
+        if (modelType != null && bean instanceof DalaranModelType) {
+            modelTypeContext.addModelType(modelType.value(), modelType.modelSchema(), (DalaranModelType) bean);
         }
         MappingFunction mappingFunction = bean.getClass().getAnnotation(MappingFunction.class);
         if (mappingFunction != null) {

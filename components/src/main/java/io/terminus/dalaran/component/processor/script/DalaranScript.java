@@ -1,6 +1,5 @@
 package io.terminus.dalaran.component.processor.script;
 
-import io.terminus.dalaran.BodySerializeType;
 import io.terminus.dalaran.core.component.DalaranProcessor;
 import io.terminus.dalaran.core.component.annotation.Processor;
 import jdk.nashorn.api.scripting.ScriptObjectMirror;
@@ -12,9 +11,7 @@ import static io.terminus.dalaran.DalaranConstants.DALARAN_CONTEXT_EXCHANGE;
         value = "script",
         name = "执行脚本",
         order = 12,
-        configType = DalaranScriptConfig.class,
-        inputSerializeType = BodySerializeType.Object,
-        outputSerializeType = BodySerializeType.Object
+        configType = DalaranScriptConfig.class
 )
 public class DalaranScript implements DalaranProcessor<DalaranScriptConfig> {
 

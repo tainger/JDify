@@ -1,6 +1,5 @@
 package io.terminus.dalaran.component.trigger.kafka.commit;
 
-import io.terminus.dalaran.BodySerializeType;
 import io.terminus.dalaran.core.component.DalaranProcessor;
 import io.terminus.dalaran.core.component.annotation.Processor;
 import org.apache.camel.model.ProcessorDefinition;
@@ -11,9 +10,7 @@ import org.apache.camel.model.ProcessorDefinition;
 @Processor(
         value = "kafka-commit",
         name = "Kafka 消费确认",
-        order = 13,
-        inputSerializeType = BodySerializeType.Serialized,
-        outputSerializeType = BodySerializeType.Serialized
+        order = 13
 )
 public class DalaranKafkaCommit implements DalaranProcessor {
 

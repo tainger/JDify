@@ -1,6 +1,5 @@
 package io.terminus.dalaran.component.processor.dubbo;
 
-import io.terminus.dalaran.BodySerializeType;
 import io.terminus.dalaran.core.component.DalaranProcessor;
 import io.terminus.dalaran.core.component.annotation.Processor;
 import org.apache.camel.model.ProcessorDefinition;
@@ -9,9 +8,7 @@ import org.apache.camel.model.ProcessorDefinition;
         value = "dubbo-consumer",
         name = "Dubbo 服务消费者",
         order = 12,
-        configType = DalaranDubboConsumerConfig.class,
-        inputSerializeType = BodySerializeType.Object,
-        outputSerializeType = BodySerializeType.Object
+        configType = DalaranDubboConsumerConfig.class
 )
 public class DalaranDubboConsumer implements DalaranProcessor<DalaranDubboConsumerConfig> {
 

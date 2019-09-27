@@ -12,7 +12,6 @@ import java.util.Map;
         value = "scheduler",
         name = "调度触发器",
         order = 16,
-        isVoid = true,
         configType = DalaranSchedulerConfig.class
 )
 public class DalaranScheduler implements DalaranTrigger<DalaranSchedulerConfig> {

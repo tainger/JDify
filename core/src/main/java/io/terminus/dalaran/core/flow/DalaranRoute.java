@@ -1,5 +1,6 @@
 package io.terminus.dalaran.core.flow;
 
+
 import io.terminus.dalaran.model.MessageModel;
 import lombok.Data;
 import org.apache.camel.Processor;
@@ -16,7 +17,7 @@ import java.util.List;
 @Data
 public class DalaranRoute extends RouteDefinition {
 
-    private boolean serializedBody;
+    private String lastBodyType;
 
     private MessageModel lastOutModel;
 

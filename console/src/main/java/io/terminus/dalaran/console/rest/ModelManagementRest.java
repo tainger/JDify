@@ -4,7 +4,6 @@ import io.terminus.dalaran.console.ResponseMessage;
 import io.terminus.dalaran.console.exception.OnExceptionMessage;
 import io.terminus.dalaran.console.repository.ModelRepository;
 import io.terminus.dalaran.console.service.ModelManagementService;
-import io.terminus.dalaran.model.BodyType;
 import io.terminus.dalaran.model.ClassificationModel;
 import io.terminus.dalaran.model.ModelField;
 import io.terminus.dalaran.model.dto.DataTemplate;
@@ -131,8 +130,8 @@ public class ModelManagementRest implements ModelReadAPI, ModelWriteAPI, ModelIm
     // TODO 其实意义不大
     @Override
     @OnExceptionMessage(value = ResponseMessage.EXCEL_PARSE_ERROR)
-    public Map<Long, Map<String, JsonSchema>> multiImportExcel(@RequestParam MultipartFile file, @RequestParam BodyType type) {
-        return modelManagementService.multiImportExcel(file, type);
+    public Map<Long, Map<String, JsonSchema>> multiImportExcel(@RequestParam MultipartFile file, @RequestParam String modelType) {
+        return modelManagementService.multiImportExcel(file, modelType);
     }
 
     @Override

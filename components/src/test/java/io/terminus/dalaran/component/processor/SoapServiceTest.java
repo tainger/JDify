@@ -2,10 +2,13 @@ package io.terminus.dalaran.component.processor;
 
 import com.alibaba.fastjson.JSON;
 import io.terminus.dalaran.component.BasicServiceTest;
-import io.terminus.dalaran.core.converter.soap.model.SoapOperationConfig;
-import io.terminus.dalaran.core.converter.soap.processor.ObjectToSoapProcessor;
-import io.terminus.dalaran.core.converter.soap.processor.SoapToObjectProcessor;
-import io.terminus.dalaran.model.*;
+import io.terminus.dalaran.core.component.model.support.soap.model.SoapOperationConfig;
+import io.terminus.dalaran.core.component.model.support.soap.processor.ObjectToSoapProcessor;
+import io.terminus.dalaran.core.component.model.support.soap.processor.SoapToObjectProcessor;
+import io.terminus.dalaran.model.FieldType;
+import io.terminus.dalaran.model.HttpProtocol;
+import io.terminus.dalaran.model.MessageModel;
+import io.terminus.dalaran.model.ModelField;
 import io.terminus.dalaran.model.schema.SoapSchema;
 import io.terminus.dalaran.model.schema.SoapSchemaOperation;
 import io.terminus.dalaran.service.soap.SoapService;
@@ -83,7 +86,7 @@ public class SoapServiceTest extends BasicServiceTest {
         schema.setOperationConfig(schemaOperation);
         schema.setFields(buildFields());
 
-        model.setModelType(BodyType.SOAP);
+        model.setModelType("SOAP");
         model.setModelSchema(schema);
 
         return model;

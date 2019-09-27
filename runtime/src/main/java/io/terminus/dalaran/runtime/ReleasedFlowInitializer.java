@@ -128,7 +128,7 @@ public class ReleasedFlowInitializer {
 
     private DalaranModelSchema getModelSchema(Long modelId) {
         ModelReleasedEntity modelEntity = resourceLoader.loadModel(modelId);
-        Class<? extends DalaranModelSchema> schemaType = dalaranContext.getDalaranConverterContext().getSchemaType(modelEntity.getType());
+        Class<? extends DalaranModelSchema> schemaType = dalaranContext.getDalaranModelTypeContext().getModelSchema(modelEntity.getType());
         return JSON.parseObject(modelEntity.getModelSchema(), schemaType);
     }
 

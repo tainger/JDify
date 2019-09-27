@@ -17,7 +17,7 @@ import io.terminus.dalaran.console.entity.TriggerFlowEntity;
 import io.terminus.dalaran.console.repository.*;
 import io.terminus.dalaran.console.service.ExportService;
 import io.terminus.dalaran.console.util.WordUtils;
-import io.terminus.dalaran.core.context.DalaranConverterContext;
+import io.terminus.dalaran.core.context.DalaranModelTypeContext;
 import io.terminus.dalaran.core.resource.entity.common.ModuleEntity;
 import io.terminus.dalaran.core.resource.repository.ModuleRepository;
 import io.terminus.dalaran.model.DalaranModelSchema;
@@ -41,7 +41,7 @@ import java.util.stream.Collectors;
 public class ExportServiceImpl implements ExportService {
 
     @Autowired
-    private DalaranConverterContext converterContext;
+    private DalaranModelTypeContext converterContext;
 
     @Autowired
     private EntityManager entityManager;
@@ -180,7 +180,7 @@ public class ExportServiceImpl implements ExportService {
 
     private DalaranModelSchema getModelSchema(Long modelId) {
         ModelEntity modelEntity = modelRepository.findById(modelId).get();
-        Class<? extends DalaranModelSchema> schemaType = converterContext.getSchemaType(modelEntity.getType());
+        Class<? extends DalaranModelSchema> schemaType = converterContext.getModelSchema(modelEntity.getType());
         return JSON.parseObject(modelEntity.getModelSchema(), schemaType);
     }
 

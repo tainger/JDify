@@ -1,9 +1,9 @@
-package io.terminus.dalaran.core.converter.soap.processor;
+package io.terminus.dalaran.core.component.model.support.soap.processor;
 
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
-import io.terminus.dalaran.core.converter.soap.jackson.DalaranObjectDeserializer;
-import io.terminus.dalaran.core.converter.soap.jackson.DalaranXMLStreamReader;
+import io.terminus.dalaran.core.component.model.support.soap.jackson.DalaranObjectDeserializer;
+import io.terminus.dalaran.core.component.model.support.soap.jackson.DalaranXMLStreamReader;
 import io.terminus.dalaran.model.schema.SoapSchemaOperation;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;

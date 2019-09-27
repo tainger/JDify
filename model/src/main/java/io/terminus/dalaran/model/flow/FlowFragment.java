@@ -1,5 +1,7 @@
 package io.terminus.dalaran.model.flow;
 
+
+import io.terminus.dalaran.DalaranConstants;
 import lombok.Data;
 
 import java.util.HashMap;
@@ -13,7 +15,9 @@ public class FlowFragment extends BasicFlow {
 
     private String fragmentId;
 
-    private final Map<String,Object> properties = new HashMap<>();
+    private String inModelType = DalaranConstants.OBJECT_MODEL_TYPE;
+
+    private final Map<String, Object> properties = new HashMap<>();
 
     @Override
     public String getRouteId() {
