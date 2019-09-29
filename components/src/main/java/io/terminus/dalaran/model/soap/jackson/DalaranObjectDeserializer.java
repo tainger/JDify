@@ -1,4 +1,4 @@
-package io.terminus.dalaran.core.component.model.support.soap.jackson;
+package io.terminus.dalaran.model.soap.jackson;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
