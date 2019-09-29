@@ -1,4 +1,4 @@
-package io.terminus.dalaran.core.component.model.support.soap.processor;
+package io.terminus.dalaran.model.soap.processor;
 
 import io.terminus.dalaran.DalaranConstants;
 import io.terminus.dalaran.model.FieldType;

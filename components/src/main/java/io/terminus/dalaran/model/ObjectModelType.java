@@ -1,4 +1,4 @@
-package io.terminus.dalaran.core.component.model.support;
+package io.terminus.dalaran.model;
 
 import io.terminus.dalaran.DalaranConstants;
 import io.terminus.dalaran.core.component.annotation.ModelType;

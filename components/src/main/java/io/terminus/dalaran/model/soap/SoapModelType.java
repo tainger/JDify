@@ -1,10 +1,10 @@
-package io.terminus.dalaran.core.component.model.support.soap;
+package io.terminus.dalaran.model.soap;
 
 import io.terminus.dalaran.core.component.annotation.ModelType;
 import io.terminus.dalaran.core.component.model.DalaranModelType;
-import io.terminus.dalaran.core.component.model.support.soap.processor.ObjectToSoapProcessor;
-import io.terminus.dalaran.core.component.model.support.soap.processor.SoapToObjectProcessor;
 import io.terminus.dalaran.model.schema.SoapSchema;
+import io.terminus.dalaran.model.soap.processor.ObjectToSoapProcessor;
+import io.terminus.dalaran.model.soap.processor.SoapToObjectProcessor;
 import org.apache.camel.model.ProcessorDefinition;
 
 @ModelType(value = "SOAP", modelSchema = SoapSchema.class)
