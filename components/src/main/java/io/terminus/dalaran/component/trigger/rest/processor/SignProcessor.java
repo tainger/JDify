@@ -28,7 +28,7 @@ public class SignProcessor implements Processor {
         checkSign(exchange, body);
     }
 
-    protected void checkSign(Exchange exchange, Map<String, String> body) {
+    void checkSign(Exchange exchange, Map<String, String> body) {
         String appKey = body.get(AUTH_APP_KEY);
         if (StringUtils.isEmpty(appKey)) {
             stopExchangeOnMissingAppKey(exchange);
