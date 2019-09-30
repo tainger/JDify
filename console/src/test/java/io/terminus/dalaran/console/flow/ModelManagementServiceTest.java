@@ -4,7 +4,6 @@ import com.alibaba.fastjson.JSON;
 import io.terminus.dalaran.console.entity.ModelEntity;
 import io.terminus.dalaran.console.repository.ModelRepository;
 import io.terminus.dalaran.console.service.ModelManagementService;
-import io.terminus.dalaran.model.BodyType;
 import io.terminus.dalaran.model.FieldType;
 import io.terminus.dalaran.model.ModelField;
 import io.terminus.dalaran.model.dto.DataTemplate;
@@ -49,7 +48,7 @@ public class ModelManagementServiceTest {
     public void create() {
         ModelDTO model = new ModelDTO();
         model.setName("test");
-        model.setModelType(BodyType.JSON);
+        model.setModelType("JSON");
         model.setModuleId(1L);
         Long id = modelManagementService.createModel(model);
         ModelEntity entity = modelRepository.findById(id).get();
@@ -61,7 +60,7 @@ public class ModelManagementServiceTest {
         ModelDTO model = new ModelDTO();
         model.setId(23L);
         model.setModuleId(1L);
-        model.setModelType(BodyType.JSON);
+        model.setModelType("JSON");
         model.setName("test");
         model.setModelSchema(buildModelSchema());
         ModelDTO newModel = modelManagementService.updateModel(model);

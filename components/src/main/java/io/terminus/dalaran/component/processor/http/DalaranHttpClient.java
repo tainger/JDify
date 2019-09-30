@@ -3,12 +3,11 @@ package io.terminus.dalaran.component.processor.http;
 import com.google.common.base.Joiner;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Maps;
-import io.terminus.dalaran.BodySerializeType;
+import io.terminus.dalaran.DalaranConstants;
 import io.terminus.dalaran.core.component.DalaranMessageBodyCustomConverter;
 import io.terminus.dalaran.core.component.DalaranProcessor;
 import io.terminus.dalaran.core.component.annotation.Processor;
-import io.terminus.dalaran.core.context.DalaranConverterContext;
-import io.terminus.dalaran.model.BodyType;
+import io.terminus.dalaran.core.context.DalaranModelTypeContext;
 import org.apache.camel.builder.Builder;
 import org.apache.camel.model.ProcessorDefinition;
 import org.apache.camel.model.RouteDefinition;
@@ -24,24 +23,22 @@ import static org.apache.camel.Exchange.HTTP_QUERY;
         name = "Http 调用器",
         order = 11,
         configType = HttpClientConfig.class,
-        allowBodyTypes = {BodyType.JSON, BodyType.XML},
-        inputSerializeType = BodySerializeType.Serialized,
-        outputSerializeType = BodySerializeType.Serialized
+        bodyType = "JSON"
 )
 public class DalaranHttpClient implements DalaranProcessor<HttpClientConfig>, DalaranMessageBodyCustomConverter<HttpClientConfig> {
 
     @Autowired
-    private DalaranConverterContext converterContext;
+    private DalaranModelTypeContext converterContext;
 
     private static final String HTTP_URI = "%s4://%s:%s%s?bridgeEndpoint=true";
 
     @Override
-    public boolean customBodyConvert(RouteDefinition route, HttpClientConfig config, boolean bodyIsSerialized) {
+    public boolean customBodyConvert(RouteDefinition route, HttpClientConfig config, String currentBodyType) {
         if (!config.getMethod().isNoBody()) {
             return true;
         }
-        if (bodyIsSerialized && config.getInModel() != null &&config.getInModel().getModelType().isSerialized()) {
-            converterContext.toObject(route, config.getInModel());
+        if (!DalaranConstants.OBJECT_MODEL_TYPE.equalsIgnoreCase(currentBodyType)) {
+            converterContext.toObject(route, config.getInModel(), currentBodyType);
         }
         route.setHeader(HTTP_QUERY).method(this, "buildQueryString");
         // 如果转为 QueryString 后, body 实际上是无用的

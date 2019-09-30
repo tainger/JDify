@@ -113,6 +113,11 @@ public class PlatformRest implements PlatformInfoAPI, PlatformImportAPI, Platfor
     }
 
     @Override
+    public Collection<String> listModelType() {
+        return dalaranContext.getDalaranModelTypeContext().listAllModelType();
+    }
+
+    @Override
     @CrossOrigin
     @OnExceptionMessage(value = ResponseMessage.SWAGGER_EXPORT_ERROR)
     public Swagger exportSwagger() {

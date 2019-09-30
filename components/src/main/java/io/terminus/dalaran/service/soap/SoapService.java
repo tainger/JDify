@@ -6,11 +6,10 @@ import io.terminus.dalaran.DalaranConstants;
 import io.terminus.dalaran.component.common.HttpMethod;
 import io.terminus.dalaran.core.component.DalaranService;
 import io.terminus.dalaran.core.component.annotation.ServiceConnector;
-import io.terminus.dalaran.core.component.model.ServiceOperationModel;
-import io.terminus.dalaran.core.converter.soap.model.SoapOperationConfig;
 import io.terminus.dalaran.model.*;
 import io.terminus.dalaran.model.schema.SoapSchema;
 import io.terminus.dalaran.model.schema.SoapSchemaOperation;
+import io.terminus.dalaran.model.soap.model.SoapOperationConfig;
 import org.apache.camel.Exchange;
 import org.apache.camel.builder.Builder;
 import org.apache.camel.model.ProcessorDefinition;
@@ -177,7 +176,7 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
             e.printStackTrace();
         }
         model.setModelSchema(soapSchema);
-        model.setModelType(BodyType.SOAP);
+        model.setModelType("SOAP");
         Map<String, ModelField> fields = new HashMap<>();
         ModelField rootField = new ModelField();
         buildFieldWithoutRootPath(rootField, message);

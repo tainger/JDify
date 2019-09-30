@@ -1,9 +1,10 @@
 package io.terminus.dalaran.component.trigger.rocketmq;
 
-import io.terminus.dalaran.BodySerializeType;
+import io.terminus.dalaran.component.processor.rocketmq.RocketMQConnector;
+import io.terminus.dalaran.component.processor.rocketmq.RocketMQProducerConfig;
 import io.terminus.dalaran.core.component.DalaranTrigger;
 import io.terminus.dalaran.core.component.annotation.Trigger;
-import io.terminus.dalaran.model.BodyType;
+import org.apache.camel.model.ProcessorDefinition;
 import org.apache.camel.model.RouteDefinition;
 
 /**
@@ -13,18 +14,19 @@ import org.apache.camel.model.RouteDefinition;
         value = "rocketmq-consumer",
         name = "RocketMQ 消费者",
         order = 15,
-        configType = RocketMQConsumerConfig.class,
-        allowBodyTypes = {BodyType.JSON, BodyType.XML},
-        inputSerializeType = BodySerializeType.Serialized,
-        outputSerializeType = BodySerializeType.Serialized
+        configType = RocketMQConsumerConfig.class
 )
 public class RocketMQConsumer implements DalaranTrigger<RocketMQConsumerConfig> {
 
+    private static final String CAMEL_ROCKET_MQ_URI = "rocketmq:?nameServer=%s&groupId=%s&topic=%s&tags=%s&useAliCloudOns=%s&accessKey=%s&secretKey=%s";
+
     @Override
     public void buildFromRoute(RouteDefinition route, RocketMQConsumerConfig config) {
-        String uri = "rocketmq:?nameServer=" + config.getConnector().getNameServer()
-                + "&groupId=" + config.getConsumerGroup()
-                + "&topic=" + config.getTopic() + "&tags=" + config.getTags();
-        route.from(uri).to("log:consumer");
+        RocketMQConnector connector = config.getConnector();
+        String uri = String.format(CAMEL_ROCKET_MQ_URI, connector.getNameServer(), config.getConsumerGroup(),
+                config.getTopic(), config.getTags(), connector.getUseAliCloudOns(),
+                connector.getAccessKey(), connector.getSecretKey());
+        route.from(uri);
+
     }
 }

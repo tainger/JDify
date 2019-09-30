@@ -1,6 +1,5 @@
 package io.terminus.dalaran.component.trigger.soap;
 
-import io.terminus.dalaran.BodySerializeType;
 import io.terminus.dalaran.component.trigger.rest.processor.QueryStringSignProcessor;
 import io.terminus.dalaran.component.trigger.soap.model.SoapAuthType;
 import io.terminus.dalaran.component.trigger.soap.processor.SoapBasicSignProcessor;
@@ -8,7 +7,6 @@ import io.terminus.dalaran.component.trigger.soap.processor.SoapTriggerProcessor
 import io.terminus.dalaran.core.component.DalaranTrigger;
 import io.terminus.dalaran.core.component.annotation.Trigger;
 import io.terminus.dalaran.core.context.DalaranClientContext;
-import io.terminus.dalaran.model.BodyType;
 import org.apache.camel.model.RouteDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -20,9 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
         name = "Soap 监听器",
         order = 13,
         configType = SoapListenerConfig.class,
-        allowBodyTypes = {BodyType.XML},
-        inputSerializeType = BodySerializeType.Serialized,
-        outputSerializeType = BodySerializeType.Serialized
+        bodyType = "SOAP"
 )
 public class DalaranSoapListener implements DalaranTrigger<SoapListenerConfig> {
 

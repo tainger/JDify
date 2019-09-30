@@ -1,4 +1,4 @@
-package io.terminus.dalaran.core.converter.soap.model;
+package io.terminus.dalaran.model.soap.model;
 
 import io.terminus.dalaran.model.HttpProtocol;
 import io.terminus.dalaran.model.component.ServiceOperation;

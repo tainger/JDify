@@ -7,7 +7,7 @@ import io.terminus.dalaran.config.ServiceInfo;
 import io.terminus.dalaran.config.TriggerInfo;
 import io.terminus.dalaran.core.component.config.*;
 import io.terminus.dalaran.core.context.DalaranComponentContext;
-import io.terminus.dalaran.core.context.DalaranConverterContext;
+import io.terminus.dalaran.core.context.DalaranModelTypeContext;
 import io.terminus.dalaran.core.context.DalaranServiceContext;
 import io.terminus.dalaran.core.resource.entity.*;
 import io.terminus.dalaran.core.resource.entity.basic.BasicFlowEntity;
@@ -34,13 +34,13 @@ public class DefaultDalaranResourceBuilder implements DalaranResourceBuilder {
 
     private final DalaranComponentContext componentContext;
 
-    private final DalaranConverterContext converterContext;
+    private final DalaranModelTypeContext converterContext;
 
     private final DalaranServiceContext serviceContext;
 
     public DefaultDalaranResourceBuilder(
             DalaranResourceLoader resourceLoader, DalaranComponentContext componentContext,
-            DalaranConverterContext converterContext, DalaranServiceContext serviceContext
+            DalaranModelTypeContext converterContext, DalaranServiceContext serviceContext
     ) {
         this.resourceLoader = resourceLoader;
         this.componentContext = componentContext;
@@ -121,7 +121,7 @@ public class DefaultDalaranResourceBuilder implements DalaranResourceBuilder {
             val model = new MessageModel();
             val modelType = modelEntity.getType();
             model.setModelType(modelType);
-            Class<? extends DalaranModelSchema> schemaType = converterContext.getSchemaType(modelType);
+            Class<? extends DalaranModelSchema> schemaType = converterContext.getModelSchema(modelType);
             DalaranModelSchema modelSchema = buildConfig(modelEntity.getModelSchema(), schemaType);
             model.setModelSchema(modelSchema);
             return model;

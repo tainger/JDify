@@ -1,7 +1,5 @@
 package io.terminus.dalaran.config;
 
-import io.terminus.dalaran.BodySerializeType;
-import io.terminus.dalaran.model.BodyType;
 
 public interface ComponentInfo {
     String getType();
@@ -12,13 +10,9 @@ public interface ComponentInfo {
 
     DalaranConfigField[] getConfigFields();
 
-    BodyType[] getAllowedBodyTypes();
+    String getModelType();
 
     ConnectorInfo getConnectorInfo();
-
-    BodySerializeType getInputSerializeType();
-
-    BodySerializeType getOutputSerializeType();
 
     Class getConfigType();
 

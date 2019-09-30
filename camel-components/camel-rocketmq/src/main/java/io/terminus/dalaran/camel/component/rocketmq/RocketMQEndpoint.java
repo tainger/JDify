@@ -26,6 +26,15 @@ public class RocketMQEndpoint extends ProcessorEndpoint {
     @UriParam(description = "consumer/producer tags", javaType = "java.lang.String")
     private String tags;
 
+    @UriParam(description = "use ali cloud ons service", javaType = "java.lang.Boolean", defaultValue = "false")
+    private Boolean useAliCloudOns;
+
+    @UriParam(description = "ACL accessKey", javaType = "java.lang.String")
+    private String accessKey;
+
+    @UriParam(description = "ACL secretKey", javaType = "java.lang.String")
+    private String secretKey;
+
     private RocketMQContext context;
 
     public RocketMQEndpoint(RocketMQContext context) {
@@ -94,5 +103,29 @@ public class RocketMQEndpoint extends ProcessorEndpoint {
 
     public void setTags(String tags) {
         this.tags = tags;
+    }
+
+    public Boolean getUseAliCloudOns() {
+        return useAliCloudOns;
+    }
+
+    public void setUseAliCloudOns(Boolean useAliCloudOns) {
+        this.useAliCloudOns = useAliCloudOns;
+    }
+
+    public String getAccessKey() {
+        return accessKey;
+    }
+
+    public void setAccessKey(String accessKey) {
+        this.accessKey = accessKey;
+    }
+
+    public String getSecretKey() {
+        return secretKey;
+    }
+
+    public void setSecretKey(String secretKey) {
+        this.secretKey = secretKey;
     }
 }

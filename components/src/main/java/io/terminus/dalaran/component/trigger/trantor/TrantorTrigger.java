@@ -1,9 +1,7 @@
 package io.terminus.dalaran.component.trigger.trantor;
 
-import io.terminus.dalaran.BodySerializeType;
 import io.terminus.dalaran.core.component.DalaranTrigger;
 import io.terminus.dalaran.core.component.annotation.Trigger;
-import io.terminus.dalaran.model.BodyType;
 import org.apache.camel.model.RouteDefinition;
 
 @Trigger(
@@ -11,9 +9,7 @@ import org.apache.camel.model.RouteDefinition;
         name = "Trantor 集成点",
         order = 11,
         configType = TrantorTriggerConfig.class,
-        allowBodyTypes = {BodyType.JSON},
-        inputSerializeType = BodySerializeType.Serialized,
-        outputSerializeType = BodySerializeType.Serialized
+        bodyType = "JSON"
 )
 public class TrantorTrigger implements DalaranTrigger<TrantorTriggerConfig> {
 

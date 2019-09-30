@@ -33,4 +33,8 @@ public interface PlatformInfoAPI {
     @ApiOperation(value = "获取服务配置结构")
     @GetMapping(value = "/service")
     Collection<ServiceInfo> listServiceInfo();
+
+    @ApiOperation(value = "获取可用服务类型")
+    @GetMapping(value = "/modelType")
+    Collection<String> listModelType();
 }

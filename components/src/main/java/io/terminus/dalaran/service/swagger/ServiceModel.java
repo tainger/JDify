@@ -1,4 +1,4 @@
-package io.terminus.dalaran.core.model;
+package io.terminus.dalaran.service.swagger;
 
 import io.terminus.dalaran.model.MessageModel;
 import lombok.Data;

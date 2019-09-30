@@ -1,10 +1,9 @@
 package io.terminus.dalaran.component.processor.rocketmq;
 
-import io.terminus.dalaran.BodySerializeType;
 import io.terminus.dalaran.core.component.DalaranProcessor;
 import io.terminus.dalaran.core.component.annotation.Processor;
-import io.terminus.dalaran.model.BodyType;
 import org.apache.camel.model.ProcessorDefinition;
+import org.apache.camel.spi.UriParam;
 
 /**
  * Created by jingdi on 2019/6/19
@@ -13,18 +12,18 @@ import org.apache.camel.model.ProcessorDefinition;
         value = "rocketmq-producer",
         name = "RocketMQ 消息发送器",
         order = 13,
-        configType = RocketMQProducerConfig.class,
-        inputSerializeType = BodySerializeType.Object,
-        outputSerializeType = BodySerializeType.Object,
-        allowBodyTypes = {BodyType.JSON, BodyType.XML})
+        configType = RocketMQProducerConfig.class
+)
 public class RocketMQProducer implements DalaranProcessor<RocketMQProducerConfig> {
+
+    private static final String CAMEL_ROCKET_MQ_URI = "rocketmq:?nameServer=%s&groupId=%s&topic=%s&tags=%s&useAliCloudOns=%s&accessKey=%s&secretKey=%s";
 
     @Override
     public void configure(ProcessorDefinition route, RocketMQProducerConfig config) {
-        String uri = "rocketmq:"
-                + "?nameServer=" + config.getConnector().getNameServer()
-                + "&groupId=" + config.getProducerGroup()
-                + "&topic=" + config.getTopic() + "&tags=" + config.getTags();
+        RocketMQConnector connector = config.getConnector();
+        String uri = String.format(CAMEL_ROCKET_MQ_URI, connector.getNameServer(), config.getProducerGroup(),
+                config.getTopic(), config.getTags(), connector.getUseAliCloudOns(),
+                connector.getAccessKey(), connector.getSecretKey());
         route.to(uri);
     }
 }

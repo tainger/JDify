@@ -1,4 +1,4 @@
-package io.terminus.dalaran.core.converter.soap.jackson;
+package io.terminus.dalaran.model.soap.jackson;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;

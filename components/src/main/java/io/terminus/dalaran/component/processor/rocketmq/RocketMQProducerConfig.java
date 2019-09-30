@@ -7,6 +7,7 @@ import io.terminus.dalaran.core.component.annotation.ConfigFieldInfo;
 import io.terminus.dalaran.core.component.config.ConnectorConfig;
 import io.terminus.dalaran.core.component.config.OutModelConfig;
 import lombok.Data;
+import org.apache.camel.spi.UriParam;
 
 /**
  * Created by jingdi on 2019/6/19
@@ -28,6 +29,6 @@ public class RocketMQProducerConfig extends OutModelConfig implements ConnectorC
     @ConfigFieldInfo(label = "生产者组", inputType = FieldInputType.String)
     private String producerGroup;
 
-    @ConfigFieldInfo(label = "tag", inputType = FieldInputType.String)
+    @ConfigFieldInfo(label = "tag", inputType = FieldInputType.String, required = false)
     private String tags;
 }
