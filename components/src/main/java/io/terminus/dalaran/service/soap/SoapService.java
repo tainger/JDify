@@ -17,14 +17,8 @@ import org.apache.camel.model.ProcessorDefinition;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.util.EntityUtils;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -378,25 +372,5 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
                 return FieldType.BOOLEAN;
         }
         return FieldType.STRING;
-    }
-
-    private String getWsdlDoc(String url) {
-        HttpGet httpGet = new HttpGet(url);
-        CloseableHttpClient httpClient = HttpClientBuilder.create().build();
-        try {
-            HttpResponse response = httpClient.execute(httpGet);
-            if (response.getStatusLine().getStatusCode() == 200) {
-                return EntityUtils.toString(response.getEntity());
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                httpClient.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        return null;
     }
 }

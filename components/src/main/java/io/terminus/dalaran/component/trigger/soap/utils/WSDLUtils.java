@@ -16,10 +16,8 @@ import io.terminus.dalaran.component.trigger.soap.model.SoapModel;
 import io.terminus.dalaran.model.DalaranModelSchema;
 import io.terminus.dalaran.model.FieldType;
 import io.terminus.dalaran.model.ModelField;
-import io.terminus.dalaran.service.soap.SoapOperation;
 import org.apache.commons.collections.MapUtils;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,17 +33,11 @@ public class WSDLUtils {
     public static Definitions buildDefinitions(List<SoapApiInfo> soapApiInfos, String runtimeLocation) {
         Definitions definitions = new Definitions(TNS, "Dalaran");
         Map<String, SoapModel> models = new HashMap<>();
-        List<SoapOperation> operations = new ArrayList<>();
         soapApiInfos.forEach(soapApiInfo -> {
             SoapModel input = soapApiInfo.getInput();
             SoapModel output = soapApiInfo.getOutput();
             models.put(input.getName(), input);
             models.put(output.getName(), output);
-            SoapOperation operation = new SoapOperation();
-            operation.setInput(input.getName());
-            operation.setOutput(output.getName());
-            operation.setName(soapApiInfo.getName());
-            operations.add(operation);
         });
 
         /**
@@ -55,10 +47,9 @@ public class WSDLUtils {
         definitions.addSchema(schema);
         schema.setDefinitions(definitions);
         models.forEach((name, model) -> {
-            Element element = schema.newElement(name);
             DalaranModelSchema modelSchema = model.getSchema();
             ModelField modelField = modelSchema.getFields().get(MapperConstants.MODEL_ROOT);
-            buildTypes(element, modelField, schema);
+            Element element = buildTypes(modelField, schema);
             Message message = definitions.newMessage(name);
             Part part = message.newPart(name, element);
             part.setElementPN(new PrefixedName("tns", name));
@@ -98,20 +89,27 @@ public class WSDLUtils {
         return definitions;
     }
 
-    private static void buildTypes(Element element, ModelField modelField, Schema schema) {
+    private static Element buildTypes(ModelField modelField, Schema schema) {
         if (MapUtils.isEmpty(modelField.getFields())) {
-            return;
+            return null;
         }
+        String currentName = "";
+        ModelField currentField = new ModelField();
+        for (Map.Entry<String, ModelField> entry: modelField.getFields().entrySet()) {
+            currentName = entry.getKey();
+            currentField = entry.getValue();
+        }
+        Element element = schema.newElement(currentName);
 
         String maxOccurs = "1";
-        if (modelField.getType() == FieldType.ARRAY) {
+        if (currentField.getType() == FieldType.ARRAY) {
             maxOccurs = SoapConstants.UNBOUNDED;
         }
         element.setMaxOccurs(maxOccurs);
         Sequence sequence = element.newComplexType().newSequence();
         sequence.setParent(element);
 
-        modelField.getFields().forEach((name, field) -> {
+        currentField.getFields().forEach((name, field) -> {
             Element e = sequence.newElement(name);
             if (field.getType() == FieldType.ARRAY) {
                 e.setMaxOccurs(SoapConstants.UNBOUNDED);
@@ -120,6 +118,7 @@ public class WSDLUtils {
             }
             buildChildrenType(name, field, schema, e, sequence);
         });
+        return element;
     }
 
     private static void buildChildrenType(String name, ModelField modelField, Schema schema, Element parent, Sequence parentSequence) {
