@@ -40,6 +40,14 @@ public class SignUtils {
         stopExchange(exchange, 1004, "Invalid Signature");
     }
 
+    public static void stopExchangeOnInvalidBasicAuth(Exchange exchange) {
+        stopExchange(exchange, 1005, "Invalid basic auth");
+    }
+
+    public static void stopExchangeOnDecodeError(Exchange exchange) {
+        stopExchange(exchange, 1006, "Decode Error");
+    }
+
     public static void stopExchange(Exchange exchange, int errorCode, String message) {
         // return http status code 403
         exchange.getOut().setHeader(HTTP_RESPONSE_CODE, 403);
