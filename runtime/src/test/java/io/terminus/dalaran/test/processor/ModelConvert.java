@@ -1,6 +1,7 @@
 package io.terminus.dalaran.test.processor;
 
 import com.alibaba.fastjson.JSON;
+import io.terminus.dalaran.DalaranConstants;
 import io.terminus.dalaran.component.common.HttpMethod;
 import io.terminus.dalaran.component.processor.mapper.DalaranMapperConfig;
 import io.terminus.dalaran.component.processor.soap.SoapClientConfig;
@@ -207,17 +208,8 @@ public class ModelConvert {
 
         String wsdlDoc = getWsdlDoc("https://svn.apache.org/repos/asf/airavata/sandbox/xbaya-web/test/Calculator.wsdl");
         SoapSchema schema = new SoapSchema();
-        schema.setWsdlDoc(wsdlDoc);
 
         SoapSchemaOperation operation = new SoapSchemaOperation();
-        operation.setWsdl(WSDL);
-        operation.setProtocol(HttpProtocol.HTTP);
-        operation.setBaseUrl("156.56.179.164:9763/services/Calculator.CalculatorHttpSoap11Endpoint/");
-        operation.setPortType("CalculatorHttpSoap11Endpoint");
-        operation.setName("add");
-        operation.setInput("addRequest");
-        operation.setOutPut("addResponse");
-        operation.setBinding("CalculatorSoap11Binding");
         schema.setOperationConfig(operation);
         model.setModelSchema(schema);
         return model;

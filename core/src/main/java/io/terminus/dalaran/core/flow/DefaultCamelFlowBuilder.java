@@ -237,6 +237,7 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
                     converterContext.fromObject(route, currentModel, currentProcessorInfo.getModelType());
                 }
             }
+            currentBodyType = currentProcessorInfo.getModelType();
 
             Object config = processor.getConfig();
 
