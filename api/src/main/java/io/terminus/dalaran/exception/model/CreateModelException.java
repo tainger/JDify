@@ -1,9 +1,6 @@
 package io.terminus.dalaran.exception.model;
 
-import io.terminus.dalaran.exception.DalaranException;
+import io.terminus.dalaran.exception.DalaranRestException;
 
-public class CreateModelException extends DalaranException {
-    public CreateModelException(String message) {
-        super(message);
-    }
+public class CreateModelException extends DalaranRestException {
 }

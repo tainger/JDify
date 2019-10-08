@@ -8,7 +8,7 @@ import io.terminus.dalaran.config.ServiceInfo;
 import io.terminus.dalaran.config.TriggerInfo;
 import io.terminus.dalaran.console.ExportData;
 import io.terminus.dalaran.console.ResponseMessage;
-import io.terminus.dalaran.console.exception.OnExceptionMessage;
+import io.terminus.dalaran.console.exception.OnException;
 import io.terminus.dalaran.console.service.AuthorizeService;
 import io.terminus.dalaran.console.service.ExportService;
 import io.terminus.dalaran.console.service.ReleaseService;
@@ -59,55 +59,55 @@ public class PlatformRest implements PlatformInfoAPI, PlatformImportAPI, Platfor
     private ExportService exportService;
 
     @Override
-    @OnExceptionMessage(value = ResponseMessage.VERSION_QUERY_ERROR)
+    @OnException(message = ResponseMessage.VERSION_QUERY_ERROR)
     public List<ReleaseRecordDTO> releaseRecordList() {
         return releaseService.listReleaseRecordDTO();
     }
 
     @Override
-    @OnExceptionMessage(value = ResponseMessage.VERSION_QUERY_ERROR)
+    @OnException(message = ResponseMessage.VERSION_QUERY_ERROR)
     public List<TriggerFlowDTO> triggerFlowList(@PathVariable String version) {
         return releaseService.listReleasedTriggerFlowDTO(version);
     }
 
     @Override
-    @OnExceptionMessage(value = ResponseMessage.RELEASE_ERROR)
+    @OnException(message = ResponseMessage.RELEASE_ERROR)
     public ReleaseRecordDTO release(@RequestBody ReleaseRequestDTO requestDTO) {
         return releaseService.release(requestDTO);
     }
 
     @Override
-    @OnExceptionMessage(value = ResponseMessage.ROLLBACK_ERROR)
+    @OnException(message = ResponseMessage.ROLLBACK_ERROR)
     public ReleaseRecordDTO rollback(@PathVariable String version) {
         return releaseService.rollback(version);
     }
 
     @Override
-    @OnExceptionMessage(value = ResponseMessage.PROCESSOR_QUERY_ERROR)
+    @OnException(message = ResponseMessage.PROCESSOR_QUERY_ERROR)
     public Collection<ProcessorInfo> listProcessorInfo() {
         return dalaranContext.getDalaranComponentContext().getAllProcessorInfo();
     }
 
     @Override
-    @OnExceptionMessage(value = ResponseMessage.TRIGGER_QUERY_ERROR)
+    @OnException(message = ResponseMessage.TRIGGER_QUERY_ERROR)
     public Collection<TriggerInfo> listTriggerInfo() {
         return dalaranContext.getDalaranComponentContext().getAllTriggerInfo();
     }
 
     @Override
-    @OnExceptionMessage(value = ResponseMessage.FUNCTION_QUERY_ERROR)
+    @OnException(message = ResponseMessage.FUNCTION_QUERY_ERROR)
     public Collection<MappingFunctionInfo> mappingFunctions() {
         return dalaranContext.getDalaranFunctionContext().allFunctionInfo();
     }
 
     @Override
-    @OnExceptionMessage(value = ResponseMessage.CONNECTOR_QUERY_ERROR)
+    @OnException(message = ResponseMessage.CONNECTOR_QUERY_ERROR)
     public Collection<ConnectorInfo> listConnectorInfo() {
         return dalaranContext.getDalaranComponentContext().getAllConnectorInfo();
     }
 
     @Override
-    @OnExceptionMessage(value = ResponseMessage.SERVICE_QUERY_ERROR)
+    @OnException(message = ResponseMessage.SERVICE_QUERY_ERROR)
     public Collection<ServiceInfo> listServiceInfo() {
         return dalaranContext.getDalaranServiceContext().getAllServiceInfo();
     }
@@ -119,13 +119,13 @@ public class PlatformRest implements PlatformInfoAPI, PlatformImportAPI, Platfor
 
     @Override
     @CrossOrigin
-    @OnExceptionMessage(value = ResponseMessage.SWAGGER_EXPORT_ERROR)
+    @OnException(message = ResponseMessage.SWAGGER_EXPORT_ERROR)
     public Swagger exportSwagger() {
         return exportService.exportSwagger();
     }
 
     @Override
-    @OnExceptionMessage(value = ResponseMessage.SWAGGER_EXPORT_ERROR)
+    @OnException(message = ResponseMessage.SWAGGER_EXPORT_ERROR)
     public ResponseEntity exportWord() {
         File file = exportService.exportWord();
         String currentDate = DateFormatUtils.format(new Date(), "yyyy-MM-dd HH:mm:ss");
@@ -138,12 +138,12 @@ public class PlatformRest implements PlatformInfoAPI, PlatformImportAPI, Platfor
 
     @Override
     @CrossOrigin
-    @OnExceptionMessage(value = ResponseMessage.WSDL_EXPORT_ERROR)
+    @OnException(message = ResponseMessage.WSDL_EXPORT_ERROR)
     public String exportWSDL() {
         return exportService.exportWSDL().getAsString();
     }
 
-    @OnExceptionMessage(value = ResponseMessage.CONFIG_EXPORT_ERROR)
+    @OnException(message = ResponseMessage.CONFIG_EXPORT_ERROR)
     public ExportData exportAll(HttpServletResponse res) {
         String currentDate = DateFormatUtils.format(new Date(), "yyyy-MM-dd HH:mm:ss");
         res.addHeader("Content-Disposition", "attachment;filename=" + currentDate + ".dlr");
@@ -152,7 +152,7 @@ public class PlatformRest implements PlatformInfoAPI, PlatformImportAPI, Platfor
 
 
     @Override
-    @OnExceptionMessage(value = ResponseMessage.CONFIG_IMPORT_ERROR)
+    @OnException(message = ResponseMessage.CONFIG_IMPORT_ERROR)
     public void importAll(@RequestParam MultipartFile importFile) {
         try {
             ExportData importData = JSON.parseObject(importFile.getInputStream(), ExportData.class);
@@ -163,7 +163,7 @@ public class PlatformRest implements PlatformInfoAPI, PlatformImportAPI, Platfor
     }
 
     @Override
-    @OnExceptionMessage(value = ResponseMessage.LOGIN_ERROR)
+    @OnException(message = ResponseMessage.LOGIN_ERROR)
     public boolean loginAuth(@RequestBody DalaranAccount account) {
         return authorizeService.authAccount(account);
     }

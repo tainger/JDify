@@ -1,9 +1,6 @@
 package io.terminus.dalaran.exception.model;
 
-import io.terminus.dalaran.exception.DalaranException;
+import io.terminus.dalaran.exception.DalaranRestException;
 
-public class ModelNotExistException extends DalaranException {
-    public ModelNotExistException(String message) {
-        super(message);
-    }
+public class ModelNotExistException extends DalaranRestException {
 }

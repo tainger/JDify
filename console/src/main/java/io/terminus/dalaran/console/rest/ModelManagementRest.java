@@ -1,7 +1,7 @@
 package io.terminus.dalaran.console.rest;
 
 import io.terminus.dalaran.console.ResponseMessage;
-import io.terminus.dalaran.console.exception.OnExceptionMessage;
+import io.terminus.dalaran.console.exception.OnException;
 import io.terminus.dalaran.console.repository.ModelRepository;
 import io.terminus.dalaran.console.service.ModelManagementService;
 import io.terminus.dalaran.model.ClassificationModel;
@@ -37,86 +37,86 @@ public class ModelManagementRest implements ModelReadAPI, ModelWriteAPI, ModelIm
     private ModelRepository modelRepository;
 
     @Override
-    @OnExceptionMessage(value = ResponseMessage.MODEL_QUERY_ERROR)
+    @OnException(message = ResponseMessage.MODEL_QUERY_ERROR)
     public List<ModelDTO> query(ModelQuery query) {
         return modelManagementService.queryModels(query);
     }
 
     @Override
-    @OnExceptionMessage(value = ResponseMessage.MODEL_CREATE_ERROR)
+    @OnException(message = ResponseMessage.MODEL_CREATE_ERROR)
     public Long create(@RequestBody ModelDTO model) {
         return modelManagementService.createModel(model);
     }
 
     @Override
-    @OnExceptionMessage(value = ResponseMessage.MODEL_UPDATE_ERROR)
+    @OnException(message = ResponseMessage.MODEL_UPDATE_ERROR)
     public ModelDTO update(@RequestBody ModelDTO model) {
         return modelManagementService.updateModel(model);
     }
 
 
     @Override
-    @OnExceptionMessage(value = ResponseMessage.MODEL_DELETE_ERROR)
+    @OnException(message = ResponseMessage.MODEL_DELETE_ERROR)
     public void deleteById(@RequestParam Long id) {
         modelManagementService.deleteModel(id);
     }
 
     @Override
-    @OnExceptionMessage(value = ResponseMessage.MODEL_QUERY_ERROR)
+    @OnException(message = ResponseMessage.MODEL_QUERY_ERROR)
     public List<ModelDTO> list() {
         return modelManagementService.list();
     }
 
     @Override
-    @OnExceptionMessage(value = ResponseMessage.MODEL_QUERY_ERROR)
+    @OnException(message = ResponseMessage.MODEL_QUERY_ERROR)
     public List<ModelDTO> listByModuleId(@PathVariable Long moduleId) {
         return modelManagementService.listByModuleId(moduleId);
     }
 
     @Override
-    @OnExceptionMessage(value = ResponseMessage.MODEL_QUERY_ERROR)
+    @OnException(message = ResponseMessage.MODEL_QUERY_ERROR)
     public List<ModelDTO> listEditable() {
         return modelManagementService.listEditableModel();
     }
 
     @Override
-    @OnExceptionMessage(value = ResponseMessage.MODEL_QUERY_ERROR)
+    @OnException(message = ResponseMessage.MODEL_QUERY_ERROR)
     public List<ModelDTO> listEditableByModuleId(@PathVariable Long moduleId) {
         return modelManagementService.listEditableModelByModuleId(moduleId);
     }
 
     @Override
-    @OnExceptionMessage(value = ResponseMessage.MODEL_QUERY_ERROR)
+    @OnException(message = ResponseMessage.MODEL_QUERY_ERROR)
     public Map<String, ClassificationModel> listClassificationByModuleId(@PathVariable Long moduleId) {
         return modelManagementService.listClassificationModels(moduleId);
     }
 
     @Override
-    @OnExceptionMessage(value = ResponseMessage.BUILD_MAPPING_SUGGEST_ERROR)
+    @OnException(message = ResponseMessage.BUILD_MAPPING_SUGGEST_ERROR)
     public Map<String, String> suggestMapping(@RequestParam Long sourceId, @RequestParam Long targetId) {
         return modelManagementService.suggestMapping(sourceId, targetId);
     }
 
     @Override
-    @OnExceptionMessage(value = ResponseMessage.EXCEL_PARSE_ERROR)
+    @OnException(message = ResponseMessage.EXCEL_PARSE_ERROR)
     public JsonSchema importExcel(@RequestParam MultipartFile file, @PathVariable long id) {
         return modelManagementService.importExcel(file, id);
     }
 
     @Override
-    @OnExceptionMessage(value = ResponseMessage.DATA_TEMPLATE_PARSE_ERROR)
+    @OnException(message = ResponseMessage.DATA_TEMPLATE_PARSE_ERROR)
     public JsonSchema importDataTemplate(@RequestBody DataTemplate dataTemplate, @PathVariable long id) {
         return modelManagementService.importDataTemplate(dataTemplate, id);
     }
 
     @Override
-    @OnExceptionMessage(value = ResponseMessage.DATA_TEMPLATE_PARSE_ERROR)
+    @OnException(message = ResponseMessage.DATA_TEMPLATE_PARSE_ERROR)
     public ObjectSchema importDalaranSchema(@RequestBody ObjectSchema objectSchema, @PathVariable long id) {
         return modelManagementService.importDalaranSchema(objectSchema, id);
     }
 
     @Override
-    @OnExceptionMessage(value = ResponseMessage.MODEL_EXAMPLE_BUILD_ERROR)
+    @OnException(message = ResponseMessage.MODEL_EXAMPLE_BUILD_ERROR)
     public String buildRequestTemplate(@RequestBody JsonSchema schema, @PathVariable long id) {
         return modelManagementService.buildDataTemplate(schema, id);
     }
@@ -129,13 +129,13 @@ public class ModelManagementRest implements ModelReadAPI, ModelWriteAPI, ModelIm
 
     // TODO 其实意义不大
     @Override
-    @OnExceptionMessage(value = ResponseMessage.EXCEL_PARSE_ERROR)
+    @OnException(message = ResponseMessage.EXCEL_PARSE_ERROR)
     public Map<Long, Map<String, JsonSchema>> multiImportExcel(@RequestParam MultipartFile file, @RequestParam String modelType) {
         return modelManagementService.multiImportExcel(file, modelType);
     }
 
     @Override
-    @OnExceptionMessage(value = ResponseMessage.TEMPLATE_DOWNLOAD_ERROR)
+    @OnException(message = ResponseMessage.TEMPLATE_DOWNLOAD_ERROR)
     public ResponseEntity<Resource> downloadExcelTemplate() {
         return modelManagementService.downloadExcelTemplate();
     }
