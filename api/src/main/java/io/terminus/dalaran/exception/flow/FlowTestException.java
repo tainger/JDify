@@ -1,9 +1,6 @@
 package io.terminus.dalaran.exception.flow;
 
-import io.terminus.dalaran.exception.DalaranException;
+import io.terminus.dalaran.exception.DalaranRestException;
 
-public class FlowTestException extends DalaranException {
-    public FlowTestException(String message) {
-        super(message);
-    }
+public class FlowTestException extends DalaranRestException {
 }

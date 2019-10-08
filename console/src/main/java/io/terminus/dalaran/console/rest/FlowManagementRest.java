@@ -1,6 +1,7 @@
 package io.terminus.dalaran.console.rest;
 
 import io.terminus.dalaran.console.ResponseMessage;
+import io.terminus.dalaran.console.exception.DalaranExceptionBuilder;
 import io.terminus.dalaran.console.exception.OnExceptionMessage;
 import io.terminus.dalaran.console.exception.OnExceptionNotThrows;
 import io.terminus.dalaran.console.repository.PropertyRepository;
@@ -51,7 +52,7 @@ public class FlowManagementRest implements FlowReadAPI, FlowWriteAPI {
         try {
             return flowManagementService.createFlow(model);
         } catch (Exception e) {
-            throw new CreateFlowException(e.getMessage());
+            throw DalaranExceptionBuilder.build(CreateFlowException.class, e.getMessage());
         }
     }
 
@@ -63,7 +64,7 @@ public class FlowManagementRest implements FlowReadAPI, FlowWriteAPI {
         } catch (FlowNotExistException e) {
             throw e;
         } catch (Exception e) {
-            throw new UpdateFlowException(e.getMessage());
+            throw DalaranExceptionBuilder.build(UpdateFlowException.class, e.getMessage());
         }
     }
 
