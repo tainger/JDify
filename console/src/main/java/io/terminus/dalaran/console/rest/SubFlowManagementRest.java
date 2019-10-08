@@ -1,7 +1,7 @@
 package io.terminus.dalaran.console.rest;
 
 import io.terminus.dalaran.console.ResponseMessage;
-import io.terminus.dalaran.console.exception.OnExceptionMessage;
+import io.terminus.dalaran.console.exception.OnException;
 import io.terminus.dalaran.console.service.SubFlowManagementService;
 import io.terminus.dalaran.console.service.TracingLogService;
 import io.terminus.dalaran.core.context.DalaranContext;
@@ -34,58 +34,58 @@ public class SubFlowManagementRest implements SubFlowReadAPI, SubFlowWriteAPI {
     private DalaranContext dalaranContext;
 
     @Override
-    @OnExceptionMessage(value = ResponseMessage.SUBFLOW_CREATE_ERROR)
+    @OnException(message = ResponseMessage.SUBFLOW_CREATE_ERROR)
     public Long create(@RequestBody SubFlowDTO model) {
         return service.createFlow(model);
     }
 
     @Override
-    @OnExceptionMessage(value = ResponseMessage.SUBFLOW_UPDATE_ERROR)
+    @OnException(message = ResponseMessage.SUBFLOW_UPDATE_ERROR)
     public SubFlowDTO update(@RequestBody SubFlowDTO model) {
         return service.updateFlow(model);
     }
 
     @Override
-    @OnExceptionMessage(value = ResponseMessage.SUBFLOW_DELETE_ERROR)
+    @OnException(message = ResponseMessage.SUBFLOW_DELETE_ERROR)
     public void deleteById(@RequestParam Long id) {
         service.deleteFlow(id);
     }
 
     @Override
-    @OnExceptionMessage(value = ResponseMessage.SUBFLOW_COPY_ERROR)
+    @OnException(message = ResponseMessage.SUBFLOW_COPY_ERROR)
     public Long copy(@RequestBody CopyFlow copyFlow) {
         return service.copyFlow(copyFlow);
     }
 
     @Override
-    @OnExceptionMessage(value = ResponseMessage.SUBFLOW_QUERY_ERROR)
+    @OnException(message = ResponseMessage.SUBFLOW_QUERY_ERROR)
     public SubFlowDTO getById(@PathVariable Long id) {
         return service.getById(id);
     }
 
     @Override
-    @OnExceptionMessage(value = ResponseMessage.SUBFLOW_QUERY_ERROR)
+    @OnException(message = ResponseMessage.SUBFLOW_QUERY_ERROR)
     public List<SubFlowDTO> query(FlowQuery query) {
         return service.queryFlows(query);
     }
 
 
     @Override
-    @OnExceptionMessage(value = ResponseMessage.SUBFLOW_QUERY_ERROR)
+    @OnException(message = ResponseMessage.SUBFLOW_QUERY_ERROR)
     public List<SubFlowDTO> list() {
         return service.list();
     }
 
 
     @Override
-    @OnExceptionMessage(value = ResponseMessage.SUBFLOW_CHECK_ERROR)
+    @OnException(message = ResponseMessage.SUBFLOW_CHECK_ERROR)
     public List<FlowValidation> validate(@RequestBody SubFlowDTO model) {
         return service.validateFlow(model);
     }
 
 
     @Override
-    @OnExceptionMessage(value = ResponseMessage.SUBFLOW_TEST_ERROR)
+    @OnException(message = ResponseMessage.SUBFLOW_TEST_ERROR)
     public MainLogDTO doSubFlowTest(@RequestBody TestRequestDTO request) {
         SubFlowDTO flow = service.getById(request.getFlowId());
         if (flow == null) {

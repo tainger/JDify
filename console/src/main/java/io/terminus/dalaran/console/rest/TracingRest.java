@@ -1,7 +1,7 @@
 package io.terminus.dalaran.console.rest;
 
 import io.terminus.dalaran.console.ResponseMessage;
-import io.terminus.dalaran.console.exception.OnExceptionMessage;
+import io.terminus.dalaran.console.exception.OnException;
 import io.terminus.dalaran.console.service.TracingLogService;
 import io.terminus.dalaran.model.dto.log.MainLogDTO;
 import io.terminus.dalaran.model.query.TracingLogQuery;
@@ -18,12 +18,12 @@ public class TracingRest implements TracingReadAPI {
     @Autowired
     private TracingLogService tracingLogService;
 
-    @OnExceptionMessage(value = ResponseMessage.TRACE_QUERY_ERROR)
+    @OnException(message = ResponseMessage.TRACE_QUERY_ERROR)
     public List<MainLogDTO> query(TracingLogQuery query) {
         return tracingLogService.triggerLogs(query);
     }
 
-    @OnExceptionMessage(value = ResponseMessage.TRACE_QUERY_ERROR)
+    @OnException(message = ResponseMessage.TRACE_QUERY_ERROR)
     public MainLogDTO logDetail(@PathVariable String recordId) {
         return tracingLogService.getRecordDetail(recordId);
     }

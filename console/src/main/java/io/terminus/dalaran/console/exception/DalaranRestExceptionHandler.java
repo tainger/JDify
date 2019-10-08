@@ -23,11 +23,11 @@ public class DalaranRestExceptionHandler {
             message.setExceptionType(ex.getClass().getCanonicalName());
             message.setMessage(ex.getMessage());
         } else {
-            OnExceptionMessage exceptionMessage = method.getMethodAnnotation(OnExceptionMessage.class);
+            OnException exceptionMessage = method.getMethodAnnotation(OnException.class);
             if (exceptionMessage != null) {
                 response.setStatus(599);
-                message.setExceptionType(DalaranException.class.getCanonicalName());
-                message.setMessage(exceptionMessage.value());
+                message.setExceptionType(exceptionMessage.exception().getCanonicalName());
+                message.setMessage(exceptionMessage.message());
             } else {
                 message.setMessage(ex.getMessage());
             }

@@ -1,5 +1,6 @@
 package io.terminus.dalaran.console.exception;
 
+import io.terminus.dalaran.exception.DalaranException;
 import io.terminus.dalaran.exception.DalaranRestException;
 
 import java.lang.annotation.ElementType;
@@ -9,7 +10,9 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
-public @interface OnExceptionNotThrows {
+public @interface OnException {
 
-    Class<? extends DalaranRestException> value();
+    String message();
+
+    Class<? extends DalaranException> exception() default DalaranException.class;
 }
