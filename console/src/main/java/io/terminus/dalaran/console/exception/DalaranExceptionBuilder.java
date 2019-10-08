@@ -11,7 +11,11 @@ public final class DalaranExceptionBuilder<T extends DalaranThrowable> {
         return new DalaranExceptionBuilder();
     }
 
-    public static DalaranThrowable build(Class<? extends DalaranThrowable> exceptionClass) {
+    public static <T extends DalaranThrowable> DalaranExceptionBuilder newBuilder(Class<T> exceptionClass) {
+        return new DalaranExceptionBuilder().exception(exceptionClass);
+    }
+
+    public static <T extends DalaranThrowable> DalaranThrowable build(Class<T> exceptionClass) {
         return buildException(exceptionClass, null);
     }
 
