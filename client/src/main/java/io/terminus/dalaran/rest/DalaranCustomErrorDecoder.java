@@ -4,8 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.Response;
 import feign.codec.ErrorDecoder;
 import io.terminus.dalaran.exception.DalaranException;
-import io.terminus.dalaran.exception.DalaranRestException;
-import io.terminus.dalaran.exception.DalaranRuntimeException;
 import io.terminus.dalaran.exception.DalaranThrowable;
 import io.terminus.dalaran.model.common.ErrorMessage;
 import org.apache.commons.lang3.StringUtils;
