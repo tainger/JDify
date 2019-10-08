@@ -3,7 +3,6 @@ package io.terminus.dalaran.component.processor.rocketmq;
 import io.terminus.dalaran.core.component.DalaranProcessor;
 import io.terminus.dalaran.core.component.annotation.Processor;
 import org.apache.camel.model.ProcessorDefinition;
-import org.apache.camel.spi.UriParam;
 
 /**
  * Created by jingdi on 2019/6/19

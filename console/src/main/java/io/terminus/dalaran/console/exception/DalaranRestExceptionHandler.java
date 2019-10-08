@@ -1,6 +1,5 @@
 package io.terminus.dalaran.console.exception;
 
-import io.terminus.dalaran.exception.DalaranException;
 import io.terminus.dalaran.exception.DalaranRestException;
 import io.terminus.dalaran.exception.DalaranRuntimeException;
 import io.terminus.dalaran.model.common.ErrorMessage;
