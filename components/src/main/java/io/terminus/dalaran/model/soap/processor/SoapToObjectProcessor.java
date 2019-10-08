@@ -29,11 +29,11 @@ public class SoapToObjectProcessor implements Processor, Traceable {
     @Override
     public void process(Exchange exchange) throws Exception {
         String in = exchange.getIn().getBody(String.class);
-        Object body = formatResponse(in);
+        Object body = parseSoapBody(in);
         exchange.getOut().setBody(body);
     }
 
-    private Object formatResponse(String body) throws Exception {
+    private Object parseSoapBody(String body) throws Exception {
         InputStream is = new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8));
         DalaranXMLStreamReader sr = new DalaranXMLStreamReader(XMLInputFactory.newFactory().createXMLStreamReader(is));
         XmlMapper xmlMapper = new XmlMapper();
