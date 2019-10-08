@@ -16,14 +16,8 @@ import org.apache.camel.model.ProcessorDefinition;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.util.EntityUtils;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -41,7 +35,7 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
 
     @Override
     public void configure(ProcessorDefinition route, SoapOperationConfig soapOperationConfig) {
-        String uri = String.format(HTTP_URI, "http", soapOperationConfig.getBaseUrl());
+        String uri = String.format(HTTP_URI, "http", soapOperationConfig.getLocation());
         route.setHeader(Exchange.HTTP_METHOD, Builder.constant(HttpMethod.POST));
         route.setHeader(Exchange.CONTENT_TYPE, Builder.constant("application/xml"));
         route.to(uri);
@@ -99,15 +93,15 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
         definitions.getServices().forEach(service -> {
             service.getPorts().forEach(port -> {
                 List<SoapOperationConfig> operations = soapOperationConfigMap.get(port.getBindingPN().getLocalName());
-                String baseUrl = StringUtils.substringAfter(port.getAddress().getLocation(), "://");
+                String location = StringUtils.substringAfter(port.getAddress().getLocation(), "://");
                 if (StringUtils.isNotBlank(wsdlImportConfig.getUsername()) && StringUtils.isNotBlank(wsdlImportConfig.getPassword())) {
-                    baseUrl = baseUrl + "&authMethod=Basic&authUsername=" + wsdlImportConfig.getUsername() + "&authPassword=" + wsdlImportConfig.getPassword();
+                    location = location + "&authMethod=Basic&authUsername=" + wsdlImportConfig.getUsername() + "&authPassword=" + wsdlImportConfig.getPassword();
                 }
-                String operationUrl = baseUrl;
+                String operationUrl = location;
                 operations.forEach(operation -> {
                     try {
                         SoapOperationConfig newOperation = (SoapOperationConfig) BeanUtils.cloneBean(operation);
-                        newOperation.setBaseUrl(operationUrl);
+                        newOperation.setLocation(operationUrl);
                         newOperation.setProtocol(HttpProtocol.valueOf(StringUtils.substringBefore(port.getAddress().getLocation(), "://").toUpperCase()));
                         newOperation.setServicePort(port.getName());
                         newOperation.setOperationKey(operation.getOperationKey());
@@ -377,25 +371,5 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
                 return FieldType.BOOLEAN;
         }
         return FieldType.STRING;
-    }
-
-    private String getWsdlDoc(String url) {
-        HttpGet httpGet = new HttpGet(url);
-        CloseableHttpClient httpClient = HttpClientBuilder.create().build();
-        try {
-            HttpResponse response = httpClient.execute(httpGet);
-            if (response.getStatusLine().getStatusCode() == 200) {
-                return EntityUtils.toString(response.getEntity());
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                httpClient.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        return null;
     }
 }

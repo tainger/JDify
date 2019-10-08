@@ -1,4 +1,4 @@
-package io.terminus.dalaran.component.trigger.soap;
+package io.terminus.dalaran.component.trigger.soap.processor;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
