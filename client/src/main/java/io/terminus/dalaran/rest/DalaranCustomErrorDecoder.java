@@ -4,6 +4,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.Response;
 import feign.codec.ErrorDecoder;
 import io.terminus.dalaran.exception.DalaranException;
+import io.terminus.dalaran.exception.DalaranRestException;
+import io.terminus.dalaran.exception.DalaranRuntimeException;
+import io.terminus.dalaran.exception.DalaranThrowable;
 import io.terminus.dalaran.model.common.ErrorMessage;
 import org.apache.commons.lang3.StringUtils;
 
@@ -24,11 +27,19 @@ public class DalaranCustomErrorDecoder implements ErrorDecoder {
                 InputStream respBody = response.body().asInputStream();
                 ErrorMessage errorMessage = objectMapper.readValue(respBody, ErrorMessage.class);
                 if (StringUtils.isNotBlank(errorMessage.getExceptionType())) {
-                    Class<? extends DalaranException> exceptionClass = (Class<? extends DalaranException>) Class.forName(errorMessage.getExceptionType());
-                    DalaranException exception = exceptionClass.getConstructor(ErrorMessage.class).newInstance(errorMessage);
-                    return exception;
+                    Class<? extends Exception> exceptionClass;
+                    try {
+                        exceptionClass = (Class<? extends Exception>) Class.forName(errorMessage.getExceptionType());
+                        if (DalaranThrowable.class.isAssignableFrom(exceptionClass)) {
+                            DalaranThrowable dalaranThrowable = (DalaranThrowable) exceptionClass.getConstructor().newInstance();
+                            dalaranThrowable.setErrorMessage(errorMessage);
+                            return (Exception) dalaranThrowable;
+                        }
+                    } catch (ClassNotFoundException e) {
+                        return new DalaranException(errorMessage.getMessage());
+                    }
                 }
-            } catch (ClassNotFoundException | IOException | NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException e) {
+            } catch (IOException | NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException e) {
                 e.printStackTrace();
             }
         }

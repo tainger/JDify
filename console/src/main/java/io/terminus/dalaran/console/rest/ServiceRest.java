@@ -1,7 +1,7 @@
 package io.terminus.dalaran.console.rest;
 
 import io.terminus.dalaran.console.ResponseMessage;
-import io.terminus.dalaran.console.exception.OnExceptionMessage;
+import io.terminus.dalaran.console.exception.OnException;
 import io.terminus.dalaran.console.service.ServiceManagement;
 import io.terminus.dalaran.model.dto.ServiceDTO;
 import io.terminus.dalaran.rest.read.ServiceReadAPI;
@@ -20,37 +20,37 @@ public class ServiceRest implements ServiceReadAPI, ServiceWriteAPI {
     private ServiceManagement serviceManagement;
 
     @Override
-    @OnExceptionMessage(value = ResponseMessage.SERVICE_CREATE_ERROR)
+    @OnException(message = ResponseMessage.SERVICE_CREATE_ERROR)
     public Long create(@RequestBody ServiceDTO serviceDTO) {
         return serviceManagement.create(serviceDTO);
     }
 
     @Override
-    @OnExceptionMessage(value = ResponseMessage.SERVICE_UPDATE_ERROR)
+    @OnException(message = ResponseMessage.SERVICE_UPDATE_ERROR)
     public ServiceDTO update(@RequestBody ServiceDTO serviceDTO) {
         return serviceManagement.update(serviceDTO);
     }
 
     @Override
-    @OnExceptionMessage(value = ResponseMessage.SERVICE_DELETE_ERROR)
+    @OnException(message = ResponseMessage.SERVICE_DELETE_ERROR)
     public void deleteById(@PathVariable Long id) {
         serviceManagement.delete(id);
     }
 
     @Override
-    @OnExceptionMessage(value = ResponseMessage.SERVICE_QUERY_ERROR)
+    @OnException(message = ResponseMessage.SERVICE_QUERY_ERROR)
     public ServiceDTO detail(@PathVariable Long id) {
         return serviceManagement.detail(id);
     }
 
     @Override
-    @OnExceptionMessage(value = ResponseMessage.SERVICE_QUERY_ERROR)
+    @OnException(message = ResponseMessage.SERVICE_QUERY_ERROR)
     public List<ServiceDTO> list() {
         return serviceManagement.list();
     }
 
     @Override
-    @OnExceptionMessage(value = ResponseMessage.SERVICE_QUERY_ERROR)
+    @OnException(message = ResponseMessage.SERVICE_QUERY_ERROR)
     public List<String> operations(@PathVariable Long id) {
         return serviceManagement.listOperation(id);
     }

@@ -3,6 +3,7 @@ package io.terminus.dalaran.console.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.google.common.collect.Maps;
 import io.terminus.dalaran.DalaranConsoleConstants;
 import io.terminus.dalaran.ServiceType;
 import io.terminus.dalaran.component.processor.mapper.model.MapperConstants;
@@ -151,7 +152,7 @@ public class ModelManagementServiceImpl implements ModelManagementService {
     }
 
     @Override
-    public Map<Long, Map<String, JsonSchema>> multiImportExcel(MultipartFile file,String modelType) {
+    public Map<Long, Map<String, JsonSchema>> multiImportExcel(MultipartFile file, String modelType) {
         try {
             Map<Long, Map<String, JsonSchema>> modelSchema = new HashMap<>();
             Map<String, Map<String, ModelField>> schemas = ExcelUtils.parseAllSheet(file.getInputStream());
@@ -282,6 +283,9 @@ public class ModelManagementServiceImpl implements ModelManagementService {
     }
 
     private Object buildTemplateBody(ModelField parent, String parentFieldName) {
+        if (parent == null) {
+            return Maps.newHashMap();
+        }
         FieldType parentType = parent.getType();
         if (parentType == FieldType.OBJECT) {
             return handleChildBody(parent);

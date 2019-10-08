@@ -6,6 +6,7 @@ import io.terminus.dalaran.console.TestFlowInitializer;
 import io.terminus.dalaran.console.convertor.FlowConvertor;
 import io.terminus.dalaran.console.entity.ModelEntity;
 import io.terminus.dalaran.console.entity.TriggerFlowEntity;
+import io.terminus.dalaran.console.exception.DalaranExceptionBuilder;
 import io.terminus.dalaran.console.repository.ModelRepository;
 import io.terminus.dalaran.console.repository.PropertyRepository;
 import io.terminus.dalaran.console.repository.TriggerFlowRepository;
@@ -264,11 +265,11 @@ public class FlowManagementServiceImpl implements FlowManagementService {
     @Override
     public TriggerFlowDTO updateFlow(TriggerFlowDTO flowModel) throws FlowNotExistException {
         if (flowModel.getId() == null) {
-            throw new FlowNotExistException("Trigger flow id can not be null.");
+            throw DalaranExceptionBuilder.build(FlowNotExistException.class, "Trigger flow id can not be null.");
         }
         Optional<TriggerFlowEntity> flowEntityOptional = flowRepository.findById(flowModel.getId());
         if (!flowEntityOptional.isPresent()) {
-            throw new FlowNotExistException("TriggerFlow[" + flowModel.getId() + "] not exist.");
+            throw DalaranExceptionBuilder.build(FlowNotExistException.class, "TriggerFlow[" + flowModel.getId() + "] not exist.");
         }
         TriggerFlowEntity flowEntity = flowEntityOptional.get();
         buildEntity(flowModel, flowEntity);
@@ -317,7 +318,7 @@ public class FlowManagementServiceImpl implements FlowManagementService {
     public Long copyFlow(CopyFlow copyFlow) throws FlowNotExistException {
         Optional<TriggerFlowEntity> flowEntityOptional = flowRepository.findById(copyFlow.getId());
         if (!flowEntityOptional.isPresent()) {
-            throw new FlowNotExistException("TriggerFlow[" + copyFlow.getId() + "] not exist.");
+            throw DalaranExceptionBuilder.build(FlowNotExistException.class, "TriggerFlow[" + copyFlow.getId() + "] not exist.");
         }
         TriggerFlowEntity newFlowEntity = new TriggerFlowEntity();
         BeanUtils.copyProperties(flowEntityOptional.get(), newFlowEntity);

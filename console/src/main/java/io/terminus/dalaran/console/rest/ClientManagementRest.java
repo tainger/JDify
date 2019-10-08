@@ -1,7 +1,7 @@
 package io.terminus.dalaran.console.rest;
 
 import io.terminus.dalaran.console.ResponseMessage;
-import io.terminus.dalaran.console.exception.OnExceptionMessage;
+import io.terminus.dalaran.console.exception.OnException;
 import io.terminus.dalaran.console.service.ClientManagementService;
 import io.terminus.dalaran.model.dto.ClientDTO;
 import io.terminus.dalaran.rest.read.ClientReadAPI;
@@ -18,25 +18,25 @@ public class ClientManagementRest implements ClientReadAPI, ClientWriteAPI {
     private ClientManagementService service;
 
     @Override
-    @OnExceptionMessage(value = ResponseMessage.CLIENT_CREATE_ERROR)
+    @OnException(message = ResponseMessage.CLIENT_CREATE_ERROR)
     public Long create(@RequestBody ClientDTO clientDTO) {
         return service.create(clientDTO);
     }
 
     @Override
-    @OnExceptionMessage(value = ResponseMessage.CLIENT_UPDATE_ERROR)
+    @OnException(message = ResponseMessage.CLIENT_UPDATE_ERROR)
     public ClientDTO update(@RequestBody ClientDTO clientDTO) {
         return service.update(clientDTO);
     }
 
     @Override
-    @OnExceptionMessage(value = ResponseMessage.CLIENT_DELETE_ERROR)
+    @OnException(message = ResponseMessage.CLIENT_DELETE_ERROR)
     public void deleteById(@PathVariable Long id) {
         service.delete(id);
     }
 
     @Override
-    @OnExceptionMessage(value = ResponseMessage.CLIENT_QUERY_ERROR)
+    @OnException(message = ResponseMessage.CLIENT_QUERY_ERROR)
     public ClientDTO detail(@PathVariable Long id) {
         return service.detail(id);
     }
