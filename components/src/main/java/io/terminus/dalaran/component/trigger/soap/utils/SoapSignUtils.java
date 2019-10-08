@@ -1,4 +1,4 @@
-package io.terminus.dalaran.component.trigger.rest.utils;
+package io.terminus.dalaran.component.trigger.soap.utils;
 
 import com.google.common.base.Charsets;
 import org.apache.camel.Exchange;
@@ -9,7 +9,7 @@ import org.apache.http.entity.ContentType;
 import static org.apache.camel.Exchange.CONTENT_TYPE;
 import static org.apache.camel.Exchange.HTTP_RESPONSE_CODE;
 
-public class SignUtils {
+public class SoapSignUtils {
 
     public static boolean signEquals(String data, String sign) {
         String backendSign = Hashing.md5().hashString(data, Charsets.UTF_8).toString();
@@ -24,20 +24,20 @@ public class SignUtils {
         stopExchange(exchange, 1002, "Invalid App Key");
     }
 
-    public static void stopExchangeOnMissingTimestamp(Exchange exchange) {
-        stopExchange(exchange, 1005, "Missing Timestamp");
-    }
-
-    public static void stopExchangeOnInvalidTimestamp(Exchange exchange) {
-        stopExchange(exchange, 1006, "Invalid Timestamp");
-    }
-
     public static void stopExchangeOnMissingSign(Exchange exchange) {
         stopExchange(exchange, 1003, "Missing Signature");
     }
 
     public static void stopExchangeOnInvalidSign(Exchange exchange) {
-        stopExchange(exchange, 1004, "Invalid Signature");
+        stopExchange(exchange, 1007, "Invalid Signature");
+    }
+
+    public static void stopExchangeOnInvalidBasicAuth(Exchange exchange) {
+        stopExchange(exchange, 1008, "Invalid basic auth");
+    }
+
+    public static void stopExchangeOnDecodeError(Exchange exchange) {
+        stopExchange(exchange, 1006, "Decode Error");
     }
 
     public static void stopExchange(Exchange exchange, int errorCode, String message) {
