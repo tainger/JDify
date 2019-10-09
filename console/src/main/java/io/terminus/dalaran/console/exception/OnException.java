@@ -1,7 +1,6 @@
 package io.terminus.dalaran.console.exception;
 
 import io.terminus.dalaran.exception.DalaranException;
-import io.terminus.dalaran.exception.DalaranRestException;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

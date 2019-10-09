@@ -7,7 +7,6 @@ import io.terminus.dalaran.core.component.annotation.ConfigFieldInfo;
 import io.terminus.dalaran.core.component.config.ConnectorConfig;
 import io.terminus.dalaran.core.component.config.OutModelConfig;
 import lombok.Data;
-import org.apache.camel.spi.UriParam;
 
 /**
  * Created by jingdi on 2019/6/19
