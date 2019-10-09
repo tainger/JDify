@@ -2,7 +2,6 @@ package io.terminus.dalaran.model.soap.processor;
 
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
-import io.terminus.dalaran.model.schema.SoapSchemaOperation;
 import io.terminus.dalaran.model.soap.jackson.DalaranObjectDeserializer;
 import io.terminus.dalaran.model.soap.jackson.DalaranXMLStreamReader;
 import org.apache.camel.Exchange;
@@ -19,12 +18,6 @@ import java.util.Map;
  * Created by jingdi on 2019/6/6
  */
 public class SoapToObjectProcessor implements Processor, Traceable {
-
-    private final SoapSchemaOperation soapOperationConfig;
-
-    public SoapToObjectProcessor(SoapSchemaOperation soapOperationConfig) {
-        this.soapOperationConfig = soapOperationConfig;
-    }
 
     @Override
     public void process(Exchange exchange) throws Exception {
