@@ -33,9 +33,9 @@ public class DalaranCustomErrorDecoder implements ErrorDecoder {
                             dalaranThrowable.setErrorMessage(errorMessage);
                             return (Exception) dalaranThrowable;
                         }
-                    } catch (ClassNotFoundException e) {
-                        return new DalaranException(errorMessage.getMessage());
+                    } catch (ClassNotFoundException ignore) {
                     }
+                    return new DalaranException(errorMessage.getMessage());
                 }
             } catch (IOException | NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException e) {
                 e.printStackTrace();

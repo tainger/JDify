@@ -197,7 +197,7 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
         return validateMessages;
     }
 
-    // TODO currentBodyIsSerialized 这个还是比较绕的....
+    // TODO 这里还是比较乱的...
     private void buildFlowRoute(DalaranRoute route, BasicFlow flow, TracingType flowTracingType, @NotNull String currentBodyType) {
         DalaranTracer flowTracer = null;
         if (flow.isTracing() && flowTracingType != null) {
@@ -217,7 +217,6 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
             DalaranProcessor processorComponent = componentContext.getProcessor(processor.getType());
             currentProcessorInfo = componentContext.getProcessorInfo(processor.getType());
 
-            // TODO no model
             if (spanTracer != null) {
                 spanTracer.before(route, currentBodyType);
             }
@@ -227,7 +226,7 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
             if (processorComponent instanceof DalaranMessageBodyCustomConverter) {
                 needConvert = ((DalaranMessageBodyCustomConverter) processorComponent).customBodyConvert(route, processor.getConfig(), currentBodyType);
             }
-            if (!UNKNOWN_MODEL_TYPE.equalsIgnoreCase(currentBodyType) && needConvert && currentProcessorInfo.getModelType() != currentBodyType) {
+            if (!UNKNOWN_MODEL_TYPE.equalsIgnoreCase(currentBodyType) && needConvert && !currentProcessorInfo.getModelType().equals(currentBodyType)) {
                 if (DalaranConstants.OBJECT_MODEL_TYPE.equalsIgnoreCase(currentBodyType)) {
                     converterContext.fromObject(route, currentModel, currentProcessorInfo.getModelType());
                 } else if (DalaranConstants.OBJECT_MODEL_TYPE.equalsIgnoreCase(currentProcessorInfo.getModelType())) {
@@ -264,6 +263,23 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
         if (flowTracer != null) {
             flowTracer.after(route, currentBodyType);
         }
+
+        if (!UNKNOWN_MODEL_TYPE.equalsIgnoreCase(currentBodyType) && flow.getOutModel() != null) {
+            String outBodyType = flow.getOutModel().getModelType();
+            if (!outBodyType.equals(currentBodyType)) {
+                if (DalaranConstants.OBJECT_MODEL_TYPE.equalsIgnoreCase(currentBodyType)) {
+                    converterContext.fromObject(route, currentModel, outBodyType);
+                } else if (DalaranConstants.OBJECT_MODEL_TYPE.equalsIgnoreCase(outBodyType)) {
+                    converterContext.toObject(route, currentBodyType);
+                } else {
+                    converterContext.toObject(route, currentBodyType);
+                    converterContext.fromObject(route, currentModel, outBodyType);
+                }
+            }
+            currentBodyType = outBodyType;
+            currentModel = flow.getOutModel();
+        }
+
         route.setLastBodyType(currentBodyType);
         route.setLastOutModel(currentModel);
     }

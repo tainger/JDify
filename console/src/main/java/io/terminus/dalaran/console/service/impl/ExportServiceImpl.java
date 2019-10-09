@@ -100,7 +100,7 @@ public class ExportServiceImpl implements ExportService {
         trantorRepository.saveAll(exportData.getTrantorEntities());
 
         // load test flow
-        testFlowInitializer.loadResources();
+        testFlowInitializer.start();
     }
 
     // TODO 如果数据暴多可能内存会炸, 可以分页读逐渐序列化至磁盘, 最后读流输出回前端
