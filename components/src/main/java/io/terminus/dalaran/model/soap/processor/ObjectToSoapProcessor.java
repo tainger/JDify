@@ -30,8 +30,6 @@ public class ObjectToSoapProcessor implements Processor, Traceable {
 
     private final SoapSchemaOperation soapOperationConfig;
 
-    private static final String XPATH = "xpath:";
-
     private static final String PREFIX = "dalaran";
 
     public ObjectToSoapProcessor(Map<String, ModelField> modelFields, SoapSchemaOperation soapOperationConfig) {
@@ -42,11 +40,11 @@ public class ObjectToSoapProcessor implements Processor, Traceable {
     @Override
     public void process(Exchange exchange) throws Exception {
         Object body = exchange.getIn().getBody();
-        Object rst = buildRequest(modelFields.get(DalaranConstants.MODEL_ROOT), body);
+        Object rst = buildSoapBody(modelFields.get(DalaranConstants.MODEL_ROOT), body);
         exchange.getOut().setBody(rst);
     }
 
-    private Object buildRequest(ModelField modelField, Object body) throws Exception {
+    private Object buildSoapBody(ModelField modelField, Object body) throws Exception {
         MessageFactory messageFactory = MessageFactory.newInstance();
         SOAPMessage message = messageFactory.createMessage();
         SOAPPart soapPart = message.getSOAPPart();

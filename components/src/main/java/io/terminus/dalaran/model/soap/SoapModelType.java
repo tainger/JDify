@@ -18,7 +18,7 @@ public class SoapModelType implements DalaranModelType<String, SoapSchema> {
 
     @Override
     public void toObject(ProcessorDefinition route, SoapSchema schema) {
-        SoapToObjectProcessor processor = new SoapToObjectProcessor(schema.getOperationConfig());
+        SoapToObjectProcessor processor = new SoapToObjectProcessor();
         route.process(processor);
     }
 
