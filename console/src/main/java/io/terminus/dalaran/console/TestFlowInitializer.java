@@ -12,13 +12,9 @@ import io.terminus.dalaran.core.resource.repository.ReleaseRecordRepository;
 import io.terminus.dalaran.model.flow.BasicFlow;
 import io.terminus.dalaran.model.flow.SubFlow;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Marker;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.annotation.PostConstruct;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 
 @Slf4j
 public class TestFlowInitializer implements DalaranStarter {

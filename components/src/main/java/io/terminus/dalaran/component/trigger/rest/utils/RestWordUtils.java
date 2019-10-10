@@ -15,7 +15,7 @@ import java.util.Map;
 
 import static org.openxmlformats.schemas.wordprocessingml.x2006.main.STTblWidth.DXA;
 
-public class WordUtils {
+public class RestWordUtils {
 
     private static final String HEADING_STYLE_ID = "Heading";
 

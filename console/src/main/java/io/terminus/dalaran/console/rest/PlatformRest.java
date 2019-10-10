@@ -118,6 +118,24 @@ public class PlatformRest implements PlatformInfoAPI, PlatformImportAPI, Platfor
     }
 
     @Override
+    public Object exportApiDocs(String triggerType) {
+        return exportService.exportApiDocs(triggerType);
+    }
+
+    @Override
+    public ResponseEntity exportWordDocs(String triggerType) {
+        File wordFile = exportService.exportWordDocs(triggerType);
+        if (wordFile == null) {
+            return null;
+        }
+        String currentDate = DateFormatUtils.format(new Date(), "yyyy-MM-dd HH:mm:ss");
+        FileSystemResource fileResource = new FileSystemResource(wordFile);
+        return ResponseEntity.ok()
+                .header("Content-Disposition", "attachment; filename=" + triggerType + "-api-docs" + currentDate + ".docx")
+                .contentType(MediaType.APPLICATION_OCTET_STREAM).body(fileResource);
+    }
+
+    @Override
     @CrossOrigin
     @OnException(message = ResponseMessage.SWAGGER_EXPORT_ERROR)
     public Swagger exportSwagger() {
@@ -135,7 +153,6 @@ public class PlatformRest implements PlatformInfoAPI, PlatformImportAPI, Platfor
                 .contentType(MediaType.APPLICATION_OCTET_STREAM).body(fileResource);
     }
 
-
     @Override
     @CrossOrigin
     @OnException(message = ResponseMessage.WSDL_EXPORT_ERROR)
@@ -149,7 +166,6 @@ public class PlatformRest implements PlatformInfoAPI, PlatformImportAPI, Platfor
         res.addHeader("Content-Disposition", "attachment;filename=" + currentDate + ".dlr");
         return exportService.exportAll();
     }
-
 
     @Override
     @OnException(message = ResponseMessage.CONFIG_IMPORT_ERROR)

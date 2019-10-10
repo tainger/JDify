@@ -61,6 +61,8 @@ public class DefaultDalaranResourceBuilder implements DalaranResourceBuilder {
         TriggerFlow flow = new TriggerFlow();
         TriggerInfo triggerInfo = componentContext.getTriggerInfo(triggerFlowEntity.getTriggerType());
         buildFlow(flow, triggerFlowEntity);
+        flow.setName(triggerFlowEntity.getName());
+        flow.setDescription(triggerFlowEntity.getDescription());
         flow.setTracing(triggerFlowEntity.isTracing());
         flow.setTriggerType(triggerFlowEntity.getTriggerType());
 
@@ -119,8 +121,9 @@ public class DefaultDalaranResourceBuilder implements DalaranResourceBuilder {
     public MessageModel buildModel(ModelAbstractEntity modelEntity) {
         if (modelEntity != null) {
             val model = new MessageModel();
-            val modelType = modelEntity.getType();
+            String modelType = modelEntity.getType();
             model.setModelType(modelType);
+            model.setName(modelEntity.getName());
             Class<? extends DalaranModelSchema> schemaType = converterContext.getModelSchema(modelType);
             DalaranModelSchema modelSchema = buildConfig(modelEntity.getModelSchema(), schemaType);
             model.setModelSchema(modelSchema);

@@ -5,10 +5,21 @@ import io.swagger.models.Swagger;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @RequestMapping(value = "/api/platform", produces = {"application/json; charset=UTF-8"})
 public interface PlatformExportAPI {
+
+    @CrossOrigin
+    @ApiOperation(value = "根据触发器类型导出 ApiDocs")
+    @GetMapping(value = "/export/api-docs/{triggerType}")
+    Object exportApiDocs(@PathVariable String triggerType);
+
+    @CrossOrigin
+    @ApiOperation(value = "根据触发器类型导出 Word 格式接口文档 Docs")
+    @GetMapping(value = "/export/word-docs/{triggerType}")
+    ResponseEntity exportWordDocs(@PathVariable String triggerType);
 
     @CrossOrigin
     @ApiOperation(value = "导出 Swagger 信息")

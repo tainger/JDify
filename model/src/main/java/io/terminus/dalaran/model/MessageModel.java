@@ -7,6 +7,8 @@ import lombok.Data;
 @Data
 public class MessageModel<Schema extends DalaranModelSchema> {
 
+    private String name;
+
     private String modelType;
 
     // TODO 此字段默认在 modelType 之后, 在反序列化时, 可以直接根据已处理对象获取 type

@@ -2,9 +2,9 @@ package io.terminus.dalaran.component.trigger.rest.model;
 
 import io.terminus.dalaran.component.common.HttpMethod;
 import io.terminus.dalaran.component.trigger.rest.RestConfig;
-import io.terminus.dalaran.core.resource.entity.TriggerFlowAbstractEntity;
-import io.terminus.dalaran.model.DalaranModelSchema;
+import io.terminus.dalaran.model.MessageModel;
 import io.terminus.dalaran.model.ModelField;
+import io.terminus.dalaran.model.flow.TriggerFlow;
 import lombok.Data;
 
 import static io.terminus.dalaran.DalaranConstants.MODEL_ROOT;
@@ -21,7 +21,10 @@ public class ApiInfo {
     private ApiParameter input;
     private ApiParameter output;
 
-    public ApiInfo(String moduleName, RestConfig restConfig, TriggerFlowAbstractEntity flow, DalaranModelSchema inSchema, DalaranModelSchema outSchema) {
+    public ApiInfo(String moduleName, TriggerFlow flow) {
+        MessageModel inSchema = flow.getInModel();
+        MessageModel outSchema = flow.getInModel();
+        RestConfig restConfig = (RestConfig) flow.getTriggerConfig();
         this.moduleName = moduleName;
         this.name = flow.getName();
         this.description = flow.getDescription();
@@ -31,9 +34,10 @@ public class ApiInfo {
         this.output = buildApiParam(outSchema);
     }
 
-    private ApiParameter buildApiParam(DalaranModelSchema schema) {
-        ModelField rootField = schema.getFields().get(MODEL_ROOT);
+    private ApiParameter buildApiParam(MessageModel model) {
+        ModelField rootField = model.getModelSchema().getFields().get(MODEL_ROOT);
         ApiParameter rootParam = new ApiParameter();
+        rootParam.setDescription(model.getName());
         rootParam.setType(rootField.getType());
         rootParam.setDescription(rootField.getDescription());
         if (!rootField.getType().isBasicType()) {

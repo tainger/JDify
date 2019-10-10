@@ -1,27 +1,27 @@
 package io.terminus.dalaran.console.service.impl;
 
-import com.alibaba.fastjson.JSON;
 import com.predic8.wsdl.Definitions;
 import io.swagger.models.Swagger;
-import io.terminus.dalaran.component.trigger.rest.RestConfig;
 import io.terminus.dalaran.component.trigger.rest.model.ApiInfo;
 import io.terminus.dalaran.component.trigger.rest.utils.SwaggerUtils;
-import io.terminus.dalaran.component.trigger.soap.SoapListenerConfig;
 import io.terminus.dalaran.component.trigger.soap.model.SoapApiInfo;
-import io.terminus.dalaran.component.trigger.soap.model.SoapModel;
 import io.terminus.dalaran.component.trigger.soap.utils.WSDLUtils;
 import io.terminus.dalaran.console.ExportData;
 import io.terminus.dalaran.console.TestFlowInitializer;
-import io.terminus.dalaran.console.entity.ModelEntity;
 import io.terminus.dalaran.console.entity.TriggerFlowEntity;
 import io.terminus.dalaran.console.repository.*;
 import io.terminus.dalaran.console.service.ExportService;
-import io.terminus.dalaran.console.util.WordUtils;
+import io.terminus.dalaran.console.util.RestWordUtils;
+import io.terminus.dalaran.core.component.DalaranTrigger;
+import io.terminus.dalaran.core.component.DalaranTriggerApiDocExport;
+import io.terminus.dalaran.core.component.DalaranTriggerWordDocExport;
+import io.terminus.dalaran.core.context.DalaranComponentContext;
 import io.terminus.dalaran.core.context.DalaranModelTypeContext;
+import io.terminus.dalaran.core.resource.DalaranResourceBuilder;
 import io.terminus.dalaran.core.resource.entity.common.ModuleEntity;
 import io.terminus.dalaran.core.resource.repository.ModuleRepository;
-import io.terminus.dalaran.model.DalaranModelSchema;
 import io.terminus.dalaran.model.flow.FlowStatus;
+import io.terminus.dalaran.model.flow.TriggerFlow;
 import org.hibernate.Session;
 import org.hibernate.metadata.ClassMetadata;
 import org.hibernate.persister.entity.AbstractEntityPersister;
@@ -33,8 +33,7 @@ import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -78,6 +77,12 @@ public class ExportServiceImpl implements ExportService {
 
     @Autowired
     private ClientRepository clientRepository;
+
+    @Autowired
+    private DalaranResourceBuilder resourceBuilder;
+
+    @Autowired
+    private DalaranComponentContext componentContext;
 
     @Value("${terminus.dalaran.runtime-location}")
     private String runtimeLocation;
@@ -131,7 +136,27 @@ public class ExportServiceImpl implements ExportService {
     @Override
     public File exportWord() {
         List<ApiInfo> apiInfoList = getExportApiInfoList();
-        return WordUtils.buildWordFile(apiInfoList);
+        return RestWordUtils.buildWordFile(apiInfoList);
+    }
+
+    @Override
+    public File exportWordDocs(String triggerType) {
+        DalaranTrigger trigger = componentContext.getTrigger(triggerType);
+        if (trigger instanceof DalaranTriggerWordDocExport) {
+            Map<String, List<TriggerFlow>> moduleTriggerFlowList = buildModuleTriggerFlowList(triggerType);
+            return ((DalaranTriggerWordDocExport) trigger).exportWord(moduleTriggerFlowList);
+        }
+        return null;
+    }
+
+    @Override
+    public Object exportApiDocs(String triggerType) {
+        DalaranTrigger trigger = componentContext.getTrigger(triggerType);
+        if (trigger instanceof DalaranTriggerApiDocExport) {
+            Map<String, List<TriggerFlow>> moduleTriggerFlowList = buildModuleTriggerFlowList(triggerType);
+            return ((DalaranTriggerApiDocExport) trigger).exportApiDoc(moduleTriggerFlowList);
+        }
+        return null;
     }
 
     @Override
@@ -150,38 +175,39 @@ public class ExportServiceImpl implements ExportService {
         }
     }
 
+    private Map<String, List<TriggerFlow>> buildModuleTriggerFlowList(String triggerType) {
+        List<TriggerFlowEntity> restFlowList = triggerFlowRepository.findByStatusNotAndTriggerType(FlowStatus.Error, triggerType);
+        Map<String, List<TriggerFlow>> moduleTriggerFlowList = new HashMap<>();
+        for (TriggerFlowEntity flowEntity : restFlowList) {
+            Optional<ModuleEntity> moduleOptional = moduleRepository.findById(flowEntity.getModuleId());
+            String moduleName;
+            if (moduleOptional.isPresent()) {
+                moduleName = moduleOptional.get().getName();
+            } else {
+                moduleName = "unknown";
+            }
+            List<TriggerFlow> triggerFlowList = moduleTriggerFlowList.computeIfAbsent(moduleName, module -> new ArrayList<>());
+            TriggerFlow triggerFlow = resourceBuilder.buildTriggerFlow(flowEntity);
+            triggerFlowList.add(triggerFlow);
+        }
+        return moduleTriggerFlowList;
+    }
+
     private List<ApiInfo> getExportApiInfoList() {
         List<TriggerFlowEntity> restFlowList = triggerFlowRepository.findByStatusNotAndTriggerType(FlowStatus.Error, "http-rest-listener");
         return restFlowList.stream().map(flowEntity -> {
             ModuleEntity module = moduleRepository.findById(flowEntity.getModuleId()).get();
-            RestConfig restConfig = JSON.parseObject(flowEntity.getTriggerConfig(), RestConfig.class);
-            DalaranModelSchema inSchema = getModelSchema(flowEntity.getInModel());
-            DalaranModelSchema outSchema = getModelSchema(flowEntity.getOutModel());
-            return new ApiInfo(module.getName(), restConfig, flowEntity, inSchema, outSchema);
+            TriggerFlow triggerFlow = resourceBuilder.buildTriggerFlow(flowEntity);
+            return new ApiInfo(module.getName(), triggerFlow);
         }).collect(Collectors.toList());
     }
 
     private List<SoapApiInfo> getExportSoapListeners() {
         List<TriggerFlowEntity> soapFlowList = triggerFlowRepository.findByStatusNotAndTriggerType(FlowStatus.Error, "soap-listener");
         return soapFlowList.stream().map(flowEntity -> {
-            ModuleEntity module = moduleRepository.findById(flowEntity.getModuleId()).get();
-            SoapListenerConfig soapListenerConfig = JSON.parseObject(flowEntity.getTriggerConfig(), SoapListenerConfig.class);
-            SoapModel inModel = getSoapModel(flowEntity.getInModel());
-            SoapModel outModel = getSoapModel(flowEntity.getOutModel());
-            return new SoapApiInfo(flowEntity.getName(), soapListenerConfig, inModel, outModel);
+            TriggerFlow triggerFlow = resourceBuilder.buildTriggerFlow(flowEntity);
+            return new SoapApiInfo(triggerFlow);
         }).collect(Collectors.toList());
-    }
-
-    private SoapModel getSoapModel(Long modelId) {
-        DalaranModelSchema schema = getModelSchema(modelId);
-        String name = modelRepository.findById(modelId).get().getName();
-        return new SoapModel(name, schema);
-    }
-
-    private DalaranModelSchema getModelSchema(Long modelId) {
-        ModelEntity modelEntity = modelRepository.findById(modelId).get();
-        Class<? extends DalaranModelSchema> schemaType = converterContext.getModelSchema(modelEntity.getType());
-        return JSON.parseObject(modelEntity.getModelSchema(), schemaType);
     }
 
 }

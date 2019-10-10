@@ -44,7 +44,7 @@ public class SoapServiceTest extends BasicServiceTest {
 
         SoapService service = new SoapService();
         ObjectToSoapProcessor objectToSoapProcessor = new ObjectToSoapProcessor(schema1.getFields(), schema1.getOperationConfig());
-        SoapToObjectProcessor soapToObjectProcessor = new SoapToObjectProcessor(schema1.getOperationConfig());
+        SoapToObjectProcessor soapToObjectProcessor = new SoapToObjectProcessor();
         ProducerTemplate template = getProcessorTemplate(service, operationConfig, objectToSoapProcessor, soapToObjectProcessor);
 
         Object result = template.requestBody(requestBody);
@@ -72,7 +72,7 @@ public class SoapServiceTest extends BasicServiceTest {
         requestBody.put("name", list);
 
         ObjectToSoapProcessor objectToSoapProcessor = new ObjectToSoapProcessor(model.getModelSchema().getFields(), model.getModelSchema().getOperationConfig());
-        SoapToObjectProcessor soapToObjectProcessor = new SoapToObjectProcessor(model.getModelSchema().getOperationConfig());
+        SoapToObjectProcessor soapToObjectProcessor = new SoapToObjectProcessor();
         ProducerTemplate template = getProcessorTemplate(service, operationConfig, objectToSoapProcessor, soapToObjectProcessor);
         Assert.assertNotNull(template);
 

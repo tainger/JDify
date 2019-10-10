@@ -19,4 +19,8 @@ public interface ExportService {
 
     File exportWord();
 
+    File exportWordDocs(String triggerType);
+
+    Object exportApiDocs(String triggerType);
+
 }
