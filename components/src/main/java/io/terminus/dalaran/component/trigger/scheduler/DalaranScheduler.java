@@ -4,6 +4,7 @@ import io.terminus.dalaran.core.component.DalaranTrigger;
 import io.terminus.dalaran.core.component.annotation.Trigger;
 import io.terminus.dalaran.core.util.UriUtils;
 import org.apache.camel.model.RouteDefinition;
+import org.apache.commons.lang3.RandomStringUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -20,7 +21,7 @@ public class DalaranScheduler implements DalaranTrigger<DalaranSchedulerConfig> 
         Map<String, Object> options = new HashMap<>();
         options.put("cron", config.getCron());
         String optionsString = UriUtils.buildOptionsQueryString(options);
-        String uri = "quartz2://" + config.getName() + optionsString;
+        String uri = "quartz2://" + config.getTaskName() + "-" + RandomStringUtils.randomAlphanumeric(6) + optionsString;
         route.from(uri);
     }
 }

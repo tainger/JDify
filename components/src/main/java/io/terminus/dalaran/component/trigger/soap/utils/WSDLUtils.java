@@ -12,9 +12,9 @@ import groovy.xml.QName;
 import io.terminus.dalaran.component.processor.mapper.model.MapperConstants;
 import io.terminus.dalaran.component.trigger.soap.model.SoapApiInfo;
 import io.terminus.dalaran.component.trigger.soap.model.SoapConstants;
-import io.terminus.dalaran.component.trigger.soap.model.SoapModel;
 import io.terminus.dalaran.model.DalaranModelSchema;
 import io.terminus.dalaran.model.FieldType;
+import io.terminus.dalaran.model.MessageModel;
 import io.terminus.dalaran.model.ModelField;
 import org.apache.commons.collections.MapUtils;
 
@@ -32,10 +32,10 @@ public class WSDLUtils {
 
     public static Definitions buildDefinitions(List<SoapApiInfo> soapApiInfos, String runtimeLocation) {
         Definitions definitions = new Definitions(TNS, "Dalaran");
-        Map<String, SoapModel> models = new HashMap<>();
+        Map<String, MessageModel> models = new HashMap<>();
         soapApiInfos.forEach(soapApiInfo -> {
-            SoapModel input = soapApiInfo.getInput();
-            SoapModel output = soapApiInfo.getOutput();
+            MessageModel input = soapApiInfo.getInput();
+            MessageModel output = soapApiInfo.getOutput();
             models.put(input.getName(), input);
             models.put(output.getName(), output);
         });
@@ -47,7 +47,7 @@ public class WSDLUtils {
         definitions.addSchema(schema);
         schema.setDefinitions(definitions);
         models.forEach((name, model) -> {
-            DalaranModelSchema modelSchema = model.getSchema();
+            DalaranModelSchema modelSchema = model.getModelSchema();
             ModelField modelField = modelSchema.getFields().get(MapperConstants.MODEL_ROOT);
             Element element = buildTypes(modelField, schema);
             Message message = definitions.newMessage(name);

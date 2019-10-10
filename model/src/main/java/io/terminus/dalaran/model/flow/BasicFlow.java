@@ -17,6 +17,10 @@ public class BasicFlow {
     @NotNull
     private Long id;
 
+    private String name;
+
+    private String description;
+
     private String version;
 
     private FlowStatus status;
