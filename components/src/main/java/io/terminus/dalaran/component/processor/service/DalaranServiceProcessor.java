@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.ArrayList;
 import java.util.List;
 
+import static io.terminus.dalaran.DalaranConstants.UNKNOWN_MODEL_TYPE;
 import static io.terminus.dalaran.component.processor.service.ServiceValidationMessages.OPERATION_NOT_EXIST;
 import static io.terminus.dalaran.component.processor.service.ServiceValidationMessages.SERVICE_NOT_EXIST;
 
@@ -27,6 +28,7 @@ import static io.terminus.dalaran.component.processor.service.ServiceValidationM
         value = "service",
         name = "服务调用器",
         order = 11,
+        bodyType = UNKNOWN_MODEL_TYPE,
         configType = ServiceOperationConfig.class
 )
 public class DalaranServiceProcessor implements DalaranProcessor<DalaranServiceOperation>, DalaranProcessorConfigCustomConverter<ServiceOperationConfig, DalaranServiceOperation>, DalaranComponentValidator<ServiceOperationConfig> {
