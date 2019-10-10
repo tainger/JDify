@@ -13,7 +13,6 @@ import io.terminus.dalaran.core.context.DalaranClientContext;
 import io.terminus.dalaran.model.flow.TriggerFlow;
 import org.apache.camel.model.RouteDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 
 import java.util.List;
 import java.util.Map;
@@ -34,8 +33,8 @@ public class DalaranSoapListener implements DalaranTrigger<SoapListenerConfig>, 
     @Autowired
     private DalaranClientContext clientContext;
 
-    @Value("${terminus.dalaran.runtime-location}")
-    private String runtimeLocation;
+//    @Value("${terminus.dalaran.runtime-location}")
+//    private String runtimeLocation;
 
     @Override
     public void buildFromRoute(RouteDefinition route, SoapListenerConfig config) {
@@ -60,6 +59,6 @@ public class DalaranSoapListener implements DalaranTrigger<SoapListenerConfig>, 
         List<SoapApiInfo> apiInfoList = moduleTriggerFlows.entrySet().stream().flatMap(module ->
                 module.getValue().stream().map(SoapApiInfo::new)
         ).collect(Collectors.toList());
-        return WSDLUtils.buildDefinitions(apiInfoList, runtimeLocation).getAsString();
+        return WSDLUtils.buildDefinitions(apiInfoList, null).getAsString();
     }
 }

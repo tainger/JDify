@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.models.Swagger;
-import io.terminus.dalaran.component.trigger.rest.RestConfig;
 import io.terminus.dalaran.component.trigger.rest.model.ApiInfo;
 import io.terminus.dalaran.component.trigger.rest.utils.SwaggerUtils;
 import io.terminus.dalaran.core.context.DalaranContext;
@@ -128,10 +127,8 @@ public class ReleasedFlowInitializer implements DalaranStarter {
         List<TriggerFlowReleasedEntity> restFlowList = resourceLoader.loadAvailableTriggerFlowByTriggerType("http-rest-listener");
         return restFlowList.stream().map(flowEntity -> {
             ModuleEntity module = moduleRepository.findById(flowEntity.getModuleId()).get();
-            RestConfig restConfig = JSON.parseObject(flowEntity.getTriggerConfig(), RestConfig.class);
-            DalaranModelSchema inSchema = getModelSchema(flowEntity.getInModel());
-            DalaranModelSchema outSchema = getModelSchema(flowEntity.getOutModel());
-            return new ApiInfo(module.getName(), restConfig, flowEntity, inSchema, outSchema);
+            TriggerFlow triggerFlow = resourceBuilder.buildTriggerFlow(flowEntity);
+            return new ApiInfo(module.getName(), triggerFlow);
         }).collect(Collectors.toList());
     }
 

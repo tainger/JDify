@@ -31,11 +31,16 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
 
     private static final String OPERATION_SPLIT = "::";
 
-    private static final String HTTP_URI = "%s4://%s&bridgeEndpoint=true";
+    private static final String HTTP_URI = "%s4://%s";
 
     @Override
     public void configure(ProcessorDefinition route, SoapOperationConfig soapOperationConfig) {
         String uri = String.format(HTTP_URI, "http", soapOperationConfig.getLocation());
+        if (StringUtils.contains(uri, "?")) {
+            uri = uri + "&bridgeEndpoint=true";
+        } else {
+            uri = uri + "?bridgeEndpoint=true";
+        }
         route.setHeader(Exchange.HTTP_METHOD, Builder.constant(HttpMethod.POST));
         route.setHeader(Exchange.CONTENT_TYPE, Builder.constant("application/xml"));
         route.to(uri);

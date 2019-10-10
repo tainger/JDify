@@ -28,7 +28,8 @@ import static io.terminus.dalaran.component.processor.service.ServiceValidationM
         value = "service",
         name = "服务调用器",
         order = 11,
-        configType = ServiceOperationConfig.class
+        configType = ServiceOperationConfig.class,
+        bodyType = "UNKNOWN"
 )
 public class DalaranServiceProcessor implements DalaranProcessor<DalaranServiceOperation>, DalaranProcessorConfigCustomConverter<ServiceOperationConfig, DalaranServiceOperation>, DalaranComponentValidator<ServiceOperationConfig> {
 
