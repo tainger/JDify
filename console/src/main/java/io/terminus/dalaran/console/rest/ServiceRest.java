@@ -3,6 +3,7 @@ package io.terminus.dalaran.console.rest;
 import io.terminus.dalaran.console.ResponseMessage;
 import io.terminus.dalaran.console.exception.OnException;
 import io.terminus.dalaran.console.service.ServiceManagement;
+import io.terminus.dalaran.model.component.ServiceOperation;
 import io.terminus.dalaran.model.dto.ServiceDTO;
 import io.terminus.dalaran.rest.read.ServiceReadAPI;
 import io.terminus.dalaran.rest.write.ServiceWriteAPI;
@@ -51,7 +52,7 @@ public class ServiceRest implements ServiceReadAPI, ServiceWriteAPI {
 
     @Override
     @OnException(message = ResponseMessage.SERVICE_QUERY_ERROR)
-    public List<String> operations(@PathVariable Long id) {
+    public List<ServiceOperation> operations(@PathVariable Long id) {
         return serviceManagement.listOperation(id);
     }
 }

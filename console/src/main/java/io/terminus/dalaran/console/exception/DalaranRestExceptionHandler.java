@@ -16,6 +16,7 @@ public class DalaranRestExceptionHandler {
     @ResponseBody
     @ExceptionHandler
     public ErrorMessage handleConflict(Exception ex, HttpServletResponse response, HandlerMethod method) {
+        ex.printStackTrace();
         ErrorMessage message = new ErrorMessage();
         if (ex instanceof DalaranRestException || ex instanceof DalaranRuntimeException) {
             response.setStatus(599);

@@ -5,6 +5,7 @@ import io.terminus.dalaran.core.component.DalaranProcessor;
 import io.terminus.dalaran.core.component.DalaranProcessorConfigCustomConverter;
 import io.terminus.dalaran.core.component.DalaranService;
 import io.terminus.dalaran.core.component.annotation.Processor;
+import io.terminus.dalaran.core.component.config.ServiceOperationConfig;
 import io.terminus.dalaran.core.context.DalaranServiceContext;
 import io.terminus.dalaran.core.resource.DalaranResourceBuilder;
 import io.terminus.dalaran.core.resource.DalaranResourceLoader;
