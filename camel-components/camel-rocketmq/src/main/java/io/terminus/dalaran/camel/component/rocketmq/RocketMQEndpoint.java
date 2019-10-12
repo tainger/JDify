@@ -35,6 +35,9 @@ public class RocketMQEndpoint extends ProcessorEndpoint {
     @UriParam(description = "ACL secretKey", javaType = "java.lang.String")
     private String secretKey;
 
+    @UriParam(description = "auto commit", javaType = "java.lang.Boolean", defaultValue = "true")
+    private String autoCommit;
+
     private RocketMQContext context;
 
     public RocketMQEndpoint(RocketMQContext context) {
