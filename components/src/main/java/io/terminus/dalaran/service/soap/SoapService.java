@@ -42,7 +42,7 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
             uri = uri + "?bridgeEndpoint=true";
         }
         route.setHeader(Exchange.HTTP_METHOD, Builder.constant(HttpMethod.POST));
-        route.setHeader(Exchange.CONTENT_TYPE, Builder.constant("application/xml"));
+        route.setHeader(Exchange.CONTENT_TYPE, Builder.constant("text/xml"));
         route.to(uri);
         // TODO Stream to string
         route.convertBodyTo(String.class);

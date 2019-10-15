@@ -1,5 +1,6 @@
 package io.terminus.dalaran.component.processor.mapper.jsonPath;
 
+import com.alibaba.dubbo.common.utils.StringUtils;
 import com.alibaba.fastjson.JSONPath;
 import io.terminus.dalaran.component.common.exception.FieldParseException;
 import io.terminus.dalaran.component.common.exception.MapperFunctionExecuteException;
@@ -7,6 +8,7 @@ import io.terminus.dalaran.component.processor.mapper.model.*;
 import io.terminus.dalaran.core.context.DalaranContext;
 import io.terminus.dalaran.model.FieldType;
 import org.apache.commons.beanutils.ConvertUtils;
+import org.apache.commons.collections.CollectionUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -18,6 +20,10 @@ public class Converter {
 
     public static Map<String, Object> convert(DalaranMappingConfig mappingConfig, Object source, DalaranContext dalaranContext) {
         Map<String, Object> destination = new HashMap<>();
+        if (isSingleXMLString(mappingConfig, source)) {
+            handleSingleXMLString(mappingConfig, source, dalaranContext, destination);
+            return destination;
+        }
         List<MessageMapping> messageMappings = mappingConfig.getMessageMappings();
         SimpleMappingField sourceRoot = mappingConfig.getSourceRoot();
         SimpleMappingField destinationRoot = mappingConfig.getDestinationRoot();
@@ -291,5 +297,25 @@ public class Converter {
             e.printStackTrace();
             throw new MapperFunctionExecuteException("Mapper function execute error. function: " + function.getId() + ", params: " + Arrays.toString(values.toArray()) + ", message: " + e.getMessage());
         }
+    }
+
+    private static boolean isSingleXMLString(DalaranMappingConfig dalaranMappingConfig, Object source) {
+        if (!(source instanceof String)) {
+            return false;
+        }
+        if (CollectionUtils.isEmpty(dalaranMappingConfig.getMessageMappings()) || dalaranMappingConfig.getMessageMappings().size() > 1) {
+            return false;
+        }
+        MessageMapping mapping = dalaranMappingConfig.getMessageMappings().get(0);
+        return mapping.getFunction() != null && StringUtils.isEquals(mapping.getFunction().getId(), "FromXml");
+    }
+
+    private static void handleSingleXMLString(DalaranMappingConfig dalaranMappingConfig, Object source, DalaranContext dalaranContext, Object destination) {
+        MessageMapping mapping = dalaranMappingConfig.getMessageMappings().get(0);
+        List<Object> values = new ArrayList<>();
+        values.add(source);
+        Object value =  dalaranContext.getDalaranFunctionContext().executeStaticFunction(mapping.getFunction().getId(), values.toArray());
+        String destinationPath = mapping.getPath();
+        JSONPath.set(destination, "$" + MapperConstants.MODEL_ROOT + "." + destinationPath, value);
     }
 }

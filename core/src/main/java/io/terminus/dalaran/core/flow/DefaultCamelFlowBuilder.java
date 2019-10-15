@@ -22,6 +22,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import static io.terminus.dalaran.DalaranConstants.*;
@@ -74,6 +75,11 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
         } else {
             buildFlowRoute(route, flow, TracingType.Flow, flow.getInModel().getModelType());
         }
+
+        if (triggerComponent instanceof DalaranTriggerBuildAfterProcessor) {
+            ((DalaranTriggerBuildAfterProcessor) triggerComponent).buildAfter(route, triggerConfig);
+        }
+
         return route;
     }
 
@@ -293,6 +299,7 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
 
     private DalaranRoute createRouteDefinition() {
         DalaranRoute route = new DalaranRoute();
+        route.setProperty(DALARAN_CONTEXT_EXCHANGE, constant(new HashMap()));
         route.errorHandler(errorHandlerFactory);
         return route;
     }

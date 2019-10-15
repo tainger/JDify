@@ -40,7 +40,7 @@ public class DalaranSoapClient implements DalaranProcessor<SoapClientConfig> {
             uri = uri + "&authMethod=Basic&authUsername=" + config.getConnector().getUsername() + "&authPassword=" + config.getConnector().getPassword();
         }
         route.setHeader(Exchange.HTTP_METHOD, Builder.constant(config.getMethod().name()));
-        route.setHeader(Exchange.CONTENT_TYPE, Builder.constant("application/xml"));
+        route.setHeader(Exchange.CONTENT_TYPE, Builder.constant("text/xml"));
         route.to(uri);
         // TODO Stream to string
         route.convertBodyTo(String.class);

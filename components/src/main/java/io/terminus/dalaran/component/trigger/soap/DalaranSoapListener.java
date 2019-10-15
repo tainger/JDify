@@ -4,10 +4,12 @@ import io.terminus.dalaran.component.trigger.rest.processor.QueryStringSignProce
 import io.terminus.dalaran.component.trigger.soap.model.SoapApiInfo;
 import io.terminus.dalaran.component.trigger.soap.model.SoapAuthType;
 import io.terminus.dalaran.component.trigger.soap.processor.SoapBasicSignProcessor;
+import io.terminus.dalaran.component.trigger.soap.processor.SoapTriggerAfterProcessor;
 import io.terminus.dalaran.component.trigger.soap.processor.SoapTriggerProcessor;
 import io.terminus.dalaran.component.trigger.soap.utils.WSDLUtils;
 import io.terminus.dalaran.core.component.DalaranTrigger;
 import io.terminus.dalaran.core.component.DalaranTriggerApiDocExport;
+import io.terminus.dalaran.core.component.DalaranTriggerBuildAfterProcessor;
 import io.terminus.dalaran.core.component.annotation.Trigger;
 import io.terminus.dalaran.core.context.DalaranClientContext;
 import io.terminus.dalaran.model.flow.TriggerFlow;
@@ -28,7 +30,7 @@ import java.util.stream.Collectors;
         configType = SoapListenerConfig.class,
         bodyType = "SOAP"
 )
-public class DalaranSoapListener implements DalaranTrigger<SoapListenerConfig>, DalaranTriggerApiDocExport<String> {
+public class DalaranSoapListener implements DalaranTrigger<SoapListenerConfig>, DalaranTriggerBuildAfterProcessor<SoapListenerConfig>, DalaranTriggerApiDocExport<String> {
 
     @Autowired
     private DalaranClientContext clientContext;
@@ -60,5 +62,10 @@ public class DalaranSoapListener implements DalaranTrigger<SoapListenerConfig>, 
                 module.getValue().stream().map(SoapApiInfo::new)
         ).collect(Collectors.toList());
         return WSDLUtils.buildDefinitions(apiInfoList, null).getAsString();
+    }
+
+    @Override
+    public void buildAfter(RouteDefinition route, SoapListenerConfig config) {
+        route.process(new SoapTriggerAfterProcessor());
     }
 }
