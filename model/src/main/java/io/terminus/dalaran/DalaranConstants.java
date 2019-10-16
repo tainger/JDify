@@ -44,4 +44,7 @@ public final class DalaranConstants {
     public static final String OBJECT_MODEL_TYPE = "OBJECT";
     public static final String UNKNOWN_MODEL_TYPE = "UNKNOWN";
 
+    public static final String MAPPER_CONVERT = "mapper-convert";
+    public static final String SOAP_TYPE = "SOAP";
+
 }

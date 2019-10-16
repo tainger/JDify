@@ -1,6 +1,5 @@
 package io.terminus.dalaran.component.processor.mapper.jsonPath;
 
-import com.alibaba.dubbo.common.utils.StringUtils;
 import com.alibaba.fastjson.JSONPath;
 import io.terminus.dalaran.component.common.exception.FieldParseException;
 import io.terminus.dalaran.component.common.exception.MapperFunctionExecuteException;
@@ -307,7 +306,7 @@ public class Converter {
             return false;
         }
         MessageMapping mapping = dalaranMappingConfig.getMessageMappings().get(0);
-        return mapping.getFunction() != null && StringUtils.isEquals(mapping.getFunction().getId(), "FromXml");
+        return mapping.getFunction() != null && mapping.getFunction().getTemKey().startsWith("FromXml");
     }
 
     private static void handleSingleXMLString(DalaranMappingConfig dalaranMappingConfig, Object source, DalaranContext dalaranContext, Object destination) {

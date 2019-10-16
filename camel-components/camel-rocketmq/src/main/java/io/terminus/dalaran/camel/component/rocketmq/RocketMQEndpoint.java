@@ -47,7 +47,6 @@ public class RocketMQEndpoint extends ProcessorEndpoint {
     @Override
     public Consumer createConsumer(Processor processor) throws Exception {
         RocketMQConsumer consumer = new RocketMQConsumer(this, processor, null);
-//        this.configureConsumer(consumer);
         return consumer;
     }
 
