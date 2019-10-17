@@ -7,7 +7,7 @@ import java.util.Date;
 
 @MappingFunction(value = "DateFormat", description = "将时间格式化")
 public class DateFormat {
-    public String execute(Date date, String pattern) {
+    public String execute(Object date, String pattern) {
         SimpleDateFormat dateFormat = new SimpleDateFormat(pattern);
         return dateFormat.format(date);
     }

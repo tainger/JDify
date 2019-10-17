@@ -197,6 +197,31 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
         return validateMessages;
     }
 
+    private String convertModel(DalaranRoute route, String currentBodyType, String nextBodyType, MessageModel currentModel, MessageModel nextModel) {
+        // 如果组件声明类型为 Unknown, 则尝试取模型的类型
+        if (UNKNOWN_MODEL_TYPE.equalsIgnoreCase(currentBodyType) && currentModel != null) {
+            currentBodyType = currentModel.getModelType();
+        }
+        if (!UNKNOWN_MODEL_TYPE.equalsIgnoreCase(currentBodyType) && !nextBodyType.equals(currentBodyType)) {
+            // 如果下一个组件声明类型为 Unknown, 则尝试取下一个模型的类型
+            if (UNKNOWN_MODEL_TYPE.equalsIgnoreCase(nextBodyType) && nextModel != null) {
+                nextBodyType = nextModel.getModelType();
+            }
+            // 如果目前是 Object, 则从 Object 转至目标类型
+            if (DalaranConstants.OBJECT_MODEL_TYPE.equalsIgnoreCase(currentBodyType)) {
+                converterContext.fromObject(route, currentModel, nextBodyType);
+                // 如果目标类型是 Object, 则从当前类型转至 Object
+            } else if (DalaranConstants.OBJECT_MODEL_TYPE.equalsIgnoreCase(nextBodyType)) {
+                converterContext.toObject(route, currentBodyType);
+                // 如果都不是, 则从当前类型转至 Object, 再由 Object 转至目标类型
+            } else {
+                converterContext.toObject(route, currentBodyType);
+                converterContext.fromObject(route, currentModel, nextBodyType);
+            }
+        }
+        return nextBodyType;
+    }
+
     // TODO 这里还是比较乱的...
     private void buildFlowRoute(DalaranRoute route, BasicFlow flow, TracingType flowTracingType, @NotNull String currentBodyType) {
         DalaranTracer flowTracer = null;
@@ -228,18 +253,8 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
             }
             String nextBodyType = currentProcessorInfo.getModelType();
             MessageModel nextModel = processor.getInModel();
-            if (!UNKNOWN_MODEL_TYPE.equalsIgnoreCase(currentBodyType) && needConvert && !nextBodyType.equals(currentBodyType)) {
-                if (UNKNOWN_MODEL_TYPE.equalsIgnoreCase(nextBodyType) && nextModel != null) {
-                    nextBodyType = nextModel.getModelType();
-                }
-                if (DalaranConstants.OBJECT_MODEL_TYPE.equalsIgnoreCase(currentBodyType)) {
-                    converterContext.fromObject(route, currentModel, nextBodyType);
-                } else if (DalaranConstants.OBJECT_MODEL_TYPE.equalsIgnoreCase(nextBodyType)) {
-                    converterContext.toObject(route, currentBodyType);
-                } else {
-                    converterContext.toObject(route, currentBodyType);
-                    converterContext.fromObject(route, currentModel, nextBodyType);
-                }
+            if (needConvert) {
+                convertModel(route, currentBodyType, nextBodyType, currentModel, nextModel);
             }
             currentBodyType = nextBodyType;
 

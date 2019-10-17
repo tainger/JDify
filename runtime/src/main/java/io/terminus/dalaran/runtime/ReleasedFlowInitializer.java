@@ -128,20 +128,8 @@ public class ReleasedFlowInitializer implements DalaranStarter {
         List<TriggerFlowReleasedEntity> restFlowList = resourceLoader.loadAvailableTriggerFlowByTriggerType("http-rest-listener");
         return restFlowList.stream().map(flowEntity -> {
             ModuleEntity module = moduleRepository.findById(flowEntity.getModuleId()).get();
-            RestConfig restConfig = JSON.parseObject(flowEntity.getTriggerConfig(), RestConfig.class);
-            DalaranModelSchema inSchema = getModelSchema(flowEntity.getInModel());
-            DalaranModelSchema outSchema = getModelSchema(flowEntity.getOutModel());
-            return new ApiInfo(module.getName(), restConfig, flowEntity, inSchema, outSchema);
+            TriggerFlow triggerFlow = resourceBuilder.buildTriggerFlow(flowEntity);
+            return new ApiInfo(module.getName(), triggerFlow);
         }).collect(Collectors.toList());
-    }
-
-    private DalaranModelSchema getModelSchema(Long modelId) {
-        ModelReleasedEntity modelEntity = resourceLoader.loadModel(modelId);
-        Class<? extends DalaranModelSchema> schemaType = dalaranContext.getDalaranModelTypeContext().getModelSchema(modelEntity.getType());
-        return JSON.parseObject(modelEntity.getModelSchema(), schemaType);
-    }
-
-    public String getSwaggerJson() throws JsonProcessingException {
-        return objectMapper.writeValueAsString(swagger);
     }
 }
