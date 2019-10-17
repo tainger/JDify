@@ -1,17 +1,17 @@
 package io.terminus.dalaran.console.service.impl;
 
+import io.terminus.dalaran.TracingType;
 import io.terminus.dalaran.console.entity.TriggerFlowEntity;
-import io.terminus.dalaran.console.model.dto.log.MainLogDTO;
-import io.terminus.dalaran.console.model.dto.log.TracingLogDTO;
-import io.terminus.dalaran.console.model.query.TracingLogQuery;
 import io.terminus.dalaran.console.repository.SubFlowRepository;
 import io.terminus.dalaran.console.repository.TriggerFlowRepository;
 import io.terminus.dalaran.console.service.ModuleManagementService;
 import io.terminus.dalaran.console.service.TracingLogService;
-import io.terminus.dalaran.core.log.TracingType;
 import io.terminus.dalaran.core.resource.entity.basic.BasicFlowEntity;
 import io.terminus.dalaran.core.resource.entity.common.TracingLogEntity;
 import io.terminus.dalaran.core.resource.repository.TracingLogRepository;
+import io.terminus.dalaran.model.dto.log.MainLogDTO;
+import io.terminus.dalaran.model.dto.log.TracingLogDTO;
+import io.terminus.dalaran.model.query.TracingLogQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
@@ -104,11 +104,11 @@ public class TracingLogServiceImpl implements TracingLogService {
             switch (log.getTracingType()) {
                 case Flow:
                 case TestFlow:
-                    flowEntity = flowRepository.findOne(log.getFlowId());
+                    flowEntity = flowRepository.findById(log.getFlowId()).get();
                     break;
                 case SubFlow:
                 case TestSubFlow:
-                    flowEntity = subFlowRepository.findOne(log.getFlowId());
+                    flowEntity = subFlowRepository.findById(log.getFlowId()).get();
                     break;
             }
             if (flowEntity != null) {
@@ -134,7 +134,7 @@ public class TracingLogServiceImpl implements TracingLogService {
 
         tracingLog.setProcessorId(log.getProcessorId());
         tracingLog.setFlowId(log.getFlowId());
-        TriggerFlowEntity flowEntity = flowRepository.findOne(log.getFlowId());
+        TriggerFlowEntity flowEntity = flowRepository.findById(log.getFlowId()).get();
         if (flowEntity != null) {
             tracingLog.setFlowName(flowEntity.getName());
         }

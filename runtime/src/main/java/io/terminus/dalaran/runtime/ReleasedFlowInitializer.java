@@ -10,6 +10,7 @@ import io.terminus.dalaran.component.trigger.rest.model.ApiInfo;
 import io.terminus.dalaran.component.trigger.rest.utils.SwaggerUtils;
 import io.terminus.dalaran.core.context.DalaranContext;
 import io.terminus.dalaran.core.resource.DalaranResourceBuilder;
+import io.terminus.dalaran.core.resource.DalaranStarter;
 import io.terminus.dalaran.core.resource.entity.common.ModuleEntity;
 import io.terminus.dalaran.core.resource.entity.common.ReleaseRecordEntity;
 import io.terminus.dalaran.core.resource.entity.released.*;
@@ -22,14 +23,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.camel.CamelContext;
 import org.apache.camel.model.RouteDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
 
 import javax.annotation.PostConstruct;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.stream.Collectors;
 
 @Slf4j
-public class ReleasedFlowInitializer {
+public class ReleasedFlowInitializer implements DalaranStarter {
 
     @Autowired
     private ModuleRepository moduleRepository;
@@ -70,10 +72,17 @@ public class ReleasedFlowInitializer {
         camelContext.addRouteDefinition(swaggerRoute);
     }
 
-    // TODO 临时每分钟 load 一下...
-    // TODO 启动延时 5 秒, 因为目前 Component 的加载是根据 Spring Bean 的初始化, 有时候初始化流时, Component 还没有 ready
-    // TODO 组件需要更好的加载方式, 更早加载或者有机制确保加载完成在初始化流
-    @Scheduled(fixedDelay = 60 * 1000L, initialDelay = 5 * 1000L)
+    @Override
+    public void start() {
+        Timer timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                loadResources();
+            }
+        }, 0, 60 * 1000L);
+    }
+
     private void loadResources() {
         ReleaseRecordEntity recordEntity = releaseRecordRepository.findByEnabledTrue();
         synchronized (this) {
@@ -118,21 +127,14 @@ public class ReleasedFlowInitializer {
     private List<ApiInfo> getExportApiInfoList() {
         List<TriggerFlowReleasedEntity> restFlowList = resourceLoader.loadAvailableTriggerFlowByTriggerType("http-rest-listener");
         return restFlowList.stream().map(flowEntity -> {
-            ModuleEntity module = moduleRepository.findOne(flowEntity.getModuleId());
-            RestConfig restConfig = JSON.parseObject(flowEntity.getTriggerConfig(), RestConfig.class);
-            DalaranModelSchema inSchema = getModelSchema(flowEntity.getInModel());
-            DalaranModelSchema outSchema = getModelSchema(flowEntity.getOutModel());
-            return new ApiInfo(module.getName(), restConfig, flowEntity, inSchema, outSchema);
+            ModuleEntity module = moduleRepository.findById(flowEntity.getModuleId()).get();
+            TriggerFlow triggerFlow = resourceBuilder.buildTriggerFlow(flowEntity);
+            return new ApiInfo(module.getName(), triggerFlow);
         }).collect(Collectors.toList());
-    }
-
-    private DalaranModelSchema getModelSchema(Long modelId) {
-        ModelReleasedEntity modelEntity = resourceLoader.loadModel(modelId);
-        Class<? extends DalaranModelSchema> schemaType = dalaranContext.getDalaranConverterContext().getSchemaType(modelEntity.getType());
-        return JSON.parseObject(modelEntity.getModelSchema(), schemaType);
     }
 
     public String getSwaggerJson() throws JsonProcessingException {
         return objectMapper.writeValueAsString(swagger);
     }
+
 }

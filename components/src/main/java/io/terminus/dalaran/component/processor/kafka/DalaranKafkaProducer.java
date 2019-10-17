@@ -1,9 +1,7 @@
 package io.terminus.dalaran.component.processor.kafka;
 
-import io.terminus.dalaran.core.component.BodySerializeType;
 import io.terminus.dalaran.core.component.DalaranProcessor;
 import io.terminus.dalaran.core.component.annotation.Processor;
-import io.terminus.dalaran.model.BodyType;
 import org.apache.camel.model.ProcessorDefinition;
 
 /**
@@ -13,10 +11,8 @@ import org.apache.camel.model.ProcessorDefinition;
         value = "kafka-producer",
         name = "Kafka 发送器",
         order = 13,
-        configType = DalaranKafkaProducerConfig.class,
-        inputSerializeType = BodySerializeType.Object,
-        outputSerializeType = BodySerializeType.Object,
-        allowBodyTypes = {BodyType.JSON, BodyType.XML})
+        configType = DalaranKafkaProducerConfig.class
+)
 public class DalaranKafkaProducer implements DalaranProcessor<DalaranKafkaProducerConfig> {
 
     // TODO camel会将数组对象拆分，依次发到kafka，如果后续有mapper操作会导致类型转换出问题

@@ -1,12 +1,12 @@
 package io.terminus.dalaran.console.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import io.terminus.dalaran.ComponentType;
 import io.terminus.dalaran.console.entity.ConnectorEntity;
-import io.terminus.dalaran.console.model.dto.ConnectorDTO;
-import io.terminus.dalaran.console.model.dto.basic.BasicConnectorInfo;
 import io.terminus.dalaran.console.repository.ConnectorRepository;
 import io.terminus.dalaran.console.service.ConnectorService;
-import io.terminus.dalaran.core.component.ComponentType;
+import io.terminus.dalaran.model.dto.ConnectorDTO;
+import io.terminus.dalaran.model.dto.basic.BasicConnectorInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -43,12 +43,12 @@ public class ConnectorServiceImpl implements ConnectorService {
 
     @Override
     public void delete(Long connectorId) {
-        connectorRepository.delete(connectorId);
+        connectorRepository.deleteById(connectorId);
     }
 
     @Override
     public ConnectorDTO detail(Long connectorId) {
-        ConnectorEntity entity = connectorRepository.findOne(connectorId);
+        ConnectorEntity entity = connectorRepository.findById(connectorId).get();
         if (entity != null) {
             return toDTO(entity);
         }

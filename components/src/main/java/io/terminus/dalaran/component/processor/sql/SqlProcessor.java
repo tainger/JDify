@@ -1,6 +1,5 @@
 package io.terminus.dalaran.component.processor.sql;
 
-import io.terminus.dalaran.core.component.BodySerializeType;
 import io.terminus.dalaran.core.component.DalaranProcessor;
 import io.terminus.dalaran.core.component.annotation.Processor;
 import org.apache.camel.model.ProcessorDefinition;
@@ -13,9 +12,7 @@ import javax.sql.DataSource;
         value = "sql",
         name = "执行 SQL",
         order = 12,
-        configType = SqlConfig.class,
-        inputSerializeType = BodySerializeType.Object,
-        outputSerializeType = BodySerializeType.Object
+        configType = SqlConfig.class
 )
 public class SqlProcessor implements DalaranProcessor<SqlConfig> {
 

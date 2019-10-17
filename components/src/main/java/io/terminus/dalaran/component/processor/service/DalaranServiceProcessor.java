@@ -1,6 +1,9 @@
 package io.terminus.dalaran.component.processor.service;
 
-import io.terminus.dalaran.core.component.*;
+import io.terminus.dalaran.core.component.DalaranComponentValidator;
+import io.terminus.dalaran.core.component.DalaranProcessor;
+import io.terminus.dalaran.core.component.DalaranProcessorConfigCustomConverter;
+import io.terminus.dalaran.core.component.DalaranService;
 import io.terminus.dalaran.core.component.annotation.Processor;
 import io.terminus.dalaran.core.context.DalaranServiceContext;
 import io.terminus.dalaran.core.resource.DalaranResourceBuilder;
@@ -17,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.ArrayList;
 import java.util.List;
 
+import static io.terminus.dalaran.DalaranConstants.UNKNOWN_MODEL_TYPE;
 import static io.terminus.dalaran.component.processor.service.ServiceValidationMessages.OPERATION_NOT_EXIST;
 import static io.terminus.dalaran.component.processor.service.ServiceValidationMessages.SERVICE_NOT_EXIST;
 
@@ -24,9 +28,8 @@ import static io.terminus.dalaran.component.processor.service.ServiceValidationM
         value = "service",
         name = "服务调用器",
         order = 11,
-        configType = ServiceOperationConfig.class,
-        inputSerializeType = BodySerializeType.Serialized,
-        outputSerializeType = BodySerializeType.Serialized
+        bodyType = UNKNOWN_MODEL_TYPE,
+        configType = ServiceOperationConfig.class
 )
 public class DalaranServiceProcessor implements DalaranProcessor<DalaranServiceOperation>, DalaranProcessorConfigCustomConverter<ServiceOperationConfig, DalaranServiceOperation>, DalaranComponentValidator<ServiceOperationConfig> {
 

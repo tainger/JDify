@@ -5,7 +5,7 @@
     <parent>
         <artifactId>dalaran-parent</artifactId>
         <groupId>io.terminus</groupId>
-        <version>2.1.1-SNAPSHOT</version>
+        <version>2.2.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -21,7 +21,6 @@
         <dependency>
             <groupId>org.apache.camel</groupId>
             <artifactId>camel-kafka</artifactId>
-            <version>${camel.version}</version>
         </dependency>
 
         <!-- RocketMQ Component -->
@@ -35,7 +34,7 @@
         <dependency>
             <groupId>org.apache.camel</groupId>
             <artifactId>camel-quartz2</artifactId>
-            <version>${camel.version}</version>
+
         </dependency>
 
         <!-- dubbo trigger -->
@@ -48,7 +47,7 @@
         <dependency>
             <groupId>org.apache.camel</groupId>
             <artifactId>camel-netty4-http</artifactId>
-            <version>${camel.version}</version>
+
             <exclusions>
                 <exclusion>
                     <groupId>javax.servlet</groupId>
@@ -61,7 +60,6 @@
         <dependency>
             <groupId>org.apache.camel</groupId>
             <artifactId>camel-sql</artifactId>
-            <version>${camel.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.tomcat</groupId>
@@ -77,19 +75,19 @@
         <dependency>
             <groupId>org.apache.camel</groupId>
             <artifactId>camel-script</artifactId>
-            <version>${camel.version}</version>
+
         </dependency>
         <dependency>
             <groupId>org.apache.camel</groupId>
             <artifactId>camel-groovy</artifactId>
-            <version>${camel.version}</version>
+
         </dependency>
 
         <!-- http processor -->
         <dependency>
             <groupId>org.apache.camel</groupId>
             <artifactId>camel-http4</artifactId>
-            <version>${camel.version}</version>
+
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
@@ -109,7 +107,7 @@
         <dependency>
             <groupId>org.apache.camel</groupId>
             <artifactId>camel-mvel</artifactId>
-            <version>${camel.version}</version>
+
         </dependency>
 
         <!-- test -->
@@ -154,6 +152,18 @@
             <groupId>com.squareup.okhttp3</groupId>
             <artifactId>okhttp</artifactId>
             <version>4.0.1</version>
+        </dependency>
+
+        <!-- export word -->
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi</artifactId>
+            <version>3.15</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-ooxml</artifactId>
+            <version>3.15</version>
         </dependency>
     </dependencies>
 

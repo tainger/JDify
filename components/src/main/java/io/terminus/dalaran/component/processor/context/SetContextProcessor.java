@@ -1,6 +1,5 @@
 package io.terminus.dalaran.component.processor.context;
 
-import io.terminus.dalaran.core.component.BodySerializeType;
 import io.terminus.dalaran.core.component.DalaranProcessor;
 import io.terminus.dalaran.core.component.annotation.Processor;
 import org.apache.camel.model.ProcessorDefinition;
@@ -14,9 +13,7 @@ import static io.terminus.dalaran.DalaranConstants.DALARAN_CONTEXT_EXCHANGE;
         value = "set-context",
         name = "设置上下文",
         order = 20,
-        configType = SetContextConfig.class,
-        inputSerializeType = BodySerializeType.Object,
-        outputSerializeType = BodySerializeType.Object
+        configType = SetContextConfig.class
 )
 public class SetContextProcessor implements DalaranProcessor<SetContextConfig> {
     @Override

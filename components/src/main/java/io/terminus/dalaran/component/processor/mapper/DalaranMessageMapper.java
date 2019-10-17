@@ -1,7 +1,6 @@
 package io.terminus.dalaran.component.processor.mapper;
 
 import io.terminus.dalaran.component.processor.mapper.model.*;
-import io.terminus.dalaran.core.component.BodySerializeType;
 import io.terminus.dalaran.core.component.DalaranComponentValidator;
 import io.terminus.dalaran.core.component.DalaranProcessor;
 import io.terminus.dalaran.core.component.annotation.Processor;
@@ -18,7 +17,6 @@ import org.apache.camel.model.ProcessorDefinition;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.kafka.common.protocol.types.Field;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.*;
@@ -32,9 +30,7 @@ import static io.terminus.dalaran.component.processor.mapper.MapperValidationMes
         value = "mapper-convert",
         name = "数据映射",
         order = 10,
-        configType = DalaranMapperConfig.class,
-        inputSerializeType = BodySerializeType.Object,
-        outputSerializeType = BodySerializeType.Object
+        configType = DalaranMapperConfig.class
 )
 @Data
 public class DalaranMessageMapper implements DalaranProcessor<DalaranMapperConfig>, DalaranComponentValidator<DalaranMapperConfig> {

@@ -1,6 +1,6 @@
 package io.terminus.dalaran.core.log;
 
-import io.terminus.dalaran.model.BodyType;
+import io.terminus.dalaran.TracingType;
 import lombok.Data;
 
 @Data
@@ -23,9 +23,9 @@ public class DalaranTracingLog {
 
     private String inputBody;
 
-    private BodyType inputBodyType;
+    private String inputBodyType;
 
     private String outputBody;
 
-    private BodyType outputBodyType;
+    private String outputBodyType;
 }

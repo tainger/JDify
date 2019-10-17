@@ -1,6 +1,6 @@
 package io.terminus.dalaran.console.service;
 
-import io.terminus.dalaran.console.model.DalaranAccount;
+import io.terminus.dalaran.model.DalaranAccount;
 
 public interface AuthorizeService {
 

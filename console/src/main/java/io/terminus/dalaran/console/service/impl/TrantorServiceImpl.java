@@ -4,13 +4,12 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 import io.terminus.dalaran.console.entity.ModelEntity;
 import io.terminus.dalaran.console.entity.TrantorEntity;
-import io.terminus.dalaran.console.model.dto.trantor.IntegrationInfoDTO;
-import io.terminus.dalaran.console.model.dto.trantor.IntegrationPointDTO;
-import io.terminus.dalaran.console.model.dto.trantor.TrantorModuleDTO;
 import io.terminus.dalaran.console.repository.ModelRepository;
 import io.terminus.dalaran.console.repository.TrantorRepository;
 import io.terminus.dalaran.console.service.TrantorService;
-import io.terminus.dalaran.model.BodyType;
+import io.terminus.dalaran.model.dto.trantor.IntegrationInfoDTO;
+import io.terminus.dalaran.model.dto.trantor.IntegrationPointDTO;
+import io.terminus.dalaran.model.dto.trantor.TrantorModuleDTO;
 import io.terminus.dalaran.model.schema.JsonSchema;
 import io.terminus.dalaran.model.trantor.DalaranIntegrationInfo;
 import io.terminus.dalaran.model.trantor.DalaranTrantorModule;
@@ -79,7 +78,7 @@ public class TrantorServiceImpl implements TrantorService {
             entity = new ModelEntity();
         }
         entity.setName(name);
-        entity.setType(BodyType.JSON);
+        entity.setType("JSON");
         entity.setModelSchema(JSON.toJSONString(schema));
         modelRepository.save(entity);
         return entity.getId();

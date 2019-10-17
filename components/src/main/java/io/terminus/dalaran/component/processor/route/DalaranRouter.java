@@ -1,6 +1,5 @@
 package io.terminus.dalaran.component.processor.route;
 
-import io.terminus.dalaran.core.component.BodySerializeType;
 import io.terminus.dalaran.core.component.DalaranProcessor;
 import io.terminus.dalaran.core.component.DalaranProcessorConfigCustomConverter;
 import io.terminus.dalaran.core.component.annotation.Processor;
@@ -24,8 +23,7 @@ import static io.terminus.dalaran.DalaranConstants.DELIMITER;
         value = "router",
         name = "条件路由",
         order = 15,
-        configType = DalaranRouterConfig.class,
-        inputSerializeType = BodySerializeType.Object
+        configType = DalaranRouterConfig.class
 )
 public class DalaranRouter implements DalaranProcessor<Map<String, String>>, DalaranProcessorConfigCustomConverter<DalaranRouterConfig, Map<String, String>> {
 

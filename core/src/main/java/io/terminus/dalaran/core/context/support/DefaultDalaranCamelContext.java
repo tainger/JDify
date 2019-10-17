@@ -22,7 +22,7 @@ import static io.terminus.dalaran.DalaranConstants.*;
 public class DefaultDalaranCamelContext implements DalaranContext<DalaranRoute> {
 
     @Autowired
-    private DalaranConverterContext converterContext;
+    private DalaranModelTypeContext modelTypeContext;
     @Autowired
     private DalaranComponentContext componentContext;
     @Autowired
@@ -179,8 +179,8 @@ public class DefaultDalaranCamelContext implements DalaranContext<DalaranRoute> 
     }
 
     @Override
-    public DalaranConverterContext getDalaranConverterContext() {
-        return converterContext;
+    public DalaranModelTypeContext getDalaranModelTypeContext() {
+        return modelTypeContext;
     }
 
     @Override

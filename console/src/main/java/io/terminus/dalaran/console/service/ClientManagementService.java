@@ -1,7 +1,7 @@
 package io.terminus.dalaran.console.service;
 
-import io.terminus.dalaran.console.model.dto.ClientDTO;
-import io.terminus.dalaran.console.model.dto.basic.BasicClientInfo;
+import io.terminus.dalaran.model.dto.ClientDTO;
+import io.terminus.dalaran.model.dto.basic.BasicClientInfo;
 
 import java.util.List;
 

@@ -1,10 +1,10 @@
 package io.terminus.dalaran.component.processor.loopwhile;
 
-import io.terminus.dalaran.core.component.BodySerializeType;
+import io.terminus.dalaran.DalaranConstants;
+import io.terminus.dalaran.config.ProcessorInfo;
 import io.terminus.dalaran.core.component.DalaranProcessor;
 import io.terminus.dalaran.core.component.DalaranProcessorConfigCustomConverter;
 import io.terminus.dalaran.core.component.annotation.Processor;
-import io.terminus.dalaran.core.config.ProcessorInfo;
 import io.terminus.dalaran.core.context.DalaranContext;
 import io.terminus.dalaran.core.flow.DalaranRoute;
 import io.terminus.dalaran.core.resource.DalaranResourceBuilder;
@@ -21,8 +21,7 @@ import static org.apache.camel.language.mvel.MvelExpression.mvel;
         value = "loop-while",
         name = "条件循环",
         order = 20,
-        configType = LoopWhileConfig.class,
-        inputSerializeType = BodySerializeType.Object
+        configType = LoopWhileConfig.class
 )
 public class LoopWhile implements DalaranProcessor<LoopWhileFragmentInfo>, DalaranProcessorConfigCustomConverter<LoopWhileConfig, LoopWhileFragmentInfo> {
     @Autowired
@@ -44,10 +43,9 @@ public class LoopWhile implements DalaranProcessor<LoopWhileFragmentInfo>, Dalar
         if (!fragment.getPipeline().isEmpty()) {
             ProcessorModel lastProcessor = fragment.getPipeline().get(fragment.getPipeline().size() - 1);
             ProcessorInfo lastProcessorInfo = dalaranContext.getDalaranComponentContext().getProcessorInfo(lastProcessor.getType());
-            if (lastProcessorInfo.getOutputSerializeType() == BodySerializeType.Serialized && lastProcessor.getOutModel() != null) {
-
+            if (!DalaranConstants.OBJECT_MODEL_TYPE.equalsIgnoreCase(lastProcessorInfo.getModelType()) && lastProcessor.getOutModel() != null) {
                 DalaranRoute route = dalaranContext.getDalaranFlowBuilder().buildFlowFragment(fragment);
-                dalaranContext.getDalaranConverterContext().toObject(route, lastProcessor.getOutModel());
+                dalaranContext.getDalaranModelTypeContext().toObject(route, lastProcessor.getOutModel(), lastProcessorInfo.getModelType());
                 try {
                     dalaranContext.removeFlow(fragment.getRouteId());
                     dalaranContext.addRoute(route);

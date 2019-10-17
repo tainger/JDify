@@ -1,20 +1,20 @@
 package io.terminus.dalaran.test.processor;
 
 import com.alibaba.fastjson.JSON;
+import io.terminus.dalaran.DalaranConstants;
 import io.terminus.dalaran.component.common.HttpMethod;
 import io.terminus.dalaran.component.processor.mapper.DalaranMapperConfig;
 import io.terminus.dalaran.component.processor.soap.SoapClientConfig;
 import io.terminus.dalaran.component.processor.soap.SoapClientConnector;
 import io.terminus.dalaran.core.context.DalaranContext;
-import io.terminus.dalaran.model.*;
+import io.terminus.dalaran.model.DalaranModelSchema;
+import io.terminus.dalaran.model.HttpProtocol;
+import io.terminus.dalaran.model.MessageModel;
+import io.terminus.dalaran.model.ModelField;
 import io.terminus.dalaran.model.component.ProcessorModel;
-import io.terminus.dalaran.model.converter.soap.model.SoapSchemaOperation;
 import io.terminus.dalaran.model.flow.BasicFlow;
 import io.terminus.dalaran.model.flow.FlowStatus;
-import io.terminus.dalaran.model.schema.JsonSchema;
-import io.terminus.dalaran.model.schema.ObjectSchema;
-import io.terminus.dalaran.model.schema.SoapSchema;
-import io.terminus.dalaran.model.schema.XMLSchema;
+import io.terminus.dalaran.model.schema.*;
 import io.terminus.dalaran.test.TestApplication;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -48,8 +48,8 @@ public class ModelConvert {
      */
     @Test
     public void basicConvert() {
-        MessageModel jsonModel = buildModel(BodyType.JSON);
-        MessageModel objectModel = buildModel(BodyType.OBJECT);
+        MessageModel jsonModel = buildModel("JSON");
+        MessageModel objectModel = buildModel(DalaranConstants.OBJECT_MODEL_TYPE);
 
         BasicFlow basicFlow = new BasicFlow();
         basicFlow.setInModel(objectModel);
@@ -78,8 +78,8 @@ public class ModelConvert {
      */
     @Test
     public void xmlConvert() {
-        MessageModel jsonModel = buildModel(BodyType.JSON);
-        MessageModel xmlModel = buildModel(BodyType.XML);
+        MessageModel jsonModel = buildModel("JSON");
+        MessageModel xmlModel = buildModel("XML");
 
         BasicFlow basicFlow = new BasicFlow();
         basicFlow.setInModel(jsonModel);
@@ -112,13 +112,13 @@ public class ModelConvert {
         JsonSchema schema = new JsonSchema();
         schema.setFields(buildRequest());
         inModel.setModelSchema(schema);
-        inModel.setModelType(BodyType.JSON);
+        inModel.setModelType("JSON");
 
         MessageModel<JsonSchema> outModel = new MessageModel<>();
         JsonSchema outModelSchema = new JsonSchema();
         outModelSchema.setFields(buildResponse());
         outModel.setModelSchema(outModelSchema);
-        outModel.setModelType(BodyType.JSON);
+        outModel.setModelType("JSON");
 
         BasicFlow basicFlow = new BasicFlow();
         basicFlow.setId(10088L);
@@ -172,25 +172,25 @@ public class ModelConvert {
         Assert.assertNotNull(rst);
     }
 
-    private MessageModel buildModel(BodyType type) {
+    private MessageModel buildModel(String type) {
         ModelField modelField = JSON.parseObject("{\"type\":\"ARRAY\",\"subType\":\"OBJECT\",\"nullable\":false,\"description\":\"根节点\",\"fields\":{\"user\":{\"type\":\"OBJECT\",\"subType\":null,\"nullable\":true,\"description\":\"结算单号\",\"fields\":{\"address\":{\"type\":\"STRING\",\"subType\":null,\"nullable\":true,\"description\":\"公司名称\",\"fields\":null},\"phone\":{\"type\":\"STRING\",\"subType\":null,\"nullable\":true,\"description\":\"处理状态\",\"fields\":null},\"name\":{\"type\":\"STRING\",\"subType\":null,\"nullable\":false,\"description\":\"单据状态\",\"fields\":null},\"wechat\":{\"type\":\"STRING\",\"subType\":null,\"nullable\":false,\"description\":\"结算单行项目\",\"fields\":null},\"id\":{\"type\":\"LONG\",\"subType\":null,\"nullable\":true,\"description\":\"结算单类型\",\"fields\":null}}},\"order\":{\"type\":\"OBJECT\",\"subType\":null,\"nullable\":false,\"description\":\"结算单行号\",\"fields\":{\"address\":{\"type\":\"ARRAY\",\"subType\":\"OBJECT\",\"nullable\":true,\"description\":\"操作码\",\"fields\":{\"addr2\":{\"type\":\"STRING\",\"subType\":null,\"nullable\":false,\"description\":null,\"fields\":null},\"addr1\":{\"type\":\"STRING\",\"subType\":null,\"nullable\":true,\"description\":\"删除记录\",\"fields\":null},\"list\":{\"type\":\"ARRAY\",\"subType\":\"OBJECT\",\"fields\":{\"itemA\":{\"type\":\"STRING\",\"subType\":null,\"fields\":null},\"itemB\":{\"type\":\"STRING\",\"subType\":null,\"fields\":null}}}}},\"id\":{\"type\":\"INTEGER\",\"subType\":null,\"nullable\":false,\"description\":\"删除标记\",\"fields\":null},\"time\":{\"type\":\"STRING\",\"subType\":null,\"nullable\":true,\"description\":\"物料凭证年份\",\"fields\":null},\"detail\":{\"type\":\"STRING\",\"subType\":null,\"nullable\":true,\"description\":\"物料凭证\",\"fields\":null},\"user\":{\"type\":\"STRING\",\"subType\":null,\"nullable\":true,\"description\":\"物料凭证行号\",\"fields\":null}}}}}", ModelField.class);
         return build(modelField, type);
     }
 
-    private MessageModel build(ModelField modelField, BodyType type) {
+    private MessageModel build(ModelField modelField, String type) {
         MessageModel model = new MessageModel();
         Map<String, ModelField> field = new HashMap<>();
         field.put("root", modelField);
         DalaranModelSchema schema;
         switch (type) {
-            case XML:
+            case "XML":
                 schema = new XMLSchema();
                 ((XMLSchema) schema).setRoot("test");
                 break;
-            case SOAP:
+            case "SOAP":
                 schema = new SoapSchema();
                 break;
-            case OBJECT:
+            case DalaranConstants.OBJECT_MODEL_TYPE:
                 schema = new ObjectSchema();
                 break;
             default:
@@ -204,21 +204,12 @@ public class ModelConvert {
 
     private MessageModel<SoapSchema> buildSoapModel() {
         MessageModel<SoapSchema> model = new MessageModel<>();
-        model.setModelType(BodyType.SOAP);
+        model.setModelType("SOAP");
 
         String wsdlDoc = getWsdlDoc("https://svn.apache.org/repos/asf/airavata/sandbox/xbaya-web/test/Calculator.wsdl");
         SoapSchema schema = new SoapSchema();
-        schema.setWsdlDoc(wsdlDoc);
 
         SoapSchemaOperation operation = new SoapSchemaOperation();
-        operation.setWsdl(WSDL);
-        operation.setProtocol(HttpProtocol.HTTP);
-        operation.setBaseUrl("156.56.179.164:9763/services/Calculator.CalculatorHttpSoap11Endpoint/");
-        operation.setPortType("CalculatorHttpSoap11Endpoint");
-        operation.setName("add");
-        operation.setInput("addRequest");
-        operation.setOutPut("addResponse");
-        operation.setBinding("CalculatorSoap11Binding");
         schema.setOperationConfig(operation);
         model.setModelSchema(schema);
         return model;

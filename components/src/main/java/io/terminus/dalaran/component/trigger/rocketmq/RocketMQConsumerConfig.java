@@ -2,16 +2,18 @@ package io.terminus.dalaran.component.trigger.rocketmq;
 
 import com.alibaba.fastjson.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.terminus.dalaran.FieldInputType;
 import io.terminus.dalaran.component.processor.rocketmq.RocketMQConnector;
-import io.terminus.dalaran.core.component.FieldInputType;
 import io.terminus.dalaran.core.component.annotation.ConfigFieldInfo;
+import io.terminus.dalaran.core.component.config.AllModelConfig;
+import io.terminus.dalaran.core.component.config.ConnectorConfig;
 import lombok.Data;
 
 /**
  * Created by jingdi on 2019/6/19
  */
 @Data
-public class RocketMQConsumerConfig {
+public class RocketMQConsumerConfig extends AllModelConfig implements ConnectorConfig<RocketMQConnector> {
 
     @ConfigFieldInfo(inputType = FieldInputType.Hidden)
     @JSONField(serialize = false)
@@ -26,4 +28,7 @@ public class RocketMQConsumerConfig {
 
     @ConfigFieldInfo(label = "消费者组", inputType = FieldInputType.String)
     private String consumerGroup;
+
+    @ConfigFieldInfo(label = "tag", inputType = FieldInputType.String, required = false)
+    private String tags;
 }

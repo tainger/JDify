@@ -1,7 +1,7 @@
 package io.terminus.dalaran.console.service;
 
-import io.terminus.dalaran.console.model.dto.log.MainLogDTO;
-import io.terminus.dalaran.console.model.query.TracingLogQuery;
+import io.terminus.dalaran.model.dto.log.MainLogDTO;
+import io.terminus.dalaran.model.query.TracingLogQuery;
 
 import java.util.List;
 

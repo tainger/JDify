@@ -2,7 +2,7 @@ package io.terminus.dalaran.component.processor.rocketmq;
 
 import com.alibaba.fastjson.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import io.terminus.dalaran.core.component.FieldInputType;
+import io.terminus.dalaran.FieldInputType;
 import io.terminus.dalaran.core.component.annotation.ConfigFieldInfo;
 import io.terminus.dalaran.core.component.config.ConnectorConfig;
 import io.terminus.dalaran.core.component.config.OutModelConfig;
@@ -27,4 +27,7 @@ public class RocketMQProducerConfig extends OutModelConfig implements ConnectorC
 
     @ConfigFieldInfo(label = "生产者组", inputType = FieldInputType.String)
     private String producerGroup;
+
+    @ConfigFieldInfo(label = "tag", inputType = FieldInputType.String, required = false)
+    private String tags;
 }

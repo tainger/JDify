@@ -1,11 +1,11 @@
 package io.terminus.dalaran.console.flow;
 
-import io.terminus.dalaran.console.model.dto.ModuleDTO;
-import io.terminus.dalaran.console.model.dto.ModuleDetailDTO;
-import io.terminus.dalaran.console.model.query.ModuleQuery;
 import io.terminus.dalaran.console.service.ModuleManagementService;
 import io.terminus.dalaran.core.resource.entity.common.ModuleEntity;
 import io.terminus.dalaran.core.resource.repository.ModuleRepository;
+import io.terminus.dalaran.model.dto.ModuleDTO;
+import io.terminus.dalaran.model.dto.ModuleDetailDTO;
+import io.terminus.dalaran.model.query.ModuleQuery;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -36,7 +36,7 @@ public class ModuleManagementServiceTest {
         ModuleDTO module = new ModuleDTO();
         module.setName("test-module");
         Long id = moduleManagementService.createModule(module);
-        ModuleEntity entity = moduleRepository.findOne(id);
+        ModuleEntity entity = moduleRepository.findById(id).get();
         Assert.assertEquals(entity.getName(), module.getName());
     }
 
@@ -68,14 +68,14 @@ public class ModuleManagementServiceTest {
     @Test
     public void getModuleDetail() {
         ModuleDetailDTO moduleDetail = moduleManagementService.getModuleDetail(1L);
-        ModuleEntity entity = moduleRepository.findOne(1L);
+        ModuleEntity entity = moduleRepository.findById(1L).get();
         Assert.assertEquals(moduleDetail.getName(), entity.getName());
     }
 
     @Test
     public void getModuleName() {
         String name = moduleManagementService.getModuleName(1L);
-        ModuleEntity entity = moduleRepository.findOne(1L);
+        ModuleEntity entity = moduleRepository.findById(1L).get();
         Assert.assertEquals(name, entity.getName());
     }
 }

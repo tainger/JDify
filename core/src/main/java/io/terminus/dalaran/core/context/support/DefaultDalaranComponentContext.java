@@ -1,12 +1,12 @@
 package io.terminus.dalaran.core.context.support;
 
-import io.terminus.dalaran.core.component.ComponentType;
+import io.terminus.dalaran.ComponentType;
+import io.terminus.dalaran.config.*;
 import io.terminus.dalaran.core.component.DalaranProcessor;
 import io.terminus.dalaran.core.component.DalaranTrigger;
 import io.terminus.dalaran.core.component.annotation.Processor;
 import io.terminus.dalaran.core.component.annotation.Trigger;
 import io.terminus.dalaran.core.component.config.ConnectorConfig;
-import io.terminus.dalaran.core.config.*;
 import io.terminus.dalaran.core.context.DalaranComponentContext;
 import io.terminus.dalaran.core.util.ConfigFieldUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -85,9 +85,7 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext {
             triggerInfo.setOrder(triggerAnnotation.order());
             triggerInfo.setConfigFields(configFields);
             triggerInfo.setConfigType(triggerAnnotation.configType());
-            triggerInfo.setAllowedBodyTypes(triggerAnnotation.allowBodyTypes());
-            triggerInfo.setInputSerializeType(triggerAnnotation.inputSerializeType());
-            triggerInfo.setOutputSerializeType(triggerAnnotation.outputSerializeType());
+            triggerInfo.setModelType(triggerAnnotation.bodyType());
 
 //            triggerInfo.setIsVoid(triggerAnnotation.isVoid());
 
@@ -116,9 +114,7 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext {
             processorInfo.setOrder(processorAnnotation.order());
             processorInfo.setConfigFields(configFields);
             processorInfo.setConfigType(processorAnnotation.configType());
-            processorInfo.setInputSerializeType(processorAnnotation.inputSerializeType());
-            processorInfo.setOutputSerializeType(processorAnnotation.outputSerializeType());
-            processorInfo.setAllowedBodyTypes(processorAnnotation.allowBodyTypes());
+            processorInfo.setModelType(processorAnnotation.bodyType());
 
             Class connectorType = getConnectorType(processorAnnotation.configType());
             if (connectorType != null) {

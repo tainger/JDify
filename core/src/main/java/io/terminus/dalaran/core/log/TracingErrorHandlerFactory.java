@@ -1,6 +1,6 @@
 package io.terminus.dalaran.core.log;
 
-import io.terminus.dalaran.model.BodyType;
+
 import org.apache.camel.*;
 import org.apache.camel.builder.DefaultErrorHandlerBuilder;
 import org.apache.camel.processor.DefaultErrorHandler;
@@ -82,7 +82,7 @@ public class TracingErrorHandlerFactory extends DefaultErrorHandlerBuilder imple
             }
             exchange.removeProperty(tracingKey);
             tracingLog.setSuccessful(false);
-            tracingLog.setOutputBodyType(BodyType.EXCEPTION);
+            tracingLog.setOutputBodyType("EXCEPTION");
             tracingLog.setOutputBody(body);
             tracingLog.setElapsed(System.currentTimeMillis() - tracingLog.getTimestamp());
 //            tracingLog.setOutputHeaders(exchange.getIn().getHeaders());

@@ -2,7 +2,7 @@ package io.terminus.dalaran.core.log;
 
 import com.alibaba.fastjson.JSON;
 import io.terminus.dalaran.DalaranConstants;
-import io.terminus.dalaran.model.BodyType;
+import io.terminus.dalaran.TracingType;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Map;
 
 import static io.terminus.dalaran.DalaranConstants.TRACING_FLOW_ID;
-import static io.terminus.dalaran.model.BodyType.UNKNOWN;
 
 /**
  * 尝试过 InterceptStrategy 和 TraceEventHandler, 最后决定自己写前后 processor 处理
@@ -38,6 +37,10 @@ public class DalaranTracer {
         this.logger = logger;
         this.tracingType = tracingType;
         this.processorId = processorId;
+    }
+
+    public static DalaranTracer buildTracer(DalaranTraceLogger logger, TracingType tracingType) {
+        return new DalaranTracer(logger, tracingType, null);
     }
 
     public static DalaranTracer buildTestSubFlowTracer(DalaranTraceLogger logger) {
@@ -64,30 +67,30 @@ public class DalaranTracer {
         return new DalaranTracer(logger, TracingType.SubFlow, null);
     }
 
-    public void before(RouteDefinition route, BodyType modelType) {
+    public void before(RouteDefinition route, String modelType) {
         route.process(this.buildBeforeProcessor(modelType));
     }
 
     public void before(RouteDefinition route) {
-        route.process(this.buildBeforeProcessor(UNKNOWN));
+        route.process(this.buildBeforeProcessor("UNKNOWN"));
     }
 
-    public void after(RouteDefinition route, BodyType modelType) {
+    public void after(RouteDefinition route, String modelType) {
         route.process(this.buildAfterProcessor(modelType));
     }
 
 
     public void after(RouteDefinition route) {
-        route.process(this.buildAfterProcessor(UNKNOWN));
+        route.process(this.buildAfterProcessor("UNKNOWN"));
     }
 
     // TODO async
-    private Processor buildBeforeProcessor(BodyType bodyModelType) {
+    private Processor buildBeforeProcessor(String bodyModelType) {
         return new TraceBeforeProcessor(bodyModelType);
     }
 
     // TODO async
-    private Processor buildAfterProcessor(BodyType bodyModelType) {
+    private Processor buildAfterProcessor(String bodyModelType) {
         return new TraceAfterProcessor(bodyModelType);
     }
 
@@ -138,9 +141,9 @@ public class DalaranTracer {
 
     private class TraceBeforeProcessor implements Processor, Traceable {
 
-        private final BodyType bodyModelType;
+        private final String bodyModelType;
 
-        private TraceBeforeProcessor(BodyType bodyModelType) {
+        private TraceBeforeProcessor(String bodyModelType) {
             this.bodyModelType = bodyModelType;
         }
 
@@ -193,9 +196,9 @@ public class DalaranTracer {
 
     private class TraceAfterProcessor implements Processor, Traceable {
 
-        private final BodyType bodyModelType;
+        private final String bodyModelType;
 
-        private TraceAfterProcessor(BodyType bodyModelType) {
+        private TraceAfterProcessor(String bodyModelType) {
             this.bodyModelType = bodyModelType;
         }
 

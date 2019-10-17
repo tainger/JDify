@@ -18,7 +18,7 @@ public interface DalaranTrigger<T> extends DalaranComponent {
 @Trigger(
         value = "netty-http-listener",
         configType = NettyHttpConfig.class,
-        allowBodyTypes = {BodyType.JSON, BodyType.XML},
+        allowBodyTypes = {"JSON", "XML"},
         inputSerializeType = BodySerializeType.Serialized,
         outputSerializeType = BodySerializeType.Serialized
 )

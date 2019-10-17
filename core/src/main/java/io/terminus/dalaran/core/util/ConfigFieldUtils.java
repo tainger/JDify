@@ -1,8 +1,8 @@
 package io.terminus.dalaran.core.util;
 
-import io.terminus.dalaran.core.component.FieldInputType;
+import io.terminus.dalaran.FieldInputType;
+import io.terminus.dalaran.config.DalaranConfigField;
 import io.terminus.dalaran.core.component.annotation.ConfigFieldInfo;
-import io.terminus.dalaran.core.config.DalaranConfigField;
 import lombok.val;
 
 import java.lang.reflect.Field;
