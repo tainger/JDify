@@ -132,4 +132,9 @@ public class ReleasedFlowInitializer implements DalaranStarter {
             return new ApiInfo(module.getName(), triggerFlow);
         }).collect(Collectors.toList());
     }
+
+    public String getSwaggerJson() throws JsonProcessingException {
+        return objectMapper.writeValueAsString(swagger);
+    }
+
 }
