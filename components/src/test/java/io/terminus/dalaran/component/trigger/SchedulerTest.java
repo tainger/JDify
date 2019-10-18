@@ -36,7 +36,7 @@ public class SchedulerTest extends BasicTriggerTest {
         DalaranScheduler trigger = new DalaranScheduler();
         DalaranSchedulerConfig config = new DalaranSchedulerConfig();
         config.setCron("0/2 * * * * ? *");
-        config.setName("test scheduler");
+        config.setTaskName("test scheduler");
 
         registerTrigger(trigger, config);
     }
