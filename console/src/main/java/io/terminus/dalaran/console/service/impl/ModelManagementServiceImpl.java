@@ -253,7 +253,7 @@ public class ModelManagementServiceImpl implements ModelManagementService {
             Map.Entry<String, ModelField> suggestField = null;
             for (Map.Entry<String, ModelField> sourceEntry : sourceFields.entrySet()) {
                 // TODO 这里可以处理一下 驼峰转换之类的, 增加建议映射准确度
-                double currentJD = jd.apply(targetEntry.getKey(), sourceEntry.getKey());
+                double currentJD = jd.apply(targetEntry.getKey().toLowerCase(), sourceEntry.getKey().toLowerCase());
                 if (maxJD < currentJD) {
                     maxJD = currentJD;
                     suggestField = sourceEntry;

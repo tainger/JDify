@@ -3,6 +3,7 @@ package io.terminus.dalaran.console.exception;
 import io.terminus.dalaran.exception.DalaranRestException;
 import io.terminus.dalaran.exception.DalaranRuntimeException;
 import io.terminus.dalaran.model.common.ErrorMessage;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -10,6 +11,7 @@ import org.springframework.web.method.HandlerMethod;
 
 import javax.servlet.http.HttpServletResponse;
 
+@Slf4j
 @ControllerAdvice
 public class DalaranRestExceptionHandler {
 

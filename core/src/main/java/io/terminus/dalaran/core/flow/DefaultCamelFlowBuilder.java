@@ -22,7 +22,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import static io.terminus.dalaran.DalaranConstants.*;
@@ -75,11 +74,6 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
         } else {
             buildFlowRoute(route, flow, TracingType.Flow, flow.getInModel().getModelType());
         }
-
-        if (triggerComponent instanceof DalaranTriggerBuildAfterProcessor) {
-            ((DalaranTriggerBuildAfterProcessor) triggerComponent).buildAfter(route, triggerConfig);
-        }
-
         return route;
     }
 
@@ -203,6 +197,31 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
         return validateMessages;
     }
 
+    private String convertModel(DalaranRoute route, String currentBodyType, String nextBodyType, MessageModel currentModel, MessageModel nextModel) {
+        // 如果组件声明类型为 Unknown, 则尝试取模型的类型
+        if (UNKNOWN_MODEL_TYPE.equalsIgnoreCase(currentBodyType) && currentModel != null) {
+            currentBodyType = currentModel.getModelType();
+        }
+        if (!UNKNOWN_MODEL_TYPE.equalsIgnoreCase(currentBodyType) && !nextBodyType.equals(currentBodyType)) {
+            // 如果下一个组件声明类型为 Unknown, 则尝试取下一个模型的类型
+            if (UNKNOWN_MODEL_TYPE.equalsIgnoreCase(nextBodyType) && nextModel != null) {
+                nextBodyType = nextModel.getModelType();
+            }
+            // 如果目前是 Object, 则从 Object 转至目标类型
+            if (DalaranConstants.OBJECT_MODEL_TYPE.equalsIgnoreCase(currentBodyType)) {
+                converterContext.fromObject(route, currentModel, nextBodyType);
+                // 如果目标类型是 Object, 则从当前类型转至 Object
+            } else if (DalaranConstants.OBJECT_MODEL_TYPE.equalsIgnoreCase(nextBodyType)) {
+                converterContext.toObject(route, currentBodyType);
+                // 如果都不是, 则从当前类型转至 Object, 再由 Object 转至目标类型
+            } else {
+                converterContext.toObject(route, currentBodyType);
+                converterContext.fromObject(route, currentModel, nextBodyType);
+            }
+        }
+        return nextBodyType;
+    }
+
     // TODO 这里还是比较乱的...
     private void buildFlowRoute(DalaranRoute route, BasicFlow flow, TracingType flowTracingType, @NotNull String currentBodyType) {
         DalaranTracer flowTracer = null;
@@ -232,20 +251,12 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
             if (processorComponent instanceof DalaranMessageBodyCustomConverter) {
                 needConvert = ((DalaranMessageBodyCustomConverter) processorComponent).customBodyConvert(route, processor.getConfig(), currentBodyType);
             }
-            if (UNKNOWN_MODEL_TYPE.equalsIgnoreCase(currentBodyType) && StringUtils.equalsIgnoreCase(processor.getType(), MAPPER_CONVERT) && StringUtils.equalsIgnoreCase(processor.getInModel().getModelType(), SOAP_TYPE)) {
-                currentBodyType = SOAP_TYPE;
+            String nextBodyType = currentProcessorInfo.getModelType();
+            MessageModel nextModel = processor.getInModel();
+            if (needConvert) {
+                convertModel(route, currentBodyType, nextBodyType, currentModel, nextModel);
             }
-            if (!UNKNOWN_MODEL_TYPE.equalsIgnoreCase(currentBodyType) && needConvert && !currentProcessorInfo.getModelType().equals(currentBodyType)) {
-                if (DalaranConstants.OBJECT_MODEL_TYPE.equalsIgnoreCase(currentBodyType)) {
-                    converterContext.fromObject(route, currentModel, currentProcessorInfo.getModelType());
-                } else if (DalaranConstants.OBJECT_MODEL_TYPE.equalsIgnoreCase(currentProcessorInfo.getModelType())) {
-                    converterContext.toObject(route, currentBodyType);
-                } else {
-                    converterContext.toObject(route, currentBodyType);
-                    converterContext.fromObject(route, currentModel, currentProcessorInfo.getModelType());
-                }
-            }
-            currentBodyType = currentProcessorInfo.getModelType();
+            currentBodyType = nextBodyType;
 
             Object config = processor.getConfig();
 
@@ -255,10 +266,10 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
 
             processorComponent.configure(route, config);
 
-            MessageModel outModel = processor.getOutModel();
+            nextModel = processor.getOutModel();
 
-            if (outModel != null) {
-                currentModel = outModel;
+            if (nextModel != null) {
+                currentModel = nextModel;
             }
             if (spanTracer != null) {
                 if (currentModel == null) {
@@ -274,18 +285,18 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
         }
 
         if (!UNKNOWN_MODEL_TYPE.equalsIgnoreCase(currentBodyType) && flow.getOutModel() != null) {
-            String outBodyType = flow.getOutModel().getModelType();
-            if (!outBodyType.equals(currentBodyType)) {
+            String nextBodyType = flow.getOutModel().getModelType();
+            if (!nextBodyType.equals(currentBodyType)) {
                 if (DalaranConstants.OBJECT_MODEL_TYPE.equalsIgnoreCase(currentBodyType)) {
-                    converterContext.fromObject(route, currentModel, outBodyType);
-                } else if (DalaranConstants.OBJECT_MODEL_TYPE.equalsIgnoreCase(outBodyType)) {
+                    converterContext.fromObject(route, currentModel, nextBodyType);
+                } else if (DalaranConstants.OBJECT_MODEL_TYPE.equalsIgnoreCase(nextBodyType)) {
                     converterContext.toObject(route, currentBodyType);
                 } else {
                     converterContext.toObject(route, currentBodyType);
-                    converterContext.fromObject(route, currentModel, outBodyType);
+                    converterContext.fromObject(route, currentModel, nextBodyType);
                 }
             }
-            currentBodyType = outBodyType;
+            currentBodyType = nextBodyType;
             currentModel = flow.getOutModel();
         }
 
@@ -302,7 +313,6 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
 
     private DalaranRoute createRouteDefinition() {
         DalaranRoute route = new DalaranRoute();
-        route.setProperty(DALARAN_CONTEXT_EXCHANGE, constant(new HashMap()));
         route.errorHandler(errorHandlerFactory);
         return route;
     }

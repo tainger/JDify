@@ -132,13 +132,8 @@ public class ReleasedFlowInitializer implements DalaranStarter {
         }).collect(Collectors.toList());
     }
 
-    private DalaranModelSchema getModelSchema(Long modelId) {
-        ModelReleasedEntity modelEntity = resourceLoader.loadModel(modelId);
-        Class<? extends DalaranModelSchema> schemaType = dalaranContext.getDalaranModelTypeContext().getModelSchema(modelEntity.getType());
-        return JSON.parseObject(modelEntity.getModelSchema(), schemaType);
-    }
-
     public String getSwaggerJson() throws JsonProcessingException {
         return objectMapper.writeValueAsString(swagger);
     }
+
 }
