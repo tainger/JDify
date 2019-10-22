@@ -22,9 +22,9 @@ import io.terminus.dalaran.core.resource.entity.common.ModuleEntity;
 import io.terminus.dalaran.core.resource.repository.ModuleRepository;
 import io.terminus.dalaran.model.flow.FlowStatus;
 import io.terminus.dalaran.model.flow.TriggerFlow;
-import org.hibernate.Session;
-import org.hibernate.metadata.ClassMetadata;
+import org.hibernate.metamodel.spi.MetamodelImplementor;
 import org.hibernate.persister.entity.AbstractEntityPersister;
+import org.hibernate.persister.entity.EntityPersister;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -167,10 +167,9 @@ public class ExportServiceImpl implements ExportService {
 
     // TODO 比较暴力, 但是需要重置 ID 自增, 否则 Json 内的依赖可能会有问题
     private void truncateTable() {
-        Session session = entityManager.unwrap(Session.class);
-        Map<String, ClassMetadata> hibernateMetadata = session.getSessionFactory().getAllClassMetadata();
-        for (ClassMetadata classMetadata : hibernateMetadata.values()) {
-            String tableName = ((AbstractEntityPersister) classMetadata).getTableName();
+        MetamodelImplementor metaMode = (MetamodelImplementor) entityManager.getMetamodel();
+        for (EntityPersister entityPersister : metaMode.entityPersisters().values()) {
+            String tableName = ((AbstractEntityPersister) entityPersister).getTableName();
             entityManager.createNativeQuery("TRUNCATE TABLE " + tableName).executeUpdate();
         }
     }
