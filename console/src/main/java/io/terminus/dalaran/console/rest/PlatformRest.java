@@ -1,6 +1,7 @@
 package io.terminus.dalaran.console.rest;
 
 import com.alibaba.fastjson.JSON;
+import io.swagger.annotations.ApiOperation;
 import io.swagger.models.Swagger;
 import io.terminus.dalaran.config.ConnectorInfo;
 import io.terminus.dalaran.config.ProcessorInfo;
@@ -160,6 +161,8 @@ public class PlatformRest implements PlatformInfoAPI, PlatformImportAPI, Platfor
         return exportService.exportWSDL().getAsString();
     }
 
+    @ApiOperation(value = "导出集成平台配置信息")
+    @GetMapping(value = "/export")
     @OnException(message = ResponseMessage.CONFIG_EXPORT_ERROR)
     public ExportData exportAll(HttpServletResponse res) {
         String currentDate = DateFormatUtils.format(new Date(), "yyyy-MM-dd HH:mm:ss");
