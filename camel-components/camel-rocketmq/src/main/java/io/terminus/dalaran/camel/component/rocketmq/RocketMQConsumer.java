@@ -37,6 +37,7 @@ public class RocketMQConsumer extends DefaultConsumer {
     @Override
     protected void doStop() throws Exception {
         super.doStop();
+        consumer.shutdown();
     }
 
     @Override
