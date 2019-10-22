@@ -5,8 +5,8 @@ import io.terminus.dalaran.component.trigger.soap.utils.SoapSignUtils;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.commons.lang3.StringUtils;
-import sun.misc.BASE64Decoder;
 
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,7 +28,8 @@ public class SoapBasicSignProcessor implements Processor {
             return;
         }
         try {
-            String[] account = new String(new BASE64Decoder().decodeBuffer(StringUtils.substringAfter(authentication,  " "))).split(":");
+
+            String[] account = new String(Base64.getDecoder().decode(StringUtils.substringAfter(authentication,  " "))).split(":");
             Map<String, String> body = new HashMap<>();
             body.put(DalaranConstants.AUTH_APP_KEY, account[0]);
             body.put(DalaranConstants.AUTH_SIGN, account[1]);
