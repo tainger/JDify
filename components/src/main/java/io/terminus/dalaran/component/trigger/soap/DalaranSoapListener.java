@@ -4,16 +4,17 @@ import io.terminus.dalaran.component.trigger.rest.processor.QueryStringSignProce
 import io.terminus.dalaran.component.trigger.soap.model.SoapApiInfo;
 import io.terminus.dalaran.component.trigger.soap.model.SoapAuthType;
 import io.terminus.dalaran.component.trigger.soap.processor.SoapBasicSignProcessor;
+import io.terminus.dalaran.component.trigger.soap.processor.SoapTriggerAfterProcessor;
 import io.terminus.dalaran.component.trigger.soap.processor.SoapTriggerProcessor;
 import io.terminus.dalaran.component.trigger.soap.utils.WSDLUtils;
 import io.terminus.dalaran.core.component.DalaranTrigger;
 import io.terminus.dalaran.core.component.DalaranTriggerApiDocExport;
+import io.terminus.dalaran.core.component.DalaranTriggerBuildAfterProcessor;
 import io.terminus.dalaran.core.component.annotation.Trigger;
 import io.terminus.dalaran.core.context.DalaranClientContext;
 import io.terminus.dalaran.model.flow.TriggerFlow;
 import org.apache.camel.model.RouteDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 
 import java.util.List;
 import java.util.Map;
@@ -29,13 +30,13 @@ import java.util.stream.Collectors;
         configType = SoapListenerConfig.class,
         bodyType = "SOAP"
 )
-public class DalaranSoapListener implements DalaranTrigger<SoapListenerConfig>, DalaranTriggerApiDocExport<String> {
+public class DalaranSoapListener implements DalaranTrigger<SoapListenerConfig>, DalaranTriggerBuildAfterProcessor<SoapListenerConfig>, DalaranTriggerApiDocExport<String> {
 
     @Autowired
     private DalaranClientContext clientContext;
 
-    @Value("${terminus.dalaran.runtime-location}")
-    private String runtimeLocation;
+//    @Value("${terminus.dalaran.runtime-location}")
+//    private String runtimeLocation;
 
     @Override
     public void buildFromRoute(RouteDefinition route, SoapListenerConfig config) {
@@ -60,6 +61,11 @@ public class DalaranSoapListener implements DalaranTrigger<SoapListenerConfig>, 
         List<SoapApiInfo> apiInfoList = moduleTriggerFlows.entrySet().stream().flatMap(module ->
                 module.getValue().stream().map(SoapApiInfo::new)
         ).collect(Collectors.toList());
-        return WSDLUtils.buildDefinitions(apiInfoList, runtimeLocation).getAsString();
+        return WSDLUtils.buildDefinitions(apiInfoList, null).getAsString();
+    }
+
+    @Override
+    public void buildAfter(RouteDefinition route, SoapListenerConfig config) {
+        route.process(new SoapTriggerAfterProcessor());
     }
 }

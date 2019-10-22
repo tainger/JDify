@@ -85,7 +85,7 @@ public class ServiceManagementImpl implements ServiceManagement {
     }
 
     @Override
-    public List<String> listOperation(Long serviceId) {
+    public List<ServiceOperation> listOperation(Long serviceId) {
         ServiceEntity entity = serviceRepository.findById(serviceId).get();
         ServiceInfo serviceInfo = serviceContext.getServiceInfo(entity.getType());
         Object serviceConfig = JSON.parseObject(entity.getServiceConfig(), serviceInfo.getServiceConfigType());

@@ -30,4 +30,7 @@ public class RocketMQProducerConfig extends OutModelConfig implements ConnectorC
 
     @ConfigFieldInfo(label = "tag", inputType = FieldInputType.String, required = false)
     private String tags;
+
+    @ConfigFieldInfo(label = "消息拆分", inputType = FieldInputType.Switch, required = false, defaultValue = "false")
+    private boolean messageSharding;
 }

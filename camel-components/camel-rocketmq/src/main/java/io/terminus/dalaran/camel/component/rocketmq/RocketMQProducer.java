@@ -12,6 +12,10 @@ import org.apache.rocketmq.client.producer.SendResult;
 import org.apache.rocketmq.common.message.Message;
 import org.apache.rocketmq.remoting.RPCHook;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 /**
  * Created by jingdi on 2019/6/14
  */
@@ -53,32 +57,50 @@ public class RocketMQProducer extends DefaultProducer {
 
     @Override
     public void process(Exchange exchange) throws Exception {
-        Message msg = buildMessage(exchange);
-        producer.send(msg, new SendCallback() {
-            @Override
-            public void onSuccess(SendResult sendResult) {
-                exchange.getOut().setBody(sendResult);
-            }
+        List<Message> messages = buildMessage(exchange, endpoint.getMessageSharding());
+        for (Message message: messages) {
+            producer.send(message, new SendCallback() {
+                @Override
+                public void onSuccess(SendResult sendResult) {
+                    exchange.getOut().setBody(sendResult);
+                }
 
-            @Override
-            public void onException(Throwable e) {
-                e.printStackTrace();
-            }
-        });
+                @Override
+                public void onException(Throwable e) {
+                    e.printStackTrace();
+                }
+            });
+        }
     }
 
-    private Message buildMessage(Exchange exchange) {
-        Message msg = new Message();
+    private List<Message> buildMessage(Exchange exchange, Boolean messageSharding) {
+        List<Message> messages = new ArrayList<>();
         org.apache.camel.Message camelMsg = exchange.getIn();
-        msg.setTopic(endpoint.getTopic());
+        Object body = camelMsg.getBody();
+        if (body == null) {
+            return messages;
+        }
+        if (messageSharding && body instanceof Collection) {
+            List<Object> msgs = (List) body;
+            msgs.forEach(msg -> {
+                messages.add(build(msg));
+            });
+        } else {
+            messages.add(build(body));
+        }
+        return messages;
+    }
+
+    private Message build(Object body) {
+        Message message = new Message();
+        message.setTopic(endpoint.getTopic());
         String tags = endpoint.getTags();
         if (StringUtils.isNotBlank(tags)) {
-            msg.setTags(tags);
+            message.setTags(tags);
         }
-        Object body = camelMsg.getBody();
         if (body != null) {
-            msg.setBody(body.toString().getBytes());
+            message.setBody(body.toString().getBytes());
         }
-        return msg;
+        return message;
     }
 }

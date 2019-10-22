@@ -5,6 +5,7 @@ import io.terminus.dalaran.DalaranConstants;
 import io.terminus.dalaran.config.ProcessorInfo;
 import io.terminus.dalaran.config.ServiceInfo;
 import io.terminus.dalaran.config.TriggerInfo;
+import io.terminus.dalaran.core.component.DalaranService;
 import io.terminus.dalaran.core.component.config.*;
 import io.terminus.dalaran.core.context.DalaranComponentContext;
 import io.terminus.dalaran.core.context.DalaranModelTypeContext;
@@ -16,6 +17,7 @@ import io.terminus.dalaran.core.resource.entity.released.ReleasedEntity;
 import io.terminus.dalaran.model.DalaranModelSchema;
 import io.terminus.dalaran.model.MessageModel;
 import io.terminus.dalaran.model.component.ProcessorModel;
+import io.terminus.dalaran.model.component.ServiceOperation;
 import io.terminus.dalaran.model.flow.BasicFlow;
 import io.terminus.dalaran.model.flow.FlowFragment;
 import io.terminus.dalaran.model.flow.SubFlow;
@@ -185,8 +187,7 @@ public class DefaultDalaranResourceBuilder implements DalaranResourceBuilder {
         }
 
         processor.setInModel(lastOutModel);
-        MessageModel outModel = injectModel(config, lastOutModel);
-        processor.setOutModel(outModel);
+
         if (config instanceof ConnectorConfig) {
             ConnectorConfig connectorConfig = (ConnectorConfig) config;
             Long connectorId = connectorConfig.getConnectorId();
@@ -195,8 +196,18 @@ public class DefaultDalaranResourceBuilder implements DalaranResourceBuilder {
                 connectorConfig.setConnector(connector);
             }
         }
+        if (config instanceof ServiceOperationConfig) {
+            ServiceOperationConfig serviceOperationConfig = (ServiceOperationConfig) config;
+            Long serviceId = serviceOperationConfig.getServiceId();
+            if (serviceId != null) {
+                ServiceOperation service = buildService(serviceId, serviceOperationConfig.getOperation());
+                serviceOperationConfig.setInModel(buildModel((service.getInModelId())));
+                serviceOperationConfig.setOutModel(buildModel(service.getOutModelId()));
+            }
+        }
+        MessageModel outModel = injectModel(config, lastOutModel);
+        processor.setOutModel(outModel);
         processor.setConfig(config);
-
         return processor;
     }
 
@@ -246,6 +257,16 @@ public class DefaultDalaranResourceBuilder implements DalaranResourceBuilder {
     private String replaceProperties(String configValue, Map<String, String> properties) {
         StringSubstitutor stringSubstitutor = new StringSubstitutor(properties, DalaranConstants.ENV_REPLACE_PREFIX, DalaranConstants.ENV_REPLACE_SUFFIX);
         return stringSubstitutor.replace(configValue);
+    }
+
+    private ServiceOperation buildService(Long serviceId, String operationKey) {
+        ServiceAbstractEntity serviceAbstractEntity = resourceLoader.loadService(serviceId);
+        if (serviceAbstractEntity == null) {
+            throw new RuntimeException("service [" + serviceId + "] not found");
+        }
+        Object service = buildServiceConfig(serviceAbstractEntity);
+        DalaranService dalaranService = serviceContext.getService(serviceAbstractEntity.getType());
+        return dalaranService.getOperationConfig(service, operationKey);
     }
 
     // TODO cache

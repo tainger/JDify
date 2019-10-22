@@ -1,5 +1,6 @@
 package io.terminus.dalaran.camel.component.dubbo;
 
+import com.alibaba.dubbo.common.utils.StringUtils;
 import com.alibaba.dubbo.config.RegistryConfig;
 import com.alibaba.dubbo.config.ServiceConfig;
 import com.alibaba.dubbo.rpc.service.GenericException;
@@ -18,16 +19,12 @@ public class DubboGenericProvider implements GenericService {
     private final Map<String, Processor> processorMap = new HashMap<>();
     private final Map<String, Endpoint> endpointMap = new HashMap<>();
 
-    private final ServiceConfig providerConfig;
+    private ServiceConfig providerConfig;
+    private final DubboEndpoint endpoint;
 
     public DubboGenericProvider(DubboEndpoint endpoint) {
-        this.providerConfig = new ServiceConfig();
-        providerConfig.setRegistry(new RegistryConfig(endpoint.getRegistryAddress()));
-        providerConfig.setTimeout(endpoint.getTimeout());
-        providerConfig.setApplication(endpoint.getApplicationConfig());
-        providerConfig.setVersion(endpoint.getVersion());
-        providerConfig.setInterface(endpoint.getServiceId());
-        providerConfig.setRef(this);
+        this.endpoint = endpoint;
+        buildProviderConfig();
     }
 
     @Override
@@ -67,6 +64,21 @@ public class DubboGenericProvider implements GenericService {
         processorMap.remove(method);
         if (processorMap.isEmpty() && endpointMap.isEmpty() && providerConfig.isExported()) {
             providerConfig.unexport();
+            // 当所有方法都不存在时, provider 会 unexport, 但是 Dubbo 里面有 unexport 和 exported 两个标志位, 所以这里需要充值一下, 以免 provider 丢失
+            buildProviderConfig();
         }
+    }
+
+    private void buildProviderConfig() {
+        this.providerConfig = new ServiceConfig();
+        providerConfig.setRegistry(new RegistryConfig(endpoint.getRegistryAddress()));
+        providerConfig.setTimeout(endpoint.getTimeout());
+        providerConfig.setApplication(endpoint.getApplicationConfig());
+        providerConfig.setVersion(endpoint.getVersion());
+        providerConfig.setInterface(endpoint.getServiceId());
+        if (!StringUtils.isBlank(System.getenv("DICE_PROJECT_ID")) && !StringUtils.isBlank(System.getenv("DICE_WORKSPACE"))) {
+            providerConfig.setOwner(System.getenv("DICE_PROJECT_ID") + "_" + System.getenv("DICE_WORKSPACE"));
+        }
+        providerConfig.setRef(this);
     }
 }

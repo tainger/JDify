@@ -86,17 +86,20 @@ public class ObjectToSoapProcessor implements Processor, Traceable {
                 if (subType == FieldType.OBJECT) {
                     for (Object data: subBody) {
                         SOAPElement element = soapElement.addChildElement(name, PREFIX);
+                        element.addNamespaceDeclaration("", soapOperationConfig.getTargetNamespace());
                         Map<String, ModelField> child = field.getFields();
                         buildBody(child, data, element);
                     }
                 } else {
                     for (Object data: subBody) {
                         SOAPElement element = soapElement.addChildElement(name, PREFIX);
+                        element.addNamespaceDeclaration("", soapOperationConfig.getTargetNamespace());
                         element.addTextNode(data.toString());
                     }
                 }
             } else if (type == FieldType.OBJECT) {
                 SOAPElement element = soapElement.addChildElement(name, PREFIX);
+                element.addNamespaceDeclaration("", soapOperationConfig.getTargetNamespace());
                 Map<String, ModelField> child = field.getFields();
                 buildBody(child, ob, element);
             } else {

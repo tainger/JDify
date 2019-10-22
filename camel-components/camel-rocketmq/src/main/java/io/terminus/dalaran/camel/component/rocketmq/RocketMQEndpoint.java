@@ -35,6 +35,12 @@ public class RocketMQEndpoint extends ProcessorEndpoint {
     @UriParam(description = "ACL secretKey", javaType = "java.lang.String")
     private String secretKey;
 
+    @UriParam(description = "auto commit", javaType = "java.lang.Boolean", defaultValue = "true")
+    private Boolean autoCommit;
+
+    @UriParam(description = "message sharding", javaType = "java.lang.Boolean", defaultValue = "false")
+    private Boolean messageSharding;
+
     private RocketMQContext context;
 
     public RocketMQEndpoint(RocketMQContext context) {
@@ -44,7 +50,6 @@ public class RocketMQEndpoint extends ProcessorEndpoint {
     @Override
     public Consumer createConsumer(Processor processor) throws Exception {
         RocketMQConsumer consumer = new RocketMQConsumer(this, processor, null);
-//        this.configureConsumer(consumer);
         return consumer;
     }
 
@@ -127,5 +132,21 @@ public class RocketMQEndpoint extends ProcessorEndpoint {
 
     public void setSecretKey(String secretKey) {
         this.secretKey = secretKey;
+    }
+
+    public Boolean getAutoCommit() {
+        return autoCommit;
+    }
+
+    public void setAutoCommit(Boolean autoCommit) {
+        this.autoCommit = autoCommit;
+    }
+
+    public Boolean getMessageSharding() {
+        return messageSharding;
+    }
+
+    public void setMessageSharding(Boolean messageSharding) {
+        this.messageSharding = messageSharding;
     }
 }

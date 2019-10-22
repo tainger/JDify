@@ -13,6 +13,13 @@ public class RocketMQManualCommit {
 
     private long offset;
 
+    public RocketMQManualCommit(MQPullConsumer consumer, String topic, MessageQueue messageQueue, long offset) {
+        this.consumer = consumer;
+        this.topic = topic;
+        this.messageQueue = messageQueue;
+        this.offset = offset;
+    }
+
     public MQPullConsumer getConsumer() {
         return consumer;
     }
