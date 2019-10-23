@@ -24,7 +24,7 @@ public class RocketMQConsumer implements DalaranTrigger<RocketMQConsumerConfig> 
         RocketMQConnector connector = config.getConnector();
         String uri = String.format(CAMEL_ROCKET_MQ_URI, connector.getNameServer(), config.getConsumerGroup(),
                 config.getTopic(), config.getTags(), connector.getUseAliCloudOns(),
-                connector.getAccessKey(), connector.getSecretKey(), config.getAutocommit());
+                connector.getAccessKey(), connector.getSecretKey(), config.isAutocommit());
         route.from(uri);
     }
 }
