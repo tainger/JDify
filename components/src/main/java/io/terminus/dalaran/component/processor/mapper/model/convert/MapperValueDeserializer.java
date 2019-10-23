@@ -19,6 +19,7 @@ public class MapperValueDeserializer implements ObjectDeserializer {
                 case FUNCTION:
                     return parser.parseObject(MappingFunction.class);
                 case MAPPING:
+                case CONTEXT:
                     return parser.parseObject(String.class);
             }
         }

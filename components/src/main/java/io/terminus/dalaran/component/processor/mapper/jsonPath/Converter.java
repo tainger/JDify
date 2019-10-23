@@ -6,18 +6,21 @@ import io.terminus.dalaran.component.common.exception.MapperFunctionExecuteExcep
 import io.terminus.dalaran.component.processor.mapper.model.*;
 import io.terminus.dalaran.core.context.DalaranContext;
 import io.terminus.dalaran.model.FieldType;
+import org.apache.camel.Exchange;
 import org.apache.commons.beanutils.ConvertUtils;
 import org.apache.commons.collections.CollectionUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static io.terminus.dalaran.DalaranConstants.DALARAN_CONTEXT_EXCHANGE;
+
 /**
  * Created by jingdi on 2019/7/16
  */
 public class Converter {
 
-    public static Map<String, Object> convert(DalaranMappingConfig mappingConfig, Object source, DalaranContext dalaranContext) {
+    public static Map<String, Object> convert(DalaranMappingConfig mappingConfig, Object source, DalaranContext dalaranContext, Exchange exchange) {
         Map<String, Object> destination = new HashMap<>();
         if (isSingleXMLString(mappingConfig, source)) {
             handleSingleXMLString(mappingConfig, source, dalaranContext, destination);
@@ -28,6 +31,11 @@ public class Converter {
         SimpleMappingField destinationRoot = mappingConfig.getDestinationRoot();
         messageMappings.forEach(messageMapping -> {
             if (messageMapping.getStatus() == MappingStatus.ERROR) {
+                return;
+            }
+            if (messageMapping.getMappingType() == MappingType.CONTEXT) {
+                Map<String, Object> context = exchange.getProperty(DALARAN_CONTEXT_EXCHANGE, Map.class);
+                buildValue(messageMapping, destination, context);
                 return;
             }
             if (messageMapping.isComplex()) {
@@ -248,6 +256,17 @@ public class Converter {
         }
         FieldType type = messageMapping.getType();
         value = parse(value, type, sourcePaths, destinationPath);
+        JSONPath.set(destination, "$" + MapperConstants.MODEL_ROOT + "." + destinationPath, value);
+    }
+
+    private static void buildValue(MessageMapping messageMapping, Object destination, Map<String, Object> context) {
+        List<SourceField> sourceFields = messageMapping.getSourceFields();
+        if (CollectionUtils.isEmpty(sourceFields)) {
+            return;
+        }
+        SourceField sourceField = sourceFields.get(0);
+        Object value = context.get(sourceField.getPath());
+        String destinationPath = messageMapping.getPath();
         JSONPath.set(destination, "$" + MapperConstants.MODEL_ROOT + "." + destinationPath, value);
     }
 

@@ -308,19 +308,19 @@ public class DalaranMessageMapper implements DalaranProcessor<DalaranMapperConfi
     private static class MessageMappingComparator implements Comparator<MessageMapping> {
         @Override
         public int compare(MessageMapping o1, MessageMapping o2) {
-            if ((o1.getMappingType() == MappingType.DEFAULT || o1.getMappingType() == MappingType.FUNCTION) && o2.getMappingType() == MappingType.MAPPING) {
+            if ((o1.getMappingType() == MappingType.CONTEXT || o1.getMappingType() == MappingType.FUNCTION) && o2.getMappingType() == MappingType.MAPPING) {
                 return 1;
             }
 
-            if (o1.getMappingType() == MappingType.DEFAULT && o2.getMappingType() == MappingType.FUNCTION) {
+            if (o1.getMappingType() == MappingType.CONTEXT && o2.getMappingType() == MappingType.FUNCTION) {
                 return 1;
             }
 
-            if (o1.getMappingType() == MappingType.FUNCTION && o2.getMappingType() == MappingType.DEFAULT) {
+            if (o1.getMappingType() == MappingType.FUNCTION && o2.getMappingType() == MappingType.CONTEXT) {
                 return -1;
             }
 
-            if (o1.getMappingType() == MappingType.MAPPING && (o2.getMappingType() == MappingType.DEFAULT || o2.getMappingType() == MappingType.FUNCTION)) {
+            if (o1.getMappingType() == MappingType.MAPPING && (o2.getMappingType() == MappingType.CONTEXT || o2.getMappingType() == MappingType.FUNCTION)) {
                 return -1;
             }
             return 0;
