@@ -10,6 +10,7 @@ import io.terminus.dalaran.model.*;
 import io.terminus.dalaran.model.schema.SoapSchema;
 import io.terminus.dalaran.model.schema.SoapSchemaOperation;
 import io.terminus.dalaran.model.soap.model.SoapOperationConfig;
+import io.terminus.dalaran.service.soap.model.SchemaModel;
 import org.apache.camel.Exchange;
 import org.apache.camel.builder.Builder;
 import org.apache.camel.model.ProcessorDefinition;
@@ -31,13 +32,18 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
 
     private static final String OPERATION_SPLIT = "::";
 
-    private static final String HTTP_URI = "%s4://%s&bridgeEndpoint=true";
+    private static final String HTTP_URI = "%s4://%s";
 
     @Override
     public void configure(ProcessorDefinition route, SoapOperationConfig soapOperationConfig) {
         String uri = String.format(HTTP_URI, "http", soapOperationConfig.getLocation());
+        if (StringUtils.contains(uri, "?")) {
+            uri = uri + "&bridgeEndpoint=true";
+        } else {
+            uri = uri + "?bridgeEndpoint=true";
+        }
         route.setHeader(Exchange.HTTP_METHOD, Builder.constant(HttpMethod.POST));
-        route.setHeader(Exchange.CONTENT_TYPE, Builder.constant("application/xml"));
+        route.setHeader(Exchange.CONTENT_TYPE, Builder.constant("text/xml; charset=utf-8"));
         route.to(uri);
         // TODO Stream to string
         route.convertBodyTo(String.class);
@@ -122,6 +128,7 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
         WSDLParser parser = new WSDLParser();
         String wsdl = wsdlImportConfig.getWsdlUrl();
         Definitions definitions = parser.parse(wsdl);
+        SchemaModel schemaModel = getSchemaModel(definitions.getLocalTypes());
         Map<String, SoapOperation> operationMap = buildOperations(definitions);
         SoapSchemaOperation schemaOperation = new SoapSchemaOperation();
         SoapOperation soapOperation = operationMap.get(StringUtils.substringBeforeLast(operationConfig.getOperationKey(), OPERATION_SPLIT));
@@ -130,8 +137,8 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
         String outputName = soapOperation.getOutput();
         schemaOperation.setTargetNamespace(operationConfig.getTargetNamespace());
 
-        MessageModel inModel = buildModel(definitions.getMessage(inputName), schemaOperation, inputName);
-        MessageModel outModel = buildModel(definitions.getMessage(outputName), schemaOperation, outputName);
+        MessageModel inModel = buildModel(definitions.getMessage(inputName), schemaOperation, schemaModel);
+        MessageModel outModel = buildModel(definitions.getMessage(outputName), schemaOperation, schemaModel);
 
         return new ServiceOperationModel(inModel, inputName, outModel, outputName);
     }
@@ -165,7 +172,7 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
         return operations;
     }
 
-    public MessageModel buildModel(Message message, SoapSchemaOperation operationConfig, String modelRoot) {
+    public MessageModel buildModel(Message message, SoapSchemaOperation operationConfig, SchemaModel schemaModel) {
         MessageModel<SoapSchema> model = new MessageModel<>();
         SoapSchema soapSchema = new SoapSchema();
         try {
@@ -179,13 +186,13 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
         model.setModelType("SOAP");
         Map<String, ModelField> fields = new HashMap<>();
         ModelField rootField = new ModelField();
-        buildFieldWithoutRootPath(rootField, message);
+        buildFieldWithoutRootPath(rootField, message, schemaModel);
         fields.put(DalaranConstants.MODEL_ROOT, rootField);
         soapSchema.setFields(fields);
         return model;
     }
 
-    private void buildFieldWithoutRootPath(ModelField parent, Message message) {
+    private void buildFieldWithoutRootPath(ModelField parent, Message message, SchemaModel schemaModel) {
         Map<String, ModelField> child = new HashMap<>();
         if (message != null) {
             List<Part> parts = message.getParts();
@@ -194,7 +201,7 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
                 parts.forEach(part -> {
                     Element element = part.getElement();
                     if (element != null) {
-                        handleElement(element, child);
+                        handleElement(element, child, schemaModel);
                     }
                 });
             }
@@ -202,13 +209,13 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
         parent.setFields(child);
     }
 
-    private void handleElement(Element element, Map<String, ModelField> child) {
+    private void handleElement(Element element, Map<String, ModelField> child, SchemaModel schemaModel) {
         Schema schema = element.getSchema();
         ModelField field = new ModelField();
         String type;
         if (element.getType() != null) {
             type = element.getType().getLocalPart();
-            if (containsComplexType(type, schema) && !containsSimpleType(type, schema)) {
+            if (schemaModel.getComplexTypes().containsKey(type) && !schemaModel.getSimpleTypes().containsKey(type)) {
                 if (element.getArrayType() == null
                         && (StringUtils.equalsIgnoreCase(element.getMaxOccurs(), "0") || StringUtils.equalsIgnoreCase(element.getMaxOccurs(), "1"))) {
                     field.setType(FieldType.OBJECT);
@@ -216,7 +223,7 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
                     field.setType(FieldType.ARRAY);
                     field.setSubType(FieldType.OBJECT);
                 }
-                buildWithoutRootPath(field, schema, type);
+                buildWithoutRootPath(field, schema, type, schemaModel);
             } else {
                 FieldType fieldType = getFieldType(type);
                 if (element.getArrayType() == null
@@ -228,39 +235,39 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
                 }
             }
         } else {
-            buildByEmbeddedTypeWithoutRootPath(field, element, schema);
+            buildByEmbeddedTypeWithoutRootPath(field, element, schema, schemaModel);
         }
         child.put(element.getName(), field);
     }
 
-    private void buildWithoutRootPath(ModelField field, Schema schema, String type) {
-        ComplexType complexType = schema.getComplexType(type);
+    private void buildWithoutRootPath(ModelField field, Schema schema, String type, SchemaModel schemaModel) {
+        ComplexType complexType = schemaModel.getComplexTypes().get(type);
         Sequence sequence = complexType.getSequence();
         if (sequence != null) {
             List<SchemaComponent> particles = sequence.getParticles();
             if (CollectionUtils.isNotEmpty(particles)) {
                 Map<String, ModelField> current = new HashMap<>();
                 particles.forEach(p -> {
-                    handleSchemaComponent(p, schema, current);
+                    handleSchemaComponent(p, schema, current, schemaModel);
                 });
                 field.setFields(current);
             }
         }
     }
 
-    private void handleSchemaComponent(SchemaComponent p, Schema schema, Map<String, ModelField> current) {
+    private void handleSchemaComponent(SchemaComponent p, Schema schema, Map<String, ModelField> current, SchemaModel schemaModel) {
         ModelField modelField = new ModelField();
         Element element = (Element) p;
         String name = element.getName();
         String elementType = element.getType().getLocalPart();
-        if (containsComplexType(elementType, schema) && !containsSimpleType(elementType, schema)) {
+        if (schemaModel.getComplexTypes().containsKey(elementType) && !schemaModel.getSimpleTypes().containsKey(elementType)) {
             if (element.getArrayType() == null && (StringUtils.equalsIgnoreCase(element.getMaxOccurs(), "0") || StringUtils.equalsIgnoreCase(element.getMaxOccurs(), "1"))) {
                 modelField.setType(FieldType.OBJECT);
             } else {
                 modelField.setType(FieldType.ARRAY);
                 modelField.setSubType(FieldType.OBJECT);
             }
-            buildWithoutRootPath(modelField, schema, elementType);
+            buildWithoutRootPath(modelField, schema, elementType, schemaModel);
         } else {
             FieldType fieldType = getFieldType(elementType);
             if (element.getArrayType() == null
@@ -274,7 +281,7 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
         current.put(name, modelField);
     }
 
-    private void buildByEmbeddedTypeWithoutRootPath(ModelField field, Element element, Schema schema) {
+    private void buildByEmbeddedTypeWithoutRootPath(ModelField field, Element element, Schema schema, SchemaModel schemaModel) {
         ComplexType complexType = (ComplexType) element.getEmbeddedType();
         Sequence sequence;
         if (complexType != null && (sequence = (Sequence) complexType.getModel()) != null) {
@@ -289,14 +296,14 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
             if (CollectionUtils.isNotEmpty(particles)) {
                 Map<String, ModelField> current = new HashMap<>();
                 particles.forEach(p -> {
-                    handleSchemaComponent(p, element, schema, maxOccurs, current);
+                    handleSchemaComponent(p, element, schema, maxOccurs, current, schemaModel);
                 });
                 field.setFields(current);
             }
         }
     }
 
-    private void handleSchemaComponent(SchemaComponent p, Element element, Schema schema, String maxOccurs, Map<String, ModelField> parent) {
+    private void handleSchemaComponent(SchemaComponent p, Element element, Schema schema, String maxOccurs, Map<String, ModelField> parent, SchemaModel schemaModel) {
         ModelField modelField = new ModelField();
         if (p instanceof Any) {
             return;
@@ -314,7 +321,7 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
             maxOccurs = e.getMaxOccurs();
         }
         String elementType = e.getType().getLocalPart();
-        if (containsComplexType(elementType, schema) && !containsSimpleType(elementType, schema)) {
+        if (schemaModel.getComplexTypes().containsKey(elementType) && !schemaModel.getSimpleTypes().containsKey(elementType)) {
             if (element.getArrayType() == null
                     && (StringUtils.equalsIgnoreCase(element.getMaxOccurs(), "0") || StringUtils.equalsIgnoreCase(element.getMaxOccurs(), "1"))
                     && (StringUtils.equalsIgnoreCase(maxOccurs, "0") || StringUtils.equalsIgnoreCase(maxOccurs, "1"))) {
@@ -323,7 +330,7 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
                 modelField.setType(FieldType.ARRAY);
                 modelField.setSubType(FieldType.OBJECT);
             }
-            buildWithoutRootPath(modelField, schema, elementType);
+            buildWithoutRootPath(modelField, schema, elementType, schemaModel);
         } else {
             FieldType fieldType = getFieldType(elementType);
             if (element.getArrayType() == null
@@ -337,28 +344,18 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
         parent.put(name, modelField);
     }
 
-    private boolean containsSimpleType(String type, Schema schema) {
-        List<SimpleType> simpleTypes = schema.getSimpleTypes();
-        if (CollectionUtils.isNotEmpty(simpleTypes)) {
-            for (SimpleType simpleType : simpleTypes) {
-                if (StringUtils.equalsIgnoreCase(type, simpleType.getName())) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    private boolean containsComplexType(String type, Schema schema) {
-        List<ComplexType> complexTypes = schema.getComplexTypes();
-        if (CollectionUtils.isNotEmpty(complexTypes)) {
-            for (ComplexType complexType : complexTypes) {
-                if (StringUtils.equalsIgnoreCase(type, complexType.getName())) {
-                    return true;
-                }
-            }
-        }
-        return false;
+    private SchemaModel getSchemaModel(Types types) {
+        Map<String, ComplexType> complexTypes = new HashMap<>();
+        Map<String, SimpleType> simpleTypes = new HashMap<>();
+        types.getSchemas().forEach(schema -> {
+            schema.getComplexTypes().forEach(complexType -> {
+                complexTypes.put(complexType.getName(), complexType);
+            });
+            schema.getSimpleTypes().forEach(simpleType -> {
+                simpleTypes.put(simpleType.getName(), simpleType);
+            });
+        });
+        return new SchemaModel(complexTypes, simpleTypes);
     }
 
     private FieldType getFieldType(String type) {

@@ -11,6 +11,7 @@ import org.apache.rocketmq.client.consumer.DefaultMQPushConsumer;
 import org.apache.rocketmq.client.consumer.listener.ConsumeConcurrentlyStatus;
 import org.apache.rocketmq.client.consumer.listener.MessageListenerConcurrently;
 import org.apache.rocketmq.client.consumer.rebalance.AllocateMessageQueueAveragely;
+import org.apache.rocketmq.common.message.MessageExt;
 import org.apache.rocketmq.remoting.RPCHook;
 
 /**
@@ -36,6 +37,7 @@ public class RocketMQConsumer extends DefaultConsumer {
     @Override
     protected void doStop() throws Exception {
         super.doStop();
+        consumer.shutdown();
     }
 
     @Override
@@ -58,18 +60,18 @@ public class RocketMQConsumer extends DefaultConsumer {
         } else {
             consumer.subscribe(endpoint.getTopic(), "*");
         }
-        consumer.registerMessageListener((MessageListenerConcurrently) (msgs, context) -> {
-            msgs.forEach(messageExt -> {
-                try {
-                    Exchange exchange = endpoint.createRocketMQExchange(messageExt.getBody());
+        consumer.registerMessageListener((MessageListenerConcurrently) (messages, context) -> {
+            try {
+                for (MessageExt message: messages) {
+                    Exchange exchange = endpoint.createRocketMQExchange(message.getBody());
                     processor.process(exchange);
-                } catch (Exception e) {
-                    e.printStackTrace();
                 }
-            });
+            } catch (Exception e) {
+                e.printStackTrace();
+                return ConsumeConcurrentlyStatus.RECONSUME_LATER;
+            }
             return ConsumeConcurrentlyStatus.CONSUME_SUCCESS;
         });
         consumer.start();
     }
-
 }

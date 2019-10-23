@@ -1,5 +1,6 @@
 package io.terminus.dalaran.console.service;
 
+import io.terminus.dalaran.model.component.ServiceOperation;
 import io.terminus.dalaran.model.dto.ServiceDTO;
 import io.terminus.dalaran.model.dto.basic.BasicServiceInfo;
 
@@ -17,7 +18,7 @@ public interface ServiceManagement {
 
     List<ServiceDTO> list();
 
-    List<String> listOperation(Long serviceId);
+    List<ServiceOperation> listOperation(Long serviceId);
 
     List<BasicServiceInfo> listBasicInfoByModuleId(Long moduleId);
 }
