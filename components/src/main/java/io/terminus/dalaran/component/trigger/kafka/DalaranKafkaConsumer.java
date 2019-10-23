@@ -20,7 +20,7 @@ public class DalaranKafkaConsumer implements DalaranTrigger<DalaranKafkaConsumer
         String uri = "kafka:" + config.getTopic()
                 + "?brokers=" + config.getConnector().getBrokers()
                 + "&groupId=" + config.getGroupId();
-        if (!Boolean.valueOf(config.getAutocommit())) {
+        if (!config.getAutocommit()) {
             uri = uri + "&autoCommitEnable=false"
                     + "&allowManualCommit=true"
                     + "&breakOnFirstError=true";

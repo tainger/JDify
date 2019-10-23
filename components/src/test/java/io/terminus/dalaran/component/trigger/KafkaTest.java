@@ -60,7 +60,7 @@ public class KafkaTest extends BasicTriggerTest {
 
         DalaranKafkaConsumerConfig consumerConfig = new DalaranKafkaConsumerConfig();
         consumerConfig.setConnector(connector);
-        consumerConfig.setAutocommit("true");
+        consumerConfig.setAutocommit(true);
         consumerConfig.setTopic(TOPIC);
         consumerConfig.setGroupId("dalaran");
 

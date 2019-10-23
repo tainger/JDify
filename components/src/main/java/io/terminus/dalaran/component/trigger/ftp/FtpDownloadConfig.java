@@ -4,10 +4,11 @@ import io.terminus.dalaran.FieldInputType;
 import io.terminus.dalaran.component.common.FtpUploadConnector;
 import io.terminus.dalaran.core.component.annotation.ConfigFieldInfo;
 import io.terminus.dalaran.core.component.config.ConnectorConfig;
+import io.terminus.dalaran.core.component.config.InModelConfig;
 import lombok.Data;
 
 @Data
-public class FtpDownloadConfig implements ConnectorConfig<FtpUploadConnector> {
+public class FtpDownloadConfig extends InModelConfig implements ConnectorConfig<FtpUploadConnector> {
 
     @ConfigFieldInfo(inputType = FieldInputType.Hidden)
     private FtpUploadConnector connector;

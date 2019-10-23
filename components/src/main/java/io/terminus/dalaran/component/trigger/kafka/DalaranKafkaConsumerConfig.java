@@ -29,7 +29,7 @@ public class DalaranKafkaConsumerConfig extends AllModelConfig implements Connec
     @ConfigFieldInfo(label = "消费组id", inputType = FieldInputType.String)
     private String groupId;
 
-    @ConfigFieldInfo(label = "自动提交", inputType = FieldInputType.Select)
-    private String autocommit = "false";
+    @ConfigFieldInfo(label = "自动提交", inputType = FieldInputType.Switch, defaultValue = "false")
+    private Boolean autocommit = false;
 
 }

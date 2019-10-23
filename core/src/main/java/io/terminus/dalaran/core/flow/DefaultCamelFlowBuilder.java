@@ -171,9 +171,8 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
             }
             flowValidateMessages.forEach(message -> message.setTargetType(Trigger));
             validateMessages.addAll(flowValidateMessages);
-
         }
-        if (lastModel != null && !lastModel.equals(flow.getOutModel())) {
+        if (lastModel != null && flow.getOutModel() != null && !lastModel.equals(flow.getOutModel())) {
             FlowValidation message = FlowValidationBuilder.newBuilder()
                     .flowEnd().message(MODEL_NOT_EQUALLY).suggest(ADD_MAPPER).build();
             validateMessages.add(message);
