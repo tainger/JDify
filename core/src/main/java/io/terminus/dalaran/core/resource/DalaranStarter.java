@@ -7,6 +7,7 @@ public interface DalaranStarter extends ApplicationListener<ApplicationReadyEven
 
     @Override
     default void onApplicationEvent(ApplicationReadyEvent event) {
+        System.setProperty("nashorn.args", "--language=es6");
         start();
     }
 

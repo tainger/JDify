@@ -37,7 +37,7 @@ public class DalaranHttpClient implements DalaranProcessor<HttpClientConfig>, Da
         if (!config.getMethod().isNoBody()) {
             return true;
         }
-        if (!DalaranConstants.OBJECT_MODEL_TYPE.equalsIgnoreCase(currentBodyType)) {
+        if (!DalaranConstants.OBJECT_MODEL_TYPE.equalsIgnoreCase(currentBodyType) && !DalaranConstants.UNKNOWN_MODEL_TYPE.equalsIgnoreCase(currentBodyType)) {
             converterContext.toObject(route, config.getInModel(), currentBodyType);
         }
         route.setHeader(HTTP_QUERY).method(this, "buildQueryString");
