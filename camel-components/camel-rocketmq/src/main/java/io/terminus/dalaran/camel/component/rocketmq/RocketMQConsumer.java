@@ -61,11 +61,12 @@ public class RocketMQConsumer extends DefaultConsumer {
         service.registerPullTaskCallback(endpoint.getTopic(), (messageQueue, pullTaskContext) -> {
             MQPullConsumer consumer = pullTaskContext.getPullConsumer();
             try {
-                long offset = consumer.fetchConsumeOffset(messageQueue, false);
+                long offset = consumer.fetchConsumeOffset(messageQueue, true);
                 if (offset < 0) {
                     offset = 0;
                 }
                 PullResult result;
+                // todo consumer目前配置写死，一次只拿一条消息，方便消费确认
                 if (StringUtils.isNotBlank(endpoint.getTags())) {
                     result = consumer.pull(messageQueue, endpoint.getTags(), offset, 1);
                 } else {
