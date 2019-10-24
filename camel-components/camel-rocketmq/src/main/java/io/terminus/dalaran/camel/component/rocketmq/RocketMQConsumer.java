@@ -82,7 +82,7 @@ public class RocketMQConsumer extends DefaultConsumer {
                 }
                 for (MessageExt message: messages) {
                     Exchange exchange = endpoint.createRocketMQExchange(message.getBody());
-                    if (!endpoint.getAutoCommit()) {
+                    if (!endpoint.getAutocommit()) {
                         RocketMQManualCommit commit = new RocketMQManualCommit(consumer, endpoint.getTopic(), messageQueue, result.getNextBeginOffset());
                         exchange.getIn().setHeader(ROCKET_MQ_MANUAL_COMMIT, commit);
                     } else {
