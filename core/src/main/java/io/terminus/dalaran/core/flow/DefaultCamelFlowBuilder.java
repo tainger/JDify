@@ -57,7 +57,7 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
     @Override
     public DalaranRoute buildTriggerFlow(TriggerFlow flow) {
         val triggerComponent = componentContext.getTrigger(flow.getTriggerType());
-
+        val triggerInfo = componentContext.getTriggerInfo(flow.getTriggerType());
 
         Object triggerConfig = flow.getTriggerConfig();
         if (triggerComponent instanceof DalaranTriggerFlowConfigCustomConverter) {
@@ -69,11 +69,15 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
         route.setProperty(TRACING_FLOW_ID).constant(flow.getId());
         triggerComponent.buildFromRoute(route, triggerConfig);
 
-        if (flow.getInModel() == null) {
-            buildFlowRoute(route, flow, TracingType.Flow, "UNKNOWN");
-        } else {
-            buildFlowRoute(route, flow, TracingType.Flow, flow.getInModel().getModelType());
+        String bodyType = triggerInfo.getModelType();
+        if (UNKNOWN_MODEL_TYPE.equals(bodyType)) {
+            if (flow.getInModel() == null) {
+                bodyType = UNKNOWN_MODEL_TYPE;
+            } else {
+                bodyType = flow.getInModel().getModelType();
+            }
         }
+        buildFlowRoute(route, flow, TracingType.Flow, bodyType);
         return route;
     }
 

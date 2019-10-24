@@ -19,8 +19,11 @@ public class DefaultDalaranModelTypeContext implements DalaranModelTypeContext {
     public void fromObject(@NotNull ProcessorDefinition route, @Nullable MessageModel model, @NotNull String modelType) {
         if (model == null) {
             fromObject(route, modelType);
-        } else {
+        } else if (model.getModelType().equals(modelType)) {
             fromObject(route, model);
+        } else {
+            // TODO 这种要考虑一下风险, 比如 SOAP 这种有特殊要求的 Schema
+            fromObject(route, modelType);
         }
     }
 
@@ -28,8 +31,11 @@ public class DefaultDalaranModelTypeContext implements DalaranModelTypeContext {
     public void toObject(@NotNull ProcessorDefinition route, @Nullable MessageModel model, @NotNull String modelType) {
         if (model == null) {
             toObject(route, modelType);
-        } else {
+        } else if (model.getModelType().equals(modelType)) {
             toObject(route, model);
+        } else {
+            // TODO 这种要考虑一下风险, 比如 SOAP 这种有特殊要求的 Schema
+            toObject(route, modelType);
         }
     }
 

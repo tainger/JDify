@@ -11,6 +11,7 @@ import org.apache.camel.model.ProcessorDefinition;
         value = "rocketmq-producer",
         name = "RocketMQ 消息发送器",
         order = 13,
+        bodyType = "JSON",
         configType = RocketMQProducerConfig.class
 )
 public class RocketMQProducer implements DalaranProcessor<RocketMQProducerConfig> {
