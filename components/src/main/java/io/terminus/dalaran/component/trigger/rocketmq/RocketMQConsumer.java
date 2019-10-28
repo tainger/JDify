@@ -12,6 +12,7 @@ import org.apache.camel.model.RouteDefinition;
         value = "rocketmq-consumer",
         name = "RocketMQ 消费者",
         order = 15,
+        bodyType = "JSON",
         configType = RocketMQConsumerConfig.class
 )
 public class RocketMQConsumer implements DalaranTrigger<RocketMQConsumerConfig> {

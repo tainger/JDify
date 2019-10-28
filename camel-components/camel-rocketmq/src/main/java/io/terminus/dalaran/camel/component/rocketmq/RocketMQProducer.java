@@ -58,7 +58,7 @@ public class RocketMQProducer extends DefaultProducer {
     @Override
     public void process(Exchange exchange) throws Exception {
         List<Message> messages = buildMessage(exchange, endpoint.getMessageSharding());
-        for (Message message: messages) {
+        for (Message message : messages) {
             producer.send(message, new SendCallback() {
                 @Override
                 public void onSuccess(SendResult sendResult) {
@@ -99,7 +99,13 @@ public class RocketMQProducer extends DefaultProducer {
             message.setTags(tags);
         }
         if (body != null) {
-            message.setBody(body.toString().getBytes());
+            if (body instanceof byte[]) {
+                message.setBody((byte[]) body);
+            } else if (body instanceof String) {
+                message.setBody(((String) body).getBytes());
+            } else {
+                throw new RuntimeException("no support body type;");
+            }
         }
         return message;
     }
