@@ -476,6 +476,7 @@ public class ModelManagementServiceImpl implements ModelManagementService {
                 return FieldType.ARRAY;
             case DalaranConsoleConstants.JAVA_FLOAT:
             case DalaranConsoleConstants.JAVA_DOUBLE:
+            case DalaranConsoleConstants.JAVA_MATH_BIGDECIMAL:
                 return FieldType.FLOAT;
             case DalaranConsoleConstants.JAVA_BOOLEAN:
                 return FieldType.BOOLEAN;

@@ -11,6 +11,6 @@ public class FromJsonFunction {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     public Object execute(String json) throws IOException {
-        return objectMapper.readTree(json);
+        return objectMapper.readValue(json, Object.class);
     }
 }
