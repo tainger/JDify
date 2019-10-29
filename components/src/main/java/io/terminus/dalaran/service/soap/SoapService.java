@@ -143,7 +143,19 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
     public ServiceOperationModel buildOperationModel(WSDLImportConfig wsdlImportConfig, SoapOperationConfig operationConfig) {
         WSDLParser parser = new WSDLParser();
         String wsdl = wsdlImportConfig.getWsdlUrl();
-        Definitions definitions = parser.parse(wsdl);
+        Definitions definitions = new Definitions();
+        String username = wsdlImportConfig.getUsername();
+        String password = wsdlImportConfig.getPassword();
+        if (StringUtils.isNotBlank(username) && StringUtils.isNotBlank(password)) {
+            try {
+                InputStream wsdlDoc = getWSDLDoc(wsdl, username, password);
+                definitions = parser.parse(wsdlDoc);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else {
+            definitions = parser.parse(wsdl);
+        }
         SchemaModel schemaModel = getSchemaModel(definitions.getLocalTypes());
         Map<String, SoapOperation> operationMap = buildOperations(definitions);
         SoapSchemaOperation schemaOperation = new SoapSchemaOperation();
