@@ -2,6 +2,7 @@ package io.terminus.dalaran.service.soap;
 
 import com.predic8.schema.*;
 import com.predic8.wsdl.*;
+import com.predic8.wsdl.soap11.SOAPHeader;
 import io.terminus.dalaran.DalaranConstants;
 import io.terminus.dalaran.component.common.HttpMethod;
 import io.terminus.dalaran.core.component.DalaranService;
@@ -127,6 +128,8 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
                         newOperation.setProtocol(HttpProtocol.valueOf(StringUtils.substringBefore(port.getAddress().getLocation(), "://").toUpperCase()));
                         newOperation.setServicePort(port.getName());
                         newOperation.setOperationKey(operation.getOperationKey());
+                        newOperation.setHeaderValues(wsdlImportConfig.getHeaderValues());
+                        newOperation.setUseHeader(wsdlImportConfig.getUseHeader());
                         operationList.add(newOperation);
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -157,7 +160,7 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
             definitions = parser.parse(wsdl);
         }
         SchemaModel schemaModel = getSchemaModel(definitions.getLocalTypes());
-        Map<String, SoapOperation> operationMap = buildOperations(definitions);
+        Map<String, SoapOperation> operationMap = buildOperations(definitions, operationConfig.getUseHeader());
         SoapSchemaOperation schemaOperation = new SoapSchemaOperation();
         SoapOperation soapOperation = operationMap.get(StringUtils.substringBeforeLast(operationConfig.getOperationKey(), OPERATION_SPLIT));
 
@@ -165,13 +168,18 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
         String outputName = soapOperation.getOutput();
         schemaOperation.setTargetNamespace(operationConfig.getTargetNamespace());
 
+        if (operationConfig.getUseHeader()) {
+            MessageModel header = buildModel(definitions.getMessage(soapOperation.getInputHeader()), schemaOperation, schemaModel);
+            schemaOperation.setHeader(header);
+        }
+
         MessageModel inModel = buildModel(definitions.getMessage(inputName), schemaOperation, schemaModel);
         MessageModel outModel = buildModel(definitions.getMessage(outputName), schemaOperation, schemaModel);
 
         return new ServiceOperationModel(inModel, inputName, outModel, outputName);
     }
 
-    private Map<String, SoapOperation> buildOperations(Definitions definitions) {
+    private Map<String, SoapOperation> buildOperations(Definitions definitions, Boolean useHeader) {
         Map<String, SoapOperation> operations = new HashMap<>();
         List<PortType> portTypes = definitions.getPortTypes();
         portTypes.forEach(portType -> {
@@ -179,33 +187,47 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
             portType.getOperations().forEach(operation -> {
                 SoapOperation soapOperation = new SoapOperation();
                 String name = operation.getName();
-
                 soapOperation.setName(name);
                 soapOperation.setPortType(portName);
-                String input = operation.getInput().getName();
-
-                if (StringUtils.isBlank(input)) {
-                    input = operation.getInput().getMessagePrefixedName().getLocalName();
+                if (operation.getInput() != null) {
+                    String input = operation.getInput().getName();
+                    if (StringUtils.isBlank(input)) {
+                        input = operation.getInput().getMessagePrefixedName().getLocalName();
+                    }
+                    soapOperation.setInput(input);
                 }
-                soapOperation.setInput(input);
-
-                String output = operation.getOutput().getName();
-                if (StringUtils.isBlank(output)) {
-                    output = operation.getOutput().getMessagePrefixedName().getLocalName();
+                if (operation.getOutput() != null) {
+                    String output = operation.getOutput().getName();
+                    if (StringUtils.isBlank(output)) {
+                        output = operation.getOutput().getMessagePrefixedName().getLocalName();
+                    }
+                    soapOperation.setOutput(output);
                 }
-                soapOperation.setOutput(output);
                 operations.put(name + OPERATION_SPLIT + portName, soapOperation);
             });
         });
 
+        if (!useHeader) {
+            return operations;
+        }
+
         List<Binding> bindings = definitions.getBindings();
         bindings.forEach(binding -> {
-            String portType =  binding.getPortType().getName();
+            String type = binding.getType().getLocalPart();
             binding.getOperations().forEach(operation -> {
-
+                List<BindingElement> elements =  operation.getInput().getBindingElements();
+                if (CollectionUtils.isEmpty(elements)) {
+                    return;
+                }
+                elements.forEach(element -> {
+                    if (element instanceof SOAPHeader) {
+                        SOAPHeader header = (SOAPHeader) element;
+                        String message = StringUtils.substringAfter(header.getMessageName(), ":");
+                        operations.get(operation.getName() + OPERATION_SPLIT + type).setInputHeader(message);
+                    }
+                });
             });
         });
-
         return operations;
     }
 
