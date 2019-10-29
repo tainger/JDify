@@ -11,6 +11,7 @@ import io.terminus.dalaran.model.schema.SoapSchema;
 import io.terminus.dalaran.model.schema.SoapSchemaOperation;
 import io.terminus.dalaran.model.soap.model.SoapOperationConfig;
 import io.terminus.dalaran.service.soap.model.SchemaModel;
+import okhttp3.*;
 import org.apache.camel.Exchange;
 import org.apache.camel.builder.Builder;
 import org.apache.camel.model.ProcessorDefinition;
@@ -18,7 +19,10 @@ import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -70,7 +74,19 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
         SoapServiceConfig serviceConfig = new SoapServiceConfig();
         WSDLParser parser = new WSDLParser();
         String wsdl = wsdlImportConfig.getWsdlUrl();
-        Definitions definitions = parser.parse(wsdl);
+        Definitions definitions = new Definitions();
+        String username = wsdlImportConfig.getUsername();
+        String password = wsdlImportConfig.getPassword();
+        if (StringUtils.isNotBlank(username) && StringUtils.isNotBlank(password)) {
+            try {
+                InputStream wsdlDoc = getWSDLDoc(wsdl, username, password);
+                definitions = parser.parse(wsdlDoc);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else {
+            definitions = parser.parse(wsdl);
+        }
         List<Binding> bindings = definitions.getBindings();
         Map<String, List<SoapOperationConfig>> soapOperationConfigMap = new HashMap<>();
         String targetNamespace = definitions.getTargetNamespace();
@@ -155,6 +171,7 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
                 soapOperation.setName(name);
                 soapOperation.setPortType(portName);
                 String input = operation.getInput().getName();
+
                 if (StringUtils.isBlank(input)) {
                     input = operation.getInput().getMessagePrefixedName().getLocalName();
                 }
@@ -166,6 +183,14 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
                 }
                 soapOperation.setOutput(output);
                 operations.put(name + OPERATION_SPLIT + portName, soapOperation);
+            });
+        });
+
+        List<Binding> bindings = definitions.getBindings();
+        bindings.forEach(binding -> {
+            String portType =  binding.getPortType().getName();
+            binding.getOperations().forEach(operation -> {
+
             });
         });
 
@@ -368,5 +393,19 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
                 return FieldType.BOOLEAN;
         }
         return FieldType.STRING;
+    }
+
+    private InputStream getWSDLDoc(String url, String user, String password) throws Exception {
+        OkHttpClient client = new OkHttpClient.Builder().authenticator(new Authenticator() {
+            @Nullable
+            @Override
+            public Request authenticate(@Nullable Route route, @NotNull Response response) throws IOException {
+                String credentials =  Credentials.basic(user, password);
+                return response.request().newBuilder().header("Authorization", credentials).build();
+            }
+        }).build();
+        Request request = new Request.Builder().url(url).build();
+        Response response = client.newCall(request).execute();
+        return response.body().byteStream();
     }
 }
