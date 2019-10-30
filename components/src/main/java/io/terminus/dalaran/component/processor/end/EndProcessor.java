@@ -6,8 +6,7 @@ import org.apache.camel.model.ProcessorDefinition;
 
 // TODO serializedBody
 @Processor(
-        value = "end",
-        name = "End 节点"
+        value = "end"
 )
 public class EndProcessor implements UnconfigurableDalaranProcessor {
     @Override

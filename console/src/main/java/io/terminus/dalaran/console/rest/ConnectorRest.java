@@ -23,31 +23,31 @@ public class ConnectorRest implements ConnectorReadAPI, ConnectorWriteAPI {
     private ConnectorService connectorService;
 
     @Override
-    @OnException(message = ResponseMessage.CONNECTOR_CREATE_ERROR)
+    @OnException(code = ResponseMessage.CONNECTOR_CREATE_ERROR)
     public Long create(@RequestBody ConnectorDTO connectorDTO) {
         return connectorService.create(connectorDTO);
     }
 
     @Override
-    @OnException(message = ResponseMessage.CONNECTOR_UPDATE_ERROR)
+    @OnException(code = ResponseMessage.CONNECTOR_UPDATE_ERROR)
     public ConnectorDTO update(@RequestBody ConnectorDTO connectorDTO) {
         return connectorService.update(connectorDTO);
     }
 
     @Override
-    @OnException(message = ResponseMessage.CONNECTOR_DELETE_ERROR)
+    @OnException(code = ResponseMessage.CONNECTOR_DELETE_ERROR)
     public void deleteById(@PathVariable Long id) {
         connectorService.delete(id);
     }
 
     @Override
-    @OnException(message = ResponseMessage.CONNECTOR_QUERY_ERROR)
+    @OnException(code = ResponseMessage.CONNECTOR_QUERY_ERROR)
     public ConnectorDTO detail(@PathVariable Long id) {
         return connectorService.detail(id);
     }
 
     @Override
-    @OnException(message = ResponseMessage.CONNECTOR_QUERY_ERROR)
+    @OnException(code = ResponseMessage.CONNECTOR_QUERY_ERROR)
     public List<BasicConnectorInfo> selectOptions(@RequestParam ComponentType componentType, @RequestParam String componentName) {
         return connectorService.listBasicInfoByComponent(componentType, componentName);
     }

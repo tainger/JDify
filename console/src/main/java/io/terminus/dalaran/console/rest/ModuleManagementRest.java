@@ -24,37 +24,37 @@ public class ModuleManagementRest implements ModuleReadAPI, ModuleWriteAPI {
     private ModuleManagementService moduleManagementService;
 
     @Override
-    @OnException(message = ResponseMessage.MODULE_QUERY_ERROR)
+    @OnException(code = ResponseMessage.MODULE_QUERY_ERROR)
     public List<ModuleDTO> query(ModuleQuery query) {
         return moduleManagementService.queryModules(query);
     }
 
     @Override
-    @OnException(message = ResponseMessage.MODULE_CREATE_ERROR)
+    @OnException(code = ResponseMessage.MODULE_CREATE_ERROR)
     public Long create(@RequestBody ModuleDTO model) {
         return moduleManagementService.createModule(model);
     }
 
     @Override
-    @OnException(message = ResponseMessage.MODULE_UPDATE_ERROR)
+    @OnException(code = ResponseMessage.MODULE_UPDATE_ERROR)
     public ModuleDTO update(@RequestBody ModuleDTO model) {
         return moduleManagementService.updateModule(model);
     }
 
     @Override
-    @OnException(message = ResponseMessage.MODULE_DELETE_ERROR)
+    @OnException(code = ResponseMessage.MODULE_DELETE_ERROR)
     public void deleteById(@RequestParam Long id) {
         moduleManagementService.deleteModule(id);
     }
 
     @Override
-    @OnException(message = ResponseMessage.MODULE_QUERY_ERROR)
+    @OnException(code = ResponseMessage.MODULE_QUERY_ERROR)
     public List<ModuleDTO> list() {
         return moduleManagementService.list();
     }
 
     @Override
-    @OnException(message = ResponseMessage.MODULE_QUERY_ERROR)
+    @OnException(code = ResponseMessage.MODULE_QUERY_ERROR)
     public ModuleDetailDTO moduleDetail(@PathVariable Long id) {
         return moduleManagementService.getModuleDetail(id);
     }

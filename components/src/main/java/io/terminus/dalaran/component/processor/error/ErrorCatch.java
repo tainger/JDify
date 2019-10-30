@@ -19,7 +19,6 @@ import java.util.List;
 
 @Processor(
         value = "error-catch",
-        name = "失败重试",
         configType = ErrorCatchConfig.class
 )
 public class ErrorCatch implements DalaranProcessor<String>, DalaranProcessorConfigCustomConverter<ErrorCatchConfig, String>, DalaranComponentValidator<ErrorCatchConfig> {

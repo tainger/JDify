@@ -46,7 +46,7 @@ public class FlowManagementRest implements FlowReadAPI, FlowWriteAPI {
     private DalaranContext dalaranContext;
 
     @Override
-    @OnException(message = ResponseMessage.FLOW_CREATE_ERROR)
+    @OnException(code = ResponseMessage.FLOW_CREATE_ERROR)
     public Long create(@RequestBody TriggerFlowDTO model) throws CreateFlowException {
         try {
             return flowManagementService.createFlow(model);
@@ -56,7 +56,7 @@ public class FlowManagementRest implements FlowReadAPI, FlowWriteAPI {
     }
 
     @Override
-    @OnException(message = ResponseMessage.FLOW_UPDATE_ERROR)
+    @OnException(code = ResponseMessage.FLOW_UPDATE_ERROR)
     public TriggerFlowDTO update(@RequestBody TriggerFlowDTO model) throws UpdateFlowException, FlowNotExistException {
         try {
             return flowManagementService.updateFlow(model);
@@ -68,55 +68,55 @@ public class FlowManagementRest implements FlowReadAPI, FlowWriteAPI {
     }
 
     @Override
-    @OnException(message = ResponseMessage.FLOW_CREATE_ERROR)
+    @OnException(code = ResponseMessage.FLOW_CREATE_ERROR)
     public ImportFlowResult importTriggerFlow(@RequestBody ImportFlowDTO model) {
         return flowManagementService.importFlow(model);
     }
 
     @Override
-    @OnException(message = ResponseMessage.FLOW_CREATE_ERROR)
+    @OnException(code = ResponseMessage.FLOW_CREATE_ERROR)
     public ImportProcessorResult importProcessor(@RequestBody ImportProcessorDTO model) {
         return flowManagementService.importProcessor(model);
     }
 
     @Override
-    @OnException(message = ResponseMessage.FLOW_DELETE_ERROR)
+    @OnException(code = ResponseMessage.FLOW_DELETE_ERROR)
     public void deleteById(@RequestParam Long id) {
         flowManagementService.deleteFlow(id);
     }
 
     @Override
-    @OnException(message = ResponseMessage.FLOW_COPY_ERROR, exception = CreateFlowException.class)
+    @OnException(code = ResponseMessage.FLOW_COPY_ERROR, exception = CreateFlowException.class)
     public Long copy(@RequestBody CopyFlow copyFlow) throws FlowNotExistException {
         return flowManagementService.copyFlow(copyFlow);
     }
 
     @Override
-    @OnException(message = ResponseMessage.FLOW_QUERY_ERROR)
+    @OnException(code = ResponseMessage.FLOW_QUERY_ERROR)
     public TriggerFlowDTO getById(@PathVariable Long id) {
         return flowManagementService.getById(id);
     }
 
     @Override
-    @OnException(message = ResponseMessage.FLOW_QUERY_ERROR)
+    @OnException(code = ResponseMessage.FLOW_QUERY_ERROR)
     public List<TriggerFlowDTO> query(FlowQuery query) {
         return flowManagementService.queryFlows(query);
     }
 
     @Override
-    @OnException(message = ResponseMessage.FLOW_QUERY_ERROR)
+    @OnException(code = ResponseMessage.FLOW_QUERY_ERROR)
     public List<TriggerFlowDTO> list() {
         return flowManagementService.list();
     }
 
     @Override
-    @OnException(message = ResponseMessage.FLOW_CHECK_ERROR)
+    @OnException(code = ResponseMessage.FLOW_CHECK_ERROR)
     public List<FlowValidation> validate(@RequestBody TriggerFlowDTO model) {
         return flowManagementService.validateFlow(model);
     }
 
     @Override
-    @OnException(message = ResponseMessage.FLOW_TEST_ERROR)
+    @OnException(code = ResponseMessage.FLOW_TEST_ERROR)
     public MainLogDTO doTest(@RequestBody TestRequestDTO request) {
         TriggerFlowDTO flow = flowManagementService.getById(request.getFlowId());
         if (flow == null) {

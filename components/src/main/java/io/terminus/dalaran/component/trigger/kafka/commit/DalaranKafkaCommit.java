@@ -9,7 +9,6 @@ import org.apache.camel.model.ProcessorDefinition;
  */
 @Processor(
         value = "kafka-commit",
-        name = "Kafka 消费确认",
         order = 13
 )
 public class DalaranKafkaCommit implements DalaranProcessor {

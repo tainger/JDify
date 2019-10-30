@@ -5,7 +5,7 @@ import io.terminus.dalaran.DalaranConstants;
 import io.terminus.dalaran.component.common.HttpMethod;
 import io.terminus.dalaran.component.processor.mapper.DalaranMapperConfig;
 import io.terminus.dalaran.component.processor.soap.SoapClientConfig;
-import io.terminus.dalaran.component.processor.soap.SoapClientConnector;
+import io.terminus.dalaran.component.connector.SoapClientConnector;
 import io.terminus.dalaran.core.context.DalaranContext;
 import io.terminus.dalaran.model.DalaranModelSchema;
 import io.terminus.dalaran.model.HttpProtocol;

@@ -3,7 +3,7 @@ package io.terminus.dalaran.component.trigger.kafka;
 import com.alibaba.fastjson.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.terminus.dalaran.FieldInputType;
-import io.terminus.dalaran.component.processor.kafka.KafkaConnector;
+import io.terminus.dalaran.component.connector.KafkaConnector;
 import io.terminus.dalaran.core.component.annotation.ConfigFieldInfo;
 import io.terminus.dalaran.core.component.config.AllModelConfig;
 import io.terminus.dalaran.core.component.config.ConnectorConfig;

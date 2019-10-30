@@ -28,7 +28,6 @@ import static io.terminus.dalaran.component.processor.mapper.MapperValidationMes
  */
 @Processor(
         value = "mapper-convert",
-        name = "数据映射",
         order = 10,
         configType = DalaranMapperConfig.class
 )

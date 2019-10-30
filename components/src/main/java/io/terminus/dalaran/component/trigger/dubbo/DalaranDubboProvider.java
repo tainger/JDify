@@ -6,7 +6,6 @@ import org.apache.camel.model.RouteDefinition;
 
 @Trigger(
         value = "dubbo-provider",
-        name = "Dubbo 服务提供者",
         order = 12,
         configType = DubboProviderConfig.class
 )

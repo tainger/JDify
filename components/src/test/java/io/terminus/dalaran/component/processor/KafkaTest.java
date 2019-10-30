@@ -3,7 +3,7 @@ package io.terminus.dalaran.component.processor;
 import io.terminus.dalaran.component.BasicProcessorTest;
 import io.terminus.dalaran.component.processor.kafka.DalaranKafkaProducer;
 import io.terminus.dalaran.component.processor.kafka.DalaranKafkaProducerConfig;
-import io.terminus.dalaran.component.processor.kafka.KafkaConnector;
+import io.terminus.dalaran.component.connector.KafkaConnector;
 import org.apache.camel.ProducerTemplate;
 import org.junit.Assert;
 import org.junit.Test;

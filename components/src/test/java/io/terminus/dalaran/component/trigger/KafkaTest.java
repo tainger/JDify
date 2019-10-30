@@ -1,7 +1,7 @@
 package io.terminus.dalaran.component.trigger;
 
 import io.terminus.dalaran.component.BasicTriggerTest;
-import io.terminus.dalaran.component.processor.kafka.KafkaConnector;
+import io.terminus.dalaran.component.connector.KafkaConnector;
 import io.terminus.dalaran.component.trigger.kafka.DalaranKafkaConsumer;
 import io.terminus.dalaran.component.trigger.kafka.DalaranKafkaConsumerConfig;
 import org.apache.kafka.clients.producer.KafkaProducer;

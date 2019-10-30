@@ -1,7 +1,7 @@
 package io.terminus.dalaran.component.processor.ftp;
 
 import io.terminus.dalaran.FieldInputType;
-import io.terminus.dalaran.component.common.FtpUploadConnector;
+import io.terminus.dalaran.component.connector.FtpUploadConnector;
 import io.terminus.dalaran.core.component.annotation.ConfigFieldInfo;
 import io.terminus.dalaran.core.component.config.ConnectorConfig;
 import lombok.Data;

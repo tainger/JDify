@@ -7,7 +7,7 @@ import io.terminus.dalaran.component.BasicProcessorTest;
 import io.terminus.dalaran.component.common.HttpMethod;
 import io.terminus.dalaran.component.processor.http.DalaranHttpClient;
 import io.terminus.dalaran.component.processor.http.HttpClientConfig;
-import io.terminus.dalaran.component.processor.http.HttpClientConnector;
+import io.terminus.dalaran.component.connector.HttpClientConnector;
 import io.terminus.dalaran.model.HttpProtocol;
 import org.apache.camel.ProducerTemplate;
 import org.junit.After;

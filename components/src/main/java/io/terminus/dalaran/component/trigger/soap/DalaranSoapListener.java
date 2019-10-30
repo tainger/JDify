@@ -25,7 +25,6 @@ import java.util.stream.Collectors;
  */
 @Trigger(
         value = "soap-listener",
-        name = "Soap 监听器",
         order = 13,
         configType = SoapListenerConfig.class,
         bodyType = "SOAP"

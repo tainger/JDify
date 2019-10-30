@@ -1,10 +1,13 @@
-package io.terminus.dalaran.component.common;
+package io.terminus.dalaran.component.connector;
 
 import io.terminus.dalaran.FieldInputType;
+import io.terminus.dalaran.component.common.FtpProtocol;
 import io.terminus.dalaran.core.component.annotation.ConfigFieldInfo;
+import io.terminus.dalaran.core.component.annotation.Connector;
 import lombok.Data;
 
 @Data
+@Connector("Ftp")
 public class FtpUploadConnector {
     @ConfigFieldInfo(label = "服务地址", inputType = FieldInputType.String)
     private String host;

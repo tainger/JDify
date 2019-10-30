@@ -1,7 +1,7 @@
 package io.terminus.dalaran.component.processor;
 
 import io.terminus.dalaran.component.BasicProcessorTest;
-import io.terminus.dalaran.component.processor.rocketmq.RocketMQConnector;
+import io.terminus.dalaran.component.connector.RocketMQConnector;
 import io.terminus.dalaran.component.processor.rocketmq.RocketMQProducer;
 import io.terminus.dalaran.component.processor.rocketmq.RocketMQProducerConfig;
 import org.apache.camel.ProducerTemplate;

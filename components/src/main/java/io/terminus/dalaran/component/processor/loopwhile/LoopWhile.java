@@ -19,7 +19,6 @@ import static org.apache.camel.language.mvel.MvelExpression.mvel;
 
 @Processor(
         value = "loop-while",
-        name = "条件循环",
         order = 20,
         configType = LoopWhileConfig.class
 )

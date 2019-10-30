@@ -18,12 +18,12 @@ public class TracingRest implements TracingReadAPI {
     @Autowired
     private TracingLogService tracingLogService;
 
-    @OnException(message = ResponseMessage.TRACE_QUERY_ERROR)
+    @OnException(code = ResponseMessage.TRACE_QUERY_ERROR)
     public List<MainLogDTO> query(TracingLogQuery query) {
         return tracingLogService.triggerLogs(query);
     }
 
-    @OnException(message = ResponseMessage.TRACE_QUERY_ERROR)
+    @OnException(code = ResponseMessage.TRACE_QUERY_ERROR)
     public MainLogDTO logDetail(@PathVariable String recordId) {
         return tracingLogService.getRecordDetail(recordId);
     }

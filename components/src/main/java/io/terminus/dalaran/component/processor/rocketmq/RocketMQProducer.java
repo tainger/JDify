@@ -1,5 +1,6 @@
 package io.terminus.dalaran.component.processor.rocketmq;
 
+import io.terminus.dalaran.component.connector.RocketMQConnector;
 import io.terminus.dalaran.core.component.DalaranProcessor;
 import io.terminus.dalaran.core.component.annotation.Processor;
 import org.apache.camel.model.ProcessorDefinition;
@@ -9,7 +10,6 @@ import org.apache.camel.model.ProcessorDefinition;
  */
 @Processor(
         value = "rocketmq-producer",
-        name = "RocketMQ 消息发送器",
         order = 13,
         bodyType = "JSON",
         configType = RocketMQProducerConfig.class

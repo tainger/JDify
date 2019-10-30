@@ -9,7 +9,6 @@ import org.apache.camel.model.ProcessorDefinition;
  */
 @Processor(
         value = "kafka-producer",
-        name = "Kafka 发送器",
         order = 13,
         bodyType = "JSON",
         configType = DalaranKafkaProducerConfig.class

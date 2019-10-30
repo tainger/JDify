@@ -20,31 +20,31 @@ public class PropertyManagementRest implements PropertyReadAPI, PropertyWriteAPI
     private PropertyManagementService propertyManagementService;
 
     @Override
-    @OnException(message = ResponseMessage.PROPERTY_CREATE_ERROR)
+    @OnException(code = ResponseMessage.PROPERTY_CREATE_ERROR)
     public Long create(@RequestBody PropertyDTO model) {
         return propertyManagementService.createProperty(model);
     }
 
     @Override
-    @OnException(message = ResponseMessage.PROPERTY_UPDATE_ERROR)
+    @OnException(code = ResponseMessage.PROPERTY_UPDATE_ERROR)
     public PropertyDTO update(@RequestBody PropertyDTO model) {
         return propertyManagementService.updateProperty(model);
     }
 
     @Override
-    @OnException(message = ResponseMessage.PROPERTY_DELETE_ERROR)
+    @OnException(code = ResponseMessage.PROPERTY_DELETE_ERROR)
     public void deleteById(@RequestBody Long id) {
         propertyManagementService.deleteProperty(id);
     }
 
     @Override
-    @OnException(message = ResponseMessage.PROPERTY_QUERY_ERROR)
+    @OnException(code = ResponseMessage.PROPERTY_QUERY_ERROR)
     public List<PropertyDTO> query(PropertyQuery query) {
         return propertyManagementService.queryProperties(query);
     }
 
     @Override
-    @OnException(message = ResponseMessage.PROCESSOR_QUERY_ERROR)
+    @OnException(code = ResponseMessage.PROCESSOR_QUERY_ERROR)
     public List<PropertyDTO> list() {
         return propertyManagementService.list();
     }

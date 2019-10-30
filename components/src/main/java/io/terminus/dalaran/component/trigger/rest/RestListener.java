@@ -24,7 +24,6 @@ import java.util.stream.Collectors;
 
 @Trigger(
         value = {"http-rest-listener", "netty-http-listener"},
-        name = "Rest 监听器",
         order = 10,
         configType = RestConfig.class,
         bodyType = "JSON"

@@ -9,6 +9,7 @@ import io.terminus.dalaran.console.entity.ServiceEntity;
 import io.terminus.dalaran.console.repository.ServiceRepository;
 import io.terminus.dalaran.console.service.ExportService;
 import io.terminus.dalaran.console.service.ServiceManagement;
+import io.terminus.dalaran.model.component.ServiceOperation;
 import io.terminus.dalaran.model.dto.ServiceDTO;
 import io.terminus.dalaran.model.dto.basic.BasicServiceInfo;
 import org.junit.Assert;
@@ -81,7 +82,7 @@ public class ServiceManagementServiceTest {
 
     @Test
     public void listOperation() {
-        List<String> operations = serviceManagement.listOperation(1L);
+        List<ServiceOperation> operations = serviceManagement.listOperation(1L);
         Assert.assertNotNull(operations);
     }
 

@@ -1,5 +1,6 @@
 package io.terminus.dalaran.component.processor.sql;
 
+import io.terminus.dalaran.component.connector.SqlDataSourceConnector;
 import io.terminus.dalaran.core.component.DalaranProcessor;
 import io.terminus.dalaran.core.component.annotation.Processor;
 import org.apache.camel.model.ProcessorDefinition;
@@ -10,7 +11,6 @@ import javax.sql.DataSource;
 
 @Processor(
         value = "sql",
-        name = "执行 SQL",
         order = 12,
         configType = SqlConfig.class
 )

@@ -4,15 +4,24 @@ import com.alibaba.fastjson.annotation.JSONField;
 import io.terminus.dalaran.ComponentType;
 import lombok.Data;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Data
 public class ConnectorInfo {
 
-    private ComponentType componentType;
+    private String name;
 
-    private String component;
+    private final List<String> components = new ArrayList<>();
+
+    private Integer order;
 
     private DalaranConfigField[] configFields;
 
     @JSONField(serialize = false)
     private Class connectorType;
+
+    public void addComponent(String component) {
+        components.add(component);
+    }
 }

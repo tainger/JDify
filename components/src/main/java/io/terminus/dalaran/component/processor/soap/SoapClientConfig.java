@@ -4,6 +4,7 @@ import com.alibaba.fastjson.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.terminus.dalaran.FieldInputType;
 import io.terminus.dalaran.component.common.HttpMethod;
+import io.terminus.dalaran.component.connector.SoapClientConnector;
 import io.terminus.dalaran.core.component.annotation.ConfigFieldInfo;
 import io.terminus.dalaran.core.component.config.ComponentModelConfig;
 import io.terminus.dalaran.core.component.config.ConnectorConfig;

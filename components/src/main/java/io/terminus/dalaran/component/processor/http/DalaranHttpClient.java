@@ -4,6 +4,7 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Maps;
 import io.terminus.dalaran.DalaranConstants;
+import io.terminus.dalaran.component.connector.HttpClientConnector;
 import io.terminus.dalaran.core.component.DalaranMessageBodyCustomConverter;
 import io.terminus.dalaran.core.component.DalaranProcessor;
 import io.terminus.dalaran.core.component.annotation.Processor;
@@ -20,7 +21,6 @@ import static org.apache.camel.Exchange.HTTP_QUERY;
 
 @Processor(
         value = "http-client",
-        name = "Http 调用器",
         order = 11,
         configType = HttpClientConfig.class,
         bodyType = "JSON"

@@ -11,7 +11,9 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 public @interface OnException {
 
-    String message();
+    String code();
+
+    String exceptionMessage() default "";
 
     Class<? extends DalaranException> exception() default DalaranException.class;
 }

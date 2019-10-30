@@ -5,7 +5,8 @@ import io.terminus.dalaran.exception.DalaranThrowable;
 public final class DalaranExceptionBuilder<T extends DalaranThrowable> {
 
     private Class<T> exceptionClass;
-    private String message;
+    private String code;
+    private String exceptionMessage;
 
     public static DalaranExceptionBuilder newBuilder() {
         return new DalaranExceptionBuilder();
@@ -19,8 +20,8 @@ public final class DalaranExceptionBuilder<T extends DalaranThrowable> {
         return buildException(exceptionClass, null);
     }
 
-    public static <T extends DalaranThrowable> T build(Class<T> exceptionClass, String message) {
-        return buildException(exceptionClass, message);
+    public static <T extends DalaranThrowable> T build(Class<T> exceptionClass, String code) {
+        return buildException(exceptionClass, code);
     }
 
     public final DalaranExceptionBuilder exception(Class<T> exceptionClass) {
@@ -28,19 +29,24 @@ public final class DalaranExceptionBuilder<T extends DalaranThrowable> {
         return this;
     }
 
-    public final DalaranExceptionBuilder message(String message) {
-        this.message = message;
+    public final DalaranExceptionBuilder code(String code) {
+        this.code = code;
+        return this;
+    }
+
+    public final DalaranExceptionBuilder exceptionMessage(String exceptionMessage) {
+        this.exceptionMessage = exceptionMessage;
         return this;
     }
 
     public final T build() {
-        return buildException(this.exceptionClass, this.message);
+        return buildException(this.exceptionClass, this.code);
     }
 
-    private static <T extends DalaranThrowable> T buildException(Class<T> exceptionClass, String message) {
+    private static <T extends DalaranThrowable> T buildException(Class<T> exceptionClass, String exceptionMessage) {
         try {
             T dalaranThrowable = exceptionClass.newInstance();
-            dalaranThrowable.setMessage(message);
+            dalaranThrowable.setMessage(exceptionMessage);
             return dalaranThrowable;
         } catch (InstantiationException | IllegalAccessException e) {
             e.printStackTrace();

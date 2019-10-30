@@ -5,7 +5,7 @@ import com.alibaba.dubbo.config.RegistryConfig;
 import com.alibaba.dubbo.config.ServiceConfig;
 import com.alibaba.dubbo.rpc.service.GenericService;
 import io.terminus.dalaran.component.BasicProcessorTest;
-import io.terminus.dalaran.component.common.DubboRegistryConnector;
+import io.terminus.dalaran.component.connector.DubboRegistryConnector;
 import io.terminus.dalaran.component.processor.dubbo.DalaranDubboConsumer;
 import io.terminus.dalaran.component.processor.dubbo.DalaranDubboConsumerConfig;
 import org.apache.camel.ProducerTemplate;
