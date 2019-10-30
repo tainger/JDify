@@ -1,6 +1,5 @@
 package io.terminus.dalaran.model.dto.basic;
 
-import io.terminus.dalaran.ComponentType;
 import lombok.Data;
 
 @Data
@@ -11,18 +10,15 @@ public class BasicConnectorInfo {
 
     private String name;
 
-    private ComponentType componentType;
-
-    private String componentName;
+    private String connectorType;
 
     public BasicConnectorInfo() {
     }
 
-    public BasicConnectorInfo(Long id, Long moduleId, String name, ComponentType componentType, String componentName) {
+    public BasicConnectorInfo(Long id, Long moduleId, String name, String connectorType) {
         this.id = id;
         this.moduleId = moduleId;
         this.name = name;
-        this.componentType = componentType;
-        this.componentName = componentName;
+        this.connectorType = connectorType;
     }
 }

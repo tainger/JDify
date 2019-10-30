@@ -1,7 +1,6 @@
 package io.terminus.dalaran.rest.read;
 
 import io.swagger.annotations.ApiOperation;
-import io.terminus.dalaran.ComponentType;
 import io.terminus.dalaran.model.dto.ConnectorDTO;
 import io.terminus.dalaran.model.dto.basic.BasicConnectorInfo;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,5 +19,5 @@ public interface ConnectorReadAPI {
 
     @GetMapping("/option")
     @ApiOperation("获取连接器可选项")
-    List<BasicConnectorInfo> selectOptions(@RequestParam ComponentType componentType, @RequestParam String componentName);
+    List<BasicConnectorInfo> selectOptions(@RequestParam String connectorType);
 }
