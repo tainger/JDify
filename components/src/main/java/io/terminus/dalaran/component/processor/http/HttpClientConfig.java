@@ -4,21 +4,21 @@ import com.alibaba.fastjson.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.terminus.dalaran.FieldInputType;
 import io.terminus.dalaran.component.common.HttpMethod;
-import io.terminus.dalaran.component.connector.HttpClientConnector;
+import io.terminus.dalaran.component.connector.RestClientConnector;
 import io.terminus.dalaran.core.component.annotation.ConfigFieldInfo;
 import io.terminus.dalaran.core.component.config.ConnectorConfig;
 import io.terminus.dalaran.core.component.config.OutModelConfig;
 import lombok.Data;
 
 @Data
-public class HttpClientConfig extends OutModelConfig implements ConnectorConfig<HttpClientConnector> {
+public class HttpClientConfig extends OutModelConfig implements ConnectorConfig<RestClientConnector> {
 
     @ConfigFieldInfo(inputType = FieldInputType.Hidden)
     @JSONField(serialize = false)
     @JsonIgnore
-    private HttpClientConnector connector;
+    private RestClientConnector connector;
 
-    @ConfigFieldInfo(label = "Http 连接器", inputType = FieldInputType.Connector, connectorType = HttpClientConnector.class)
+    @ConfigFieldInfo(label = "Http 连接器", inputType = FieldInputType.Connector, connectorType = RestClientConnector.class)
     private Long connectorId;
 
     @ConfigFieldInfo(label = "Http Method", inputType = FieldInputType.Select, defaultValue = "GET")

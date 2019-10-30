@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Created by jingdi on 2019/4/1
@@ -92,10 +93,11 @@ public class ModuleManagementServiceImpl implements ModuleManagementService {
 
     @Override
     public ModuleDetailDTO getModuleDetail(Long moduleId) {
-        ModuleEntity moduleEntity = moduleRepository.findById(moduleId).get();
-        if (moduleEntity == null) {
+        Optional<ModuleEntity> moduleEntityOptional = moduleRepository.findById(moduleId);
+        if (!moduleEntityOptional.isPresent()) {
             return null;
         }
+        ModuleEntity moduleEntity = moduleEntityOptional.get();
         ModuleDetailDTO moduleDetail = new ModuleDetailDTO();
         moduleDetail.setId(moduleEntity.getId());
         moduleDetail.setName(moduleEntity.getName());
