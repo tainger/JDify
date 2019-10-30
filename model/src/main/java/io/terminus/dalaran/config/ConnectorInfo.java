@@ -1,7 +1,6 @@
 package io.terminus.dalaran.config;
 
 import com.alibaba.fastjson.annotation.JSONField;
-import io.terminus.dalaran.ComponentType;
 import lombok.Data;
 
 import java.util.ArrayList;
