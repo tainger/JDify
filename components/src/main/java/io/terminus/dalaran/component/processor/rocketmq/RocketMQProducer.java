@@ -44,7 +44,7 @@ public class RocketMQProducer implements DalaranProcessor<RocketMQProducerConfig
         if (!DalaranConstants.OBJECT_MODEL_TYPE.equalsIgnoreCase(currentBodyType) && !DalaranConstants.UNKNOWN_MODEL_TYPE.equalsIgnoreCase(currentBodyType)) {
             converterContext.toObject(route, config.getInModel(), currentBodyType);
         }
-
+//        route.split(body());
 
         return false;
     }

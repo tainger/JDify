@@ -3,6 +3,7 @@ package io.terminus.dalaran.service.soap;
 import com.predic8.schema.*;
 import com.predic8.wsdl.*;
 import com.predic8.wsdl.soap11.SOAPHeader;
+import groovy.xml.QName;
 import io.terminus.dalaran.DalaranConstants;
 import io.terminus.dalaran.component.common.HttpMethod;
 import io.terminus.dalaran.core.component.DalaranService;
@@ -117,7 +118,7 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
             service.getPorts().forEach(port -> {
                 List<SoapOperationConfig> operations = soapOperationConfigMap.get(port.getBindingPN().getLocalName());
                 String location = StringUtils.substringAfter(port.getAddress().getLocation(), "://");
-                if (StringUtils.isNotBlank(wsdlImportConfig.getUsername()) && StringUtils.isNotBlank(wsdlImportConfig.getPassword())) {
+                if (StringUtils.isNotBlank(wsdlImportConfig.getUsername()) && StringUtils.isNotBlank(wsdlImportConfig.getPassword()) && !wsdlImportConfig.getUseHeader()) {
                     location = location + "&authMethod=Basic&authUsername=" + wsdlImportConfig.getUsername() + "&authPassword=" + wsdlImportConfig.getPassword();
                 }
                 String operationUrl = location;
@@ -171,6 +172,7 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
         if (operationConfig.getUseHeader()) {
             MessageModel header = buildModel(definitions.getMessage(soapOperation.getInputHeader()), schemaOperation, schemaModel);
             schemaOperation.setHeader(header);
+            schemaOperation.setHeaderValues(operationConfig.getHeaderValues());
         }
 
         MessageModel inModel = buildModel(definitions.getMessage(inputName), schemaOperation, schemaModel);
@@ -318,26 +320,31 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
         ModelField modelField = new ModelField();
         Element element = (Element) p;
         String name = element.getName();
-        String elementType = element.getType().getLocalPart();
-        if (schemaModel.getComplexTypes().containsKey(elementType) && !schemaModel.getSimpleTypes().containsKey(elementType)) {
-            if (element.getArrayType() == null && (StringUtils.equalsIgnoreCase(element.getMaxOccurs(), "0") || StringUtils.equalsIgnoreCase(element.getMaxOccurs(), "1"))) {
-                modelField.setType(FieldType.OBJECT);
-            } else {
-                modelField.setType(FieldType.ARRAY);
-                modelField.setSubType(FieldType.OBJECT);
-            }
-            buildWithoutRootPath(modelField, schema, elementType, schemaModel);
+        QName type = element.getType();
+        if (type == null) {
+            ComplexType complexType = element.getEmbeddedType()
         } else {
-            FieldType fieldType = getFieldType(elementType);
-            if (element.getArrayType() == null
-                    && (StringUtils.equalsIgnoreCase(element.getMaxOccurs(), "0") || StringUtils.equalsIgnoreCase(element.getMaxOccurs(), "1"))) {
-                modelField.setType(fieldType);
+            String elementType = type.getLocalPart();
+            if (schemaModel.getComplexTypes().containsKey(elementType) && !schemaModel.getSimpleTypes().containsKey(elementType)) {
+                if (element.getArrayType() == null && (StringUtils.equalsIgnoreCase(element.getMaxOccurs(), "0") || StringUtils.equalsIgnoreCase(element.getMaxOccurs(), "1"))) {
+                    modelField.setType(FieldType.OBJECT);
+                } else {
+                    modelField.setType(FieldType.ARRAY);
+                    modelField.setSubType(FieldType.OBJECT);
+                }
+                buildWithoutRootPath(modelField, schema, elementType, schemaModel);
             } else {
-                modelField.setType(FieldType.ARRAY);
-                modelField.setSubType(fieldType);
+                FieldType fieldType = getFieldType(elementType);
+                if (element.getArrayType() == null
+                        && (StringUtils.equalsIgnoreCase(element.getMaxOccurs(), "0") || StringUtils.equalsIgnoreCase(element.getMaxOccurs(), "1"))) {
+                    modelField.setType(fieldType);
+                } else {
+                    modelField.setType(FieldType.ARRAY);
+                    modelField.setSubType(fieldType);
+                }
             }
+            current.put(name, modelField);
         }
-        current.put(name, modelField);
     }
 
     private void buildByEmbeddedTypeWithoutRootPath(ModelField field, Element element, Schema schema, SchemaModel schemaModel) {

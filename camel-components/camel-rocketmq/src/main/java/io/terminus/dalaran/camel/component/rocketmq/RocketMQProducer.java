@@ -1,5 +1,7 @@
 package io.terminus.dalaran.camel.component.rocketmq;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import org.apache.camel.Exchange;
 import org.apache.camel.impl.DefaultProducer;
 import org.apache.commons.lang3.StringUtils;
@@ -13,7 +15,6 @@ import org.apache.rocketmq.common.message.Message;
 import org.apache.rocketmq.remoting.RPCHook;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -62,7 +63,7 @@ public class RocketMQProducer extends DefaultProducer {
             producer.send(message, new SendCallback() {
                 @Override
                 public void onSuccess(SendResult sendResult) {
-                    exchange.getOut().setBody(sendResult);
+                    exchange.getOut().setBody(JSON.toJSON(sendResult));
                 }
 
                 @Override
@@ -75,13 +76,13 @@ public class RocketMQProducer extends DefaultProducer {
 
     private List<Message> buildMessage(Exchange exchange, Boolean messageSharding) {
         List<Message> messages = new ArrayList<>();
-        org.apache.camel.Message camelMsg = exchange.getIn();
-        Object body = camelMsg.getBody();
+        Object body = exchange.getIn().getBody();
         if (body == null) {
             return messages;
         }
-        if (messageSharding && body instanceof Collection) {
-            List<Object> msgs = (List) body;
+        Object json = JSON.toJSON(body);
+        if (messageSharding && json instanceof JSONArray) {
+            List<Object> msgs = (List) json;
             msgs.forEach(msg -> {
                 messages.add(build(msg));
             });
@@ -103,6 +104,10 @@ public class RocketMQProducer extends DefaultProducer {
                 message.setBody((byte[]) body);
             } else if (body instanceof String) {
                 message.setBody(((String) body).getBytes());
+            } else if (body instanceof JSON) {
+                message.setBody(body.toString().getBytes());
+            } else if (body instanceof Object) {
+                message.setBody(JSON.toJSONString(body).getBytes());
             } else {
                 throw new RuntimeException("no support body type;");
             }

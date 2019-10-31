@@ -54,7 +54,7 @@ public class ObjectToSoapProcessor implements Processor, Traceable {
         buildBody(modelField.getFields(), body, soapBody);
         if (soapOperationConfig.getHeader() != null) {
             SOAPHeader header = soapEnvelope.getHeader();
-            buildHeader(soapOperationConfig.getHeader().getModelSchema().getFields(), soapOperationConfig.getHeaderValues(), header);
+            buildHeader(soapOperationConfig.getHeader().getModelSchema().getFields().get(DalaranConstants.MODEL_ROOT).getFields(), soapOperationConfig.getHeaderValues(), header);
         }
         message.saveChanges();
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
@@ -126,10 +126,10 @@ public class ObjectToSoapProcessor implements Processor, Traceable {
                 SOAPElement element = soapElement.addChildElement(name, PREFIX);
                 element.addNamespaceDeclaration("", soapOperationConfig.getTargetNamespace());
                 Map<String, ModelField> child = field.getFields();
-                buildBody(child, values, element);
+                buildHeader(child, values, element);
             } else {
-                SOAPElement element = soapElement.addChildElement(name);
-                element.addTextNode(values.get(name).toString());
+                SOAPElement element = soapElement.addChildElement(name, PREFIX);
+                element.addTextNode(values.getOrDefault(name, "").toString());
             }
         }
     }

@@ -117,6 +117,8 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
         route.from(DalaranConstants.TEST_FLOW_DIRECT_PREFIX + flow.getRouteId());
         if (flow.getInModel() == null) {
             buildFlowRoute(route, flow, tracingType, "UNKNOWN");
+        } else if (flow.getInModel().getModelType().equals("OBJECT")) {
+            buildFlowRoute(route, flow, tracingType, "JSON");
         } else {
             buildFlowRoute(route, flow, tracingType, flow.getInModel().getModelType());
         }
