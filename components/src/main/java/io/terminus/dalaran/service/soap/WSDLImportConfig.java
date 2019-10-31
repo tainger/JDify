@@ -10,12 +10,12 @@ import lombok.Data;
 @Data
 public class WSDLImportConfig {
 
-    @ConfigFieldInfo(label = "wsdl url", inputType = FieldInputType.String)
+    @ConfigFieldInfo(label = "WSDL Url", inputType = FieldInputType.String)
     private String wsdlUrl;
 
-    @ConfigFieldInfo(label = "用户名", inputType = FieldInputType.String, required = false)
+    @ConfigFieldInfo(label = "Username", inputType = FieldInputType.String, required = false)
     private String username;
 
-    @ConfigFieldInfo(label = "密码", inputType = FieldInputType.String, required = false)
+    @ConfigFieldInfo(label = "Password", inputType = FieldInputType.String, required = false)
     private String password;
 }

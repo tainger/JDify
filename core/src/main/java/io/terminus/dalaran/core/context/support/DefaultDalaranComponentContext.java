@@ -14,13 +14,12 @@ import io.terminus.dalaran.core.context.DalaranComponentContext;
 import io.terminus.dalaran.core.util.ConfigFieldUtils;
 import io.terminus.dalaran.core.util.I18nUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -65,22 +64,57 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext {
 
     @Override
     public Collection<TriggerInfo> getAllTriggerInfo() {
-        return triggerInfoMapping.values().stream()
-                .sorted(Comparator.comparingInt(AbstractComponentInfo::getOrder))
+        return triggerInfoMapping.values().stream().map(triggerInfo -> {
+            TriggerInfo newTriggerInfo = new TriggerInfo();
+            BeanUtils.copyProperties(triggerInfo, newTriggerInfo);
+            newTriggerInfo.setName(i18nUtils.getComponentName(triggerInfo.getType()));
+            List<DalaranConfigField> fields = new ArrayList<>();
+            for (DalaranConfigField configField : newTriggerInfo.getConfigFields()) {
+                DalaranConfigField i18nField = new DalaranConfigField();
+                fields.add(i18nField);
+                BeanUtils.copyProperties(configField, i18nField);
+                i18nField.setLabel(i18nUtils.getComponentFieldLabel(newTriggerInfo.getType(), configField.getName()));
+            }
+            newTriggerInfo.setConfigFields(fields.toArray(new DalaranConfigField[0]));
+            return newTriggerInfo;
+        }).sorted(Comparator.comparingInt(AbstractComponentInfo::getOrder))
                 .collect(Collectors.toList());
     }
 
     @Override
     public Collection<ConnectorInfo> getAllConnectorInfo() {
-        return connectorInfoMapping.values().stream()
-                .sorted(Comparator.comparingInt(ConnectorInfo::getOrder))
+        return connectorInfoMapping.values().stream().map(connectorInfo -> {
+            ConnectorInfo newConnectorInfo = new ConnectorInfo();
+            BeanUtils.copyProperties(connectorInfo, newConnectorInfo);
+            List<DalaranConfigField> fields = new ArrayList<>();
+            for (DalaranConfigField configField : newConnectorInfo.getConfigFields()) {
+                DalaranConfigField i18nField = new DalaranConfigField();
+                fields.add(i18nField);
+                BeanUtils.copyProperties(configField, i18nField);
+                i18nField.setLabel(i18nUtils.getConnectorFieldLabel(connectorInfo.getName(), configField.getName()));
+            }
+            newConnectorInfo.setConfigFields(fields.toArray(new DalaranConfigField[0]));
+            return newConnectorInfo;
+        }).sorted(Comparator.comparingInt(ConnectorInfo::getOrder))
                 .collect(Collectors.toList());
     }
 
     @Override
     public Collection<ProcessorInfo> getAllProcessorInfo() {
-        return processorInfoMapping.values().stream()
-                .sorted(Comparator.comparingInt(AbstractComponentInfo::getOrder))
+        return processorInfoMapping.values().stream().map(processorInfo -> {
+            ProcessorInfo newProcessorInfo = new ProcessorInfo();
+            BeanUtils.copyProperties(processorInfo, newProcessorInfo);
+            newProcessorInfo.setName(i18nUtils.getComponentName(processorInfo.getType()));
+            List<DalaranConfigField> fields = new ArrayList<>();
+            for (DalaranConfigField configField : newProcessorInfo.getConfigFields()) {
+                DalaranConfigField i18nField = new DalaranConfigField();
+                fields.add(i18nField);
+                BeanUtils.copyProperties(configField, i18nField);
+                i18nField.setLabel(i18nUtils.getComponentFieldLabel(newProcessorInfo.getType(), configField.getName()));
+            }
+            newProcessorInfo.setConfigFields(fields.toArray(new DalaranConfigField[0]));
+            return newProcessorInfo;
+        }).sorted(Comparator.comparingInt(AbstractComponentInfo::getOrder))
                 .collect(Collectors.toList());
     }
 
@@ -93,7 +127,7 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext {
             TriggerInfo triggerInfo = new TriggerInfo();
             triggerInfo.setOutdated(i != 0);
             triggerInfo.setType(triggerType);
-            triggerInfo.setName(i18nUtils.getComponentMessage(triggerType));
+            triggerInfo.setName(triggerType);
             triggerInfo.setOrder(triggerAnnotation.order());
             triggerInfo.setConfigFields(configFields);
             triggerInfo.setConfigType(triggerAnnotation.configType());
@@ -132,7 +166,7 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext {
             processorInfo.setOutdated(i != 0);
             processorInfo.setType(processorType);
 
-            processorInfo.setName(i18nUtils.getComponentMessage(processorType));
+            processorInfo.setName(processorType);
             processorInfo.setOrder(processorAnnotation.order());
             processorInfo.setConfigFields(configFields);
             processorInfo.setConfigType(processorAnnotation.configType());
