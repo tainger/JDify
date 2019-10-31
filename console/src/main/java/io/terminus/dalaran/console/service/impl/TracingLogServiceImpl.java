@@ -22,6 +22,7 @@ import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -134,11 +135,8 @@ public class TracingLogServiceImpl implements TracingLogService {
 
         tracingLog.setProcessorId(log.getProcessorId());
         tracingLog.setFlowId(log.getFlowId());
-        TriggerFlowEntity flowEntity = flowRepository.findById(log.getFlowId()).get();
-        if (flowEntity != null) {
-            tracingLog.setFlowName(flowEntity.getName());
-        }
-
+        Optional<TriggerFlowEntity> flowEntityOptional = flowRepository.findById(log.getFlowId());
+        flowEntityOptional.ifPresent(triggerFlowEntity -> tracingLog.setFlowName(triggerFlowEntity.getName()));
         return tracingLog;
     }
 }
