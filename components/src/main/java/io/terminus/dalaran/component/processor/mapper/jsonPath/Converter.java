@@ -139,7 +139,7 @@ public class Converter {
         String name = parentPath + "." + field.getName();
         if (field.getLocal() == FieldLocal.MIDDLE) {
             SimpleMappingField child = field.getChild();
-            if (field.getType() == FieldType.ARRAY) {
+            if (field.getType() == FieldType.ARRAY && arrayFieldSize.size() > level) {
                 int bodySize = arrayFieldSize.get(level++);
                 for (int i = 0; i < bodySize; i++) {
                     StringBuilder index = new StringBuilder();

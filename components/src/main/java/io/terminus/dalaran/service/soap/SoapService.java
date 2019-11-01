@@ -322,7 +322,26 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
         String name = element.getName();
         QName type = element.getType();
         if (type == null) {
-            ComplexType complexType = element.getEmbeddedType()
+            if (element.getArrayType() == null && (StringUtils.equalsIgnoreCase(element.getMaxOccurs(), "0") || StringUtils.equalsIgnoreCase(element.getMaxOccurs(), "1"))) {
+                modelField.setType(FieldType.OBJECT);
+            } else {
+                modelField.setType(FieldType.ARRAY);
+                modelField.setSubType(FieldType.OBJECT);
+            }
+
+            ComplexType complexType = (ComplexType) element.getEmbeddedType();
+            if (complexType == null) {
+                return;
+            }
+            if (complexType.getSequence() == null || CollectionUtils.isEmpty(complexType.getSequence().getParticles())) {
+                return;
+            }
+            List<SchemaComponent> particles = complexType.getSequence().getParticles();
+            Map<String, ModelField> child = new HashMap<>();
+            particles.forEach(particle -> {
+                handleSchemaComponent(particle, schema, child, schemaModel);
+            });
+            modelField.setFields(child);
         } else {
             String elementType = type.getLocalPart();
             if (schemaModel.getComplexTypes().containsKey(elementType) && !schemaModel.getSimpleTypes().containsKey(elementType)) {
@@ -343,8 +362,8 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
                     modelField.setSubType(fieldType);
                 }
             }
-            current.put(name, modelField);
         }
+        current.put(name, modelField);
     }
 
     private void buildByEmbeddedTypeWithoutRootPath(ModelField field, Element element, Schema schema, SchemaModel schemaModel) {

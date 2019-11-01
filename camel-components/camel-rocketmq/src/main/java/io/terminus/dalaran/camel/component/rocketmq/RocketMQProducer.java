@@ -63,7 +63,7 @@ public class RocketMQProducer extends DefaultProducer {
             producer.send(message, new SendCallback() {
                 @Override
                 public void onSuccess(SendResult sendResult) {
-                    exchange.getOut().setBody(JSON.toJSON(sendResult));
+                    exchange.getOut().setBody(JSON.toJSON(new DalaranSendResult(sendResult, messages.size())));
                 }
 
                 @Override
