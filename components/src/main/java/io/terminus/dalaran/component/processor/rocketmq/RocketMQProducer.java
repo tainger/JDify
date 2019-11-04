@@ -25,14 +25,14 @@ public class RocketMQProducer implements DalaranProcessor<RocketMQProducerConfig
     private DalaranModelTypeContext converterContext;
 
     private static final String CAMEL_ROCKET_MQ_URI = "rocketmq:?nameServer=%s&groupId=%s&topic=%s&tags=%s&useAliCloudOns=%s&accessKey=%s&secretKey=%s" +
-            "&messageSharding=%s";
+            "&messageSharding=%s&timeout=%s&async=%s";
 
     @Override
     public void configure(ProcessorDefinition route, RocketMQProducerConfig config) {
         RocketMQConnector connector = config.getConnector();
         String uri = String.format(CAMEL_ROCKET_MQ_URI, connector.getNameServer(), config.getProducerGroup(),
                 config.getTopic(), config.getTags(), connector.getUseAliCloudOns(),
-                connector.getAccessKey(), connector.getSecretKey(), config.isMessageSharding());
+                connector.getAccessKey(), connector.getSecretKey(), config.isMessageSharding(), connector.getTimeout(), config.getAsync());
         route.to(uri);
     }
 
@@ -44,8 +44,6 @@ public class RocketMQProducer implements DalaranProcessor<RocketMQProducerConfig
         if (!DalaranConstants.OBJECT_MODEL_TYPE.equalsIgnoreCase(currentBodyType) && !DalaranConstants.UNKNOWN_MODEL_TYPE.equalsIgnoreCase(currentBodyType)) {
             converterContext.toObject(route, config.getInModel(), currentBodyType);
         }
-//        route.split(body());
-
         return false;
     }
 }

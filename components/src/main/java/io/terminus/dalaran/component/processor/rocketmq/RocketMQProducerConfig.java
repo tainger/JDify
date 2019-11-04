@@ -27,4 +27,7 @@ public class RocketMQProducerConfig extends DalaranMQProducerConfig implements C
 
     @ConfigFieldInfo(label = "tag", inputType = FieldInputType.String, required = false)
     private String tags;
+
+    @ConfigFieldInfo(label = "异步发送", inputType = FieldInputType.Switch, required = false)
+    private Boolean async = false;
 }

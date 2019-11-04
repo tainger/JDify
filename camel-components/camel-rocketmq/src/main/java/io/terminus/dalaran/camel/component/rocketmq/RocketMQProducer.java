@@ -16,6 +16,9 @@ import org.apache.rocketmq.remoting.RPCHook;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by jingdi on 2019/6/14
@@ -25,6 +28,9 @@ public class RocketMQProducer extends DefaultProducer {
     private DefaultMQProducer producer;
 
     private RocketMQEndpoint endpoint;
+
+    private ThreadPoolExecutor executor = new ThreadPoolExecutor(10, 10,
+            1000, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>());
 
     public RocketMQProducer(RocketMQEndpoint endpoint) {
         super(endpoint);
@@ -46,6 +52,8 @@ public class RocketMQProducer extends DefaultProducer {
                 producer.setAccessChannel(AccessChannel.LOCAL);
             }
             producer.setNamesrvAddr(endpoint.getNameServer());
+            producer.setSendMsgTimeout(endpoint.getTimeout());
+            producer.setMaxMessageSize(41943040);
             producer.start();
         }
     }
@@ -59,18 +67,32 @@ public class RocketMQProducer extends DefaultProducer {
     @Override
     public void process(Exchange exchange) throws Exception {
         List<Message> messages = buildMessage(exchange, endpoint.getMessageSharding());
-        for (Message message : messages) {
-            producer.send(message, new SendCallback() {
-                @Override
-                public void onSuccess(SendResult sendResult) {
-                    exchange.getOut().setBody(JSON.toJSON(new DalaranSendResult(sendResult, messages.size())));
-                }
+        Boolean async = endpoint.getAsync();
+        if (async) {
+            for (Message message : messages) {
+                producer.send(message, new SendCallback() {
+                    @Override
+                    public void onSuccess(SendResult sendResult) {
+                        exchange.getOut().setBody(JSON.toJSON(new DalaranSendResult(sendResult, messages.size())));
+                    }
 
-                @Override
-                public void onException(Throwable e) {
-                    e.printStackTrace();
+                    @Override
+                    public void onException(Throwable e) {
+                        e.printStackTrace();
+                    }
+                });
+            }
+        } else {
+            executor.execute(() -> {
+                for (Message message: messages) {
+                    try {
+                        producer.send(message);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
             });
+            exchange.getOut().setBody(JSON.toJSON(new DalaranSendResult(null, messages.size())));
         }
     }
 

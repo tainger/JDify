@@ -21,4 +21,7 @@ public class RocketMQConnector {
 
     @ConfigFieldInfo(label = "ACL secretKey", inputType = FieldInputType.String, required = false)
     private String secretKey;
+
+    @ConfigFieldInfo(label = "超时时间", inputType = FieldInputType.String, required = false)
+    private Integer timeout = 3000;
 }
