@@ -21,9 +21,9 @@ public class WSDLImportConfig {
     @ConfigFieldInfo(label = "密码", inputType = FieldInputType.String, required = false)
     private String password;
 
-    @ConfigFieldInfo(label = "使用头信息", inputType = FieldInputType.Switch, required = false)
+//    @ConfigFieldInfo(label = "使用头信息", inputType = FieldInputType.Switch, required = false)
     private Boolean useHeader = false;
 
-    @ConfigFieldInfo(label = "头信息配置", inputType = FieldInputType.Auto, required = false)
+//    @ConfigFieldInfo(label = "头信息配置", inputType = FieldInputType.Auto, required = false)
     private Map<String, Object> headerValues;
 }
