@@ -16,13 +16,16 @@ import io.terminus.dalaran.model.MessageModel;
 import io.terminus.dalaran.model.component.ProcessorModel;
 import io.terminus.dalaran.model.flow.*;
 import lombok.val;
+import org.apache.camel.builder.Builder;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static io.terminus.dalaran.DalaranConstants.*;
 import static io.terminus.dalaran.core.flow.DefaultFlowValidateMessages.FIELD_NOT_NULL;
@@ -229,6 +232,8 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
 
     // TODO 这里还是比较乱的...
     private void buildFlowRoute(DalaranRoute route, BasicFlow flow, TracingType flowTracingType, @NotNull String currentBodyType) {
+        Map context = new HashMap<>();
+        route.setProperty(DALARAN_CONTEXT_EXCHANGE, Builder.constant(context));
         DalaranTracer flowTracer = null;
         if (flow.isTracing() && flowTracingType != null) {
             flowTracer = DalaranTracer.buildTracer(traceLogger, flowTracingType);
