@@ -34,58 +34,58 @@ public class SubFlowManagementRest implements SubFlowReadAPI, SubFlowWriteAPI {
     private DalaranContext dalaranContext;
 
     @Override
-    @OnException(message = ResponseMessage.SUBFLOW_CREATE_ERROR)
+    @OnException(code = ResponseMessage.SUB_FLOW_CREATE_ERROR)
     public Long create(@RequestBody SubFlowDTO model) {
         return service.createFlow(model);
     }
 
     @Override
-    @OnException(message = ResponseMessage.SUBFLOW_UPDATE_ERROR)
+    @OnException(code = ResponseMessage.SUB_FLOW_UPDATE_ERROR)
     public SubFlowDTO update(@RequestBody SubFlowDTO model) {
         return service.updateFlow(model);
     }
 
     @Override
-    @OnException(message = ResponseMessage.SUBFLOW_DELETE_ERROR)
+    @OnException(code = ResponseMessage.SUB_FLOW_DELETE_ERROR)
     public void deleteById(@RequestParam Long id) {
         service.deleteFlow(id);
     }
 
     @Override
-    @OnException(message = ResponseMessage.SUBFLOW_COPY_ERROR)
+    @OnException(code = ResponseMessage.SUB_FLOW_COPY_ERROR)
     public Long copy(@RequestBody CopyFlow copyFlow) {
         return service.copyFlow(copyFlow);
     }
 
     @Override
-    @OnException(message = ResponseMessage.SUBFLOW_QUERY_ERROR)
+    @OnException(code = ResponseMessage.SUB_FLOW_QUERY_ERROR)
     public SubFlowDTO getById(@PathVariable Long id) {
         return service.getById(id);
     }
 
     @Override
-    @OnException(message = ResponseMessage.SUBFLOW_QUERY_ERROR)
+    @OnException(code = ResponseMessage.SUB_FLOW_QUERY_ERROR)
     public List<SubFlowDTO> query(FlowQuery query) {
         return service.queryFlows(query);
     }
 
 
     @Override
-    @OnException(message = ResponseMessage.SUBFLOW_QUERY_ERROR)
+    @OnException(code = ResponseMessage.SUB_FLOW_QUERY_ERROR)
     public List<SubFlowDTO> list() {
         return service.list();
     }
 
 
     @Override
-    @OnException(message = ResponseMessage.SUBFLOW_CHECK_ERROR)
+    @OnException(code = ResponseMessage.SUB_FLOW_CHECK_ERROR)
     public List<FlowValidation> validate(@RequestBody SubFlowDTO model) {
         return service.validateFlow(model);
     }
 
 
     @Override
-    @OnException(message = ResponseMessage.SUBFLOW_TEST_ERROR)
+    @OnException(code = ResponseMessage.SUB_FLOW_TEST_ERROR)
     public MainLogDTO doSubFlowTest(@RequestBody TestRequestDTO request) {
         SubFlowDTO flow = service.getById(request.getFlowId());
         if (flow == null) {

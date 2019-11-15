@@ -3,6 +3,7 @@ package io.terminus.dalaran.component.processor.rocketmq;
 import io.terminus.dalaran.DalaranConstants;
 import io.terminus.dalaran.component.common.expression.ExpressionParser;
 import io.terminus.dalaran.core.component.DalaranMessageBodyCustomConverter;
+import io.terminus.dalaran.component.connector.RocketMQConnector;
 import io.terminus.dalaran.core.component.DalaranProcessor;
 import io.terminus.dalaran.core.component.annotation.Processor;
 import io.terminus.dalaran.core.context.DalaranModelTypeContext;
@@ -16,7 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 @Processor(
         value = "rocketmq-producer",
-        name = "RocketMQ 消息发送器",
         order = 13,
         bodyType = "JSON",
         configType = RocketMQProducerConfig.class

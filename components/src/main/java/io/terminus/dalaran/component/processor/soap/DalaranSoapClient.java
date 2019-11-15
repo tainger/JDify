@@ -12,7 +12,6 @@ import org.apache.commons.lang3.StringUtils;
  */
 @Processor(
         value = "soap-client",
-        name = "Soap 调用器",
         order = 11,
         configType = SoapClientConfig.class,
         bodyType = "SOAP"

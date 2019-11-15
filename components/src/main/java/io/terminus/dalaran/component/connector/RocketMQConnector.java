@@ -1,13 +1,15 @@
-package io.terminus.dalaran.component.processor.rocketmq;
+package io.terminus.dalaran.component.connector;
 
 import io.terminus.dalaran.FieldInputType;
 import io.terminus.dalaran.core.component.annotation.ConfigFieldInfo;
+import io.terminus.dalaran.core.component.annotation.Connector;
 import lombok.Data;
 
 /**
  * Created by jingdi on 2019/7/2
  */
 @Data
+@Connector("RocketMQ")
 public class RocketMQConnector {
 
     @ConfigFieldInfo(label = "接入点", inputType = FieldInputType.String)

@@ -1,6 +1,6 @@
 package io.terminus.dalaran.component.trigger.rocketmq;
 
-import io.terminus.dalaran.component.processor.rocketmq.RocketMQConnector;
+import io.terminus.dalaran.component.connector.RocketMQConnector;
 import io.terminus.dalaran.core.component.DalaranTrigger;
 import io.terminus.dalaran.core.component.annotation.Trigger;
 import org.apache.camel.model.RouteDefinition;
@@ -10,7 +10,6 @@ import org.apache.camel.model.RouteDefinition;
  */
 @Trigger(
         value = "rocketmq-consumer",
-        name = "RocketMQ 消费者",
         order = 15,
         bodyType = "JSON",
         configType = RocketMQConsumerConfig.class

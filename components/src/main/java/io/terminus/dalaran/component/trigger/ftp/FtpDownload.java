@@ -1,6 +1,6 @@
 package io.terminus.dalaran.component.trigger.ftp;
 
-import io.terminus.dalaran.component.common.FtpUploadConnector;
+import io.terminus.dalaran.component.connector.FtpUploadConnector;
 import io.terminus.dalaran.core.component.DalaranTrigger;
 import io.terminus.dalaran.core.component.annotation.Trigger;
 import org.apache.camel.model.RouteDefinition;
@@ -8,7 +8,6 @@ import org.apache.commons.lang3.StringUtils;
 
 @Trigger(
         value = "ftp-download",
-        name = "FTP 下载文件",
         order = 11,
         configType = FtpDownloadConfig.class,
         bodyType = "CSV"

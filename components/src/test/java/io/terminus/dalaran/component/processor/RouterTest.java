@@ -1,10 +1,10 @@
 package io.terminus.dalaran.component.processor;
 
 import io.terminus.dalaran.component.BasicProcessorTest;
+import io.terminus.dalaran.component.connector.SqlDataSourceConnector;
 import io.terminus.dalaran.component.processor.route.DalaranRouter;
 import io.terminus.dalaran.component.processor.sql.Database;
 import io.terminus.dalaran.component.processor.sql.SqlConfig;
-import io.terminus.dalaran.component.processor.sql.SqlDataSourceConnector;
 import io.terminus.dalaran.component.processor.sql.SqlProcessor;
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.model.RouteDefinition;

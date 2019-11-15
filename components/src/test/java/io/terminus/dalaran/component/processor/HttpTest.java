@@ -5,9 +5,9 @@ import com.alibaba.dubbo.common.utils.StringUtils;
 import com.sun.net.httpserver.HttpServer;
 import io.terminus.dalaran.component.BasicProcessorTest;
 import io.terminus.dalaran.component.common.HttpMethod;
+import io.terminus.dalaran.component.connector.RestClientConnector;
 import io.terminus.dalaran.component.processor.http.DalaranHttpClient;
 import io.terminus.dalaran.component.processor.http.HttpClientConfig;
-import io.terminus.dalaran.component.processor.http.HttpClientConnector;
 import io.terminus.dalaran.model.HttpProtocol;
 import org.apache.camel.ProducerTemplate;
 import org.junit.After;
@@ -32,7 +32,7 @@ public class HttpTest extends BasicProcessorTest {
     public void test() throws IOException {
         DalaranHttpClient processor = new DalaranHttpClient();
         HttpClientConfig config = new HttpClientConfig();
-        HttpClientConnector connector = new HttpClientConnector();
+        RestClientConnector connector = new RestClientConnector();
         connector.setProtocol(HttpProtocol.HTTP);
         connector.setHost("localhost");
         connector.setPort(MOCK_PORT);
@@ -47,7 +47,7 @@ public class HttpTest extends BasicProcessorTest {
         Assert.assertEquals(result, METHOD_NOT_SUPPORTED);
 
         HttpClientConfig config2 = new HttpClientConfig();
-        HttpClientConnector connector2 = new HttpClientConnector();
+        RestClientConnector connector2 = new RestClientConnector();
         connector2.setProtocol(HttpProtocol.HTTP);
         connector2.setHost("localhost");
         connector2.setPort(MOCK_PORT);

@@ -11,7 +11,6 @@ import java.util.Map;
 
 @Trigger(
         value = "scheduler",
-        name = "调度触发器",
         order = 16,
         configType = DalaranSchedulerConfig.class
 )

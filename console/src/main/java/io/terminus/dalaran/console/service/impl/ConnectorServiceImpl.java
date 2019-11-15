@@ -1,7 +1,6 @@
 package io.terminus.dalaran.console.service.impl;
 
 import com.alibaba.fastjson.JSON;
-import io.terminus.dalaran.ComponentType;
 import io.terminus.dalaran.console.entity.ConnectorEntity;
 import io.terminus.dalaran.console.repository.ConnectorRepository;
 import io.terminus.dalaran.console.service.ConnectorService;
@@ -17,6 +16,7 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class ConnectorServiceImpl implements ConnectorService {
@@ -48,11 +48,8 @@ public class ConnectorServiceImpl implements ConnectorService {
 
     @Override
     public ConnectorDTO detail(Long connectorId) {
-        ConnectorEntity entity = connectorRepository.findById(connectorId).get();
-        if (entity != null) {
-            return toDTO(entity);
-        }
-        return null;
+        Optional<ConnectorEntity> entityOptional = connectorRepository.findById(connectorId);
+        return entityOptional.map(this::toDTO).orElse(null);
     }
 
     @Override
@@ -60,20 +57,19 @@ public class ConnectorServiceImpl implements ConnectorService {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<BasicConnectorInfo> criteriaQuery = builder.createQuery(BasicConnectorInfo.class);
         Root<ConnectorEntity> root = criteriaQuery.from(ConnectorEntity.class);
-        criteriaQuery.multiselect(root.get("id"), root.get("moduleId"), root.get("name"), root.get("componentType"), root.get("componentName"))
+        criteriaQuery.multiselect(root.get("id"), root.get("moduleId"), root.get("name"), root.get("connectorType"))
                 .where(builder.equal(root.get("moduleId"), moduleId));
         return entityManager.createQuery(criteriaQuery).getResultList();
     }
 
     @Override
-    public List<BasicConnectorInfo> listBasicInfoByComponent(ComponentType componentType, String componentName) {
+    public List<BasicConnectorInfo> listBasicInfoByComponent(String connectorType) {
 
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<BasicConnectorInfo> criteriaQuery = builder.createQuery(BasicConnectorInfo.class);
         Root<ConnectorEntity> root = criteriaQuery.from(ConnectorEntity.class);
-        Predicate where = builder.and(builder.equal(root.get("componentType"), componentType), builder.equal(root.get("componentType"), componentType));
-        criteriaQuery.multiselect(root.get("id"), root.get("moduleId"), root.get("name"), root.get("componentType"),
-                root.get("componentName")).where(where);
+        Predicate where = builder.and(builder.equal(root.get("connectorType"), connectorType));
+        criteriaQuery.multiselect(root.get("id"), root.get("moduleId"), root.get("name"), root.get("connectorType")).where(where);
         return entityManager.createQuery(criteriaQuery).getResultList();
     }
 
@@ -81,8 +77,7 @@ public class ConnectorServiceImpl implements ConnectorService {
         ConnectorDTO dto = new ConnectorDTO();
         dto.setId(entity.getId());
         dto.setName(entity.getName());
-        dto.setComponentType(entity.getComponentType());
-        dto.setComponentName(entity.getComponentName());
+        dto.setConnectorType(entity.getConnectorType());
         dto.setDescription(entity.getDescription());
         dto.setModuleId(entity.getModuleId());
         dto.setConfig(JSON.parseObject(entity.getConfig(), Map.class));
@@ -93,8 +88,7 @@ public class ConnectorServiceImpl implements ConnectorService {
         ConnectorEntity entity = new ConnectorEntity();
         entity.setId(dto.getId());
         entity.setName(dto.getName());
-        entity.setComponentType(dto.getComponentType());
-        entity.setComponentName(dto.getComponentName());
+        entity.setConnectorType(dto.getConnectorType());
         entity.setDescription(dto.getDescription());
         entity.setModuleId(dto.getModuleId());
         entity.setConfig(JSON.toJSONString(dto.getConfig()));

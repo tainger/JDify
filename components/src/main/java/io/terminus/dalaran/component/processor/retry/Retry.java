@@ -15,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 @Processor(
         value = "retry",
-        name = "失败重试",
         configType = RetryConfig.class
 )
 public class Retry implements DalaranProcessor<String>, DalaranProcessorConfigCustomConverter<RetryConfig, String> {

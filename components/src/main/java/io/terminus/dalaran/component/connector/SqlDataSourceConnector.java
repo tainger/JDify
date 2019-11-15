@@ -1,10 +1,13 @@
-package io.terminus.dalaran.component.processor.sql;
+package io.terminus.dalaran.component.connector;
 
 import io.terminus.dalaran.FieldInputType;
+import io.terminus.dalaran.component.processor.sql.Database;
 import io.terminus.dalaran.core.component.annotation.ConfigFieldInfo;
+import io.terminus.dalaran.core.component.annotation.Connector;
 import lombok.Data;
 
 @Data
+@Connector("DataBase")
 public class SqlDataSourceConnector {
 
     @ConfigFieldInfo(label = "数据库类型", inputType = FieldInputType.Select, defaultValue = "MYSQL")

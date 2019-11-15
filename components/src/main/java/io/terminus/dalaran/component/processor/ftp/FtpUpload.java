@@ -1,6 +1,6 @@
 package io.terminus.dalaran.component.processor.ftp;
 
-import io.terminus.dalaran.component.common.FtpUploadConnector;
+import io.terminus.dalaran.component.connector.FtpUploadConnector;
 import io.terminus.dalaran.core.component.DalaranProcessor;
 import io.terminus.dalaran.core.component.annotation.Processor;
 import org.apache.camel.model.ProcessorDefinition;
@@ -8,7 +8,6 @@ import org.apache.commons.lang3.StringUtils;
 
 @Processor(
         value = "ftp-upload",
-        name = "FTP 上传文件",
         order = 11,
         configType = FtpUploadConfig.class,
         bodyType = "CSV"

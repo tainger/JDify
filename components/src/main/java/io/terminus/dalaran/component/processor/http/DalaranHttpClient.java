@@ -4,6 +4,7 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Maps;
 import io.terminus.dalaran.DalaranConstants;
+import io.terminus.dalaran.component.connector.RestClientConnector;
 import io.terminus.dalaran.core.component.DalaranMessageBodyCustomConverter;
 import io.terminus.dalaran.core.component.DalaranProcessor;
 import io.terminus.dalaran.core.component.annotation.Processor;
@@ -20,7 +21,6 @@ import static org.apache.camel.Exchange.HTTP_QUERY;
 
 @Processor(
         value = "http-client",
-        name = "Http 调用器",
         order = 11,
         configType = HttpClientConfig.class,
         bodyType = "JSON"
@@ -49,7 +49,7 @@ public class DalaranHttpClient implements DalaranProcessor<HttpClientConfig>, Da
     // TODO form && queryString
     @Override
     public void configure(ProcessorDefinition route, HttpClientConfig config) {
-        HttpClientConnector connector = config.getConnector();
+        RestClientConnector connector = config.getConnector();
         String uri = String.format(HTTP_URI, connector.getProtocol().name().toLowerCase(), connector.getHost(),
                 connector.getPort(), config.getPath());
         if (config.getConnector().getUsername() != null && config.getConnector().getPassword() != null) {

@@ -27,7 +27,6 @@ import static io.terminus.dalaran.component.processor.service.ServiceValidationM
 
 @Processor(
         value = "service",
-        name = "服务调用器",
         order = 11,
         bodyType = UNKNOWN_MODEL_TYPE,
         configType = ServiceOperationConfig.class

@@ -6,7 +6,7 @@ import com.alibaba.dubbo.config.RegistryConfig;
 import com.alibaba.dubbo.config.utils.ReferenceConfigCache;
 import com.alibaba.dubbo.rpc.service.GenericService;
 import io.terminus.dalaran.component.BasicTriggerTest;
-import io.terminus.dalaran.component.common.DubboRegistryConnector;
+import io.terminus.dalaran.component.connector.DubboRegistryConnector;
 import io.terminus.dalaran.component.trigger.dubbo.DalaranDubboProvider;
 import io.terminus.dalaran.component.trigger.dubbo.DubboProviderConfig;
 import org.apache.curator.test.TestingServer;

@@ -16,7 +16,11 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.web.servlet.LocaleResolver;
+import org.springframework.web.servlet.i18n.CookieLocaleResolver;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
+
+import java.util.Locale;
 
 @EnableSwagger2
 @ComponentScan({"io.terminus.dalaran"})
@@ -39,6 +43,14 @@ public class DalaranConsoleConfigure {
     @Bean
     public TestFlowInitializer testFlowInitializer() {
         return new TestFlowInitializer();
+    }
+
+    @Bean
+    public LocaleResolver localeResolver() {
+        CookieLocaleResolver localeResolver = new CookieLocaleResolver();
+        localeResolver.setCookieName("locale");
+        localeResolver.setDefaultLocale(Locale.SIMPLIFIED_CHINESE);
+        return localeResolver;
     }
 
     @Bean

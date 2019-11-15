@@ -265,11 +265,11 @@ public class FlowManagementServiceImpl implements FlowManagementService {
     @Override
     public TriggerFlowDTO updateFlow(TriggerFlowDTO flowModel) throws FlowNotExistException {
         if (flowModel.getId() == null) {
-            throw DalaranExceptionBuilder.build(FlowNotExistException.class, "Trigger flow id can not be null.");
+            throw new FlowNotExistException();
         }
         Optional<TriggerFlowEntity> flowEntityOptional = flowRepository.findById(flowModel.getId());
         if (!flowEntityOptional.isPresent()) {
-            throw DalaranExceptionBuilder.build(FlowNotExistException.class, "TriggerFlow[" + flowModel.getId() + "] not exist.");
+            throw new FlowNotExistException();
         }
         TriggerFlowEntity flowEntity = flowEntityOptional.get();
         buildEntity(flowModel, flowEntity);

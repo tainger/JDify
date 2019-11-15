@@ -26,7 +26,6 @@ import static io.terminus.dalaran.DalaranConstants.DELIMITER;
 
 @Processor(
         value = "scatter-gather",
-        name = "并行/聚合",
         configType = ScatterGatherConfig.class
 )
 public class ScatterGather implements DalaranProcessor<List<String>>, DalaranProcessorConfigCustomConverter<ScatterGatherConfig, List<String>> {

@@ -81,6 +81,8 @@ public class TracingLogServiceImpl implements TracingLogService {
             }
             if (query.getTracingType() != null) {
                 predicates.add(builder.equal(root.get("tracingType"), query.getTracingType()));
+            } else if (!query.isTestFlow()) {
+                predicates.add(builder.and(builder.equal(root.get("tracingType"), TracingType.Flow)));
             }
             if (query.getModuleId() != null) {
                 predicates.add(builder.equal(root.get("moduleId"), query.getModuleId()));
@@ -90,6 +92,12 @@ public class TracingLogServiceImpl implements TracingLogService {
             }
             if (query.getEndTime() != null) {
                 predicates.add(builder.le(root.get("timestamp"), query.getEndTime().getTime()));
+            }
+            if (query.getTimeLt() != null) {
+                predicates.add(builder.le(root.get("elapsed"), query.getTimeLt()));
+            }
+            if (query.getTimeGt() != null) {
+                predicates.add(builder.ge(root.get("elapsed"), query.getTimeGt()));
             }
             return builder.and(predicates.toArray(new Predicate[0]));
         };

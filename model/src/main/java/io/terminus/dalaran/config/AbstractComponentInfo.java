@@ -1,6 +1,7 @@
 package io.terminus.dalaran.config;
 
 import com.alibaba.fastjson.annotation.JSONField;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import org.jetbrains.annotations.NotNull;
 
@@ -17,12 +18,16 @@ public abstract class AbstractComponentInfo implements ComponentInfo {
 
     private boolean outdated;
 
+    private String connectorType;
+
     @NotNull
     private String modelType;
 
     @JSONField(serialize = false)
+    @JsonIgnore
     private ConnectorInfo connectorInfo;
 
     @JSONField(serialize = false)
+    @JsonIgnore
     private Class configType;
 }

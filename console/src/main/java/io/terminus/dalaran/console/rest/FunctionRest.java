@@ -18,25 +18,25 @@ public class FunctionRest implements FunctionReadAPI, FunctionWriteAPI {
     private FunctionService service;
 
     @Override
-    @OnException(message = ResponseMessage.FUNCTION_CREATE_ERROR)
+    @OnException(code = ResponseMessage.FUNCTION_CREATE_ERROR)
     public Long create(@RequestBody FunctionDTO dto) {
         return service.create(dto);
     }
 
     @Override
-    @OnException(message = ResponseMessage.FUNCTION_UPDATE_ERROR)
+    @OnException(code = ResponseMessage.FUNCTION_UPDATE_ERROR)
     public FunctionDTO update(@RequestBody FunctionDTO dto) {
         return service.update(dto);
     }
 
     @Override
-    @OnException(message = ResponseMessage.FUNCTION_DELETE_ERROR)
+    @OnException(code = ResponseMessage.FUNCTION_DELETE_ERROR)
     public void deleteById(@PathVariable Long id) {
         service.delete(id);
     }
 
     @Override
-    @OnException(message = ResponseMessage.FUNCTION_QUERY_ERROR)
+    @OnException(code = ResponseMessage.FUNCTION_QUERY_ERROR)
     public FunctionDTO detail(@PathVariable Long id) {
         return service.detail(id);
     }

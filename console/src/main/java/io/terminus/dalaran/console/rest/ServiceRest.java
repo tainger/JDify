@@ -21,37 +21,37 @@ public class ServiceRest implements ServiceReadAPI, ServiceWriteAPI {
     private ServiceManagement serviceManagement;
 
     @Override
-    @OnException(message = ResponseMessage.SERVICE_CREATE_ERROR)
+    @OnException(code = ResponseMessage.SERVICE_CREATE_ERROR)
     public Long create(@RequestBody ServiceDTO serviceDTO) {
         return serviceManagement.create(serviceDTO);
     }
 
     @Override
-    @OnException(message = ResponseMessage.SERVICE_UPDATE_ERROR)
+    @OnException(code = ResponseMessage.SERVICE_UPDATE_ERROR)
     public ServiceDTO update(@RequestBody ServiceDTO serviceDTO) {
         return serviceManagement.update(serviceDTO);
     }
 
     @Override
-    @OnException(message = ResponseMessage.SERVICE_DELETE_ERROR)
+    @OnException(code = ResponseMessage.SERVICE_DELETE_ERROR)
     public void deleteById(@PathVariable Long id) {
         serviceManagement.delete(id);
     }
 
     @Override
-    @OnException(message = ResponseMessage.SERVICE_QUERY_ERROR)
+    @OnException(code = ResponseMessage.SERVICE_QUERY_ERROR)
     public ServiceDTO detail(@PathVariable Long id) {
         return serviceManagement.detail(id);
     }
 
     @Override
-    @OnException(message = ResponseMessage.SERVICE_QUERY_ERROR)
+    @OnException(code = ResponseMessage.SERVICE_QUERY_ERROR)
     public List<ServiceDTO> list() {
         return serviceManagement.list();
     }
 
     @Override
-    @OnException(message = ResponseMessage.SERVICE_QUERY_ERROR)
+    @OnException(code = ResponseMessage.SERVICE_QUERY_ERROR)
     public List<ServiceOperation> operations(@PathVariable Long id) {
         return serviceManagement.listOperation(id);
     }

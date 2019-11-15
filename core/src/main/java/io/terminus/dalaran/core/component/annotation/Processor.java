@@ -19,8 +19,6 @@ public @interface Processor {
      */
     String[] value();
 
-    String name();
-
     int order() default Short.MAX_VALUE;
 
     String bodyType() default DalaranConstants.OBJECT_MODEL_TYPE;

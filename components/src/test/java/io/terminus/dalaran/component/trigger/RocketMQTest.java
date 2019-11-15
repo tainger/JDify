@@ -1,7 +1,7 @@
 package io.terminus.dalaran.component.trigger;
 
 import io.terminus.dalaran.component.BasicTriggerTest;
-import io.terminus.dalaran.component.processor.rocketmq.RocketMQConnector;
+import io.terminus.dalaran.component.connector.RocketMQConnector;
 import io.terminus.dalaran.component.trigger.rocketmq.RocketMQConsumer;
 import io.terminus.dalaran.component.trigger.rocketmq.RocketMQConsumerConfig;
 import org.apache.rocketmq.client.producer.DefaultMQProducer;
