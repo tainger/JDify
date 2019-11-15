@@ -2,8 +2,10 @@ package io.terminus.dalaran.camel.component.rocketmq;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONPath;
 import org.apache.camel.Exchange;
 import org.apache.camel.impl.DefaultProducer;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.rocketmq.acl.common.AclClientRPCHook;
 import org.apache.rocketmq.acl.common.SessionCredentials;
@@ -13,6 +15,8 @@ import org.apache.rocketmq.client.producer.SendCallback;
 import org.apache.rocketmq.client.producer.SendResult;
 import org.apache.rocketmq.common.message.Message;
 import org.apache.rocketmq.remoting.RPCHook;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,8 +33,12 @@ public class RocketMQProducer extends DefaultProducer {
 
     private RocketMQEndpoint endpoint;
 
+    private final Logger logger = LoggerFactory.getLogger(RocketMQProducer.class);
+
     private ThreadPoolExecutor executor = new ThreadPoolExecutor(10, 10,
             1000, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>());
+
+    private final String JSON_PATH_HEADER = "$.";
 
     public RocketMQProducer(RocketMQEndpoint endpoint) {
         super(endpoint);
@@ -73,7 +81,7 @@ public class RocketMQProducer extends DefaultProducer {
                 producer.send(message, new SendCallback() {
                     @Override
                     public void onSuccess(SendResult sendResult) {
-                        exchange.getOut().setBody(JSON.toJSON(new DalaranSendResult(sendResult, messages.size())));
+                        exchange.getOut().setBody(JSON.toJSONString(new DalaranSendResult(sendResult, messages.size())));
                     }
 
                     @Override
@@ -92,7 +100,7 @@ public class RocketMQProducer extends DefaultProducer {
                     }
                 }
             });
-            exchange.getOut().setBody(JSON.toJSON(new DalaranSendResult(null, messages.size())));
+            exchange.getOut().setBody(JSON.toJSONString(new DalaranSendResult(null, messages.size())));
         }
     }
 
@@ -116,10 +124,14 @@ public class RocketMQProducer extends DefaultProducer {
 
     private Message build(Object body) {
         Message message = new Message();
-        message.setTopic(endpoint.getTopic());
+        String topic = parseExpression(endpoint.getTopic(), body);
+        message.setTopic(topic);
+        logger.info("topic : " + topic);
         String tags = endpoint.getTags();
         if (StringUtils.isNotBlank(tags)) {
+            tags = parseExpression(tags, body);
             message.setTags(tags);
+            logger.info("tag : " + tags);
         }
         if (body != null) {
             if (body instanceof byte[]) {
@@ -128,12 +140,31 @@ public class RocketMQProducer extends DefaultProducer {
                 message.setBody(((String) body).getBytes());
             } else if (body instanceof JSON) {
                 message.setBody(body.toString().getBytes());
-            } else if (body instanceof Object) {
-                message.setBody(JSON.toJSONString(body).getBytes());
             } else {
                 throw new RuntimeException("no support body type;");
             }
         }
         return message;
+    }
+
+    private String parseExpression(String origin, Object body) {
+        if (!StringUtils.startsWith(origin, JSON_PATH_HEADER)) {
+            return origin;
+        }
+        if (body instanceof byte[]) {
+            try {
+                body = JSON.parseObject(IOUtils.toString((byte[])body));
+            } catch (Exception e) {
+                throw new RuntimeException("body parse error;");
+            }
+        }
+        if (body instanceof String) {
+            body = JSON.parseObject((String) body);
+        }
+        Object data = JSONPath.eval(body, origin);
+        if (data == null) {
+            return origin;
+        }
+        return data.toString();
     }
 }

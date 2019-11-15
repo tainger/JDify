@@ -13,6 +13,8 @@ public class SoapSchemaOperation {
 
     private String targetNamespace;
 
+    private String prefix = "dalaran";
+
     private MessageModel header;
 
     private Map<String, Object> headerValues;

@@ -81,6 +81,9 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
             }
         }
         buildFlowRoute(route, flow, TracingType.Flow, bodyType);
+        if (triggerComponent instanceof DalaranTriggerBuildAfterProcessor) {
+            ((DalaranTriggerBuildAfterProcessor) triggerComponent).buildAfter(route, triggerConfig);
+        }
         return route;
     }
 

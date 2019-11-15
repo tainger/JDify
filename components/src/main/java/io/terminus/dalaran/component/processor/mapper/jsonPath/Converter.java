@@ -1,13 +1,16 @@
 package io.terminus.dalaran.component.processor.mapper.jsonPath;
 
 import com.alibaba.fastjson.JSONPath;
+import io.terminus.dalaran.DalaranConstants;
 import io.terminus.dalaran.component.common.exception.FieldParseException;
 import io.terminus.dalaran.component.common.exception.MapperFunctionExecuteException;
 import io.terminus.dalaran.component.processor.mapper.model.*;
 import io.terminus.dalaran.core.context.DalaranContext;
 import io.terminus.dalaran.model.FieldType;
+import org.apache.camel.Exchange;
 import org.apache.commons.beanutils.ConvertUtils;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -17,12 +20,9 @@ import java.util.stream.Collectors;
  */
 public class Converter {
 
-    public static Map<String, Object> convert(DalaranMappingConfig mappingConfig, Object source, DalaranContext dalaranContext) {
+    public static Map<String, Object> convert(DalaranMappingConfig mappingConfig, Exchange exchange, DalaranContext dalaranContext) {
+        Object source = exchange.getIn().getBody();
         Map<String, Object> destination = new HashMap<>();
-        if (isSingleXMLString(mappingConfig, source)) {
-            handleSingleXMLString(mappingConfig, source, dalaranContext, destination);
-            return destination;
-        }
         List<MessageMapping> messageMappings = mappingConfig.getMessageMappings();
         SimpleMappingField sourceRoot = mappingConfig.getSourceRoot();
         SimpleMappingField destinationRoot = mappingConfig.getDestinationRoot();
@@ -30,12 +30,20 @@ public class Converter {
             if (messageMapping.getStatus() == MappingStatus.ERROR) {
                 return;
             }
+            if (messageMapping.getMappingType() == MappingType.CONTEXT) {
+                buildValue(exchange, messageMapping, destination);
+                return;
+            }
+            if (messageMapping.getMappingType() == MappingType.STATIC) {
+                buildValue(messageMapping, destination);
+                return;
+            }
             if (messageMapping.isComplex()) {
                 SourceFieldDetail sourceFieldDetail = buildSource(source, messageMapping, sourceRoot);
                 Map<String, PathDetail> destinationPaths = buildPathMapping(messageMapping, sourceFieldDetail.getArrayFieldSize(), destinationRoot);
-                buildValue(source, sourceFieldDetail.getSourcePaths(), destinationPaths, messageMapping, destination, dalaranContext);
+                buildValue(exchange, source, sourceFieldDetail.getSourcePaths(), destinationPaths, messageMapping, destination, dalaranContext);
             } else {
-                buildValue(source, messageMapping, destination, dalaranContext);
+                buildValue(exchange, source, messageMapping, destination, dalaranContext);
             }
         });
         return destination;
@@ -161,10 +169,11 @@ public class Converter {
         }
     }
 
-    private static void buildValue(Object source, Map<String, List<SourcePath>> sourcePaths, Map<String, PathDetail> destinationPaths, MessageMapping messageMapping, Object destination, DalaranContext dalaranContext) {
+    private static void buildValue(Exchange exchange, Object source, Map<String, List<SourcePath>> sourcePaths, Map<String, PathDetail> destinationPaths, MessageMapping messageMapping, Object destination, DalaranContext dalaranContext) {
         if (sourcePaths == null || sourcePaths.size() == 0) {
             return;
         }
+        Map<String, Object> contextValues = (Map<String, Object>)exchange.getProperties().get(DalaranConstants.DALARAN_CONTEXT_EXCHANGE);
 
         for (Map.Entry<String, List<SourcePath>> entry : sourcePaths.entrySet()) {
             List<Object> values = new ArrayList<>();
@@ -206,7 +215,7 @@ public class Converter {
             PathDetail pathDetail = destinationPaths.get(indexes);
             Object value;
             if (function != null) {
-                value = execute(dalaranContext, function, values);
+                value = execute(dalaranContext, function, values, contextValues);
             } else {
                 value = values.get(0);
             }
@@ -224,10 +233,36 @@ public class Converter {
         }
     }
 
-    private static void buildValue(Object source, MessageMapping messageMapping, Object destination, DalaranContext dalaranContext) {
+    private static void buildValue(Exchange exchange, MessageMapping messageMapping, Object destination) {
+        List<SourceField> sourceFields = messageMapping.getSourceFields();
+        if (CollectionUtils.isEmpty(sourceFields)) {
+            return;
+        }
+        String contextKey = sourceFields.get(0).getPath();
+        Map<String, Object> contextValues = (Map<String, Object>)exchange.getProperties().get(DalaranConstants.DALARAN_CONTEXT_EXCHANGE);
+        if (MapUtils.isEmpty(contextValues) || !contextValues.containsKey(contextKey)) {
+            return;
+        }
+        Object value = contextValues.get(contextKey);
+        String destinationPath = messageMapping.getPath();
+        JSONPath.set(destination, "$" + MapperConstants.MODEL_ROOT + "." + destinationPath, value);
+    }
+
+    private static void buildValue(MessageMapping messageMapping, Object destination) {
+        List<SourceField> sourceFields = messageMapping.getSourceFields();
+        if (CollectionUtils.isEmpty(sourceFields)) {
+            return;
+        }
+        Object value = sourceFields.get(0).getPath();
+        String destinationPath = messageMapping.getPath();
+        JSONPath.set(destination, "$" + MapperConstants.MODEL_ROOT + "." + destinationPath, value);
+    }
+
+    private static void buildValue(Exchange exchange, Object source, MessageMapping messageMapping, Object destination, DalaranContext dalaranContext) {
         List<Object> values = new ArrayList<>();
         List<SourceField> sourceFields = messageMapping.getSourceFields();
         List<SourcePath> sourcePaths = new ArrayList<>();
+        Map<String, Object> contextValues = (Map<String, Object>)exchange.getProperties().get(DalaranConstants.DALARAN_CONTEXT_EXCHANGE);
 
         sourceFields.forEach(sourceField -> {
             Object value;
@@ -244,7 +279,7 @@ public class Converter {
         MappingFunction function = messageMapping.getFunction();
         Object value;
         if (function != null) {
-            value = execute(dalaranContext, function, values);
+            value = execute(dalaranContext, function, values, contextValues);
         } else {
             value = values.get(0);
         }
@@ -285,10 +320,13 @@ public class Converter {
         return target;
     }
 
-    private static Object execute(DalaranContext dalaranContext, MappingFunction function, List<Object> values) {
+    private static Object execute(DalaranContext dalaranContext, MappingFunction function, List<Object> values, Map<String, Object> context) {
         try {
             switch (function.getType()) {
                 case STATIC:
+                    if (dalaranContext.getDalaranFunctionContext().getFunctionByKey(function.getId()).getContainsContext()) {
+                        values.add(context);
+                    }
                     return dalaranContext.getDalaranFunctionContext().executeStaticFunction(function.getId(), values.toArray());
                 case CUSTOM:
                     return dalaranContext.getDalaranFunctionContext().executeCustomFunction(Long.valueOf(function.getId()), values.toArray());
@@ -298,25 +336,5 @@ public class Converter {
             e.printStackTrace();
             throw new MapperFunctionExecuteException("Mapper function execute error. function: " + function.getId() + ", params: " + Arrays.toString(values.toArray()) + ", message: " + e.getMessage());
         }
-    }
-
-    private static boolean isSingleXMLString(DalaranMappingConfig dalaranMappingConfig, Object source) {
-        if (!(source instanceof String)) {
-            return false;
-        }
-        if (CollectionUtils.isEmpty(dalaranMappingConfig.getMessageMappings()) || dalaranMappingConfig.getMessageMappings().size() > 1) {
-            return false;
-        }
-        MessageMapping mapping = dalaranMappingConfig.getMessageMappings().get(0);
-        return mapping.getFunction() != null && mapping.getFunction().getTemKey().startsWith("FromXml");
-    }
-
-    private static void handleSingleXMLString(DalaranMappingConfig dalaranMappingConfig, Object source, DalaranContext dalaranContext, Object destination) {
-        MessageMapping mapping = dalaranMappingConfig.getMessageMappings().get(0);
-        List<Object> values = new ArrayList<>();
-        values.add(source);
-        Object value =  dalaranContext.getDalaranFunctionContext().executeStaticFunction(mapping.getFunction().getId(), values.toArray());
-        String destinationPath = mapping.getPath();
-        JSONPath.set(destination, "$" + MapperConstants.MODEL_ROOT + "." + destinationPath, value);
     }
 }

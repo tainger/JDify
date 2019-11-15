@@ -28,12 +28,12 @@ public class DalaranMapperProcessor implements Processor, Traceable {
     @Override
     public void process(Exchange exchange) {
         Object source = exchange.getIn().getBody();
-        Object destination = (mappingConfig == null || CollectionUtils.isEmpty(mappingConfig.getMessageMappings())) ? source : convert(mappingConfig, source);
+        Object destination = (mappingConfig == null || CollectionUtils.isEmpty(mappingConfig.getMessageMappings())) ? source : convert(mappingConfig, exchange);
         exchange.getOut().setBody(destination);
     }
 
-    public Object convert(DalaranMappingConfig mappingConfig, Object source) {
-        Map<String, Object> destination = Converter.convert(mappingConfig, source, dalaranContext);
+    public Object convert(DalaranMappingConfig mappingConfig, Exchange exchange) {
+        Map<String, Object> destination = Converter.convert(mappingConfig, exchange, dalaranContext);
         return destination.get(MapperConstants.MODEL_ROOT);
     }
 

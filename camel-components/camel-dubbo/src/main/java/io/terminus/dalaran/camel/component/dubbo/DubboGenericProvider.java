@@ -51,10 +51,12 @@ public class DubboGenericProvider implements GenericService {
         return exchange.getOut().getBody();
     }
 
-    public void registerMethod(String method, DubboEndpoint endpoint, Processor processor) {
+    public void registerMethod(String method, DubboEndpoint endpoint, Processor processor) throws InterruptedException {
         endpointMap.put(method, endpoint);
         processorMap.put(method, processor);
+
         if (!providerConfig.isExported()) {
+            Thread.sleep(10000);
             providerConfig.export();
         }
     }

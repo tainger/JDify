@@ -55,11 +55,33 @@ public class DalaranMessageMapper implements DalaranProcessor<DalaranMapperConfi
         List<MessageMapping> messageMappings = new ArrayList<>();
         simpleMapping.forEach((path, mapping) -> {
             MessageMapping messageMapping = new MessageMapping();
+            if (mapping.getMappingType() == MappingType.CONTEXT) {
+                MappingContext mappingContext = (MappingContext) mapping.getValue();
+                String contextKey = mappingContext.getContextKey();
+                if (StringUtils.isBlank(contextKey)) {
+                    return;
+                }
+                messageMapping.setStatus(MappingStatus.CORRECT);
+                messageMapping.setMappingType(MappingType.CONTEXT);
+                SourceField field = new SourceField();
+                field.setPath(contextKey);
+                messageMapping.setSourceFields(Collections.singletonList(field));
+                messageMappings.add(messageMapping);
+                return;
+            }
+            if (mapping.getMappingType() == MappingType.STATIC) {
+                messageMapping.setStatus(MappingStatus.CORRECT);
+                messageMapping.setMappingType(MappingType.STATIC);
+                SourceField field = new SourceField();
+                field.setPath(mapping.getValue().toString());
+                messageMapping.setSourceFields(Collections.singletonList(field));
+                messageMappings.add(messageMapping);
+                return;
+            }
             buildMapping(messageMapping, path, mapping, in, out);
             messageMappings.add(messageMapping);
         });
         messageMappings.sort(new MessageMappingComparator());
-
         mappingConfig.setMessageMappings(messageMappings);
         SimpleMappingField sourceRoot = new SimpleMappingField();
         sourceRoot.setType(in.getModelSchema().getFields().get(MapperConstants.MODEL_ROOT).getType());
@@ -308,19 +330,27 @@ public class DalaranMessageMapper implements DalaranProcessor<DalaranMapperConfi
     private static class MessageMappingComparator implements Comparator<MessageMapping> {
         @Override
         public int compare(MessageMapping o1, MessageMapping o2) {
-            if ((o1.getMappingType() == MappingType.DEFAULT || o1.getMappingType() == MappingType.FUNCTION) && o2.getMappingType() == MappingType.MAPPING) {
+            if ((o1.getMappingType() == MappingType.STATIC || o1.getMappingType() == MappingType.CONTEXT || o1.getMappingType() == MappingType.FUNCTION) && o2.getMappingType() == MappingType.MAPPING) {
                 return 1;
             }
 
-            if (o1.getMappingType() == MappingType.DEFAULT && o2.getMappingType() == MappingType.FUNCTION) {
+            if (o1.getMappingType() == MappingType.CONTEXT && o2.getMappingType() == MappingType.FUNCTION) {
                 return 1;
             }
 
-            if (o1.getMappingType() == MappingType.FUNCTION && o2.getMappingType() == MappingType.DEFAULT) {
+            if (o1.getMappingType() == MappingType.FUNCTION && o2.getMappingType() == MappingType.CONTEXT) {
                 return -1;
             }
 
-            if (o1.getMappingType() == MappingType.MAPPING && (o2.getMappingType() == MappingType.DEFAULT || o2.getMappingType() == MappingType.FUNCTION)) {
+            if (o1.getMappingType() == MappingType.STATIC && o2.getMappingType() == MappingType.CONTEXT) {
+                return 1;
+            }
+
+            if (o1.getMappingType() == MappingType.CONTEXT && o2.getMappingType() == MappingType.STATIC) {
+                return -1;
+            }
+
+            if (o1.getMappingType() == MappingType.MAPPING && (o2.getMappingType() == MappingType.STATIC || o2.getMappingType() == MappingType.CONTEXT || o2.getMappingType() == MappingType.FUNCTION)) {
                 return -1;
             }
             return 0;

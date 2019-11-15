@@ -35,9 +35,6 @@ public class DalaranSoapListener implements DalaranTrigger<SoapListenerConfig>, 
     @Autowired
     private DalaranClientContext clientContext;
 
-//    @Value("${terminus.dalaran.runtime-location}")
-//    private String runtimeLocation;
-
     @Override
     public void buildFromRoute(RouteDefinition route, SoapListenerConfig config) {
         String uri = "netty4-http:" + config.getProtocol().name().toLowerCase() +
@@ -66,6 +63,6 @@ public class DalaranSoapListener implements DalaranTrigger<SoapListenerConfig>, 
 
     @Override
     public void buildAfter(RouteDefinition route, SoapListenerConfig config) {
-        route.process(new SoapTriggerAfterProcessor());
+        route.process(new SoapTriggerAfterProcessor(config));
     }
 }

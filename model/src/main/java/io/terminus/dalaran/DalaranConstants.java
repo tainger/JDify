@@ -47,4 +47,6 @@ public final class DalaranConstants {
     public static final String MAPPER_CONVERT = "mapper-convert";
     public static final String SOAP_TYPE = "SOAP";
 
+    public static final String DALARAN_EXPRESSION_HEADER = "DALARAN_EXPRESSION::";
+
 }

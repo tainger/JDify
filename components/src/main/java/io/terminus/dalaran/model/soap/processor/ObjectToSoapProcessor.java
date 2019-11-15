@@ -30,7 +30,7 @@ public class ObjectToSoapProcessor implements Processor, Traceable {
 
     private final SoapSchemaOperation soapOperationConfig;
 
-    private static final String PREFIX = "dalaran";
+    private String PREFIX;
 
     public ObjectToSoapProcessor(Map<String, ModelField> modelFields, SoapSchemaOperation soapOperationConfig) {
         this.modelFields = modelFields;
@@ -45,6 +45,7 @@ public class ObjectToSoapProcessor implements Processor, Traceable {
     }
 
     private Object buildSoapBody(ModelField modelField, Object body) throws Exception {
+        PREFIX = soapOperationConfig.getPrefix();
         MessageFactory messageFactory = MessageFactory.newInstance();
         SOAPMessage message = messageFactory.createMessage();
         SOAPPart soapPart = message.getSOAPPart();
