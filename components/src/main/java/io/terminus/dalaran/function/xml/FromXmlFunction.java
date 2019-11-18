@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import io.terminus.dalaran.core.component.annotation.MappingFunction;
 import io.terminus.dalaran.function.model.FunctionConstants;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.util.List;
@@ -25,6 +26,13 @@ public class FromXmlFunction {
             case FunctionConstants.LONG:
                 javaClass = Long.class;
         }
-        return xmlMapper.readValue(data, javaClass);
+        return xmlMapper.readValue(format(data), javaClass);
+    }
+
+    private String format(String data) {
+        if (!StringUtils.startsWith(data, "<![CDATA[")) {
+            return data;
+        }
+        return StringUtils.substringBetween(data, "<![CDATA[", "]]");
     }
 }
