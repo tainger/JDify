@@ -6,10 +6,11 @@ import io.terminus.dalaran.FieldInputType;
 import io.terminus.dalaran.component.connector.SqlDataSourceConnector;
 import io.terminus.dalaran.core.component.annotation.ConfigFieldInfo;
 import io.terminus.dalaran.core.component.config.ConnectorConfig;
+import io.terminus.dalaran.core.component.config.OutModelConfig;
 import lombok.Data;
 
 @Data
-public class SqlConfig implements ConnectorConfig<SqlDataSourceConnector> {
+public class SqlConfig extends OutModelConfig implements ConnectorConfig<SqlDataSourceConnector> {
 
     @ConfigFieldInfo(inputType = FieldInputType.Hidden)
     @JSONField(serialize = false)

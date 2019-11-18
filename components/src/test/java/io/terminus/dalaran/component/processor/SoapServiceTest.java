@@ -15,7 +15,6 @@ import io.terminus.dalaran.service.soap.SoapService;
 import org.apache.camel.ProducerTemplate;
 import org.junit.Assert;
 import org.junit.Test;
-import sun.misc.BASE64Encoder;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -54,7 +53,6 @@ public class SoapServiceTest extends BasicServiceTest {
 
     @Test
     public void testSoapService() {
-        String authorization = new BASE64Encoder().encode(("admin" + ":" + "secret").getBytes());
         SoapService service = new SoapService();
 
         MessageModel<SoapSchema> model = buildModel();

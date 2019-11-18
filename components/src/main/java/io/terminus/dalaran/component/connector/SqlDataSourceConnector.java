@@ -28,4 +28,14 @@ public class SqlDataSourceConnector {
     @ConfigFieldInfo(label = "Schema", inputType = FieldInputType.String)
     private String schema;
 
+    @ConfigFieldInfo(label = "最小闲置线程", inputType = FieldInputType.Integer, defaultValue = "5")
+    private int minIdle = 5;
+    @ConfigFieldInfo(label = "最大闲置线程", inputType = FieldInputType.Integer, defaultValue = "10")
+    private int maxIdle = 10;
+    @ConfigFieldInfo(label = "最大等待线程", inputType = FieldInputType.Integer, defaultValue = "10000")
+    private int maxWait = 10000;
+    @ConfigFieldInfo(label = "初始化线程数", inputType = FieldInputType.Integer, defaultValue = "5")
+    private int initialSize = 10;
+
+
 }

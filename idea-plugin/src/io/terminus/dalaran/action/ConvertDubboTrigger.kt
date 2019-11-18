@@ -23,7 +23,7 @@ class ConvertDubboTrigger : AnAction() {
         val triggerId = "${method.containingClass!!.qualifiedName!!}#${method.name}"
         val inModel = method.parameters.firstOrNull()?.let { buildSchema(it.type as PsiClassReferenceType) }
         val outModel = method.returnType?.let { buildSchema(it) }
-        val desc = method.docComment?.descriptionElements?.map { it.text?.trim() }?.joinToString("\n")?.trim()
+        val desc = method.docComment?.descriptionElements?.map { it.text?.trim() }?.joinToString(System.lineSeparator())?.trim()
 
         TriggerInfo(triggerId, desc, DUBBO_TRIGGER_TYPE, triggerConfig, inModel, outModel).setCopyPasteContent()
     }

@@ -33,6 +33,16 @@ public class SqlProcessor implements DalaranProcessor<SqlConfig> {
 
     private javax.sql.DataSource buildDataSource(SqlDataSourceConnector connector) {
         org.apache.tomcat.jdbc.pool.DataSource dataSource = new org.apache.tomcat.jdbc.pool.DataSource();
+
+        dataSource.setMaxIdle(connector.getMaxIdle());
+        dataSource.setMinIdle(connector.getMinIdle());
+        dataSource.setMaxWait(connector.getMaxWait());
+        dataSource.setInitialSize(connector.getInitialSize());
+        dataSource.setTimeBetweenEvictionRunsMillis(18800);
+
+        dataSource.setTestOnBorrow(false);
+        dataSource.setTestWhileIdle(true);
+
         dataSource.setUsername(connector.getUsername());
         dataSource.setPassword(connector.getPassword());
         switch (connector.getDatabaseType()) {
@@ -40,6 +50,7 @@ public class SqlProcessor implements DalaranProcessor<SqlConfig> {
                 String urlTemplate = "jdbc:mysql://%s:%s/%s?useUnicode=true&characterEncoding=utf-8&useSSL=false";
                 String url = String.format(urlTemplate, connector.getHost(), connector.getPort(), connector.getSchema());
                 dataSource.setUrl(url);
+                dataSource.setValidationQuery("select 1");
                 dataSource.setDriverClassName("com.mysql.jdbc.Driver");
                 break;
 //            case ORACLE:

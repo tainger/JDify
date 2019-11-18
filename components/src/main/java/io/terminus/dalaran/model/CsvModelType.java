@@ -16,7 +16,12 @@ public class CsvModelType implements DalaranModelType<String, CsvModelSchema> {
         route.process(exchange -> {
             exchange.getOut().copyFrom(exchange.getIn());
             List list = exchange.getIn().getBody(List.class);
-            String data = (String) list.stream().map(this::objectToString).collect(Collectors.joining("\n", "", "\n"));
+            String data;
+            if (list == null) {
+                data = objectToString(exchange.getIn().getBody()) + System.lineSeparator();
+            } else {
+                data = (String) list.stream().map(this::objectToString).collect(Collectors.joining(System.lineSeparator(), "", System.lineSeparator()));
+            }
             exchange.getOut().setBody(data.getBytes());
         });
     }
@@ -59,7 +64,7 @@ public class CsvModelType implements DalaranModelType<String, CsvModelSchema> {
             GenericFileMessage body = exchange.getIn().getBody(GenericFileMessage.class);
             byte[] content = (byte[]) body.getGenericFile().getBody();
             String contentStr = new String(content);
-            String[] records = contentStr.split("\n");
+            String[] records = contentStr.split(System.lineSeparator());
             List<Map<Integer, Object>> data = new ArrayList<>();
             for (String record : records) {
                 Map<Integer, Object> recordObj = new HashMap<>();
