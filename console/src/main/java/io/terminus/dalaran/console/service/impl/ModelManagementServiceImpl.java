@@ -333,7 +333,7 @@ public class ModelManagementServiceImpl implements ModelManagementService {
                 case DATE:
                     return new Date();
                 case FLOAT:
-                    return (float) index;
+                    return (float) index + 1.1;
             }
         }
         return "";
