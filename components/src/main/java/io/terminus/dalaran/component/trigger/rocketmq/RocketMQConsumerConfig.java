@@ -31,4 +31,7 @@ public class RocketMQConsumerConfig extends AllModelConfig implements ConnectorC
 
     @ConfigFieldInfo(label = "tag", inputType = FieldInputType.String, required = false)
     private String tags;
+
+    @ConfigFieldInfo(label = "消费自动确认", inputType = FieldInputType.Switch, defaultValue = "true")
+    private boolean autocommit = true;
 }

@@ -39,7 +39,7 @@ public class RocketMQEndpoint extends ProcessorEndpoint {
     private String secretKey;
 
     @UriParam(description = "auto commit", javaType = "java.lang.Boolean", defaultValue = "true")
-    private Boolean autoCommit;
+    private Boolean autocommit;
 
     @UriParam(description = "message sharding", javaType = "java.lang.Boolean", defaultValue = "false")
     private Boolean messageSharding;
@@ -140,12 +140,12 @@ public class RocketMQEndpoint extends ProcessorEndpoint {
         this.secretKey = secretKey;
     }
 
-    public Boolean getAutoCommit() {
-        return autoCommit;
+    public Boolean getAutocommit() {
+        return autocommit;
     }
 
-    public void setAutoCommit(Boolean autoCommit) {
-        this.autoCommit = autoCommit;
+    public void setAutocommit(Boolean autocommit) {
+        this.autocommit = autocommit;
     }
 
     public Boolean getMessageSharding() {
