@@ -30,7 +30,7 @@ public class ObjectToSoapProcessor implements Processor, Traceable {
 
     private final SoapSchemaOperation soapOperationConfig;
 
-    private static final String PREFIX = "dalaran";
+    private String PREFIX;
 
     public ObjectToSoapProcessor(Map<String, ModelField> modelFields, SoapSchemaOperation soapOperationConfig) {
         this.modelFields = modelFields;
@@ -45,6 +45,7 @@ public class ObjectToSoapProcessor implements Processor, Traceable {
     }
 
     private Object buildSoapBody(ModelField modelField, Object body) throws Exception {
+        PREFIX = soapOperationConfig.getPrefix();
         MessageFactory messageFactory = MessageFactory.newInstance();
         SOAPMessage message = messageFactory.createMessage();
         SOAPPart soapPart = message.getSOAPPart();
@@ -52,6 +53,10 @@ public class ObjectToSoapProcessor implements Processor, Traceable {
         soapEnvelope.addNamespaceDeclaration(PREFIX, soapOperationConfig.getTargetNamespace());
         SOAPBody soapBody = soapEnvelope.getBody();
         buildBody(modelField.getFields(), body, soapBody);
+        if (soapOperationConfig.getHeader() != null) {
+            SOAPHeader header = soapEnvelope.getHeader();
+            buildHeader(soapOperationConfig.getHeader().getModelSchema().getFields().get(DalaranConstants.MODEL_ROOT).getFields(), soapOperationConfig.getHeaderValues(), header);
+        }
         message.saveChanges();
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         message.writeTo(stream);
@@ -105,6 +110,27 @@ public class ObjectToSoapProcessor implements Processor, Traceable {
             } else {
                 SOAPElement element = soapElement.addChildElement(name);
                 element.addTextNode(ob.toString());
+            }
+        }
+    }
+
+    private void buildHeader(Map<String, ModelField> modelField, Map<String, Object> values, SOAPElement soapElement) throws Exception {
+        if (MapUtils.isEmpty(modelField)) {
+            return;
+        }
+        for (Map.Entry<String, ModelField> entry : modelField.entrySet()) {
+            String name = entry.getKey();
+            ModelField field = entry.getValue();
+            FieldType type = field.getType();
+
+            if (type == FieldType.OBJECT) {
+                SOAPElement element = soapElement.addChildElement(name, PREFIX);
+                element.addNamespaceDeclaration("", soapOperationConfig.getTargetNamespace());
+                Map<String, ModelField> child = field.getFields();
+                buildHeader(child, values, element);
+            } else {
+                SOAPElement element = soapElement.addChildElement(name, PREFIX);
+                element.addTextNode(values.getOrDefault(name, "").toString());
             }
         }
     }

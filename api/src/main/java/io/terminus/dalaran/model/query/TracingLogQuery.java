@@ -27,4 +27,16 @@ public class TracingLogQuery {
     private Boolean successful;
 
     private boolean testFlow = false;
+
+    private PageRequest pageRequest;
+
+    @Data
+    public class PageRequest {
+
+        private Integer pageSize;
+
+        private Integer pageNumber;
+
+        private Long offset;
+    }
 }

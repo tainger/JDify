@@ -12,6 +12,7 @@ public class MappingFunctionInfo {
     private String name;
     private String description;
     private MappingFunctionType type;
+    private Boolean containsContext = false;
 
     private String[] params;
 

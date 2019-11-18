@@ -34,4 +34,7 @@ public class SoapListenerConfig extends AllModelConfig {
 
     @ConfigFieldInfo(label = "鉴权类型", inputType = FieldInputType.CheckBox, required = false)
     private SoapAuthType authType;
+
+    @ConfigFieldInfo(label = "返回体为空", inputType = FieldInputType.Switch, required = false)
+    private boolean nullResponseBody = false;
 }

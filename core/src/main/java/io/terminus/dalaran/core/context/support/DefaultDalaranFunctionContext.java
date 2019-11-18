@@ -1,22 +1,22 @@
 package io.terminus.dalaran.core.context.support;
 
+import io.terminus.dalaran.core.component.annotation.ContainsContextFunction;
+import io.terminus.dalaran.core.component.annotation.HiddenParam;
 import io.terminus.dalaran.core.context.DalaranFunctionContext;
 import io.terminus.dalaran.model.function.MappingFunctionInfo;
 import io.terminus.dalaran.model.function.MappingFunctionType;
 import jdk.nashorn.api.scripting.ScriptObjectMirror;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
 
 import javax.script.Invocable;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.lang.reflect.Parameter;
+import java.util.*;
 
 public class DefaultDalaranFunctionContext implements DalaranFunctionContext {
 
@@ -68,8 +68,26 @@ public class DefaultDalaranFunctionContext implements DalaranFunctionContext {
         functionInfo.setDescription(desc);
         functionInfo.setBean(bean);
         functionInfo.setMethod(method);
-        LocalVariableTableParameterNameDiscoverer u = new LocalVariableTableParameterNameDiscoverer();
-        functionInfo.setParams(u.getParameterNames(method));
+
+        ContainsContextFunction containsContextFunction = bean.getClass().getAnnotation(ContainsContextFunction.class);
+        if (containsContextFunction != null) {
+            functionInfo.setContainsContext(true);
+        }
+
+        List<String> params = new ArrayList<>();
+        Parameter[] parameters = method.getParameters();
+        for (Parameter parameter: parameters) {
+            Annotation[] annotations =  parameter.getAnnotations();
+            params.add(parameter.getName());
+            if (annotations != null && annotations.length > 0) {
+                for (Annotation annotation: annotations) {
+                    if (annotation instanceof HiddenParam) {
+                        params.remove(parameter.getName());
+                    }
+                }
+            }
+        }
+        functionInfo.setParams(params.toArray(new String[0]));
         functionInfoMapper.put(name, functionInfo);
     }
 

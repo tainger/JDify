@@ -26,6 +26,4 @@ public class MessageMapping {
     private SimpleMappingField destinationField;
 
     private List<SourceField> sourceFields;
-
-
 }
