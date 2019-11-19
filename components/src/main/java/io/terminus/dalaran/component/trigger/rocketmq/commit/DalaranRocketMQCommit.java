@@ -9,7 +9,6 @@ import org.apache.camel.model.ProcessorDefinition;
  */
 @Processor(
         value = "rocket-commit",
-        name = "RocketMQ 消费确认",
         order = 19
 )
 public class DalaranRocketMQCommit implements DalaranProcessor {

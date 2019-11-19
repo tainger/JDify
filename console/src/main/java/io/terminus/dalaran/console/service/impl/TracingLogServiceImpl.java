@@ -13,10 +13,7 @@ import io.terminus.dalaran.model.dto.log.MainLogDTO;
 import io.terminus.dalaran.model.dto.log.TracingLogDTO;
 import io.terminus.dalaran.model.query.TracingLogQuery;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
@@ -44,15 +41,28 @@ public class TracingLogServiceImpl implements TracingLogService {
     private ModuleManagementService moduleService;
 
     @Override
-    public List<MainLogDTO> triggerLogs(TracingLogQuery query) {
-        Sort.Order order = new Sort.Order(Sort.Direction.DESC, "timestamp");
+    public Page<MainLogDTO> triggerLogsPageable(TracingLogQuery query) {
+        Sort order = new Sort(new Sort.Order(Sort.Direction.DESC, "timestamp"));
         if (query.getPageRequest() != null) {
-            Page<TracingLogEntity> logs = tracingLogRepository.findAll(buildSpecification(query), buildPageable(query, order));
-            return logs.stream().map(this::buildTracingMainLog).collect(Collectors.toList());
+            Pageable pageable = buildPageable(query, order);
+            Page<TracingLogEntity> logs = tracingLogRepository.findAll(buildSpecification(query), pageable);
+            return new PageImpl<>(logs.stream().map(this::buildTracingMainLog).collect(Collectors.toList()), pageable, logs.getTotalElements());
         } else {
-            List<TracingLogEntity> logs = tracingLogRepository.findAll(buildSpecification(query), new Sort(order));
-            return logs.stream().map(this::buildTracingMainLog).collect(Collectors.toList());
+            List<TracingLogEntity> logs = tracingLogRepository.findAll(buildSpecification(query), order);
+            int pageSize = logs.size();
+            if (pageSize < 1) {
+                pageSize = 1;
+            }
+            Pageable pageable = PageRequest.of(0, pageSize, order);
+            return new PageImpl<>(logs.stream().map(this::buildTracingMainLog).collect(Collectors.toList()), pageable, logs.size());
         }
+    }
+
+    @Override
+    public List<MainLogDTO> triggerLogs(TracingLogQuery query) {
+        Sort order = new Sort(new Sort.Order(Sort.Direction.DESC, "timestamp"));
+        List<TracingLogEntity> logs = tracingLogRepository.findAll(buildSpecification(query), order);
+        return logs.stream().map(this::buildTracingMainLog).collect(Collectors.toList());
     }
 
     @Override
@@ -103,8 +113,12 @@ public class TracingLogServiceImpl implements TracingLogService {
         };
     }
 
-    private Pageable buildPageable(TracingLogQuery query, Sort.Order order) {
-        return PageRequest.of(query.getPageRequest().getPageNumber(), query.getPageRequest().getPageSize(), new Sort(order));
+    private Pageable buildPageable(TracingLogQuery query, Sort order) {
+        int pageSize = query.getPageRequest().getPageSize();
+        if (pageSize < 1) {
+            pageSize = 1;
+        }
+        return PageRequest.of(query.getPageRequest().getPageNumber(), pageSize, order);
     }
 
     private MainLogDTO buildTracingMainLog(TracingLogEntity log) {
