@@ -17,6 +17,8 @@ public interface ExportService {
 
     Definitions exportWSDL();
 
+    Definitions exportOperationWSDL(String operation);
+
     File exportWord();
 
     File exportWordDocs(String triggerType);

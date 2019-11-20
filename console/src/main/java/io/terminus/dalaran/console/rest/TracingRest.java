@@ -20,8 +20,8 @@ public class TracingRest implements TracingReadAPI {
     private TracingLogService tracingLogService;
 
     @OnException(code = ResponseMessage.TRACE_QUERY_ERROR)
-    public Page<MainLogDTO> queryPageable(TracingLogQuery query) {
-        return tracingLogService.triggerLogsPageable(query);
+    public Page<MainLogDTO> queryPageable(TracingLogQuery query, Integer pageNumber, Integer pageSize) {
+        return tracingLogService.triggerLogsPageable(query, pageNumber, pageSize);
     }
 
     @OnException(code = ResponseMessage.TRACE_QUERY_ERROR)

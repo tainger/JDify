@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
@@ -13,7 +14,7 @@ import java.util.List;
 public interface TracingReadAPI {
 
     @GetMapping("/pageable")
-    Page<MainLogDTO> queryPageable(TracingLogQuery query);
+    Page<MainLogDTO> queryPageable(TracingLogQuery query, @RequestParam Integer pageNumber, @RequestParam Integer pageSize);
 
     @GetMapping
     List<MainLogDTO> query(TracingLogQuery query);

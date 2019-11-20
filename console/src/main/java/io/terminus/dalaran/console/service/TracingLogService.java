@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface TracingLogService {
 
-    Page<MainLogDTO> triggerLogsPageable(TracingLogQuery query);
+    Page<MainLogDTO> triggerLogsPageable(TracingLogQuery query, Integer pageNumber, Integer pageSize);
 
     List<MainLogDTO> triggerLogs(TracingLogQuery query);
 

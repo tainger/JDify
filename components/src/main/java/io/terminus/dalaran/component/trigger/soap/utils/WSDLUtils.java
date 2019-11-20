@@ -30,6 +30,56 @@ public class WSDLUtils {
 
     private static final String OPERATION_SPLIT = "::";
 
+    public static Definitions getOperationDefinitions(SoapApiInfo apiInfo, String runtimeLocation) {
+        Definitions definitions = new Definitions(TNS, "Dalaran");
+        Map<String, MessageModel> models = new HashMap<>();
+        MessageModel input = apiInfo.getInput();
+        MessageModel output = apiInfo.getOutput();
+        models.put(input.getName(), input);
+        models.put(output.getName(), output);
+
+        Schema schema = new Schema(TNS);
+        definitions.addSchema(schema);
+        schema.setDefinitions(definitions);
+        models.forEach((name, model) -> {
+            DalaranModelSchema modelSchema = model.getModelSchema();
+            ModelField modelField = modelSchema.getFields().get(MapperConstants.MODEL_ROOT);
+            Element element = buildTypes(modelField, schema);
+            Message message = definitions.newMessage(name);
+            Part part = message.newPart(name, element);
+            part.setElementPN(new PrefixedName("tns", name));
+            part.setParent(message);
+        });
+
+        String apiName = apiInfo.getName().trim();
+        PortType pt = definitions.newPortType(SoapConstants.PORT_TYPE + OPERATION_SPLIT + apiName);
+        Operation op = pt.newOperation(apiName);
+        op.newInput(apiInfo.getInput().getName()).setMessage(definitions.getMessage(apiInfo.getInput().getName()));
+        op.newOutput(apiInfo.getOutput().getName()).setMessage(definitions.getMessage(apiInfo.getOutput().getName()));
+
+        Port port = definitions.newService(SoapConstants.SERVICE_NAME + OPERATION_SPLIT + apiName).newPort(SoapConstants.SERVICE_PORT + OPERATION_SPLIT + apiName);
+        Binding binding = port.newBinding(SoapConstants.BINDING + OPERATION_SPLIT + apiName);
+        binding.setType(pt);
+        SOAPBinding soapBinding = binding.newSOAP11Binding();
+        soapBinding.setBinding(binding);
+
+        BindingOperation bindingOperation = binding.newBindingOperation(apiName);
+        SOAPOperation soapOperation = bindingOperation.newSOAP11Operation();
+        soapOperation.setName(apiName);
+        soapOperation.setSoapAction(runtimeLocation + apiInfo.getPath());
+        BindingInput bindingInput = bindingOperation.newInput();
+        bindingInput.setName(apiInfo.getInput().getName());
+        SOAPBody inputBody = bindingInput.newSOAP11Body();
+        inputBody.setUse("literal");
+        BindingOutput bindingOutput = bindingOperation.newOutput();
+        bindingOutput.setName(apiInfo.getOutput().getName());
+        SOAPBody outputBody = bindingOutput.newSOAP11Body();
+        outputBody.setUse("literal");
+        port.newSOAP11Address(runtimeLocation + apiInfo.getPath());
+
+        return definitions;
+    }
+
     public static Definitions buildDefinitions(List<SoapApiInfo> soapApiInfos, String runtimeLocation) {
         Definitions definitions = new Definitions(TNS, "Dalaran");
         Map<String, MessageModel> models = new HashMap<>();

@@ -22,6 +22,7 @@ import io.terminus.dalaran.core.resource.entity.common.ModuleEntity;
 import io.terminus.dalaran.core.resource.repository.ModuleRepository;
 import io.terminus.dalaran.model.flow.FlowStatus;
 import io.terminus.dalaran.model.flow.TriggerFlow;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.metamodel.spi.MetamodelImplementor;
 import org.hibernate.persister.entity.AbstractEntityPersister;
 import org.hibernate.persister.entity.EntityPersister;
@@ -165,6 +166,12 @@ public class ExportServiceImpl implements ExportService {
         return WSDLUtils.buildDefinitions(soapApiList, runtimeLocation);
     }
 
+    @Override
+    public Definitions exportOperationWSDL(String operation) {
+        SoapApiInfo apiInfo = getApiInfoByOperation(operation);
+        return WSDLUtils.getOperationDefinitions(apiInfo, runtimeLocation);
+    }
+
     // TODO 比较暴力, 但是需要重置 ID 自增, 否则 Json 内的依赖可能会有问题
     private void truncateTable() {
         MetamodelImplementor metaMode = (MetamodelImplementor) entityManager.getMetamodel();
@@ -209,4 +216,13 @@ public class ExportServiceImpl implements ExportService {
         }).collect(Collectors.toList());
     }
 
+    private SoapApiInfo getApiInfoByOperation(String operation) {
+        List<TriggerFlowEntity> soapFlowList = triggerFlowRepository.findByStatusNotAndTriggerType(FlowStatus.Error, "soap-listener");
+        return soapFlowList.stream().filter(triggerFlowEntity ->
+            StringUtils.equals(triggerFlowEntity.getName().trim(), operation)
+        ).findFirst().map(flowEntity -> {
+            TriggerFlow triggerFlow = resourceBuilder.buildTriggerFlow(flowEntity);
+            return new SoapApiInfo(triggerFlow);
+        }).get();
+    }
 }

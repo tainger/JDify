@@ -126,4 +126,10 @@ public class FlowManagementRest implements FlowReadAPI, FlowWriteAPI {
         String recordId = dalaranContext.testFlow(request.getFlowId(), request.getBody());
         return tracingLogService.getRecordDetail(recordId);
     }
+
+    @Override
+    @OnException(code = ResponseMessage.SERVICE_QUERY_ERROR)
+    public List<String> listOperations() {
+        return flowManagementService.listTriggerOperations();
+    }
 }
