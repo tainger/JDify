@@ -33,9 +33,4 @@ public interface FlowReadAPI {
     @ApiOperation(value = "测试集成流")
     @PostMapping("/test")
     MainLogDTO doTest(@RequestBody TestRequestDTO request) throws FlowTestException;
-
-    @CrossOrigin
-    @ApiOperation(value = "获取 operation 列表")
-    @GetMapping(value = "/export/operations")
-    List<String> listOperations();
 }
