@@ -130,7 +130,7 @@ public class DalaranTracer {
             try {
                 InputStream inputStream = ((StringEntity) body).getContent();
                 List<String> data = IOUtils.readLines(inputStream);
-                return StringUtils.join(data, "\n");
+                return StringUtils.join(data, System.lineSeparator());
             } catch (IOException e) {
                 e.printStackTrace();
             }

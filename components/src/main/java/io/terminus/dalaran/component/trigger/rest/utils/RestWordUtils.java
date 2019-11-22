@@ -37,7 +37,7 @@ public class RestWordUtils {
 
     private static void addParamTable(XWPFDocument doc, ApiInfo info) {
         XWPFParagraph headingParagraph = doc.createParagraph();
-        headingParagraph.createRun().setText("\n" + info.getName() + "\n");
+        headingParagraph.createRun().setText(System.lineSeparator() + info.getName() + System.lineSeparator());
         headingParagraph.setStyle(HEADING_STYLE_ID);
 
         int maxCol = info.getParamLevel() + 2;

@@ -26,7 +26,7 @@ class ConvertRestTriggerDubboFlow : AnAction() {
         val processorInModel = method.parameters.firstOrNull()?.let { buildSchema(it.type as PsiClassReferenceType) }
         val processorOutModel = method.returnType?.let { buildSchema(it) }
 
-        val desc = method.docComment?.descriptionElements?.map { it.text?.trim() }?.joinToString("\n")?.trim()
+        val desc = method.docComment?.descriptionElements?.map { it.text?.trim() }?.joinToString(System.lineSeparator())?.trim()
         val inModel = processorInModel?.let {
             ModelInfo(it.modelSchema, "${it.name}-JSON", "${it.description}-JSON", "${it.modelKey}-JSON", "JSON")
         }

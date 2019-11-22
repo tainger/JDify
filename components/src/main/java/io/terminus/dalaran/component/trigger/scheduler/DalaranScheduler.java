@@ -19,6 +19,7 @@ public class DalaranScheduler implements DalaranTrigger<DalaranSchedulerConfig> 
     public void buildFromRoute(RouteDefinition route, DalaranSchedulerConfig config) {
         Map<String, Object> options = new HashMap<>();
         options.put("cron", config.getCron());
+        options.put("stateful", config.getStateful());
         String optionsString = UriUtils.buildOptionsQueryString(options);
         String uri = "quartz2://" + config.getTaskName() + "-" + RandomStringUtils.randomAlphanumeric(6) + optionsString;
         route.from(uri);

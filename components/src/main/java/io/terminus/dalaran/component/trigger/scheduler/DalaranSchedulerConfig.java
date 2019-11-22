@@ -12,4 +12,7 @@ public class DalaranSchedulerConfig {
 
     @ConfigFieldInfo(label = "Cron 表达式", inputType = FieldInputType.String)
     private String cron;
+
+    @ConfigFieldInfo(label = "正在执行则不触发", inputType = FieldInputType.Switch, defaultValue = "false")
+    private Boolean stateful = false;
 }
