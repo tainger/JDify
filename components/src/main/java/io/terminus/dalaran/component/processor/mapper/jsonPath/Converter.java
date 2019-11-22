@@ -301,7 +301,7 @@ public class Converter {
 
     private static Object parse(Object target, FieldType destination) {
         if (target == null) {
-            return null;
+            return "";
         }
         if (destination != null) {
             switch (destination) {
