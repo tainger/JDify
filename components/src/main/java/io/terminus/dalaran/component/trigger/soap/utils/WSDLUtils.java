@@ -31,6 +31,9 @@ public class WSDLUtils {
     private static final String OPERATION_SPLIT = "::";
 
     public static Definitions getOperationDefinitions(SoapApiInfo apiInfo, String runtimeLocation) {
+        if (apiInfo == null) {
+            return new Definitions(TNS, "Dalaran");
+        }
         Definitions definitions = new Definitions(TNS, "Dalaran");
         Map<String, MessageModel> models = new HashMap<>();
         MessageModel input = apiInfo.getInput();
