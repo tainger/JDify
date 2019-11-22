@@ -76,6 +76,11 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-aop</artifactId>
         </dependency>
+        <dependency>
+            <artifactId>draco-web-autoconfigure</artifactId>
+            <groupId>io.terminus.draco</groupId>
+            <version>1.0.1.RELEASE</version>
+        </dependency>
     </dependencies>
 
     <build>
