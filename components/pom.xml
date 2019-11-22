@@ -74,7 +74,11 @@
             <artifactId>mysql-connector-java</artifactId>
             <version>${mysql.connector.version}</version>
         </dependency>
-
+        <dependency>
+            <groupId>com.microsoft.sqlserver</groupId>
+            <artifactId>mssql-jdbc</artifactId>
+            <version>${mssql.connector.version}</version>
+        </dependency>
         <!-- script processor -->
         <dependency>
             <groupId>org.apache.camel</groupId>

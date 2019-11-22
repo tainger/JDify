@@ -45,7 +45,7 @@ public class TracingLogServiceImpl implements TracingLogService {
     @Override
     public Page<MainLogDTO> triggerLogsPageable(TracingLogQuery query, Integer pageNumber, Integer pageSize) {
         Sort order = new Sort(new Sort.Order(Sort.Direction.DESC, "timestamp"));
-        Pageable pageable = PageRequest.of(pageNumber, pageSize, order);
+        Pageable pageable = PageRequest.of(pageNumber - 1, pageSize, order);
         Page<TracingLogEntity> logs = tracingLogRepository.findAll(buildSpecification(query), pageable);
         return new PageImpl<>(logs.stream().map(this::buildTracingMainLog).collect(Collectors.toList()), pageable, logs.getTotalElements());
     }

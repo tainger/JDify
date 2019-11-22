@@ -1,6 +1,7 @@
 package io.terminus.dalaran.component.processor.sql;
 
 public enum Database {
-    MYSQL
+    MYSQL,
+    SQL_SERVER
 //    ORACLE
 }

@@ -35,12 +35,20 @@ public class SqlProcessor implements DalaranProcessor<SqlConfig> {
         org.apache.tomcat.jdbc.pool.DataSource dataSource = new org.apache.tomcat.jdbc.pool.DataSource();
         dataSource.setUsername(connector.getUsername());
         dataSource.setPassword(connector.getPassword());
+        String urlTemplate;
+        String url;
         switch (connector.getDatabaseType()) {
             case MYSQL:
-                String urlTemplate = "jdbc:mysql://%s:%s/%s?useUnicode=true&characterEncoding=utf-8&useSSL=false";
-                String url = String.format(urlTemplate, connector.getHost(), connector.getPort(), connector.getSchema());
+                urlTemplate = "jdbc:mysql://%s:%s/%s?useUnicode=true&characterEncoding=utf-8&useSSL=false";
+                url = String.format(urlTemplate, connector.getHost(), connector.getPort(), connector.getSchema());
                 dataSource.setUrl(url);
                 dataSource.setDriverClassName("com.mysql.jdbc.Driver");
+                break;
+            case SQL_SERVER:
+                urlTemplate = "jdbc:sqlserver://%s:%s;databaseName=%s";
+                url = String.format(urlTemplate, connector.getHost(), connector.getPort(), connector.getSchema());
+                dataSource.setUrl(url);
+                dataSource.setDriverClassName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
                 break;
 //            case ORACLE:
 //                break;
