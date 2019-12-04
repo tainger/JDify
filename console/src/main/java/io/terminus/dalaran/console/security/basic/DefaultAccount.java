@@ -1,4 +1,4 @@
-package io.terminus.dalaran.console.security;
+package io.terminus.dalaran.console.security.basic;
 
 import io.terminus.dalaran.model.DalaranAccount;
 import lombok.Data;

@@ -22,4 +22,7 @@ public class SqlConfig extends OutModelConfig implements ConnectorConfig<SqlData
 
     @ConfigFieldInfo(label = "SQL 语句", inputType = FieldInputType.SQL)
     private String sql;
+
+    @ConfigFieldInfo(label = "SQL类型", inputType = FieldInputType.Select, defaultValue = "COMMON")
+    private SQLType sqlType = SQLType.COMMON;
 }

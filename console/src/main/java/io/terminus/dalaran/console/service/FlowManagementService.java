@@ -43,4 +43,6 @@ public interface FlowManagementService {
     Long copyFlow(CopyFlow copyFlow) throws FlowNotExistException;
 
     List<FlowValidation> validateFlow(TriggerFlowDTO model);
+
+    List<String> listTriggerOperations();
 }

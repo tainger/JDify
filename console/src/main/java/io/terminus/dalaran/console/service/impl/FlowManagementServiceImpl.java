@@ -336,6 +336,11 @@ public class FlowManagementServiceImpl implements FlowManagementService {
         return validateFlow(entity);
     }
 
+    @Override
+    public List<String> listTriggerOperations() {
+        return getSoapOperations();
+    }
+
     private void setFlowStatus(TriggerFlowEntity flowEntity) {
         FlowStatus flowStatus = null;
         for (FlowValidation flowValidation : validateFlow(flowEntity)) {
@@ -392,5 +397,12 @@ public class FlowManagementServiceImpl implements FlowManagementService {
         model.setModuleId(entity.getModuleId());
         model.setDescription(entity.getDescription());
         return model;
+    }
+
+    private List<String> getSoapOperations() {
+        List<TriggerFlowEntity> soapFlowList = flowRepository.findByStatusNotAndTriggerType(FlowStatus.Error, "soap-listener");
+        return soapFlowList.stream().map(flowEntity -> {
+            return flowEntity.getName().trim();
+        }).collect(Collectors.toList());
     }
 }

@@ -34,4 +34,9 @@ public interface PlatformExportAPI {
     @ApiOperation(value = "导出 WSDL 信息")
     @GetMapping(value = "/export/WSDL", produces = "text/xml;charset=UTF-8")
     String exportWSDL();
+
+    @CrossOrigin
+    @ApiOperation(value = "导出 单个operation的WSDL 信息")
+    @GetMapping(value = "/export/WSDL/{operation}", produces = "text/xml;charset=UTF-8")
+    String exportOperationWSDL(@PathVariable String operation);
 }

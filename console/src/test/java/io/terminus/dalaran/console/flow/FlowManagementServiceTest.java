@@ -1,7 +1,6 @@
 package io.terminus.dalaran.console.flow;
 
 import com.alibaba.fastjson.JSON;
-import io.terminus.dalaran.ComponentType;
 import io.terminus.dalaran.console.entity.TriggerFlowEntity;
 import io.terminus.dalaran.console.repository.ModelRepository;
 import io.terminus.dalaran.console.repository.TriggerFlowRepository;
@@ -227,8 +226,6 @@ public class FlowManagementServiceTest {
         ConnectorDTO connector = new ConnectorDTO();
         connector.setModuleId(1L);
         connector.setName("test-connector");
-        connector.setComponentType(ComponentType.Processor);
-        connector.setComponentName("http-client");
 
         /**
          * {"host":"localhost","protocol":"HTTP","port":"8080","timeout":"3000"}

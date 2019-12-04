@@ -27,9 +27,14 @@ public class SqlProcessor implements DalaranProcessor<SqlConfig> {
             beanFactory.registerSingleton(dataSourceBeanName, dataSource);
         }
         // TODO 目前取值只支持一级, 后面可用通过实现 SqlPrepareStatementStrategy 来扩展
-        route.to("sql:" + config.getSql() + "?dataSource=" + dataSourceBeanName);
+        String uri;
+        if (config.getSqlType() == SQLType.STORED_PROCEDURE) {
+            uri = "sql-stored:";
+        } else {
+            uri = "sql:";
+        }
+        route.to(uri + config.getSql() + "?dataSource=" + dataSourceBeanName);
     }
-
 
     private javax.sql.DataSource buildDataSource(SqlDataSourceConnector connector) {
         org.apache.tomcat.jdbc.pool.DataSource dataSource = new org.apache.tomcat.jdbc.pool.DataSource();
@@ -45,13 +50,21 @@ public class SqlProcessor implements DalaranProcessor<SqlConfig> {
 
         dataSource.setUsername(connector.getUsername());
         dataSource.setPassword(connector.getPassword());
+        String urlTemplate;
+        String url;
         switch (connector.getDatabaseType()) {
             case MYSQL:
-                String urlTemplate = "jdbc:mysql://%s:%s/%s?useUnicode=true&characterEncoding=utf-8&useSSL=false";
-                String url = String.format(urlTemplate, connector.getHost(), connector.getPort(), connector.getSchema());
+                urlTemplate = "jdbc:mysql://%s:%s/%s?useUnicode=true&characterEncoding=utf-8&useSSL=false";
+                url = String.format(urlTemplate, connector.getHost(), connector.getPort(), connector.getSchema());
                 dataSource.setUrl(url);
                 dataSource.setValidationQuery("select 1");
                 dataSource.setDriverClassName("com.mysql.jdbc.Driver");
+                break;
+            case SQL_SERVER:
+                urlTemplate = "jdbc:sqlserver://%s:%s;databaseName=%s";
+                url = String.format(urlTemplate, connector.getHost(), connector.getPort(), connector.getSchema());
+                dataSource.setUrl(url);
+                dataSource.setDriverClassName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
                 break;
 //            case ORACLE:
 //                break;

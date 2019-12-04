@@ -26,6 +26,9 @@ public class RocketMQEndpoint extends ProcessorEndpoint {
     @UriParam(description = "consumer/producer tags", javaType = "java.lang.String")
     private String tags;
 
+    @UriParam(description = "timeout", javaType = "java.lang.Integer")
+    private Integer timeout;
+
     @UriParam(description = "use ali cloud ons service", javaType = "java.lang.Boolean", defaultValue = "false")
     private Boolean useAliCloudOns;
 
@@ -36,10 +39,13 @@ public class RocketMQEndpoint extends ProcessorEndpoint {
     private String secretKey;
 
     @UriParam(description = "auto commit", javaType = "java.lang.Boolean", defaultValue = "true")
-    private Boolean autoCommit;
+    private Boolean autocommit;
 
     @UriParam(description = "message sharding", javaType = "java.lang.Boolean", defaultValue = "false")
     private Boolean messageSharding;
+
+    @UriParam(description = "async", javaType = "java.lang.Boolean", defaultValue = "false")
+    private Boolean async;
 
     private RocketMQContext context;
 
@@ -134,12 +140,12 @@ public class RocketMQEndpoint extends ProcessorEndpoint {
         this.secretKey = secretKey;
     }
 
-    public Boolean getAutoCommit() {
-        return autoCommit;
+    public Boolean getAutocommit() {
+        return autocommit;
     }
 
-    public void setAutoCommit(Boolean autoCommit) {
-        this.autoCommit = autoCommit;
+    public void setAutocommit(Boolean autocommit) {
+        this.autocommit = autocommit;
     }
 
     public Boolean getMessageSharding() {
@@ -148,5 +154,21 @@ public class RocketMQEndpoint extends ProcessorEndpoint {
 
     public void setMessageSharding(Boolean messageSharding) {
         this.messageSharding = messageSharding;
+    }
+
+    public Integer getTimeout() {
+        return timeout;
+    }
+
+    public void setTimeout(Integer timeout) {
+        this.timeout = timeout;
+    }
+
+    public Boolean getAsync() {
+        return async;
+    }
+
+    public void setAsync(Boolean async) {
+        this.async = async;
     }
 }

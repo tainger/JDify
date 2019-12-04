@@ -21,8 +21,10 @@ public class DefaultDalaranModelTypeContext implements DalaranModelTypeContext {
             fromObject(route, modelType);
         } else if (model.getModelType().equals(modelType)) {
             fromObject(route, model);
-        } else {
+        } else if (model.getModelType().equals("SOAP")) {
             // TODO 这种要考虑一下风险, 比如 SOAP 这种有特殊要求的 Schema
+            fromObject(route, model, modelType);
+        } else {
             fromObject(route, modelType);
         }
     }

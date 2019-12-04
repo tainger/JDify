@@ -1,6 +1,7 @@
 package io.terminus.dalaran.core.component.model;
 
 import io.terminus.dalaran.model.DalaranModelSchema;
+import io.terminus.dalaran.model.schema.DataTemplate;
 import org.apache.camel.model.ProcessorDefinition;
 
 public interface DalaranModelType<T, Schema extends DalaranModelSchema> {
@@ -12,4 +13,8 @@ public interface DalaranModelType<T, Schema extends DalaranModelSchema> {
     String buildTemplateData(Schema schema);
 
     Schema buildSchemaFromTemplateData(String dataStr);
+
+    Schema importTemplateData(DataTemplate dataTemplate);
+
+    Schema importDalaranSchema(Schema schema);
 }

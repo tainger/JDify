@@ -6,10 +6,12 @@ import io.terminus.dalaran.config.ProcessorInfo;
 import io.terminus.dalaran.config.ServiceInfo;
 import io.terminus.dalaran.config.TriggerInfo;
 import io.terminus.dalaran.model.function.MappingFunctionInfo;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.Collection;
+import java.util.List;
 
 @RequestMapping(value = "/api/platform", produces = {"application/json; charset=UTF-8"})
 public interface PlatformInfoAPI {
@@ -37,4 +39,9 @@ public interface PlatformInfoAPI {
     @ApiOperation(value = "获取可用服务类型")
     @GetMapping(value = "/modelType")
     Collection<String> listModelType();
+
+    @CrossOrigin
+    @ApiOperation(value = "获取 operation 列表")
+    @GetMapping(value = "/trigger/soap/operations")
+    List<String> listOperations();
 }

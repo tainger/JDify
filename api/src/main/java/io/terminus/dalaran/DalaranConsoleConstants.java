@@ -15,6 +15,8 @@ public class DalaranConsoleConstants {
 
     public static final String JAVA_DOUBLE = "java.lang.Double";
 
+    public static final String JAVA_MATH_BIGDECIMAL = "java.math.BigDecimal";
+
     public static final String JAVA_NUMBER = "java.lang.Number";
 
     public static final String JAVA_BOOLEAN = "java.lang.Boolean";

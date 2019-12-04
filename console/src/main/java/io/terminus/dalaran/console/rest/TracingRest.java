@@ -7,6 +7,7 @@ import io.terminus.dalaran.model.dto.log.MainLogDTO;
 import io.terminus.dalaran.model.query.TracingLogQuery;
 import io.terminus.dalaran.rest.read.TracingReadAPI;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -17,6 +18,11 @@ public class TracingRest implements TracingReadAPI {
 
     @Autowired
     private TracingLogService tracingLogService;
+
+    @OnException(code = ResponseMessage.TRACE_QUERY_ERROR)
+    public Page<MainLogDTO> queryPageable(TracingLogQuery query, Integer pageNumber, Integer pageSize) {
+        return tracingLogService.triggerLogsPageable(query, pageNumber, pageSize);
+    }
 
     @OnException(code = ResponseMessage.TRACE_QUERY_ERROR)
     public List<MainLogDTO> query(TracingLogQuery query) {

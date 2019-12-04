@@ -30,8 +30,11 @@ public class SoapListenerConfig extends AllModelConfig {
     private Long timeout = 3000L;
 
     @ConfigFieldInfo(label = "鉴权签名", inputType = FieldInputType.Switch, defaultValue = "true")
-    private boolean enableSign = true;
+    private boolean enableSign = false;
 
-    @ConfigFieldInfo(label = "鉴权类型", inputType = FieldInputType.CheckBox, required = false)
+    @ConfigFieldInfo(label = "鉴权类型", inputType = FieldInputType.Select, required = false)
     private SoapAuthType authType;
+
+    @ConfigFieldInfo(label = "返回体为空", inputType = FieldInputType.Switch, required = false)
+    private boolean nullResponseBody = false;
 }

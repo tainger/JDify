@@ -15,7 +15,11 @@ public class SoapOperation {
 
     private String input;
 
+    private String inputHeader;
+
     private String output;
+
+    private String outputHeader;
 
     private String path;
 

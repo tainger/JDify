@@ -17,10 +17,10 @@ import io.terminus.dalaran.console.util.ExcelUtils;
 import io.terminus.dalaran.core.context.DalaranContext;
 import io.terminus.dalaran.core.resource.repository.ModuleRepository;
 import io.terminus.dalaran.model.*;
-import io.terminus.dalaran.model.dto.DataTemplate;
 import io.terminus.dalaran.model.dto.ModelDTO;
 import io.terminus.dalaran.model.dto.basic.BasicModelInfo;
 import io.terminus.dalaran.model.query.ModelQuery;
+import io.terminus.dalaran.model.schema.DataTemplate;
 import io.terminus.dalaran.model.schema.JsonSchema;
 import io.terminus.dalaran.model.schema.ObjectSchema;
 import org.apache.commons.collections.CollectionUtils;
@@ -172,7 +172,6 @@ public class ModelManagementServiceImpl implements ModelManagementService {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         return new HashMap<>();
     }
 
@@ -189,6 +188,15 @@ public class ModelManagementServiceImpl implements ModelManagementService {
         JsonSchema schema = new JsonSchema();
         schema.setFields(root);
         ModelEntity model = modelRepository.findById(id).get();
+        model.setModelSchema(JSON.toJSONString(schema));
+        modelRepository.save(model);
+        return schema;
+    }
+
+    @Override
+    public Object importModelTemplate(DataTemplate dataTemplate, Long id) {
+        ModelEntity model = modelRepository.findById(id).get();
+        DalaranModelSchema schema = dalaranContext.getDalaranModelTypeContext().getModelType(model.getType()).importTemplateData(dataTemplate);
         model.setModelSchema(JSON.toJSONString(schema));
         modelRepository.save(model);
         return schema;
@@ -333,7 +341,7 @@ public class ModelManagementServiceImpl implements ModelManagementService {
                 case DATE:
                     return new Date();
                 case FLOAT:
-                    return (float) index;
+                    return (float) index + 1.1;
             }
         }
         return "";
@@ -476,6 +484,7 @@ public class ModelManagementServiceImpl implements ModelManagementService {
                 return FieldType.ARRAY;
             case DalaranConsoleConstants.JAVA_FLOAT:
             case DalaranConsoleConstants.JAVA_DOUBLE:
+            case DalaranConsoleConstants.JAVA_MATH_BIGDECIMAL:
                 return FieldType.FLOAT;
             case DalaranConsoleConstants.JAVA_BOOLEAN:
                 return FieldType.BOOLEAN;

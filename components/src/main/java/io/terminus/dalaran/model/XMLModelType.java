@@ -2,6 +2,7 @@ package io.terminus.dalaran.model;
 
 import io.terminus.dalaran.core.component.annotation.ModelType;
 import io.terminus.dalaran.core.component.model.DalaranModelType;
+import io.terminus.dalaran.model.schema.DataTemplate;
 import io.terminus.dalaran.model.schema.XMLSchema;
 import org.apache.camel.model.ProcessorDefinition;
 import org.apache.camel.model.dataformat.JsonLibrary;
@@ -36,6 +37,11 @@ public class XMLModelType implements DalaranModelType<String, XMLSchema> {
         return null;
     }
 
+    @Override
+    public XMLSchema importTemplateData(DataTemplate dataTemplate) {
+        return null;
+    }
+
     // TODO 处理 XML 特殊逻辑, 比如 attr, 应该可以抽象
     private Map<String, String> buildOptions(XMLSchema schema) {
         Map<String, String> options = new HashMap<>();
@@ -47,5 +53,10 @@ public class XMLModelType implements DalaranModelType<String, XMLSchema> {
         XmlJsonDataFormat dataFormat = new XmlJsonDataFormat();
         dataFormat.setRootName(schema.getRoot());
         return dataFormat;
+    }
+
+    @Override
+    public XMLSchema importDalaranSchema(XMLSchema schema) {
+        return null;
     }
 }

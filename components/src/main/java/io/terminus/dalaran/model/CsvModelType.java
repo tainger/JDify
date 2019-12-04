@@ -3,6 +3,7 @@ package io.terminus.dalaran.model;
 import io.terminus.dalaran.core.component.annotation.ModelType;
 import io.terminus.dalaran.core.component.model.DalaranModelType;
 import io.terminus.dalaran.model.schema.CsvModelSchema;
+import io.terminus.dalaran.model.schema.DataTemplate;
 import org.apache.camel.component.file.GenericFileMessage;
 import org.apache.camel.model.ProcessorDefinition;
 
@@ -85,6 +86,16 @@ public class CsvModelType implements DalaranModelType<String, CsvModelSchema> {
 
     @Override
     public CsvModelSchema buildSchemaFromTemplateData(String dataStr) {
+        return null;
+    }
+
+    @Override
+    public CsvModelSchema importTemplateData(DataTemplate dataTemplate) {
+        return null;
+    }
+
+    @Override
+    public CsvModelSchema importDalaranSchema(CsvModelSchema schema) {
         return null;
     }
 }

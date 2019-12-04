@@ -1,7 +1,11 @@
 package io.terminus.dalaran.camel.component.rocketmq;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONPath;
 import org.apache.camel.Exchange;
 import org.apache.camel.impl.DefaultProducer;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.rocketmq.acl.common.AclClientRPCHook;
 import org.apache.rocketmq.acl.common.SessionCredentials;
@@ -11,10 +15,14 @@ import org.apache.rocketmq.client.producer.SendCallback;
 import org.apache.rocketmq.client.producer.SendResult;
 import org.apache.rocketmq.common.message.Message;
 import org.apache.rocketmq.remoting.RPCHook;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by jingdi on 2019/6/14
@@ -24,6 +32,13 @@ public class RocketMQProducer extends DefaultProducer {
     private DefaultMQProducer producer;
 
     private RocketMQEndpoint endpoint;
+
+    private final Logger logger = LoggerFactory.getLogger(RocketMQProducer.class);
+
+    private ThreadPoolExecutor executor = new ThreadPoolExecutor(10, 10,
+            1000, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>());
+
+    private final String JSON_PATH_HEADER = "$.";
 
     public RocketMQProducer(RocketMQEndpoint endpoint) {
         super(endpoint);
@@ -45,6 +60,8 @@ public class RocketMQProducer extends DefaultProducer {
                 producer.setAccessChannel(AccessChannel.LOCAL);
             }
             producer.setNamesrvAddr(endpoint.getNameServer());
+            producer.setSendMsgTimeout(endpoint.getTimeout());
+            producer.setMaxMessageSize(41943040);
             producer.start();
         }
     }
@@ -58,30 +75,45 @@ public class RocketMQProducer extends DefaultProducer {
     @Override
     public void process(Exchange exchange) throws Exception {
         List<Message> messages = buildMessage(exchange, endpoint.getMessageSharding());
-        for (Message message : messages) {
-            producer.send(message, new SendCallback() {
-                @Override
-                public void onSuccess(SendResult sendResult) {
-                    exchange.getOut().setBody(sendResult);
-                }
+        Boolean async = endpoint.getAsync();
+        if (async) {
+            for (Message message : messages) {
+                producer.send(message, new SendCallback() {
+                    @Override
+                    public void onSuccess(SendResult sendResult) {
+                        exchange.getOut().setBody(JSON.toJSONString(new DalaranSendResult(sendResult, messages.size())));
+                    }
 
-                @Override
-                public void onException(Throwable e) {
-                    e.printStackTrace();
+                    @Override
+                    public void onException(Throwable e) {
+                        e.printStackTrace();
+                    }
+                });
+            }
+        } else {
+            executor.execute(() -> {
+                SendResult sendResult = new SendResult();
+                for (Message message: messages) {
+                    try {
+                        sendResult = producer.send(message);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
+                exchange.getOut().setBody(JSON.toJSONString(new DalaranSendResult(sendResult, messages.size())));
             });
         }
     }
 
     private List<Message> buildMessage(Exchange exchange, Boolean messageSharding) {
         List<Message> messages = new ArrayList<>();
-        org.apache.camel.Message camelMsg = exchange.getIn();
-        Object body = camelMsg.getBody();
+        Object body = exchange.getIn().getBody();
         if (body == null) {
             return messages;
         }
-        if (messageSharding && body instanceof Collection) {
-            List<Object> msgs = (List) body;
+        Object json = JSON.toJSON(body);
+        if (messageSharding && json instanceof JSONArray) {
+            List<Object> msgs = (List) json;
             msgs.forEach(msg -> {
                 messages.add(build(msg));
             });
@@ -93,20 +125,47 @@ public class RocketMQProducer extends DefaultProducer {
 
     private Message build(Object body) {
         Message message = new Message();
-        message.setTopic(endpoint.getTopic());
+        String topic = parseExpression(endpoint.getTopic(), body);
+        message.setTopic(topic);
+        logger.info("topic : " + topic);
         String tags = endpoint.getTags();
         if (StringUtils.isNotBlank(tags)) {
+            tags = parseExpression(tags, body);
             message.setTags(tags);
+            logger.info("tag : " + tags);
         }
         if (body != null) {
             if (body instanceof byte[]) {
                 message.setBody((byte[]) body);
             } else if (body instanceof String) {
                 message.setBody(((String) body).getBytes());
+            } else if (body instanceof JSON) {
+                message.setBody(body.toString().getBytes());
             } else {
                 throw new RuntimeException("no support body type;");
             }
         }
         return message;
+    }
+
+    private String parseExpression(String origin, Object body) {
+        if (!StringUtils.startsWith(origin, JSON_PATH_HEADER)) {
+            return origin;
+        }
+        if (body instanceof byte[]) {
+            try {
+                body = JSON.parseObject(IOUtils.toString((byte[])body));
+            } catch (Exception e) {
+                throw new RuntimeException("body parse error;");
+            }
+        }
+        if (body instanceof String) {
+            body = JSON.parseObject((String) body);
+        }
+        Object data = JSONPath.eval(body, origin);
+        if (data == null) {
+            return origin;
+        }
+        return data.toString();
     }
 }

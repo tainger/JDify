@@ -10,10 +10,7 @@ import io.terminus.dalaran.config.TriggerInfo;
 import io.terminus.dalaran.console.ExportData;
 import io.terminus.dalaran.console.ResponseMessage;
 import io.terminus.dalaran.console.exception.OnException;
-import io.terminus.dalaran.console.service.AuthorizeService;
-import io.terminus.dalaran.console.service.ExportService;
-import io.terminus.dalaran.console.service.ReleaseService;
-import io.terminus.dalaran.console.service.TrantorService;
+import io.terminus.dalaran.console.service.*;
 import io.terminus.dalaran.core.context.DalaranContext;
 import io.terminus.dalaran.model.DalaranAccount;
 import io.terminus.dalaran.model.dto.ReleaseRecordDTO;
@@ -58,6 +55,9 @@ public class PlatformRest implements PlatformInfoAPI, PlatformImportAPI, Platfor
 
     @Autowired
     private ExportService exportService;
+
+    @Autowired
+    private FlowManagementService flowManagementService;
 
     @Override
     @OnException(code = ResponseMessage.VERSION_QUERY_ERROR)
@@ -171,6 +171,13 @@ public class PlatformRest implements PlatformInfoAPI, PlatformImportAPI, Platfor
     }
 
     @Override
+    @CrossOrigin
+    @OnException(code = ResponseMessage.WSDL_EXPORT_ERROR)
+    public String exportOperationWSDL(String operation) {
+        return exportService.exportOperationWSDL(operation).getAsString();
+    }
+
+    @Override
     @OnException(code = ResponseMessage.CONFIG_IMPORT_ERROR)
     public void importAll(@RequestParam MultipartFile importFile) {
         try {
@@ -185,5 +192,11 @@ public class PlatformRest implements PlatformInfoAPI, PlatformImportAPI, Platfor
     @OnException(code = ResponseMessage.LOGIN_ERROR)
     public boolean loginAuth(@RequestBody DalaranAccount account) {
         return authorizeService.authAccount(account);
+    }
+
+    @Override
+    @OnException(code = ResponseMessage.SERVICE_QUERY_ERROR)
+    public List<String> listOperations() {
+        return flowManagementService.listTriggerOperations();
     }
 }

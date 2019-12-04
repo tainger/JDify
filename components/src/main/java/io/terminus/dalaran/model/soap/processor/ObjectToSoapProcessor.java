@@ -3,6 +3,7 @@ package io.terminus.dalaran.model.soap.processor;
 import io.terminus.dalaran.DalaranConstants;
 import io.terminus.dalaran.model.FieldType;
 import io.terminus.dalaran.model.ModelField;
+import io.terminus.dalaran.model.schema.SoapSchema;
 import io.terminus.dalaran.model.schema.SoapSchemaOperation;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
@@ -30,11 +31,11 @@ public class ObjectToSoapProcessor implements Processor, Traceable {
 
     private final SoapSchemaOperation soapOperationConfig;
 
-    private static final String PREFIX = "dalaran";
+    private String PREFIX;
 
-    public ObjectToSoapProcessor(Map<String, ModelField> modelFields, SoapSchemaOperation soapOperationConfig) {
-        this.modelFields = modelFields;
-        this.soapOperationConfig = soapOperationConfig;
+    public ObjectToSoapProcessor(SoapSchema schema) {
+        this.modelFields = schema.getFields();
+        this.soapOperationConfig = schema.getOperationConfig();
     }
 
     @Override
@@ -44,14 +45,19 @@ public class ObjectToSoapProcessor implements Processor, Traceable {
         exchange.getOut().setBody(rst);
     }
 
-    private Object buildSoapBody(ModelField modelField, Object body) throws Exception {
+    public String buildSoapBody(ModelField modelField, Object body) throws Exception {
+        PREFIX = soapOperationConfig.getPrefix();
         MessageFactory messageFactory = MessageFactory.newInstance();
         SOAPMessage message = messageFactory.createMessage();
         SOAPPart soapPart = message.getSOAPPart();
         SOAPEnvelope soapEnvelope = soapPart.getEnvelope();
         soapEnvelope.addNamespaceDeclaration(PREFIX, soapOperationConfig.getTargetNamespace());
         SOAPBody soapBody = soapEnvelope.getBody();
-        buildBody(modelField.getFields(), body, soapBody);
+        buildRoot(modelField.getFields(), body, soapBody);
+        if (soapOperationConfig.getHeader() != null) {
+            SOAPHeader header = soapEnvelope.getHeader();
+            buildHeader(soapOperationConfig.getHeader().getModelSchema().getFields().get(DalaranConstants.MODEL_ROOT).getFields(), soapOperationConfig.getHeaderValues(), header);
+        }
         message.saveChanges();
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         message.writeTo(stream);
@@ -67,7 +73,22 @@ public class ObjectToSoapProcessor implements Processor, Traceable {
         return data.toString();
     }
 
-    private void buildBody(Map<String, ModelField> modelField, Object body, SOAPElement soapElement) throws Exception {
+    private void buildRoot(Map<String, ModelField> modelField, Object body, SOAPElement soapElement) throws Exception {
+        if (MapUtils.isEmpty(modelField)) {
+            return;
+        }
+        for (Map.Entry<String, ModelField> entry : modelField.entrySet()) {
+            Object ob = ((Map) body).get(entry.getKey());
+            SOAPElement element = soapElement.addChildElement(entry.getKey(), PREFIX);
+            if (soapOperationConfig.getBodyContainsXmlns()) {
+                element.addNamespaceDeclaration("", soapOperationConfig.getTargetNamespace());
+            }
+            Map<String, ModelField> child = entry.getValue().getFields();
+            buildBody(child, ob, element, soapOperationConfig.getBodyContainsXmlns(), soapOperationConfig.getBodyContainsPrefix());
+        }
+    }
+
+    private void buildBody(Map<String, ModelField> modelField, Object body, SOAPElement soapElement, Boolean bodyContainsXmlns, Boolean bodyContainsPrefix) throws Exception {
         if (MapUtils.isEmpty(modelField)) {
             return;
         }
@@ -85,10 +106,17 @@ public class ObjectToSoapProcessor implements Processor, Traceable {
                 FieldType subType = field.getSubType();
                 if (subType == FieldType.OBJECT) {
                     for (Object data: subBody) {
-                        SOAPElement element = soapElement.addChildElement(name, PREFIX);
-                        element.addNamespaceDeclaration("", soapOperationConfig.getTargetNamespace());
+                        SOAPElement element;
+                        if (bodyContainsPrefix) {
+                            element = soapElement.addChildElement(name, PREFIX);
+                        } else {
+                            element = soapElement.addChildElement(name);
+                        }
+                        if (bodyContainsXmlns) {
+                            element.addNamespaceDeclaration("", soapOperationConfig.getTargetNamespace());
+                        }
                         Map<String, ModelField> child = field.getFields();
-                        buildBody(child, data, element);
+                        buildBody(child, data, element, bodyContainsXmlns, bodyContainsPrefix);
                     }
                 } else {
                     for (Object data: subBody) {
@@ -98,13 +126,41 @@ public class ObjectToSoapProcessor implements Processor, Traceable {
                     }
                 }
             } else if (type == FieldType.OBJECT) {
-                SOAPElement element = soapElement.addChildElement(name, PREFIX);
-                element.addNamespaceDeclaration("", soapOperationConfig.getTargetNamespace());
+                SOAPElement element;
+                if (bodyContainsPrefix) {
+                    element = soapElement.addChildElement(name, PREFIX);
+                } else {
+                    element = soapElement.addChildElement(name);
+                }
+                if (bodyContainsXmlns) {
+                    element.addNamespaceDeclaration("", soapOperationConfig.getTargetNamespace());
+                }
                 Map<String, ModelField> child = field.getFields();
-                buildBody(child, ob, element);
+                buildBody(child, ob, element, bodyContainsXmlns, bodyContainsPrefix);
             } else {
                 SOAPElement element = soapElement.addChildElement(name);
                 element.addTextNode(ob.toString());
+            }
+        }
+    }
+
+    private void buildHeader(Map<String, ModelField> modelField, Map<String, Object> values, SOAPElement soapElement) throws Exception {
+        if (MapUtils.isEmpty(modelField)) {
+            return;
+        }
+        for (Map.Entry<String, ModelField> entry : modelField.entrySet()) {
+            String name = entry.getKey();
+            ModelField field = entry.getValue();
+            FieldType type = field.getType();
+
+            if (type == FieldType.OBJECT) {
+                SOAPElement element = soapElement.addChildElement(name, PREFIX);
+                element.addNamespaceDeclaration("", soapOperationConfig.getTargetNamespace());
+                Map<String, ModelField> child = field.getFields();
+                buildHeader(child, values, element);
+            } else {
+                SOAPElement element = soapElement.addChildElement(name, PREFIX);
+                element.addTextNode(values.getOrDefault(name, "").toString());
             }
         }
     }
