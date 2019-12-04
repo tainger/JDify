@@ -141,7 +141,6 @@ public class DalaranTracer {
                 return IOUtils.toString((InputStream)body, StandardCharsets.UTF_8);
             } catch (Exception e) {
                 e.printStackTrace();
-                return body.toString();
             }
         }
         return body.toString();
