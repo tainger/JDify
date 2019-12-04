@@ -11,9 +11,13 @@ import java.util.Map;
 @Data
 public class SoapSchemaOperation {
 
-    private String targetNamespace;
+    private String targetNamespace = "http://schemas.xmlsoap.org/wsdl";
 
     private String prefix = "dalaran";
+
+    private Boolean bodyContainsXmlns = true;
+
+    private Boolean bodyContainsPrefix = true;
 
     private MessageModel header;
 

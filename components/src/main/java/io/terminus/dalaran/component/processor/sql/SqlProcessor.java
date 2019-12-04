@@ -27,9 +27,14 @@ public class SqlProcessor implements DalaranProcessor<SqlConfig> {
             beanFactory.registerSingleton(dataSourceBeanName, dataSource);
         }
         // TODO 目前取值只支持一级, 后面可用通过实现 SqlPrepareStatementStrategy 来扩展
-        route.to("sql:" + config.getSql() + "?dataSource=" + dataSourceBeanName);
+        String uri;
+        if (config.getSqlType() == SQLType.STORED_PROCEDURE) {
+            uri = "sql-stored:";
+        } else {
+            uri = "sql:";
+        }
+        route.to(uri + config.getSql() + "?dataSource=" + dataSourceBeanName);
     }
-
 
     private javax.sql.DataSource buildDataSource(SqlDataSourceConnector connector) {
         org.apache.tomcat.jdbc.pool.DataSource dataSource = new org.apache.tomcat.jdbc.pool.DataSource();

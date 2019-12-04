@@ -15,6 +15,7 @@ import org.apache.http.entity.StringEntity;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 
@@ -134,7 +135,14 @@ public class DalaranTracer {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
+        }
+        if (body instanceof InputStream) {
+            try {
+                return IOUtils.toString((InputStream)body, StandardCharsets.UTF_8);
+            } catch (Exception e) {
+                e.printStackTrace();
+                return body.toString();
+            }
         }
         return body.toString();
     }

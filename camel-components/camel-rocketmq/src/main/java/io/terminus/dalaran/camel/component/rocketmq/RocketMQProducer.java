@@ -92,15 +92,16 @@ public class RocketMQProducer extends DefaultProducer {
             }
         } else {
             executor.execute(() -> {
+                SendResult sendResult = new SendResult();
                 for (Message message: messages) {
                     try {
-                        producer.send(message);
+                        sendResult = producer.send(message);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
                 }
+                exchange.getOut().setBody(JSON.toJSONString(new DalaranSendResult(sendResult, messages.size())));
             });
-            exchange.getOut().setBody(JSON.toJSONString(new DalaranSendResult(null, messages.size())));
         }
     }
 

@@ -2,7 +2,7 @@ package io.terminus.dalaran.rest.write;
 
 import io.swagger.annotations.ApiOperation;
 import io.terminus.dalaran.model.ModelField;
-import io.terminus.dalaran.model.dto.DataTemplate;
+import io.terminus.dalaran.model.schema.DataTemplate;
 import io.terminus.dalaran.model.schema.JsonSchema;
 import io.terminus.dalaran.model.schema.ObjectSchema;
 import org.springframework.web.bind.annotation.*;

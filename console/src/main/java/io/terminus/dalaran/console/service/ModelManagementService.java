@@ -2,7 +2,7 @@ package io.terminus.dalaran.console.service;
 
 import io.terminus.dalaran.console.entity.ModelEntity;
 import io.terminus.dalaran.model.ClassificationModel;
-import io.terminus.dalaran.model.dto.DataTemplate;
+import io.terminus.dalaran.model.schema.DataTemplate;
 import io.terminus.dalaran.model.dto.ModelDTO;
 import io.terminus.dalaran.model.dto.basic.BasicModelInfo;
 import io.terminus.dalaran.model.query.ModelQuery;
@@ -57,4 +57,6 @@ public interface ModelManagementService {
     Map<String, String> suggestMapping(Long sourceId, Long targetId);
 
     ResponseEntity<Resource> downloadExcelTemplate();
+
+    Object importModelTemplate(DataTemplate dataTemplate, Long id);
 }

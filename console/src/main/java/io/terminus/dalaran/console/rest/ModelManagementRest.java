@@ -6,7 +6,7 @@ import io.terminus.dalaran.console.repository.ModelRepository;
 import io.terminus.dalaran.console.service.ModelManagementService;
 import io.terminus.dalaran.model.ClassificationModel;
 import io.terminus.dalaran.model.ModelField;
-import io.terminus.dalaran.model.dto.DataTemplate;
+import io.terminus.dalaran.model.schema.DataTemplate;
 import io.terminus.dalaran.model.dto.ModelDTO;
 import io.terminus.dalaran.model.query.ModelQuery;
 import io.terminus.dalaran.model.schema.JsonSchema;

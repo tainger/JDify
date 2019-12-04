@@ -13,7 +13,10 @@ import io.terminus.dalaran.model.schema.SoapSchema;
 import io.terminus.dalaran.model.schema.SoapSchemaOperation;
 import io.terminus.dalaran.model.soap.model.SoapOperationConfig;
 import io.terminus.dalaran.service.soap.model.SchemaModel;
-import okhttp3.*;
+import okhttp3.Credentials;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 import org.apache.camel.Exchange;
 import org.apache.camel.builder.Builder;
 import org.apache.camel.model.ProcessorDefinition;
@@ -21,9 +24,7 @@ import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -118,8 +119,14 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
             service.getPorts().forEach(port -> {
                 List<SoapOperationConfig> operations = soapOperationConfigMap.get(port.getBindingPN().getLocalName());
                 String location = StringUtils.substringAfter(port.getAddress().getLocation(), "://");
+                if (!StringUtils.contains(location, "?")) {
+                    location = location + "?";
+                }
                 if (StringUtils.isNotBlank(wsdlImportConfig.getUsername()) && StringUtils.isNotBlank(wsdlImportConfig.getPassword()) && !wsdlImportConfig.getUseHeader()) {
-                    location = location + "&authMethod=Basic&authUsername=" + wsdlImportConfig.getUsername() + "&authPassword=" + wsdlImportConfig.getPassword();
+                    if (!StringUtils.endsWith(location, "?")) {
+                        location = location + "&";
+                    }
+                    location = location + "authMethod=Basic&authUsername=" + wsdlImportConfig.getUsername() + "&authPassword=" + wsdlImportConfig.getPassword();
                 }
                 String operationUrl = location;
                 operations.forEach(operation -> {
@@ -456,13 +463,9 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
     }
 
     private InputStream getWSDLDoc(String url, String user, String password) throws Exception {
-        OkHttpClient client = new OkHttpClient.Builder().authenticator(new Authenticator() {
-            @Nullable
-            @Override
-            public Request authenticate(@Nullable Route route, @NotNull Response response) throws IOException {
-                String credentials =  Credentials.basic(user, password);
-                return response.request().newBuilder().header("Authorization", credentials).build();
-            }
+        OkHttpClient client = new OkHttpClient.Builder().authenticator((route, response) -> {
+            String credentials =  Credentials.basic(user, password);
+            return response.request().newBuilder().header("Authorization", credentials).build();
         }).build();
         Request request = new Request.Builder().url(url).build();
         Response response = client.newCall(request).execute();
