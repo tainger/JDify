@@ -218,11 +218,12 @@ public class ExportServiceImpl implements ExportService {
 
     private SoapApiInfo getApiInfoByOperation(String operation) {
         List<TriggerFlowEntity> soapFlowList = triggerFlowRepository.findByStatusNotAndTriggerType(FlowStatus.Error, "soap-listener");
-        return soapFlowList.stream().filter(triggerFlowEntity ->
-            StringUtils.equals(triggerFlowEntity.getName().trim(), operation)
+        Optional<SoapApiInfo> soapApiInfo = soapFlowList.stream().filter(triggerFlowEntity ->
+                StringUtils.equals(triggerFlowEntity.getName().trim(), operation)
         ).findFirst().map(flowEntity -> {
             TriggerFlow triggerFlow = resourceBuilder.buildTriggerFlow(flowEntity);
             return new SoapApiInfo(triggerFlow);
-        }).get();
+        });
+        return soapApiInfo.orElse(null);
     }
 }

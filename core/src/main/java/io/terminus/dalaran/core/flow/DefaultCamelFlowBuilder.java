@@ -223,10 +223,10 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
                 converterContext.fromObject(route, currentModel, nextBodyType);
                 // 如果目标类型是 Object, 则从当前类型转至 Object
             } else if (DalaranConstants.OBJECT_MODEL_TYPE.equalsIgnoreCase(nextBodyType)) {
-                converterContext.toObject(route, currentBodyType);
+                converterContext.toObject(route, currentModel, currentBodyType);
                 // 如果都不是, 则从当前类型转至 Object, 再由 Object 转至目标类型
             } else {
-                converterContext.toObject(route, currentBodyType);
+                converterContext.toObject(route, currentModel, currentBodyType);
                 converterContext.fromObject(route, currentModel, nextBodyType);
             }
         }

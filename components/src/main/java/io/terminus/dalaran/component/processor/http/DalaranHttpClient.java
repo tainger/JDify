@@ -12,6 +12,7 @@ import io.terminus.dalaran.core.context.DalaranModelTypeContext;
 import org.apache.camel.builder.Builder;
 import org.apache.camel.model.ProcessorDefinition;
 import org.apache.camel.model.RouteDefinition;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Map;
@@ -52,7 +53,7 @@ public class DalaranHttpClient implements DalaranProcessor<HttpClientConfig>, Da
         RestClientConnector connector = config.getConnector();
         String uri = String.format(HTTP_URI, connector.getProtocol().name().toLowerCase(), connector.getHost(),
                 connector.getPort(), config.getPath());
-        if (config.getConnector().getUsername() != null && config.getConnector().getPassword() != null) {
+        if (StringUtils.isNotBlank(config.getConnector().getUsername()) && StringUtils.isNotBlank(config.getConnector().getPassword())) {
             uri = uri + "&authMethod=Basic&authUsername=" + config.getConnector().getUsername() + "&authPassword=" + config.getConnector().getPassword();
         }
         route.setHeader(HTTP_METHOD, Builder.constant(config.getMethod().name()));

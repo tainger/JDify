@@ -78,7 +78,11 @@ public class ReleasedFlowInitializer implements DalaranStarter {
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                loadResources();
+                try {
+                    loadResources();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         }, 0, 60 * 1000L);
     }
