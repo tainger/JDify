@@ -72,23 +72,34 @@ public class RocketMQConsumer extends DefaultConsumer {
                 } else {
                     result = consumer.pull(messageQueue, "*", offset, 1);
                 }
-                if (result.getPullStatus() != PullStatus.FOUND) {
-                    return;
-                }
 
-                List<MessageExt> messages = result.getMsgFoundList();
-                if (messages == null || messages.size() == 0) {
-                    return;
-                }
-                for (MessageExt message: messages) {
-                    Exchange exchange = endpoint.createRocketMQExchange(message.getBody());
-                    if (!endpoint.getAutocommit()) {
-                        RocketMQManualCommit commit = new RocketMQManualCommit(consumer, endpoint.getTopic(), messageQueue, result.getNextBeginOffset());
-                        exchange.getIn().setHeader(ROCKET_MQ_MANUAL_COMMIT, commit);
-                    } else {
+//                if (result.getPullStatus() != PullStatus.FOUND) {
+//                    return;
+//                }
+
+                switch (result.getPullStatus()) {
+                    case FOUND:
+                        List<MessageExt> messages = result.getMsgFoundList();
+                        if (messages == null || messages.size() == 0) {
+                            return;
+                        }
+                        for (MessageExt message: messages) {
+                            Exchange exchange = endpoint.createRocketMQExchange(message.getBody());
+                            if (!endpoint.getAutocommit()) {
+                                RocketMQManualCommit commit = new RocketMQManualCommit(consumer, endpoint.getTopic(), messageQueue, result.getNextBeginOffset());
+                                exchange.getIn().setHeader(ROCKET_MQ_MANUAL_COMMIT, commit);
+                            } else {
+                                consumer.updateConsumeOffset(messageQueue, result.getNextBeginOffset());
+                            }
+                            processor.process(exchange);
+                        }
+                        break;
+                    case NO_MATCHED_MSG:
+                    case NO_NEW_MSG:
+                    case OFFSET_ILLEGAL:
+                    default:
                         consumer.updateConsumeOffset(messageQueue, result.getNextBeginOffset());
-                    }
-                    processor.process(exchange);
+                        break;
                 }
             } catch (Exception e) {
                 e.printStackTrace();
