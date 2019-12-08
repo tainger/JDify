@@ -29,4 +29,6 @@ public class ComponentConstants {
     public static final String MODEL_FIELD_ROOT = "root";
 
     public static final int MODEL_ARRAY_SIZE = 1;
+
+    public static final String SQL_RETRIEVE_GENERATED_KEYS = "CamelSqlRetrieveGeneratedKeys";
 }
