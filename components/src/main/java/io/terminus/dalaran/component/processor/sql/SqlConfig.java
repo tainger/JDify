@@ -25,4 +25,13 @@ public class SqlConfig extends OutModelConfig implements ConnectorConfig<SqlData
 
     @ConfigFieldInfo(label = "SQL类型", inputType = FieldInputType.Select, defaultValue = "COMMON")
     private SQLType sqlType = SQLType.COMMON;
+
+    @ConfigFieldInfo(label = "操作类型", inputType = FieldInputType.Select, defaultValue = "SELECT")
+    private SQLOperationType operationType = SQLOperationType.SELECT;
+
+    @ConfigFieldInfo(label = "打印SQL", inputType = FieldInputType.Switch, defaultValue = "false")
+    private Boolean printSql = false;
+
+    @ConfigFieldInfo(label = "SQL预处理", inputType = FieldInputType.Switch, defaultValue = "false")
+    private Boolean preHandle = false;
 }

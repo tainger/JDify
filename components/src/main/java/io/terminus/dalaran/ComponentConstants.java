@@ -31,4 +31,9 @@ public class ComponentConstants {
     public static final int MODEL_ARRAY_SIZE = 1;
 
     public static final String SQL_RETRIEVE_GENERATED_KEYS = "CamelSqlRetrieveGeneratedKeys";
+    public static final String SQL_RETURN_KEYS = "CamelSqlGeneratedKeyRows";
+    public static final String SQL_UPDATE_COUNT = "CamelSqlUpdateCount";
+    public static final String SQL_QUERY =  "CamelSqlQuery";
+
+    public static final String PRE_HANDLE_SQL = "PreHandleSql";
 }

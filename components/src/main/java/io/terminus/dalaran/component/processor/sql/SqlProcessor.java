@@ -1,5 +1,6 @@
 package io.terminus.dalaran.component.processor.sql;
 
+import io.terminus.dalaran.ComponentConstants;
 import io.terminus.dalaran.component.connector.SqlDataSourceConnector;
 import io.terminus.dalaran.core.component.DalaranProcessor;
 import io.terminus.dalaran.core.component.annotation.Processor;
@@ -33,7 +34,13 @@ public class SqlProcessor implements DalaranProcessor<SqlConfig> {
         } else {
             uri = "sql:";
         }
-        route.to(uri + config.getSql() + "?dataSource=" + dataSourceBeanName);
+        route.process(new SqlBeforeProcessor(config));
+        if (config.getPreHandle()) {
+            route.toD(uri + "${headers." + ComponentConstants.PRE_HANDLE_SQL + "}?dataSource=" + dataSourceBeanName);
+        } else {
+            route.to(uri + config.getSql() + "?dataSource=" + dataSourceBeanName);
+        }
+        route.process(new SqlAfterProcessor(config.getOperationType(), config.getPrintSql()));
     }
 
     private javax.sql.DataSource buildDataSource(SqlDataSourceConnector connector) {

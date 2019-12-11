@@ -45,8 +45,12 @@ public class DubboGenericProvider implements GenericService {
         }
         try {
             processor.process(exchange);
+            if (exchange.getException() != null) {
+                throw new RuntimeException(exchange.getException().getMessage(), exchange.getException().getCause());
+            }
         } catch (Exception e) {
             e.printStackTrace();
+            throw new RuntimeException(e.getMessage(), e.getCause());
         }
         return exchange.getOut().getBody();
     }
