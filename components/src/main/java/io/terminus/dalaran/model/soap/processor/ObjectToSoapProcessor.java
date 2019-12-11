@@ -74,10 +74,13 @@ public class ObjectToSoapProcessor implements Processor, Traceable {
     }
 
     private void buildRoot(Map<String, ModelField> modelField, Object body, SOAPElement soapElement) throws Exception {
-        if (MapUtils.isEmpty(modelField)) {
+        if (MapUtils.isEmpty(modelField) || body == null) {
             return;
         }
         for (Map.Entry<String, ModelField> entry : modelField.entrySet()) {
+            if (!((Map) body).containsKey(entry.getKey())) {
+                continue;
+            }
             Object ob = ((Map) body).get(entry.getKey());
             SOAPElement element = soapElement.addChildElement(entry.getKey(), PREFIX);
             if (soapOperationConfig.getBodyContainsXmlns()) {
@@ -89,11 +92,14 @@ public class ObjectToSoapProcessor implements Processor, Traceable {
     }
 
     private void buildBody(Map<String, ModelField> modelField, Object body, SOAPElement soapElement, Boolean bodyContainsXmlns, Boolean bodyContainsPrefix) throws Exception {
-        if (MapUtils.isEmpty(modelField)) {
+        if (MapUtils.isEmpty(modelField) || body == null) {
             return;
         }
         for (Map.Entry<String, ModelField> entry : modelField.entrySet()) {
             String name = entry.getKey();
+            if (!((Map) body).containsKey(name)) {
+                continue;
+            }
             ModelField field = entry.getValue();
             FieldType type = field.getType();
             Object ob = ((Map) body).get(name);
