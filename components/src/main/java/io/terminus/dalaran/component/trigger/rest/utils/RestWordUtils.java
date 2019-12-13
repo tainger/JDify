@@ -1,4 +1,4 @@
-package io.terminus.dalaran.console.util;
+package io.terminus.dalaran.component.trigger.rest.utils;
 
 import io.terminus.dalaran.component.trigger.rest.model.ApiInfo;
 import io.terminus.dalaran.component.trigger.rest.model.ApiParameter;
