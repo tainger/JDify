@@ -26,6 +26,10 @@
             <groupId>org.apache.camel</groupId>
             <artifactId>camel-ftp</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.apache.camel</groupId>
+            <artifactId>camel-as2</artifactId>
+        </dependency>
 
         <!-- RocketMQ Component -->
         <dependency>
@@ -38,7 +42,6 @@
         <dependency>
             <groupId>org.apache.camel</groupId>
             <artifactId>camel-quartz2</artifactId>
-
         </dependency>
 
         <!-- dubbo trigger -->
