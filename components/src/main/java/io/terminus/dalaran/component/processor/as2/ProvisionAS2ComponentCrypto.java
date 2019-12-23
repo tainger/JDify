@@ -45,7 +45,9 @@ public class ProvisionAS2ComponentCrypto {
 
     private List<Certificate> encryptingCertificateChain;
 
-    public void configure(AS2ClientConfig config) throws Exception {
+
+
+    public void configCertificateChain(AS2ClientConfig config) throws Exception {
         CertificateFactory factory = CertificateFactory.getInstance("X.509");
         Certificate sslCer = factory.generateCertificate(IOUtils.toInputStream(config.getSslCer()));
         signingCertificateChain.add(sslCer);

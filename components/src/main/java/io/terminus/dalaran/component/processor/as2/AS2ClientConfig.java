@@ -21,22 +21,22 @@ public class AS2ClientConfig {
     @ConfigFieldInfo(label = "路径", inputType = FieldInputType.String, defaultValue = "/")
     private String requestUri;
 
-    @ConfigFieldInfo(label = "AS2 Body Type", inputType = FieldInputType.Select, defaultValue = "ediMessage")
+    @ConfigFieldInfo(label = "AS2 Body Type", inputType = FieldInputType.Select)
     private String bodyType;
 
-    @ConfigFieldInfo(label = "SSL CERTIFICATE", inputType = FieldInputType.String, defaultValue = "")
+    @ConfigFieldInfo(label = "SSL CERTIFICATE", inputType = FieldInputType.String)
     private String sslCer;
 
-    @ConfigFieldInfo(label = "SSL PKCS7", inputType = FieldInputType.String, defaultValue = "")
+    @ConfigFieldInfo(label = "SSL PKCS7", inputType = FieldInputType.String)
     private String sslPb;
 
-    @ConfigFieldInfo(label = "ENCRYPTION CERTIFICATE", inputType = FieldInputType.String, defaultValue = "")
+    @ConfigFieldInfo(label = "ENCRYPTION CERTIFICATE", inputType = FieldInputType.String)
     private String encryptionCer;
 
-    @ConfigFieldInfo(label = "ENCRYPTION PKCS7", inputType = FieldInputType.String, defaultValue = "")
+    @ConfigFieldInfo(label = "ENCRYPTION PKCS7", inputType = FieldInputType.String)
     private String encryptionPb;
 
-    @ConfigFieldInfo(label = "ISSUE DN", inputType = FieldInputType.String, defaultValue = "")
+    @ConfigFieldInfo(label = "ISSUE DN", inputType = FieldInputType.String)
     private String issueDN;
 
     @ConfigFieldInfo(label = "SIGNING DN", inputType = FieldInputType.String, defaultValue = "")

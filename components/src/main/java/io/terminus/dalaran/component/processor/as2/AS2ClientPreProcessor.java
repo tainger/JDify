@@ -19,7 +19,7 @@ public class AS2ClientPreProcessor implements Processor {
     @Override
     public void process(Exchange exchange) throws Exception {
         ProvisionAS2ComponentCrypto provisionAS2ComponentCrypto = new ProvisionAS2ComponentCrypto();
-        provisionAS2ComponentCrypto.configure(config);
+        provisionAS2ComponentCrypto.configCertificateChain(config);
 
         exchange.getIn().setHeader("CamelAS2.signingAlgorithm", AS2SignatureAlgorithm.SHA512WITHRSA);
         exchange.getIn().setHeader("CamelAS2.signingCertificateChain", provisionAS2ComponentCrypto.getSigningCertificateChain().toArray());
