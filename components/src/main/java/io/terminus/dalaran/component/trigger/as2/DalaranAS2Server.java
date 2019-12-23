@@ -1,8 +1,14 @@
 package io.terminus.dalaran.component.trigger.as2;
 
 import io.terminus.dalaran.core.component.DalaranTrigger;
+import io.terminus.dalaran.core.component.annotation.Trigger;
 import org.apache.camel.model.RouteDefinition;
 
+@Trigger(
+        value = "as2-server",
+        order = 19,
+        configType = AS2ServerConfig.class
+)
 public class DalaranAS2Server implements DalaranTrigger<AS2ServerConfig> {
 
     private static final String AS2_SERVER_URI = "as2://server/listen?requestUri=%s&requestUriPattern=%s&serverPortNumber=%s";
