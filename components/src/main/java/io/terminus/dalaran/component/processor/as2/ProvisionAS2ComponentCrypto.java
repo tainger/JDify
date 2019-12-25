@@ -22,7 +22,6 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 import java.util.Date;
-import java.util.List;
 
 @Data
 public class ProvisionAS2ComponentCrypto {
@@ -41,23 +40,73 @@ public class ProvisionAS2ComponentCrypto {
 
     private X509Certificate clientCert;
 
-    private List<Certificate> signingCertificateChain;
+    private Certificate[] signingCertificateChain = new Certificate[1];
 
-    private List<Certificate> encryptingCertificateChain;
+    private Certificate signingCertificate;
 
+    private Certificate[] encryptingCertificateChain = new Certificate[1];
 
+    private Certificate encryptingCertificate;
 
     public void configCertificateChain(AS2ClientConfig config) throws Exception {
         CertificateFactory factory = CertificateFactory.getInstance("X.509");
-        Certificate sslCer = factory.generateCertificate(IOUtils.toInputStream(config.getSslCer()));
-        signingCertificateChain.add(sslCer);
-        Certificate sslPb = factory.generateCertificate(IOUtils.toInputStream(config.getSslPb()));
-        signingCertificateChain.add(sslPb);
+        Certificate sslCer = factory.generateCertificate(IOUtils.toInputStream("-----BEGIN CERTIFICATE-----\n" +
+                "MIIBtzCCASACCQCuC5mfp897VTANBgkqhkiG9w0BAQsFADAgMQswCQYDVQQGEwJD\n" +
+                "TjERMA8GA1UECgwIVGVybWludXMwHhcNMTkxMTI1MDkzMjExWhcNMjAxMTI0MDkz\n" +
+                "MjExWjAgMQswCQYDVQQGEwJDTjERMA8GA1UECgwIVGVybWludXMwgZ8wDQYJKoZI\n" +
+                "hvcNAQEBBQADgY0AMIGJAoGBAOl8hfO6pqHRmSI6bDQMzg8QgpTw1m3pOBri3RzB\n" +
+                "ZgZu+5asK1JrB02BQR0sHEc+BBlvEfbJgIdx1/Mx9OCXinrdm+08kxy8QbxumnjI\n" +
+                "Vois/1k1xKpXolIZv2lnNKFsLjEuVJVIfnWVNXadgVsu1/+9lmEn2FuEmORyBwXb\n" +
+                "Md7FAgMBAAEwDQYJKoZIhvcNAQELBQADgYEAaX0Nfr2vGZKA99jngzG+/MxpNp13\n" +
+                "fFoSaDmjfS3XyAWIskA9Iq82QYtClGNqMJ0LrPbneTW9pyQvxdwiNAYfVA0dgzwu\n" +
+                "qwfW52drl697WcC5l4HRpRnaahwyqFdyzzLLIadXlgXW4Q/8phd8+ndt0BnGTjWK\n" +
+                "biyyIjAOUK12kuA=\n" +
+                "-----END CERTIFICATE-----\n", "utf-8"));
+        signingCertificateChain[0] = sslCer;
+        signingCertificate = sslCer;
+//        Certificate sslPb = factory.generateCertificate(IOUtils.toInputStream("-----BEGIN PKCS7-----\n" +
+//                "MIIB6AYJKoZIhvcNAQcCoIIB2TCCAdUCAQExADALBgkqhkiG9w0BBwGgggG7MIIB\n" +
+//                "tzCCASACCQCuC5mfp897VTANBgkqhkiG9w0BAQsFADAgMQswCQYDVQQGEwJDTjER\n" +
+//                "MA8GA1UECgwIVGVybWludXMwHhcNMTkxMTI1MDkzMjExWhcNMjAxMTI0MDkzMjEx\n" +
+//                "WjAgMQswCQYDVQQGEwJDTjERMA8GA1UECgwIVGVybWludXMwgZ8wDQYJKoZIhvcN\n" +
+//                "AQEBBQADgY0AMIGJAoGBAOl8hfO6pqHRmSI6bDQMzg8QgpTw1m3pOBri3RzBZgZu\n" +
+//                "+5asK1JrB02BQR0sHEc+BBlvEfbJgIdx1/Mx9OCXinrdm+08kxy8QbxumnjIVois\n" +
+//                "/1k1xKpXolIZv2lnNKFsLjEuVJVIfnWVNXadgVsu1/+9lmEn2FuEmORyBwXbMd7F\n" +
+//                "AgMBAAEwDQYJKoZIhvcNAQELBQADgYEAaX0Nfr2vGZKA99jngzG+/MxpNp13fFoS\n" +
+//                "aDmjfS3XyAWIskA9Iq82QYtClGNqMJ0LrPbneTW9pyQvxdwiNAYfVA0dgzwuqwfW\n" +
+//                "52drl697WcC5l4HRpRnaahwyqFdyzzLLIadXlgXW4Q/8phd8+ndt0BnGTjWKbiyy\n" +
+//                "IjAOUK12kuChADEA\n" +
+//                "-----END PKCS7-----\n", "utf-8"));
+//        signingCertificateChain.add(sslPb);
 
-        Certificate encryptionCer = factory.generateCertificate(IOUtils.toInputStream(config.getEncryptionCer()));
-        encryptingCertificateChain.add(encryptionCer);
-        Certificate encryptionPb = factory.generateCertificate(IOUtils.toInputStream(config.getEncryptionPb()));
-        encryptingCertificateChain.add(encryptionPb);
+        Certificate encryptionCer = factory.generateCertificate(IOUtils.toInputStream("-----BEGIN CERTIFICATE-----\n" +
+                "MIIBtzCCASACCQDGlkm3RRXReDANBgkqhkiG9w0BAQsFADAgMQswCQYDVQQGEwJD\n" +
+                "TjERMA8GA1UECgwIVGVybWludXMwHhcNMTkxMTI1MDk0MTM1WhcNMjAxMTI0MDk0\n" +
+                "MTM1WjAgMQswCQYDVQQGEwJDTjERMA8GA1UECgwIVGVybWludXMwgZ8wDQYJKoZI\n" +
+                "hvcNAQEBBQADgY0AMIGJAoGBAN3/t704ErhHSzWmhfStFKGuN+17IHAbVLANiFmv\n" +
+                "0ea3GqFzQvwIoZHLwd8Tpaf6GLxyfkcheGZdr00H3pHsyW1yxiwt05acIvguQEib\n" +
+                "dM2yw/OJG5JuABtdw0cMw9EoHoZvTMWMe4EYyUniTmMWRIUitc8sT6mRTEDJ51ul\n" +
+                "YCTfAgMBAAEwDQYJKoZIhvcNAQELBQADgYEAzUwKa2vzYTZ8WeHOqnCt0ySgpneP\n" +
+                "yUPq1RzBovPrtChOPFlJ/snkySdlkWO78+NPie9uieP1pV+T3E4bDvLPwRxSiC7+\n" +
+                "PD+8YCywQ+mES+quuIxyl/HMZugEuB6UPoiKP8EYhU829azSeBYZTwV4ZDDhp3CZ\n" +
+                "JNfByok8z9OdsTc=\n" +
+                "-----END CERTIFICATE-----\n", "utf-8"));
+        encryptingCertificateChain[0] = encryptionCer;
+        encryptingCertificate = encryptionCer;
+//        Certificate encryptionPb = factory.generateCertificate(IOUtils.toInputStream("-----BEGIN PKCS7-----\n" +
+//                "MIIB6AYJKoZIhvcNAQcCoIIB2TCCAdUCAQExADALBgkqhkiG9w0BBwGgggG7MIIB\n" +
+//                "tzCCASACCQDGlkm3RRXReDANBgkqhkiG9w0BAQsFADAgMQswCQYDVQQGEwJDTjER\n" +
+//                "MA8GA1UECgwIVGVybWludXMwHhcNMTkxMTI1MDk0MTM1WhcNMjAxMTI0MDk0MTM1\n" +
+//                "WjAgMQswCQYDVQQGEwJDTjERMA8GA1UECgwIVGVybWludXMwgZ8wDQYJKoZIhvcN\n" +
+//                "AQEBBQADgY0AMIGJAoGBAN3/t704ErhHSzWmhfStFKGuN+17IHAbVLANiFmv0ea3\n" +
+//                "GqFzQvwIoZHLwd8Tpaf6GLxyfkcheGZdr00H3pHsyW1yxiwt05acIvguQEibdM2y\n" +
+//                "w/OJG5JuABtdw0cMw9EoHoZvTMWMe4EYyUniTmMWRIUitc8sT6mRTEDJ51ulYCTf\n" +
+//                "AgMBAAEwDQYJKoZIhvcNAQELBQADgYEAzUwKa2vzYTZ8WeHOqnCt0ySgpnePyUPq\n" +
+//                "1RzBovPrtChOPFlJ/snkySdlkWO78+NPie9uieP1pV+T3E4bDvLPwRxSiC7+PD+8\n" +
+//                "YCywQ+mES+quuIxyl/HMZugEuB6UPoiKP8EYhU829azSeBYZTwV4ZDDhp3CZJNfB\n" +
+//                "yok8z9OdsTehADEA\n" +
+//                "-----END PKCS7-----\n", "utf-8"));
+//        encryptingCertificateChain.add(encryptionPb);
     }
 
     private PrivateKey buildPrivateKey(String key) throws Exception {
