@@ -70,6 +70,7 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
         val route = createRouteDefinition();
         route.setId(flow.getRouteId());
         route.setProperty(TRACING_FLOW_ID).constant(flow.getId());
+        route.setProperty(TRACING_MODULE_ID).constant(flow.getModuleId());
         triggerComponent.buildFromRoute(route, triggerConfig);
 
         String bodyType = triggerInfo.getModelType();
@@ -91,6 +92,7 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
     public DalaranRoute buildSubFLow(SubFlow flow) {
         val route = createRouteDefinition(flow);
         route.setProperty(TRACING_FLOW_ID).constant(flow.getId());
+        route.setProperty(TRACING_MODULE_ID).constant(flow.getModuleId());
         if (flow.getInModel() == null) {
             buildFlowRoute(route, flow, TracingType.SubFlow, "UNKNOWN");
         } else {
@@ -120,6 +122,7 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
         val route = createRouteDefinition();
         route.setId(TEST_FLOW_PREFIX + flow.getRouteId());
         route.setProperty(TRACING_FLOW_ID).constant(flow.getId());
+        route.setProperty(TRACING_MODULE_ID).constant(flow.getModuleId());
         route.from(DalaranConstants.TEST_FLOW_DIRECT_PREFIX + flow.getRouteId());
         if (flow.getInModel() == null) {
             buildFlowRoute(route, flow, tracingType, "UNKNOWN");
@@ -136,6 +139,7 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
         val route = createRouteDefinition();
         route.setId(TEST_SUB_FLOW_PREFIX + flow.getRouteId());
         route.setProperty(TRACING_FLOW_ID).constant(flow.getId());
+        route.setProperty(TRACING_MODULE_ID).constant(flow.getModuleId());
         route.from(DalaranConstants.TEST_SUB_FLOW_DIRECT_PREFIX + flow.getRouteId());
         flow.setTracing(true);
         if (flow.getInModel() == null) {

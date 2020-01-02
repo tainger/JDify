@@ -1,4 +1,4 @@
-package io.terminus.dalaran.component.processor.as2;
+package io.terminus.dalaran.model.edi.processor;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
@@ -9,7 +9,7 @@ import org.apache.http.protocol.BasicHttpContext;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
-public class AS2ClientDataProcessor implements Processor {
+public class EDIToObjectProcessor implements Processor {
 
     @Override
     public void process(Exchange exchange) throws Exception {

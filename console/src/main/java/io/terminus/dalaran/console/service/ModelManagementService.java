@@ -2,6 +2,7 @@ package io.terminus.dalaran.console.service;
 
 import io.terminus.dalaran.console.entity.ModelEntity;
 import io.terminus.dalaran.model.ClassificationModel;
+import io.terminus.dalaran.model.DalaranModelSchema;
 import io.terminus.dalaran.model.schema.DataTemplate;
 import io.terminus.dalaran.model.dto.ModelDTO;
 import io.terminus.dalaran.model.dto.basic.BasicModelInfo;
@@ -52,7 +53,7 @@ public interface ModelManagementService {
 
     ObjectSchema importDalaranSchema(ObjectSchema schema, Long id);
 
-    String buildDataTemplate(JsonSchema schema, Long id);
+    String buildDataTemplate(DalaranModelSchema schema, Long id);
 
     Map<String, String> suggestMapping(Long sourceId, Long targetId);
 

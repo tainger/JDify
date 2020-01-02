@@ -1,6 +1,5 @@
-package io.terminus.dalaran.runtime;
+package io.terminus.dalaran.as2;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.models.Swagger;
@@ -21,7 +20,6 @@ import io.terminus.dalaran.model.flow.SubFlow;
 import io.terminus.dalaran.model.flow.TriggerFlow;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.camel.CamelContext;
-import org.apache.camel.model.RouteDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.PostConstruct;
@@ -57,19 +55,19 @@ public class ReleasedFlowInitializer implements DalaranStarter {
 
     @PostConstruct
     private void init() throws Exception {
-        objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-        RouteDefinition swaggerJsonRoute = new RouteDefinition();
-        swaggerJsonRoute.from("netty4-http:http://0.0.0.0:8080/__dalaran/swagger.json?httpMethodRestrict=GET")
-                .setBody().method(this, "getSwaggerJson").end();
-        camelContext.addRouteDefinition(swaggerJsonRoute);
-        RouteDefinition swaggerRoute = new RouteDefinition();
-        swaggerRoute.from("netty4-http:http://0.0.0.0:8080/__dalaran/swagger?httpMethodRestrict=GET")
-                .setBody().constant("<html><head><script src=\"//unpkg.com/swagger-ui-dist@3/swagger-ui-bundle.js\">" +
-                "</script><link href=\"https://unpkg.com/swagger-ui-dist@3.23.5/swagger-ui.css\"  rel=\"stylesheet\"></head>" +
-                "<body><div id=\"swagger-ui\"/></body>" +
-                "<script>SwaggerUIBundle({url:\"/__dalaran/swagger.json\",dom_id:'#swagger-ui',presets:[SwaggerUIBundle.presets.apis,SwaggerUIBundle.SwaggerUIStandalonePreset]})</script>" +
-                "</html>").end();
-        camelContext.addRouteDefinition(swaggerRoute);
+//        objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+//        RouteDefinition swaggerJsonRoute = new RouteDefinition();
+//        swaggerJsonRoute.from("netty4-http:http://0.0.0.0:8080/__dalaran/swagger.json?httpMethodRestrict=GET")
+//                .setBody().method(this, "getSwaggerJson").end();
+//        camelContext.addRouteDefinition(swaggerJsonRoute);
+//        RouteDefinition swaggerRoute = new RouteDefinition();
+//        swaggerRoute.from("netty4-http:http://0.0.0.0:8080/__dalaran/swagger?httpMethodRestrict=GET")
+//                .setBody().constant("<html><head><script src=\"//unpkg.com/swagger-ui-dist@3/swagger-ui-bundle.js\">" +
+//                "</script><link href=\"https://unpkg.com/swagger-ui-dist@3.23.5/swagger-ui.css\"  rel=\"stylesheet\"></head>" +
+//                "<body><div id=\"swagger-ui\"/></body>" +
+//                "<script>SwaggerUIBundle({url:\"/__dalaran/swagger.json\",dom_id:'#swagger-ui',presets:[SwaggerUIBundle.presets.apis,SwaggerUIBundle.SwaggerUIStandalonePreset]})</script>" +
+//                "</html>").end();
+//        camelContext.addRouteDefinition(swaggerRoute);
     }
 
     @Override
@@ -111,7 +109,7 @@ public class ReleasedFlowInitializer implements DalaranStarter {
 
             List<TriggerFlowReleasedEntity> triggerFlows = resourceLoader.loadAvailableTriggerFlow();
             for (TriggerFlowReleasedEntity triggerFlowEntity : triggerFlows) {
-                if (triggerFlowEntity.getTriggerType().equalsIgnoreCase("as2-server")) {
+                if (!triggerFlowEntity.getTriggerType().equalsIgnoreCase("as2-server")) {
                     continue;
                 }
                 TriggerFlow triggerFlow = resourceBuilder.buildTriggerFlow(triggerFlowEntity);

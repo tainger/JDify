@@ -25,7 +25,7 @@ public class DalaranAS2Client implements DalaranProcessor<AS2ClientConfig> {
         String uri = String.format(AS2_CLIENT_URI, config.getBodyType(), config.getConnector().getHost(), config.getRequestUri(), config.getConnector().getPort());
         route.setHeader("CamelAS2.ediMessageContentType", Builder.constant(ContentType.create(AS2MediaType.APPLICATION_EDIFACT, StandardCharsets.UTF_8)));
         route.setHeader("CamelAS2.ediMessageTransferEncoding", Builder.constant("7bit"));
-        route.setHeader("CamelAS2.requestUri", Builder.constant("/"));
+        route.setHeader("CamelAS2.requestUri", Builder.constant(config.getRequestUri()));
         route.setHeader("CamelAS2.from", Builder.constant("mrAS@example.org"));
         route.setHeader("CamelAS2.as2From", Builder.constant("878051556"));
         route.setHeader("CamelAS2.as2To", Builder.constant("878051556"));
@@ -34,6 +34,6 @@ public class DalaranAS2Client implements DalaranProcessor<AS2ClientConfig> {
         route.setHeader("CamelAS2.as2MessageStructure", Builder.constant(AS2MessageStructure.PLAIN));
         route.process(new AS2ClientPreProcessor(config));
         route.to(uri);
-        route.process(new AS2ClientDataProcessor());
+//        route.process(new AS2ClientDataProcessor());
     }
 }

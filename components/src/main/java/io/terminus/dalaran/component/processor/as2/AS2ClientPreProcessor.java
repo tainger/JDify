@@ -39,13 +39,15 @@ public class AS2ClientPreProcessor implements Processor {
         Object inBody = exchange.getIn().getBody();
         if (!(inBody instanceof byte[])) {
             byte[] bytes = IOUtils.toByteArray(JSON.toJSONString(JSONPath.eval(inBody, "$.data")));
-            File temp = File.createTempFile("dalaran-" + System.currentTimeMillis(), ".edi");
+            File temp = File.createTempFile("dalaran-as2-" + System.currentTimeMillis(), ".edi");
+            System.out.println(temp.getName());
             FileUtils.writeByteArrayToFile(temp, bytes);
             exchange.getOut().setBody(new FileInputStream(temp));
             exchange.getOut().setHeaders(exchange.getIn().getHeaders());
         } else {
             byte[] bytes = IOUtils.toByteArray(JSON.toJSONString(JSONPath.eval(JSON.parseObject(IOUtils.toString((byte[])inBody, "utf-8")), "$.data")));
-            File temp = File.createTempFile("dalaran-" + System.currentTimeMillis(), ".edi");
+            File temp = File.createTempFile("dalaran-as2-" + System.currentTimeMillis(), ".edi");
+            System.out.println(temp.getName());
             FileUtils.writeByteArrayToFile(temp, bytes);
             exchange.getOut().setBody(new FileInputStream(temp));
             exchange.getOut().setHeaders(exchange.getIn().getHeaders());

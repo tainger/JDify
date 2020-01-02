@@ -25,6 +25,7 @@
         <module>api</module>
         <module>model</module>
         <module>client</module>
+        <module>as2</module>
     </modules>
 
     <properties>

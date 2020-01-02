@@ -17,6 +17,8 @@ public class BasicFlow {
     @NotNull
     private Long id;
 
+    private Long moduleId;
+
     private String name;
 
     private String description;

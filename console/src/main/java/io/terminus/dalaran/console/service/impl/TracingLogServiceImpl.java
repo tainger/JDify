@@ -86,9 +86,9 @@ public class TracingLogServiceImpl implements TracingLogService {
             } else if (!query.isTestFlow()) {
                 predicates.add(builder.and(builder.equal(root.get("tracingType"), TracingType.Flow)));
             }
-            if (query.getModuleId() != null) {
-                predicates.add(builder.equal(root.get("moduleId"), query.getModuleId()));
-            }
+//            if (query.getModuleId() != null) {
+//                predicates.add(builder.equal(root.get("moduleId"), query.getModuleId()));
+//            }
             if (query.getStartTime() != null) {
                 predicates.add(builder.ge(root.get("timestamp"), query.getStartTime().getTime()));
             }

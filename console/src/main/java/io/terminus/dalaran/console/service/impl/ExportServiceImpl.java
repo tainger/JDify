@@ -1,5 +1,6 @@
 package io.terminus.dalaran.console.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.predic8.wsdl.Definitions;
 import io.swagger.models.Swagger;
 import io.terminus.dalaran.component.trigger.rest.model.ApiInfo;
@@ -12,6 +13,7 @@ import io.terminus.dalaran.console.TestFlowInitializer;
 import io.terminus.dalaran.console.entity.TriggerFlowEntity;
 import io.terminus.dalaran.console.repository.*;
 import io.terminus.dalaran.console.service.ExportService;
+import io.terminus.dalaran.console.service.ModelManagementService;
 import io.terminus.dalaran.core.component.DalaranTrigger;
 import io.terminus.dalaran.core.component.DalaranTriggerApiDocExport;
 import io.terminus.dalaran.core.component.DalaranTriggerWordDocExport;
@@ -85,6 +87,9 @@ public class ExportServiceImpl implements ExportService {
     @Autowired
     private DalaranComponentContext componentContext;
 
+    @Autowired
+    private ModelManagementService modelManagementService;
+
     @Value("${terminus.dalaran.runtime-location}")
     private String runtimeLocation;
 
@@ -131,6 +136,12 @@ public class ExportServiceImpl implements ExportService {
     @Override
     public Swagger exportSwagger() {
         List<ApiInfo> apiInfoList = getExportApiInfoList();
+        apiInfoList.forEach(apiInfo -> {
+            Object inExample = JSON.parseObject(modelManagementService.buildDataTemplate(apiInfo.getInSchema().getModelSchema(), null));
+            Object outExample = JSON.parseObject(modelManagementService.buildDataTemplate(apiInfo.getOutSchema().getModelSchema(), null));
+            apiInfo.setInExample(inExample);
+            apiInfo.setOutExample(outExample);
+        });
         return SwaggerUtils.buildSwagger(apiInfoList);
     }
 

@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 import static io.terminus.dalaran.DalaranConstants.TRACING_FLOW_ID;
+import static io.terminus.dalaran.DalaranConstants.TRACING_MODULE_ID;
 
 /**
  * 尝试过 InterceptStrategy 和 TraceEventHandler, 最后决定自己写前后 processor 处理
@@ -171,6 +172,7 @@ public class DalaranTracer {
             }
             tracingLog.setTracingType(tracingType);
             tracingLog.setFlowId(exchange.getProperty(TRACING_FLOW_ID, Long.class));
+            tracingLog.setModuleId(exchange.getProperty(TRACING_MODULE_ID, Long.class));
             tracingLog.setProcessorId(processorId);
             tracingLog.setTimestamp(System.currentTimeMillis());
             tracingLog.setInputBody(extractBody(exchange.getIn().getBody()));

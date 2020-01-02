@@ -211,7 +211,7 @@ public class ModelManagementServiceImpl implements ModelManagementService {
     }
 
     @Override
-    public String buildDataTemplate(JsonSchema schema, Long id) {
+    public String buildDataTemplate(DalaranModelSchema schema, Long id) {
         Map<String, ModelField> modelField = schema.getFields();
         ModelField root = modelField.get(DalaranConsoleConstants.MODEL_FIELD_ROOT);
         Object body = buildTemplateBody(root, "");
