@@ -9,6 +9,7 @@ import io.terminus.dalaran.core.log.TracingErrorHandlerFactory;
 import io.terminus.dalaran.core.resource.DalaranResourceBuilder;
 import io.terminus.dalaran.core.resource.DalaranResourceLoader;
 import io.terminus.dalaran.core.resource.DefaultDalaranResourceBuilder;
+import io.terminus.dalaran.core.resource.oss.OSSAccount;
 import org.apache.camel.CamelContext;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.spi.Registry;
@@ -101,5 +102,10 @@ public class DalaranAutoConfiguration {
             DalaranComponentContext componentContext
     ) {
         return new DefaultCamelFlowBuilder(traceLogger, errorHandlerFactory, converterContext, componentContext);
+    }
+
+    @Bean
+    public OSSAccount ossAccount(@Value("${oss.endpoint}") String endpoint, @Value("${oss.accessId}") String accessId, @Value("${oss.accessSecret}") String accessSecret, @Value("${oss.bucketName}") String bucketName, @Value("${oss.rootDir}") String rootDir) {
+        return new OSSAccount(endpoint, accessId, accessSecret, bucketName, rootDir);
     }
 }

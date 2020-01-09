@@ -48,6 +48,7 @@ public class ProvisionAS2ComponentCrypto {
 
     private Certificate encryptingCertificate;
 
+
     public void configCertificateChain(AS2ClientConfig config) throws Exception {
         CertificateFactory factory = CertificateFactory.getInstance("X.509");
         Certificate sslCer = factory.generateCertificate(IOUtils.toInputStream("-----BEGIN CERTIFICATE-----\n" +
@@ -107,9 +108,10 @@ public class ProvisionAS2ComponentCrypto {
 //                "yok8z9OdsTehADEA\n" +
 //                "-----END PKCS7-----\n", "utf-8"));
 //        encryptingCertificateChain.add(encryptionPb);
+
     }
 
-    private PrivateKey buildPrivateKey(String key) throws Exception {
+    public PrivateKey buildPrivateKey(String key) throws Exception {
         byte[] buffer = Base64.getDecoder().decode(key);
         PKCS8EncodedKeySpec pkcs8EncodedKeySpec = new PKCS8EncodedKeySpec(buffer);
         KeyFactory factory = KeyFactory.getInstance("RSA", "BC");

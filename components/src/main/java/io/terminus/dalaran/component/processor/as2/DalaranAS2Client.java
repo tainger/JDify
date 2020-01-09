@@ -27,13 +27,14 @@ public class DalaranAS2Client implements DalaranProcessor<AS2ClientConfig> {
         route.setHeader("CamelAS2.ediMessageTransferEncoding", Builder.constant("7bit"));
         route.setHeader("CamelAS2.requestUri", Builder.constant(config.getRequestUri()));
         route.setHeader("CamelAS2.from", Builder.constant("mrAS@example.org"));
-        route.setHeader("CamelAS2.as2From", Builder.constant("878051556"));
-        route.setHeader("CamelAS2.as2To", Builder.constant("878051556"));
+        route.setHeader("CamelAS2.as2From", Builder.constant("JJYTestEnv"));
+        route.setHeader("CamelAS2.as2To", Builder.constant("PGTEnt"));
         route.setHeader("CamelAS2.dispositionNotificationTo", Builder.constant("mrAS@example.org"));
         route.setHeader("CamelAS2.subject", Builder.constant("Signed AS2 Message Example"));
         route.setHeader("CamelAS2.as2MessageStructure", Builder.constant(AS2MessageStructure.PLAIN));
-        route.process(new AS2ClientPreProcessor(config));
-        route.to(uri);
+        route.process(new MDNAsyncProcessor(config));
+//        route.process(new AS2ClientPreProcessor(config));
+//        route.to(uri);
 //        route.process(new AS2ClientDataProcessor());
     }
 }

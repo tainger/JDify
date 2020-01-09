@@ -27,8 +27,9 @@
             <artifactId>camel-ftp</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.apache.camel</groupId>
-            <artifactId>camel-as2</artifactId>
+            <groupId>io.terminus</groupId>
+            <artifactId>camel-as2-component</artifactId>
+            <version>${project.version}</version>
             <exclusions>
                 <exclusion>
                     <artifactId>log4j-slf4j-impl</artifactId>
@@ -188,6 +189,12 @@
             <groupId>com.fasterxml.jackson.dataformat</groupId>
             <artifactId>jackson-dataformat-xml</artifactId>
             <version>2.9.9</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.aliyun.oss</groupId>
+            <artifactId>aliyun-sdk-oss</artifactId>
+            <version>2.8.2</version>
         </dependency>
     </dependencies>
 
