@@ -19,6 +19,8 @@ public class SoapSchemaOperation {
 
     private Boolean bodyContainsPrefix = true;
 
+    private Boolean allContainsPrefix = false;
+
     private MessageModel header;
 
     private Map<String, Object> headerValues;

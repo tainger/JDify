@@ -1,26 +1,32 @@
 package io.terminus.dalaran.component.trigger.as2;
 
-import com.alibaba.fastjson.JSON;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
-
-import java.util.HashMap;
-import java.util.Map;
+import org.apache.camel.component.as2.api.util.AS2Utils;
+import org.apache.http.message.BasicHttpRequest;
+import org.apache.http.protocol.BasicHttpContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class AS2ServerDataProcessor implements Processor {
 
+    private Logger logger = LoggerFactory.getLogger(AS2ServerDataProcessor.class);
+
     @Override
     public void process(Exchange exchange) throws Exception {
-//        BasicHttpContext httpContext = exchange.getIn().getBody(BasicHttpContext.class);
-//        BasicHttpRequest request = (BasicHttpRequest) httpContext.getAttribute("http.request");
-//        List<String> body = IOUtils.readLines(request.getEntity().getContent(), "utf-8");
-//        Object body = IOUtils.toString((InputStream) exchange.getIn().getBody(), StandardCharsets.UTF_8);
-        Object body = exchange.getIn();
-        System.out.println(body.getClass().toGenericString());
-        Map<String, Object> result = new HashMap<>();
-        result.put("status", "received");
-        result.put("body", body.toString());
-        exchange.getOut().setBody(JSON.toJSON(result));
-        exchange.getOut().setHeaders(exchange.getIn().getHeaders());
+        logger.info(exchange.getIn().getBody().getClass().getName());
+        BasicHttpContext httpContext = exchange.getIn().getBody(BasicHttpContext.class);
+        logger.info("context: " + httpContext.toString());
+        logger.info(httpContext.getAttribute("http.request").getClass().getName());
+
+//        BasicHttpEntityEnclosingRequest request = (BasicHttpEntityEnclosingRequest) httpContext.getAttribute("http.request");
+
+        BasicHttpRequest request = (BasicHttpRequest) httpContext.getAttribute("http.request");
+
+        AS2Utils.printRequest(request);
+        logger.info("====================");
+//        String body = IOUtils.toString(request.getEntity().getContent());
+        String body = request.toString();
+        logger.info(body);
     }
 }

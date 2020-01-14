@@ -113,7 +113,7 @@ public class ObjectToSoapProcessor implements Processor, Traceable {
                 if (subType == FieldType.OBJECT) {
                     for (Object data: subBody) {
                         SOAPElement element;
-                        if (bodyContainsPrefix) {
+                        if (bodyContainsPrefix || soapOperationConfig.getAllContainsPrefix()) {
                             element = soapElement.addChildElement(name, PREFIX);
                         } else {
                             element = soapElement.addChildElement(name);
@@ -133,7 +133,7 @@ public class ObjectToSoapProcessor implements Processor, Traceable {
                 }
             } else if (type == FieldType.OBJECT) {
                 SOAPElement element;
-                if (bodyContainsPrefix) {
+                if (bodyContainsPrefix || soapOperationConfig.getAllContainsPrefix()) {
                     element = soapElement.addChildElement(name, PREFIX);
                 } else {
                     element = soapElement.addChildElement(name);
@@ -144,7 +144,12 @@ public class ObjectToSoapProcessor implements Processor, Traceable {
                 Map<String, ModelField> child = field.getFields();
                 buildBody(child, ob, element, bodyContainsXmlns, bodyContainsPrefix);
             } else {
-                SOAPElement element = soapElement.addChildElement(name);
+                SOAPElement element;
+                if (soapOperationConfig.getAllContainsPrefix()) {
+                    element = soapElement.addChildElement(name, PREFIX);
+                } else {
+                    element = soapElement.addChildElement(name);
+                }
                 element.addTextNode(ob.toString());
             }
         }

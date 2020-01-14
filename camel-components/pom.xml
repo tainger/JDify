@@ -14,8 +14,6 @@
     <modules>
         <module>camel-dubbo</module>
         <module>camel-rocketmq</module>
-        <module>camel-as2-api</module>
-        <module>camel-as2-component</module>
     </modules>
 
     <dependencies>
