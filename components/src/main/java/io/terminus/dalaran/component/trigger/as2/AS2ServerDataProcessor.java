@@ -8,6 +8,8 @@ import org.apache.http.protocol.BasicHttpContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
+
 public class AS2ServerDataProcessor implements Processor {
 
     private Logger logger = LoggerFactory.getLogger(AS2ServerDataProcessor.class);
@@ -22,6 +24,10 @@ public class AS2ServerDataProcessor implements Processor {
 //        BasicHttpEntityEnclosingRequest request = (BasicHttpEntityEnclosingRequest) httpContext.getAttribute("http.request");
 
         BasicHttpRequest request = (BasicHttpRequest) httpContext.getAttribute("http.request");
+
+        logger.info("headers: " + Arrays.toString(request.getAllHeaders()));
+        logger.info("request line: " + request.getRequestLine().toString());
+        logger.info("params: " + request.getParams().toString());
 
         AS2Utils.printRequest(request);
         logger.info("====================");

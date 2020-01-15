@@ -150,9 +150,9 @@ public class MapperTest extends BasicProcessorTest {
 
         DalaranMapperProcessor mapperProcessor = new DalaranMapperProcessor(mappingConfig, null);
 
-        Object destination = mapperProcessor.convert(mappingConfig, source);
-
-        System.out.println(destination);
+//        Object destination = mapperProcessor.convert(mappingConfig, source);
+//
+//        System.out.println(destination);
     }
 
     private MessageModel buildIn() {
