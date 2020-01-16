@@ -43,7 +43,7 @@
         </dependency>
 
 <!--        <dependency>-->
-<!--            <groupId>org.apache.camel</groupId>-->
+<!--            <groupId>io.terminus</groupId>-->
 <!--            <artifactId>camel-as2-api</artifactId>-->
 <!--            <version>${camel.version}</version>-->
 <!--            <scope>system</scope>-->

@@ -224,9 +224,7 @@ public class Converter {
                 FieldType type = pathDetail.getType();
                 value = parse(value, type, entry.getValue(), pathDetail.getPath());
             }
-            if (value == null) {
-                value = "";
-            }
+
             if (pathDetail != null && pathDetail.getPath() != null) {
                 JSONPath.set(destination, pathDetail.getPath(), value);
             }

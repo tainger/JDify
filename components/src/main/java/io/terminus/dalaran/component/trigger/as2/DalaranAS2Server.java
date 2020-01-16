@@ -38,6 +38,7 @@ public class DalaranAS2Server implements DalaranTrigger<AS2ServerConfig> {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        route.process(new AS2ServerPreProcessor());
         route.from(uri);
         route.process(new AS2ServerDataProcessor());
     }

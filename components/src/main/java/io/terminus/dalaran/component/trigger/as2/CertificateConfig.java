@@ -42,7 +42,7 @@ public class CertificateConfig {
         encryptingCertificateChain.add(partnerCer);
 
         Certificate stationCer = factory.generateCertificate(new FileInputStream(getFileFromOss(config.getStationCertificate(), ossAccount)));
-        signingCertificateChain.add(stationCer);
+        signingCertificateChain.add(partnerCer);
 
         BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(getFileFromOss(config.getStationPem(), ossAccount))));
         PEMParser pemParser = new PEMParser(reader);
