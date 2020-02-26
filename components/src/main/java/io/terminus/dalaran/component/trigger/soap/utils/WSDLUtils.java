@@ -158,12 +158,18 @@ public class WSDLUtils {
         if (currentField.getType() == FieldType.ARRAY) {
             maxOccurs = SoapConstants.UNBOUNDED;
         }
+        element.setMinOccurs("1");
         element.setMaxOccurs(maxOccurs);
+
         Sequence sequence = element.newComplexType().newSequence();
         sequence.setParent(element);
+//        sequence.setMaxOccurs(maxOccurs);
+        sequence.setMinOccurs("0");
 
         currentField.getFields().forEach((name, field) -> {
             Element e = sequence.newElement(name);
+            e.setNillable(true);
+            e.setMinOccurs("0");
             if (field.getType() == FieldType.ARRAY) {
                 e.setMaxOccurs(SoapConstants.UNBOUNDED);
             } else {
@@ -184,11 +190,16 @@ public class WSDLUtils {
         parent.setType(new QName(TNS, name, "tns"));
         parent.setParent(parentSequence);
         Sequence sequence = schema.newComplexType(name).newSequence();
+//        sequence.setMaxOccurs(parent.getMaxOccurs());
+        sequence.setMinOccurs("0");
+
         if (MapUtils.isEmpty(modelField.getFields())) {
             return;
         }
         modelField.getFields().forEach((fieldName, field) -> {
             Element e = sequence.newElement(fieldName);
+            e.setNillable(true);
+            e.setMinOccurs("0");
             if (field.getType() == FieldType.ARRAY) {
                 e.setMaxOccurs(SoapConstants.UNBOUNDED);
             } else {

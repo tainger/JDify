@@ -30,6 +30,9 @@ public class FtpUpload implements DalaranProcessor<FtpUploadConfig> {
         if (connector.getTimeout() != null) {
             uri += "&timeout=" + connector.getTimeout();
         }
-        route.to(uri);
+        route.to(uri).process(exchange -> {
+            exchange.getOut().setHeaders(exchange.getIn().getHeaders());
+            exchange.getOut().setBody(exchange.getIn().getBody());
+        });
     }
 }

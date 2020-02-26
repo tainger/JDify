@@ -23,24 +23,6 @@ public class AS2ClientConfig extends OutModelConfig implements ConnectorConfig<A
     @ConfigFieldInfo(label = "路径", inputType = FieldInputType.String, defaultValue = "/")
     private String requestUri;
 
-    @ConfigFieldInfo(label = "AS2 Body Type", inputType = FieldInputType.String)
+    @ConfigFieldInfo(label = "AS2 Body Type", inputType = FieldInputType.String, defaultValue = "ediMessage")
     private String bodyType;
-
-    @ConfigFieldInfo(label = "SSL CERTIFICATE", inputType = FieldInputType.String)
-    private String sslCer;
-
-    @ConfigFieldInfo(label = "SSL PKCS7", inputType = FieldInputType.String)
-    private String sslPb;
-
-    @ConfigFieldInfo(label = "ENCRYPTION CERTIFICATE", inputType = FieldInputType.String)
-    private String encryptionCer;
-
-    @ConfigFieldInfo(label = "ENCRYPTION PKCS7", inputType = FieldInputType.String)
-    private String encryptionPb;
-
-//    @ConfigFieldInfo(label = "ISSUE DN", inputType = FieldInputType.String)
-//    private String issueDN;
-//
-//    @ConfigFieldInfo(label = "SIGNING DN", inputType = FieldInputType.String, defaultValue = "")
-//    private String signingDN;
 }

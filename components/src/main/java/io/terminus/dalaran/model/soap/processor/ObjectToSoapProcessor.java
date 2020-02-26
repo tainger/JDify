@@ -11,6 +11,8 @@ import org.apache.camel.Traceable;
 import org.apache.commons.collections.MapUtils;
 import org.apache.xml.serialize.OutputFormat;
 import org.apache.xml.serialize.XMLSerializer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 
@@ -27,6 +29,8 @@ import java.util.Map;
  */
 public class ObjectToSoapProcessor implements Processor, Traceable {
 
+    private Logger logger = LoggerFactory.getLogger(ObjectToSoapProcessor.class);
+
     private final Map<String, ModelField> modelFields;
 
     private final SoapSchemaOperation soapOperationConfig;
@@ -42,7 +46,9 @@ public class ObjectToSoapProcessor implements Processor, Traceable {
     public void process(Exchange exchange) throws Exception {
         Object body = exchange.getIn().getBody();
         Object rst = buildSoapBody(modelFields.get(DalaranConstants.MODEL_ROOT), body);
+        logger.info("soap request: " + rst);
         exchange.getOut().setBody(rst);
+        exchange.getOut().setHeaders(exchange.getIn().getHeaders());
     }
 
     public String buildSoapBody(ModelField modelField, Object body) throws Exception {
@@ -105,6 +111,11 @@ public class ObjectToSoapProcessor implements Processor, Traceable {
             Object ob = ((Map) body).get(name);
 
             if (ob == null) {
+                if (soapOperationConfig.getAllContainsPrefix()) {
+                    soapElement.addChildElement(name, PREFIX);
+                } else {
+                    soapElement.addChildElement(name);
+                }
                 continue;
             }
             if (type == FieldType.ARRAY) {

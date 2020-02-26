@@ -82,6 +82,7 @@ public class DubboGenericProvider implements GenericService {
         providerConfig.setApplication(endpoint.getApplicationConfig());
         providerConfig.setVersion(endpoint.getVersion());
         providerConfig.setInterface(endpoint.getServiceId());
+        providerConfig.setRetries(endpoint.getRetries());
         if (!StringUtils.isBlank(System.getenv("DICE_PROJECT_ID")) && !StringUtils.isBlank(System.getenv("DICE_WORKSPACE"))) {
             providerConfig.setOwner(System.getenv("DICE_PROJECT_ID") + "_" + System.getenv("DICE_WORKSPACE"));
         }

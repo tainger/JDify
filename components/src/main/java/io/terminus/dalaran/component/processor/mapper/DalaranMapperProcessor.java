@@ -30,6 +30,7 @@ public class DalaranMapperProcessor implements Processor, Traceable {
         Object source = exchange.getIn().getBody();
         Object destination = (mappingConfig == null || CollectionUtils.isEmpty(mappingConfig.getMessageMappings())) ? source : convert(mappingConfig, exchange);
         exchange.getOut().setBody(destination);
+        exchange.getOut().setHeaders(exchange.getIn().getHeaders());
     }
 
     public Object convert(DalaranMappingConfig mappingConfig, Exchange exchange) {

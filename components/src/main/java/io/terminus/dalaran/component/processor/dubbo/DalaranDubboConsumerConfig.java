@@ -28,7 +28,8 @@ public class DalaranDubboConsumerConfig extends OutModelConfig implements Connec
     private String version;
     @ConfigFieldInfo(label = "超时时间(ms)", inputType = FieldInputType.Integer, defaultValue = "500")
     private Integer timeout = 500;
-
+    @ConfigFieldInfo(label = "重试次数", inputType = FieldInputType.Integer, defaultValue = "3")
+    private Integer retries = 3;
     @ConfigFieldInfo(label = "入参类型(有方法重载时才需要声明入参类型)", inputType = FieldInputType.String, required = false)
     private String parameterType;
 

@@ -36,4 +36,8 @@ public class ComponentConstants {
     public static final String SQL_QUERY =  "CamelSqlQuery";
 
     public static final String PRE_HANDLE_SQL = "PreHandleSql";
+
+    public static final String EDI_RESPONSE_MESSAGE = "message";
+    public static final String EDI_MESSAGE_STATUS = "status";
+    public static final String EDI_REQUEST_SUCCESS = "success";
 }

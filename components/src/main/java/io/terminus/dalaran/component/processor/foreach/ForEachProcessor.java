@@ -19,7 +19,7 @@ import static org.apache.camel.builder.Builder.body;
         order = 20,
         configType = ForEachConfig.class
 )
-public class ForEachProcessor implements DalaranProcessor<String>, DalaranProcessorConfigCustomConverter<ForEachConfig, String> {
+public class ForEachProcessor implements DalaranProcessor<ForEachProcessorConfig>, DalaranProcessorConfigCustomConverter<ForEachConfig, ForEachProcessorConfig> {
 
     @Autowired
     private DalaranContext<DalaranRoute> dalaranContext;
@@ -28,15 +28,17 @@ public class ForEachProcessor implements DalaranProcessor<String>, DalaranProces
     private DalaranResourceBuilder resourceBuilder;
 
     @Override
-    public void configure(ProcessorDefinition route, String fragmentUri) {
-        route.split(body()).to(fragmentUri);
+    public void configure(ProcessorDefinition route, ForEachProcessorConfig processorConfig) {
+        route.split(body()).process(new ForEachContextProcessor(processorConfig.getRoute()));
+        route.to(processorConfig.getFragmentUri());
     }
 
     @Override
-    public String convert(ForEachConfig config, ComponentModel component, BasicFlow flow) {
+    public ForEachProcessorConfig convert(ForEachConfig config, ComponentModel component, BasicFlow flow) {
         FlowFragment fragment = resourceBuilder.buildFlowFragment(config.getPipeline(), component.getInModel(),
                 component.getOutModel(), flow.getId(), component.getId(), flow.isTracing());
         dalaranContext.addFragmentFlow(fragment);
-        return fragment.getDirectRouteUri();
+        DalaranRoute route = dalaranContext.getDalaranFlowBuilder().buildFlowFragment(fragment);
+        return new ForEachProcessorConfig(fragment.getDirectRouteUri(), route);
     }
 }

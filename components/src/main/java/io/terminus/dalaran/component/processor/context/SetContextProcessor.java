@@ -22,6 +22,13 @@ public class SetContextProcessor implements DalaranProcessor<SetContextConfig> {
     public void configure(ProcessorDefinition route, SetContextConfig config) {
         route.process(exchange -> {
             Map<String, Object> context = exchange.getProperty(DALARAN_CONTEXT_EXCHANGE, Map.class);
+            Map<String, Object> header = exchange.getIn().getHeader(exchange.getExchangeId(), Map.class);
+
+            if (header == null) {
+                header = new HashMap<>();
+                exchange.getOut().setHeader(exchange.getExchangeId(), header);
+            }
+
             if (context == null) {
                 context = new HashMap<>();
                 exchange.setProperty(DALARAN_CONTEXT_EXCHANGE, context);
@@ -30,9 +37,9 @@ public class SetContextProcessor implements DalaranProcessor<SetContextConfig> {
             String value = config.getValue();
             if (StringUtils.startsWith(value, DalaranConstants.DALARAN_EXPRESSION_HEADER)) {
                 ExpressionParser parser = new ExpressionParser();
-                context.put(config.getKey(), parser.parse(value, exchange));
+                header.put(config.getKey(), parser.parse(value, exchange));
             } else {
-                context.put(config.getKey(), value);
+                header.put(config.getKey(), value);
             }
         });
     }

@@ -46,7 +46,10 @@ public class RocketMQProducer implements DalaranProcessor<RocketMQProducerConfig
         String uri = String.format(CAMEL_ROCKET_MQ_URI, connector.getNameServer(), config.getProducerGroup(),
                 topic, tags, connector.getUseAliCloudOns(),
                 connector.getAccessKey(), connector.getSecretKey(), config.isMessageSharding(), connector.getTimeout(), config.getAsync());
-        route.to(uri);
+        route.to(uri).process(exchange -> {
+            exchange.getOut().setHeaders(exchange.getIn().getHeaders());
+            exchange.getOut().setBody(exchange.getIn().getBody());
+        });
     }
 
     @Override

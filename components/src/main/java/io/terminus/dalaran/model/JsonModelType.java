@@ -3,6 +3,7 @@ package io.terminus.dalaran.model;
 import com.alibaba.fastjson.JSON;
 import io.terminus.dalaran.core.component.annotation.ModelType;
 import io.terminus.dalaran.core.component.model.DalaranModelType;
+import io.terminus.dalaran.model.json.JsonMarshalPreProcessor;
 import io.terminus.dalaran.model.schema.DataTemplate;
 import io.terminus.dalaran.model.schema.JsonSchema;
 import io.terminus.dalaran.model.utils.ModelUtils;
@@ -16,6 +17,7 @@ public class JsonModelType implements DalaranModelType<String, JsonSchema> {
 
     @Override
     public void fromObject(ProcessorDefinition route, JsonSchema schema) {
+        route.process(new JsonMarshalPreProcessor());
         route.marshal().json(JsonLibrary.Fastjson);
     }
 

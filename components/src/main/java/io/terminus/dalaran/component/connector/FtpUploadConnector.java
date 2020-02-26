@@ -24,6 +24,6 @@ public class FtpUploadConnector {
     @ConfigFieldInfo(label = "用户名", inputType = FieldInputType.String, required = false)
     private String username;
 
-    @ConfigFieldInfo(label = "密码", inputType = FieldInputType.String, required = false)
+    @ConfigFieldInfo(label = "密码", inputType = FieldInputType.Password, required = false)
     private String password;
 }

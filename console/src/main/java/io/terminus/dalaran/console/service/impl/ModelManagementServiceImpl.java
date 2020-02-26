@@ -23,6 +23,7 @@ import io.terminus.dalaran.model.query.ModelQuery;
 import io.terminus.dalaran.model.schema.DataTemplate;
 import io.terminus.dalaran.model.schema.JsonSchema;
 import io.terminus.dalaran.model.schema.ObjectSchema;
+import io.terminus.dalaran.model.schema.SoapSchemaOperation;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.similarity.JaroWinklerDistance;
@@ -399,9 +400,14 @@ public class ModelManagementServiceImpl implements ModelManagementService {
             modelEntity.setName("Dalaran Model");
         }
 
-        Map modelSchema = model.getModelSchema();
+        Map<String, Object> modelSchema = model.getModelSchema();
+        String modelType = model.getModelType();
+        if (modelType.equalsIgnoreCase("SOAP")) {
+            SoapSchemaOperation soapSchemaOperation = new SoapSchemaOperation();
+            modelSchema.put("operationConfig", soapSchemaOperation);
+        }
         if (modelSchema != null) {
-            modelEntity.setModelSchema(JSON.toJSONString(model.getModelSchema()));
+            modelEntity.setModelSchema(JSON.toJSONString(modelSchema));
         } else {
             modelEntity.setModelSchema(JSON.toJSONString(new HashMap<>()));
         }

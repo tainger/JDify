@@ -34,6 +34,7 @@ public class SoapToObjectProcessor implements Processor, Traceable {
         String in = exchange.getIn().getBody(String.class);
         Object body = parseSoapBody(in);
         exchange.getOut().setBody(body);
+        exchange.getOut().setHeaders(exchange.getIn().getHeaders());
     }
 
     public Object parseSoapBody(String body) throws Exception {

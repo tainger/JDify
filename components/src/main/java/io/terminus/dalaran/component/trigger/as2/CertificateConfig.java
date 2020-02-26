@@ -3,6 +3,7 @@ package io.terminus.dalaran.component.trigger.as2;
 import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSClientBuilder;
 import com.aliyun.oss.model.GetObjectRequest;
+import io.terminus.dalaran.component.connector.AS2Connector;
 import io.terminus.dalaran.core.resource.oss.OSSAccount;
 import lombok.Data;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
@@ -42,7 +43,7 @@ public class CertificateConfig {
         encryptingCertificateChain.add(partnerCer);
 
         Certificate stationCer = factory.generateCertificate(new FileInputStream(getFileFromOss(config.getStationCertificate(), ossAccount)));
-        signingCertificateChain.add(partnerCer);
+        signingCertificateChain.add(stationCer);
 
         BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(getFileFromOss(config.getStationPem(), ossAccount))));
         PEMParser pemParser = new PEMParser(reader);
@@ -50,6 +51,28 @@ public class CertificateConfig {
         PEMEncryptedKeyPair pemObject = (PEMEncryptedKeyPair)pemParser.readObject();
 
         PEMDecryptorProvider decProv = new JcePEMDecryptorProviderBuilder().build("anywhere".toCharArray());
+
+        JcaPEMKeyConverter converter = new JcaPEMKeyConverter().setProvider("BC");
+
+        keyPair = converter.getKeyPair(pemObject.decryptKeyPair(decProv));
+    }
+
+    public void configCertificates(AS2Connector connector, OSSAccount ossAccount) throws Exception {
+        Security.addProvider(new BouncyCastleProvider());
+
+        CertificateFactory factory = CertificateFactory.getInstance("X.509");
+        Certificate partnerCer = factory.generateCertificate(new FileInputStream(getFileFromOss(connector.getPartnerCertificate(), ossAccount)));
+        encryptingCertificateChain.add(partnerCer);
+
+        Certificate stationCer = factory.generateCertificate(new FileInputStream(getFileFromOss(connector.getStationCertificate(), ossAccount)));
+        signingCertificateChain.add(stationCer);
+
+        BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(getFileFromOss(connector.getStationPem(), ossAccount))));
+        PEMParser pemParser = new PEMParser(reader);
+
+        PEMEncryptedKeyPair pemObject = (PEMEncryptedKeyPair)pemParser.readObject();
+
+        PEMDecryptorProvider decProv = new JcePEMDecryptorProviderBuilder().build(connector.getPassword().toCharArray());
 
         JcaPEMKeyConverter converter = new JcaPEMKeyConverter().setProvider("BC");
 
