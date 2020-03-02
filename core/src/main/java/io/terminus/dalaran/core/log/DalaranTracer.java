@@ -164,12 +164,13 @@ public class DalaranTracer {
             boolean isMainFlow = TracingType.Flow == tracingType || TracingType.TestFlow == tracingType || TracingType.TestSubFlow == tracingType;
             tracingLog.setMain(isMainFlow);
             exchange.setProperty(getTracingLogPropertyKey(), tracingLog);
-            String testRecordId = exchange.getProperty(DalaranConstants.TEST_FLOW_RECORD_ID_HEADER, String.class);
-            if (testRecordId != null) {
-                tracingLog.setRecordId(testRecordId);
-            } else {
-                tracingLog.setRecordId(exchange.getExchangeId());
-            }
+//            String testRecordId = exchange.getProperty(DalaranConstants.TEST_FLOW_RECORD_ID_HEADER, String.class);
+//            if (testRecordId != null) {
+//                tracingLog.setRecordId(testRecordId);
+//            } else {
+//                tracingLog.setRecordId(exchange.getExchangeId());
+//            }
+            tracingLog.setRecordId(exchange.getExchangeId());
             tracingLog.setTracingType(tracingType);
             tracingLog.setFlowId(exchange.getProperty(TRACING_FLOW_ID, Long.class));
             tracingLog.setModuleId(exchange.getProperty(TRACING_MODULE_ID, Long.class));

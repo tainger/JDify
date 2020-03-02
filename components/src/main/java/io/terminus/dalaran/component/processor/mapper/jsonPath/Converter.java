@@ -1,7 +1,6 @@
 package io.terminus.dalaran.component.processor.mapper.jsonPath;
 
 import com.alibaba.fastjson.JSONPath;
-import io.terminus.dalaran.DalaranConstants;
 import io.terminus.dalaran.component.common.exception.FieldParseException;
 import io.terminus.dalaran.component.common.exception.MapperFunctionExecuteException;
 import io.terminus.dalaran.component.processor.mapper.model.*;
@@ -173,7 +172,7 @@ public class Converter {
         if (sourcePaths == null || sourcePaths.size() == 0) {
             return;
         }
-        Map<String, Object> contextValues = (Map<String, Object>)exchange.getProperties().get(DalaranConstants.DALARAN_CONTEXT_EXCHANGE);
+        Map<String, Object> contextValues = (Map<String, Object>)exchange.getIn().getHeader(exchange.getExchangeId());
 
         for (Map.Entry<String, List<SourcePath>> entry : sourcePaths.entrySet()) {
             List<Object> values = new ArrayList<>();
@@ -224,7 +223,9 @@ public class Converter {
                 FieldType type = pathDetail.getType();
                 value = parse(value, type, entry.getValue(), pathDetail.getPath());
             }
-
+            if (value == null) {
+                value = "";
+            }
             if (pathDetail != null && pathDetail.getPath() != null) {
                 JSONPath.set(destination, pathDetail.getPath(), value);
             }
@@ -237,7 +238,7 @@ public class Converter {
             return;
         }
         String contextKey = sourceFields.get(0).getPath();
-        Map<String, Object> contextValues = (Map<String, Object>)exchange.getProperties().get(DalaranConstants.DALARAN_CONTEXT_EXCHANGE);
+        Map<String, Object> contextValues = (Map<String, Object>)exchange.getIn().getHeader(exchange.getExchangeId());
         if (MapUtils.isEmpty(contextValues) || !contextValues.containsKey(contextKey)) {
             return;
         }
@@ -260,7 +261,7 @@ public class Converter {
         List<Object> values = new ArrayList<>();
         List<SourceField> sourceFields = messageMapping.getSourceFields();
         List<SourcePath> sourcePaths = new ArrayList<>();
-        Map<String, Object> contextValues = (Map<String, Object>)exchange.getProperties().get(DalaranConstants.DALARAN_CONTEXT_EXCHANGE);
+        Map<String, Object> contextValues = (Map<String, Object>)exchange.getIn().getHeader(exchange.getExchangeId());
 
         sourceFields.forEach(sourceField -> {
             Object value;

@@ -27,5 +27,6 @@ public class DubboCamelProcessor extends DefaultProducer {
             result = endpoint.getGenericService().$invoke(method, new String[]{}, new Object[]{});
         }
         exchange.getOut().setBody(result);
+        exchange.getOut().setHeaders(exchange.getIn().getHeaders());
     }
 }

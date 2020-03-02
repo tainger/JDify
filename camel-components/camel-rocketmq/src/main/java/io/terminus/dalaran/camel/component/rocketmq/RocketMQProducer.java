@@ -82,6 +82,7 @@ public class RocketMQProducer extends DefaultProducer {
                     @Override
                     public void onSuccess(SendResult sendResult) {
                         exchange.getOut().setBody(JSON.toJSONString(new DalaranSendResult(sendResult, messages.size())));
+                        exchange.getOut().setHeaders(exchange.getIn().getHeaders());
                     }
 
                     @Override
@@ -127,12 +128,10 @@ public class RocketMQProducer extends DefaultProducer {
         Message message = new Message();
         String topic = parseExpression(endpoint.getTopic(), body);
         message.setTopic(topic);
-        logger.info("topic : " + topic);
         String tags = endpoint.getTags();
         if (StringUtils.isNotBlank(tags)) {
             tags = parseExpression(tags, body);
             message.setTags(tags);
-            logger.info("tag : " + tags);
         }
         if (body != null) {
             if (body instanceof byte[]) {

@@ -83,7 +83,6 @@ public class CertificateConfig {
         File tmpDir = File.createTempFile("dalaran-", System.currentTimeMillis() + "");
         tmpDir.mkdirs();
         OSS ossClient = new OSSClientBuilder().build(ossAccount.getEndpoint(), ossAccount.getAccessId(), ossAccount.getAccessSecret());
-        File file = new File(tmpDir, DALARAN_FILE);
         ossClient.getObject(new GetObjectRequest(ossAccount.getBucketName(), fileKey), tmpDir);
         return tmpDir;
     }

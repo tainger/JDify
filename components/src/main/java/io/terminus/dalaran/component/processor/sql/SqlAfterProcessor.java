@@ -32,5 +32,6 @@ public class SqlAfterProcessor implements Processor {
             Object rowCount = exchange.getIn().getHeader(ComponentConstants.SQL_UPDATE_COUNT);
             exchange.getOut().setBody(rowCount);
         }
+        exchange.getOut().setHeaders(exchange.getIn().getHeaders());
     }
 }

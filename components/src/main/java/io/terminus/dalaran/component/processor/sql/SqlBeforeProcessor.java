@@ -29,6 +29,7 @@ public class SqlBeforeProcessor implements Processor {
                 }
             }
             exchange.getOut().setHeader(ComponentConstants.PRE_HANDLE_SQL, sql);
+            exchange.getOut().setHeaders(exchange.getIn().getHeaders());
         }
     }
 }

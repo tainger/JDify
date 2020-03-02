@@ -27,6 +27,7 @@ public class SetContextProcessor implements DalaranProcessor<SetContextConfig> {
             if (header == null) {
                 header = new HashMap<>();
                 exchange.getOut().setHeader(exchange.getExchangeId(), header);
+                exchange.getOut().setBody(exchange.getIn().getBody());
             }
 
             if (context == null) {
