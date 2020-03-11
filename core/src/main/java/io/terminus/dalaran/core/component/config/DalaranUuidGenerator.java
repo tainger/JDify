@@ -9,6 +9,6 @@ public class DalaranUuidGenerator extends DefaultUuidGenerator {
     @Override
     public String generateUuid() {
         String parentId = super.generateUuid();
-        return parentId + "-" + new Random().nextInt();
+        return parentId + "-" + Thread.currentThread().getId() + "-" + new Random().nextInt();
     }
 }

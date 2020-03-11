@@ -19,8 +19,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 
-import static io.terminus.dalaran.DalaranConstants.TRACING_FLOW_ID;
-import static io.terminus.dalaran.DalaranConstants.TRACING_MODULE_ID;
+import static io.terminus.dalaran.DalaranConstants.*;
 
 /**
  * 尝试过 InterceptStrategy 和 TraceEventHandler, 最后决定自己写前后 processor 处理
@@ -160,17 +159,32 @@ public class DalaranTracer {
             // 保持输入输出不变
             exchange.getOut().copyFrom(exchange.getIn());
 
+            String parentId = exchange.getProperty(CAMEL_CORRELATION_ID, String.class);
+            String currentId = exchange.getExchangeId();
+
             DalaranTracingLog tracingLog = new DalaranTracingLog();
             boolean isMainFlow = TracingType.Flow == tracingType || TracingType.TestFlow == tracingType || TracingType.TestSubFlow == tracingType;
             tracingLog.setMain(isMainFlow);
-            exchange.setProperty(getTracingLogPropertyKey(), tracingLog);
-            String testRecordId = exchange.getProperty(DalaranConstants.TEST_FLOW_RECORD_ID_HEADER, String.class);
+            exchange.setProperty(getTracingLogPropertyKey() + currentId, tracingLog);
+//            String testRecordId = exchange.getProperty(DalaranConstants.TEST_FLOW_RECORD_ID_HEADER, String.class);
 //            if (testRecordId != null) {
 //                tracingLog.setRecordId(testRecordId);
 //            } else {
 //                tracingLog.setRecordId(exchange.getExchangeId());
 //            }
-            tracingLog.setRecordId(exchange.getExchangeId());
+            if (parentId == null) {
+                tracingLog.setMainRecordId(currentId);
+            } else {
+                tracingLog.setMainRecordId(parentId);
+            }
+
+            Boolean camelMulticastComplete = exchange.getProperty(CAMEL_MULTICAST_COMPLETE, Boolean.class);
+            if (camelMulticastComplete != null && parentId != null) {
+                tracingLog.setRecordId(parentId);
+            } else {
+                tracingLog.setRecordId(currentId);
+            }
+
             tracingLog.setTracingType(tracingType);
             tracingLog.setFlowId(exchange.getProperty(TRACING_FLOW_ID, Long.class));
             tracingLog.setModuleId(exchange.getProperty(TRACING_MODULE_ID, Long.class));
@@ -216,7 +230,7 @@ public class DalaranTracer {
         public void process(Exchange exchange) {
             // 保持输入输出不变
             exchange.getOut().copyFrom(exchange.getIn());
-            String propertyKey = getTracingLogPropertyKey();
+            String propertyKey = getTracingLogPropertyKey() + exchange.getExchangeId();
             DalaranTracingLog tracingLog = exchange.getProperty(propertyKey, DalaranTracingLog.class);
             if (tracingLog == null) {
                 return;
@@ -226,8 +240,6 @@ public class DalaranTracer {
             tracingLog.setOutputBody(extractBody(exchange.getIn().getBody()));
             tracingLog.setOutputBodyType(bodyModelType);
             tracingLog.setElapsed(System.currentTimeMillis() - tracingLog.getTimestamp());
-//            tracingLog.setOutputHeaders(exchange.getIn().getHeaders());
-
             logger.log(tracingLog);
         }
 

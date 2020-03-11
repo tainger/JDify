@@ -32,6 +32,9 @@ public class TracingLogEntity {
     @Column(nullable = false, length = 256)
     private String recordId;
 
+    @Column(length = 256)
+    private String mainRecordId;
+
     @Column(nullable = false)
     private boolean successful;
 

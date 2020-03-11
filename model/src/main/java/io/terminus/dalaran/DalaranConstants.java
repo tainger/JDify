@@ -21,6 +21,8 @@ public final class DalaranConstants {
     public static final String DALARAN_CONTEXT_EXCHANGE = "DalaranContextExchange";
     public static final String CAMEL_CORRELATION_ID = "CamelCorrelationId";
 
+    public static final String CAMEL_MULTICAST_COMPLETE = "CamelMulticastComplete";
+
     public static final String DALARAN_CONTEXT_HEADER = "DalaranContextHeader";
 
     public static final String MODEL_ROOT = "root";

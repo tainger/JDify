@@ -13,6 +13,8 @@ public class DalaranTracingLog {
 
     private Long elapsed;
 
+    private String mainRecordId;
+
     private String recordId;
 
     private boolean successful;
