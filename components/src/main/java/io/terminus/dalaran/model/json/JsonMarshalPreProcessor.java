@@ -12,7 +12,6 @@ public class JsonMarshalPreProcessor implements Processor {
         if (in instanceof byte[]) {
             exchange.getOut().setBody(JSON.parse((byte[])in));
             exchange.getOut().setHeaders(exchange.getIn().getHeaders());
-            return;
         }
     }
 }

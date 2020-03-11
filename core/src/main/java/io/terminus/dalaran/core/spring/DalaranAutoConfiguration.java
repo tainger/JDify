@@ -1,5 +1,6 @@
 package io.terminus.dalaran.core.spring;
 
+import io.terminus.dalaran.core.component.config.CustomCamelContext;
 import io.terminus.dalaran.core.context.*;
 import io.terminus.dalaran.core.context.support.*;
 import io.terminus.dalaran.core.flow.DalaranFlowBuilder;
@@ -11,7 +12,6 @@ import io.terminus.dalaran.core.resource.DalaranResourceLoader;
 import io.terminus.dalaran.core.resource.DefaultDalaranResourceBuilder;
 import io.terminus.dalaran.core.resource.oss.OSSAccount;
 import org.apache.camel.CamelContext;
-import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.spi.Registry;
 import org.apache.camel.spring.spi.ApplicationContextRegistry;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,7 +26,7 @@ public class DalaranAutoConfiguration {
     @Bean
     public CamelContext camelContext(ApplicationContext applicationContext, @Value("${terminus.dalaran.tracing:true}") boolean tracing) {
         Registry registry = new ApplicationContextRegistry(applicationContext);
-        CamelContext camelContext = new DefaultCamelContext(registry);
+        CamelContext camelContext = new CustomCamelContext(registry);
         try {
             camelContext.setTracing(tracing);
             camelContext.start();

@@ -14,6 +14,8 @@ import org.apache.commons.collections4.MapUtils;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static io.terminus.dalaran.DalaranConstants.DALARAN_CONTEXT_EXCHANGE;
+
 /**
  * Created by jingdi on 2019/7/16
  */
@@ -172,7 +174,7 @@ public class Converter {
         if (sourcePaths == null || sourcePaths.size() == 0) {
             return;
         }
-        Map<String, Object> contextValues = (Map<String, Object>)exchange.getIn().getHeader(exchange.getExchangeId());
+        Map<String, Object> contextValues = (Map<String, Object>)exchange.getProperties().get(DALARAN_CONTEXT_EXCHANGE + exchange.getExchangeId());
 
         for (Map.Entry<String, List<SourcePath>> entry : sourcePaths.entrySet()) {
             List<Object> values = new ArrayList<>();
@@ -238,7 +240,7 @@ public class Converter {
             return;
         }
         String contextKey = sourceFields.get(0).getPath();
-        Map<String, Object> contextValues = (Map<String, Object>)exchange.getIn().getHeader(exchange.getExchangeId());
+        Map<String, Object> contextValues = (Map<String, Object>)exchange.getProperties().get(DALARAN_CONTEXT_EXCHANGE + exchange.getExchangeId());
         if (MapUtils.isEmpty(contextValues) || !contextValues.containsKey(contextKey)) {
             return;
         }
@@ -261,7 +263,7 @@ public class Converter {
         List<Object> values = new ArrayList<>();
         List<SourceField> sourceFields = messageMapping.getSourceFields();
         List<SourcePath> sourcePaths = new ArrayList<>();
-        Map<String, Object> contextValues = (Map<String, Object>)exchange.getIn().getHeader(exchange.getExchangeId());
+        Map<String, Object> contextValues = (Map<String, Object>)exchange.getProperties().get(DALARAN_CONTEXT_EXCHANGE + exchange.getExchangeId());
 
         sourceFields.forEach(sourceField -> {
             Object value;

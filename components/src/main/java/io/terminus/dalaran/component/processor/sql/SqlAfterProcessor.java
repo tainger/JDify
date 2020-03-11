@@ -22,7 +22,7 @@ public class SqlAfterProcessor implements Processor {
     @Override
     public void process(Exchange exchange) throws Exception {
         if (printSql) {
-            logger.info(exchange.getIn().getHeader(ComponentConstants.SQL_QUERY).toString());
+//            logger.info(exchange.getIn().getHeader(ComponentConstants.SQL_QUERY).toString());
         }
         if (operationType == SQLOperationType.INSERT) {
             Object rows = exchange.getIn().getHeader(ComponentConstants.SQL_RETURN_KEYS);
@@ -32,6 +32,5 @@ public class SqlAfterProcessor implements Processor {
             Object rowCount = exchange.getIn().getHeader(ComponentConstants.SQL_UPDATE_COUNT);
             exchange.getOut().setBody(rowCount);
         }
-        exchange.getOut().setHeaders(exchange.getIn().getHeaders());
     }
 }

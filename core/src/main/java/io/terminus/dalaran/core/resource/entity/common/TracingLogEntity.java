@@ -9,7 +9,7 @@ import java.util.Date;
 
 @Data
 @Entity
-@Table(name = "dalaran_tracing_log")
+@Table(name = "dalaran_tracing_log", indexes={@Index(name = "recordId", columnList = "recordId")})
 public class TracingLogEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,7 +29,7 @@ public class TracingLogEntity {
     @Column(nullable = false)
     private Long elapsed;
 
-    @Column(nullable = false, length = 64)
+    @Column(nullable = false, length = 256)
     private String recordId;
 
     @Column(nullable = false)

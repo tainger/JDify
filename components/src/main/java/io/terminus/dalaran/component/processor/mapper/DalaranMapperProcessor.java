@@ -3,6 +3,7 @@ package io.terminus.dalaran.component.processor.mapper;
 import io.terminus.dalaran.component.processor.mapper.jsonPath.Converter;
 import io.terminus.dalaran.component.processor.mapper.model.DalaranMappingConfig;
 import io.terminus.dalaran.component.processor.mapper.model.MapperConstants;
+import io.terminus.dalaran.component.utils.ContextUtils;
 import io.terminus.dalaran.core.context.DalaranContext;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
@@ -27,6 +28,7 @@ public class DalaranMapperProcessor implements Processor, Traceable {
 
     @Override
     public void process(Exchange exchange) {
+        ContextUtils.setExchange(exchange);
         Object source = exchange.getIn().getBody();
         Object destination = (mappingConfig == null || CollectionUtils.isEmpty(mappingConfig.getMessageMappings())) ? source : convert(mappingConfig, exchange);
         exchange.getOut().setBody(destination);

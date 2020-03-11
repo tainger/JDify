@@ -82,7 +82,6 @@ public class RocketMQProducer extends DefaultProducer {
                     @Override
                     public void onSuccess(SendResult sendResult) {
                         exchange.getOut().setBody(JSON.toJSONString(new DalaranSendResult(sendResult, messages.size())));
-                        exchange.getOut().setHeaders(exchange.getIn().getHeaders());
                     }
 
                     @Override

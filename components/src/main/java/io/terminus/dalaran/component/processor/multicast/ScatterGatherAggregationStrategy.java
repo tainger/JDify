@@ -61,13 +61,13 @@ public class ScatterGatherAggregationStrategy implements CompletionAwareAggregat
         return dataMapper;
     }
 
-    private String transferData(Object in) throws Exception {
+    private Object transferData(Object in) {
         if (in instanceof byte[]) {
-            return JSON.parse((byte[])in).toString();
+            return JSON.parse((byte[])in);
         }
         if (in instanceof String) {
-            return (String)in;
+            return in;
         }
-        return JSON.toJSONString(in);
+        return JSON.toJSON(in);
     }
 }
