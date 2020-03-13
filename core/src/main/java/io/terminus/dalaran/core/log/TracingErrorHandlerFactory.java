@@ -76,7 +76,7 @@ public class TracingErrorHandlerFactory extends DefaultErrorHandlerBuilder imple
         }
 
         private void log(Exchange exchange, String tracingKey, String body) {
-            DalaranTracingLog tracingLog = exchange.getProperty(tracingKey, DalaranTracingLog.class);
+            DalaranTracingLog tracingLog = exchange.getProperty(tracingKey + exchange.getExchangeId(), DalaranTracingLog.class);
             if (tracingLog == null) {
                 return;
             }
