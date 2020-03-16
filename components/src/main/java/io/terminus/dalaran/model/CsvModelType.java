@@ -22,15 +22,18 @@ public class CsvModelType implements DalaranModelType<String, CsvModelSchema> {
     public void fromObject(ProcessorDefinition route, CsvModelSchema schema) {
         route.process(exchange -> {
             exchange.getOut().copyFrom(exchange.getIn());
-            List list = exchange.getIn().getBody(List.class);
             String data;
             Object body = exchange.getIn().getBody();
-            if (body instanceof String) {
-                data = body + System.lineSeparator();
-            } else if (body instanceof byte[]) {
-                data = IOUtils.toString((byte[])body, "UTF-8") + System.lineSeparator();
+            if (schema.getType() == CSVModelType.CARSO) {
+                data = carsoFromObject(body, schema);
             } else {
-                data = JSON.toJSONString(body) + System.lineSeparator();
+                if (body instanceof String) {
+                    data = body + System.lineSeparator();
+                } else if (body instanceof byte[]) {
+                    data = IOUtils.toString((byte[])body, "UTF-8") + System.lineSeparator();
+                } else {
+                    data = JSON.toJSONString(body) + System.lineSeparator();
+                }
             }
 //            if (list == null) {
 //                Object body = exchange.getIn().getBody();
@@ -57,8 +60,34 @@ public class CsvModelType implements DalaranModelType<String, CsvModelSchema> {
 //            }
             logger.info("data: " + data);
             exchange.getOut().setBody(data.getBytes());
-            exchange.getOut().setHeaders(exchange.getIn().getHeaders());
         });
+    }
+
+    private String carsoFromObject(Object body, CsvModelSchema schema) {
+        StringBuilder stringBuilder = new StringBuilder();
+        String[] columnArray = schema.getColumnSequence().trim().split(schema.getColumnDelimiter());
+        Object in = JSON.toJSON(body);
+        if (in instanceof Iterable) {
+            for (Object ob: (List)in) {
+                Map<String, Object> data = JSON.toJavaObject((JSON)ob, Map.class);
+                for (int i = 0; i < columnArray.length; i++) {
+                    String trimColumn = columnArray[i].trim();
+                    if (data.containsKey(trimColumn)) {
+                        stringBuilder.append(data.get(trimColumn));
+                    } else {
+                        stringBuilder.append(" ");
+                    }
+                    if (i < columnArray.length - 1) {
+                        stringBuilder.append(schema.getDataDelimiter());
+                    }
+                }
+                stringBuilder.append("\n");
+            }
+            stringBuilder.deleteCharAt(stringBuilder.length()-1);
+        } else {
+            stringBuilder.append(body.toString());
+        }
+        return stringBuilder.toString();
     }
 
     // TODO 临时处理一下先, 还有很多场景没有考虑到
@@ -96,22 +125,45 @@ public class CsvModelType implements DalaranModelType<String, CsvModelSchema> {
     public void toObject(ProcessorDefinition route, CsvModelSchema schema) {
         route.process(exchange -> {
             exchange.getOut().copyFrom(exchange.getIn());
+            Object in = exchange.getIn().getBody();
+            if (!(in instanceof GenericFileMessage)) {
+                return;
+            }
             GenericFileMessage body = exchange.getIn().getBody(GenericFileMessage.class);
             byte[] content = (byte[]) body.getGenericFile().getBody();
             String contentStr = new String(content);
             String[] records = contentStr.split(System.lineSeparator());
-            List<Map<Integer, Object>> data = new ArrayList<>();
-            for (String record : records) {
-                Map<Integer, Object> recordObj = new HashMap<>();
-                String[] recordValues = record.split(",");
-                for (int i = 0; i < recordValues.length; i++) {
-                    recordObj.put(i, recordValues[i]);
+            List out;
+            if (schema.getType() == CSVModelType.CARSO) {
+                out = carsoToObject(records, schema);
+            } else {
+                out = new ArrayList<>();
+                for (String record : records) {
+                    Map<Integer, Object> recordObj = new HashMap<>();
+                    String[] recordValues = record.split(",");
+                    for (int i = 0; i < recordValues.length; i++) {
+                        recordObj.put(i, recordValues[i]);
+                    }
+                    out.add(recordObj);
                 }
-                data.add(recordObj);
             }
-            exchange.getOut().setBody(data);
+            exchange.getOut().setBody(out);
             exchange.getOut().setHeaders(exchange.getIn().getHeaders());
         });
+    }
+
+    private List<Map<String, Object>> carsoToObject(String[] records, CsvModelSchema schema) {
+        String[] columnArray = schema.getColumnSequence().trim().split(schema.getColumnDelimiter());
+        List<Map<String, Object>> out = new ArrayList<>();
+        for (String record : records) {
+            Map<String, Object> recordObj = new HashMap<>();
+            String[] recordValues = record.split(schema.getColumnDelimiter());
+            for (int i = 0; i < recordValues.length; i++) {
+                recordObj.put(columnArray[i], recordValues[i]);
+            }
+            out.add(recordObj);
+        }
+        return out;
     }
 
     @Override

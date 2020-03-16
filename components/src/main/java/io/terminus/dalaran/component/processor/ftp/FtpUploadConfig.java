@@ -21,6 +21,9 @@ public class FtpUploadConfig implements ConnectorConfig<FtpUploadConnector> {
     @ConfigFieldInfo(label = "路径", inputType = FieldInputType.String, defaultValue = "/")
     private String path;
 
-    @ConfigFieldInfo(label = "文件名", inputType = FieldInputType.String)
-    private String fileName;
+    @ConfigFieldInfo(label = "文件前缀", inputType = FieldInputType.String)
+    private String fileRoot;
+
+    @ConfigFieldInfo(label = "文件后缀日期格式", inputType = FieldInputType.String)
+    private String datePattern;
 }
