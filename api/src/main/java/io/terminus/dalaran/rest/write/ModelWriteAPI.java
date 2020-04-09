@@ -1,8 +1,9 @@
 package io.terminus.dalaran.rest.write;
 
 import io.swagger.annotations.ApiOperation;
+import io.terminus.dalaran.model.DalaranModelSchema;
+import io.terminus.dalaran.model.DalaranModelTemplate;
 import io.terminus.dalaran.model.dto.ModelDTO;
-import io.terminus.dalaran.model.schema.JsonSchema;
 import org.springframework.web.bind.annotation.*;
 
 @RequestMapping(value = "/api/model", produces = {"application/json; charset=UTF-8"})
@@ -22,6 +23,5 @@ public interface ModelWriteAPI {
 
     @ApiOperation(value = "根据模型结构生成数据样例")
     @PostMapping(value = "/{id}/build/data-template")
-    String buildRequestTemplate(@RequestBody JsonSchema schema, @PathVariable long id);
-
+    DalaranModelTemplate buildRequestTemplate(@RequestBody DalaranModelSchema schema, @PathVariable long id);
 }

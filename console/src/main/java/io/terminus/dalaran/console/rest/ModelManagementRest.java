@@ -5,12 +5,13 @@ import io.terminus.dalaran.console.exception.OnException;
 import io.terminus.dalaran.console.repository.ModelRepository;
 import io.terminus.dalaran.console.service.ModelManagementService;
 import io.terminus.dalaran.model.ClassificationModel;
+import io.terminus.dalaran.model.DalaranModelSchema;
+import io.terminus.dalaran.model.DalaranModelTemplate;
 import io.terminus.dalaran.model.ModelField;
-import io.terminus.dalaran.model.schema.DataTemplate;
 import io.terminus.dalaran.model.dto.ModelDTO;
 import io.terminus.dalaran.model.query.ModelQuery;
+import io.terminus.dalaran.model.schema.DataTemplate;
 import io.terminus.dalaran.model.schema.JsonSchema;
-import io.terminus.dalaran.model.schema.ObjectSchema;
 import io.terminus.dalaran.rest.read.ModelReadAPI;
 import io.terminus.dalaran.rest.write.ModelImportAPI;
 import io.terminus.dalaran.rest.write.ModelWriteAPI;
@@ -53,7 +54,6 @@ public class ModelManagementRest implements ModelReadAPI, ModelWriteAPI, ModelIm
     public ModelDTO update(@RequestBody ModelDTO model) {
         return modelManagementService.updateModel(model);
     }
-
 
     @Override
     @OnException(code = ResponseMessage.MODEL_DELETE_ERROR)
@@ -105,19 +105,19 @@ public class ModelManagementRest implements ModelReadAPI, ModelWriteAPI, ModelIm
 
     @Override
     @OnException(code = ResponseMessage.DATA_TEMPLATE_PARSE_ERROR)
-    public JsonSchema importDataTemplate(@RequestBody DataTemplate dataTemplate, @PathVariable long id) {
-        return modelManagementService.importDataTemplate(dataTemplate, id);
+    public DalaranModelSchema importDataTemplate(@RequestBody DataTemplate dataTemplate, @PathVariable long id) {
+        return modelManagementService.importModelTemplate(dataTemplate, id);
     }
 
     @Override
     @OnException(code = ResponseMessage.DATA_TEMPLATE_PARSE_ERROR)
-    public ObjectSchema importDalaranSchema(@RequestBody ObjectSchema objectSchema, @PathVariable long id) {
+    public DalaranModelSchema importDalaranSchema(@RequestBody DalaranModelSchema objectSchema, @PathVariable long id) {
         return modelManagementService.importDalaranSchema(objectSchema, id);
     }
 
     @Override
     @OnException(code = ResponseMessage.MODEL_EXAMPLE_BUILD_ERROR)
-    public String buildRequestTemplate(@RequestBody JsonSchema schema, @PathVariable long id) {
+    public DalaranModelTemplate buildRequestTemplate(@RequestBody DalaranModelSchema schema, @PathVariable long id) {
         return modelManagementService.buildDataTemplate(schema, id);
     }
 

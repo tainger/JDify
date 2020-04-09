@@ -33,7 +33,7 @@ public class TracingLogEntity {
     private String recordId;
 
     @Column(length = 256)
-    private String mainRecordId;
+    private String childRecordId;
 
     @Column(nullable = false)
     private boolean successful;

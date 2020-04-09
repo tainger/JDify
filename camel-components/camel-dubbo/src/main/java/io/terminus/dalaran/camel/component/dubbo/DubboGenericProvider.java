@@ -1,6 +1,7 @@
 package io.terminus.dalaran.camel.component.dubbo;
 
 import com.alibaba.dubbo.common.utils.StringUtils;
+import com.alibaba.dubbo.config.ProviderConfig;
 import com.alibaba.dubbo.config.RegistryConfig;
 import com.alibaba.dubbo.config.ServiceConfig;
 import com.alibaba.dubbo.rpc.service.GenericException;
@@ -87,5 +88,9 @@ public class DubboGenericProvider implements GenericService {
             providerConfig.setOwner(System.getenv("DICE_PROJECT_ID") + "_" + System.getenv("DICE_WORKSPACE"));
         }
         providerConfig.setRef(this);
+        ProviderConfig config = new ProviderConfig();
+        config.setDispatcher("message");
+        config.setThreads(endpoint.getThreads());
+        providerConfig.setProvider(config);
     }
 }

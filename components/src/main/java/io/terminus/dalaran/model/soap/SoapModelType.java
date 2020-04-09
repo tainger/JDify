@@ -1,8 +1,8 @@
 package io.terminus.dalaran.model.soap;
 
+import com.alibaba.fastjson.JSON;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
-import io.terminus.dalaran.ComponentConstants;
 import io.terminus.dalaran.DalaranConstants;
 import io.terminus.dalaran.core.component.annotation.ModelType;
 import io.terminus.dalaran.core.component.model.DalaranModelType;
@@ -45,7 +45,10 @@ public class SoapModelType implements DalaranModelType<String, SoapSchema> {
     }
 
     @Override
-    public String buildTemplateData(SoapSchema schema) {
+    public String buildTemplateData(Map fields) {
+        SoapSchema schema = new SoapSchema();
+        schema.setFields(fields);
+        schema.setOperationConfig(new SoapSchemaOperation());
         Object body = ModelUtils.buildBody(schema);
         ObjectToSoapProcessor processor = new ObjectToSoapProcessor(schema);
         ModelField field = schema.getFields().get(DalaranConstants.MODEL_ROOT);
@@ -63,28 +66,32 @@ public class SoapModelType implements DalaranModelType<String, SoapSchema> {
     }
 
     @Override
-    public SoapSchema importTemplateData(DataTemplate dataTemplate) {
+    public SoapSchema importTemplateData(DataTemplate dataTemplate, String originSchema) {
         InputStream is = new ByteArrayInputStream(dataTemplate.getDataTemplate().getBytes(StandardCharsets.UTF_8));
         try {
             DalaranXMLStreamReader sr = new DalaranXMLStreamReader(XMLInputFactory.newFactory().createXMLStreamReader(is));
             XmlMapper xmlMapper = new XmlMapper();
             xmlMapper.registerModule(new SimpleModule().addDeserializer(Object.class, new DalaranObjectDeserializer()));
             Map<String, Object> map = (Map) xmlMapper.readValue(sr, Object.class);
-            SoapSchema soapSchema = new SoapSchema();
+            SoapSchema soapSchema;
+            if (StringUtils.isNotBlank(originSchema)) {
+                soapSchema = JSON.parseObject(originSchema, SoapSchema.class);
+            } else {
+                soapSchema = new SoapSchema();
+            }
             Object body = map.getOrDefault("Body", null);
             if (body != null) {
-                Map<String, ModelField> root = ModelUtils.parseDataTemplate(body);
+                Map<String, ModelField> root = ModelUtils.parseDataTemplate(JSON.toJSON(body));
                 soapSchema.setFields(root);
             }
-
-            SoapSchemaOperation schemaOperation = new SoapSchemaOperation();
-            map.forEach((k, v) -> {
-                if (StringUtils.startsWithIgnoreCase(k, ComponentConstants.XMLNS) && StringUtils.endsWithIgnoreCase(k, ComponentConstants.SOAP_ENV)) {
-                    schemaOperation.setPrefix(StringUtils.substringAfter(k, ComponentConstants.XMLNS));
-                    schemaOperation.setTargetNamespace(v.toString());
-                }
-            });
-            soapSchema.setOperationConfig(schemaOperation);
+//            SoapSchemaOperation schemaOperation = new SoapSchemaOperation();
+//            map.forEach((k, v) -> {
+//                if (StringUtils.startsWithIgnoreCase(k, ComponentConstants.XMLNS) && StringUtils.endsWithIgnoreCase(k, ComponentConstants.SOAP_ENV)) {
+//                    schemaOperation.setPrefix(StringUtils.substringAfter(k, ComponentConstants.XMLNS));
+//                    schemaOperation.setTargetNamespace(v.toString());
+//                }
+//            });
+//            soapSchema.setOperationConfig(schemaOperation);
             return soapSchema;
         } catch (Exception e) {
             e.printStackTrace();

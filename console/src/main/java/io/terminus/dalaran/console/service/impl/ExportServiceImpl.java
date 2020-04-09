@@ -137,8 +137,8 @@ public class ExportServiceImpl implements ExportService {
     public Swagger exportSwagger() {
         List<ApiInfo> apiInfoList = getExportApiInfoList();
         apiInfoList.forEach(apiInfo -> {
-            Object inExample = JSON.parseObject(modelManagementService.buildDataTemplate(apiInfo.getInSchema().getModelSchema(), null));
-            Object outExample = JSON.parseObject(modelManagementService.buildDataTemplate(apiInfo.getOutSchema().getModelSchema(), null));
+            Object inExample = JSON.parseObject(modelManagementService.buildDataTemplate(apiInfo.getInSchema().getModelSchema(), null).getData());
+            Object outExample = JSON.parseObject(modelManagementService.buildDataTemplate(apiInfo.getOutSchema().getModelSchema(), null).getData());
             apiInfo.setInExample(inExample);
             apiInfo.setOutExample(outExample);
         });

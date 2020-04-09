@@ -6,13 +6,15 @@ public class LogRetentionPolicyExecutor {
 
     private static final long HOUR_MILLISECOND = 60 * 60 * 1000L;
 
+    private static final String LOG_CRON = "0 0 1 * * ?";
+
     private final LogRetentionPolicy logRetentionPolicy;
 
     public LogRetentionPolicyExecutor(LogRetentionPolicy logRetentionPolicy) {
         this.logRetentionPolicy = logRetentionPolicy;
     }
 
-    @Scheduled(fixedDelay = HOUR_MILLISECOND, initialDelay = HOUR_MILLISECOND)
+    @Scheduled(cron = LOG_CRON)
     private void execute() {
         logRetentionPolicy.processing();
     }

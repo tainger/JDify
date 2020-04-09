@@ -22,6 +22,10 @@ public class ComponentConstants {
 
     public static final String JSON_ARRAY = "com.alibaba.fastjson.JSONArray";
 
+    public static final String JAVA_MAP = "java.util.Map";
+
+    public static final String JAVA_LIST = "java.lang.Iterable";
+
     public static final String XMLNS = "@xmlns:";
 
     public static final String SOAP_ENV =  "soapenv";

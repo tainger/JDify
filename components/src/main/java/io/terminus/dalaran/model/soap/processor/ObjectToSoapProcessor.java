@@ -52,6 +52,10 @@ public class ObjectToSoapProcessor implements Processor, Traceable {
     }
 
     public String buildSoapBody(ModelField modelField, Object body) throws Exception {
+        ByteArrayOutputStream data = new ByteArrayOutputStream();
+        if (modelField == null) {
+            return data.toString();
+        }
         PREFIX = soapOperationConfig.getPrefix();
         MessageFactory messageFactory = MessageFactory.newInstance();
         SOAPMessage message = messageFactory.createMessage();
@@ -67,7 +71,6 @@ public class ObjectToSoapProcessor implements Processor, Traceable {
         message.saveChanges();
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         message.writeTo(stream);
-        ByteArrayOutputStream data = new ByteArrayOutputStream();
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder;
         builder = factory.newDocumentBuilder();

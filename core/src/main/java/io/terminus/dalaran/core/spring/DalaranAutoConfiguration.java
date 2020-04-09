@@ -108,4 +108,11 @@ public class DalaranAutoConfiguration {
     public OSSAccount ossAccount(@Value("${oss.endpoint}") String endpoint, @Value("${oss.accessId}") String accessId, @Value("${oss.accessSecret}") String accessSecret, @Value("${oss.bucketName}") String bucketName, @Value("${oss.rootDir}") String rootDir) {
         return new OSSAccount(endpoint, accessId, accessSecret, bucketName, rootDir);
     }
+
+//    @Bean
+//    public HttpComponent httpComponent() {
+//        HttpComponent component = new HttpComponent();
+//        component.setConnectionTimeToLive(0);
+//        return component;
+//    }
 }

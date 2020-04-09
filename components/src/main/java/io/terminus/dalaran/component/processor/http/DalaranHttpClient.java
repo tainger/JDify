@@ -57,10 +57,7 @@ public class DalaranHttpClient implements DalaranProcessor<HttpClientConfig>, Da
             uri = uri + "&authMethod=Basic&authUsername=" + config.getConnector().getUsername() + "&authPassword=" + config.getConnector().getPassword();
         }
         route.setHeader(HTTP_METHOD, Builder.constant(config.getMethod().name()));
-        route.to(uri).process(exchange -> {
-            exchange.getOut().setHeaders(exchange.getIn().getHeaders());
-            exchange.getOut().setBody(exchange.getIn().getBody());
-        });
+        route.to(uri);
         // TODO Stream to string
         route.convertBodyTo(String.class);
     }

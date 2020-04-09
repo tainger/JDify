@@ -5,11 +5,12 @@ import lombok.Data;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Index;
 import javax.persistence.Table;
 
 @Data
 @Entity
-@Table(name = "dalaran_released_model")
+@Table(name = "dalaran_released_model", indexes={@Index(name = "originId", columnList = "originId")})
 public class ModelReleasedEntity extends ModelAbstractEntity implements ReleasedEntity {
 
     @Column(nullable = false)

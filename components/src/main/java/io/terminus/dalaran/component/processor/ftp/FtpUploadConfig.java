@@ -26,4 +26,7 @@ public class FtpUploadConfig implements ConnectorConfig<FtpUploadConnector> {
 
     @ConfigFieldInfo(label = "文件后缀日期格式", inputType = FieldInputType.String)
     private String datePattern;
+
+    @ConfigFieldInfo(label = "文件后缀", inputType = FieldInputType.String, required = false)
+    private String fileSuffix;
 }

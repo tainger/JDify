@@ -173,16 +173,16 @@ public class DalaranTracer {
 //                tracingLog.setRecordId(exchange.getExchangeId());
 //            }
             if (parentId == null) {
-                tracingLog.setMainRecordId(currentId);
+                tracingLog.setRecordId(currentId);
             } else {
-                tracingLog.setMainRecordId(parentId);
+                tracingLog.setRecordId(parentId);
             }
 
             Boolean camelMulticastComplete = exchange.getProperty(CAMEL_MULTICAST_COMPLETE, Boolean.class);
             if (camelMulticastComplete != null && parentId != null) {
-                tracingLog.setRecordId(parentId);
+                tracingLog.setChildRecordId(parentId);
             } else {
-                tracingLog.setRecordId(currentId);
+                tracingLog.setChildRecordId(currentId);
             }
 
             tracingLog.setTracingType(tracingType);

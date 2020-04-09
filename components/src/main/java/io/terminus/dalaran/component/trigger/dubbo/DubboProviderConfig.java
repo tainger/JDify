@@ -30,5 +30,5 @@ public class DubboProviderConfig extends AllModelConfig implements ConnectorConf
     @ConfigFieldInfo(label = "超时时间(ms)", inputType = FieldInputType.Integer, defaultValue = "500")
     private Integer timeout;
     @ConfigFieldInfo(label = "重试次数", inputType = FieldInputType.Integer, defaultValue = "3")
-    private Integer retries = 3;
+    private Integer retries = 0;
 }

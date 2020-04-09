@@ -7,6 +7,8 @@ import io.terminus.dalaran.model.schema.DataTemplate;
 import io.terminus.dalaran.model.schema.EDISchema;
 import org.apache.camel.model.ProcessorDefinition;
 
+import java.util.Map;
+
 @ModelType(value = "EDI", modelSchema = EDISchema.class)
 public class EDIModelType implements DalaranModelType<String, EDISchema> {
 
@@ -21,7 +23,7 @@ public class EDIModelType implements DalaranModelType<String, EDISchema> {
     }
 
     @Override
-    public String buildTemplateData(EDISchema schema) {
+    public String buildTemplateData(Map fields) {
         return null;
     }
 
@@ -31,7 +33,7 @@ public class EDIModelType implements DalaranModelType<String, EDISchema> {
     }
 
     @Override
-    public EDISchema importTemplateData(DataTemplate dataTemplate) {
+    public EDISchema importTemplateData(DataTemplate dataTemplate, String originSchema) {
         return null;
     }
 

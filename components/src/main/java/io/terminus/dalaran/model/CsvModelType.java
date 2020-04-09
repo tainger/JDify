@@ -5,9 +5,12 @@ import io.terminus.dalaran.core.component.annotation.ModelType;
 import io.terminus.dalaran.core.component.model.DalaranModelType;
 import io.terminus.dalaran.model.schema.CsvModelSchema;
 import io.terminus.dalaran.model.schema.DataTemplate;
+import io.terminus.dalaran.model.utils.ModelUtils;
+import org.apache.camel.component.file.GenericFile;
 import org.apache.camel.component.file.GenericFileMessage;
 import org.apache.camel.model.ProcessorDefinition;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -126,11 +129,18 @@ public class CsvModelType implements DalaranModelType<String, CsvModelSchema> {
         route.process(exchange -> {
             exchange.getOut().copyFrom(exchange.getIn());
             Object in = exchange.getIn().getBody();
-            if (!(in instanceof GenericFileMessage)) {
+            if (!(in instanceof GenericFileMessage) && !(in instanceof GenericFile)) {
                 return;
             }
-            GenericFileMessage body = exchange.getIn().getBody(GenericFileMessage.class);
-            byte[] content = (byte[]) body.getGenericFile().getBody();
+
+            byte[] content;
+            if (in instanceof GenericFile) {
+                GenericFile file = exchange.getIn().getBody(GenericFile.class);
+                content = (byte[])file.getBody();
+            } else {
+                GenericFileMessage body = exchange.getIn().getBody(GenericFileMessage.class);
+                content = (byte[]) body.getGenericFile().getBody();
+            }
             String contentStr = new String(content);
             String[] records = contentStr.split(System.lineSeparator());
             List out;
@@ -159,7 +169,7 @@ public class CsvModelType implements DalaranModelType<String, CsvModelSchema> {
             Map<String, Object> recordObj = new HashMap<>();
             String[] recordValues = record.split(schema.getColumnDelimiter());
             for (int i = 0; i < recordValues.length; i++) {
-                recordObj.put(columnArray[i], recordValues[i]);
+                recordObj.put(columnArray[i].trim(), recordValues[i]);
             }
             out.add(recordObj);
         }
@@ -167,7 +177,13 @@ public class CsvModelType implements DalaranModelType<String, CsvModelSchema> {
     }
 
     @Override
-    public String buildTemplateData(CsvModelSchema schema) {
+    public String buildTemplateData(Map fields) {
+        CsvModelSchema schema = new CsvModelSchema();
+        schema.setFields(fields);
+        Object body = ModelUtils.buildBody(schema);
+        if (body != null) {
+            return JSON.toJSONString(body);
+        }
         return null;
     }
 
@@ -177,8 +193,17 @@ public class CsvModelType implements DalaranModelType<String, CsvModelSchema> {
     }
 
     @Override
-    public CsvModelSchema importTemplateData(DataTemplate dataTemplate) {
-        return null;
+    public CsvModelSchema importTemplateData(DataTemplate dataTemplate, String originSchema) {
+        Object body = JSON.parse(dataTemplate.getDataTemplate());
+        Map<String, ModelField> root = ModelUtils.parseDataTemplate(body);
+        CsvModelSchema schema;
+        if (StringUtils.isNotBlank(originSchema)) {
+            schema = JSON.parseObject(originSchema, CsvModelSchema.class);
+        } else {
+            schema = new CsvModelSchema();
+        }
+        schema.setFields(root);
+        return schema;
     }
 
     @Override

@@ -15,7 +15,7 @@ public class SoapSchemaOperation {
 
     private String prefix = "dalaran";
 
-    private Boolean bodyContainsXmlns = true;
+    private Boolean bodyContainsXmlns = false;
 
     private Boolean bodyContainsPrefix = false;
 

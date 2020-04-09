@@ -20,7 +20,8 @@ public class I18nUtils {
     private static final String COMPONENT_PREFIX = "component.";
     private static final String COMPONENT_FIELD_PREFIX = "component_field.";
     private static final String CONNECTOR_FIELD_PREFIX = "connector_field.";
-
+    private static final String MODEL_PREFIX = "model.";
+    private static final String MODEL_FIELD_PREFIX = "model_field.";
 
     public String getExceptionMessage(@NotNull String code) {
         return getExceptionMessage(code, null);
@@ -80,6 +81,15 @@ public class I18nUtils {
 
     public String getComponentFieldLabel(String component, String field) {
         Optional<String> message = getMessageOptional(COMPONENT_FIELD_PREFIX + component + "." + field);
+        return message.orElse(field);
+    }
+
+    public String getModelName(String modelType) {
+        return getMessageOptional(MODEL_PREFIX + modelType).orElse(modelType);
+    }
+
+    public String getModelFieldLabel(String model, String field) {
+        Optional<String> message = getMessageOptional(MODEL_FIELD_PREFIX + model + "." + field);
         return message.orElse(field);
     }
 }

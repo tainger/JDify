@@ -3,10 +3,7 @@ package io.terminus.dalaran.console.rest;
 import com.alibaba.fastjson.JSON;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.models.Swagger;
-import io.terminus.dalaran.config.ConnectorInfo;
-import io.terminus.dalaran.config.ProcessorInfo;
-import io.terminus.dalaran.config.ServiceInfo;
-import io.terminus.dalaran.config.TriggerInfo;
+import io.terminus.dalaran.config.*;
 import io.terminus.dalaran.console.ExportData;
 import io.terminus.dalaran.console.ResponseMessage;
 import io.terminus.dalaran.console.exception.OnException;
@@ -111,6 +108,12 @@ public class PlatformRest implements PlatformInfoAPI, PlatformImportAPI, Platfor
     @OnException(code = ResponseMessage.SERVICE_QUERY_ERROR)
     public Collection<ServiceInfo> listServiceInfo() {
         return dalaranContext.getDalaranServiceContext().getAllServiceInfo();
+    }
+
+    @Override
+    @OnException(code = ResponseMessage.MODEL_QUERY_ERROR)
+    public Collection<ModelInfo> listModelInfo() {
+        return dalaranContext.getDalaranModelTypeContext().listAllModelInfo();
     }
 
     @Override

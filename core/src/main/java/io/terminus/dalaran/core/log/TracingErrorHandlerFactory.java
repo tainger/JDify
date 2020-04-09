@@ -76,11 +76,12 @@ public class TracingErrorHandlerFactory extends DefaultErrorHandlerBuilder imple
         }
 
         private void log(Exchange exchange, String tracingKey, String body) {
-            DalaranTracingLog tracingLog = exchange.getProperty(tracingKey + exchange.getExchangeId(), DalaranTracingLog.class);
+            String propertyKey = tracingKey + exchange.getExchangeId();
+            DalaranTracingLog tracingLog = exchange.getProperty(propertyKey, DalaranTracingLog.class);
             if (tracingLog == null) {
                 return;
             }
-            exchange.removeProperty(tracingKey);
+            exchange.removeProperty(propertyKey);
             tracingLog.setSuccessful(false);
             tracingLog.setOutputBodyType("EXCEPTION");
             tracingLog.setOutputBody(body);

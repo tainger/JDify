@@ -8,6 +8,7 @@ import io.terminus.dalaran.model.schema.DataTemplate;
 import io.terminus.dalaran.model.schema.ObjectSchema;
 import io.terminus.dalaran.model.utils.ModelUtils;
 import org.apache.camel.model.ProcessorDefinition;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Map;
 
@@ -24,7 +25,9 @@ public class ObjectModelType implements DalaranModelType<Object, ObjectSchema> {
     }
 
     @Override
-    public String buildTemplateData(ObjectSchema schema) {
+    public String buildTemplateData(Map fields) {
+        ObjectSchema schema = new ObjectSchema();
+        schema.setFields(fields);
         Object body = ModelUtils.buildBody(schema);
         if (body != null) {
             return JSON.toJSONString(body);
@@ -38,10 +41,15 @@ public class ObjectModelType implements DalaranModelType<Object, ObjectSchema> {
     }
 
     @Override
-    public ObjectSchema importTemplateData(DataTemplate dataTemplate) {
+    public ObjectSchema importTemplateData(DataTemplate dataTemplate, String originSchema) {
         Object body = JSON.parse(dataTemplate.getDataTemplate());
         Map<String, ModelField> root = ModelUtils.parseDataTemplate(body);
-        ObjectSchema schema = new ObjectSchema();
+        ObjectSchema schema;
+        if (StringUtils.isNotBlank(originSchema)) {
+            schema = JSON.parseObject(originSchema, ObjectSchema.class);
+        } else {
+            schema = new ObjectSchema();
+        }
         schema.setFields(root);
         return schema;
     }

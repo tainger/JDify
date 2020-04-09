@@ -5,11 +5,12 @@ import lombok.Data;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Index;
 import javax.persistence.Table;
 
 @Data
 @Entity
-@Table(name = "dalaran_released_trigger_flow")
+@Table(name = "dalaran_released_trigger_flow", indexes={@Index(name = "originId", columnList = "originId")})
 public class TriggerFlowReleasedEntity extends TriggerFlowAbstractEntity implements ReleasedEntity {
 
     @Column(nullable = false)

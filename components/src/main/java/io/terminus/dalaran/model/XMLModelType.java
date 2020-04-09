@@ -1,12 +1,15 @@
 package io.terminus.dalaran.model;
 
+import com.alibaba.fastjson.JSON;
 import io.terminus.dalaran.core.component.annotation.ModelType;
 import io.terminus.dalaran.core.component.model.DalaranModelType;
 import io.terminus.dalaran.model.schema.DataTemplate;
 import io.terminus.dalaran.model.schema.XMLSchema;
+import io.terminus.dalaran.model.utils.ModelUtils;
 import org.apache.camel.model.ProcessorDefinition;
 import org.apache.camel.model.dataformat.JsonLibrary;
 import org.apache.camel.model.dataformat.XmlJsonDataFormat;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -27,8 +30,13 @@ public class XMLModelType implements DalaranModelType<String, XMLSchema> {
     }
 
     @Override
-    public String buildTemplateData(XMLSchema schema) {
-
+    public String buildTemplateData(Map fields) {
+        XMLSchema schema = new XMLSchema();
+        schema.setFields(fields);
+        Object body = ModelUtils.buildBody(schema);
+        if (body != null) {
+            return JSON.toJSONString(body);
+        }
         return null;
     }
 
@@ -38,8 +46,17 @@ public class XMLModelType implements DalaranModelType<String, XMLSchema> {
     }
 
     @Override
-    public XMLSchema importTemplateData(DataTemplate dataTemplate) {
-        return null;
+    public XMLSchema importTemplateData(DataTemplate dataTemplate, String originSchema) {
+        Object body = JSON.parse(dataTemplate.getDataTemplate());
+        Map<String, ModelField> root = ModelUtils.parseDataTemplate(body);
+        XMLSchema schema;
+        if (StringUtils.isNotBlank(originSchema)) {
+            schema = JSON.parseObject(originSchema, XMLSchema.class);
+        } else {
+            schema = new XMLSchema();
+        }
+        schema.setFields(root);
+        return schema;
     }
 
     // TODO 处理 XML 特殊逻辑, 比如 attr, 应该可以抽象

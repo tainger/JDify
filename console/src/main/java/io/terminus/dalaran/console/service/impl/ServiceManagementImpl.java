@@ -61,7 +61,6 @@ public class ServiceManagementImpl implements ServiceManagement {
     @Autowired
     private DalaranResourceBuilder resourceBuilder;
 
-
     @Override
     @Transactional
     public Long create(ServiceDTO serviceDTO) {

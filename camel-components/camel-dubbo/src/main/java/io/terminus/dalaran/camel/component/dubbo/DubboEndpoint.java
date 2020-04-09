@@ -35,6 +35,8 @@ public class DubboEndpoint extends ProcessorEndpoint {
     private Integer retries;
     @UriParam(label = "parameterType", description = "Dubbo service parameter type", javaType = "java.lang.String")
     private String parameterType;
+    @UriParam(defaultValue = "500", description = "Dubbo service thread pool size", javaType = "java.lang.Integer")
+    private Integer threads;
 
     private GenericService genericService;
 
@@ -155,5 +157,13 @@ public class DubboEndpoint extends ProcessorEndpoint {
 
     public void setRetries(Integer retries) {
         this.retries = retries;
+    }
+
+    public Integer getThreads() {
+        return threads;
+    }
+
+    public void setThreads(Integer threads) {
+        this.threads = threads;
     }
 }
