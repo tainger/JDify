@@ -143,6 +143,9 @@ public class DefaultDalaranCamelContext implements DalaranContext<DalaranRoute> 
     @Override
     public String testFlow(Long flowId, String body) {
         String recordId = nextRecordId();
+        if (camelContext.getRoute(TEST_FLOW_PREFIX + FLOW_PREFIX + flowId) == null) {
+            throw new RuntimeException("Test error! This flow can't be loaded into test service, please check it.");
+        }
         try {
             DefaultProducerTemplate template = (DefaultProducerTemplate) camelContext.createProducerTemplate();
             template.sendBodyAndProperty(TEST_FLOW_DIRECT_PREFIX + FLOW_PREFIX + flowId, body, DalaranConstants.TEST_FLOW_RECORD_ID_HEADER, recordId);
@@ -155,6 +158,9 @@ public class DefaultDalaranCamelContext implements DalaranContext<DalaranRoute> 
     @Override
     public String testSubFlow(Long subFlowId, String body) {
         String recordId = nextRecordId();
+        if (camelContext.getRoute(TEST_SUB_FLOW_PREFIX + FLOW_PREFIX + subFlowId) == null) {
+            throw new RuntimeException("Test error! This sub flow can't be loaded into test service, please check it.");
+        }
         try {
             DefaultProducerTemplate template = (DefaultProducerTemplate) camelContext.createProducerTemplate();
             template.sendBodyAndProperty(TEST_SUB_FLOW_DIRECT_PREFIX + FLOW_PREFIX + subFlowId, body, DalaranConstants.TEST_FLOW_RECORD_ID_HEADER, recordId);

@@ -10,20 +10,14 @@ public class SqlAfterProcessor implements Processor {
 
     private SQLOperationType operationType;
 
-    private Boolean printSql;
-
     private final Logger logger = LoggerFactory.getLogger(SqlAfterProcessor.class);
 
-    public SqlAfterProcessor(SQLOperationType operationType, Boolean printSql) {
+    public SqlAfterProcessor(SQLOperationType operationType) {
         this.operationType = operationType;
-        this.printSql = printSql;
     }
 
     @Override
     public void process(Exchange exchange) throws Exception {
-        if (printSql) {
-//            logger.info(exchange.getIn().getHeader(ComponentConstants.SQL_QUERY).toString());
-        }
         if (operationType == SQLOperationType.INSERT) {
             Object rows = exchange.getIn().getHeader(ComponentConstants.SQL_RETURN_KEYS);
             exchange.getOut().setBody(rows);
