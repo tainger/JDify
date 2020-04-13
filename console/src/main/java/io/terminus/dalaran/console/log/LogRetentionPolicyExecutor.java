@@ -6,7 +6,7 @@ public class LogRetentionPolicyExecutor {
 
     private static final long HOUR_MILLISECOND = 60 * 60 * 1000L;
 
-    private static final String LOG_CRON = "0 0 1 * * ?";
+    private static final String LOG_CRON = "0 0 1 */3 * ?";
 
     private final LogRetentionPolicy logRetentionPolicy;
 
