@@ -2,13 +2,14 @@ package io.terminus.dalaran.component.processor.retry;
 
 import io.terminus.dalaran.FieldInputType;
 import io.terminus.dalaran.core.component.annotation.ConfigFieldInfo;
+import io.terminus.dalaran.core.component.config.OutModelConfig;
 import io.terminus.dalaran.core.resource.entity.common.ProcessorEntity;
 import lombok.Data;
 
 import java.util.List;
 
 @Data
-public class RetryConfig {
+public class RetryConfig extends OutModelConfig {
 
     @ConfigFieldInfo(label = "最大重试次数", inputType = FieldInputType.Integer)
     private Integer maxRetry;

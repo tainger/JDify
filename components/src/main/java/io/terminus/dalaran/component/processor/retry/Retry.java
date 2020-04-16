@@ -7,17 +7,19 @@ import io.terminus.dalaran.core.context.DalaranContext;
 import io.terminus.dalaran.core.flow.DalaranFlowBuilder;
 import io.terminus.dalaran.core.flow.DalaranRoute;
 import io.terminus.dalaran.core.resource.DalaranResourceBuilder;
+import io.terminus.dalaran.model.RetryConvertFragmentInfo;
 import io.terminus.dalaran.model.component.ComponentModel;
 import io.terminus.dalaran.model.flow.BasicFlow;
 import io.terminus.dalaran.model.flow.FlowFragment;
 import org.apache.camel.model.ProcessorDefinition;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @Processor(
         value = "retry",
         configType = RetryConfig.class
 )
-public class Retry implements DalaranProcessor<String>, DalaranProcessorConfigCustomConverter<RetryConfig, String> {
+public class Retry implements DalaranProcessor<RetryConvertFragmentInfo>, DalaranProcessorConfigCustomConverter<RetryConfig, RetryConvertFragmentInfo> {
 
     @Autowired
     private DalaranContext<DalaranRoute> dalaranContext;
@@ -29,17 +31,24 @@ public class Retry implements DalaranProcessor<String>, DalaranProcessorConfigCu
     private DalaranResourceBuilder resourceBuilder;
 
     @Override
-    public void configure(ProcessorDefinition route, String fragmentUri) {
-        route.to(fragmentUri);
+    public void configure(ProcessorDefinition route, RetryConvertFragmentInfo fragment) {
+        route.to(fragment.getUri());
     }
 
     @Override
-    public String convert(RetryConfig config, ComponentModel component, BasicFlow flow) {
+    public RetryConvertFragmentInfo convert(RetryConfig config, ComponentModel component, BasicFlow flow) {
         FlowFragment fragment = resourceBuilder.buildFlowFragment(config.getPipeline(), component.getInModel(),
                 component.getOutModel(), flow.getId(), component.getId(), flow.isTracing());
         DalaranRoute retryRoute = flowBuilder.buildFlowFragment(fragment);
         retryRoute.onException(Throwable.class).maximumRedeliveries(config.getMaxRetry()).redeliveryDelay(config.getRetryDelay());
         dalaranContext.addRoute(retryRoute);
-        return fragment.getDirectRouteUri();
+        RetryConvertFragmentInfo fragmentInfo = new RetryConvertFragmentInfo();
+        fragmentInfo.setUri(fragment.getDirectRouteUri());
+        if (StringUtils.isNotBlank(retryRoute.getLastBodyType())) {
+            fragmentInfo.setOutModelType(retryRoute.getLastBodyType());
+        } else {
+            fragmentInfo.setOutModelType(retryRoute.getLastOutModel().getModelType());
+        }
+        return fragmentInfo;
     }
 }
