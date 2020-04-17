@@ -22,6 +22,7 @@ import io.terminus.dalaran.model.dto.basic.BasicModelInfo;
 import io.terminus.dalaran.model.query.ModelQuery;
 import io.terminus.dalaran.model.schema.*;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.similarity.JaroWinklerDistance;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -426,7 +427,7 @@ public class ModelManagementServiceImpl implements ModelManagementService {
 //            SoapSchemaOperation soapSchemaOperation = new SoapSchemaOperation();
 //            modelSchema.put("operationConfig", soapSchemaOperation);
 //        }
-        if (modelSchema != null) {
+        if (MapUtils.isNotEmpty(modelSchema)) {
             modelEntity.setModelSchema(JSON.toJSONString(modelSchema));
         } else {
             if (schema != null) {
