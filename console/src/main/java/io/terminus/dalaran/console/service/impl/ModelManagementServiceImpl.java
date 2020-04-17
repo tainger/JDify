@@ -419,6 +419,7 @@ public class ModelManagementServiceImpl implements ModelManagementService {
             modelEntity.setName("Dalaran Model");
         }
 
+        String schema = modelEntity.getModelSchema();
         Map<String, Object> modelSchema = model.getModelSchema();
 //        String modelType = model.getModelType();
 //        if (modelType.equalsIgnoreCase("SOAP")) {
@@ -428,7 +429,11 @@ public class ModelManagementServiceImpl implements ModelManagementService {
         if (modelSchema != null) {
             modelEntity.setModelSchema(JSON.toJSONString(modelSchema));
         } else {
-            modelEntity.setModelSchema(JSON.toJSONString(new HashMap<>()));
+            if (schema != null) {
+                modelEntity.setModelSchema(schema);
+            } else {
+                modelEntity.setModelSchema(JSON.toJSONString(new HashMap<>()));
+            }
         }
         modelEntity.setType(model.getModelType());
         modelEntity.setModelKey(model.getModelKey());
