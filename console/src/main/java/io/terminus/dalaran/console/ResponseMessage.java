@@ -128,4 +128,6 @@ public class ResponseMessage {
     public static final String LOGIN_ERROR = "Login.Exception";
 
     public static final String TRACE_QUERY_ERROR = "Trace.Log.Query.Exception";
+
+    public static final String OSS_FILE_UPLOAD_ERROR = "OSS.Log.Upload.Exception";
 }
