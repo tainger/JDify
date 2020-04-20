@@ -5,8 +5,10 @@ import io.terminus.dalaran.console.exception.OnException;
 import io.terminus.dalaran.console.service.OSSManagementService;
 import io.terminus.dalaran.rest.write.OSSWriteAPI;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+@RestController
 public class OSSManagementRest implements OSSWriteAPI {
 
     @Autowired

@@ -25,7 +25,7 @@ public class CarsoFtpUpload implements DalaranProcessor<CarsoFtpUploadConfig> {
 
     private static final String FTP_ROUTE_URI = "%s:%s:%s/%s?passiveMode=true&fileExist=%s";
 
-    private static final String DATA_TEMPLATE_DIR = "";
+    private static final String DATA_TEMPLATE_DIR = "/var/tmp";
 
     @Autowired
     private OSSAccount ossAccount;
@@ -64,10 +64,10 @@ public class CarsoFtpUpload implements DalaranProcessor<CarsoFtpUploadConfig> {
     }
 
     private String getFileFromOss(String fileKey, OSSAccount ossAccount, File dir) throws Exception {
-        String fileName = "dalaran-" + System.currentTimeMillis();
+        String fileName = "dalaran-" + fileKey.hashCode();
         File tempFile = File.createTempFile(fileName, ".ftl", dir);
         OSS ossClient = new OSSClientBuilder().build(ossAccount.getEndpoint(), ossAccount.getAccessId(), ossAccount.getAccessSecret());
         ossClient.getObject(new GetObjectRequest(ossAccount.getBucketName(), fileKey), tempFile);
-        return fileName + ".ftl";
+        return tempFile.getName();
     }
 }

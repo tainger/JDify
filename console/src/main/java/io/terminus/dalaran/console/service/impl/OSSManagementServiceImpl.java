@@ -5,8 +5,10 @@ import com.aliyun.oss.OSSClientBuilder;
 import io.terminus.dalaran.console.service.OSSManagementService;
 import io.terminus.dalaran.core.resource.oss.OSSAccount;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+@Service
 public class OSSManagementServiceImpl implements OSSManagementService {
 
     private static final String FILE_ROOT = "carso";
