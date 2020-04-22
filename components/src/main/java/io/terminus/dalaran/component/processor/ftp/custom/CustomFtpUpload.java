@@ -1,4 +1,4 @@
-package io.terminus.dalaran.component.processor.carso.ftp;
+package io.terminus.dalaran.component.processor.ftp.custom;
 
 import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSClientBuilder;
@@ -16,12 +16,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.io.File;
 
 @Processor(
-        value = "carso-ftp-upload",
+        value = "custom-ftp-upload",
         order = 19,
-        configType = CarsoFtpUploadConfig.class,
+        configType = CustomFtpUploadConfig.class,
         bodyType = "CSV"
 )
-public class CarsoFtpUpload implements DalaranProcessor<CarsoFtpUploadConfig> {
+public class CustomFtpUpload implements DalaranProcessor<CustomFtpUploadConfig> {
 
     private static final String FTP_ROUTE_URI = "%s:%s:%s/%s?passiveMode=true&fileExist=%s";
 
@@ -31,7 +31,7 @@ public class CarsoFtpUpload implements DalaranProcessor<CarsoFtpUploadConfig> {
     private OSSAccount ossAccount;
 
     @Override
-    public void configure(ProcessorDefinition route, CarsoFtpUploadConfig config) {
+    public void configure(ProcessorDefinition route, CustomFtpUploadConfig config) {
         FtpUploadConnector connector = config.getConnector();
         String uri = String.format(FTP_ROUTE_URI, connector.getProtocol().toString().toLowerCase(), connector.getHost(),
                 connector.getPort(), config.getPath(), config.getFileExist());
@@ -45,13 +45,13 @@ public class CarsoFtpUpload implements DalaranProcessor<CarsoFtpUploadConfig> {
             uri += "&timeout=" + connector.getTimeout();
         }
 
-        route.process(new CarsoFTPUpLoadPreProcessor(config, templateConfigure(config))).to(uri).process(exchange -> {
+        route.process(new CustomFTPUpLoadPreProcessor(config, templateConfigure(config))).to(uri).process(exchange -> {
             Object fileName = exchange.getIn().getHeader("CamelFileNameProduced");
             exchange.getOut().setBody(fileName);
         });
     }
 
-    private Template templateConfigure(CarsoFtpUploadConfig config) {
+    private Template templateConfigure(CustomFtpUploadConfig config) {
         Configuration configuration = new Configuration();
         File dir = new File(DATA_TEMPLATE_DIR);
         try {

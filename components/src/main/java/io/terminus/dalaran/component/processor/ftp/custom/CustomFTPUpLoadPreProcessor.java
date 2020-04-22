@@ -1,4 +1,4 @@
-package io.terminus.dalaran.component.processor.carso.ftp;
+package io.terminus.dalaran.component.processor.ftp.custom;
 
 import com.alibaba.fastjson.JSON;
 import freemarker.template.Template;
@@ -10,13 +10,13 @@ import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class CarsoFTPUpLoadPreProcessor implements Processor {
+public class CustomFTPUpLoadPreProcessor implements Processor {
 
-    private CarsoFtpUploadConfig config;
+    private CustomFtpUploadConfig config;
 
     private Template template;
 
-    public CarsoFTPUpLoadPreProcessor(CarsoFtpUploadConfig config, Template template) {
+    public CustomFTPUpLoadPreProcessor(CustomFtpUploadConfig config, Template template) {
         this.config = config;
         this.template = template;
     }

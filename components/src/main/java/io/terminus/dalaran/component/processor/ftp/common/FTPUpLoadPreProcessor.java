@@ -1,4 +1,4 @@
-package io.terminus.dalaran.component.processor.ftp;
+package io.terminus.dalaran.component.processor.ftp.common;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;

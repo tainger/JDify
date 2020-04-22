@@ -1,4 +1,4 @@
-package io.terminus.dalaran.component.processor.ftp;
+package io.terminus.dalaran.component.processor.ftp.common;
 
 import io.terminus.dalaran.component.connector.FtpUploadConnector;
 import io.terminus.dalaran.core.component.DalaranProcessor;
