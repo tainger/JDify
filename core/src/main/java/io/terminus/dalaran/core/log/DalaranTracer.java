@@ -159,12 +159,17 @@ public class DalaranTracer {
             // 保持输入输出不变
             exchange.getOut().copyFrom(exchange.getIn());
 
-            String parentId = exchange.getProperty(CAMEL_CORRELATION_ID, String.class);
             String currentId = exchange.getExchangeId();
-
             DalaranTracingLog tracingLog = new DalaranTracingLog();
             boolean isMainFlow = TracingType.Flow == tracingType || TracingType.TestFlow == tracingType || TracingType.TestSubFlow == tracingType;
             tracingLog.setMain(isMainFlow);
+            if (isMainFlow) {
+                exchange.setProperty(LOG_MAIN_RECORD_ID, currentId);
+            }
+
+            String parentId = exchange.getProperty(CAMEL_CORRELATION_ID, String.class);
+            String recordId = exchange.getProperty(LOG_MAIN_RECORD_ID, String.class);
+
             exchange.setProperty(getTracingLogPropertyKey() + currentId, tracingLog);
 //            String testRecordId = exchange.getProperty(DalaranConstants.TEST_FLOW_RECORD_ID_HEADER, String.class);
 //            if (testRecordId != null) {
@@ -172,10 +177,10 @@ public class DalaranTracer {
 //            } else {
 //                tracingLog.setRecordId(exchange.getExchangeId());
 //            }
-            if (parentId == null) {
+            if (recordId == null) {
                 tracingLog.setRecordId(currentId);
             } else {
-                tracingLog.setRecordId(parentId);
+                tracingLog.setRecordId(recordId);
             }
 
             Boolean camelMulticastComplete = exchange.getProperty(CAMEL_MULTICAST_COMPLETE, Boolean.class);

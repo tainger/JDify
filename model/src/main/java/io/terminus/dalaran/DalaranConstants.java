@@ -20,6 +20,7 @@ public final class DalaranConstants {
     public static final String SCATTER_GATHER_EXCHANGE = "DalaranScatterGatherExchange";
     public static final String DALARAN_CONTEXT_EXCHANGE = "DalaranContextExchange";
     public static final String CAMEL_CORRELATION_ID = "CamelCorrelationId";
+    public static final String LOG_MAIN_RECORD_ID = "LogMainRecordId";
 
     public static final String CAMEL_MULTICAST_COMPLETE = "CamelMulticastComplete";
 
