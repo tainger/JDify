@@ -40,7 +40,7 @@ public class DalaranSoapListener implements DalaranTrigger<SoapListenerConfig>, 
     public void buildFromRoute(RouteDefinition route, SoapListenerConfig config) {
         String uri = "netty4-http:" + config.getProtocol().name().toLowerCase() +
                 "://0.0.0.0:" + config.getPort() + config.getPath() +
-                "?httpMethodRestrict=" + config.getMethod();
+                "?chunkedMaxContentLength=104857600&httpMethodRestrict=" + config.getMethod();
         route.from(uri).process(new SoapTriggerProcessor());
 
         if (!config.isEnableSign()) {
