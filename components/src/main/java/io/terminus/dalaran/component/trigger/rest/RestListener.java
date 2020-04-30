@@ -37,7 +37,7 @@ public class RestListener implements DalaranTrigger<RestConfig>, DalaranTriggerA
     public void buildFromRoute(RouteDefinition route, RestConfig config) {
         String uri = "netty4-http:" + config.getProtocol().name().toLowerCase() +
                 "://0.0.0.0:" + config.getPort() + config.getPath() +
-                "?httpMethodRestrict=" + config.getMethod();
+                "?chunkedMaxContentLength=104857600&httpMethodRestrict=" + config.getMethod();
         route.from(uri);
         if (config.getMethod().isNoBody()) {
             if (config.isEnableSign()) {

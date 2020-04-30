@@ -59,11 +59,11 @@ public class ReleasedFlowInitializer implements DalaranStarter {
     private void init() throws Exception {
         objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
         RouteDefinition swaggerJsonRoute = new RouteDefinition();
-        swaggerJsonRoute.from("netty4-http:http://0.0.0.0:8080/__dalaran/swagger.json?httpMethodRestrict=GET")
+        swaggerJsonRoute.from("netty4-http:http://0.0.0.0:8080/__dalaran/swagger.json?httpMethodRestrict=GET&chunkedMaxContentLength=104857600")
                 .setBody().method(this, "getSwaggerJson").end();
         camelContext.addRouteDefinition(swaggerJsonRoute);
         RouteDefinition swaggerRoute = new RouteDefinition();
-        swaggerRoute.from("netty4-http:http://0.0.0.0:8080/__dalaran/swagger?httpMethodRestrict=GET")
+        swaggerRoute.from("netty4-http:http://0.0.0.0:8080/__dalaran/swagger?httpMethodRestrict=GET&chunkedMaxContentLength=104857600")
                 .setBody().constant("<html><head><script src=\"//unpkg.com/swagger-ui-dist@3/swagger-ui-bundle.js\">" +
                 "</script><link href=\"https://unpkg.com/swagger-ui-dist@3.23.5/swagger-ui.css\"  rel=\"stylesheet\"></head>" +
                 "<body><div id=\"swagger-ui\"/></body>" +
