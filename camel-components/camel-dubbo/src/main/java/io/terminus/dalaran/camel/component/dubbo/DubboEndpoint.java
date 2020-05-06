@@ -31,8 +31,12 @@ public class DubboEndpoint extends ProcessorEndpoint {
     private String version;
     @UriParam(defaultValue = "500", description = "Dubbo service timeout", javaType = "java.lang.Integer")
     private Integer timeout;
+    @UriParam(defaultValue = "3", description = "Dubbo retries", javaType = "java.lang.Integer")
+    private Integer retries;
     @UriParam(label = "parameterType", description = "Dubbo service parameter type", javaType = "java.lang.String")
     private String parameterType;
+    @UriParam(defaultValue = "500", description = "Dubbo service thread pool size", javaType = "java.lang.Integer")
+    private Integer threads;
 
     private GenericService genericService;
 
@@ -59,6 +63,8 @@ public class DubboEndpoint extends ProcessorEndpoint {
             reference.setInterface(serviceId);
             reference.setCheck(false);
             reference.setGeneric(true);
+            reference.setRetries(retries);
+            reference.setOwner(version.substring(6));
             genericService = reference.get();
         }
         return this.genericService;
@@ -143,5 +149,21 @@ public class DubboEndpoint extends ProcessorEndpoint {
 
     public void setParameterType(String parameterType) {
         this.parameterType = parameterType;
+    }
+
+    public Integer getRetries() {
+        return retries;
+    }
+
+    public void setRetries(Integer retries) {
+        this.retries = retries;
+    }
+
+    public Integer getThreads() {
+        return threads;
+    }
+
+    public void setThreads(Integer threads) {
+        this.threads = threads;
     }
 }

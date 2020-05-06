@@ -5,11 +5,12 @@ import lombok.Data;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Index;
 import javax.persistence.Table;
 
 @Data
 @Entity
-@Table(name = "dalaran_released_connector")
+@Table(name = "dalaran_released_connector", indexes={@Index(name = "originId", columnList = "originId")})
 public class ConnectorReleasedEntity extends ConnectorAbstractEntity implements ReleasedEntity {
 
     @Column(nullable = false)

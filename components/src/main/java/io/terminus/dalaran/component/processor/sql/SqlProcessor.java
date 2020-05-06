@@ -1,9 +1,11 @@
 package io.terminus.dalaran.component.processor.sql;
 
+import io.terminus.dalaran.ComponentConstants;
 import io.terminus.dalaran.component.connector.SqlDataSourceConnector;
 import io.terminus.dalaran.core.component.DalaranProcessor;
 import io.terminus.dalaran.core.component.annotation.Processor;
 import org.apache.camel.model.ProcessorDefinition;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 
@@ -33,7 +35,16 @@ public class SqlProcessor implements DalaranProcessor<SqlConfig> {
         } else {
             uri = "sql:";
         }
-        route.to(uri + config.getSql() + "?dataSource=" + dataSourceBeanName);
+        if (config.getCompress()) {
+            config.setSql(compressSql(config.getSql()));
+        }
+        route.process(new SqlBeforeProcessor(config));
+        if (config.getPreHandle()) {
+            route.toD(uri + "${headers." + ComponentConstants.PRE_HANDLE_SQL + "}?dataSource=" + dataSourceBeanName);
+        } else {
+            route.to(uri + config.getSql() + "?dataSource=" + dataSourceBeanName);
+        }
+        route.process(new SqlAfterProcessor(config.getOperationType()));
     }
 
     private javax.sql.DataSource buildDataSource(SqlDataSourceConnector connector) {
@@ -74,5 +85,12 @@ public class SqlProcessor implements DalaranProcessor<SqlConfig> {
 
     private String getDataSourceBeanName(Long connectorId) {
         return "sqlDataSource-" + connectorId;
+    }
+
+    private String compressSql(String originSql) {
+        String[] ignore = {"\n", "\r", "\t"};
+        String[] replace = {" ", " ", " "};
+        originSql = StringUtils.replaceEachRepeatedly(originSql, ignore, replace);
+        return originSql;
     }
 }

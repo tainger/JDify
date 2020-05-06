@@ -15,9 +15,11 @@ public class SoapSchemaOperation {
 
     private String prefix = "dalaran";
 
-    private Boolean bodyContainsXmlns = true;
+    private Boolean bodyContainsXmlns = false;
 
-    private Boolean bodyContainsPrefix = true;
+    private Boolean bodyContainsPrefix = false;
+
+    private Boolean allContainsPrefix = false;
 
     private MessageModel header;
 

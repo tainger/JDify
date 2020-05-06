@@ -22,6 +22,10 @@ public class ComponentConstants {
 
     public static final String JSON_ARRAY = "com.alibaba.fastjson.JSONArray";
 
+    public static final String JAVA_MAP = "java.util.Map";
+
+    public static final String JAVA_LIST = "java.lang.Iterable";
+
     public static final String XMLNS = "@xmlns:";
 
     public static final String SOAP_ENV =  "soapenv";
@@ -29,4 +33,15 @@ public class ComponentConstants {
     public static final String MODEL_FIELD_ROOT = "root";
 
     public static final int MODEL_ARRAY_SIZE = 1;
+
+    public static final String SQL_RETRIEVE_GENERATED_KEYS = "CamelSqlRetrieveGeneratedKeys";
+    public static final String SQL_RETURN_KEYS = "CamelSqlGeneratedKeyRows";
+    public static final String SQL_UPDATE_COUNT = "CamelSqlUpdateCount";
+    public static final String SQL_QUERY =  "CamelSqlQuery";
+
+    public static final String PRE_HANDLE_SQL = "PreHandleSql";
+
+    public static final String EDI_RESPONSE_MESSAGE = "message";
+    public static final String EDI_MESSAGE_STATUS = "status";
+    public static final String EDI_REQUEST_SUCCESS = "success";
 }

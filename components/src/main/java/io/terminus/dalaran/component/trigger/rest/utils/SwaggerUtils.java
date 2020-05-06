@@ -7,6 +7,7 @@ import io.swagger.models.parameters.QueryParameter;
 import io.swagger.models.properties.*;
 import io.terminus.dalaran.component.trigger.rest.model.ApiInfo;
 import io.terminus.dalaran.component.trigger.rest.model.ApiParameter;
+import io.terminus.dalaran.component.trigger.rest.model.DalaranSwaggerModel;
 
 import java.util.*;
 
@@ -28,10 +29,11 @@ public class SwaggerUtils {
             operation.addResponse("200", response);
             response.description("OK");
             response.setSchema(toSwaggerProperty(apiInfo.getOutput()));
+            response.getSchema().setExample(apiInfo.getOutExample());
             if (apiInfo.getMethod().isNoBody()) {
                 operation.setParameters(toQueryParameter(apiInfo.getInput()));
             } else {
-                operation.addParameter(toBodyParameter(apiInfo.getInput()));
+                operation.addParameter(toBodyParameter(apiInfo.getInput(), apiInfo.getInExample()));
             }
         }
         return swagger;
@@ -50,12 +52,13 @@ public class SwaggerUtils {
         return parameters;
     }
 
-    private static Parameter toBodyParameter(ApiParameter param) {
+    private static Parameter toBodyParameter(ApiParameter param, Object example) {
         BodyParameter parameter = new BodyParameter();
-        Model bodyModel = new ModelImpl();
+        Model bodyModel = new DalaranSwaggerModel();
         Map<String, Property> properties = new HashMap<>();
         param.getSubParameter().forEach((name, subField) -> properties.put(name, buildProperty(subField)));
         bodyModel.setProperties(properties);
+        bodyModel.setExample(example);
         parameter.setSchema(bodyModel);
         return parameter;
     }

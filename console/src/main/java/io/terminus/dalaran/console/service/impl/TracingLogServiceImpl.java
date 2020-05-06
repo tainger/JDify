@@ -86,9 +86,9 @@ public class TracingLogServiceImpl implements TracingLogService {
             } else if (!query.isTestFlow()) {
                 predicates.add(builder.and(builder.equal(root.get("tracingType"), TracingType.Flow)));
             }
-            if (query.getModuleId() != null) {
-                predicates.add(builder.equal(root.get("moduleId"), query.getModuleId()));
-            }
+//            if (query.getModuleId() != null) {
+//                predicates.add(builder.equal(root.get("moduleId"), query.getModuleId()));
+//            }
             if (query.getStartTime() != null) {
                 predicates.add(builder.ge(root.get("timestamp"), query.getStartTime().getTime()));
             }
@@ -158,11 +158,14 @@ public class TracingLogServiceImpl implements TracingLogService {
 
         tracingLog.setProcessorId(log.getProcessorId());
         tracingLog.setFlowId(log.getFlowId());
-        TriggerFlowEntity flowEntity = flowRepository.findById(log.getFlowId()).get();
+        Optional<TriggerFlowEntity> optional = flowRepository.findById(log.getFlowId());
+        TriggerFlowEntity flowEntity = null;
+        if (optional.isPresent()) {
+            flowEntity = optional.get();
+        }
         if (flowEntity != null) {
             tracingLog.setFlowName(flowEntity.getName());
         }
-
         return tracingLog;
     }
 }

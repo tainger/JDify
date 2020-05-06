@@ -11,6 +11,8 @@ import org.apache.camel.Traceable;
 import org.apache.commons.collections.MapUtils;
 import org.apache.xml.serialize.OutputFormat;
 import org.apache.xml.serialize.XMLSerializer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 
@@ -27,6 +29,8 @@ import java.util.Map;
  */
 public class ObjectToSoapProcessor implements Processor, Traceable {
 
+    private Logger logger = LoggerFactory.getLogger(ObjectToSoapProcessor.class);
+
     private final Map<String, ModelField> modelFields;
 
     private final SoapSchemaOperation soapOperationConfig;
@@ -42,10 +46,16 @@ public class ObjectToSoapProcessor implements Processor, Traceable {
     public void process(Exchange exchange) throws Exception {
         Object body = exchange.getIn().getBody();
         Object rst = buildSoapBody(modelFields.get(DalaranConstants.MODEL_ROOT), body);
+        logger.info("soap request: " + rst);
         exchange.getOut().setBody(rst);
+        exchange.getOut().setHeaders(exchange.getIn().getHeaders());
     }
 
     public String buildSoapBody(ModelField modelField, Object body) throws Exception {
+        ByteArrayOutputStream data = new ByteArrayOutputStream();
+        if (modelField == null) {
+            return data.toString();
+        }
         PREFIX = soapOperationConfig.getPrefix();
         MessageFactory messageFactory = MessageFactory.newInstance();
         SOAPMessage message = messageFactory.createMessage();
@@ -61,7 +71,6 @@ public class ObjectToSoapProcessor implements Processor, Traceable {
         message.saveChanges();
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         message.writeTo(stream);
-        ByteArrayOutputStream data = new ByteArrayOutputStream();
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder;
         builder = factory.newDocumentBuilder();
@@ -74,10 +83,13 @@ public class ObjectToSoapProcessor implements Processor, Traceable {
     }
 
     private void buildRoot(Map<String, ModelField> modelField, Object body, SOAPElement soapElement) throws Exception {
-        if (MapUtils.isEmpty(modelField)) {
+        if (MapUtils.isEmpty(modelField) || body == null) {
             return;
         }
         for (Map.Entry<String, ModelField> entry : modelField.entrySet()) {
+            if (!((Map) body).containsKey(entry.getKey())) {
+                continue;
+            }
             Object ob = ((Map) body).get(entry.getKey());
             SOAPElement element = soapElement.addChildElement(entry.getKey(), PREFIX);
             if (soapOperationConfig.getBodyContainsXmlns()) {
@@ -89,16 +101,24 @@ public class ObjectToSoapProcessor implements Processor, Traceable {
     }
 
     private void buildBody(Map<String, ModelField> modelField, Object body, SOAPElement soapElement, Boolean bodyContainsXmlns, Boolean bodyContainsPrefix) throws Exception {
-        if (MapUtils.isEmpty(modelField)) {
+        if (MapUtils.isEmpty(modelField) || body == null) {
             return;
         }
         for (Map.Entry<String, ModelField> entry : modelField.entrySet()) {
             String name = entry.getKey();
+            if (!((Map) body).containsKey(name)) {
+                continue;
+            }
             ModelField field = entry.getValue();
             FieldType type = field.getType();
             Object ob = ((Map) body).get(name);
 
             if (ob == null) {
+                if (soapOperationConfig.getAllContainsPrefix()) {
+                    soapElement.addChildElement(name, PREFIX);
+                } else {
+                    soapElement.addChildElement(name);
+                }
                 continue;
             }
             if (type == FieldType.ARRAY) {
@@ -107,7 +127,7 @@ public class ObjectToSoapProcessor implements Processor, Traceable {
                 if (subType == FieldType.OBJECT) {
                     for (Object data: subBody) {
                         SOAPElement element;
-                        if (bodyContainsPrefix) {
+                        if (bodyContainsPrefix || soapOperationConfig.getAllContainsPrefix()) {
                             element = soapElement.addChildElement(name, PREFIX);
                         } else {
                             element = soapElement.addChildElement(name);
@@ -127,7 +147,7 @@ public class ObjectToSoapProcessor implements Processor, Traceable {
                 }
             } else if (type == FieldType.OBJECT) {
                 SOAPElement element;
-                if (bodyContainsPrefix) {
+                if (bodyContainsPrefix || soapOperationConfig.getAllContainsPrefix()) {
                     element = soapElement.addChildElement(name, PREFIX);
                 } else {
                     element = soapElement.addChildElement(name);
@@ -138,7 +158,12 @@ public class ObjectToSoapProcessor implements Processor, Traceable {
                 Map<String, ModelField> child = field.getFields();
                 buildBody(child, ob, element, bodyContainsXmlns, bodyContainsPrefix);
             } else {
-                SOAPElement element = soapElement.addChildElement(name);
+                SOAPElement element;
+                if (soapOperationConfig.getAllContainsPrefix()) {
+                    element = soapElement.addChildElement(name, PREFIX);
+                } else {
+                    element = soapElement.addChildElement(name);
+                }
                 element.addTextNode(ob.toString());
             }
         }

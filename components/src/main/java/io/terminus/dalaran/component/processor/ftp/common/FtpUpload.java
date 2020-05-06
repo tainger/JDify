@@ -1,4 +1,4 @@
-package io.terminus.dalaran.component.processor.ftp;
+package io.terminus.dalaran.component.processor.ftp.common;
 
 import io.terminus.dalaran.component.connector.FtpUploadConnector;
 import io.terminus.dalaran.core.component.DalaranProcessor;
@@ -14,13 +14,13 @@ import org.apache.commons.lang3.StringUtils;
 )
 public class FtpUpload implements DalaranProcessor<FtpUploadConfig> {
 
-    private static final String FTP_ROUTE_URI = "%s:%s:%s/%s?passiveMode=true&fileName=%s&fileExist=%s";
+    private static final String FTP_ROUTE_URI = "%s:%s:%s/%s?passiveMode=true&fileExist=%s";
 
     @Override
     public void configure(ProcessorDefinition route, FtpUploadConfig config) {
         FtpUploadConnector connector = config.getConnector();
         String uri = String.format(FTP_ROUTE_URI, connector.getProtocol().toString().toLowerCase(), connector.getHost(),
-                connector.getPort(), config.getPath(), config.getFileName(), config.getFileExist());
+                connector.getPort(), config.getPath(), config.getFileExist());
         if (StringUtils.isNotBlank(connector.getUsername())) {
             uri += "&username=" + connector.getUsername();
         }
@@ -30,6 +30,9 @@ public class FtpUpload implements DalaranProcessor<FtpUploadConfig> {
         if (connector.getTimeout() != null) {
             uri += "&timeout=" + connector.getTimeout();
         }
-        route.to(uri);
+        route.process(new FTPUpLoadPreProcessor(config)).to(uri).process(exchange -> {
+            Object fileName = exchange.getIn().getHeader("CamelFileNameProduced");
+            exchange.getOut().setBody(fileName);
+        });
     }
 }

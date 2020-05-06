@@ -21,7 +21,7 @@ public class RocketMQConnector {
     @ConfigFieldInfo(label = "ACL accessKey", inputType = FieldInputType.String, required = false)
     private String accessKey;
 
-    @ConfigFieldInfo(label = "ACL secretKey", inputType = FieldInputType.String, required = false)
+    @ConfigFieldInfo(label = "ACL secretKey", inputType = FieldInputType.Password, required = false)
     private String secretKey;
 
     @ConfigFieldInfo(label = "超时时间", inputType = FieldInputType.String, required = false)

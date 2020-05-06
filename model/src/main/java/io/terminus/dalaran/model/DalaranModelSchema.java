@@ -9,7 +9,7 @@ import static io.terminus.dalaran.DalaranConstants.MODEL_ROOT;
 
 // TODO Schema 最好有版本, 做升级时比较好处理
 @Data
-public abstract class DalaranModelSchema {
+public class DalaranModelSchema {
 
     private static final Map<String, Class<? extends DalaranModelSchema>> modelSchemaMapping = new HashMap<>();
 

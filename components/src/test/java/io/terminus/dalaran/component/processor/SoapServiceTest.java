@@ -42,7 +42,7 @@ public class SoapServiceTest extends BasicServiceTest {
         operationConfig.setLocation("piqas.shimaogroup.com:50000/XISOAPAdapter/MessageServlet?senderParty=&senderService=BS_HYPERSMART&receiverParty=&receiverService=&interface=SI_COMMON_S_OUT&interfaceNamespace=urn%3A%3Ashimaogroup.com%3AI_HYPERSMART%3AECC&authMethod=Basic&authUsername=HYPERS_PI&authPassword=HYPERS_PI2019");
 
         SoapService service = new SoapService();
-        ObjectToSoapProcessor objectToSoapProcessor = new ObjectToSoapProcessor(schema1.getFields(), schema1.getOperationConfig());
+        ObjectToSoapProcessor objectToSoapProcessor = new ObjectToSoapProcessor(schema1);
         SoapToObjectProcessor soapToObjectProcessor = new SoapToObjectProcessor(null);
         ProducerTemplate template = getProcessorTemplate(service, operationConfig, objectToSoapProcessor, soapToObjectProcessor);
 
@@ -69,7 +69,7 @@ public class SoapServiceTest extends BasicServiceTest {
         list.add("Spain");
         requestBody.put("name", list);
 
-        ObjectToSoapProcessor objectToSoapProcessor = new ObjectToSoapProcessor(model.getModelSchema().getFields(), model.getModelSchema().getOperationConfig());
+        ObjectToSoapProcessor objectToSoapProcessor = new ObjectToSoapProcessor(model.getModelSchema());
         SoapToObjectProcessor soapToObjectProcessor = new SoapToObjectProcessor(null);
 
         ProducerTemplate template = getProcessorTemplate(service, operationConfig, objectToSoapProcessor, soapToObjectProcessor);

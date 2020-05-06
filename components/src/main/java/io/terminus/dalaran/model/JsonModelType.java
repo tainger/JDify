@@ -3,11 +3,13 @@ package io.terminus.dalaran.model;
 import com.alibaba.fastjson.JSON;
 import io.terminus.dalaran.core.component.annotation.ModelType;
 import io.terminus.dalaran.core.component.model.DalaranModelType;
+import io.terminus.dalaran.model.json.JsonMarshalPreProcessor;
 import io.terminus.dalaran.model.schema.DataTemplate;
 import io.terminus.dalaran.model.schema.JsonSchema;
 import io.terminus.dalaran.model.utils.ModelUtils;
 import org.apache.camel.model.ProcessorDefinition;
 import org.apache.camel.model.dataformat.JsonLibrary;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Map;
 
@@ -16,6 +18,7 @@ public class JsonModelType implements DalaranModelType<String, JsonSchema> {
 
     @Override
     public void fromObject(ProcessorDefinition route, JsonSchema schema) {
+        route.process(new JsonMarshalPreProcessor());
         route.marshal().json(JsonLibrary.Fastjson);
     }
 
@@ -25,7 +28,9 @@ public class JsonModelType implements DalaranModelType<String, JsonSchema> {
     }
 
     @Override
-    public String buildTemplateData(JsonSchema schema) {
+    public String buildTemplateData(Map fields) {
+        JsonSchema schema = new JsonSchema();
+        schema.setFields(fields);
         Object body = ModelUtils.buildBody(schema);
         if (body != null) {
             return JSON.toJSONString(body);
@@ -39,10 +44,15 @@ public class JsonModelType implements DalaranModelType<String, JsonSchema> {
     }
 
     @Override
-    public JsonSchema importTemplateData(DataTemplate dataTemplate) {
+    public JsonSchema importTemplateData(DataTemplate dataTemplate, String originSchema) {
         Object body = JSON.parse(dataTemplate.getDataTemplate());
         Map<String, ModelField> root = ModelUtils.parseDataTemplate(body);
-        JsonSchema schema = new JsonSchema();
+        JsonSchema schema;
+        if (StringUtils.isNotBlank(originSchema)) {
+            schema = JSON.parseObject(originSchema, JsonSchema.class);
+        } else {
+            schema = new JsonSchema();
+        }
         schema.setFields(root);
         return schema;
     }

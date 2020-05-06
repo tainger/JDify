@@ -1,7 +1,6 @@
 package io.terminus.dalaran.component.processor.mapper.jsonPath;
 
 import com.alibaba.fastjson.JSONPath;
-import io.terminus.dalaran.DalaranConstants;
 import io.terminus.dalaran.component.common.exception.FieldParseException;
 import io.terminus.dalaran.component.common.exception.MapperFunctionExecuteException;
 import io.terminus.dalaran.component.processor.mapper.model.*;
@@ -14,6 +13,8 @@ import org.apache.commons.collections4.MapUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static io.terminus.dalaran.DalaranConstants.DALARAN_CONTEXT_EXCHANGE;
 
 /**
  * Created by jingdi on 2019/7/16
@@ -50,6 +51,7 @@ public class Converter {
     }
 
     private static SourceFieldDetail buildSource(Object source, MessageMapping mapping, SimpleMappingField sourceRoot) {
+
         Map<String, List<SourcePath>> sourcePaths = new HashMap<>();
         List<Integer> arrayFieldSize = new ArrayList<>();
         Integer lastArray = 0;
@@ -124,41 +126,44 @@ public class Converter {
     }
 
     private static Map<String, PathDetail> buildPathMapping(MessageMapping mapping, List<Integer> arrayFieldSize, SimpleMappingField destinationRoot) {
-        int level = 0;
+        Integer level = 0;
         Map<String, PathDetail> paths = new HashMap<>();
         SimpleMappingField field = mapping.getDestinationField();
         if (destinationRoot.getType() == FieldType.ARRAY) {
-            int size = arrayFieldSize.get(level++);
+            Integer size = arrayFieldSize.get(level);
+            level++;
             for (int i = 0; i < size; i++) {
                 StringBuilder indexes = new StringBuilder();
                 indexes.append(i).append(".");
                 String path = "$" + MapperConstants.MODEL_ROOT + "[" + i + "]";
-                buildDestinationPaths(path, field, arrayFieldSize, level, paths, indexes);
+                level = buildDestinationPaths(path, field, arrayFieldSize, level, paths, indexes);
             }
         } else {
             String path = "$" + MapperConstants.MODEL_ROOT;
             StringBuilder indexes = new StringBuilder();
-            buildDestinationPaths(path, field, arrayFieldSize, level, paths, indexes);
+            level = buildDestinationPaths(path, field, arrayFieldSize, level, paths, indexes);
         }
         return paths;
     }
 
-    private static void buildDestinationPaths(String parentPath, SimpleMappingField field, List<Integer> arrayFieldSize, int level, Map<String, PathDetail> paths, StringBuilder indexes) {
+    private static Integer buildDestinationPaths(String parentPath, SimpleMappingField field, List<Integer> arrayFieldSize, Integer level, Map<String, PathDetail> paths, StringBuilder indexes) {
+        Integer size = level;
         String name = parentPath + "." + field.getName();
         if (field.getLocal() == FieldLocal.MIDDLE) {
             SimpleMappingField child = field.getChild();
             if (field.getType() == FieldType.ARRAY && arrayFieldSize.size() > level) {
-                int bodySize = arrayFieldSize.get(level++);
+                Integer bodySize = arrayFieldSize.get(size);
+                size++;
                 for (int i = 0; i < bodySize; i++) {
                     StringBuilder index = new StringBuilder();
                     index.append(indexes);
                     index.append(i).append(".");
                     String path = name + "[" + i + "]";
-                    buildDestinationPaths(path, child, arrayFieldSize, level, paths, index);
+                    size = buildDestinationPaths(path, child, arrayFieldSize, size, paths, index);
                 }
             }
             if (field.getType() == FieldType.OBJECT) {
-                buildDestinationPaths(name, child, arrayFieldSize, level, paths, indexes);
+                size = buildDestinationPaths(name, child, arrayFieldSize, size, paths, indexes);
             }
         } else if (field.getLocal() == FieldLocal.END) {
             PathDetail detail = new PathDetail();
@@ -167,13 +172,14 @@ public class Converter {
             detail.setIndexes(indexes.toString());
             paths.put(indexes.toString(), detail);
         }
+        return size;
     }
 
     private static void buildValue(Exchange exchange, Object source, Map<String, List<SourcePath>> sourcePaths, Map<String, PathDetail> destinationPaths, MessageMapping messageMapping, Object destination, DalaranContext dalaranContext) {
         if (sourcePaths == null || sourcePaths.size() == 0) {
             return;
         }
-        Map<String, Object> contextValues = (Map<String, Object>)exchange.getProperties().get(DalaranConstants.DALARAN_CONTEXT_EXCHANGE);
+        Map<String, Object> contextValues = (Map<String, Object>)exchange.getProperties().get(DALARAN_CONTEXT_EXCHANGE + exchange.getExchangeId());
 
         for (Map.Entry<String, List<SourcePath>> entry : sourcePaths.entrySet()) {
             List<Object> values = new ArrayList<>();
@@ -239,7 +245,7 @@ public class Converter {
             return;
         }
         String contextKey = sourceFields.get(0).getPath();
-        Map<String, Object> contextValues = (Map<String, Object>)exchange.getProperties().get(DalaranConstants.DALARAN_CONTEXT_EXCHANGE);
+        Map<String, Object> contextValues = (Map<String, Object>)exchange.getProperties().get(DALARAN_CONTEXT_EXCHANGE + exchange.getExchangeId());
         if (MapUtils.isEmpty(contextValues) || !contextValues.containsKey(contextKey)) {
             return;
         }
@@ -262,7 +268,7 @@ public class Converter {
         List<Object> values = new ArrayList<>();
         List<SourceField> sourceFields = messageMapping.getSourceFields();
         List<SourcePath> sourcePaths = new ArrayList<>();
-        Map<String, Object> contextValues = (Map<String, Object>)exchange.getProperties().get(DalaranConstants.DALARAN_CONTEXT_EXCHANGE);
+        Map<String, Object> contextValues = (Map<String, Object>)exchange.getProperties().get(DALARAN_CONTEXT_EXCHANGE + exchange.getExchangeId());
 
         sourceFields.forEach(sourceField -> {
             Object value;

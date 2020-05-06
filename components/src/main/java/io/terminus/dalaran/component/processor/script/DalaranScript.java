@@ -1,5 +1,6 @@
 package io.terminus.dalaran.component.processor.script;
 
+import io.terminus.dalaran.component.utils.ContextUtils;
 import io.terminus.dalaran.core.component.DalaranProcessor;
 import io.terminus.dalaran.core.component.annotation.Processor;
 import jdk.nashorn.api.scripting.ScriptObjectMirror;
@@ -21,7 +22,9 @@ public class DalaranScript implements DalaranProcessor<DalaranScriptConfig> {
                 String content = "function execute(body, headers, context) {\n";
                 content += config.getScript();
                 content += "\n}\n";
-                content += "exchange.out.body = execute(request.body, request.headers, exchange.properties." + DALARAN_CONTEXT_EXCHANGE + ")";
+                content += "var exchangeId = exchange.exchangeId;\nvar contextKey = 'DalaranContextExchange' + exchangeId;\n";
+                content += "exchange.out.body = execute(request.body, request.headers, exchange.properties.get(contextKey)" + ")";
+                route.process(ContextUtils::setExchange);
                 route.script().javaScript(content);
                 // TODO 这里很奇怪, 处理一下 array 的输出, 因为 java script 产出的数组其实也是一个 map....
                 route.process(exchange -> {

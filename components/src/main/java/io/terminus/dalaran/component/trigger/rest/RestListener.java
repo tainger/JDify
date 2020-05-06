@@ -5,8 +5,8 @@ import io.terminus.dalaran.component.trigger.rest.model.ApiInfo;
 import io.terminus.dalaran.component.trigger.rest.processor.QueryStringConvertProcessor;
 import io.terminus.dalaran.component.trigger.rest.processor.QueryStringSignProcessor;
 import io.terminus.dalaran.component.trigger.rest.processor.SignProcessor;
+import io.terminus.dalaran.component.trigger.rest.utils.RestWordUtils;
 import io.terminus.dalaran.component.trigger.rest.utils.SwaggerUtils;
-import io.terminus.dalaran.console.util.RestWordUtils;
 import io.terminus.dalaran.core.component.DalaranTrigger;
 import io.terminus.dalaran.core.component.DalaranTriggerApiDocExport;
 import io.terminus.dalaran.core.component.DalaranTriggerWordDocExport;
@@ -37,7 +37,7 @@ public class RestListener implements DalaranTrigger<RestConfig>, DalaranTriggerA
     public void buildFromRoute(RouteDefinition route, RestConfig config) {
         String uri = "netty4-http:" + config.getProtocol().name().toLowerCase() +
                 "://0.0.0.0:" + config.getPort() + config.getPath() +
-                "?httpMethodRestrict=" + config.getMethod();
+                "?chunkedMaxContentLength=104857600&httpMethodRestrict=" + config.getMethod();
         route.from(uri);
         if (config.getMethod().isNoBody()) {
             if (config.isEnableSign()) {

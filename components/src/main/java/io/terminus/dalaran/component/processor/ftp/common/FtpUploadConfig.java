@@ -1,7 +1,8 @@
-package io.terminus.dalaran.component.processor.ftp;
+package io.terminus.dalaran.component.processor.ftp.common;
 
 import io.terminus.dalaran.FieldInputType;
 import io.terminus.dalaran.component.connector.FtpUploadConnector;
+import io.terminus.dalaran.component.processor.ftp.FileExist;
 import io.terminus.dalaran.core.component.annotation.ConfigFieldInfo;
 import io.terminus.dalaran.core.component.config.ConnectorConfig;
 import lombok.Data;
@@ -21,6 +22,12 @@ public class FtpUploadConfig implements ConnectorConfig<FtpUploadConnector> {
     @ConfigFieldInfo(label = "路径", inputType = FieldInputType.String, defaultValue = "/")
     private String path;
 
-    @ConfigFieldInfo(label = "文件名", inputType = FieldInputType.String)
-    private String fileName;
+    @ConfigFieldInfo(label = "文件前缀", inputType = FieldInputType.String)
+    private String fileRoot;
+
+    @ConfigFieldInfo(label = "文件后缀日期格式", inputType = FieldInputType.String, required = false)
+    private String datePattern;
+
+    @ConfigFieldInfo(label = "文件后缀", inputType = FieldInputType.String, required = false)
+    private String fileSuffix;
 }

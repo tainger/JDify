@@ -20,10 +20,9 @@ import io.terminus.dalaran.model.*;
 import io.terminus.dalaran.model.dto.ModelDTO;
 import io.terminus.dalaran.model.dto.basic.BasicModelInfo;
 import io.terminus.dalaran.model.query.ModelQuery;
-import io.terminus.dalaran.model.schema.DataTemplate;
-import io.terminus.dalaran.model.schema.JsonSchema;
-import io.terminus.dalaran.model.schema.ObjectSchema;
+import io.terminus.dalaran.model.schema.*;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.similarity.JaroWinklerDistance;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -176,7 +175,7 @@ public class ModelManagementServiceImpl implements ModelManagementService {
     }
 
     @Override
-    public JsonSchema importDataTemplate(DataTemplate dataTemplate, Long id) {
+    public DalaranModelSchema importDataTemplate(DataTemplate dataTemplate, Long id) {
         SortedMap<String, ModelField> root = new TreeMap<>();
         ModelField modelField = new ModelField();
         root.put(MapperConstants.MODEL_ROOT, modelField);
@@ -185,40 +184,62 @@ public class ModelManagementServiceImpl implements ModelManagementService {
         if (isComplexType(type)) {
             buildModel(body, type, modelField);
         }
-        JsonSchema schema = new JsonSchema();
-        schema.setFields(root);
+        DalaranModelSchema schema;
         ModelEntity model = modelRepository.findById(id).get();
-        model.setModelSchema(JSON.toJSONString(schema));
-        modelRepository.save(model);
-        return schema;
-    }
-
-    @Override
-    public Object importModelTemplate(DataTemplate dataTemplate, Long id) {
-        ModelEntity model = modelRepository.findById(id).get();
-        DalaranModelSchema schema = dalaranContext.getDalaranModelTypeContext().getModelType(model.getType()).importTemplateData(dataTemplate);
-        model.setModelSchema(JSON.toJSONString(schema));
-        modelRepository.save(model);
-        return schema;
-    }
-
-    @Override
-    public ObjectSchema importDalaranSchema(ObjectSchema schema, Long id) {
-        ModelEntity model = modelRepository.findById(id).get();
-        model.setModelSchema(JSON.toJSONString(schema));
-        modelRepository.save(model);
-        return schema;
-    }
-
-    @Override
-    public String buildDataTemplate(JsonSchema schema, Long id) {
-        Map<String, ModelField> modelField = schema.getFields();
-        ModelField root = modelField.get(DalaranConsoleConstants.MODEL_FIELD_ROOT);
-        Object body = buildTemplateBody(root, "");
-        if (body != null) {
-            return JSON.toJSONString(body);
+        if (model.getType().equals("SOAP")) {
+            schema = JSON.parseObject(model.getModelSchema(), SoapSchema.class);
+            if (schema == null) {
+                schema = new SoapSchema();
+            }
+        } else if (model.getType().equals("CSV")) {
+            schema = JSON.parseObject(model.getModelSchema(), CsvModelSchema.class);
+            if (schema == null) {
+                schema = new CsvModelSchema();
+            }
+        } else {
+            schema = JSON.parseObject(model.getModelSchema(), JsonSchema.class);
+            if (schema == null) {
+                schema = new JsonSchema();
+            }
         }
-        return null;
+        schema.setFields(root);
+        model.setModelSchema(JSON.toJSONString(schema));
+        modelRepository.save(model);
+        return schema;
+    }
+
+    @Override
+    public DalaranModelSchema importModelTemplate(DataTemplate dataTemplate, Long id) {
+        ModelEntity model = modelRepository.findById(id).get();
+        DalaranModelSchema schema = dalaranContext.getDalaranModelTypeContext().getModelType(model.getType()).importTemplateData(dataTemplate, model.getModelSchema());
+        model.setModelSchema(JSON.toJSONString(schema));
+        modelRepository.save(model);
+        return schema;
+    }
+
+    @Override
+    public DalaranModelSchema importDalaranSchema(DalaranModelSchema schema, Long id) {
+        ModelEntity model = modelRepository.findById(id).get();
+        model.setModelSchema(JSON.toJSONString(schema));
+        modelRepository.save(model);
+        return schema;
+    }
+
+    @Override
+    public DalaranModelTemplate buildDataTemplate(DalaranModelSchema schema, Long id) {
+        ModelEntity model = modelRepository.findById(id).get();
+        Map fields = schema.getFields();
+        DalaranModelTemplate dalaranModelTemplate = new DalaranModelTemplate();
+        dalaranModelTemplate.setData(dalaranContext.getDalaranModelTypeContext().getModelType(model.getType()).buildTemplateData(fields));
+        dalaranModelTemplate.setType(model.getType());
+        return dalaranModelTemplate;
+//        Map<String, ModelField> modelField = schema.getFields();
+//        ModelField root = modelField.get(DalaranConsoleConstants.MODEL_FIELD_ROOT);
+//        Object body = buildTemplateBody(root, "");
+//        if (body != null) {
+//            return JSON.toJSONString(body);
+//        }
+//        return null;
     }
 
     @Override
@@ -399,11 +420,21 @@ public class ModelManagementServiceImpl implements ModelManagementService {
             modelEntity.setName("Dalaran Model");
         }
 
-        Map modelSchema = model.getModelSchema();
-        if (modelSchema != null) {
-            modelEntity.setModelSchema(JSON.toJSONString(model.getModelSchema()));
+        String schema = modelEntity.getModelSchema();
+        Map<String, Object> modelSchema = model.getModelSchema();
+//        String modelType = model.getModelType();
+//        if (modelType.equalsIgnoreCase("SOAP")) {
+//            SoapSchemaOperation soapSchemaOperation = new SoapSchemaOperation();
+//            modelSchema.put("operationConfig", soapSchemaOperation);
+//        }
+        if (MapUtils.isNotEmpty(modelSchema)) {
+            modelEntity.setModelSchema(JSON.toJSONString(modelSchema));
         } else {
-            modelEntity.setModelSchema(JSON.toJSONString(new HashMap<>()));
+            if (schema != null) {
+                modelEntity.setModelSchema(schema);
+            } else {
+                modelEntity.setModelSchema(JSON.toJSONString(new HashMap<>()));
+            }
         }
         modelEntity.setType(model.getModelType());
         modelEntity.setModelKey(model.getModelKey());

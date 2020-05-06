@@ -1,9 +1,12 @@
 package io.terminus.dalaran.component.processor.multicast;
 
+import com.alibaba.fastjson.JSON;
 import org.apache.camel.Exchange;
 import org.apache.camel.processor.aggregate.CompletionAwareAggregationStrategy;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static io.terminus.dalaran.DalaranConstants.BRANCH_FLOW_NAME_HEADER;
@@ -13,9 +16,17 @@ public class ScatterGatherAggregationStrategy implements CompletionAwareAggregat
     @Override
     public void onCompletion(Exchange exchange) {
         if (exchange != null) {
-            Map<String, Object> dataMapper = (Map<String, Object>) exchange.removeProperty(SCATTER_GATHER_EXCHANGE);
+            Map<String, Object> dataMapper = (Map<String, Object>) exchange.removeProperty(SCATTER_GATHER_EXCHANGE + exchange.getExchangeId());
             if (dataMapper != null) {
-                exchange.getIn().setBody(dataMapper);
+                List<Object> body = new ArrayList<>();
+                for (Map.Entry<String, Object> entry: dataMapper.entrySet()) {
+                    try {
+                        body.add(transferData(entry.getValue()));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+                exchange.getIn().setBody(body);
             }
         }
     }
@@ -41,12 +52,22 @@ public class ScatterGatherAggregationStrategy implements CompletionAwareAggregat
     }
 
     private Map<String, Object> getMapper(Exchange exchange) {
-        Map<String, Object> dataMapper = exchange.getProperty(SCATTER_GATHER_EXCHANGE, Map.class);
+        Map<String, Object> dataMapper = exchange.getProperty(SCATTER_GATHER_EXCHANGE + exchange.getExchangeId(), Map.class);
         if (dataMapper == null) {
             dataMapper = new HashMap<>();
-            exchange.setProperty(SCATTER_GATHER_EXCHANGE, dataMapper);
+            exchange.setProperty(SCATTER_GATHER_EXCHANGE + exchange.getExchangeId(), dataMapper);
         }
 
         return dataMapper;
+    }
+
+    private Object transferData(Object in) {
+        if (in instanceof byte[]) {
+            return JSON.parse((byte[])in);
+        }
+        if (in instanceof String) {
+            return in;
+        }
+        return JSON.toJSON(in);
     }
 }

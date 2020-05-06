@@ -35,6 +35,8 @@ public class RocketMQProducer extends DefaultProducer {
 
     private final Logger logger = LoggerFactory.getLogger(RocketMQProducer.class);
 
+    private final Integer MESSAGE_SHARDING_LIMIT = 100;
+
     private ThreadPoolExecutor executor = new ThreadPoolExecutor(10, 10,
             1000, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>());
 
@@ -91,17 +93,14 @@ public class RocketMQProducer extends DefaultProducer {
                 });
             }
         } else {
-            executor.execute(() -> {
-                SendResult sendResult = new SendResult();
-                for (Message message: messages) {
-                    try {
-                        sendResult = producer.send(message);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-                exchange.getOut().setBody(JSON.toJSONString(new DalaranSendResult(sendResult, messages.size())));
-            });
+            int size = messages.size();
+            if (size < MESSAGE_SHARDING_LIMIT) {
+               send(exchange, messages);
+            } else {
+                executor.execute(() -> {
+                    send(exchange, messages);
+                });
+            }
         }
     }
 
@@ -127,12 +126,10 @@ public class RocketMQProducer extends DefaultProducer {
         Message message = new Message();
         String topic = parseExpression(endpoint.getTopic(), body);
         message.setTopic(topic);
-        logger.info("topic : " + topic);
         String tags = endpoint.getTags();
         if (StringUtils.isNotBlank(tags)) {
             tags = parseExpression(tags, body);
             message.setTags(tags);
-            logger.info("tag : " + tags);
         }
         if (body != null) {
             if (body instanceof byte[]) {
@@ -167,5 +164,17 @@ public class RocketMQProducer extends DefaultProducer {
             return origin;
         }
         return data.toString();
+    }
+
+    private void send(Exchange exchange, List<Message> messages) {
+        SendResult sendResult = new SendResult();
+        for (Message message: messages) {
+            try {
+                sendResult = producer.send(message);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        exchange.getOut().setBody(JSON.toJSONString(new DalaranSendResult(sendResult, messages.size())));
     }
 }

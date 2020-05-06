@@ -1,10 +1,10 @@
 package io.terminus.dalaran.rest.write;
 
 import io.swagger.annotations.ApiOperation;
+import io.terminus.dalaran.model.DalaranModelSchema;
 import io.terminus.dalaran.model.ModelField;
 import io.terminus.dalaran.model.schema.DataTemplate;
 import io.terminus.dalaran.model.schema.JsonSchema;
-import io.terminus.dalaran.model.schema.ObjectSchema;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -19,11 +19,11 @@ public interface ModelImportAPI {
 
     @ApiOperation(value = "导入数据模板更新模型结构")
     @PostMapping(value = "/{id}/import/data-template")
-    JsonSchema importDataTemplate(@RequestBody DataTemplate dataTemplate, @PathVariable long id);
+    DalaranModelSchema importDataTemplate(@RequestBody DataTemplate dataTemplate, @PathVariable long id);
 
     @ApiOperation(value = "导入数据模板更新模型结构")
     @PostMapping(value = "/{id}/import/dalaran-schema")
-    ObjectSchema importDalaranSchema(@RequestBody ObjectSchema objectSchema, @PathVariable long id);
+    DalaranModelSchema importDalaranSchema(@RequestBody DalaranModelSchema schema, @PathVariable long id);
 
     // TODO 待开发
     @ApiOperation(value = "导入模型类信息更新模型结构")

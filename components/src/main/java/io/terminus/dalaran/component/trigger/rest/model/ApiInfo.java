@@ -20,6 +20,10 @@ public class ApiInfo {
     private HttpMethod method;
     private ApiParameter input;
     private ApiParameter output;
+    private Object inExample;
+    private Object outExample;
+    private MessageModel inSchema;
+    private MessageModel outSchema;
 
     public ApiInfo(String moduleName, TriggerFlow flow) {
         MessageModel inSchema = flow.getInModel();
@@ -32,6 +36,8 @@ public class ApiInfo {
         this.method = restConfig.getMethod();
         this.input = buildApiParam(inSchema);
         this.output = buildApiParam(outSchema);
+        this.inSchema = inSchema;
+        this.outSchema = outSchema;
     }
 
     private ApiParameter buildApiParam(MessageModel model) {

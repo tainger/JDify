@@ -14,4 +14,7 @@ public class DubboRegistryConnector {
 
     @ConfigFieldInfo(label = "应用名", inputType = FieldInputType.String)
     private String application;
+
+    @ConfigFieldInfo(label = "线程池", inputType = FieldInputType.Integer)
+    private Integer threads = 500;
 }

@@ -1,5 +1,6 @@
 package io.terminus.dalaran.model.soap.processor;
 
+import com.alibaba.fastjson.JSON;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import io.terminus.dalaran.model.FieldType;
@@ -34,6 +35,7 @@ public class SoapToObjectProcessor implements Processor, Traceable {
         String in = exchange.getIn().getBody(String.class);
         Object body = parseSoapBody(in);
         exchange.getOut().setBody(body);
+        exchange.getOut().setHeaders(exchange.getIn().getHeaders());
     }
 
     public Object parseSoapBody(String body) throws Exception {
@@ -41,7 +43,13 @@ public class SoapToObjectProcessor implements Processor, Traceable {
         DalaranXMLStreamReader sr = new DalaranXMLStreamReader(XMLInputFactory.newFactory().createXMLStreamReader(is));
         XmlMapper xmlMapper = new XmlMapper();
         xmlMapper.registerModule(new SimpleModule().addDeserializer(Object.class, new DalaranObjectDeserializer()));
-        Map map = (Map) xmlMapper.readValue(sr, Object.class);
+        Object in = xmlMapper.readValue(sr, Object.class);
+        Map map;
+        if (in instanceof String) {
+            map = JSON.parseObject((String)in, Map.class);
+        } else {
+            map = (Map)in;
+        }
         if (MapUtils.isEmpty(fields) || map.get("Body") == null) {
             return new HashMap<>();
         }

@@ -1,6 +1,7 @@
 package io.terminus.dalaran.camel.component.dubbo;
 
 import com.alibaba.dubbo.common.utils.StringUtils;
+import com.alibaba.dubbo.config.ProviderConfig;
 import com.alibaba.dubbo.config.RegistryConfig;
 import com.alibaba.dubbo.config.ServiceConfig;
 import com.alibaba.dubbo.rpc.service.GenericException;
@@ -45,8 +46,12 @@ public class DubboGenericProvider implements GenericService {
         }
         try {
             processor.process(exchange);
+            if (exchange.getException() != null) {
+                throw new RuntimeException(exchange.getException().getMessage(), exchange.getException().getCause());
+            }
         } catch (Exception e) {
             e.printStackTrace();
+            throw new RuntimeException(e.getMessage(), e.getCause());
         }
         return exchange.getOut().getBody();
     }
@@ -78,9 +83,14 @@ public class DubboGenericProvider implements GenericService {
         providerConfig.setApplication(endpoint.getApplicationConfig());
         providerConfig.setVersion(endpoint.getVersion());
         providerConfig.setInterface(endpoint.getServiceId());
+        providerConfig.setRetries(endpoint.getRetries());
         if (!StringUtils.isBlank(System.getenv("DICE_PROJECT_ID")) && !StringUtils.isBlank(System.getenv("DICE_WORKSPACE"))) {
             providerConfig.setOwner(System.getenv("DICE_PROJECT_ID") + "_" + System.getenv("DICE_WORKSPACE"));
         }
         providerConfig.setRef(this);
+        ProviderConfig config = new ProviderConfig();
+        config.setDispatcher("message");
+        config.setThreads(endpoint.getThreads());
+        providerConfig.setProvider(config);
     }
 }

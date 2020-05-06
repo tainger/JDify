@@ -1,10 +1,7 @@
 package io.terminus.dalaran.rest.read;
 
 import io.swagger.annotations.ApiOperation;
-import io.terminus.dalaran.config.ConnectorInfo;
-import io.terminus.dalaran.config.ProcessorInfo;
-import io.terminus.dalaran.config.ServiceInfo;
-import io.terminus.dalaran.config.TriggerInfo;
+import io.terminus.dalaran.config.*;
 import io.terminus.dalaran.model.function.MappingFunctionInfo;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -36,7 +33,11 @@ public interface PlatformInfoAPI {
     @GetMapping(value = "/service")
     Collection<ServiceInfo> listServiceInfo();
 
-    @ApiOperation(value = "获取可用服务类型")
+    @ApiOperation(value = "获取可用模型配置结构")
+    @GetMapping(value = "/model")
+    Collection<ModelInfo> listModelInfo();
+
+    @ApiOperation(value = "获取可用模型类型")
     @GetMapping(value = "/modelType")
     Collection<String> listModelType();
 

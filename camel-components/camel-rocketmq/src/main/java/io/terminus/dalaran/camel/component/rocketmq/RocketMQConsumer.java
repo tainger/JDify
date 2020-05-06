@@ -7,7 +7,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.rocketmq.acl.common.AclClientRPCHook;
 import org.apache.rocketmq.acl.common.SessionCredentials;
 import org.apache.rocketmq.client.AccessChannel;
-import org.apache.rocketmq.client.consumer.*;
+import org.apache.rocketmq.client.consumer.DefaultMQPullConsumer;
+import org.apache.rocketmq.client.consumer.MQPullConsumer;
+import org.apache.rocketmq.client.consumer.MQPullConsumerScheduleService;
+import org.apache.rocketmq.client.consumer.PullResult;
 import org.apache.rocketmq.common.message.MessageExt;
 import org.apache.rocketmq.remoting.RPCHook;
 
@@ -53,6 +56,7 @@ public class RocketMQConsumer extends DefaultConsumer {
         service = new MQPullConsumerScheduleService(endpoint.getGroupId(), rpcHook);
         DefaultMQPullConsumer defaultMQPullConsumer = service.getDefaultMQPullConsumer();
         defaultMQPullConsumer.setNamesrvAddr(endpoint.getNameServer());
+
         if (endpoint.getUseAliCloudOns()) {
             defaultMQPullConsumer.setAccessChannel(AccessChannel.CLOUD);
         } else {
@@ -61,7 +65,7 @@ public class RocketMQConsumer extends DefaultConsumer {
         service.registerPullTaskCallback(endpoint.getTopic(), (messageQueue, pullTaskContext) -> {
             MQPullConsumer consumer = pullTaskContext.getPullConsumer();
             try {
-                long offset = consumer.fetchConsumeOffset(messageQueue, true);
+                long offset = consumer.fetchConsumeOffset(messageQueue, false);
                 if (offset < 0) {
                     offset = 0;
                 }
@@ -72,23 +76,34 @@ public class RocketMQConsumer extends DefaultConsumer {
                 } else {
                     result = consumer.pull(messageQueue, "*", offset, 1);
                 }
-                if (result.getPullStatus() != PullStatus.FOUND) {
-                    return;
-                }
 
-                List<MessageExt> messages = result.getMsgFoundList();
-                if (messages == null || messages.size() == 0) {
-                    return;
-                }
-                for (MessageExt message: messages) {
-                    Exchange exchange = endpoint.createRocketMQExchange(message.getBody());
-                    if (!endpoint.getAutocommit()) {
-                        RocketMQManualCommit commit = new RocketMQManualCommit(consumer, endpoint.getTopic(), messageQueue, result.getNextBeginOffset());
-                        exchange.getIn().setHeader(ROCKET_MQ_MANUAL_COMMIT, commit);
-                    } else {
+//                if (result.getPullStatus() != PullStatus.FOUND) {
+//                    return;
+//                }
+
+                switch (result.getPullStatus()) {
+                    case FOUND:
+                        List<MessageExt> messages = result.getMsgFoundList();
+                        if (messages == null || messages.size() == 0) {
+                            return;
+                        }
+                        for (MessageExt message: messages) {
+                            Exchange exchange = endpoint.createRocketMQExchange(message.getBody());
+                            if (!endpoint.getAutocommit()) {
+                                RocketMQManualCommit commit = new RocketMQManualCommit(consumer, endpoint.getTopic(), messageQueue, result.getNextBeginOffset());
+                                exchange.getIn().setHeader(ROCKET_MQ_MANUAL_COMMIT, commit);
+                            } else {
+                                consumer.updateConsumeOffset(messageQueue, result.getNextBeginOffset());
+                            }
+                            processor.process(exchange);
+                        }
+                        break;
+                    case NO_MATCHED_MSG:
+                    case NO_NEW_MSG:
+                    case OFFSET_ILLEGAL:
+                    default:
                         consumer.updateConsumeOffset(messageQueue, result.getNextBeginOffset());
-                    }
-                    processor.process(exchange);
+                        break;
                 }
             } catch (Exception e) {
                 e.printStackTrace();

@@ -40,7 +40,7 @@ public class DalaranComponentLoader implements BeanPostProcessor {
         }
         ModelType modelType = bean.getClass().getAnnotation(ModelType.class);
         if (modelType != null && bean instanceof DalaranModelType) {
-            modelTypeContext.addModelType(modelType.value(), modelType.modelSchema(), (DalaranModelType) bean);
+            modelTypeContext.addModelType((DalaranModelType) bean);
         }
         MappingFunction mappingFunction = bean.getClass().getAnnotation(MappingFunction.class);
         if (mappingFunction != null) {
