@@ -1,7 +1,9 @@
 package io.terminus.dalaran.component.trigger.rest;
 
 import io.swagger.models.Swagger;
+import io.terminus.dalaran.component.common.HttpMethod;
 import io.terminus.dalaran.component.trigger.rest.model.ApiInfo;
+import io.terminus.dalaran.component.trigger.rest.processor.MixMethodProcessor;
 import io.terminus.dalaran.component.trigger.rest.processor.QueryStringConvertProcessor;
 import io.terminus.dalaran.component.trigger.rest.processor.QueryStringSignProcessor;
 import io.terminus.dalaran.component.trigger.rest.processor.SignProcessor;
@@ -37,8 +39,18 @@ public class RestListener implements DalaranTrigger<RestConfig>, DalaranTriggerA
     public void buildFromRoute(RouteDefinition route, RestConfig config) {
         String uri = "netty4-http:" + config.getProtocol().name().toLowerCase() +
                 "://0.0.0.0:" + config.getPort() + config.getPath() +
-                "?chunkedMaxContentLength=104857600&httpMethodRestrict=" + config.getMethod();
+                "?chunkedMaxContentLength=104857600";
+        if (config.getMethod() != HttpMethod.MIX) {
+            uri += "&httpMethodRestrict=" + config.getMethod();
+        } else {
+            uri += "&httpMethodRestrict=GET,POST";
+        }
         route.from(uri);
+        if (config.getMethod() == HttpMethod.MIX) {
+            route.process(new MixMethodProcessor());
+            route.convertBodyTo(String.class);
+            return;
+        }
         if (config.getMethod().isNoBody()) {
             if (config.isEnableSign()) {
                 route.process(new QueryStringSignProcessor(clientContext.getAllClient()));
