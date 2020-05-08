@@ -1,6 +1,5 @@
 package io.terminus.dalaran.component.utils;
 
-import com.alibaba.fastjson.JSON;
 import io.terminus.dalaran.ComponentConstants;
 import io.terminus.dalaran.component.trigger.rest.model.EncryptionAlgorithm;
 import io.terminus.dalaran.component.trigger.rest.model.SignAlgorithm;
@@ -21,10 +20,6 @@ public class SignUtilsTest {
         body.put("name", "momo");
         body.put("code", "mmmmm");
         body.put("description", "Hello");
-
-        Object o = JSON.toJSON(body);
-
-        Map m = JSON.toJavaObject((JSON) o, Map.class);
 
 
         SignAuthenticatorInfo authenticatorInfo = new SignAuthenticatorInfo();
