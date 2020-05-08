@@ -165,6 +165,12 @@
             <artifactId>mssql-jdbc</artifactId>
             <version>${mssql.connector.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.oracle.ojdbc</groupId>
+            <artifactId>ojdbc8</artifactId>
+            <version>${oracle.connector.version}</version>
+        </dependency>
+
         <!-- script processor -->
         <dependency>
             <groupId>org.apache.camel</groupId>
