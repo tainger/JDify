@@ -1,6 +1,5 @@
 package io.terminus.dalaran.component.trigger.soap;
 
-import io.terminus.dalaran.component.trigger.rest.processor.QueryStringSignProcessor;
 import io.terminus.dalaran.component.trigger.soap.model.SoapApiInfo;
 import io.terminus.dalaran.component.trigger.soap.model.SoapAuthType;
 import io.terminus.dalaran.component.trigger.soap.processor.SoapBasicSignProcessor;
@@ -50,7 +49,7 @@ public class DalaranSoapListener implements DalaranTrigger<SoapListenerConfig>, 
             route.process(new SoapBasicSignProcessor(clientContext.getAllClient()));
         }
         if (config.getAuthType() == SoapAuthType.CUSTOM) {
-            route.process(new QueryStringSignProcessor(clientContext.getAllClient()));
+            route.process(new SoapBasicSignProcessor(clientContext.getAllClient()));
         }
     }
 

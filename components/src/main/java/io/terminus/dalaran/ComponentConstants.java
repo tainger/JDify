@@ -44,4 +44,8 @@ public class ComponentConstants {
     public static final String EDI_RESPONSE_MESSAGE = "message";
     public static final String EDI_MESSAGE_STATUS = "status";
     public static final String EDI_REQUEST_SUCCESS = "success";
+
+    public static final String SIGNATURE = "signature";
+
+    public static final String SIGNATURE_METHOD = "signatureMethod";
 }

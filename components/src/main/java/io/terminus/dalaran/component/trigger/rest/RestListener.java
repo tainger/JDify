@@ -1,7 +1,11 @@
 package io.terminus.dalaran.component.trigger.rest;
 
+import com.aliyun.oss.OSS;
+import com.aliyun.oss.OSSClientBuilder;
+import com.aliyun.oss.model.GetObjectRequest;
 import io.swagger.models.Swagger;
 import io.terminus.dalaran.component.trigger.rest.model.ApiInfo;
+import io.terminus.dalaran.component.trigger.rest.model.SignAuthenticatorInfo;
 import io.terminus.dalaran.component.trigger.rest.processor.QueryStringConvertProcessor;
 import io.terminus.dalaran.component.trigger.rest.processor.QueryStringSignProcessor;
 import io.terminus.dalaran.component.trigger.rest.processor.SignProcessor;
@@ -12,12 +16,16 @@ import io.terminus.dalaran.core.component.DalaranTriggerApiDocExport;
 import io.terminus.dalaran.core.component.DalaranTriggerWordDocExport;
 import io.terminus.dalaran.core.component.annotation.Trigger;
 import io.terminus.dalaran.core.context.DalaranClientContext;
+import io.terminus.dalaran.core.resource.oss.OSSAccount;
 import io.terminus.dalaran.model.flow.TriggerFlow;
 import org.apache.camel.model.RouteDefinition;
 import org.apache.camel.model.dataformat.JsonLibrary;
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.File;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -33,15 +41,19 @@ public class RestListener implements DalaranTrigger<RestConfig>, DalaranTriggerA
     @Autowired
     private DalaranClientContext clientContext;
 
+    @Autowired
+    private OSSAccount ossAccount;
+
     @Override
     public void buildFromRoute(RouteDefinition route, RestConfig config) {
         String uri = "netty4-http:" + config.getProtocol().name().toLowerCase() +
                 "://0.0.0.0:" + config.getPort() + config.getPath() +
                 "?chunkedMaxContentLength=104857600&httpMethodRestrict=" + config.getMethod();
         route.from(uri);
+        SignAuthenticatorInfo signAuthenticatorInfo = authenticatorConfig(ossAccount, config);
         if (config.getMethod().isNoBody()) {
             if (config.isEnableSign()) {
-                route.process(new QueryStringSignProcessor(clientContext.getAllClient()));
+                route.process(new QueryStringSignProcessor(clientContext.getAllClient(), signAuthenticatorInfo));
             } else {
                 route.process(new QueryStringConvertProcessor());
             }
@@ -50,7 +62,7 @@ public class RestListener implements DalaranTrigger<RestConfig>, DalaranTriggerA
         } else {
             if (config.isEnableSign()) {
                 route.unmarshal().json(JsonLibrary.Fastjson);
-                route.process(new SignProcessor(clientContext.getAllClient()));
+                route.process(new SignProcessor(clientContext.getAllClient(), signAuthenticatorInfo));
             } else {
                 // TODO Stream to string
                 route.convertBodyTo(String.class);
@@ -72,5 +84,30 @@ public class RestListener implements DalaranTrigger<RestConfig>, DalaranTriggerA
         return moduleTriggerFlows.entrySet().stream().flatMap(module ->
                 module.getValue().stream().map(flow -> new ApiInfo(module.getKey(), flow))
         ).collect(Collectors.toList());
+    }
+
+    private SignAuthenticatorInfo authenticatorConfig(OSSAccount ossAccount, RestConfig config) {
+        SignAuthenticatorInfo authenticatorInfo = new SignAuthenticatorInfo();
+        authenticatorInfo.setEncryptionAlgorithm(config.getEncryptionAlgorithm());
+        authenticatorInfo.setSignAlgorithm(config.getSignAlgorithm());
+        OSS client = new OSSClientBuilder().build(ossAccount.getEndpoint(), ossAccount.getAccessId(), ossAccount.getAccessSecret());
+        InputStream dalaranPublicStream = client.getObject(new GetObjectRequest(ossAccount.getBucketName(), config.getDalaranPublicKey())).getObjectContent();
+        InputStream dalaranPrivateStream = client.getObject(new GetObjectRequest(ossAccount.getBucketName(), config.getDalaranPrivateKey())).getObjectContent();
+        InputStream partnerPublicStream = client.getObject(new GetObjectRequest(ossAccount.getBucketName(), config.getPartnerPublicKey())).getObjectContent();
+        try {
+            authenticatorInfo.setDalaranPublicKey(IOUtils.toString(dalaranPublicStream, StandardCharsets.UTF_8));
+            authenticatorInfo.setDalaranPrivateKey(IOUtils.toString(dalaranPrivateStream, StandardCharsets.UTF_8));
+            authenticatorInfo.setPartnerPublicKey(IOUtils.toString(partnerPublicStream, StandardCharsets.UTF_8));
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                dalaranPublicStream.close();
+                client.shutdown();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return authenticatorInfo;
     }
 }

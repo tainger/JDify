@@ -1,6 +1,7 @@
 package io.terminus.dalaran.component.trigger.rest.processor;
 
 import com.google.common.base.Splitter;
+import io.terminus.dalaran.component.trigger.rest.model.SignAuthenticatorInfo;
 import org.apache.camel.Exchange;
 import org.apache.commons.lang3.StringUtils;
 
@@ -10,8 +11,8 @@ import static io.terminus.dalaran.component.trigger.rest.utils.SignUtils.stopExc
 
 public class QueryStringSignProcessor extends SignProcessor {
 
-    public QueryStringSignProcessor(Map<String, String> clientMapper) {
-        super(clientMapper);
+    public QueryStringSignProcessor(Map<String, String> clientMapper, SignAuthenticatorInfo authenticatorInfo) {
+        super(clientMapper, authenticatorInfo);
     }
 
     @Override
