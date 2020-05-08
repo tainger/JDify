@@ -8,11 +8,13 @@ import io.terminus.dalaran.component.trigger.rest.model.ApiInfo;
 import io.terminus.dalaran.component.trigger.rest.model.SignAuthenticatorInfo;
 import io.terminus.dalaran.component.trigger.rest.processor.QueryStringConvertProcessor;
 import io.terminus.dalaran.component.trigger.rest.processor.QueryStringSignProcessor;
+import io.terminus.dalaran.component.trigger.rest.processor.RestAfterProcessor;
 import io.terminus.dalaran.component.trigger.rest.processor.SignProcessor;
 import io.terminus.dalaran.component.trigger.rest.utils.RestWordUtils;
 import io.terminus.dalaran.component.trigger.rest.utils.SwaggerUtils;
 import io.terminus.dalaran.core.component.DalaranTrigger;
 import io.terminus.dalaran.core.component.DalaranTriggerApiDocExport;
+import io.terminus.dalaran.core.component.DalaranTriggerBuildAfterProcessor;
 import io.terminus.dalaran.core.component.DalaranTriggerWordDocExport;
 import io.terminus.dalaran.core.component.annotation.Trigger;
 import io.terminus.dalaran.core.context.DalaranClientContext;
@@ -36,7 +38,7 @@ import java.util.stream.Collectors;
         configType = RestConfig.class,
         bodyType = "JSON"
 )
-public class RestListener implements DalaranTrigger<RestConfig>, DalaranTriggerApiDocExport<Swagger>, DalaranTriggerWordDocExport {
+public class RestListener implements DalaranTrigger<RestConfig>, DalaranTriggerApiDocExport<Swagger>, DalaranTriggerWordDocExport, DalaranTriggerBuildAfterProcessor<RestConfig> {
 
     @Autowired
     private DalaranClientContext clientContext;
@@ -44,13 +46,15 @@ public class RestListener implements DalaranTrigger<RestConfig>, DalaranTriggerA
     @Autowired
     private OSSAccount ossAccount;
 
+    private SignAuthenticatorInfo signAuthenticatorInfo;
+
     @Override
     public void buildFromRoute(RouteDefinition route, RestConfig config) {
         String uri = "netty4-http:" + config.getProtocol().name().toLowerCase() +
                 "://0.0.0.0:" + config.getPort() + config.getPath() +
                 "?chunkedMaxContentLength=104857600&httpMethodRestrict=" + config.getMethod();
         route.from(uri);
-        SignAuthenticatorInfo signAuthenticatorInfo = authenticatorConfig(ossAccount, config);
+        signAuthenticatorInfo = authenticatorConfig(ossAccount, config);
         if (config.getMethod().isNoBody()) {
             if (config.isEnableSign()) {
                 route.process(new QueryStringSignProcessor(clientContext.getAllClient(), signAuthenticatorInfo));
@@ -78,6 +82,11 @@ public class RestListener implements DalaranTrigger<RestConfig>, DalaranTriggerA
     @Override
     public File exportWord(Map<String, List<TriggerFlow>> moduleTriggerFlows) {
         return RestWordUtils.buildWordFile(buildApiInfoList(moduleTriggerFlows));
+    }
+
+    @Override
+    public void buildAfter(RouteDefinition route, RestConfig config) {
+        route.process(new RestAfterProcessor(signAuthenticatorInfo));
     }
 
     private List<ApiInfo> buildApiInfoList(Map<String, List<TriggerFlow>> moduleTriggerFlows) {
