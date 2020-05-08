@@ -95,9 +95,9 @@ public class RestListener implements DalaranTrigger<RestConfig>, DalaranTriggerA
         InputStream dalaranPrivateStream = client.getObject(new GetObjectRequest(ossAccount.getBucketName(), config.getDalaranPrivateKey())).getObjectContent();
         InputStream partnerPublicStream = client.getObject(new GetObjectRequest(ossAccount.getBucketName(), config.getPartnerPublicKey())).getObjectContent();
         try {
-            authenticatorInfo.setDalaranPublicKey(IOUtils.toString(dalaranPublicStream, StandardCharsets.UTF_8));
-            authenticatorInfo.setDalaranPrivateKey(IOUtils.toString(dalaranPrivateStream, StandardCharsets.UTF_8));
-            authenticatorInfo.setPartnerPublicKey(IOUtils.toString(partnerPublicStream, StandardCharsets.UTF_8));
+            authenticatorInfo.setDalaranPublicKey(IOUtils.toString(dalaranPublicStream, StandardCharsets.UTF_8).replace("\n", ""));
+            authenticatorInfo.setDalaranPrivateKey(IOUtils.toString(dalaranPrivateStream, StandardCharsets.UTF_8).replace("\n", ""));
+            authenticatorInfo.setPartnerPublicKey(IOUtils.toString(partnerPublicStream, StandardCharsets.UTF_8).replace("\n", ""));
         } catch (Exception e) {
             e.printStackTrace();
         } finally {

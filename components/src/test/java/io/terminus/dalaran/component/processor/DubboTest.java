@@ -31,7 +31,6 @@ public class DubboTest extends BasicProcessorTest {
     private static final String DUBBO_SERVICE_ID = "io.terminus.dalaran.TestDubboService";
     private static final Integer INPUT_NUMBER = 998;
 
-
     @Test
     public void test() {
         DalaranDubboConsumer processor = new DalaranDubboConsumer();
