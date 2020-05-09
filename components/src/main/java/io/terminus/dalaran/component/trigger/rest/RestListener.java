@@ -67,6 +67,7 @@ public class RestListener implements DalaranTrigger<RestConfig>, DalaranTriggerA
             if (config.isEnableSign()) {
                 route.unmarshal().json(JsonLibrary.Fastjson);
                 route.process(new SignProcessor(clientContext.getAllClient(), signAuthenticatorInfo));
+                route.convertBodyTo(String.class);
             } else {
                 // TODO Stream to string
                 route.convertBodyTo(String.class);
@@ -86,7 +87,9 @@ public class RestListener implements DalaranTrigger<RestConfig>, DalaranTriggerA
 
     @Override
     public void buildAfter(RouteDefinition route, RestConfig config) {
-        route.process(new RestAfterProcessor(signAuthenticatorInfo));
+        if (config.isEnableSign()) {
+            route.process(new RestAfterProcessor(signAuthenticatorInfo));
+        }
     }
 
     private List<ApiInfo> buildApiInfoList(Map<String, List<TriggerFlow>> moduleTriggerFlows) {
@@ -97,6 +100,9 @@ public class RestListener implements DalaranTrigger<RestConfig>, DalaranTriggerA
 
     private SignAuthenticatorInfo authenticatorConfig(OSSAccount ossAccount, RestConfig config) {
         SignAuthenticatorInfo authenticatorInfo = new SignAuthenticatorInfo();
+        if (!config.isEnableSign()) {
+            return authenticatorInfo;
+        }
         authenticatorInfo.setEncryptionAlgorithm(config.getEncryptionAlgorithm());
         authenticatorInfo.setSignAlgorithm(config.getSignAlgorithm());
         OSS client = new OSSClientBuilder().build(ossAccount.getEndpoint(), ossAccount.getAccessId(), ossAccount.getAccessSecret());
