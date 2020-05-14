@@ -83,7 +83,12 @@
         <dependency>
             <artifactId>draco-web-autoconfigure</artifactId>
             <groupId>io.terminus.draco</groupId>
-            <version>1.0.1.RELEASE</version>
+            <version>1.2.3.BUILD-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.interceptor</groupId>
+            <artifactId>javax.interceptor-api</artifactId>
+            <version>1.2.2</version>
         </dependency>
     </dependencies>
 

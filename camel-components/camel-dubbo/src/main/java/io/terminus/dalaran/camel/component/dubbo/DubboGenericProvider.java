@@ -1,6 +1,5 @@
 package io.terminus.dalaran.camel.component.dubbo;
 
-import com.alibaba.dubbo.common.utils.StringUtils;
 import com.alibaba.dubbo.config.ProviderConfig;
 import com.alibaba.dubbo.config.RegistryConfig;
 import com.alibaba.dubbo.config.ServiceConfig;
@@ -11,6 +10,7 @@ import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.apache.camel.Processor;
 import org.apache.camel.impl.DefaultMessage;
+import org.apache.dubbo.common.utils.StringUtils;
 
 import java.util.HashMap;
 import java.util.Map;
