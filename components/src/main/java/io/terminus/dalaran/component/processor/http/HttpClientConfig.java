@@ -26,4 +26,10 @@ public class HttpClientConfig extends OutModelConfig implements ConnectorConfig<
 
     @ConfigFieldInfo(label = "路径", inputType = FieldInputType.String, defaultValue = "/")
     private String path;
+
+    @ConfigFieldInfo(label = "鉴权签名", inputType = FieldInputType.Switch, defaultValue = "false")
+    private boolean enableSign = false;
+
+    @ConfigFieldInfo(label = "api secret", inputType = FieldInputType.String, defaultValue = "", required = false)
+    private String apiSecret;
 }

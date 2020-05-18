@@ -12,10 +12,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static io.terminus.dalaran.DalaranConstants.AUTH_APP_KEY;
-import static io.terminus.dalaran.DalaranConstants.AUTH_APP_SECRET;
-import static io.terminus.dalaran.component.trigger.rest.utils.SignUtils.stopExchangeOnInvalidAppKey;
-import static io.terminus.dalaran.component.trigger.rest.utils.SignUtils.stopExchangeOnMissingAppKey;
+import static io.terminus.dalaran.DalaranConstants.*;
+import static io.terminus.dalaran.component.trigger.rest.utils.SignUtils.*;
 
 @Data
 public class SignProcessor implements Processor {

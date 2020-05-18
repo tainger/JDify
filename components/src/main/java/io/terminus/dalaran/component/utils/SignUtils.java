@@ -1,16 +1,21 @@
 package io.terminus.dalaran.component.utils;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import io.terminus.dalaran.component.trigger.rest.model.EncryptionAlgorithm;
 import io.terminus.dalaran.component.trigger.rest.model.SignAlgorithm;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.codec.digest.DigestUtils;
 
-import java.security.KeyFactory;
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.security.Signature;
+import java.io.UnsupportedEncodingException;
+import java.security.*;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
+import java.util.Arrays;
 import java.util.Base64;
+import java.util.Comparator;
+import java.util.Map;
 
 @Slf4j
 public class SignUtils {
@@ -66,4 +71,43 @@ public class SignUtils {
         }
         return null;
     }
+
+    //计算签字
+    public static String calculateMD5Signature(JsonObject jObject, String apiSecret) throws NoSuchAlgorithmException, UnsupportedEncodingException {
+        String signature;
+        String contents = getJsonValue(jObject);
+//        signature = Security.md5(contents+apiSecret, "UTF-8");
+        signature = DigestUtils.md5Hex(contents + apiSecret);
+        return signature;
+    }
+
+    protected static String getJsonValue(JsonElement jElement)	{
+        StringBuffer value = new StringBuffer("");
+        if (jElement.isJsonNull()) {
+            //value = "";
+        }
+        else if (jElement.isJsonArray()) {
+            JsonArray jArray = jElement.getAsJsonArray();
+            for (int i = 0; i < jArray.size(); i++) {
+                value.append(getJsonValue(jArray.get(i)));
+            }
+        }
+        else if (jElement.isJsonObject()) {
+            JsonObject jObject = jElement.getAsJsonObject();
+            Map.Entry<String, JsonElement>[] keys = jObject.entrySet().toArray(new Map.Entry[jObject.entrySet().size()]);
+            Arrays.sort(keys, Comparator.comparing(Map.Entry::getKey));
+            for (Map.Entry<String, JsonElement> key : keys) {
+                if (key.getKey().equalsIgnoreCase("apiKey") || key.getKey().equalsIgnoreCase("signature") || key.getValue().isJsonNull()) {
+                    continue;
+                }
+                value.append( getJsonValue(key.getValue()) ) ;
+            }
+        }
+        else {
+            value.append( jElement.getAsString() ) ;
+        }
+        return value.toString();
+
+    }
+
 }
