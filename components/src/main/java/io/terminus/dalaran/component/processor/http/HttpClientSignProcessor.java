@@ -8,8 +8,6 @@ import io.terminus.dalaran.component.utils.SignUtils;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 
-import java.util.Map;
-
 public class HttpClientSignProcessor implements Processor {
 
     private String apiSecret;
@@ -23,6 +21,7 @@ public class HttpClientSignProcessor implements Processor {
         Object body = exchange.getIn().getBody();
         JsonObject jsonObject;
         Gson gson = new Gson();
+        System.out.println("body class name: " + body.getClass().getName());
         if (body instanceof byte[]) {
             jsonObject = gson.toJsonTree(JSON.parse((byte[])body)).getAsJsonObject();
         } else if (body instanceof String) {
@@ -30,9 +29,8 @@ public class HttpClientSignProcessor implements Processor {
         } else {
             jsonObject = gson.toJsonTree(body).getAsJsonObject();
         }
-        String sign = SignUtils.calculateMD5Signature(jsonObject, "");
+        String sign = SignUtils.calculateMD5Signature(jsonObject, apiSecret).toUpperCase();
         jsonObject.addProperty(ComponentConstants.SIGNATURE, sign);
-        Object out = gson.fromJson(jsonObject, Map.class);
         exchange.getOut().setBody(jsonObject.toString());
         exchange.getOut().setHeaders(exchange.getIn().getHeaders());
     }

@@ -1,10 +1,14 @@
 package io.terminus.dalaran.component.utils;
 
+import com.alibaba.fastjson.JSON;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import io.terminus.dalaran.ComponentConstants;
 import io.terminus.dalaran.component.trigger.rest.model.EncryptionAlgorithm;
 import io.terminus.dalaran.component.trigger.rest.model.SignAlgorithm;
 import io.terminus.dalaran.component.trigger.rest.model.SignAuthenticatorInfo;
 import io.terminus.dalaran.component.trigger.rest.processor.SignProcessor;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -12,6 +16,35 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class SignUtilsTest {
+
+    @Test
+    public void md5() {
+
+        String body = "{\n" +
+                "    \"apiKey\": \"TEST\",\n" +
+                "    \"timestamp\": \"20181106121212\",\n" +
+                "    \"docNo\": \"S03M0116000075\",\n" +
+                "    \"storeCode\": \"S1000168\",\n" +
+                "    \"tillId\": \"01\",\n" +
+                "    \"txDate\": \"2018-09-11\",\n" +
+                "    \"txTime\": \"151322\",\n" +
+                "    \"netAmount\": 1500\n" +
+                "}";
+        JsonObject jsonObject;
+        Gson gson = new Gson();
+        jsonObject = gson.toJsonTree(JSON.parseObject((String)body)).getAsJsonObject();
+        String ssss = SignUtils.getJsonValue(jsonObject);
+//        if (body instanceof byte[]) {
+//            jsonObject = gson.toJsonTree(JSON.parse((byte[])body)).getAsJsonObject();
+//        } else if (body instanceof String) {
+//        } else {
+//            jsonObject = gson.toJsonTree(body).getAsJsonObject();
+//        }
+
+        String s = DigestUtils.md5Hex("S03M0116000075150.0000S100016801201811061212122018-09-11151322" + "amhIEWlsG0rVhg4ffRyfssF1Aff03cu6C6ERkFv2nDlKv811jGfWqFKrE2am0Ue");
+
+        Assert.assertNotNull(s);
+    }
 
     @Test
     public void sign() {

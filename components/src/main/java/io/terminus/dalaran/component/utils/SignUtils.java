@@ -74,11 +74,12 @@ public class SignUtils {
 
     //计算签字
     public static String calculateMD5Signature(JsonObject jObject, String apiSecret) throws NoSuchAlgorithmException, UnsupportedEncodingException {
-        String signature;
         String contents = getJsonValue(jObject);
+        System.out.println("get json value: " + contents);
+        System.out.println("api secret: " + apiSecret);
+        System.out.println("md5 : " + DigestUtils.md5Hex(contents + apiSecret).toUpperCase());
 //        signature = Security.md5(contents+apiSecret, "UTF-8");
-        signature = DigestUtils.md5Hex(contents + apiSecret);
-        return signature;
+        return DigestUtils.md5Hex(contents + apiSecret);
     }
 
     protected static String getJsonValue(JsonElement jElement)	{
@@ -100,14 +101,12 @@ public class SignUtils {
                 if (key.getKey().equalsIgnoreCase("apiKey") || key.getKey().equalsIgnoreCase("signature") || key.getValue().isJsonNull()) {
                     continue;
                 }
-                value.append( getJsonValue(key.getValue()) ) ;
+                value.append(getJsonValue(key.getValue())) ;
             }
         }
         else {
-            value.append( jElement.getAsString() ) ;
+            value.append(jElement.getAsString()) ;
         }
         return value.toString();
-
     }
-
 }
