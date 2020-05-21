@@ -29,7 +29,7 @@ public class TracingLogEntity {
     @Column(nullable = false)
     private Long elapsed;
 
-    @Column(nullable = false, length = 256)
+    @Column(nullable = false, length = 64)
     private String recordId;
 
     @Column(length = 256)
