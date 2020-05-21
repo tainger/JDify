@@ -77,8 +77,12 @@ public class SqlProcessor implements DalaranProcessor<SqlConfig> {
                 dataSource.setUrl(url);
                 dataSource.setDriverClassName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
                 break;
-//            case ORACLE:
-//                break;
+            case ORACLE:
+                urlTemplate = "jdbc:oracle:thin:@%s:%s/%s";
+                url = String.format(urlTemplate, connector.getHost(), connector.getPort(), connector.getSchema());
+                dataSource.setUrl(url);
+                dataSource.setDriverClassName("oracle.jdbc.driver.OracleDriver");
+                break;
         }
         return dataSource;
     }
