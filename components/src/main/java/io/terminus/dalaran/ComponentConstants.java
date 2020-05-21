@@ -46,6 +46,7 @@ public class ComponentConstants {
     public static final String EDI_REQUEST_SUCCESS = "success";
 
     public static final String SIGNATURE = "signature";
+    public static final String API_KEY = "apiKey";
 
     public static final String SIGNATURE_METHOD = "signatureMethod";
 }

@@ -30,6 +30,12 @@ public class HttpClientConfig extends OutModelConfig implements ConnectorConfig<
     @ConfigFieldInfo(label = "鉴权签名", inputType = FieldInputType.Switch, defaultValue = "false")
     private boolean enableSign = false;
 
-    @ConfigFieldInfo(label = "api secret", inputType = FieldInputType.String, defaultValue = "", required = false)
+    @ConfigFieldInfo(label = "Api Secret", inputType = FieldInputType.String, defaultValue = "", required = false)
     private String apiSecret;
+
+    @ConfigFieldInfo(label = "Api Key", inputType = FieldInputType.String, defaultValue = "", required = false)
+    private String apiKey;
+
+    @ConfigFieldInfo(label = "Headers", inputType = FieldInputType.String, defaultValue = "", required = false)
+    private String headers;
 }

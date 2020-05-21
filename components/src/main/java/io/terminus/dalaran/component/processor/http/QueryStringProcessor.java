@@ -1,10 +1,12 @@
 package io.terminus.dalaran.component.processor.http;
 
+import com.alibaba.fastjson.JSON;
 import com.google.common.base.Joiner;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Maps;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
+import org.apache.commons.io.IOUtils;
 
 import java.util.Map;
 
@@ -17,11 +19,16 @@ public class QueryStringProcessor implements Processor {
         exchange.getOut().setHeader(Exchange.HTTP_QUERY, queryString);
     }
 
-    public String buildQueryString(Object obj) {
-        if (obj instanceof Map) {
-            Map queryKV = Maps.filterEntries((Map) obj, (Predicate<Map.Entry>) entry -> entry.getValue() != null && entry.getKey() != null);
-            return Joiner.on("&").withKeyValueSeparator("=").join(queryKV);
+    private String buildQueryString(Object obj) throws Exception {
+        Map inBody;
+        if (obj instanceof byte[]) {
+            inBody = JSON.parseObject(IOUtils.toString((byte[]) obj), Map.class);
+        } else if (obj instanceof String) {
+            inBody = JSON.parseObject((String)obj, Map.class);
+        } else {
+            inBody = JSON.parseObject(JSON.toJSONString(obj), Map.class);
         }
-        return null;
+        Map queryKV = Maps.filterEntries(inBody, (Predicate<Map.Entry>) entry -> entry.getValue() != null && entry.getKey() != null);
+        return Joiner.on("&").withKeyValueSeparator("=").join(queryKV);
     }
 }

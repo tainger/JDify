@@ -10,10 +10,13 @@ import org.apache.camel.Processor;
 
 public class HttpClientSignProcessor implements Processor {
 
+    private String apiKey;
+
     private String apiSecret;
 
-    public HttpClientSignProcessor(String apiSecret) {
+    public HttpClientSignProcessor(String apiKey, String apiSecret) {
         this.apiSecret = apiSecret;
+        this.apiKey = apiKey;
     }
 
     @Override
@@ -31,6 +34,7 @@ public class HttpClientSignProcessor implements Processor {
         }
         String sign = SignUtils.calculateMD5Signature(jsonObject, apiSecret).toUpperCase();
         jsonObject.addProperty(ComponentConstants.SIGNATURE, sign);
+        jsonObject.addProperty(ComponentConstants.API_KEY, apiKey);
         exchange.getOut().setBody(jsonObject.toString());
         exchange.getOut().setHeaders(exchange.getIn().getHeaders());
     }
