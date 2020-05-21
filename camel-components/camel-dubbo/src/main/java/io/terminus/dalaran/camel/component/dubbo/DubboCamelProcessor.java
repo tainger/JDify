@@ -1,8 +1,8 @@
 package io.terminus.dalaran.camel.component.dubbo;
 
-import com.alibaba.dubbo.common.utils.StringUtils;
 import org.apache.camel.Exchange;
 import org.apache.camel.impl.DefaultProducer;
+import org.apache.dubbo.common.utils.StringUtils;
 
 public class DubboCamelProcessor extends DefaultProducer {
 
