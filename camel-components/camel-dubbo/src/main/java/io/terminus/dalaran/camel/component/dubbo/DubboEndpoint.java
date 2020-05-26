@@ -1,15 +1,15 @@
 package io.terminus.dalaran.camel.component.dubbo;
 
-import com.alibaba.dubbo.config.ApplicationConfig;
-import com.alibaba.dubbo.config.ReferenceConfig;
-import com.alibaba.dubbo.config.RegistryConfig;
-import com.alibaba.dubbo.rpc.service.GenericService;
 import org.apache.camel.Consumer;
 import org.apache.camel.Processor;
 import org.apache.camel.impl.ProcessorEndpoint;
 import org.apache.camel.spi.Metadata;
 import org.apache.camel.spi.UriEndpoint;
 import org.apache.camel.spi.UriParam;
+import org.apache.dubbo.config.ApplicationConfig;
+import org.apache.dubbo.config.ReferenceConfig;
+import org.apache.dubbo.config.RegistryConfig;
+import org.apache.dubbo.rpc.service.GenericService;
 
 @UriEndpoint(firstVersion = "1.0.0", scheme = "dubbo", title = "Dubbo", syntax = "dubbo:application", label = "rpc")
 public class DubboEndpoint extends ProcessorEndpoint {
