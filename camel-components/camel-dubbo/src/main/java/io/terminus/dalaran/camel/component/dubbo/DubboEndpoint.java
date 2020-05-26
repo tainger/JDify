@@ -64,7 +64,9 @@ public class DubboEndpoint extends ProcessorEndpoint {
             reference.setCheck(false);
             reference.setGeneric(true);
             reference.setRetries(retries);
-            reference.setOwner(version.substring(6));
+            if (version.length() > 6) {
+                reference.setOwner(version.substring(6));
+            }
             genericService = reference.get();
         }
         return this.genericService;
