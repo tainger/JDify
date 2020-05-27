@@ -171,6 +171,9 @@ public class CsvModelType implements DalaranModelType<String, CsvModelSchema> {
             Map<String, Object> recordObj = new HashMap<>();
             String[] recordValues = record.split(schema.getColumnDelimiter());
             for (int i = 0; i < recordValues.length; i++) {
+                if (columnArray.length <= i) {
+                    break;
+                }
                 recordObj.put(columnArray[i].trim(), recordValues[i]);
             }
             out.add(recordObj);
