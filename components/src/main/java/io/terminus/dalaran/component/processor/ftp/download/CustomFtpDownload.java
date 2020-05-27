@@ -19,20 +19,28 @@ public class CustomFtpDownload implements DalaranProcessor<CustomFtpDownloadConf
 
     private SFTPClient sftpClient;
 
+    private SSHClient sshClient;
+
     @Override
     public void configure(ProcessorDefinition route, CustomFtpDownloadConfig config) {
         ftpConnectionConfig(config);
-        route.process(new CustomFtpDownloadProcessor(sftpClient, config));
+        route.process(new CustomFtpDownloadProcessor(sshClient, sftpClient, config));
     }
 
     private void ftpConnectionConfig(CustomFtpDownloadConfig config){
         try {
+            if (sftpClient != null) {
+                sftpClient.close();
+            }
+            if (sshClient != null && sshClient.isConnected()) {
+                sshClient.close();
+            }
             if (config.getConnector().getProtocol() == FtpProtocol.SFTP) {
-                SSHClient client = new SSHClient();
-                client.addHostKeyVerifier(new PromiscuousVerifier());
-                client.connect(config.getConnector().getHost());
-                client.authPassword(config.getConnector().getUsername(), config.getConnector().getPassword());
-                this.sftpClient = client.newSFTPClient();
+                SSHClient sshClient = new SSHClient();
+                sshClient.addHostKeyVerifier(new PromiscuousVerifier());
+                sshClient.connect(config.getConnector().getHost());
+                sshClient.authPassword(config.getConnector().getUsername(), config.getConnector().getPassword());
+                this.sftpClient = sshClient.newSFTPClient();
             }
         } catch (Exception e) {
             throw new RuntimeException("custom ftp download config error, " + e.getCause());
