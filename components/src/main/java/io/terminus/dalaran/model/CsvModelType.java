@@ -129,14 +129,16 @@ public class CsvModelType implements DalaranModelType<String, CsvModelSchema> {
         route.process(exchange -> {
             exchange.getOut().copyFrom(exchange.getIn());
             Object in = exchange.getIn().getBody();
-            if (!(in instanceof GenericFileMessage) && !(in instanceof GenericFile)) {
-                return;
-            }
+//            if (!(in instanceof GenericFileMessage) && !(in instanceof GenericFile)) {
+//                return;
+//            }
 
             byte[] content;
             if (in instanceof GenericFile) {
                 GenericFile file = exchange.getIn().getBody(GenericFile.class);
                 content = (byte[])file.getBody();
+            } else if (in instanceof String) {
+                content = IOUtils.toByteArray((String)in);
             } else {
                 GenericFileMessage body = exchange.getIn().getBody(GenericFileMessage.class);
                 content = (byte[]) body.getGenericFile().getBody();
