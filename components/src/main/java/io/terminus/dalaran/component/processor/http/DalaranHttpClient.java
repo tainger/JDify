@@ -42,7 +42,7 @@ public class DalaranHttpClient implements DalaranProcessor<HttpClientConfig>, Da
         }
         route.setHeader(HTTP_QUERY).method(this, "buildQueryString");
         // 如果转为 QueryString 后, body 实际上是无用的
-        route.setBody(Builder.constant(null));
+//        route.setBody(Builder.constant(null));
         return false;
     }
 
@@ -65,7 +65,7 @@ public class DalaranHttpClient implements DalaranProcessor<HttpClientConfig>, Da
         }
         if (config.isEnableSign()) {
             if (config.getMethod().isNoBody()) {
-
+                route.process(new QuerySignProcessor(config.getApiKey(), config.getApiSecret()));
             } else {
                 route.process(new HttpClientSignProcessor(config.getApiKey(), config.getApiSecret()));
             }
