@@ -7,11 +7,14 @@ import net.schmizz.sshj.transport.verification.PromiscuousVerifier;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.Reader;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 @Slf4j
 public class CustomFtpDownloadProcessor implements Processor {
@@ -34,8 +37,16 @@ public class CustomFtpDownloadProcessor implements Processor {
             log.warn("sftpClient is null! Please check custom ftp download config");
             return;
         }
-        String remotePath = downloadConfig.getPath() + "/" + downloadConfig.getFileName();
-        String localPath = "/var/tmp/" + downloadConfig.getFileName();
+        String fileName = downloadConfig.getFileName();
+        if (StringUtils.isNotBlank(downloadConfig.getDatePattern())) {
+            fileName += downloadConfig.getDateConnector().getValue() + new SimpleDateFormat(downloadConfig.getDatePattern()).format(new Date());
+        }
+        if (StringUtils.isNotBlank(downloadConfig.getFileSuffix())) {
+            fileName += downloadConfig.getFileSuffix();
+        }
+
+        String remotePath = downloadConfig.getPath() + "/" + fileName;
+        String localPath = "/var/tmp/" + fileName;
         try {
             sftpClient.get(remotePath, localPath);
         } catch (Exception e) {

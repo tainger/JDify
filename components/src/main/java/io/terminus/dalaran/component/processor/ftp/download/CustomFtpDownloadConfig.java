@@ -3,6 +3,7 @@ package io.terminus.dalaran.component.processor.ftp.download;
 
 import io.terminus.dalaran.FieldInputType;
 import io.terminus.dalaran.component.connector.FtpUploadConnector;
+import io.terminus.dalaran.component.processor.ftp.FileNameConnector;
 import io.terminus.dalaran.core.component.annotation.ConfigFieldInfo;
 import io.terminus.dalaran.core.component.config.ConnectorConfig;
 import io.terminus.dalaran.core.component.config.OutModelConfig;
@@ -23,6 +24,16 @@ public class CustomFtpDownloadConfig extends OutModelConfig implements Connector
     @ConfigFieldInfo(label = "路径", inputType = FieldInputType.String, defaultValue = "/")
     private String path;
 
-    @ConfigFieldInfo(label = "文件名", inputType = FieldInputType.String)
+    @ConfigFieldInfo(label = "文件名前缀", inputType = FieldInputType.String)
     private String fileName;
+
+    @ConfigFieldInfo(label = "前缀日期分隔符", inputType = FieldInputType.Select, required = false)
+    private FileNameConnector dateConnector = FileNameConnector.DOT;
+
+    @ConfigFieldInfo(label = "日期格式", inputType = FieldInputType.String, required = false)
+    private String datePattern;
+
+    @ConfigFieldInfo(label = "文件名后缀", inputType = FieldInputType.String, required = false)
+    private String fileSuffix;
+
 }
