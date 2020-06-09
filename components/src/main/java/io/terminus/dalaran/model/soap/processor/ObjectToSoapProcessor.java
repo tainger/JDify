@@ -13,6 +13,7 @@ import org.apache.xml.serialize.OutputFormat;
 import org.apache.xml.serialize.XMLSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 
@@ -33,13 +34,16 @@ public class ObjectToSoapProcessor implements Processor, Traceable {
 
     private final Map<String, ModelField> modelFields;
 
-    private final SoapSchemaOperation soapOperationConfig;
+    private SoapSchemaOperation soapOperationConfig;
+
+    private SoapSchema schema;
 
     private String PREFIX;
 
     public ObjectToSoapProcessor(SoapSchema schema) {
         this.modelFields = schema.getFields();
         this.soapOperationConfig = schema.getOperationConfig();
+        this.schema = schema;
     }
 
     @Override
@@ -55,6 +59,10 @@ public class ObjectToSoapProcessor implements Processor, Traceable {
         ByteArrayOutputStream data = new ByteArrayOutputStream();
         if (modelField == null) {
             return data.toString();
+        }
+        if (soapOperationConfig == null) {
+            soapOperationConfig = new SoapSchemaOperation();
+            BeanUtils.copyProperties(schema, soapOperationConfig);
         }
         PREFIX = soapOperationConfig.getPrefix();
         MessageFactory messageFactory = MessageFactory.newInstance();
