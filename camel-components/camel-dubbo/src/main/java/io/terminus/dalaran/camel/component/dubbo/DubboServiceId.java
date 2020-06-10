@@ -2,7 +2,6 @@ package io.terminus.dalaran.camel.component.dubbo;
 
 
 import org.apache.dubbo.common.utils.StringUtils;
-
 import java.util.Objects;
 
 public class DubboServiceId {
