@@ -60,4 +60,6 @@ public interface ModelManagementService {
     ResponseEntity<Resource> downloadExcelTemplate();
 
     DalaranModelSchema importModelTemplate(DataTemplate dataTemplate, Long id);
+
+    DalaranModelTemplate buildSwaggerDataTemplate(DalaranModelSchema schema, String type);
 }

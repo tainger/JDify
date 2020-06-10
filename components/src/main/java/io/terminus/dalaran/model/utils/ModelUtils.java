@@ -141,7 +141,7 @@ public class ModelUtils {
         if (type != null) {
             switch (type) {
                 case STRING:
-                    return fieldName + index;
+                    return fieldName;
                 case INTEGER:
                     return index;
                 case BOOLEAN:

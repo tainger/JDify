@@ -243,6 +243,15 @@ public class ModelManagementServiceImpl implements ModelManagementService {
     }
 
     @Override
+    public DalaranModelTemplate buildSwaggerDataTemplate(DalaranModelSchema schema, String type) {
+        Map fields = schema.getFields();
+        DalaranModelTemplate dalaranModelTemplate = new DalaranModelTemplate();
+        dalaranModelTemplate.setData(dalaranContext.getDalaranModelTypeContext().getModelType(type).buildTemplateData(fields));
+        dalaranModelTemplate.setType(type);
+        return dalaranModelTemplate;
+    }
+
+    @Override
     public Map<String, String> suggestMapping(Long sourceId, Long targetId) {
         ModelEntity sourceEntity = modelRepository.findById(sourceId).get();
         Class<? extends DalaranModelSchema> sourceSchemaType = dalaranContext.getDalaranModelTypeContext().getModelSchema(sourceEntity.getType());
