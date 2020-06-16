@@ -140,7 +140,7 @@ public class ReleaseServiceImpl implements ReleaseService {
 
     @Override
     public List<TriggerFlowDTO> listReleasedTriggerFlowDTO(String version) {
-        return triggerFlowReleasedRepository.findByVersion(version).stream().map(flowConvertor::toDTO).collect(Collectors.toList());
+        return triggerFlowReleasedRepository.findByVersion(version).stream().map(flowConvertor::releaseToDTO).collect(Collectors.toList());
     }
 
     @Override

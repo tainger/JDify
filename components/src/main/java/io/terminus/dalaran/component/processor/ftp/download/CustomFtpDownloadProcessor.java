@@ -91,6 +91,7 @@ public class CustomFtpDownloadProcessor implements Processor {
         sshClient.connect(downloadConfig.getConnector().getHost());
         sshClient.authPassword(downloadConfig.getConnector().getUsername(), downloadConfig.getConnector().getPassword());
         this.sftpClient = sshClient.newSFTPClient();
+        this.sshClient = sshClient;
         return this.sftpClient;
     }
 }

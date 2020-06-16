@@ -1,6 +1,5 @@
 package io.terminus.dalaran.component.processor.ftp.download;
 
-
 import io.terminus.dalaran.component.common.FtpProtocol;
 import io.terminus.dalaran.core.component.DalaranProcessor;
 import io.terminus.dalaran.core.component.annotation.Processor;
@@ -41,6 +40,7 @@ public class CustomFtpDownload implements DalaranProcessor<CustomFtpDownloadConf
                 sshClient.connect(config.getConnector().getHost());
                 sshClient.authPassword(config.getConnector().getUsername(), config.getConnector().getPassword());
                 this.sftpClient = sshClient.newSFTPClient();
+                this.sshClient = sshClient;
             }
         } catch (Exception e) {
             throw new RuntimeException("custom ftp download config error, " + e.getCause());
