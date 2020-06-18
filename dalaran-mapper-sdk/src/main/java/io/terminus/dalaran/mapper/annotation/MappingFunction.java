@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 import java.lang.annotation.*;
 
 @Component
+@IgnoreScan
 @Inherited
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
