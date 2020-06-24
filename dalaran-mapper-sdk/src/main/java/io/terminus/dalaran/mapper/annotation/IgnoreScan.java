@@ -1,4 +1,4 @@
-package io.terminus.dalaran.model.annotation;
+package io.terminus.dalaran.mapper.annotation;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

@@ -1,9 +1,9 @@
 package io.terminus.dalaran.mapper;
 
+import io.terminus.dalaran.mapper.annotation.IgnoreScan;
 import io.terminus.dalaran.mapper.context.DalaranFunctionContext;
 import io.terminus.dalaran.mapper.context.DefaultDalaranFunctionContext;
 import io.terminus.dalaran.mapper.spring.DalaranMapperLoader;
-import io.terminus.dalaran.model.annotation.IgnoreScan;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;

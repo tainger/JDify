@@ -1,6 +1,5 @@
 package io.terminus.dalaran.mapper.annotation;
 
-import io.terminus.dalaran.model.annotation.IgnoreScan;
 import org.springframework.stereotype.Component;
 
 import java.lang.annotation.Retention;
