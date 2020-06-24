@@ -1,12 +1,14 @@
 package io.terminus.dalaran.mapper.function.context;
 
-import io.terminus.dalaran.mapper.annotation.ContainsContextFunction;
-import io.terminus.dalaran.mapper.annotation.HiddenParam;
-import io.terminus.dalaran.mapper.annotation.MappingFunction;
+import io.terminus.dalaran.mapper.annotation.FunctionFilter;
+import io.terminus.dalaran.model.annotation.ContainsContextFunction;
+import io.terminus.dalaran.model.annotation.HiddenParam;
+import io.terminus.dalaran.model.annotation.MappingFunction;
 import org.apache.commons.collections4.MapUtils;
 
 import java.util.Map;
 
+@FunctionFilter
 @ContainsContextFunction
 @MappingFunction(value = "GetValueFromContext", description = "获取context中的数据")
 public class GetValueFromContext {

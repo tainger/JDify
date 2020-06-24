@@ -1,9 +1,12 @@
 package io.terminus.dalaran.mapper.function.number;
 
-import io.terminus.dalaran.mapper.annotation.MappingFunction;
+
+import io.terminus.dalaran.mapper.annotation.FunctionFilter;
+import io.terminus.dalaran.model.annotation.MappingFunction;
 
 import java.text.DecimalFormat;
 
+@FunctionFilter
 @MappingFunction(value = "NumberFormat", description = "将数字格式化")
 public class NumberFormat {
     public String execute(Number num, String pattern) {

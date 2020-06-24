@@ -1,11 +1,7 @@
-package io.terminus.dalaran.mapper.annotation;
-
-import org.springframework.stereotype.Component;
+package io.terminus.dalaran.model.annotation;
 
 import java.lang.annotation.*;
 
-@Component
-@IgnoreScan
 @Inherited
 @Documented
 @Retention(RetentionPolicy.RUNTIME)

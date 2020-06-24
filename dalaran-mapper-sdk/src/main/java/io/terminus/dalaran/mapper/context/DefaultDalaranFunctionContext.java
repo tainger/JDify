@@ -1,7 +1,7 @@
 package io.terminus.dalaran.mapper.context;
 
-import io.terminus.dalaran.mapper.annotation.ContainsContextFunction;
-import io.terminus.dalaran.mapper.annotation.HiddenParam;
+import io.terminus.dalaran.model.annotation.ContainsContextFunction;
+import io.terminus.dalaran.model.annotation.HiddenParam;
 import io.terminus.dalaran.model.function.MappingFunctionInfo;
 import io.terminus.dalaran.model.function.MappingFunctionType;
 import jdk.nashorn.api.scripting.ScriptObjectMirror;

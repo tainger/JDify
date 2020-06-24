@@ -1,8 +1,10 @@
 package io.terminus.dalaran.mapper.function.number;
 
 
-import io.terminus.dalaran.mapper.annotation.MappingFunction;
+import io.terminus.dalaran.mapper.annotation.FunctionFilter;
+import io.terminus.dalaran.model.annotation.MappingFunction;
 
+@FunctionFilter
 @MappingFunction(value = "MathAbsolute", description = "返回数字的绝对值")
 public class MathAbsolute {
     public Number execute(Number num1) {

@@ -1,7 +1,7 @@
 package io.terminus.dalaran.mapper.spring;
 
-import io.terminus.dalaran.mapper.annotation.MappingFunction;
 import io.terminus.dalaran.mapper.context.DalaranFunctionContext;
+import io.terminus.dalaran.model.annotation.MappingFunction;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 
