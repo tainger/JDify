@@ -1,6 +1,9 @@
 package io.terminus.dalaran.function.xml;
 
+import com.alibaba.fastjson.JSON;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import io.terminus.dalaran.core.component.annotation.MappingFunction;
 import io.terminus.dalaran.function.model.FunctionConstants;
@@ -26,7 +29,15 @@ public class FromXmlFunction {
             case FunctionConstants.LONG:
                 javaClass = Long.class;
         }
-        return xmlMapper.readValue(format(data), javaClass);
+        xmlMapper.registerModule(new SimpleModule().addDeserializer(
+                JsonNode.class,
+                new DuplicateToArrayJsonNodeDeserializer()
+        ));
+        JsonNode node = xmlMapper.readTree(format(data));
+        ObjectMapper jsonMapper = new ObjectMapper();
+        String json = jsonMapper.writeValueAsString(node);
+        return JSON.parse(json);
+//        return xmlMapper.readValue(format(data), javaClass);
     }
 
     private String format(String data) {

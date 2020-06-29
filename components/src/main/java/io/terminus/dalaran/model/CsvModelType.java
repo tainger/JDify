@@ -1,6 +1,7 @@
 package io.terminus.dalaran.model;
 
 import com.alibaba.fastjson.JSON;
+import com.google.common.collect.Lists;
 import io.terminus.dalaran.core.component.annotation.ModelType;
 import io.terminus.dalaran.core.component.model.DalaranModelType;
 import io.terminus.dalaran.model.schema.CsvModelSchema;
@@ -149,15 +150,16 @@ public class CsvModelType implements DalaranModelType<String, CsvModelSchema> {
             if (schema.getType() == CSVModelType.CARSO) {
                 out = carsoToObject(records, schema);
             } else {
-                out = new ArrayList<>();
-                for (String record : records) {
-                    Map<Integer, Object> recordObj = new HashMap<>();
-                    String[] recordValues = record.split(",");
-                    for (int i = 0; i < recordValues.length; i++) {
-                        recordObj.put(i, recordValues[i]);
-                    }
-                    out.add(recordObj);
-                }
+//                out = new ArrayList<>();
+//                for (String record : records) {
+//                    Map<Integer, Object> recordObj = new HashMap<>();
+//                    String[] recordValues = record.split(",");
+//                    for (int i = 0; i < recordValues.length; i++) {
+//                        recordObj.put(i, recordValues[i]);
+//                    }
+//                    out.add(recordObj);
+//                }
+                out = Lists.newArrayList(contentStr);
             }
             exchange.getOut().setBody(out);
             exchange.getOut().setHeaders(exchange.getIn().getHeaders());
