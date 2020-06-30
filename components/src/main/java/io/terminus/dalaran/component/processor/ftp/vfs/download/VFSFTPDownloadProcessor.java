@@ -1,6 +1,6 @@
 package io.terminus.dalaran.component.processor.ftp.vfs.download;
 
-import io.terminus.dalaran.component.connector.FtpUploadConnector;
+import io.terminus.dalaran.component.connector.FtpConnector;
 import io.terminus.dalaran.component.utils.DalaranFileUtils;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
@@ -37,7 +37,7 @@ public class VFSFTPDownloadProcessor implements Processor {
         }
         String remotePath = downloadConfig.getPath() + "/" + fileName;
 
-        FtpUploadConnector connector =  downloadConfig.getConnector();
+        FtpConnector connector =  downloadConfig.getConnector();
         URI uri = new URI(connector.getProtocol().name().toLowerCase(), connector.getUsername() + ":" + connector.getPassword(), connector.getHost(), -1,
                 remotePath, null, null);
 

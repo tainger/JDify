@@ -8,7 +8,7 @@ import lombok.Data;
 
 @Data
 @Connector("Ftp")
-public class FtpUploadConnector {
+public class FtpConnector {
     @ConfigFieldInfo(label = "服务地址", inputType = FieldInputType.String)
     private String host;
 

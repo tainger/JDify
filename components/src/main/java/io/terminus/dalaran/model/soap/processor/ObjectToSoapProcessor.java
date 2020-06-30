@@ -149,7 +149,9 @@ public class ObjectToSoapProcessor implements Processor, Traceable {
                 } else {
                     for (Object data: subBody) {
                         SOAPElement element = soapElement.addChildElement(name, PREFIX);
-                        element.addNamespaceDeclaration("", soapOperationConfig.getTargetNamespace());
+                        if (bodyContainsXmlns) {
+                            element.addNamespaceDeclaration("", soapOperationConfig.getTargetNamespace());
+                        }
                         element.addTextNode(data.toString());
                     }
                 }
