@@ -49,10 +49,10 @@ public class SignUtilsTest {
     @Test
     public void sign() {
         Map<String, Object> body = new HashMap<>();
-        body.put("merchantCode", "merchantCode0");
-        body.put("merchantExts", "merchantExts0");
-        body.put("merchantId", "merchantId0");
-        body.put("userId", "userId0");
+        body.put("merchantCode", "code");
+        body.put("merchantExts", "false");
+        body.put("merchantId", "001");
+        body.put("userId", "user");
 
 
         String DEMO_PUBLIC_KEY = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAwTAewIdIC+Mb+PRP2Hu1\n"
@@ -153,14 +153,50 @@ public class SignUtilsTest {
                 "EwIDAQAB\n");
 
 
+        authenticatorInfo.setDalaranPrivateKey("-----BEGIN PRIVATE KEY-----\n" +
+                "MIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQDoY7ZtzxweNuXE\n" +
+                "ucWwOUikPiuglzQFS5mbng1ZlksA1hkQ62srh1BKxAWPDooow5HpsydYlPB3CG7G\n" +
+                "9vcdyHJGoG2BnLIeCGTREVEMtMcdZpG4XVMF+ZkjE220UNbHEKL6ZcA7KpwETPNe\n" +
+                "KGEF6alkrEelf1vEFY3C/Z4JmR+JtSWtr6pY5aCIRCTEwHdCboMuouhOCHY26Isq\n" +
+                "9J9WjC1AX40UHPCnTv5XULgM1aerePds5sTvAJ/vxFUiLuHl9otZIoqoLubxQQwU\n" +
+                "O7ff5a3Pa3CYtxFYLzB36w1KyS4iMWzgwsHf0IzmiVX8OGSKKEK9f3wGo4w50Xda\n" +
+                "LryEs2YlAgMBAAECggEAVc+8JYA82ctbvPD8Vr5QXJW4dmxfATWRWy1ZsKMWvxBP\n" +
+                "4TeNM12cAH+xrcmoqrTMxIcrGEKnKM0sWrwHNDA4QmwrA5lhDEX9NFY4n4CBphGh\n" +
+                "7XpIlgQ8z/70m4jeRlOWWvAHs9FgGxZvJ22xpgVKT6puKmaE9DshRcdw/ApW4voU\n" +
+                "1ImbA8wdrnAsUSyVazGZYx+WOOH4I2rd/zwNZ9ZRP1hmaZNWC+01dXfKPTzEfEpL\n" +
+                "UFcjQZtmmwInns8O5TioOMGNXeJg1bI3UEg44uqpMIh+UQTI/hQjNOkRAvnE44pq\n" +
+                "LqsF6iA0Mwvnr1kIVMAJ0P8htq5TOZ98MrksBIrOAQKBgQD9Uzz7UqUER3NeTMEJ\n" +
+                "EQqQJ31PfaaoXyIhyXTd4f5sHwfrooWp5cp9pckJ49rGEc6MSFF7K1Ub7anERb8B\n" +
+                "RCmZtU8pthadS2quKSk8F++HiuCX6hBYs+qgLF+O4Fiv9fqL8cfmw9U3VRvTb/n8\n" +
+                "SECXDwX6mEjR0R9zLSPteoXhMQKBgQDq1+IkxQNoml/v1m7miVRUTN6/vOpiDee9\n" +
+                "epymP58tI/LHFRLsCtsQBnDrH65xoEeTvIyeNx3uO7o7NQ5+rAuYgviiidXz6zM8\n" +
+                "S2JGhE5fhvUmxykcpExV+aoRCJR2E635dtZq1oWiYEH7cmyzxOfFOnCBn5uIepuc\n" +
+                "6AN1nK53NQKBgQCgEa+v0rnoqUlR5cf39aeqDPnWd7wOGgbUOJq69WkxYq47i3dQ\n" +
+                "Mp4vpMkSkcKUc34DEFNEM85Ulmk2VyfpIevzbyh1X9SMUbI4GFQw36MAD5X5B/KK\n" +
+                "Si1QRpmfC02e6hwFv6Ijw8x/aSzq/o+EhRcjHGAXx5AD3FM2EOjpzwi3kQKBgQCy\n" +
+                "21J/gJC1BQXWCvGRoLvaLGVlkELOBRse4xgVQdVAMuW/G9y6axYmIVG0sP9RyKla\n" +
+                "6joKcZ3ZCCIw35q3fN6j+/PTDrklOVdfL2acoD10YbuqGfrEtpjwzeHpcShouVpB\n" +
+                "6XEqE1HZtgfqsl35mBiQzI5NGrsA+ag0mzuvQnJZlQKBgQCJGvdsX9t9lTXHKTN1\n" +
+                "kZnhOKHqv0ZCX/DgN7SJpZ5UaKx0wZi+pwsJ7B0K3jrDSE6GxcRZF6vwmo10eqgu\n" +
+                "zjbW6TmDCJgxWbVQHT5JwXkrlzDYK2aap5fuQZI9juoDo9nCe5sZsJV4lgSzrSR8\n" +
+                "hsgjsPCwXJmRNyz690C+E7hHsA==\n" +
+                "-----END PRIVATE KEY-----\n");
+
+        authenticatorInfo.setPartnerPublicKey("MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA6GO2bc8cHjblxLnFsDlI\n" +
+                "pD4roJc0BUuZm54NWZZLANYZEOtrK4dQSsQFjw6KKMOR6bMnWJTwdwhuxvb3Hchy\n" +
+                "RqBtgZyyHghk0RFRDLTHHWaRuF1TBfmZIxNttFDWxxCi+mXAOyqcBEzzXihhBemp\n" +
+                "ZKxHpX9bxBWNwv2eCZkfibUlra+qWOWgiEQkxMB3Qm6DLqLoTgh2NuiLKvSfVowt\n" +
+                "QF+NFBzwp07+V1C4DNWnq3j3bObE7wCf78RVIi7h5faLWSKKqC7m8UEMFDu33+Wt\n" +
+                "z2twmLcRWC8wd+sNSskuIjFs4MLB39CM5olV/DhkiihCvX98BqOMOdF3Wi68hLNm\n" +
+                "JQIDAQAB");
+
         authenticatorInfo.setPartnerPublicKey(authenticatorInfo.getPartnerPublicKey().replace("\n", ""));
-        authenticatorInfo.setDalaranPrivateKey(authenticatorInfo.getDalaranPrivateKey().replace("\n", ""));
+//        authenticatorInfo.setDalaranPrivateKey(authenticatorInfo.getDalaranPrivateKey().replace("\n", ""));
 
         String platformDK = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAmB2d4NasdZEQ//lg7/h7ZFwuiyBn86a9SoE0gfquIkdFmEv2+8dj7AwxlsXidzxI4Ta9zkiZFHqgC3bmtlRuF6BgtS1+ubs7ksd3YG+kyk+H6dAb6LnhGf7rv7PTUxSb8WN8ytZbl/5li2NYJva2igiWhOQ9VITPFobYcbZLiaaRfRRUmkPGgbuP2ScgrKQJB6cy34/wpc0bYMoqLETTCKctZRnfX1G1d1E8meCKdWWHmQqsRFkA8+OxzBKMeKhrJYT3fa2lDdA9yQDQsWj+jbmMd42NE6VnOQWpI/afsCNalFBVOM/RTYY2yLjhmX20P0ytVfs4Ep1h2SM4g9PP8wIDAQAB";
 
         authenticatorInfo.setDalaranPrivateKey(DEMO_PRIVATE_KEY.replace("\n", ""));
         authenticatorInfo.setPartnerPublicKey(DEMO_PUBLIC_KEY.replace("\n", ""));
-
 
         authenticatorInfo.setEncryptionAlgorithm(EncryptionAlgorithm.RSA);
         authenticatorInfo.setSignAlgorithm(SignAlgorithm.SHA256withRSA);
@@ -173,5 +209,15 @@ public class SignUtilsTest {
 
         boolean result = processor.verify(in, signCode, authenticatorInfo);
         Assert.assertTrue(result);
+    }
+
+    @Test
+    public void aes() {
+        String s = AESUtils.encrypt("123456", "89622015104709087435617163207900");
+
+
+        String ss = AESUtils.decrypt("rUJMYBRRMnAJ6OHi6VFqHA==", "89622015104709087435617163207900");
+
+        Assert.assertTrue(false);
     }
 }

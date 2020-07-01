@@ -2,10 +2,9 @@ package io.terminus.dalaran.component.utils;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
-import java.security.MessageDigest;
-import java.util.Arrays;
 import java.util.Base64;
 
 @Slf4j
@@ -16,14 +15,10 @@ public class AESUtils {
             return null;
         }
         try {
-            byte[] key = secret.getBytes("UTF-8");
-            MessageDigest sha = MessageDigest.getInstance("SHA-1");
-            byte[] digestBytes = sha.digest(key);
-            byte[] secretBytes = Arrays.copyOf(digestBytes, 16);
-            SecretKeySpec secretKeySpec = new SecretKeySpec(secretBytes, "AES");
-            Cipher cipher = Cipher.getInstance("AES/ECB/PKCS7Padding");
+            SecretKeySpec secretKeySpec = new SecretKeySpec(secret.getBytes("UTF-8"), "AES");
+            Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5PADDING");
             cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec);
-            return Base64.getEncoder().encodeToString(cipher.doFinal(origin.getBytes("UTF-8")));
+            return Base64.getEncoder().encodeToString(cipher.doFinal(origin.getBytes()));
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException("AES Encrypt Error: " + e.getMessage());
@@ -35,11 +30,7 @@ public class AESUtils {
             return null;
         }
         try {
-            byte[] key = secret.getBytes("UTF-8");
-            MessageDigest sha = MessageDigest.getInstance("SHA-1");
-            byte[] digestBytes = sha.digest(key);
-            byte[] secretBytes = Arrays.copyOf(digestBytes, 16);
-            SecretKeySpec secretKeySpec = new SecretKeySpec(secretBytes, "AES");
+            SecretKeySpec secretKeySpec = new SecretKeySpec(secret.getBytes("UTF-8"), "AES");
             Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5PADDING");
             cipher.init(Cipher.DECRYPT_MODE, secretKeySpec);
             return new String(cipher.doFinal(Base64.getDecoder().decode(origin)));
