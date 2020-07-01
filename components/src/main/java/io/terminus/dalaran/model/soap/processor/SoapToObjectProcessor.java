@@ -53,8 +53,7 @@ public class SoapToObjectProcessor implements Processor, Traceable {
         if (MapUtils.isEmpty(fields) || map.get("Body") == null) {
             return new HashMap<>();
         }
-        Object destination = buildBody((Map)map.get("Body"), new HashMap(), fields);
-        return destination;
+        return buildBody((Map)map.get("Body"), new HashMap(), fields);
     }
 
     private Object buildBody(Map origin, Map destination,  Map<String, ModelField> fields) {

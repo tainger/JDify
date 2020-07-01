@@ -63,7 +63,6 @@ public class DalaranSoapListener implements DalaranTrigger<SoapListenerConfig>, 
 
     @Override
     public File exportWord(Map<String, List<TriggerFlow>> moduleTriggerFlows) {
-
         return null;
     }
 

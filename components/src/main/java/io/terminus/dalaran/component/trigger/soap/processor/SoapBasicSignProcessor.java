@@ -28,7 +28,6 @@ public class SoapBasicSignProcessor implements Processor {
             return;
         }
         try {
-
             String[] account = new String(Base64.getDecoder().decode(StringUtils.substringAfter(authentication,  " "))).split(":");
             Map<String, String> body = new HashMap<>();
             body.put(DalaranConstants.AUTH_APP_KEY, account[0]);
