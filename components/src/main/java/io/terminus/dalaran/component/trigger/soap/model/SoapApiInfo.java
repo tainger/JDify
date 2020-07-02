@@ -1,7 +1,7 @@
 package io.terminus.dalaran.component.trigger.soap.model;
 
 import io.terminus.dalaran.component.common.HttpMethod;
-import io.terminus.dalaran.component.trigger.soap.SoapListenerConfig;
+import io.terminus.dalaran.component.trigger.rest.BasicHttpListenerConfig;
 import io.terminus.dalaran.model.MessageModel;
 import io.terminus.dalaran.model.flow.TriggerFlow;
 import lombok.Data;
@@ -24,7 +24,7 @@ public class SoapApiInfo {
     private MessageModel output;
 
     public SoapApiInfo(TriggerFlow flow) {
-        SoapListenerConfig listenerConfig = (SoapListenerConfig) flow.getTriggerConfig();
+        BasicHttpListenerConfig listenerConfig = (BasicHttpListenerConfig) flow.getTriggerConfig();
         this.name = flow.getName();
         this.path = listenerConfig.getPath();
         this.method = listenerConfig.getMethod();
