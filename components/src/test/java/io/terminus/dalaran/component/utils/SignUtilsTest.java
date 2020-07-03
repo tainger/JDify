@@ -191,7 +191,7 @@ public class SignUtilsTest {
                 "JQIDAQAB");
 
         authenticatorInfo.setPartnerPublicKey(authenticatorInfo.getPartnerPublicKey().replace("\n", ""));
-//        authenticatorInfo.setDalaranPrivateKey(authenticatorInfo.getDalaranPrivateKey().replace("\n", ""));
+        authenticatorInfo.setDalaranPrivateKey(authenticatorInfo.getDalaranPrivateKey().replace("\n", ""));
 
         String platformDK = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAmB2d4NasdZEQ//lg7/h7ZFwuiyBn86a9SoE0gfquIkdFmEv2+8dj7AwxlsXidzxI4Ta9zkiZFHqgC3bmtlRuF6BgtS1+ubs7ksd3YG+kyk+H6dAb6LnhGf7rv7PTUxSb8WN8ytZbl/5li2NYJva2igiWhOQ9VITPFobYcbZLiaaRfRRUmkPGgbuP2ScgrKQJB6cy34/wpc0bYMoqLETTCKctZRnfX1G1d1E8meCKdWWHmQqsRFkA8+OxzBKMeKhrJYT3fa2lDdA9yQDQsWj+jbmMd42NE6VnOQWpI/afsCNalFBVOM/RTYY2yLjhmX20P0ytVfs4Ep1h2SM4g9PP8wIDAQAB";
 
