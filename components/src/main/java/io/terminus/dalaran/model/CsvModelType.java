@@ -26,6 +26,9 @@ public class CsvModelType implements DalaranModelType<String, CsvModelSchema> {
     public void fromObject(ProcessorDefinition route, CsvModelSchema schema) {
         route.process(exchange -> {
             exchange.getOut().copyFrom(exchange.getIn());
+            if (schema == null) {
+                return;
+            }
             String data;
             Object body = exchange.getIn().getBody();
             if (schema.getType() == CSVModelType.CARSO) {
@@ -129,6 +132,9 @@ public class CsvModelType implements DalaranModelType<String, CsvModelSchema> {
     public void toObject(ProcessorDefinition route, CsvModelSchema schema) {
         route.process(exchange -> {
             exchange.getOut().copyFrom(exchange.getIn());
+            if (schema == null) {
+                return;
+            }
             Object in = exchange.getIn().getBody();
 //            if (!(in instanceof GenericFileMessage) && !(in instanceof GenericFile)) {
 //                return;
