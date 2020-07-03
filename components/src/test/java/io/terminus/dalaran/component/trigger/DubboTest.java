@@ -3,7 +3,6 @@ package io.terminus.dalaran.component.trigger;
 import com.alibaba.dubbo.config.ApplicationConfig;
 import com.alibaba.dubbo.config.ReferenceConfig;
 import com.alibaba.dubbo.config.RegistryConfig;
-import com.alibaba.dubbo.config.utils.ReferenceConfigCache;
 import com.alibaba.dubbo.rpc.service.GenericService;
 import io.terminus.dalaran.component.BasicTriggerTest;
 import io.terminus.dalaran.component.connector.DubboRegistryConnector;

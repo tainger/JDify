@@ -14,10 +14,13 @@ public class DalaranMailSenderConfig {
     @ConfigFieldInfo(label = "Mail 连接器", inputType = FieldInputType.Connector, connectorType = MailConnector.class)
     private Long connectorId;
 
-    @ConfigFieldInfo(label = "收件人(逗号分隔)", inputType = FieldInputType.String)
+    @ConfigFieldInfo(label = "收件人(逗号分隔)", inputType = FieldInputType.Radio, defaultValue = "false")
+    private Boolean dynamicAddress;
+
+    @ConfigFieldInfo(label = "收件人(逗号分隔)", inputType = FieldInputType.String, required = false)
     private String sendTo;
 
-    @ConfigFieldInfo(label = "抄送人(逗号分隔)", inputType = FieldInputType.String)
+    @ConfigFieldInfo(label = "抄送人(逗号分隔)", inputType = FieldInputType.String, required = false)
     private String ccTo;
 
     @ConfigFieldInfo(label = "标题", inputType = FieldInputType.String, required = false)

@@ -44,4 +44,8 @@ public class ComponentConstants {
     public static final String EDI_RESPONSE_MESSAGE = "message";
     public static final String EDI_MESSAGE_STATUS = "status";
     public static final String EDI_REQUEST_SUCCESS = "success";
+
+    public static final String DALARAN_MAIL_TO = "DalaranMailTo";
+    public static final String DALARAN_MAIL_FROM = "DalaranMailFrom";
+
 }
