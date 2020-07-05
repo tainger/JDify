@@ -2,6 +2,7 @@ package io.terminus.dalaran.component.trigger.rest.processor;
 
 import io.terminus.dalaran.ComponentConstants;
 import io.terminus.dalaran.component.trigger.rest.model.SignAuthenticatorInfo;
+import io.terminus.dalaran.component.utils.AESUtils;
 import io.terminus.dalaran.component.utils.SignUtils;
 import lombok.Data;
 import org.apache.camel.Exchange;
@@ -83,6 +84,14 @@ public class SignProcessor implements Processor {
 
     public String sign(String body, SignAuthenticatorInfo authenticator) {
         return SignUtils.sign(body, authenticator.getDalaranPrivateKey(), authenticator.getSignAlgorithm(), authenticator.getEncryptionAlgorithm());
+    }
+
+    public String signAES(String body, String secret) {
+        return AESUtils.encrypt(body, secret);
+    }
+
+    public boolean verifyAES(String body, String sign, String secret) {
+        return StringUtils.equalsIgnoreCase(sign, AESUtils.encrypt(body, secret));
     }
 
     public String buildSignBody(Map<String, Object> in) {
