@@ -3,19 +3,19 @@ package io.terminus.dalaran.component.utils;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import io.terminus.dalaran.ComponentConstants;
 import io.terminus.dalaran.component.trigger.rest.model.EncryptionAlgorithm;
 import io.terminus.dalaran.component.trigger.rest.model.SignAlgorithm;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.UnsupportedEncodingException;
 import java.security.*;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.Comparator;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 public class SignUtils {
@@ -80,6 +80,28 @@ public class SignUtils {
         System.out.println("md5 : " + DigestUtils.md5Hex(contents + apiSecret).toUpperCase());
 //        signature = Security.md5(contents+apiSecret, "UTF-8");
         return DigestUtils.md5Hex(contents + apiSecret);
+    }
+
+    public static String signAES(String body, String secret) {
+        return AESUtils.encrypt(body, secret);
+    }
+
+    public static boolean verifyAES(String body, String sign, String secret) {
+        return StringUtils.equalsIgnoreCase(sign, AESUtils.encrypt(body, secret));
+    }
+
+    public static String buildSignBody(Map<String, Object> in) {
+        Map<String, Object> data = in.entrySet().stream()
+                .filter(entry -> !(StringUtils.equalsIgnoreCase(entry.getKey(), ComponentConstants.SIGNATURE) || StringUtils.equalsIgnoreCase(entry.getKey(), ComponentConstants.SIGNATURE_METHOD)))
+                .sorted((o1, o2) -> StringUtils.compare(o1.getKey(), o2.getKey()))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (oldValue, newValue) -> oldValue, LinkedHashMap::new));
+
+        StringBuilder dataToBeSigned = new StringBuilder();
+        for (Map.Entry entry: data.entrySet()) {
+            dataToBeSigned.append(dataToBeSigned.toString().equals("") ? "" : "&")
+                    .append( entry.getKey() + "=" + entry.getValue());
+        }
+        return dataToBeSigned.toString();
     }
 
     protected static String getJsonValue(JsonElement jElement)	{
