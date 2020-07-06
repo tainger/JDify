@@ -213,7 +213,8 @@ public class SignUtilsTest {
 
     @Test
     public void aes() {
-        String s = AESUtils.encrypt("123456", "89622015104709087435617163207900");
+        String ssss = "userId=123456&vipcode=vip123456";
+        String s = AESUtils.encrypt(ssss, "89622015104709087435617163207900");
 
 
         String ss = AESUtils.decrypt("rUJMYBRRMnAJ6OHi6VFqHA==", "89622015104709087435617163207900");
