@@ -19,7 +19,7 @@ public class FtpUploadConfig implements ConnectorConfig<FtpConnector> {
     @ConfigFieldInfo(label = "如果文件已存在", inputType = FieldInputType.Radio, defaultValue = "Override")
     private FileExist fileExist;
 
-    @ConfigFieldInfo(label = "动态文件名", inputType = FieldInputType.Radio, defaultValue = "false")
+    @ConfigFieldInfo(label = "动态文件名", inputType = FieldInputType.Switch, defaultValue = "false")
     private boolean dynamicFileName = false;
 
     @ConfigFieldInfo(label = "动态路径", inputType = FieldInputType.String, defaultValue = "fileName", required = false)
