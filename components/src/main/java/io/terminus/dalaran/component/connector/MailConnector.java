@@ -13,7 +13,10 @@ public class MailConnector {
     @ConfigFieldInfo(label = "邮箱地址", inputType = FieldInputType.String)
     private String host;
 
-    @ConfigFieldInfo(label = "协议", inputType = FieldInputType.Radio, defaultValue = "IMAP")
+    @ConfigFieldInfo(label = "端口", inputType = FieldInputType.Integer)
+    private Integer port;
+
+    @ConfigFieldInfo(label = "协议", inputType = FieldInputType.Radio, defaultValue = "SMTP")
     private MailProtocol protocol;
 
     @ConfigFieldInfo(label = "用户名", inputType = FieldInputType.String)

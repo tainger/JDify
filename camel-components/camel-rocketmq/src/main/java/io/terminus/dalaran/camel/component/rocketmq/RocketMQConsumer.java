@@ -77,10 +77,6 @@ public class RocketMQConsumer extends DefaultConsumer {
                     result = consumer.pull(messageQueue, "*", offset, 1);
                 }
 
-//                if (result.getPullStatus() != PullStatus.FOUND) {
-//                    return;
-//                }
-
                 switch (result.getPullStatus()) {
                     case FOUND:
                         List<MessageExt> messages = result.getMsgFoundList();
