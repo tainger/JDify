@@ -24,7 +24,7 @@ import java.util.Map;
 
 public class WSDLUtils {
 
-    private static final String TNS = "http://schemas.xmlsoap.org/wsdl";
+    private static final String TNS = "http://www.tech-trans.com.cn/";
 
     private static final String XSD = "http://www.w3.org/2001/XMLSchema";
 
