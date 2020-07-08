@@ -19,10 +19,15 @@ public class DalaranMapperConverterImpl implements DalaranMapperConverter {
 
     @Override
     public <T> T convert(Object source, DalaranMapperConfig mapperConfig, Class<T> outClass) {
-        DalaranMapperBuilder mapperBuilder = new DalaranMapperBuilder(functionContext);
-        DalaranMappingConfig mappingConfig = mapperBuilder.transfer(mapperConfig.getMessageMapping(), mapperConfig.getInModel(), mapperConfig.getOutModel());
-        Object destination = (mappingConfig == null || CollectionUtils.isEmpty(mappingConfig.getMessageMappings())) ? source : Converter.convert(source, mappingConfig, functionContext).get(MapperConstants.MODEL_ROOT);
+        Object destination = convert(source, mapperConfig);
         ObjectMapper mapper = new ObjectMapper();
         return mapper.convertValue(destination, outClass);
+    }
+
+    @Override
+    public Object convert(Object source, DalaranMapperConfig mapperConfig) {
+        DalaranMapperBuilder mapperBuilder = new DalaranMapperBuilder(functionContext);
+        DalaranMappingConfig mappingConfig = mapperBuilder.transfer(mapperConfig.getMessageMapping(), mapperConfig.getInModel(), mapperConfig.getOutModel());
+        return (mappingConfig == null || CollectionUtils.isEmpty(mappingConfig.getMessageMappings())) ? source : Converter.convert(source, mappingConfig, functionContext).get(MapperConstants.MODEL_ROOT);
     }
 }
