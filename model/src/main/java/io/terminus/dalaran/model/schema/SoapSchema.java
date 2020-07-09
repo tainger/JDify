@@ -31,6 +31,9 @@ public class SoapSchema extends DalaranModelSchema {
     @ModelFieldInfo(label = "所有节点包含命名空间", inputType = FieldInputType.Switch, defaultValue = "false")
     private Boolean allContainsPrefix = false;
 
+    @ModelFieldInfo(label = "移除空节点", inputType = FieldInputType.Switch, defaultValue = "false")
+    private Boolean removeNullColumn = false;
+
     private MessageModel header;
 
     private Map<String, Object> headerValues;

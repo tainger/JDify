@@ -21,6 +21,8 @@ public class SoapSchemaOperation {
 
     private Boolean allContainsPrefix = false;
 
+    private Boolean removeNullColumn = false;
+
     private MessageModel header;
 
     private Map<String, Object> headerValues;
