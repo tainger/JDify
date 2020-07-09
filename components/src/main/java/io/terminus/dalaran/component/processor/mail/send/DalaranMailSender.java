@@ -19,13 +19,14 @@ public class DalaranMailSender implements DalaranProcessor<DalaranMailSenderConf
     @Autowired
     private OSSAccount ossAccount;
 
-    private static final String MAIL_ROUTE_URI = "%s://%s@%s:%s?password=%s&cc=%s&subject=%s";
+    private static final String MAIL_ROUTE_URI = "%s://%s:%s?username=%s&password=%s&cc=%s&subject=%s";
 
     @Override
     public void configure(ProcessorDefinition route, DalaranMailSenderConfig config) {
         MailConnector connector = config.getConnector();
         String uri = String.format(MAIL_ROUTE_URI, connector.getProtocol().name().toLowerCase(),
-                connector.getUsername(), connector.getHost(), connector.getPort(), connector.getPassword(), config.getCcTo(), config.getSubject());
+                connector.getHost(), connector.getPort(), connector.getUsername(), connector.getPassword(),
+                config.getCcTo(), config.getSubject());
         route.process(new DalaranMailSenderProcessor(config, ossAccount));
         if (config.isDynamicAddress()) {
             route.toD(uri + "&to=${headers." + ComponentConstants.DALARAN_MAIL_TO + "}");
