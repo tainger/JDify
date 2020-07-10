@@ -219,9 +219,11 @@ public class SignUtilsTest {
         String data = "9GdXIColbGHM8QKNuE8FQQ==";
 //        String s = AESUtils.encrypt(ssss, "89622015104709087435617163207900");
 
-        String s = AESUtils.encrypt(ssss, "8962201510470905");
+        String in = "{\"data\":{\"totxdate\":\"2020-07-20 10:10:10\",\"identity\":\"CRM\",\"openid\":\"\",\"action\":\"\",\"remark\":\"\",\"userId\":\"99899\",\"frmtxdate\":\"2020-07-01 10:10:10\",\"vipcode\":\"\"}}";
 
-        String ss = AESUtils.decrypt(data, "8962201510470905");
+        String s = AESUtils.encrypt(in, "89622015104709087435617163207900");
+
+        String ss = AESUtils.decrypt("MmL6oNfNkuMlqsDjAmLFZxv6oGyCixIQDePDgkqCjRcTrY0KXb3ZjfHl/8BSzeZrHER2HGHd9pfZ+S6X4UADH2wvNuGfaYBgGHk6h6pHErg=", "89622015104709087435617163207900");
 
         Assert.assertTrue(false);
     }
