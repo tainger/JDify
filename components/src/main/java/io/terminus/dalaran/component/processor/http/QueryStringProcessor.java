@@ -20,6 +20,9 @@ public class QueryStringProcessor implements Processor {
     }
 
     private String buildQueryString(Object obj) throws Exception {
+        if (obj == null) {
+            return null;
+        }
         Map inBody;
         if (obj instanceof byte[]) {
             inBody = JSON.parseObject(IOUtils.toString((byte[]) obj), Map.class);

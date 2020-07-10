@@ -69,6 +69,10 @@ public class DalaranHttpClient implements DalaranProcessor<HttpClientConfig>, Da
             } else {
                 route.process(new HttpClientSignProcessor(config.getApiKey(), config.getApiSecret()));
             }
+        } else {
+            if (config.getMethod().isNoBody()) {
+                route.process(new QueryStringProcessor());
+            }
         }
         route.to(uri);
         // TODO Stream to string
