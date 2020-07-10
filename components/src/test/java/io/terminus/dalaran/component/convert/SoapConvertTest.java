@@ -1,7 +1,9 @@
 package io.terminus.dalaran.component.convert;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import io.terminus.dalaran.function.xml.DuplicateToArrayJsonNodeDeserializer;
 import io.terminus.dalaran.model.soap.jackson.DalaranObjectDeserializer;
 import io.terminus.dalaran.model.soap.jackson.DalaranXMLStreamReader;
 import org.junit.Assert;
@@ -30,7 +32,8 @@ public class SoapConvertTest {
         InputStream is = new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8));
         DalaranXMLStreamReader sr = new DalaranXMLStreamReader(XMLInputFactory.newFactory().createXMLStreamReader(is));
         XmlMapper xmlMapper = new XmlMapper();
-        xmlMapper.registerModule(new SimpleModule().addDeserializer(Object.class, new DalaranObjectDeserializer()));
+        xmlMapper.registerModule(new SimpleModule().addDeserializer(Object.class, new DalaranObjectDeserializer()).addDeserializer(JsonNode.class,
+                new DuplicateToArrayJsonNodeDeserializer()));
         Map map = (Map) xmlMapper.readValue(sr, Object.class);
         Assert.assertNotNull(map);
     }

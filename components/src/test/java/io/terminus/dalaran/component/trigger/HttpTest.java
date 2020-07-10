@@ -1,12 +1,12 @@
 package io.terminus.dalaran.component.trigger;
 
-import com.alibaba.dubbo.common.utils.IOUtils;
-import com.alibaba.dubbo.common.utils.StringUtils;
 import io.terminus.dalaran.component.BasicTriggerTest;
 import io.terminus.dalaran.component.common.HttpMethod;
 import io.terminus.dalaran.component.trigger.rest.RestConfig;
 import io.terminus.dalaran.component.trigger.rest.RestListener;
 import io.terminus.dalaran.model.HttpProtocol;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
