@@ -1,8 +1,10 @@
 package io.terminus.dalaran.model.soap.processor;
 
 import com.alibaba.fastjson.JSON;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import io.terminus.dalaran.function.xml.DuplicateToArrayJsonNodeDeserializer;
 import io.terminus.dalaran.model.FieldType;
 import io.terminus.dalaran.model.ModelField;
 import io.terminus.dalaran.model.soap.jackson.DalaranObjectDeserializer;
@@ -38,11 +40,15 @@ public class SoapToObjectProcessor implements Processor, Traceable {
         exchange.getOut().setHeaders(exchange.getIn().getHeaders());
     }
 
+
     public Object parseSoapBody(String body) throws Exception {
         InputStream is = new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8));
         DalaranXMLStreamReader sr = new DalaranXMLStreamReader(XMLInputFactory.newFactory().createXMLStreamReader(is));
         XmlMapper xmlMapper = new XmlMapper();
-        xmlMapper.registerModule(new SimpleModule().addDeserializer(Object.class, new DalaranObjectDeserializer()));
+        xmlMapper.registerModule(new SimpleModule().
+                addDeserializer(Object.class, new DalaranObjectDeserializer()).
+                addDeserializer(JsonNode.class, new DuplicateToArrayJsonNodeDeserializer()
+        ));
         Object in = xmlMapper.readValue(sr, Object.class);
         Map map;
         if (in instanceof String) {
@@ -53,7 +59,8 @@ public class SoapToObjectProcessor implements Processor, Traceable {
         if (MapUtils.isEmpty(fields) || map.get("Body") == null) {
             return new HashMap<>();
         }
-        return buildBody((Map)map.get("Body"), new HashMap(), fields);
+        return map.get("Body");
+//        return buildBody((Map)map.get("Body"), new HashMap(), fields);
     }
 
     private Object buildBody(Map origin, Map destination,  Map<String, ModelField> fields) {
