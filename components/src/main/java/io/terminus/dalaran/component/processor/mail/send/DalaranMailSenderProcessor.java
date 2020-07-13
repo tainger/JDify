@@ -28,9 +28,9 @@ public class DalaranMailSenderProcessor implements Processor {
         Object in = exchange.getIn().getBody();
         MailSenderInfo senderInfo = JSON.parseObject(JSON.toJSONString(in), MailSenderInfo.class);
         File file = OSSUtils.getFileFromOss(senderInfo.getUploadUrl(), ossAccount);
-        String fileContent = FileUtils.readFileToString(file, "UTF-8");
+        byte[] fileContent = FileUtils.readFileToByteArray(file);
         Message out = exchange.getOut();
-        out.addAttachment(senderInfo.getFileName(), new DataHandler(fileContent,"plain/text"));
+        out.addAttachment(senderInfo.getFileName(), new DataHandler(fileContent,"application/excel"));
         out.setHeader(ComponentConstants.DALARAN_MAIL_TO, senderInfo.getEmailUrl());
     }
 }
