@@ -43,7 +43,7 @@ public class DalaranHttpClient implements DalaranProcessor<HttpClientConfig>, Da
         }
         route.setHeader(HTTP_QUERY).method(this, "buildQueryString");
         // 如果转为 QueryString 后, body 实际上是无用的
-        route.setBody(Builder.constant(null));
+//        route.setBody(Builder.constant(null));
         return false;
     }
 
