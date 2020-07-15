@@ -9,6 +9,7 @@ import org.apache.commons.beanutils.ConvertUtils;
 import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 /**
@@ -184,6 +185,7 @@ public class Converter {
             });
 
             MappingFunction function = messageMapping.getFunction();
+            AtomicBoolean flag = new AtomicBoolean(false);
             if (function != null) {
                 Map<String, FunctionParam> functionParams = function.getSourcePaths();
                 Set<String> paths = functionParams.keySet();
@@ -193,6 +195,9 @@ public class Converter {
                         SourcePath sourcePath = dynamicParams.get(path);
                         PathDetail pathDetail = sourcePath.getDetail();
                         if (pathDetail != null && pathDetail.getPath() != null) {
+                            if (!JSONPath.contains(source, pathDetail.getPath())) {
+                                flag.set(true);
+                            }
                             value = JSONPath.eval(source, pathDetail.getPath());
                         }
                     } else {
@@ -206,10 +211,17 @@ public class Converter {
                     Object value = null;
                     PathDetail pathDetail = v.getDetail();
                     if (pathDetail != null && pathDetail.getPath() != null) {
+                        if (!JSONPath.contains(source, pathDetail.getPath())) {
+                            flag.set(true);
+                        }
                         value = JSONPath.eval(source, pathDetail.getPath());
                     }
                     values.add(value);
                 });
+            }
+
+            if (flag.get()) {
+                continue;
             }
 
             PathDetail pathDetail = destinationPaths.get(indexes);
@@ -269,6 +281,9 @@ public class Converter {
             if (sourceField.getParamType() == ParamType.STATIC) {
                 value = sourceField.getPath();
             } else {
+                if (!JSONPath.contains(source, sourceField.getPath())) {
+                    return;
+                }
                 value = JSONPath.eval(source, sourceField.getPath());
             }
             values.add(value);
