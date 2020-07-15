@@ -9,6 +9,7 @@ import io.terminus.dalaran.core.component.DalaranMessageBodyCustomConverter;
 import io.terminus.dalaran.core.component.DalaranProcessor;
 import io.terminus.dalaran.core.component.annotation.Processor;
 import io.terminus.dalaran.core.context.DalaranModelTypeContext;
+import org.apache.camel.Exchange;
 import org.apache.camel.builder.Builder;
 import org.apache.camel.model.ProcessorDefinition;
 import org.apache.camel.model.RouteDefinition;
@@ -57,6 +58,8 @@ public class DalaranHttpClient implements DalaranProcessor<HttpClientConfig>, Da
             uri = uri + "&authMethod=Basic&authUsername=" + config.getConnector().getUsername() + "&authPassword=" + config.getConnector().getPassword();
         }
         route.setHeader(HTTP_METHOD, Builder.constant(config.getMethod().name()));
+        route.setHeader("Accept-Encoding", Builder.constant("gzip, deflate, br"));
+        route.setHeader(Exchange.CONTENT_ENCODING, Builder.constant("gzip, deflate, br"));
 
         if (!config.getMethod().isNoBody() && StringUtils.isNotBlank(config.getHeaders())) {
             route.process(new QueryHeadersProcessor(config.getHeaders()));
