@@ -72,6 +72,9 @@ public class ObjectToSoapProcessor implements Processor, Traceable {
         soapEnvelope.removeNamespaceDeclaration(soapEnvelope.getPrefix());
         soapEnvelope.setPrefix("soap");
         soapEnvelope.addNamespaceDeclaration(PREFIX, soapOperationConfig.getTargetNamespace());
+        soapEnvelope.addNamespaceDeclaration("xsi", "http://www.w3.org/2001/XMLSchema-instance");
+        soapEnvelope.addNamespaceDeclaration("xsd", "http://www.w3.org/2001/XMLSchema");
+        soapEnvelope.addNamespaceDeclaration("soap", "http://schemas.xmlsoap.org/soap/envelope/");
         SOAPBody soapBody = soapEnvelope.getBody();
         soapBody.setPrefix("soap");
         buildRoot(modelField.getFields(), body, soapBody);
@@ -149,7 +152,7 @@ public class ObjectToSoapProcessor implements Processor, Traceable {
                             element = soapElement.addChildElement(name);
                         }
                         if (bodyContainsXmlns) {
-                            element.addNamespaceDeclaration("", soapOperationConfig.getTargetNamespace());
+//                            element.addNamespaceDeclaration("", soapOperationConfig.getTargetNamespace());
                         }
                         Map<String, ModelField> child = field.getFields();
                         buildBody(child, data, element, bodyContainsXmlns, bodyContainsPrefix);
@@ -157,7 +160,7 @@ public class ObjectToSoapProcessor implements Processor, Traceable {
                 } else {
                     for (Object data: subBody) {
                         SOAPElement element = soapElement.addChildElement(name, PREFIX);
-                        element.addNamespaceDeclaration("", soapOperationConfig.getTargetNamespace());
+//                        element.addNamespaceDeclaration("", soapOperationConfig.getTargetNamespace());
                         element.addTextNode(data.toString());
                     }
                 }
@@ -169,7 +172,7 @@ public class ObjectToSoapProcessor implements Processor, Traceable {
                     element = soapElement.addChildElement(name);
                 }
                 if (bodyContainsXmlns) {
-                    element.addNamespaceDeclaration("", soapOperationConfig.getTargetNamespace());
+//                    element.addNamespaceDeclaration("", soapOperationConfig.getTargetNamespace());
                 }
                 Map<String, ModelField> child = field.getFields();
                 buildBody(child, ob, element, bodyContainsXmlns, bodyContainsPrefix);
