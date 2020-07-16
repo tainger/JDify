@@ -3,6 +3,7 @@ package io.terminus.dalaran.model;
 import lombok.Data;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import static io.terminus.dalaran.DalaranConstants.MODEL_ROOT;
@@ -13,7 +14,7 @@ public class DalaranModelSchema {
 
     private static final Map<String, Class<? extends DalaranModelSchema>> modelSchemaMapping = new HashMap<>();
 
-    private Map<String, ModelField> fields = new HashMap<>();
+    private Map<String, ModelField> fields = new LinkedHashMap<>();
 
     public void setRootField(ModelField rootField) {
         fields.put(MODEL_ROOT, rootField);

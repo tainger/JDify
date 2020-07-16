@@ -1,6 +1,8 @@
 package io.terminus.dalaran.core.resource;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.parser.Feature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.terminus.dalaran.DalaranConstants;
 import io.terminus.dalaran.config.ProcessorInfo;
 import io.terminus.dalaran.config.ServiceInfo;
@@ -127,7 +129,13 @@ public class DefaultDalaranResourceBuilder implements DalaranResourceBuilder {
             model.setModelType(modelType);
             model.setName(modelEntity.getName());
             Class<? extends DalaranModelSchema> schemaType = converterContext.getModelSchema(modelType);
-            DalaranModelSchema modelSchema = buildConfig(modelEntity.getModelSchema(), schemaType);
+            DalaranModelSchema modelSchema = new DalaranModelSchema();
+            ObjectMapper objectMapper = new ObjectMapper();
+            try {
+                modelSchema = objectMapper.readValue(modelEntity.getModelSchema(), schemaType);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             model.setModelSchema(modelSchema);
             return model;
         }
@@ -252,7 +260,7 @@ public class DefaultDalaranResourceBuilder implements DalaranResourceBuilder {
 
     private <T> T buildConfig(String configValue, Class<T> configType) {
         String replacedConfig = replaceProperties(configValue, getProperties());
-        return JSON.parseObject(replacedConfig, configType);
+        return JSON.parseObject(replacedConfig, configType, Feature.OrderedField);
     }
 
     private String replaceProperties(String configValue, Map<String, String> properties) {

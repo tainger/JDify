@@ -2,7 +2,7 @@ package io.terminus.dalaran.model;
 
 import lombok.Data;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -19,7 +19,7 @@ public class ModelField {
 
     private String description;
 
-    Map<String, ModelField> fields = new HashMap<>();
+    Map<String, ModelField> fields = new LinkedHashMap<>();
 
     public void addField(String name, ModelField field) {
         fields.put(name, field);
