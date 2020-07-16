@@ -229,16 +229,19 @@ public class Converter {
             if (function != null) {
                 value = execute(dalaranContext, function, values);
             } else {
-                value = values.get(0);
+                if (CollectionUtils.isEmpty(values)) {
+                    value = null;
+                } else {
+                    value = values.get(0);
+                }
             }
-
             if (pathDetail != null) {
                 FieldType type = pathDetail.getType();
                 value = parse(value, type, entry.getValue(), pathDetail.getPath());
             }
-            if (value == null) {
-                value = "";
-            }
+//            if (value == null) {
+//                value = "";
+//            }
             if (pathDetail != null && pathDetail.getPath() != null) {
                 JSONPath.set(destination, pathDetail.getPath(), value);
             }
@@ -296,7 +299,11 @@ public class Converter {
         if (function != null) {
             value = execute(dalaranContext, function, values);
         } else {
-            value = values.get(0);
+            if (CollectionUtils.isEmpty(values)) {
+                value = null;
+            } else {
+                value = values.get(0);
+            }
         }
         FieldType type = messageMapping.getType();
         value = parse(value, type, sourcePaths, destinationPath);
