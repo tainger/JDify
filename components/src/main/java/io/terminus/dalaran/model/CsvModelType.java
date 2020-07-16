@@ -87,10 +87,14 @@ public class CsvModelType implements DalaranModelType<String, CsvModelSchema> {
                     if (i < columnArray.length - 1) {
                         stringBuilder.append(schema.getDataDelimiter());
                     }
+                    if (i == columnArray.length - 1 && schema.isRemainEOF()) {
+                        stringBuilder.append(schema.getDataDelimiter());
+                    }
                 }
                 stringBuilder.append("\n");
             }
             stringBuilder.deleteCharAt(stringBuilder.length()-1);
+
         } else {
             stringBuilder.append(body.toString());
         }

@@ -21,4 +21,7 @@ public class CsvModelSchema extends DalaranModelSchema {
 
     @ModelFieldInfo(label = "模型类型", inputType = FieldInputType.Select, defaultValue = "COMMON")
     private CSVModelType type = CSVModelType.COMMON;
+
+    @ModelFieldInfo(label = "保留行结束符", inputType = FieldInputType.Switch, required = false, defaultValue = "false")
+    private boolean remainEOF = false;
 }
