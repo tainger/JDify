@@ -40,7 +40,7 @@ public class SoapModelType implements DalaranModelType<String, SoapSchema> {
         if (schema != null) {
             fields = schema.getFields().get(DalaranConstants.MODEL_ROOT).getFields();
         }
-        SoapToObjectProcessor processor = new SoapToObjectProcessor(fields);
+        SoapToObjectProcessor processor = new SoapToObjectProcessor(schema);
         route.process(processor);
     }
 

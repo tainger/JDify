@@ -34,6 +34,9 @@ public class SoapSchema extends DalaranModelSchema {
     @ModelFieldInfo(label = "移除空节点", inputType = FieldInputType.Switch, defaultValue = "false")
     private Boolean removeNullColumn = false;
 
+    @ModelFieldInfo(label = "利用模型结构构建json数据", inputType = FieldInputType.Switch, defaultValue = "false")
+    private Boolean buildBodyByField = false;
+
     private MessageModel header;
 
     private Map<String, Object> headerValues;

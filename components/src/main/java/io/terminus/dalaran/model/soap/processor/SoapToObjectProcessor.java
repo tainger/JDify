@@ -4,9 +4,11 @@ import com.alibaba.fastjson.JSON;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import io.terminus.dalaran.DalaranConstants;
 import io.terminus.dalaran.function.xml.DuplicateToArrayJsonNodeDeserializer;
 import io.terminus.dalaran.model.FieldType;
 import io.terminus.dalaran.model.ModelField;
+import io.terminus.dalaran.model.schema.SoapSchema;
 import io.terminus.dalaran.model.soap.jackson.DalaranObjectDeserializer;
 import io.terminus.dalaran.model.soap.jackson.DalaranXMLStreamReader;
 import org.apache.camel.Exchange;
@@ -26,10 +28,15 @@ import java.util.*;
  */
 public class SoapToObjectProcessor implements Processor, Traceable {
 
-    private final Map<String, ModelField> fields;
+    private Map<String, ModelField> fields = new LinkedHashMap<>();
 
-    public SoapToObjectProcessor(Map<String, ModelField> fields) {
-        this.fields = fields;
+    private SoapSchema soapSchema;
+
+    public SoapToObjectProcessor(SoapSchema schema) {
+        if (schema != null) {
+            this.fields = schema.getFields().get(DalaranConstants.MODEL_ROOT).getFields();
+        }
+        this.soapSchema = schema;
     }
 
     @Override
@@ -59,8 +66,10 @@ public class SoapToObjectProcessor implements Processor, Traceable {
         if (MapUtils.isEmpty(fields) || map.get("Body") == null) {
             return new HashMap<>();
         }
+        if (soapSchema.getBuildBodyByField()) {
+            return buildBody((Map)map.get("Body"), new HashMap(), fields);
+        }
         return map.get("Body");
-//        return buildBody((Map)map.get("Body"), new HashMap(), fields);
     }
 
     private Object buildBody(Map origin, Map destination,  Map<String, ModelField> fields) {

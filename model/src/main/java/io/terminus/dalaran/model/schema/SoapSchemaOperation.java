@@ -23,6 +23,8 @@ public class SoapSchemaOperation {
 
     private Boolean removeNullColumn = false;
 
+    private Boolean buildBodyByField = false;
+
     private MessageModel header;
 
     private Map<String, Object> headerValues;
