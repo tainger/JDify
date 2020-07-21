@@ -14,6 +14,7 @@ import io.terminus.dalaran.model.soap.jackson.DalaranXMLStreamReader;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.Traceable;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -102,7 +103,9 @@ public class SoapToObjectProcessor implements Processor, Traceable {
                             buildBody((Map) currentOrigin.get(i), (Map)currentDestination.get(i), field.getFields());
                         }
                     } else {
-                        buildBody((Map)data, (Map)currentDestination.get(0), field.getFields());
+                        if (CollectionUtils.isNotEmpty(currentDestination)) {
+                            buildBody((Map)data, (Map)currentDestination.get(0), field.getFields());
+                        }
                     }
                 }
             } else {

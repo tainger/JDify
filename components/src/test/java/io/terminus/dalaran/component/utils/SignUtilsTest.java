@@ -215,6 +215,10 @@ public class SignUtilsTest {
     public void aes() {
         String ssss = "yins";
 
+        String da = "ou4egjd72bel1I9M0925k3R1wfqVVwzFcU5gsMOUQvzeNMBRLdDoZMlLFkNgJPzEc6PdMSBk6as9DFNc5vmmMOU6MAdGBTD64T3tCSxxyuo=";
+
+        String d = "eyJkYXRhIjp7ImVycmNvZGUiOiIxIiwiZXJybXNnIjoi5oKo5bey57uP5rOo5YaM6L+HIn19";
+
         String dd = "qo/4D91HL1q7jvASzpJxCg==";
         String data = "9GdXIColbGHM8QKNuE8FQQ==";
 //        String s = AESUtils.encrypt(ssss, "89622015104709087435617163207900");
@@ -223,7 +227,8 @@ public class SignUtilsTest {
 
         String s = AESUtils.encrypt("001", "89622015104709087435617163207900");
 
-        String ss = AESUtils.decrypt("8EEV+kAAzyICTvI/u/UmBw==", "8962201510470905");
+        String ss = AESUtils.decrypt(d, "89622015104709087435617163207900");
+
 
         Assert.assertTrue(false);
     }

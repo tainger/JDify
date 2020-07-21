@@ -130,6 +130,9 @@ public class Converter {
         Map<String, PathDetail> paths = new HashMap<>();
         SimpleMappingField field = mapping.getDestinationField();
         if (destinationRoot.getType() == FieldType.ARRAY) {
+            if (CollectionUtils.isEmpty(arrayFieldSize)) {
+                return paths;
+            }
             Integer size = arrayFieldSize.get(level);
             level++;
             for (int i = 0; i < size; i++) {
@@ -223,7 +226,11 @@ public class Converter {
             if (function != null) {
                 value = execute(dalaranContext, function, values, contextValues);
             } else {
-                value = values.get(0);
+                if (!CollectionUtils.isEmpty(values)) {
+                    value = values.get(0);
+                } else {
+                    value = null;
+                }
             }
 
             if (pathDetail != null) {
@@ -287,7 +294,11 @@ public class Converter {
         if (function != null) {
             value = execute(dalaranContext, function, values, contextValues);
         } else {
-            value = values.get(0);
+            if (!CollectionUtils.isEmpty(values)) {
+                value = values.get(0);
+            } else {
+                value = null;
+            }
         }
         FieldType type = messageMapping.getType();
         value = parse(value, type, sourcePaths, destinationPath);

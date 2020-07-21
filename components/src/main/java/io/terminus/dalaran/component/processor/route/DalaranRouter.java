@@ -13,7 +13,7 @@ import org.apache.camel.model.ChoiceDefinition;
 import org.apache.camel.model.ProcessorDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -56,7 +56,7 @@ public class DalaranRouter implements DalaranProcessor<Map<String, String>>, Dal
     @Override
     public Map<String, String> convert(DalaranRouterConfig config, ComponentModel component, BasicFlow flow) {
         List<DalaranRouterConfig.Route> routes = config.getRoutes();
-        Map<String, String> routeMapper = new HashMap<>();
+        Map<String, String> routeMapper = new LinkedHashMap<>();
 
         for (int i = 0; i < routes.size(); i++) {
             val route = routes.get(i);
