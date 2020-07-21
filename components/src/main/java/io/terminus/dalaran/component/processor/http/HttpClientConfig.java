@@ -27,6 +27,9 @@ public class HttpClientConfig extends OutModelConfig implements ConnectorConfig<
     @ConfigFieldInfo(label = "路径", inputType = FieldInputType.String, defaultValue = "/")
     private String path;
 
-    @ConfigFieldInfo(label = "Headers", inputType = FieldInputType.String, defaultValue = "", required = false)
+    @ConfigFieldInfo(label = "Headers", inputType = FieldInputType.String, required = false)
     private String headers;
+
+    @ConfigFieldInfo(label = "Query Param", inputType = FieldInputType.String, required = false)
+    private String queryParams;
 }

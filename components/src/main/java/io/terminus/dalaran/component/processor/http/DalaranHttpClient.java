@@ -64,6 +64,9 @@ public class DalaranHttpClient implements DalaranProcessor<HttpClientConfig>, Da
         if (!config.getMethod().isNoBody() && StringUtils.isNotBlank(config.getHeaders())) {
             route.process(new QueryHeadersProcessor(config.getHeaders()));
         }
+        if (!config.getMethod().isNoBody() && StringUtils.isNotBlank(config.getQueryParams())) {
+            route.process(new QueryParamProcessor(config.getQueryParams()));
+        }
         if (config.getMethod().isNoBody()) {
             route.process(new QueryStringProcessor());
         }
