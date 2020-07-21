@@ -1,9 +1,10 @@
 package io.terminus.dalaran.mapper.service;
 
+import com.alibaba.fastjson.JSON;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.terminus.dalaran.mapper.context.DalaranFunctionContext;
 import io.terminus.dalaran.mapper.handler.Converter;
 import io.terminus.dalaran.mapper.handler.DalaranMapperBuilder;
-import io.terminus.dalaran.mapper.context.DalaranFunctionContext;
 import io.terminus.dalaran.mapper.model.DalaranMapperConfig;
 import io.terminus.dalaran.mapper.model.DalaranMappingConfig;
 import io.terminus.dalaran.mapper.model.MapperConstants;
@@ -28,6 +29,7 @@ public class DalaranMapperConverterImpl implements DalaranMapperConverter {
     public Object convert(Object source, DalaranMapperConfig mapperConfig) {
         DalaranMapperBuilder mapperBuilder = new DalaranMapperBuilder(functionContext);
         DalaranMappingConfig mappingConfig = mapperBuilder.transfer(mapperConfig.getMessageMapping(), mapperConfig.getInModel(), mapperConfig.getOutModel());
-        return (mappingConfig == null || CollectionUtils.isEmpty(mappingConfig.getMessageMappings())) ? source : Converter.convert(source, mappingConfig, functionContext).get(MapperConstants.MODEL_ROOT);
+        Object out = (mappingConfig == null || CollectionUtils.isEmpty(mappingConfig.getMessageMappings())) ? source : Converter.convert(source, mappingConfig, functionContext).get(MapperConstants.MODEL_ROOT);
+        return JSON.parseObject(JSON.toJSONString(out));
     }
 }
