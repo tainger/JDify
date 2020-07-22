@@ -12,6 +12,8 @@ import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Map;
+
 @Service
 public class DalaranMapperConverterImpl implements DalaranMapperConverter {
 
@@ -30,6 +32,6 @@ public class DalaranMapperConverterImpl implements DalaranMapperConverter {
         DalaranMapperBuilder mapperBuilder = new DalaranMapperBuilder(functionContext);
         DalaranMappingConfig mappingConfig = mapperBuilder.transfer(mapperConfig.getMessageMapping(), mapperConfig.getInModel(), mapperConfig.getOutModel());
         Object out = (mappingConfig == null || CollectionUtils.isEmpty(mappingConfig.getMessageMappings())) ? source : Converter.convert(source, mappingConfig, functionContext).get(MapperConstants.MODEL_ROOT);
-        return JSON.parseObject(JSON.toJSONString(out));
+        return JSON.parseObject(JSON.toJSONString(out), Map.class);
     }
 }
