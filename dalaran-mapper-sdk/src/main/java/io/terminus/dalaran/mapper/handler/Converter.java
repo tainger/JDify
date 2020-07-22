@@ -279,12 +279,14 @@ public class Converter {
         List<SourcePath> sourcePaths = new ArrayList<>();
 //        Map<String, Object> contextValues = (Map<String, Object>)exchange.getProperties().get(DALARAN_CONTEXT_EXCHANGE + exchange.getExchangeId());
 
+        AtomicBoolean flag = new AtomicBoolean(false);
         sourceFields.forEach(sourceField -> {
             Object value;
             if (sourceField.getParamType() == ParamType.STATIC) {
                 value = sourceField.getPath();
             } else {
                 if (!JSONPath.contains(source, sourceField.getPath())) {
+                    flag.set(true);
                     return;
                 }
                 value = JSONPath.eval(source, sourceField.getPath());
@@ -292,6 +294,10 @@ public class Converter {
             values.add(value);
             sourcePaths.add(new SourcePath(sourceField.getPath(), null));
         });
+
+        if (flag.get()) {
+            return;
+        }
 
         String destinationPath = messageMapping.getPath();
         MappingFunction function = messageMapping.getFunction();
