@@ -35,9 +35,7 @@ public class FTPUpLoadPreProcessor implements Processor {
                 throw new RuntimeException("body: " + body + ", no file name");
             }
             fileName = JSONPath.eval(body, config.getDynamicPath()).toString();
-            exchange.getOut().setHeaders(exchange.getIn().getHeaders());
-            exchange.getOut().setHeader("CamelOverruleFileName", fileName);
-            exchange.getOut().setBody(exchange.getIn().getBody());
+
         } else {
             fileName = config.getFileRoot();
             if (StringUtils.isNotBlank(config.getDatePattern())) {
@@ -47,10 +45,9 @@ public class FTPUpLoadPreProcessor implements Processor {
             if (StringUtils.isNotBlank(config.getFileSuffix())) {
                 fileName += "." + config.getFileSuffix();
             }
-            exchange.getOut().setHeaders(exchange.getIn().getHeaders());
-            exchange.getOut().setHeader("CamelOverruleFileName", fileName);
-            exchange.getOut().setBody(exchange.getIn().getBody());
         }
-
+        exchange.getOut().setHeaders(exchange.getIn().getHeaders());
+        exchange.getOut().setHeader("CamelOverruleFileName", fileName);
+        exchange.getOut().setBody(exchange.getIn().getBody());
     }
 }
