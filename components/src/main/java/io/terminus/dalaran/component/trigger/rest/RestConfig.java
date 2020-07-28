@@ -20,7 +20,7 @@ public class RestConfig extends AllModelConfig {
     @ConfigFieldInfo(label = "协议", inputType = FieldInputType.Radio, defaultValue = "HTTP")
     private HttpProtocol protocol;
 
-    @ConfigFieldInfo(label = "方法", inputType = FieldInputType.Select, defaultValue = "GET")
+    @ConfigFieldInfo(label = "方法", inputType = FieldInputType.Select, defaultValue = "POST")
     private HttpMethod method;
 
     @ConfigFieldInfo(label = "路径", inputType = FieldInputType.String, defaultValue = "/")
