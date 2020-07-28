@@ -88,6 +88,7 @@ public class CustomFtpDownloadProcessor implements Processor {
         }
         SSHClient sshClient = new SSHClient();
         sshClient.addHostKeyVerifier(new PromiscuousVerifier());
+        sshClient.setConnectTimeout(30000);
         sshClient.connect(downloadConfig.getConnector().getHost());
         sshClient.authPassword(downloadConfig.getConnector().getUsername(), downloadConfig.getConnector().getPassword());
         this.sftpClient = sshClient.newSFTPClient();

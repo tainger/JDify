@@ -37,6 +37,7 @@ public class CustomFtpDownload implements DalaranProcessor<CustomFtpDownloadConf
             if (config.getConnector().getProtocol() == FtpProtocol.SFTP) {
                 SSHClient sshClient = new SSHClient();
                 sshClient.addHostKeyVerifier(new PromiscuousVerifier());
+                sshClient.setConnectTimeout(30000);
                 sshClient.connect(config.getConnector().getHost());
                 sshClient.authPassword(config.getConnector().getUsername(), config.getConnector().getPassword());
                 this.sftpClient = sshClient.newSFTPClient();
