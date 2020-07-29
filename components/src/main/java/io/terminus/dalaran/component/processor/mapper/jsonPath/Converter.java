@@ -92,7 +92,12 @@ public class Converter {
             }
             SimpleMappingField childField = field.getChild();
             if (field.getType() == FieldType.ARRAY) {
-                List<Object> child = (List) body;
+                List<Object> child = new LinkedList<>();
+                if (!(body instanceof List)) {
+                    child.add(body);
+                } else {
+                    child = (List) body;
+                }
                 int bodySize = child.size();
                 Integer level = lastArrayLevel + 1;
                 arrayFieldSize.add(bodySize);

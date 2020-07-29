@@ -227,7 +227,7 @@ public class SignUtilsTest {
 
         String s = AESUtils.encrypt("001", "89622015104709087435617163207900");
 
-        String ss = AESUtils.decrypt("9lSbfM7InsPS+m34xTR8kA==", "8962201510470905");
+        String ss = AESUtils.decrypt("XP5WjkA+26FrMsAW/fVW7HnzOkZTbgfpVwQVrFWC3wg=", "8962201510470905");
 
 
         Assert.assertTrue(false);
