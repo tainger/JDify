@@ -1,6 +1,7 @@
 package io.terminus.dalaran.component.processor.mapper.jsonPath;
 
 import com.alibaba.fastjson.JSONPath;
+import com.google.common.collect.Lists;
 import io.terminus.dalaran.component.common.exception.FieldParseException;
 import io.terminus.dalaran.component.common.exception.MapperFunctionExecuteException;
 import io.terminus.dalaran.component.processor.mapper.model.*;
@@ -95,6 +96,8 @@ public class Converter {
                 List<Object> child = new LinkedList<>();
                 if (!(body instanceof List)) {
                     child.add(body);
+                    List newBody = Lists.newArrayList(body);
+                    JSONPath.set(source, name, newBody);
                 } else {
                     child = (List) body;
                 }
