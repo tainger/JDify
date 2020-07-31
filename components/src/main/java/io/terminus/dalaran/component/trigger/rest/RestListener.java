@@ -118,6 +118,8 @@ public class RestListener implements DalaranTrigger<RestConfig>, DalaranTriggerA
         } finally {
             try {
                 dalaranPublicStream.close();
+                dalaranPrivateStream.close();
+                partnerPublicStream.close();
                 client.shutdown();
             } catch (Exception e) {
                 e.printStackTrace();
