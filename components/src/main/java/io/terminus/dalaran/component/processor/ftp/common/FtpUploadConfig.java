@@ -22,7 +22,7 @@ public class FtpUploadConfig implements ConnectorConfig<FtpConnector> {
     @ConfigFieldInfo(label = "动态文件名", inputType = FieldInputType.Switch, defaultValue = "false")
     private boolean dynamicFileName = false;
 
-    @ConfigFieldInfo(label = "动态路径", inputType = FieldInputType.String, defaultValue = "fileName", required = false)
+    @ConfigFieldInfo(label = "动态路径", inputType = FieldInputType.String, defaultValue = "", required = false)
     private String dynamicPath;
 
     @ConfigFieldInfo(label = "路径", inputType = FieldInputType.String, defaultValue = "/", required = false)

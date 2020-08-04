@@ -1,5 +1,7 @@
 package io.terminus.dalaran.component.processor.ftp.download;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONPath;
 import lombok.extern.slf4j.Slf4j;
 import net.schmizz.sshj.SSHClient;
 import net.schmizz.sshj.sftp.SFTPClient;
@@ -7,6 +9,7 @@ import net.schmizz.sshj.transport.verification.PromiscuousVerifier;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.BufferedReader;
@@ -37,14 +40,31 @@ public class CustomFtpDownloadProcessor implements Processor {
             log.warn("sftpClient is null! Please check custom ftp download config");
             return;
         }
-        String fileName = downloadConfig.getFileName();
-        if (StringUtils.isNotBlank(downloadConfig.getDatePattern())) {
-            fileName += downloadConfig.getDateConnector().getValue() + new SimpleDateFormat(downloadConfig.getDatePattern()).format(new Date());
-        }
-        if (StringUtils.isNotBlank(downloadConfig.getFileSuffix())) {
-            fileName += downloadConfig.getFileSuffix();
-        }
 
+        String fileName;
+        if (downloadConfig.isDynamicFileName()) {
+            Object in = exchange.getIn().getBody();
+            JSON body;
+            if (in instanceof String) {
+                body = JSON.parseObject((String)in, JSON.class);
+            } else if (in instanceof byte[]) {
+                body = JSON.parseObject(IOUtils.toString((byte[])in), JSON.class);
+            } else {
+                body = JSON.parseObject(JSON.toJSONString(in), JSON.class);
+            }
+            if (!JSONPath.contains(body, downloadConfig.getDynamicPath())) {
+                throw new RuntimeException("body: " + body + ", no file name");
+            }
+            fileName = JSONPath.eval(body, downloadConfig.getDynamicPath()).toString();
+        } else {
+            fileName = downloadConfig.getFileName();
+            if (StringUtils.isNotBlank(downloadConfig.getDatePattern())) {
+                fileName += downloadConfig.getDateConnector().getValue() + new SimpleDateFormat(downloadConfig.getDatePattern()).format(new Date());
+            }
+            if (StringUtils.isNotBlank(downloadConfig.getFileSuffix())) {
+                fileName += downloadConfig.getFileSuffix();
+            }
+        }
         String remotePath = downloadConfig.getPath() + "/" + fileName;
         String localPath = "/var/tmp/" + fileName;
         try {
