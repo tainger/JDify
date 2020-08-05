@@ -30,7 +30,7 @@ public class CustomFtpDownloadConfig extends OutModelConfig implements Connector
     @ConfigFieldInfo(label = "动态路径", inputType = FieldInputType.String, defaultValue = "", required = false)
     private String dynamicPath;
 
-    @ConfigFieldInfo(label = "文件名前缀", inputType = FieldInputType.String)
+    @ConfigFieldInfo(label = "文件名前缀", inputType = FieldInputType.String, required = false)
     private String fileName;
 
     @ConfigFieldInfo(label = "前缀日期分隔符", inputType = FieldInputType.Select, required = false)
