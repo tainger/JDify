@@ -9,6 +9,8 @@ import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.Traceable;
 import org.apache.commons.collections.MapUtils;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.xml.serialize.OutputFormat;
 import org.apache.xml.serialize.XMLSerializer;
 import org.slf4j.Logger;
@@ -107,6 +109,12 @@ public class ObjectToSoapProcessor implements Processor, Traceable {
                 continue;
             }
             Object ob = ((Map) body).get(entry.getKey());
+
+            if (ob == null || StringUtils.isBlank(ob.toString()) || StringUtils.equalsIgnoreCase(ob.toString(), "{}")) {
+                if (soapOperationConfig.getRemoveNullColumn()) {
+                    continue;
+                }
+            }
             SOAPElement element = soapElement.addChildElement(entry.getKey(), PREFIX);
             if (soapOperationConfig.getBodyContainsXmlns()) {
                 element.addNamespaceDeclaration("", soapOperationConfig.getTargetNamespace());
@@ -129,7 +137,7 @@ public class ObjectToSoapProcessor implements Processor, Traceable {
             FieldType type = field.getType();
             Object ob = ((Map) body).get(name);
 
-            if (ob == null) {
+            if (ob == null || StringUtils.isBlank(ob.toString()) || StringUtils.equalsIgnoreCase(ob.toString(), "{}")) {
                 if (soapOperationConfig.getRemoveNullColumn()) {
                     continue;
                 }
@@ -142,6 +150,9 @@ public class ObjectToSoapProcessor implements Processor, Traceable {
             }
             if (type == FieldType.ARRAY) {
                 List subBody = (List) ob;
+                if (CollectionUtils.isEmpty(subBody) && soapOperationConfig.getRemoveNullColumn()) {
+                    continue;
+                }
                 FieldType subType = field.getSubType();
                 if (subType == FieldType.OBJECT) {
                     for (Object data: subBody) {
