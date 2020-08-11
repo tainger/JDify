@@ -26,11 +26,16 @@ public class DalaranMailSenderProcessor implements Processor {
     @Override
     public void process(Exchange exchange) throws Exception {
         Object in = exchange.getIn().getBody();
-        MailSenderInfo senderInfo = JSON.parseObject(JSON.toJSONString(in), MailSenderInfo.class);
-        File file = OSSUtils.getFileFromOss(senderInfo.getUploadUrl(), ossAccount);
-        byte[] fileContent = FileUtils.readFileToByteArray(file);
-        Message out = exchange.getOut();
-        out.addAttachment(senderInfo.getFileName(), new DataHandler(fileContent,"application/excel"));
-        out.setHeader(ComponentConstants.DALARAN_MAIL_TO, senderInfo.getEmailUrl());
+        if (config.isDynamicAddress()) {
+            MailSenderInfo senderInfo = JSON.parseObject(JSON.toJSONString(in), MailSenderInfo.class);
+            File file = OSSUtils.getFileFromOss(senderInfo.getUploadUrl(), ossAccount);
+            byte[] fileContent = FileUtils.readFileToByteArray(file);
+            Message out = exchange.getOut();
+            out.addAttachment(senderInfo.getFileName(), new DataHandler(fileContent,"application/excel"));
+            out.setHeader(ComponentConstants.DALARAN_MAIL_TO, senderInfo.getEmailUrl());
+        } else {
+            Message out = exchange.getOut();
+            out.addAttachment("DalaranFile", new DataHandler(JSON.toJSONString(in),"application/excel"));
+            out.setHeader(ComponentConstants.DALARAN_MAIL_TO, config.getSendTo());        }
     }
 }

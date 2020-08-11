@@ -114,6 +114,13 @@ public class DalaranTracer {
         }
     }
 
+    private String checkLogSize(String body) {
+        if (body != null && body.length() > 2796202) {
+            return "large record.";
+        }
+        return body;
+    }
+
     private String extractBody(Object body) {
         if (body == null) {
             return null;
@@ -195,7 +202,7 @@ public class DalaranTracer {
             tracingLog.setModuleId(exchange.getProperty(TRACING_MODULE_ID, Long.class));
             tracingLog.setProcessorId(processorId);
             tracingLog.setTimestamp(System.currentTimeMillis());
-            tracingLog.setInputBody(extractBody(exchange.getIn().getBody()));
+            tracingLog.setInputBody(checkLogSize(extractBody(exchange.getIn().getBody())));
             tracingLog.setInputBodyType(bodyModelType);
         }
 
@@ -242,7 +249,7 @@ public class DalaranTracer {
             }
             exchange.removeProperty(propertyKey);
             tracingLog.setSuccessful(true);
-            tracingLog.setOutputBody(extractBody(exchange.getIn().getBody()));
+            tracingLog.setOutputBody(checkLogSize(extractBody(exchange.getIn().getBody())));
             tracingLog.setOutputBodyType(bodyModelType);
             tracingLog.setElapsed(System.currentTimeMillis() - tracingLog.getTimestamp());
             logger.log(tracingLog);

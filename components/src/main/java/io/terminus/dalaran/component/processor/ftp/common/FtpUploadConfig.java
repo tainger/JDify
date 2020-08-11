@@ -3,6 +3,7 @@ package io.terminus.dalaran.component.processor.ftp.common;
 import io.terminus.dalaran.FieldInputType;
 import io.terminus.dalaran.component.connector.FtpConnector;
 import io.terminus.dalaran.component.processor.ftp.FileExist;
+import io.terminus.dalaran.component.processor.ftp.FtpInputType;
 import io.terminus.dalaran.core.component.annotation.ConfigFieldInfo;
 import io.terminus.dalaran.core.component.config.ConnectorConfig;
 import lombok.Data;
@@ -21,6 +22,9 @@ public class FtpUploadConfig implements ConnectorConfig<FtpConnector> {
 
     @ConfigFieldInfo(label = "动态文件名", inputType = FieldInputType.Switch, defaultValue = "false")
     private boolean dynamicFileName = false;
+
+    @ConfigFieldInfo(label = "入参类型", inputType = FieldInputType.Radio, defaultValue = "OBJECT")
+    private FtpInputType inputType = FtpInputType.OBJECT;
 
     @ConfigFieldInfo(label = "动态路径", inputType = FieldInputType.String, defaultValue = "", required = false)
     private String dynamicPath;
