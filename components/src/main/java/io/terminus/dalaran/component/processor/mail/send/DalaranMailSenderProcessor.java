@@ -35,7 +35,8 @@ public class DalaranMailSenderProcessor implements Processor {
             out.setHeader(ComponentConstants.DALARAN_MAIL_TO, senderInfo.getEmailUrl());
         } else {
             Message out = exchange.getOut();
-            out.addAttachment("DalaranFile", new DataHandler(JSON.toJSONString(in),"application/excel"));
-            out.setHeader(ComponentConstants.DALARAN_MAIL_TO, config.getSendTo());        }
+            out.addAttachment("DalaranFile", new DataHandler(JSON.toJSONString(in),"text/plain"));
+            out.setHeader(ComponentConstants.DALARAN_MAIL_TO, config.getSendTo());
+        }
     }
 }

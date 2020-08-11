@@ -24,4 +24,7 @@ public class MailConnector {
 
     @ConfigFieldInfo(label = "密码", inputType = FieldInputType.Password)
     private String password;
+
+    @ConfigFieldInfo(label = "发件人", inputType = FieldInputType.String)
+    private String from;
 }
