@@ -1,45 +1,100 @@
 package io.terminus.dalaran.component.processor.http.brotli;
 
+import com.alibaba.fastjson.JSON;
+import com.google.common.base.Joiner;
+import com.google.common.base.Predicate;
+import com.google.common.collect.Maps;
+import io.terminus.dalaran.component.common.HttpMethod;
 import io.terminus.dalaran.component.processor.http.HttpClientConfig;
 import lombok.extern.slf4j.Slf4j;
+import okhttp3.*;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 
 @Slf4j
 public class BrotliHttpProcessor implements Processor {
 
     private HttpClientConfig config;
 
-    public BrotliHttpProcessor(HttpClientConfig config) {
+    private OkHttpClient client;
+
+    public BrotliHttpProcessor(HttpClientConfig config, OkHttpClient client) {
         this.config = config;
+        this.client = client;
     }
 
     @Override
     public void process(Exchange exchange) throws Exception {
-        String url = "http://" + config.getConnector().getHost() + config.getPath();
+        String url = config.getConnector().getProtocol().name().toLowerCase() + "://" + config.getConnector().getHost() + config.getPath();
         log.info("url: " + url);
-        HttpClient httpClient = HttpClientBuilder.create().build();
-        HttpUriRequest httpUriRequest = new HttpGet(url);
-        try {
-            HttpResponse response = httpClient.execute(httpUriRequest);
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
-            StringBuilder result = new StringBuilder();
-            String line = "";
-            while ((line = bufferedReader.readLine()) != null) {
-                result.append(line);
-            }
-            log.info("result: " + result);
-            exchange.getOut().setBody(result.toString());
-        } catch (Exception e) {
-            e.printStackTrace();
+        Request request;
+        HttpUrl.Builder httpBuilder = HttpUrl.parse(url).newBuilder();
+
+        Headers headers = Headers.of();
+        if (StringUtils.isNotBlank(config.getHeaders())) {
+            headers = Headers.of(buildValues(exchange, config.getHeaders()));
         }
+
+        if (config.getMethod() == HttpMethod.GET) {
+            Map<String, String> params = buildQueryString(exchange.getIn().getBody());
+            params.forEach(httpBuilder::addQueryParameter);
+            request = new Request.Builder().url(httpBuilder.build()).headers(headers).build();
+        } else {
+            if (StringUtils.isNotBlank(config.getQueryParams())) {
+                url += url + Joiner.on("&").withKeyValueSeparator("=").join(buildValues(exchange, config.getQueryParams()));
+            }
+            RequestBody body = RequestBody.create(MediaType.parse("application/json"), buildRequestBody(exchange.getIn().getBody()));
+            request = new Request.Builder().url(url).headers(headers).post(body).build();
+        }
+        Response response = client.newCall(request).execute();
+        String responseBody = Objects.requireNonNull(response.body()).string();
+        log.info("response: " + responseBody);
+        exchange.getOut().setBody(JSON.parse(responseBody));
+    }
+
+    private Map<String, String> buildQueryString(Object obj) throws Exception {
+        if (obj == null) {
+            return null;
+        }
+        Map inBody;
+        if (obj instanceof byte[]) {
+            inBody = JSON.parseObject(IOUtils.toString((byte[]) obj), Map.class);
+        } else if (obj instanceof String) {
+            inBody = JSON.parseObject((String)obj, Map.class);
+        } else {
+            inBody = JSON.parseObject(JSON.toJSONString(obj), Map.class);
+        }
+        return Maps.filterEntries(inBody, (Predicate<Map.Entry>) entry -> entry.getValue() != null && entry.getKey() != null);
+//        return Joiner.on("&").withKeyValueSeparator("=").join(queryKV);
+    }
+
+    private String buildRequestBody(Object body) throws Exception {
+        if (body == null) {
+            return null;
+        }
+        if (body instanceof byte[]) {
+            return IOUtils.toString((byte[])body);
+        } else if (body instanceof String) {
+            return (String)body;
+        } else {
+            return JSON.toJSONString(body);
+        }
+    }
+
+    private Map<String, String> buildValues(Exchange exchange, String params) {
+        String contextKey = "DalaranContextExchange" + exchange.getExchangeId();
+        Map<String, Object> contextValues = (Map)exchange.getProperties().get(contextKey);
+        Map<String, String> values = new HashMap<>();
+        String[] headerNames = StringUtils.split(StringUtils.replaceChars(params, " ", ""), ",");
+        for (String name: headerNames) {
+            values.put(name, (String)contextValues.get(name));
+        }
+        return values;
     }
 }
