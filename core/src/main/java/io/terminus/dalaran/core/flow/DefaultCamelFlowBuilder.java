@@ -82,7 +82,17 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
                 bodyType = flow.getInModel().getModelType();
             }
         }
+
+        /**
+         * todo 限流器 熔断器配置初始化
+         */
+
         buildFlowRoute(route, flow, TracingType.Flow, bodyType);
+
+        /**
+         * todo 限流器 熔断器异常返回处理
+         */
+
         if (triggerComponent instanceof DalaranTriggerBuildAfterProcessor) {
             ((DalaranTriggerBuildAfterProcessor) triggerComponent).buildAfter(route, triggerConfig);
         }
