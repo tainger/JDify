@@ -152,6 +152,9 @@ public class DalaranMessageMapper implements DalaranProcessor<DalaranMapperConfi
                     temKey = "";
                 }
                 Map<String, FunctionParam> functionParams = function.getParams();
+                if (MapUtils.isEmpty(functionParams)) {
+                    return sourcePaths;
+                }
                 for (String param : params) {
                     FunctionParam functionParam = functionParams.get(temKey + param);
                     if (functionParam == null) {

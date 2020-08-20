@@ -1,6 +1,7 @@
 package io.terminus.dalaran.component.processor.mapper.jsonPath;
 
 import com.alibaba.fastjson.JSONPath;
+import com.google.common.collect.Lists;
 import io.terminus.dalaran.component.common.exception.FieldParseException;
 import io.terminus.dalaran.component.common.exception.MapperFunctionExecuteException;
 import io.terminus.dalaran.component.processor.mapper.model.*;
@@ -92,7 +93,14 @@ public class Converter {
             }
             SimpleMappingField childField = field.getChild();
             if (field.getType() == FieldType.ARRAY) {
-                List<Object> child = (List) body;
+                List<Object> child = new LinkedList<>();
+                if (!(body instanceof List)) {
+                    child.add(body);
+                    List newBody = Lists.newArrayList(body);
+                    JSONPath.set(source, name, newBody);
+                } else {
+                    child = (List) body;
+                }
                 int bodySize = child.size();
                 Integer level = lastArrayLevel + 1;
                 arrayFieldSize.add(bodySize);
@@ -130,6 +138,9 @@ public class Converter {
         Map<String, PathDetail> paths = new HashMap<>();
         SimpleMappingField field = mapping.getDestinationField();
         if (destinationRoot.getType() == FieldType.ARRAY) {
+            if (CollectionUtils.isEmpty(arrayFieldSize)) {
+                return paths;
+            }
             Integer size = arrayFieldSize.get(level);
             level++;
             for (int i = 0; i < size; i++) {
@@ -223,7 +234,11 @@ public class Converter {
             if (function != null) {
                 value = execute(dalaranContext, function, values, contextValues);
             } else {
-                value = values.get(0);
+                if (!CollectionUtils.isEmpty(values)) {
+                    value = values.get(0);
+                } else {
+                    value = null;
+                }
             }
 
             if (pathDetail != null) {
@@ -287,7 +302,11 @@ public class Converter {
         if (function != null) {
             value = execute(dalaranContext, function, values, contextValues);
         } else {
-            value = values.get(0);
+            if (!CollectionUtils.isEmpty(values)) {
+                value = values.get(0);
+            } else {
+                value = null;
+            }
         }
         FieldType type = messageMapping.getType();
         value = parse(value, type, sourcePaths, destinationPath);
