@@ -64,7 +64,7 @@ public class DefaultDalaranCamelContext implements DalaranContext<DalaranRoute> 
     public void addTriggerFlow(TriggerFlow flow) {
         try {
             camelContext.removeRoute(FLOW_PREFIX + flow.getId());
-            DalaranRoute route = flowBuilder.buildTriggerFlow(flow);
+            DalaranRoute route = flowBuilder.buildTriggerFlow(flow, camelContext);
             log.info("load trigger flow [{}], steps: {}", route.getId(), route.getSteps());
             camelContext.addRouteDefinition(route);
         } catch (Exception e) {

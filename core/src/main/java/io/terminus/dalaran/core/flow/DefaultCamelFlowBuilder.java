@@ -17,6 +17,7 @@ import io.terminus.dalaran.model.RetryConvertFragmentInfo;
 import io.terminus.dalaran.model.component.ProcessorModel;
 import io.terminus.dalaran.model.flow.*;
 import lombok.val;
+import org.apache.camel.CamelContext;
 import org.apache.camel.builder.Builder;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -59,7 +60,7 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
     }
 
     @Override
-    public DalaranRoute buildTriggerFlow(TriggerFlow flow) {
+    public DalaranRoute buildTriggerFlow(TriggerFlow flow, CamelContext camelContext) {
         val triggerComponent = componentContext.getTrigger(flow.getTriggerType());
         val triggerInfo = componentContext.getTriggerInfo(flow.getTriggerType());
 
@@ -83,15 +84,23 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
             }
         }
 
-        /**
-         * todo 限流器 熔断器配置初始化
-         */
+        val processorRoute = createRouteDefinition();
+        String processorRouteId = DALARAN_PROCESSOR + flow.getRouteId();
+        processorRoute.setId(processorRouteId);
+        processorRoute.from(DIRECT_PREFIX + processorRouteId);
+        try {
+            camelContext.removeRoute(processorRoute.getId());
+            buildBreakerFlowRoute(route, processorRoute, flow, TracingType.Flow, bodyType);
+            camelContext.addRouteDefinition(processorRoute);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
-        buildFlowRoute(route, flow, TracingType.Flow, bodyType);
-
-        /**
-         * todo 限流器 熔断器异常返回处理
-         */
+        if (triggerComponent instanceof DalaranCircuitBreaker) {
+            ((DalaranCircuitBreaker) triggerComponent).buildBreakerConfig(route, processorRouteId, triggerConfig, camelContext, errorHandlerFactory);
+        } else {
+            route.to(DIRECT_PREFIX + processorRouteId);
+        }
 
         if (triggerComponent instanceof DalaranTriggerBuildAfterProcessor) {
             ((DalaranTriggerBuildAfterProcessor) triggerComponent).buildAfter(route, triggerConfig);
@@ -307,6 +316,92 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
                     spanTracer.after(route);
                 } else {
                     spanTracer.after(route, currentModel.getModelType());
+                }
+            }
+        }
+
+        if (flowTracer != null) {
+            flowTracer.after(route, currentBodyType);
+        }
+
+        if (!UNKNOWN_MODEL_TYPE.equalsIgnoreCase(currentBodyType) && flow.getOutModel() != null) {
+            String nextBodyType = flow.getOutModel().getModelType();
+            if (!nextBodyType.equals(currentBodyType)) {
+                if (DalaranConstants.OBJECT_MODEL_TYPE.equalsIgnoreCase(currentBodyType)) {
+                    converterContext.fromObject(route, currentModel, nextBodyType);
+                } else if (DalaranConstants.OBJECT_MODEL_TYPE.equalsIgnoreCase(nextBodyType)) {
+                    converterContext.toObject(route, currentBodyType);
+                } else {
+                    converterContext.toObject(route, currentBodyType);
+                    converterContext.fromObject(route, currentModel, nextBodyType);
+                }
+            }
+            currentBodyType = nextBodyType;
+            currentModel = flow.getOutModel();
+        }
+
+        route.setLastBodyType(currentBodyType);
+        route.setLastOutModel(currentModel);
+    }
+
+    private void buildBreakerFlowRoute(DalaranRoute route, DalaranRoute processorRoute, BasicFlow flow, TracingType flowTracingType, @NotNull String currentBodyType) {
+        Map context = new HashMap<>();
+        route.setProperty(DALARAN_CONTEXT_EXCHANGE, Builder.constant(context));
+        DalaranTracer flowTracer = null;
+        if (flow.isTracing() && flowTracingType != null) {
+            flowTracer = DalaranTracer.buildTracer(traceLogger, flowTracingType);
+        }
+        if (flowTracer != null) {
+            flowTracer.before(route, currentBodyType);
+        }
+        List<ProcessorModel> processorList = flow.getPipeline();
+        MessageModel currentModel = flow.getInModel();
+        ProcessorInfo currentProcessorInfo;
+        for (ProcessorModel processor : processorList) {
+            DalaranTracer spanTracer = null;
+            if (flow.isTracing()) {
+                spanTracer = DalaranTracer.buildFlowSpanTracer(traceLogger, processor.getId());
+            }
+            DalaranProcessor processorComponent = componentContext.getProcessor(processor.getType());
+            currentProcessorInfo = componentContext.getProcessorInfo(processor.getType());
+
+            if (spanTracer != null) {
+                spanTracer.before(processorRoute, currentBodyType);
+            }
+            // TODO 这里还是比较奇怪, 有点绕, 而且有些特殊场景没有考虑到
+//                currentBodyIsSerialized = currentModel.getModelType().isSerialized();
+            boolean needConvert = true;
+            if (processorComponent instanceof DalaranMessageBodyCustomConverter) {
+                needConvert = ((DalaranMessageBodyCustomConverter) processorComponent).customBodyConvert(processorRoute, processor.getConfig(), currentBodyType);
+            }
+            String nextBodyType = currentProcessorInfo.getModelType();
+            MessageModel nextModel = processor.getInModel();
+            if (needConvert) {
+                nextBodyType = convertModel(processorRoute, currentBodyType, nextBodyType, currentModel, nextModel);
+            }
+            currentBodyType = nextBodyType;
+
+            Object config = processor.getConfig();
+
+            if (processorComponent instanceof DalaranProcessorConfigCustomConverter) {
+                config = ((DalaranProcessorConfigCustomConverter) processorComponent).convert(config, processor, flow);
+                if (config instanceof RetryConvertFragmentInfo) {
+                    currentBodyType = ((RetryConvertFragmentInfo)config).getOutModelType();
+                }
+            }
+
+            processorComponent.configure(processorRoute, config);
+
+            nextModel = processor.getOutModel();
+
+            if (nextModel != null) {
+                currentModel = nextModel;
+            }
+            if (spanTracer != null) {
+                if (currentModel == null) {
+                    spanTracer.after(processorRoute);
+                } else {
+                    spanTracer.after(processorRoute, currentModel.getModelType());
                 }
             }
         }
