@@ -20,12 +20,18 @@ public abstract class AbstractComponentInfo implements ComponentInfo {
 
     private String connectorType;
 
+    private String limiterType;
+
     @NotNull
     private String modelType;
 
     @JSONField(serialize = false)
     @JsonIgnore
     private ConnectorInfo connectorInfo;
+
+    @JSONField(serialize = false)
+    @JsonIgnore
+    private LimiterInfo limiterInfo;
 
     @JSONField(serialize = false)
     @JsonIgnore

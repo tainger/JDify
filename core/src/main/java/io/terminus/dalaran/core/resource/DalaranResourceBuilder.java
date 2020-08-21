@@ -33,6 +33,8 @@ public interface DalaranResourceBuilder {
 
     Object buildConnectorConfig(Long connectorId, Class connectorConfigType);
 
+    Object buildLimiterConfig(Long limiterId, Class limiterConfigType);
+
     Object buildServiceConfig(ServiceAbstractEntity serviceEntity);
 
 }

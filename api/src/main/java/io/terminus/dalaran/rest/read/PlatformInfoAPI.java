@@ -29,6 +29,10 @@ public interface PlatformInfoAPI {
     @GetMapping(value = "/connector")
     Collection<ConnectorInfo> listConnectorInfo();
 
+    @ApiOperation(value = "获取熔断限流器结构")
+    @GetMapping(value = "/limiter")
+    Collection<LimiterInfo> listLimiterInfo();
+
     @ApiOperation(value = "获取服务配置结构")
     @GetMapping(value = "/service")
     Collection<ServiceInfo> listServiceInfo();

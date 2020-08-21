@@ -83,6 +83,16 @@ public class DefaultDalaranResourceBuilder implements DalaranResourceBuilder {
                 connectorConfig.setConnector(connector);
             }
         }
+
+        if (config instanceof LimiterConfig) {
+            LimiterConfig limiterConfig = (LimiterConfig) config;
+            Long limiterId = limiterConfig.getLimiterId();
+            if (limiterId != null) {
+                Object limiter = buildLimiterConfig(limiterId, triggerInfo.getConnectorInfo().getConnectorType());
+                limiterConfig.setLimiter(limiter);
+            }
+        }
+
         return flow;
     }
 
@@ -150,6 +160,15 @@ public class DefaultDalaranResourceBuilder implements DalaranResourceBuilder {
             throw new RuntimeException("connector [" + connectorId + "] not found");
         }
         return buildConfig(entity.getConfig(), connectorConfigType);
+    }
+
+    @Override
+    public Object buildLimiterConfig(Long limiterId, Class limiterConfigType) {
+        LimiterAbstractEntity entity = resourceLoader.loadLimiter(limiterId);
+        if (entity == null) {
+            throw new RuntimeException("limiter [" + limiterId + "] not found");
+        }
+        return buildConfig(entity.getConfig(), limiterConfigType);
     }
 
     @Override

@@ -1,6 +1,7 @@
 package io.terminus.dalaran.core.context;
 
 import io.terminus.dalaran.config.ConnectorInfo;
+import io.terminus.dalaran.config.LimiterInfo;
 import io.terminus.dalaran.config.ProcessorInfo;
 import io.terminus.dalaran.config.TriggerInfo;
 import io.terminus.dalaran.core.component.DalaranProcessor;
@@ -21,6 +22,8 @@ public interface DalaranComponentContext {
     Collection<TriggerInfo> getAllTriggerInfo();
 
     Collection<ConnectorInfo> getAllConnectorInfo();
+
+    Collection<LimiterInfo> getAllLimiterInfo();
 
     Collection<ProcessorInfo> getAllProcessorInfo();
 

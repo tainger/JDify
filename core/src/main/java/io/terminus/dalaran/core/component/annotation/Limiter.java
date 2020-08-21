@@ -6,7 +6,7 @@ import java.lang.annotation.*;
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE})
-public @interface CircuitBreaker {
+public @interface Limiter {
     String value();
 
     int order() default Short.MAX_VALUE;

@@ -64,7 +64,6 @@ public class ConnectorServiceImpl implements ConnectorService {
 
     @Override
     public List<BasicConnectorInfo> listBasicInfoByComponent(String connectorType) {
-
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<BasicConnectorInfo> criteriaQuery = builder.createQuery(BasicConnectorInfo.class);
         Root<ConnectorEntity> root = criteriaQuery.from(ConnectorEntity.class);
