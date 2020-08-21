@@ -1,8 +1,10 @@
 package io.terminus.dalaran.model.soap.processor;
 
 import com.alibaba.fastjson.JSON;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import io.terminus.dalaran.function.xml.DuplicateToArrayJsonNodeDeserializer;
 import io.terminus.dalaran.model.FieldType;
 import io.terminus.dalaran.model.ModelField;
 import io.terminus.dalaran.model.soap.jackson.DalaranObjectDeserializer;
@@ -10,6 +12,7 @@ import io.terminus.dalaran.model.soap.jackson.DalaranXMLStreamReader;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.Traceable;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -17,7 +20,10 @@ import javax.xml.stream.XMLInputFactory;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by jingdi on 2019/6/6
@@ -42,7 +48,10 @@ public class SoapToObjectProcessor implements Processor, Traceable {
         InputStream is = new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8));
         DalaranXMLStreamReader sr = new DalaranXMLStreamReader(XMLInputFactory.newFactory().createXMLStreamReader(is));
         XmlMapper xmlMapper = new XmlMapper();
-        xmlMapper.registerModule(new SimpleModule().addDeserializer(Object.class, new DalaranObjectDeserializer()));
+        xmlMapper.registerModule(new SimpleModule().
+                addDeserializer(Object.class, new DalaranObjectDeserializer()).
+                addDeserializer(JsonNode.class, new DuplicateToArrayJsonNodeDeserializer()
+        ));
         Object in = xmlMapper.readValue(sr, Object.class);
         Map map;
         if (in instanceof String) {
@@ -87,7 +96,9 @@ public class SoapToObjectProcessor implements Processor, Traceable {
                             buildBody((Map) currentOrigin.get(i), (Map)currentDestination.get(i), field.getFields());
                         }
                     } else {
-                        buildBody((Map)data, (Map)currentDestination.get(0), field.getFields());
+                        if (CollectionUtils.isNotEmpty(currentDestination)) {
+                            buildBody((Map)data, (Map)currentDestination.get(0), field.getFields());
+                        }
                     }
                 }
             } else {
