@@ -167,7 +167,7 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext {
             }
 
             Class limiterType = getConfigType(triggerAnnotation.configType(), Limiter.class);
-            if (connectorType != null) {
+            if (limiterType != null) {
                 Limiter limiter = (Limiter) limiterType.getDeclaredAnnotation(Limiter.class);
                 if (limiter != null) {
                     LimiterInfo limiterInfo = buildLimiterInfo(limiterType, limiter, triggerType);
