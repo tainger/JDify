@@ -1,4 +1,4 @@
-package io.terminus.dalaran.component.processor.mail.send;
+package io.terminus.dalaran.component.processor.mail.camel;
 
 import com.alibaba.fastjson.JSON;
 import io.terminus.dalaran.ComponentConstants;
@@ -12,13 +12,13 @@ import org.apache.commons.io.FileUtils;
 import javax.activation.DataHandler;
 import java.io.File;
 
-public class DalaranMailSenderProcessor implements Processor {
+public class CamelMailSenderProcessor implements Processor {
 
     private DalaranMailSenderConfig config;
 
     private OSSAccount ossAccount;
 
-    public DalaranMailSenderProcessor(DalaranMailSenderConfig config, OSSAccount ossAccount) {
+    public CamelMailSenderProcessor(DalaranMailSenderConfig config, OSSAccount ossAccount) {
         this.config = config;
         this.ossAccount = ossAccount;
     }

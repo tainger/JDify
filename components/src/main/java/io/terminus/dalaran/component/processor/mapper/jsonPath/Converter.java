@@ -7,6 +7,7 @@ import io.terminus.dalaran.component.common.exception.MapperFunctionExecuteExcep
 import io.terminus.dalaran.component.processor.mapper.model.*;
 import io.terminus.dalaran.core.context.DalaranContext;
 import io.terminus.dalaran.model.FieldType;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.camel.Exchange;
 import org.apache.commons.beanutils.ConvertUtils;
 import org.apache.commons.collections.CollectionUtils;
@@ -20,6 +21,7 @@ import static io.terminus.dalaran.DalaranConstants.DALARAN_CONTEXT_EXCHANGE;
 /**
  * Created by jingdi on 2019/7/16
  */
+@Slf4j
 public class Converter {
 
     public static Map<String, Object> convert(DalaranMappingConfig mappingConfig, Exchange exchange, DalaranContext dalaranContext) {
@@ -245,9 +247,9 @@ public class Converter {
                 FieldType type = pathDetail.getType();
                 value = parse(value, type, entry.getValue(), pathDetail.getPath());
             }
-            if (value == null) {
-                value = "";
-            }
+//            if (value == null) {
+//                value = "";
+//            }
             if (pathDetail != null && pathDetail.getPath() != null) {
                 JSONPath.set(destination, pathDetail.getPath(), value);
             }

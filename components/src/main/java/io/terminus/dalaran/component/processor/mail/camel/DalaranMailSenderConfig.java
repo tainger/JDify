@@ -1,4 +1,4 @@
-package io.terminus.dalaran.component.processor.mail.send;
+package io.terminus.dalaran.component.processor.mail.camel;
 
 import io.terminus.dalaran.FieldInputType;
 import io.terminus.dalaran.component.connector.MailConnector;

@@ -1,4 +1,4 @@
-package io.terminus.dalaran.component.processor.mail.send;
+package io.terminus.dalaran.component.processor.mail.camel;
 
 
 import io.terminus.dalaran.ComponentConstants;
@@ -14,12 +14,12 @@ import org.springframework.beans.factory.annotation.Autowired;
         order = 23,
         configType = DalaranMailSenderConfig.class
 )
-public class DalaranMailSender implements DalaranProcessor<DalaranMailSenderConfig> {
+public class CamelMailSender implements DalaranProcessor<DalaranMailSenderConfig> {
 
     @Autowired
     private OSSAccount ossAccount;
 
-    private static final String MAIL_ROUTE_URI = "%s://%s:%s?username=%s&password=%s&cc=%s&subject=%s&from=%s&debugMode=true&mail.smtp.auth=true&mail.smtp.starttls.enable=true";
+    private static final String MAIL_ROUTE_URI = "%s://%s:%s?username=%s&password=%s&cc=%s&subject=%s&from=%s&debugMode=true&mail.smtps.auth=true&mail.smtps.starttls.enable=true";
 
     @Override
     public void configure(ProcessorDefinition route, DalaranMailSenderConfig config) {
@@ -27,7 +27,7 @@ public class DalaranMailSender implements DalaranProcessor<DalaranMailSenderConf
         String uri = String.format(MAIL_ROUTE_URI, connector.getProtocol().name().toLowerCase(),
                 connector.getHost(), connector.getPort(), connector.getUsername(), connector.getPassword(),
                 config.getCcTo(), config.getSubject(), config.getConnector().getFrom());
-        route.process(new DalaranMailSenderProcessor(config, ossAccount));
+        route.process(new CamelMailSenderProcessor(config, ossAccount));
         if (config.isDynamicAddress()) {
             route.toD(uri + "&to=${headers." + ComponentConstants.DALARAN_MAIL_TO + "}");
             return;

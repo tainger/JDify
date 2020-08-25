@@ -55,7 +55,7 @@ public class BrotliHttpProcessor implements Processor {
         Response response = client.newCall(request).execute();
         String responseBody = Objects.requireNonNull(response.body()).string();
         log.info("response: " + responseBody);
-        exchange.getOut().setBody(JSON.parse(responseBody));
+        exchange.getOut().setBody(responseBody);
     }
 
     private Map<String, String> buildQueryString(Object obj) throws Exception {
