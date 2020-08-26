@@ -9,6 +9,7 @@ import io.terminus.dalaran.core.resource.oss.OSSAccount;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.activation.DataHandler;
 import javax.mail.*;
@@ -60,6 +61,10 @@ public class DalaranMailSenderProcessor implements Processor {
             message.setFrom(new InternetAddress(from));
             message.setRecipients(javax.mail.Message.RecipientType.TO,
                     InternetAddress.parse(to));
+            if (StringUtils.isNotBlank(config.getCcTo())) {
+                message.setRecipients(Message.RecipientType.CC,
+                        InternetAddress.parse(config.getCcTo()));
+            }
             message.setSubject(config.getSubject());
 
             BodyPart messageBodyPart = new MimeBodyPart();
