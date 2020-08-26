@@ -225,9 +225,16 @@ public class SignUtilsTest {
 
         String in = "{\"data\":{\"totxdate\":\"2020-07-20 10:10:10\",\"identity\":\"CRM\",\"openid\":\"\",\"action\":\"\",\"remark\":\"\",\"userId\":\"99899\",\"frmtxdate\":\"2020-07-01 10:10:10\",\"vipcode\":\"\"}}";
 
-        String s = AESUtils.encrypt("001", "89622015104709087435617163207900");
+        /**
+         * 8962201510470905
+         */
+        String s = AESUtils.encrypt("17150137665", "8962201510470905");
 
-        String ss = AESUtils.decrypt("XP5WjkA+26FrMsAW/fVW7HnzOkZTbgfpVwQVrFWC3wg=", "8962201510470905");
+        String soo = AESUtils.encryptNoPadding( "17150137665", "8962201510470905");
+
+        String somoo = AESUtils.decryptNoPadding("eZkmKwvwdIjqm0WftKlUhA==", "8962201510470905");
+
+        String ss = AESUtils.decrypt("eZkmKwvwdIjqm0WftKlUhA==", "8962201510470905");
 
 
         Assert.assertTrue(false);
