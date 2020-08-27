@@ -83,24 +83,25 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
                 bodyType = flow.getInModel().getModelType();
             }
         }
+        buildFlowRoute(route, flow, TracingType.Flow, bodyType);
 
-        val processorRoute = createRouteDefinition();
-        String processorRouteId = DALARAN_PROCESSOR + flow.getRouteId();
-        processorRoute.setId(processorRouteId);
-        processorRoute.from(DIRECT_PREFIX + processorRouteId);
-        try {
-            camelContext.removeRoute(processorRoute.getId());
-            buildBreakerFlowRoute(route, processorRoute, flow, TracingType.Flow, bodyType);
-            camelContext.addRouteDefinition(processorRoute);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        if (triggerComponent instanceof DalaranCircuitBreaker) {
-            ((DalaranCircuitBreaker) triggerComponent).buildBreakerConfig(route, processorRouteId, triggerConfig, camelContext, errorHandlerFactory);
-        } else {
-            route.to(DIRECT_PREFIX + processorRouteId);
-        }
+//        val processorRoute = createRouteDefinition();
+//        String processorRouteId = DALARAN_PROCESSOR + flow.getRouteId();
+//        processorRoute.setId(processorRouteId);
+//        processorRoute.from(DIRECT_PREFIX + processorRouteId);
+//        try {
+//            camelContext.removeRoute(processorRoute.getId());
+//            buildBreakerFlowRoute(route, processorRoute, flow, TracingType.Flow, bodyType);
+//            camelContext.addRouteDefinition(processorRoute);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//
+//        if (triggerComponent instanceof DalaranCircuitBreaker) {
+//            ((DalaranCircuitBreaker) triggerComponent).buildBreakerConfig(route, processorRouteId, triggerConfig, camelContext, errorHandlerFactory);
+//        } else {
+//            route.to(DIRECT_PREFIX + processorRouteId);
+//        }
 
         if (triggerComponent instanceof DalaranTriggerBuildAfterProcessor) {
             ((DalaranTriggerBuildAfterProcessor) triggerComponent).buildAfter(route, triggerConfig);

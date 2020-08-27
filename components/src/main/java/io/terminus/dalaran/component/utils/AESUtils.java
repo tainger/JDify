@@ -46,8 +46,8 @@ public class AESUtils {
 
     public static String encryptNoPadding(String data, String secret) {
         try {
-            val key = fillAESZeroPadding(secret, StandardCharsets.UTF_8);
-            val secretKeySpec = new SecretKeySpec(key, "AES");
+//            val key = fillAESZeroPadding(secret, StandardCharsets.UTF_8);
+            val secretKeySpec = new SecretKeySpec(secret.getBytes(), "AES");
             var cipher = Cipher.getInstance("AES/ECB/NoPadding");
             cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec);
             val content = fillAESZeroPadding(data, StandardCharsets.UTF_8);
@@ -61,9 +61,9 @@ public class AESUtils {
 
     public static String decryptNoPadding(String data, String secret) {
         try {
-            val key = fillAESZeroPadding(secret, StandardCharsets.UTF_8);
+//            val key = fillAESZeroPadding(secret, StandardCharsets.UTF_8);
             val content = Base64.getDecoder().decode(data.getBytes(StandardCharsets.UTF_8));
-            val secretKeySpec = new SecretKeySpec(key, "AES");
+            val secretKeySpec = new SecretKeySpec(secret.getBytes(), "AES");
             val cipher = Cipher.getInstance("AES/ECB/NoPadding");
             cipher.init(Cipher.DECRYPT_MODE, secretKeySpec);
             var raw = cipher.doFinal(content);
@@ -77,9 +77,9 @@ public class AESUtils {
 
     private static byte[] fillAESZeroPadding(String pwd , Charset charset) {
         val password = pwd.getBytes(charset);
-
-        val factor = 16;
         val size = password.length;
+        val factor = (size/16 + 1) * 16;
+
         val offset = size % factor;
         if(offset == 0) {
             return password;

@@ -13,7 +13,7 @@ public class SoapSchemaOperation {
 
     private String targetNamespace = "http://schemas.xmlsoap.org/wsdl";
 
-    private String prefix = "dalaran";
+    private String prefix = "";
 
     private Boolean bodyContainsXmlns = false;
 

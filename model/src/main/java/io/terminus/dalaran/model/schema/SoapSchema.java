@@ -19,8 +19,8 @@ public class SoapSchema extends DalaranModelSchema {
     @ModelFieldInfo(label = "命名空间", inputType = FieldInputType.String, defaultValue = "http://schemas.xmlsoap.org/wsdl")
     private String targetNamespace = "http://schemas.xmlsoap.org/wsdl";
 
-    @ModelFieldInfo(label = "命名空间前缀", inputType = FieldInputType.String, defaultValue = "dalaran")
-    private String prefix = "dalaran";
+    @ModelFieldInfo(label = "命名空间前缀", inputType = FieldInputType.String, defaultValue = "")
+    private String prefix = "";
 
     @ModelFieldInfo(label = "根节点包含命名空间", inputType = FieldInputType.Switch, defaultValue = "false")
     private Boolean bodyContainsXmlns = false;

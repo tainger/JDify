@@ -230,7 +230,8 @@ public class SignUtilsTest {
          */
         String s = AESUtils.encrypt("17150137665", "8962201510470905");
 
-        String soo = AESUtils.encryptNoPadding( "17150137665", "8962201510470905");
+        String soo = AESUtils.encryptNoPadding( "200000025433940100901221", "8962201510470905");
+
 
         String somoo = AESUtils.decryptNoPadding("eZkmKwvwdIjqm0WftKlUhA==", "8962201510470905");
 
