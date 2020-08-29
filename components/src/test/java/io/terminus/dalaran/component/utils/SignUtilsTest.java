@@ -228,15 +228,13 @@ public class SignUtilsTest {
         /**
          * 8962201510470905
          */
-        String s = AESUtils.encrypt("17150137665", "8962201510470905");
+        String s = AESUtils.encrypt("{\"xf_surname\":\"CRM注册8284-地址验证\",\"eb_souce\":\"1\",\"telephone2\":\"18951640003\",\"birthdaydd\":\"06\",\"xf_mobile\":\"18951640003\",\"identity\":\"CRM\",\"xf_vipcodeprefix\":\"1\",\"xf_address2\":\"330000|330100|330110\",\"xf_address1\":\"浙江省杭州市余杭区xx街道\",\"xf_sex\":\"F\",\"eb_cardtype\":\"0\",\"telephone\":\"18951640003\",\"xf_issuestore\":\"50202501\",\"birthdayyyyy\":\"2000\",\"xf_email\":\"15764228277@qq.com\",\"defsaleman\":\"testman\",\"xfIssuestaffcode\":\"02342\",\"xf_vipid\":\"390810200006161234\",\"birthdaymm\":\"16\",\"eb_regirstrystore\":\"323\",\"xf_birthday\":\"2010-04-14 00:00:00\",\"postal\":\"2314\",\"remark1\":\"test\",\"remark2\":\"test\"}", "89622015104709087435617163207900");
 
-        String soo = AESUtils.encryptNoPadding( "200000025433940100901221", "8962201510470905");
-
+        String soo = AESUtils.encryptNoPadding( "82154558866614574815", "8962201510470905");
 
         String somoo = AESUtils.decryptNoPadding("eZkmKwvwdIjqm0WftKlUhA==", "8962201510470905");
 
-        String ss = AESUtils.decrypt("eZkmKwvwdIjqm0WftKlUhA==", "8962201510470905");
-
+        String ss = AESUtils.decrypt("HDdmklsa+nkQi8K8alVlFA==", "8962201510470905");
 
         Assert.assertTrue(false);
     }

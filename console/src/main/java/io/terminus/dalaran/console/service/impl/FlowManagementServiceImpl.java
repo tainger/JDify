@@ -274,6 +274,7 @@ public class FlowManagementServiceImpl implements FlowManagementService {
         TriggerFlowEntity flowEntity = flowEntityOptional.get();
         buildEntity(flowModel, flowEntity);
         setFlowStatus(flowEntity);
+        flowEntity.setUpdatedAt(new Date());
         flowRepository.save(flowEntity);
         // TODO 这里依赖 loader 有点怪 而且可以异步
         testFlowInitializer.reloadTestTriggerFlow(flowEntity.getId());

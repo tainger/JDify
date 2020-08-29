@@ -1,10 +1,13 @@
 package io.terminus.dalaran.component.processor.mapper;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import io.terminus.dalaran.component.processor.mapper.jsonPath.Converter;
 import io.terminus.dalaran.component.processor.mapper.model.DalaranMappingConfig;
 import io.terminus.dalaran.component.processor.mapper.model.MapperConstants;
 import io.terminus.dalaran.component.utils.ContextUtils;
 import io.terminus.dalaran.core.context.DalaranContext;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.Traceable;
@@ -15,6 +18,7 @@ import java.util.Map;
 /**
  * Created by jingdi on 2019/3/18
  */
+@Slf4j
 public class DalaranMapperProcessor implements Processor, Traceable {
 
     private final DalaranMappingConfig mappingConfig;
@@ -31,6 +35,7 @@ public class DalaranMapperProcessor implements Processor, Traceable {
         ContextUtils.setExchange(exchange);
         Object source = exchange.getIn().getBody();
         Object destination = (mappingConfig == null || CollectionUtils.isEmpty(mappingConfig.getMessageMappings())) ? source : convert(mappingConfig, exchange);
+        log.info("destination: " + JSON.toJSONString(destination, SerializerFeature.WriteMapNullValue));
         exchange.getOut().setBody(destination);
         exchange.getOut().setHeaders(exchange.getIn().getHeaders());
     }

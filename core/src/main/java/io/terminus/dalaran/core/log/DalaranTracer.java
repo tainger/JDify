@@ -1,6 +1,7 @@
 package io.terminus.dalaran.core.log;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import io.terminus.dalaran.DalaranConstants;
 import io.terminus.dalaran.TracingType;
 import lombok.extern.slf4j.Slf4j;
@@ -125,7 +126,7 @@ public class DalaranTracer {
             return new String((byte[]) body);
         }
         if (body instanceof Map || body instanceof Iterable || body instanceof Serializable) {
-            return JSON.toJSONString(body);
+            return JSON.toJSONString(body, SerializerFeature.WriteMapNullValue);
         }
         if (body instanceof StringEntity) {
             try {

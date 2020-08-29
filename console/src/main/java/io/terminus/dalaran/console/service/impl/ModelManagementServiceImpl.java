@@ -78,7 +78,9 @@ public class ModelManagementServiceImpl implements ModelManagementService {
 
     @Override
     public ModelDTO updateModel(ModelDTO modelModel) {
-        modelRepository.save(buildEntity(modelModel));
+        ModelEntity entity = buildEntity(modelModel);
+        entity.setUpdatedAt(new Date());
+        modelRepository.save(entity);
         return modelModel;
     }
 
@@ -176,7 +178,7 @@ public class ModelManagementServiceImpl implements ModelManagementService {
 
     @Override
     public DalaranModelSchema importDataTemplate(DataTemplate dataTemplate, Long id) {
-        SortedMap<String, ModelField> root = new TreeMap<>();
+        LinkedHashMap<String, ModelField> root = new LinkedHashMap<>();
         ModelField modelField = new ModelField();
         root.put(MapperConstants.MODEL_ROOT, modelField);
         Object body = JSON.parse(dataTemplate.getDataTemplate());
@@ -369,7 +371,7 @@ public class ModelManagementServiceImpl implements ModelManagementService {
     }
 
     private void buildModel(Object body, String type, ModelField modelField) {
-        SortedMap<String, ModelField> child = new TreeMap<>();
+        LinkedHashMap<String, ModelField> child = new LinkedHashMap<>();
         modelField.setFields(child);
         if (type.equalsIgnoreCase(DalaranConsoleConstants.JSON_OBJECT)) {
             modelField.setType(FieldType.OBJECT);
@@ -389,7 +391,7 @@ public class ModelManagementServiceImpl implements ModelManagementService {
         }
     }
 
-    private void buildChildren(Object element, SortedMap<String, ModelField> child) {
+    private void buildChildren(Object element, LinkedHashMap<String, ModelField> child) {
         JSONObject jsonObject = (JSONObject) element;
         jsonObject.forEach((name, value) -> {
             ModelField field = new ModelField();

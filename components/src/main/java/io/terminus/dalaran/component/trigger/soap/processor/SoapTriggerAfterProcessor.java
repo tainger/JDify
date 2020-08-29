@@ -14,9 +14,9 @@ public class SoapTriggerAfterProcessor implements Processor {
 
     @Override
     public void process(Exchange exchange) throws Exception {
-        exchange.getIn().setHeader(Exchange.CONTENT_TYPE, "text/xml");
+        exchange.getIn().setHeader(Exchange.CONTENT_TYPE, "text/xml;charset=utf-8");
         if (config.isNullResponseBody()) {
-            exchange.getOut().setHeader(Exchange.CONTENT_TYPE, "text/xml");
+            exchange.getOut().setHeader(Exchange.CONTENT_TYPE, "text/xml;charset=utf-8");
             exchange.getOut().setBody(null);
         }
     }
