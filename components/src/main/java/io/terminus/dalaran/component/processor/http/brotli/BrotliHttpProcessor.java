@@ -95,6 +95,11 @@ public class BrotliHttpProcessor implements Processor {
         for (String name: headerNames) {
             values.put(name, (String)contextValues.get(name));
         }
+        if (config.getAddLastHeaders()) {
+            exchange.getIn().getHeaders().forEach((k, v) -> {
+                values.put(k, String.valueOf(v));
+            });
+        }
         return values;
     }
 }

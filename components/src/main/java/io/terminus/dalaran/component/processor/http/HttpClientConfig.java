@@ -32,4 +32,8 @@ public class HttpClientConfig extends OutModelConfig implements ConnectorConfig<
 
     @ConfigFieldInfo(label = "Query Param", inputType = FieldInputType.String, required = false)
     private String queryParams;
+
+    @ConfigFieldInfo(label = "Add Last Headers", inputType = FieldInputType.Switch, required = false)
+    private Boolean addLastHeaders = false;
+
 }
