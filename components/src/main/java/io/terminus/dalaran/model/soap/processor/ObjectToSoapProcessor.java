@@ -160,6 +160,9 @@ public class ObjectToSoapProcessor implements Processor, Traceable {
 //                continue;
             }
             if (type == FieldType.ARRAY) {
+                if (ob == null) {
+                    continue;
+                }
                 List subBody = (List) ob;
                 if (CollectionUtils.isEmpty(subBody) && soapOperationConfig.getRemoveNullColumn()) {
                     continue;
