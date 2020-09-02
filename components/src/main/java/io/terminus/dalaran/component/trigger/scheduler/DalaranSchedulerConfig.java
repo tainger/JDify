@@ -15,4 +15,7 @@ public class DalaranSchedulerConfig {
 
     @ConfigFieldInfo(label = "正在执行则不触发", inputType = FieldInputType.Switch, defaultValue = "false")
     private Boolean stateful = false;
+
+    @ConfigFieldInfo(label = "时区", inputType = FieldInputType.String, required = false)
+    private String timezone = "Asia/Shanghai";
 }
