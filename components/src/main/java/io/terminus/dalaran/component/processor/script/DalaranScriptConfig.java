@@ -8,7 +8,7 @@ import lombok.Data;
 @Data
 public class DalaranScriptConfig extends OutModelConfig {
 
-    @ConfigFieldInfo(label = "脚本语言", inputType = FieldInputType.Radio, defaultValue = "JavaScript")
+    @ConfigFieldInfo(label = "脚本语言", inputType = FieldInputType.Select, defaultValue = "JavaScript")
     private DalaranScriptType type;
 
     @ConfigFieldInfo(label = "脚本代码", inputType = FieldInputType.Script)
