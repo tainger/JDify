@@ -31,7 +31,7 @@ public class AESUtils {
 
     public static String decrypt(String origin, String secret) {
         if (StringUtils.isBlank(origin) || StringUtils.isBlank(secret)) {
-            return null;
+            throw new RuntimeException("AES Decrypt Error: " + origin);
         }
         try {
             SecretKeySpec secretKeySpec = new SecretKeySpec(secret.getBytes("UTF-8"), "AES");
