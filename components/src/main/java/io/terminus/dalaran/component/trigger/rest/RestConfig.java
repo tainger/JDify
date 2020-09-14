@@ -17,6 +17,9 @@ public class RestConfig extends AllModelConfig {
     @ConfigFieldInfo(label = "鉴权签名", inputType = FieldInputType.Switch, defaultValue = "false")
     private boolean enableSign = false;
 
+    @ConfigFieldInfo(label = "密钥", inputType = FieldInputType.Password, required = false)
+    private String secret;
+
     @ConfigFieldInfo(label = "协议", inputType = FieldInputType.Radio, defaultValue = "HTTP")
     private HttpProtocol protocol;
 

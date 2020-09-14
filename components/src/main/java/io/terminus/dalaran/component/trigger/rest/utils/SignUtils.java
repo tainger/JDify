@@ -6,6 +6,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.curator.shaded.com.google.common.hash.Hashing;
 import org.apache.http.entity.ContentType;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import static org.apache.camel.Exchange.CONTENT_TYPE;
 import static org.apache.camel.Exchange.HTTP_RESPONSE_CODE;
 
@@ -48,4 +52,16 @@ public class SignUtils {
         exchange.setProperty(Exchange.ROUTE_STOP, Boolean.TRUE);
     }
 
+    public static String buildSignBody(Map<String, Object> in) {
+        Map<String, Object> data = in.entrySet().stream()
+                .sorted((o1, o2) -> StringUtils.compare(o1.getKey(), o2.getKey()))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (oldValue, newValue) -> oldValue, LinkedHashMap::new));
+
+        StringBuilder dataToBeSigned = new StringBuilder();
+        for (Map.Entry entry: data.entrySet()) {
+            dataToBeSigned.append(dataToBeSigned.toString().equals("") ? "" : "&")
+                    .append( entry.getKey() + "=" + entry.getValue());
+        }
+        return dataToBeSigned.toString();
+    }
 }
