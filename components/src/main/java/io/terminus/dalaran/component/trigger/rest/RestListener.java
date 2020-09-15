@@ -60,10 +60,8 @@ public class RestListener implements DalaranTrigger<RestConfig>, DalaranTriggerA
             if (config.isEnableSign()) {
                 route.unmarshal().json(JsonLibrary.Fastjson);
                 route.process(new AESSignProcessor(config));
-            } else {
-                // TODO Stream to string
-                route.convertBodyTo(String.class);
             }
+            route.convertBodyTo(String.class);
         }
     }
 
