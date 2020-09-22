@@ -49,4 +49,10 @@ public class ComponentConstants {
     public static final String API_KEY = "apiKey";
 
     public static final String SIGNATURE_METHOD = "signatureMethod";
+
+    public static final String AES_PKCS5PADDING = "AES/ECB/PKCS5PADDING";
+
+    public static final String AES_NOPADDING = "AES/ECB/NoPadding";
+
+    public static final String CONTENT_TYPE_JSON = "application/json";
 }

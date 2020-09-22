@@ -1,7 +1,5 @@
 package io.terminus.dalaran.component.processor.mapper;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.serializer.SerializerFeature;
 import io.terminus.dalaran.component.processor.mapper.jsonPath.Converter;
 import io.terminus.dalaran.component.processor.mapper.model.DalaranMappingConfig;
 import io.terminus.dalaran.component.processor.mapper.model.MapperConstants;
@@ -35,7 +33,6 @@ public class DalaranMapperProcessor implements Processor, Traceable {
         ContextUtils.setExchange(exchange);
         Object source = exchange.getIn().getBody();
         Object destination = (mappingConfig == null || CollectionUtils.isEmpty(mappingConfig.getMessageMappings())) ? source : convert(mappingConfig, exchange);
-        log.info("destination: " + JSON.toJSONString(destination, SerializerFeature.WriteMapNullValue));
         exchange.getOut().setBody(destination);
         exchange.getOut().setHeaders(exchange.getIn().getHeaders());
     }

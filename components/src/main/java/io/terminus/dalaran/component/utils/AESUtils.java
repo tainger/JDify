@@ -1,5 +1,6 @@
 package io.terminus.dalaran.component.utils;
 
+import io.terminus.dalaran.ComponentConstants;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import lombok.var;
@@ -14,14 +15,14 @@ import java.util.Base64;
 @Slf4j
 public class AESUtils {
 
-    public static String encrypt(String origin, String secret) {
-        if (StringUtils.isBlank(origin) || StringUtils.isBlank(secret)) {
+    public static String encrypt(String origin, Cipher cipher) {
+        if (StringUtils.isBlank(origin)) {
             return null;
         }
         try {
-            SecretKeySpec secretKeySpec = new SecretKeySpec(secret.getBytes("UTF-8"), "AES");
-            Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5PADDING");
-            cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec);
+//            SecretKeySpec secretKeySpec = new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), "AES");
+//            Cipher cipher = Cipher.getInstance(ComponentConstants.AES_PKCS5PADDING);
+//            cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec);
             return Base64.getEncoder().encodeToString(cipher.doFinal(origin.getBytes()));
         } catch (Exception e) {
             e.printStackTrace();
@@ -29,14 +30,14 @@ public class AESUtils {
         }
     }
 
-    public static String decrypt(String origin, String secret) {
-        if (StringUtils.isBlank(origin) || StringUtils.isBlank(secret)) {
+    public static String decrypt(String origin, Cipher cipher) {
+        if (StringUtils.isBlank(origin)) {
             return null;
         }
         try {
-            SecretKeySpec secretKeySpec = new SecretKeySpec(secret.getBytes("UTF-8"), "AES");
-            Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5PADDING");
-            cipher.init(Cipher.DECRYPT_MODE, secretKeySpec);
+//            SecretKeySpec secretKeySpec = new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), "AES");
+//            Cipher cipher = Cipher.getInstance(ComponentConstants.AES_PKCS5PADDING);
+//            cipher.init(Cipher.DECRYPT_MODE, secretKeySpec);
             return new String(cipher.doFinal(Base64.getDecoder().decode(origin)));
         } catch (Exception e) {
             e.printStackTrace();
@@ -48,7 +49,7 @@ public class AESUtils {
         try {
 //            val key = fillAESZeroPadding(secret, StandardCharsets.UTF_8);
             val secretKeySpec = new SecretKeySpec(secret.getBytes(), "AES");
-            var cipher = Cipher.getInstance("AES/ECB/NoPadding");
+            var cipher = Cipher.getInstance(ComponentConstants.AES_NOPADDING);
             cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec);
             val content = fillAESZeroPadding(data, StandardCharsets.UTF_8);
             val result = cipher.doFinal(content);
@@ -64,7 +65,7 @@ public class AESUtils {
 //            val key = fillAESZeroPadding(secret, StandardCharsets.UTF_8);
             val content = Base64.getDecoder().decode(data.getBytes(StandardCharsets.UTF_8));
             val secretKeySpec = new SecretKeySpec(secret.getBytes(), "AES");
-            val cipher = Cipher.getInstance("AES/ECB/NoPadding");
+            var cipher = Cipher.getInstance(ComponentConstants.AES_NOPADDING);
             cipher.init(Cipher.DECRYPT_MODE, secretKeySpec);
             var raw = cipher.doFinal(content);
             val newRaw = removeZeroPadding(raw);

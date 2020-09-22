@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import javax.crypto.Cipher;
 import java.io.UnsupportedEncodingException;
 import java.security.*;
 import java.security.spec.PKCS8EncodedKeySpec;
@@ -75,19 +76,19 @@ public class SignUtils {
     //计算签字
     public static String calculateMD5Signature(JsonObject jObject, String apiSecret) throws NoSuchAlgorithmException, UnsupportedEncodingException {
         String contents = getJsonValue(jObject);
-        System.out.println("get json value: " + contents);
-        System.out.println("api secret: " + apiSecret);
-        System.out.println("md5 : " + DigestUtils.md5Hex(contents + apiSecret).toUpperCase());
 //        signature = Security.md5(contents+apiSecret, "UTF-8");
         return DigestUtils.md5Hex(contents + apiSecret);
     }
 
-    public static String signAES(String body, String secret) {
-        return AESUtils.encrypt(body, secret);
+    public static String signAES(String body, Cipher cipher) {
+        return AESUtils.encrypt(body, cipher);
     }
 
-    public static boolean verifyAES(String body, String sign, String secret) {
-        return StringUtils.equalsIgnoreCase(sign, AESUtils.encrypt(body, secret));
+    public static boolean verifyAES(String body, String sign, Cipher cipher) {
+//        SecretKeySpec secretKeySpec = new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), "AES");
+//        Cipher cipher = Cipher.getInstance(ComponentConstants.AES_PKCS5PADDING);
+//        cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec);
+        return StringUtils.equalsIgnoreCase(sign, AESUtils.encrypt(body, cipher));
     }
 
     public static String buildSignBody(Map<String, Object> in) {

@@ -55,9 +55,7 @@ public class ObjectToSoapProcessor implements Processor, Traceable {
     @Override
     public void process(Exchange exchange) throws Exception {
         Object body = exchange.getIn().getBody();
-        log.info("soap in: " + JSON.toJSONString(body, SerializerFeature.WriteMapNullValue));
         Object rst = buildSoapBody(modelFields.get(DalaranConstants.MODEL_ROOT), body);
-        log.info("soap request: " + rst);
         exchange.getOut().setBody(rst);
         exchange.getOut().setHeaders(exchange.getIn().getHeaders());
     }

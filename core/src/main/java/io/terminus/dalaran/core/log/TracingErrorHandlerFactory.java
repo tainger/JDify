@@ -59,6 +59,12 @@ public class TracingErrorHandlerFactory extends DefaultErrorHandlerBuilder imple
             AsyncProcessorHelper.process(this, exchange);
         }
 
+//        @Override
+//        public void process(Exchange exchange) throws Exception {
+//            super.process(exchange);
+//        }
+
+
         @Override
         public boolean process(Exchange exchange, AsyncCallback callback) {
             // TODO 理论上可以在这里做 tracing, 这样就不需要包前后的 processor 了, 回头可以看一下可行性
@@ -74,6 +80,12 @@ public class TracingErrorHandlerFactory extends DefaultErrorHandlerBuilder imple
             callback.done(true);
             return true;
         }
+
+
+//        @Override
+//        public boolean process(Exchange exchange, AsyncCallback callback) {
+//            return super.process(exchange, callback);
+//        }
 
         private void log(Exchange exchange, String tracingKey, String body) {
             String propertyKey = tracingKey + exchange.getExchangeId();
