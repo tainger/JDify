@@ -22,4 +22,8 @@ class DalaranRouterConfig extends OutModelConfig {
 
         private List<ProcessorEntity> pipeline;
     }
+
+    public List<Route> getRoutes() {
+        return routes;
+    }
 }
