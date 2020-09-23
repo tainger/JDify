@@ -40,12 +40,12 @@ public class DalaranMailSenderProcessor implements Processor {
             byte[] fileContent = FileUtils.readFileToByteArray(file);
             send(senderInfo.getEmailUrl(), fileContent, "application/excel");
         } else {
-            send(config.getConnector().getHost(), JSON.toJSONString(in), "text/plain");
+            send(config.getSendTo(), JSON.toJSONString(in), "text/plain");
         }
     }
 
-    private void send(String host, Object body, String type) {
-        String to = config.getSendTo();
+    private void send(String to, Object body, String type) {
+        String host = config.getConnector().getHost();
         String from = config.getConnector().getFrom();
         final String username = config.getConnector().getUsername();
         final String password = config.getConnector().getPassword();
