@@ -68,7 +68,7 @@ public class DalaranMailSenderProcessor implements Processor {
             message.setSubject(config.getSubject());
 
             BodyPart messageBodyPart = new MimeBodyPart();
-            messageBodyPart.setText("Hello!");
+            messageBodyPart.setText("Hello! This mail is from Dalaran, Terminus. Please check it! Thank you!");
             Multipart multipart = new MimeMultipart();
             multipart.addBodyPart(messageBodyPart);
             messageBodyPart = new MimeBodyPart();
