@@ -1,5 +1,7 @@
 package io.terminus.dalaran.core.component.annotation;
 
+import io.terminus.dalaran.DalaranConstants;
+
 import java.lang.annotation.*;
 
 @Inherited
@@ -10,4 +12,6 @@ public @interface Connector {
     String value();
 
     int order() default Short.MAX_VALUE;
+
+    String description() default DalaranConstants.DALARAN_COMPONENT_DEFAULT_DESC;
 }

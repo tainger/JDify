@@ -132,7 +132,7 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext {
             triggerInfo.setConfigFields(configFields);
             triggerInfo.setConfigType(triggerAnnotation.configType());
             triggerInfo.setModelType(triggerAnnotation.bodyType());
-
+            triggerInfo.setDescription(triggerAnnotation.description());
 //            triggerInfo.setIsVoid(triggerAnnotation.isVoid());
 
             Class connectorType = getConnectorType(triggerAnnotation.configType());
@@ -171,6 +171,7 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext {
             processorInfo.setConfigFields(configFields);
             processorInfo.setConfigType(processorAnnotation.configType());
             processorInfo.setModelType(processorAnnotation.bodyType());
+            processorInfo.setDescription(processorAnnotation.description());
 
             Class connectorType = getConnectorType(processorAnnotation.configType());
             if (connectorType != null) {
@@ -179,6 +180,7 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext {
                     ConnectorInfo connectorInfo = buildConnectorInfo(ComponentType.Processor, connectorType, connector, processorType);
                     processorInfo.setConnectorInfo(connectorInfo);
                     processorInfo.setConnectorType(connector.value());
+
                 }
             }
 
@@ -196,6 +198,7 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext {
             newConnectorInfo.setOrder(connector.order());
             newConnectorInfo.setConnectorType(connectorType);
             newConnectorInfo.setConfigFields(connectorConfigFields);
+            newConnectorInfo.setDescription(connector.description());
             return newConnectorInfo;
         });
         connectorInfo.addComponent(componentName);

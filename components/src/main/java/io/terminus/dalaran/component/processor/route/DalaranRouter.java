@@ -22,7 +22,8 @@ import static io.terminus.dalaran.DalaranConstants.DELIMITER;
 @Processor(
         value = "router",
         order = 15,
-        configType = DalaranRouterConfig.class
+        configType = DalaranRouterConfig.class,
+        description = "路由选择节点：能够通过设置判定条件控制流程的多分支执行，类似编程逻辑中的switch, if/else"
 )
 public class DalaranRouter implements DalaranProcessor<Map<String, String>>, DalaranProcessorConfigCustomConverter<DalaranRouterConfig, Map<String, String>> {
 

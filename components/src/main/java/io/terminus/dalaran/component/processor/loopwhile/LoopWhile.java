@@ -20,7 +20,8 @@ import static org.apache.camel.language.mvel.MvelExpression.mvel;
 @Processor(
         value = "loop-while",
         order = 20,
-        configType = LoopWhileConfig.class
+        configType = LoopWhileConfig.class,
+        description = "While循环：模拟条件循环，使循环节点内的流程节点循环执行，直到条件表达式不成立"
 )
 public class LoopWhile implements DalaranProcessor<LoopWhileFragmentInfo>, DalaranProcessorConfigCustomConverter<LoopWhileConfig, LoopWhileFragmentInfo> {
     @Autowired

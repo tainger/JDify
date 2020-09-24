@@ -17,6 +17,8 @@ public class ConnectorInfo {
 
     private DalaranConfigField[] configFields;
 
+    private String description;
+
     @JSONField(serialize = false)
     private Class connectorType;
 

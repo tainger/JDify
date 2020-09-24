@@ -57,4 +57,6 @@ public final class DalaranConstants {
 
     public static final String DALARAN_EXPRESSION_HEADER = "DALARAN_EXPRESSION::";
 
+    public static final String DALARAN_COMPONENT_DEFAULT_DESC = "待补充";
+
 }

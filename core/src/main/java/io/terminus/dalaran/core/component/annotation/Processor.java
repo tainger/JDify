@@ -24,4 +24,6 @@ public @interface Processor {
     String bodyType() default DalaranConstants.OBJECT_MODEL_TYPE;
 
     Class configType() default Void.class;
+
+    String description() default DalaranConstants.DALARAN_COMPONENT_DEFAULT_DESC;
 }

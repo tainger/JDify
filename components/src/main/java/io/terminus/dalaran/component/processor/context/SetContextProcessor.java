@@ -13,7 +13,8 @@ import java.util.Map;
 @Processor(
         value = "set-context",
         order = 20,
-        configType = SetContextConfig.class
+        configType = SetContextConfig.class,
+        description = "设置全局上下文：设置流程中会使用到的全局变量"
 )
 public class SetContextProcessor implements DalaranProcessor<SetContextConfig> {
     @Override

@@ -30,4 +30,6 @@ public abstract class AbstractComponentInfo implements ComponentInfo {
     @JSONField(serialize = false)
     @JsonIgnore
     private Class configType;
+
+    private String description;
 }

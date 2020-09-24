@@ -19,7 +19,8 @@ import java.util.List;
 
 @Processor(
         value = "error-catch",
-        configType = ErrorCatchConfig.class
+        configType = ErrorCatchConfig.class,
+        description = "异常处理：模拟try-catch机制，包含一个正常流程一个异常流程，当正常流程发生异常时，执行流转到异常流程执行"
 )
 public class ErrorCatch implements DalaranProcessor<String>, DalaranProcessorConfigCustomConverter<ErrorCatchConfig, String>, DalaranComponentValidator<ErrorCatchConfig> {
 

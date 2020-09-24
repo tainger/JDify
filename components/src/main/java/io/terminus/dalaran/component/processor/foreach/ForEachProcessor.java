@@ -17,7 +17,8 @@ import static org.apache.camel.builder.Builder.body;
 @Processor(
         value = "foreach",
         order = 20,
-        configType = ForEachConfig.class
+        configType = ForEachConfig.class,
+        description = "For循环：模拟For循环，循环节点会将数组类型的数据自动切分，循环执行"
 )
 public class ForEachProcessor implements DalaranProcessor<String>, DalaranProcessorConfigCustomConverter<ForEachConfig, String> {
 
