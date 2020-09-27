@@ -14,7 +14,7 @@ import org.apache.commons.lang3.StringUtils;
 )
 public class FtpUpload implements DalaranProcessor<FtpUploadConfig> {
 
-    private static final String FTP_ROUTE_URI = "%s:%s:%s/%s?passiveMode=true&fileExist=%s";
+    private static final String FTP_ROUTE_URI = "%s:%s:%s/%s?passiveMode=true&fileExist=%s&stepwise=false&disconnect=true";
 
     @Override
     public void configure(ProcessorDefinition route, FtpUploadConfig config) {
