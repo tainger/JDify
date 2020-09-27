@@ -2,11 +2,9 @@ package io.terminus.dalaran.core.context.support;
 
 import io.terminus.dalaran.ComponentType;
 import io.terminus.dalaran.config.*;
-import io.terminus.dalaran.core.component.DalaranProcessor;
-import io.terminus.dalaran.core.component.DalaranTrigger;
-import io.terminus.dalaran.core.component.DalaranTriggerApiDocExport;
-import io.terminus.dalaran.core.component.DalaranTriggerWordDocExport;
+import io.terminus.dalaran.core.component.*;
 import io.terminus.dalaran.core.component.annotation.Connector;
+import io.terminus.dalaran.core.component.annotation.DynamicModel;
 import io.terminus.dalaran.core.component.annotation.Processor;
 import io.terminus.dalaran.core.component.annotation.Trigger;
 import io.terminus.dalaran.core.component.config.ConnectorConfig;
@@ -36,6 +34,8 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext {
     private final Map<String, ProcessorInfo> processorInfoMapping = new ConcurrentHashMap<>();
 
     private final Map<String, ConnectorInfo> connectorInfoMapping = new ConcurrentHashMap<>();
+
+    private final Map<String, BasicComponentInfo> basicComponentInfoMap = new ConcurrentHashMap<>();
 
     @Override
     public DalaranTrigger getTrigger(String triggerType) {
@@ -118,6 +118,24 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public Collection<BasicComponentInfo> getAllBasicComponentInfo() {
+        return basicComponentInfoMap.values().stream().map(basicComponentInfo -> {
+            BasicComponentInfo newComponentInfo = new BasicComponentInfo();
+            BeanUtils.copyProperties(basicComponentInfo, newComponentInfo);
+            newComponentInfo.setName(basicComponentInfo.getType());
+            List<DalaranConfigField> fields = new ArrayList<>();
+            for (DalaranConfigField configField : newComponentInfo.getConfigFields()) {
+                DalaranConfigField i18nField = new DalaranConfigField();
+                fields.add(i18nField);
+                BeanUtils.copyProperties(configField, i18nField);
+                i18nField.setLabel(i18nUtils.getBasicComponentFieldName(newComponentInfo.getType(), configField.getName()));
+            }
+            newComponentInfo.setConfigFields(fields.toArray(new DalaranConfigField[0]));
+            return newComponentInfo;
+        }).collect(Collectors.toList());
+    }
+
     // TODO 很多重复性的代码
     public void addTrigger(DalaranTrigger trigger) {
         Trigger triggerAnnotation = trigger.getClass().getDeclaredAnnotation(Trigger.class);
@@ -188,6 +206,17 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext {
             processorMapping.put(processorType, processor);
         }
         log.info("load processor {}", processorAnnotation);
+    }
+
+    @Override
+    public void addBasicComponent(DalaranBasicComponent component) {
+        DynamicModel componentAnnotation = component.getClass().getDeclaredAnnotation(DynamicModel.class);
+        DalaranConfigField[] configFields = ConfigFieldUtils.buildConfigFields(component.getClass());
+        BasicComponentInfo componentInfo = new BasicComponentInfo();
+        componentInfo.setConfigFields(configFields);
+        componentInfo.setName(componentAnnotation.value());
+        componentInfo.setType(componentAnnotation.value());
+        basicComponentInfoMap.put(componentAnnotation.value(), componentInfo);
     }
 
     private ConnectorInfo buildConnectorInfo(ComponentType component, Class connectorType, Connector connector, String componentName) {

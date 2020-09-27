@@ -16,6 +16,12 @@ import java.util.Map;
 @Model(value = "SOAP")
 public class SoapSchema extends DalaranModelSchema {
 
+    @ModelFieldInfo(label = "名称", inputType = FieldInputType.String)
+    private String name;
+
+    @ModelFieldInfo(label = "类型", inputType = FieldInputType.ModelSelector)
+    private String modelType;
+
     @ModelFieldInfo(label = "命名空间", inputType = FieldInputType.String, defaultValue = "http://schemas.xmlsoap.org/wsdl")
     private String targetNamespace = "http://schemas.xmlsoap.org/wsdl";
 

@@ -105,6 +105,11 @@ public class PlatformRest implements PlatformInfoAPI, PlatformImportAPI, Platfor
     }
 
     @Override
+    public Collection<BasicComponentInfo> listBasicComponentInfo() {
+        return dalaranContext.getDalaranComponentContext().getAllBasicComponentInfo();
+    }
+
+    @Override
     @OnException(code = ResponseMessage.SERVICE_QUERY_ERROR)
     public Collection<ServiceInfo> listServiceInfo() {
         return dalaranContext.getDalaranServiceContext().getAllServiceInfo();

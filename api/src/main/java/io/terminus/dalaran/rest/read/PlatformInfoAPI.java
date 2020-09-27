@@ -29,6 +29,10 @@ public interface PlatformInfoAPI {
     @GetMapping(value = "/connector")
     Collection<ConnectorInfo> listConnectorInfo();
 
+    @ApiOperation(value = "获取新增或更新组件所需的基本结构")
+    @GetMapping(value = "/basicComponent")
+    Collection<BasicComponentInfo> listBasicComponentInfo();
+
     @ApiOperation(value = "获取服务配置结构")
     @GetMapping(value = "/service")
     Collection<ServiceInfo> listServiceInfo();
