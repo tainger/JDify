@@ -44,9 +44,9 @@ public class DalaranMailSenderProcessor implements Processor {
             MailSenderInfo senderInfo = JSON.parseObject(JSON.toJSONString(in), MailSenderInfo.class);
             File file = OSSUtils.getFileFromOss(senderInfo.getUploadUrl(), ossAccount);
             byte[] fileContent = FileUtils.readFileToByteArray(file);
-            sendSmtp(senderInfo.getEmailUrl(), fileContent, "application/excel");
+            sendSmtp(senderInfo.getFileName(), senderInfo.getEmailUrl(), fileContent, "application/excel");
         } else {
-            sendSmtp(config.getSendTo(), JSON.toJSONString(in), "text/plain");
+            sendSmtp("", config.getSendTo(), JSON.toJSONString(in), "text/plain");
         }
     }
 
@@ -91,7 +91,7 @@ public class DalaranMailSenderProcessor implements Processor {
         }
     }
 
-    private void sendSmtp(String to, Object body, String type) throws Exception {
+    private void sendSmtp(String fileName, String to, Object body, String type) throws Exception {
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
         mailSender.setDefaultEncoding("UTF-8");
         mailSender.setUsername(config.getConnector().getUsername());
@@ -109,8 +109,8 @@ public class DalaranMailSenderProcessor implements Processor {
         }
         helper.setSubject(config.getSubject());
 
-        ByteArrayResource byteArrayResource = new ByteArrayResource(body.toString().getBytes());
-        helper.addAttachment("DalaranFile", byteArrayResource, type);
+        ByteArrayResource byteArrayResource = new ByteArrayResource((byte[])body);
+        helper.addAttachment(fileName, byteArrayResource, type);
 
 //        helper.addAttachment("DalaranFile", new DataHandler(body, type));
 //        helper.addAttachment("DalaranFile", new InputStreamResource(IOUtils.toInputStream(body.toString(), "utf-8")), type);
