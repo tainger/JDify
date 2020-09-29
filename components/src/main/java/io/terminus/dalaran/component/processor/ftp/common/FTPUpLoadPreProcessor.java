@@ -27,7 +27,7 @@ public class FTPUpLoadPreProcessor implements Processor {
         String fileName;
         if (config.isDynamicFileName()) {
             Map<String, Object> contextValues = (Map<String, Object>)exchange.getProperties().get(DALARAN_CONTEXT_EXCHANGE + exchange.getExchangeId());
-            if (config.getInputType() == FtpInputType.ARRAY && contextValues.containsKey(config.getDynamicPath())) {
+            if (config.getInputType() == FtpInputType.XML || (config.getInputType() == FtpInputType.ARRAY && contextValues.containsKey(config.getDynamicPath()))) {
                 fileName = contextValues.get(config.getDynamicPath()).toString();
             } else {
                 Object in = exchange.getIn().getBody();
