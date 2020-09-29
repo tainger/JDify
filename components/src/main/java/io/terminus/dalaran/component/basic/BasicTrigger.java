@@ -7,7 +7,7 @@ import io.terminus.dalaran.core.component.annotation.DynamicModel;
 import lombok.Data;
 
 @Data
-@DynamicModel(value = "Trigger")
+@DynamicModel(value = "Flow")
 public class BasicTrigger implements DalaranBasicComponent {
 
     @ConfigFieldInfo(label = "流程名称", inputType = FieldInputType.String)

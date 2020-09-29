@@ -10,12 +10,6 @@ import lombok.Data;
 @Data
 @Model(value = "CSV")
 public class CsvModelSchema extends DalaranModelSchema {
-    @ModelFieldInfo(label = "名称", inputType = FieldInputType.String)
-    private String name;
-
-    @ModelFieldInfo(label = "类型", inputType = FieldInputType.ModelSelector)
-    private String modelType;
-
     @ModelFieldInfo(label = "字段顺序", inputType = FieldInputType.String, required = false)
     private String columnSequence;
 
