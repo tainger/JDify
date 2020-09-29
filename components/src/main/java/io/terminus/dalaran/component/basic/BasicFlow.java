@@ -8,7 +8,7 @@ import lombok.Data;
 
 @Data
 @DynamicModel(value = "Flow")
-public class BasicTrigger implements DalaranBasicComponent {
+public class BasicFlow implements DalaranBasicComponent {
 
     @ConfigFieldInfo(label = "流程名称", inputType = FieldInputType.String)
     private String name;
