@@ -16,6 +16,12 @@ public class DalaranSchedulerConfig {
     @ConfigFieldInfo(label = "正在执行则不触发", inputType = FieldInputType.Switch, defaultValue = "false")
     private Boolean stateful = false;
 
+    @ConfigFieldInfo(label = "流程停止后删除任务", inputType = FieldInputType.Switch, defaultValue = "true")
+    private Boolean deleteJob = true;
+
+    @ConfigFieldInfo(label = "流程停止后中止任务", inputType = FieldInputType.Switch, defaultValue = "false")
+    private Boolean pauseJob = false;
+
     @ConfigFieldInfo(label = "时区", inputType = FieldInputType.String, required = false)
     private String timezone = "Asia/Shanghai";
 }

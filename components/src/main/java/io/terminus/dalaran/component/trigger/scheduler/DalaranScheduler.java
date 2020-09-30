@@ -20,6 +20,8 @@ public class DalaranScheduler implements DalaranTrigger<DalaranSchedulerConfig> 
         Map<String, Object> options = new HashMap<>();
         options.put("cron", config.getCron());
         options.put("stateful", config.getStateful());
+        options.put("deleteJob", config.getDeleteJob());
+        options.put("pauseJob", config.getPauseJob());
         options.put("trigger.timeZone", config.getTimezone());
         String optionsString = UriUtils.buildOptionsQueryString(options);
         String uri = "quartz2://" + config.getTaskName() + "-" + RandomStringUtils.randomAlphanumeric(6) + optionsString;
