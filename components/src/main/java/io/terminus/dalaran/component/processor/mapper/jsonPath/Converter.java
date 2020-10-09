@@ -340,6 +340,11 @@ public class Converter {
                     return ConvertUtils.convert(target, Boolean.class);
                 case STRING:
                     return ConvertUtils.convert(target, String.class);
+                case ARRAY:
+                    if (!(target instanceof Iterable)) {
+                        return Collections.singletonList(target);
+                    }
+                    return target;
                 default:
                     return target;
             }
