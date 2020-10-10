@@ -20,7 +20,9 @@ public class ConnectorInfo {
     private String description;
 
     @JSONField(serialize = false)
-    private Class connectorType;
+    private Class classType;
+
+    private String type;
 
     public void addComponent(String component) {
         components.add(component);

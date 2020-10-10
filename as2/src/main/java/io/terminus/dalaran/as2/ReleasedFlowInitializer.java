@@ -97,14 +97,22 @@ public class ReleasedFlowInitializer implements DalaranStarter {
             // load client info
             List<ClientReleasedEntity> clients = resourceLoader.loadAllClient();
             for (ClientReleasedEntity client : clients) {
-                dalaranContext.getDalaranClientContext().addClient(client.getAppKey(), client.getSecret());
+                try {
+                    dalaranContext.getDalaranClientContext().addClient(client.getAppKey(), client.getSecret());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
 
             // load mapping function
             List<FunctionReleasedEntity> functions = resourceLoader.loadAllFunctions();
             for (FunctionReleasedEntity function : functions) {
-                dalaranContext.getDalaranFunctionContext().addCustomFunction(function.getOriginId(), function.getType(),
-                        function.getScript(), function.getParams());
+                try {
+                    dalaranContext.getDalaranFunctionContext().addCustomFunction(function.getOriginId(), function.getType(),
+                            function.getScript(), function.getParams());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
 
             List<TriggerFlowReleasedEntity> triggerFlows = resourceLoader.loadAvailableTriggerFlow();
@@ -112,16 +120,24 @@ public class ReleasedFlowInitializer implements DalaranStarter {
                 if (!triggerFlowEntity.getTriggerType().equalsIgnoreCase("as2-server")) {
                     continue;
                 }
-                TriggerFlow triggerFlow = resourceBuilder.buildTriggerFlow(triggerFlowEntity);
-                dalaranContext.addTriggerFlow(triggerFlow);
-                log.info("load released flow [{}]", triggerFlow.getId());
+                try {
+                    TriggerFlow triggerFlow = resourceBuilder.buildTriggerFlow(triggerFlowEntity);
+                    dalaranContext.addTriggerFlow(triggerFlow);
+                    log.info("load released flow [{}]", triggerFlow.getId());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
 
             List<SubFlowReleasedEntity> subFLows = resourceLoader.loadAvailableSubFlow();
             for (SubFlowReleasedEntity subFlowEntity : subFLows) {
-                SubFlow subFlow = resourceBuilder.buildSubFlow(subFlowEntity);
-                dalaranContext.addSubFlow(subFlow);
-                log.info("load released sub-flow {}", subFlow.getId());
+                try {
+                    SubFlow subFlow = resourceBuilder.buildSubFlow(subFlowEntity);
+                    dalaranContext.addSubFlow(subFlow);
+                    log.info("load released sub-flow {}", subFlow.getId());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
 
             List<ApiInfo> apiInfoList = getExportApiInfoList();

@@ -219,13 +219,14 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext {
         basicComponentInfoMap.put(componentAnnotation.value(), componentInfo);
     }
 
-    private ConnectorInfo buildConnectorInfo(ComponentType component, Class connectorType, Connector connector, String componentName) {
+    private ConnectorInfo buildConnectorInfo(ComponentType component, Class classType, Connector connector, String componentName) {
         ConnectorInfo connectorInfo = connectorInfoMapping.computeIfAbsent(connector.value(), key -> {
-            DalaranConfigField[] connectorConfigFields = ConfigFieldUtils.buildConfigFields(connectorType);
+            DalaranConfigField[] connectorConfigFields = ConfigFieldUtils.buildConfigFields(classType);
             ConnectorInfo newConnectorInfo = new ConnectorInfo();
             newConnectorInfo.setName(connector.value());
             newConnectorInfo.setOrder(connector.order());
-            newConnectorInfo.setConnectorType(connectorType);
+            newConnectorInfo.setClassType(classType);
+            newConnectorInfo.setType(classType.getSimpleName());
             newConnectorInfo.setConfigFields(connectorConfigFields);
             newConnectorInfo.setDescription(connector.description());
             return newConnectorInfo;

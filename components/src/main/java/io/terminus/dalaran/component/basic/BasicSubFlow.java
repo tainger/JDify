@@ -13,6 +13,6 @@ public class BasicSubFlow implements DalaranBasicComponent {
     @ConfigFieldInfo(label = "子流程名称", inputType = FieldInputType.String)
     private String name;
 
-    @ConfigFieldInfo(label = "子流程描述", inputType = FieldInputType.String)
+    @ConfigFieldInfo(label = "子流程描述", inputType = FieldInputType.String, required = false)
     private String description;
 }

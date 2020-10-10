@@ -16,7 +16,7 @@ public class BasicFlow implements DalaranBasicComponent {
     @ConfigFieldInfo(label = "触发器类型", inputType = FieldInputType.TriggerSelector)
     private String triggerType;
 
-    @ConfigFieldInfo(label = "流程描述", inputType = FieldInputType.String)
+    @ConfigFieldInfo(label = "流程描述", inputType = FieldInputType.String, required = false)
     private String description;
 
     @ConfigFieldInfo(label = "开启日志", inputType = FieldInputType.Switch)

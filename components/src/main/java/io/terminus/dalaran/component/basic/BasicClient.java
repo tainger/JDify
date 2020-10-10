@@ -19,6 +19,6 @@ public class BasicClient implements DalaranBasicComponent {
     @ConfigFieldInfo(label = "App Secret", inputType = FieldInputType.Password)
     private String secret;
 
-    @ConfigFieldInfo(label = "应用描述", inputType = FieldInputType.String)
+    @ConfigFieldInfo(label = "应用描述", inputType = FieldInputType.String, required = false)
     private String description;
 }

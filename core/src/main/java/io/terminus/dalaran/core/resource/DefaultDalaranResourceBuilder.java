@@ -77,7 +77,7 @@ public class DefaultDalaranResourceBuilder implements DalaranResourceBuilder {
             ConnectorConfig connectorConfig = (ConnectorConfig) config;
             Long connectorId = connectorConfig.getConnectorId();
             if (connectorId != null) {
-                Object connector = buildConnectorConfig(connectorId, triggerInfo.getConnectorInfo().getConnectorType());
+                Object connector = buildConnectorConfig(connectorId, triggerInfo.getConnectorInfo().getClassType());
                 connectorConfig.setConnector(connector);
             }
         }
@@ -193,7 +193,7 @@ public class DefaultDalaranResourceBuilder implements DalaranResourceBuilder {
             ConnectorConfig connectorConfig = (ConnectorConfig) config;
             Long connectorId = connectorConfig.getConnectorId();
             if (connectorId != null) {
-                Object connector = buildConnectorConfig(connectorId, processorInfo.getConnectorInfo().getConnectorType());
+                Object connector = buildConnectorConfig(connectorId, processorInfo.getConnectorInfo().getClassType());
                 connectorConfig.setConnector(connector);
             }
         }
