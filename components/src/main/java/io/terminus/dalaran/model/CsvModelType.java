@@ -93,8 +93,9 @@ public class CsvModelType implements DalaranModelType<String, CsvModelSchema> {
                 }
                 stringBuilder.append("\n");
             }
-            stringBuilder.deleteCharAt(stringBuilder.length()-1);
-
+            if (!schema.isRemainNewLine()) {
+                stringBuilder.deleteCharAt(stringBuilder.length()-1);
+            }
         } else {
             stringBuilder.append(body.toString());
         }

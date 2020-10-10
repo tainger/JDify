@@ -1,15 +1,20 @@
 package io.terminus.dalaran.component.processor.mail.dalaran;
 
 import com.alibaba.fastjson.JSON;
+import com.sun.mail.util.MailSSLSocketFactory;
 import io.terminus.dalaran.component.common.MailProtocol;
 import io.terminus.dalaran.component.processor.mail.camel.DalaranMailSenderConfig;
 import io.terminus.dalaran.component.processor.mail.camel.MailSenderInfo;
 import io.terminus.dalaran.component.utils.OSSUtils;
 import io.terminus.dalaran.core.resource.oss.OSSAccount;
+import lombok.val;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
+import org.springframework.mail.javamail.MimeMessageHelper;
 
 import javax.activation.DataHandler;
 import javax.mail.*;
@@ -18,6 +23,7 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import java.io.File;
+import java.security.GeneralSecurityException;
 import java.util.Properties;
 
 public class DalaranMailSenderProcessor implements Processor {
@@ -38,9 +44,9 @@ public class DalaranMailSenderProcessor implements Processor {
             MailSenderInfo senderInfo = JSON.parseObject(JSON.toJSONString(in), MailSenderInfo.class);
             File file = OSSUtils.getFileFromOss(senderInfo.getUploadUrl(), ossAccount);
             byte[] fileContent = FileUtils.readFileToByteArray(file);
-            send(senderInfo.getEmailUrl(), fileContent, "application/excel");
+            sendSmtp(senderInfo.getFileName(), senderInfo.getEmailUrl(), fileContent, "application/excel");
         } else {
-            send(config.getSendTo(), JSON.toJSONString(in), "text/plain");
+            sendSmtp("", config.getSendTo(), JSON.toJSONString(in), "text/plain");
         }
     }
 
@@ -68,7 +74,7 @@ public class DalaranMailSenderProcessor implements Processor {
             message.setSubject(config.getSubject());
 
             BodyPart messageBodyPart = new MimeBodyPart();
-            messageBodyPart.setText("Hello!");
+            messageBodyPart.setText("Hello! This mail is from Dalaran, Terminus. Please check it! Thank you!");
             Multipart multipart = new MimeMultipart();
             multipart.addBodyPart(messageBodyPart);
             messageBodyPart = new MimeBodyPart();
@@ -85,7 +91,35 @@ public class DalaranMailSenderProcessor implements Processor {
         }
     }
 
-    private Properties buildProperties(String host, MailProtocol protocol) {
+    private void sendSmtp(String fileName, String to, Object body, String type) throws Exception {
+        JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
+        mailSender.setDefaultEncoding("UTF-8");
+        mailSender.setUsername(config.getConnector().getUsername());
+        mailSender.setPassword(config.getConnector().getPassword());
+        mailSender.setHost(config.getConnector().getHost());
+        mailSender.setPort(config.getConnector().getPort());
+        mailSender.setProtocol("smtp");
+        mailSender.setJavaMailProperties(configProperties());
+        val mimeMessage = mailSender.createMimeMessage();
+        val helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+        helper.setFrom(config.getConnector().getUsername());
+        helper.setTo(to);
+        if (StringUtils.isNotBlank(config.getCcTo())) {
+            helper.setCc(config.getCcTo());
+        }
+        helper.setSubject(config.getSubject());
+
+        ByteArrayResource byteArrayResource = new ByteArrayResource((byte[])body);
+        helper.addAttachment(fileName, byteArrayResource, type);
+
+//        helper.addAttachment("DalaranFile", new DataHandler(body, type));
+//        helper.addAttachment("DalaranFile", new InputStreamResource(IOUtils.toInputStream(body.toString(), "utf-8")), type);
+        helper.setText("Hello! This mail is from Dalaran, Terminus. Please check it! Thank you!");
+        mailSender.send(mimeMessage);
+    }
+
+
+        private Properties buildProperties(String host, MailProtocol protocol) {
         Properties props = new Properties();
         switch (protocol) {
             case SMTPS:
@@ -99,5 +133,23 @@ public class DalaranMailSenderProcessor implements Processor {
                 break;
         }
         return props;
+    }
+
+    private Properties configProperties() {
+        Properties properties = new Properties();
+        properties.put("mail.smtp.auth", true);
+        properties.put("mail.debug", true);
+        properties.put("mail.smtps.ssl.checkserveridentity", true);
+        properties.put("mail.smtps.ssl.trust", "*");
+        MailSSLSocketFactory sf = null;
+        try {
+            sf = new MailSSLSocketFactory();
+        } catch (GeneralSecurityException e) {
+            e.printStackTrace();
+        }
+        sf.setTrustAllHosts(true);
+        properties.put("mail.smtp.ssl.enable", "true");
+        properties.put("mail.smtp.ssl.socketFactory", sf);
+        return properties;
     }
 }

@@ -1,5 +1,6 @@
 package io.terminus.dalaran.component.processor.route;
 
+import com.google.common.collect.Maps;
 import io.terminus.dalaran.core.component.DalaranProcessor;
 import io.terminus.dalaran.core.component.DalaranProcessorConfigCustomConverter;
 import io.terminus.dalaran.core.component.annotation.Processor;
@@ -11,9 +12,10 @@ import io.terminus.dalaran.model.flow.FlowFragment;
 import lombok.val;
 import org.apache.camel.model.ChoiceDefinition;
 import org.apache.camel.model.ProcessorDefinition;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -38,7 +40,7 @@ public class DalaranRouter implements DalaranProcessor<Map<String, String>>, Dal
     public void configure(ProcessorDefinition route, Map<String, String> config) {
         ChoiceDefinition choiceDefinition = route.choice();
         for (Map.Entry<String, String> routeItem : config.entrySet()) {
-            if (OTHERWISE_EXPRESSION.equals(routeItem.getKey())) {
+            if (StringUtils.contains(routeItem.getKey(), OTHERWISE_EXPRESSION)) {
                 choiceDefinition.otherwise();
             } else {
                 choiceDefinition.when().mvel(routeItem.getKey());
@@ -57,8 +59,9 @@ public class DalaranRouter implements DalaranProcessor<Map<String, String>>, Dal
     @Override
     public Map<String, String> convert(DalaranRouterConfig config, ComponentModel component, BasicFlow flow) {
         List<DalaranRouterConfig.Route> routes = config.getRoutes();
-        Map<String, String> routeMapper = new HashMap<>();
+        Map<String, String> routeMapper = new LinkedHashMap<>();
 
+        Map.Entry<String, String> entry = null;
         for (int i = 0; i < routes.size(); i++) {
             val route = routes.get(i);
 
@@ -72,7 +75,14 @@ public class DalaranRouter implements DalaranProcessor<Map<String, String>>, Dal
                     component.getOutModel(), flow.getId(), fragmentId, flow.isTracing());
             dalaranContext.addFragmentFlow(fragment);
 
+            if (StringUtils.contains(route.getExpression(), OTHERWISE_EXPRESSION)) {
+                entry = Maps.immutableEntry(route.getExpression(), fragment.getDirectRouteUri());
+                continue;
+            }
             routeMapper.put(route.getExpression(), fragment.getDirectRouteUri());
+        }
+        if (entry != null) {
+            routeMapper.put(entry.getKey(), entry.getValue());
         }
         return routeMapper;
     }

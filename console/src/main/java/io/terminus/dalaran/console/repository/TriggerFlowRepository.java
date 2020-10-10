@@ -12,4 +12,6 @@ public interface TriggerFlowRepository extends JpaRepository<TriggerFlowEntity, 
     List<TriggerFlowEntity> findByStatusNotAndTriggerType(FlowStatus status, String triggerType);
 
     List<TriggerFlowEntity> findByStatusNot(FlowStatus status);
+
+    TriggerFlowEntity findByName(String name);
 }
