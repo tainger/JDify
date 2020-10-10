@@ -9,6 +9,7 @@ import org.apache.camel.processor.exceptionpolicy.ExceptionPolicyStrategy;
 import org.apache.camel.spi.RouteContext;
 import org.apache.camel.util.AsyncProcessorHelper;
 import org.apache.camel.util.CamelLogger;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.concurrent.ScheduledExecutorService;
 
@@ -79,7 +80,17 @@ public class TracingErrorHandlerFactory extends DefaultErrorHandlerBuilder imple
             String propertyKey = tracingKey + exchange.getExchangeId();
             DalaranTracingLog tracingLog = exchange.getProperty(propertyKey, DalaranTracingLog.class);
             if (tracingLog == null) {
-                return;
+                if (StringUtils.startsWith(propertyKey, PROCESSOR_TRACING_LOG)) {
+                    return;
+                }
+                String mainRecordId = exchange.getProperty(LOG_MAIN_RECORD_ID, String.class);
+                tracingLog = exchange.getProperty(tracingKey + mainRecordId, DalaranTracingLog.class);
+                String mainLogRecordHandled = LOG_MAIN_RECORD_ID + LOG_MAIN_RECORD_HANDLED;
+                if (tracingLog == null || !tracingLog.isMain()
+                        || (exchange.getProperty(mainLogRecordHandled) != null && exchange.getProperty(mainLogRecordHandled, Boolean.class))) {
+                    return;
+                }
+                exchange.setProperty(mainLogRecordHandled, true);
             }
             exchange.removeProperty(propertyKey);
             tracingLog.setSuccessful(false);

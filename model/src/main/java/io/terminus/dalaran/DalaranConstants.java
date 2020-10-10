@@ -22,6 +22,8 @@ public final class DalaranConstants {
     public static final String CAMEL_CORRELATION_ID = "CamelCorrelationId";
     public static final String LOG_MAIN_RECORD_ID = "LogMainRecordId";
 
+    public static final String LOG_MAIN_RECORD_HANDLED = "LogMainRecordHandled";
+
     public static final String CAMEL_MULTICAST_COMPLETE = "CamelMulticastComplete";
 
     public static final String DALARAN_CONTEXT_HEADER = "DalaranContextHeader";
