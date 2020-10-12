@@ -60,7 +60,7 @@ public class ComponentManagementServiceImpl implements ComponentManagementServic
                     return moduleManagementService.createModule(objectMapper.readValue(componentConfig, ModuleDTO.class));
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException("create component error! ", e.getCause());
         }
         return null;
     }
@@ -89,7 +89,7 @@ public class ComponentManagementServiceImpl implements ComponentManagementServic
                     return moduleManagementService.updateModule(objectMapper.readValue(componentConfig, ModuleDTO.class));
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException("update component error! ", e.getCause());
         }
         return null;
     }
@@ -124,7 +124,7 @@ public class ComponentManagementServiceImpl implements ComponentManagementServic
                     break;
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException("delete component error! ", e.getCause());
         }
     }
 
