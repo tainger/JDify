@@ -3,6 +3,7 @@ package io.terminus.dalaran.component.processor.http;
 import com.alibaba.fastjson.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.terminus.dalaran.FieldInputType;
+import io.terminus.dalaran.component.common.ContentType;
 import io.terminus.dalaran.component.common.HttpMethod;
 import io.terminus.dalaran.component.connector.RestClientConnector;
 import io.terminus.dalaran.core.component.annotation.ConfigFieldInfo;
@@ -26,6 +27,9 @@ public class HttpClientConfig extends OutModelConfig implements ConnectorConfig<
 
     @ConfigFieldInfo(label = "路径", inputType = FieldInputType.String, defaultValue = "/")
     private String path;
+
+    @ConfigFieldInfo(label = "数据类型", inputType = FieldInputType.Select, defaultValue = "APPLICATION_JSON")
+    private ContentType contentType = ContentType.APPLICATION_JSON;
 
     @ConfigFieldInfo(label = "Headers", inputType = FieldInputType.String, required = false)
     private String headers;

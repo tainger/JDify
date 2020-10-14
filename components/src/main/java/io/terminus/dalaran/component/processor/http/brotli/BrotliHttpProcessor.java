@@ -49,8 +49,18 @@ public class BrotliHttpProcessor implements Processor {
             if (StringUtils.isNotBlank(config.getQueryParams())) {
                 url += url + Joiner.on("&").withKeyValueSeparator("=").join(buildValues(exchange, config.getQueryParams()));
             }
-            RequestBody body = RequestBody.create(MediaType.parse("application/json"), buildRequestBody(exchange.getIn().getBody()));
-            request = new Request.Builder().url(url).headers(headers).post(body).build();
+            switch (config.getContentType()) {
+                case APPLICATION_FORM_URLENCODED:
+                    Map<String, String> formBody = buildFormBody(exchange.getIn().getBody());
+                    FormBody.Builder form = new FormBody.Builder();
+                    formBody.forEach((k, v) -> form.add(k, v));
+                    FormBody requestBody = form.build();
+                    request = new Request.Builder().url(url).headers(headers).post(requestBody).build();
+                    break;
+                default:
+                    RequestBody body = RequestBody.create(MediaType.parse("application/json"), buildRequestBody(exchange.getIn().getBody()));
+                    request = new Request.Builder().url(url).headers(headers).post(body).build();
+            }
         }
         Response response = client.newCall(request).execute();
         String responseBody = Objects.requireNonNull(response.body()).string();
@@ -101,5 +111,18 @@ public class BrotliHttpProcessor implements Processor {
             });
         }
         return values;
+    }
+
+    private Map<String, String> buildFormBody(Object body) throws Exception {
+        if (body == null) {
+            return null;
+        }
+        if (body instanceof byte[]) {
+            return JSON.parseObject(IOUtils.toString((byte[])body), Map.class);
+        } else if (body instanceof String) {
+            return JSON.parseObject((String) body, Map.class);
+        } else {
+            return JSON.parseObject(JSON.toJSONString(body), Map.class);
+        }
     }
 }

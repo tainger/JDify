@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 @Processor(
-        value = "BrotliHttpClient",
+        value = {"DalaranHttpClient", "BrotliHttpClient"},
         order = 10,
         configType = HttpClientConfig.class,
         bodyType = "JSON"

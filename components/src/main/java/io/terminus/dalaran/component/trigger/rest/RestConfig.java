@@ -1,6 +1,7 @@
 package io.terminus.dalaran.component.trigger.rest;
 
 import io.terminus.dalaran.FieldInputType;
+import io.terminus.dalaran.component.common.ContentType;
 import io.terminus.dalaran.component.common.HttpMethod;
 import io.terminus.dalaran.core.component.annotation.ConfigFieldInfo;
 import io.terminus.dalaran.core.component.config.AllModelConfig;
@@ -28,6 +29,9 @@ public class RestConfig extends AllModelConfig {
 
     @ConfigFieldInfo(label = "路径", inputType = FieldInputType.String, defaultValue = "/")
     private String path;
+
+    @ConfigFieldInfo(label = "数据类型", inputType = FieldInputType.Select, defaultValue = "APPLICATION_JSON")
+    private ContentType contentType = ContentType.APPLICATION_JSON;
 
     @ConfigFieldInfo(label = "超时时间(ms)", inputType = FieldInputType.Integer, defaultValue = "3000")
     private Long timeout = 3000L;

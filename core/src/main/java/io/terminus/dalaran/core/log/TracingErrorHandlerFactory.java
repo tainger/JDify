@@ -11,6 +11,7 @@ import org.apache.camel.util.AsyncProcessorHelper;
 import org.apache.camel.util.CamelLogger;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.ScheduledExecutorService;
 
 import static io.terminus.dalaran.DalaranConstants.*;
@@ -18,6 +19,11 @@ import static io.terminus.dalaran.DalaranConstants.*;
 public class TracingErrorHandlerFactory extends DefaultErrorHandlerBuilder implements ErrorHandlerFactory {
 
     private final DalaranTraceLogger dalaranTraceLogger;
+
+//    private static ConcurrentHashMap<String, Boolean> mainLogHandleRecord = new ConcurrentHashMap<>();
+
+    private static PriorityBlockingQueue<String> mainLogHandleRecord = new PriorityBlockingQueue<>(500);
+
 
     public TracingErrorHandlerFactory(DalaranTraceLogger dalaranTraceLogger) {
         this.dalaranTraceLogger = dalaranTraceLogger;
@@ -77,20 +83,23 @@ public class TracingErrorHandlerFactory extends DefaultErrorHandlerBuilder imple
         }
 
         private void log(Exchange exchange, String tracingKey, String body) {
+            String mainLogRecordHandled = exchange.getProperty(LOG_MAIN_RECORD_ID) + LOG_MAIN_RECORD_HANDLED;
             String propertyKey = tracingKey + exchange.getExchangeId();
             DalaranTracingLog tracingLog = exchange.getProperty(propertyKey, DalaranTracingLog.class);
+            if (tracingLog != null && tracingLog.isMain() && mainLogHandleRecord.contains(mainLogRecordHandled)) {
+                return;
+            }
             if (tracingLog == null) {
                 if (StringUtils.startsWith(propertyKey, PROCESSOR_TRACING_LOG)) {
                     return;
                 }
                 String mainRecordId = exchange.getProperty(LOG_MAIN_RECORD_ID, String.class);
                 tracingLog = exchange.getProperty(tracingKey + mainRecordId, DalaranTracingLog.class);
-                String mainLogRecordHandled = LOG_MAIN_RECORD_ID + LOG_MAIN_RECORD_HANDLED;
                 if (tracingLog == null || !tracingLog.isMain()
-                        || (exchange.getProperty(mainLogRecordHandled) != null && exchange.getProperty(mainLogRecordHandled, Boolean.class))) {
+                        || mainLogHandleRecord.contains(mainLogRecordHandled)) {
                     return;
                 }
-                exchange.setProperty(mainLogRecordHandled, true);
+                mainLogHandleRecord.add(mainLogRecordHandled);
             }
             exchange.removeProperty(propertyKey);
             tracingLog.setSuccessful(false);

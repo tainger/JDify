@@ -55,6 +55,7 @@ public class DalaranHttpClient implements DalaranProcessor<HttpClientConfig>, Da
         if (StringUtils.isNotBlank(config.getConnector().getUsername()) && StringUtils.isNotBlank(config.getConnector().getPassword())) {
             uri = uri + "&authMethod=Basic&authUsername=" + config.getConnector().getUsername() + "&authPassword=" + config.getConnector().getPassword();
         }
+
         route.setHeader(HTTP_METHOD, Builder.constant(config.getMethod().name()));
         route.setHeader(CONTENT_TYPE, Builder.constant("application/json"));
 //        if (config.getMethod().isNoBody()) {
