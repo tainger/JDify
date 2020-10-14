@@ -12,6 +12,9 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
+import javax.crypto.Cipher;
+import javax.crypto.spec.SecretKeySpec;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -228,13 +231,32 @@ public class SignUtilsTest {
         /**
          * 8962201510470905
          */
-        String s = AESUtils.encrypt("{\"xf_surname\":\"CRM注册8284-地址验证\",\"eb_souce\":\"1\",\"telephone2\":\"18951640003\",\"birthdaydd\":\"06\",\"xf_mobile\":\"18951640003\",\"identity\":\"CRM\",\"xf_vipcodeprefix\":\"1\",\"xf_address2\":\"330000|330100|330110\",\"xf_address1\":\"浙江省杭州市余杭区xx街道\",\"xf_sex\":\"F\",\"eb_cardtype\":\"0\",\"telephone\":\"18951640003\",\"xf_issuestore\":\"50202501\",\"birthdayyyyy\":\"2000\",\"xf_email\":\"15764228277@qq.com\",\"defsaleman\":\"testman\",\"xfIssuestaffcode\":\"02342\",\"xf_vipid\":\"390810200006161234\",\"birthdaymm\":\"16\",\"eb_regirstrystore\":\"323\",\"xf_birthday\":\"2010-04-14 00:00:00\",\"postal\":\"2314\",\"remark1\":\"test\",\"remark2\":\"test\"}", "89622015104709087435617163207900");
+
+        String origin = "{\"country\":\"China\",\"city\":\"shanghai\"}";
+
+//        String origin = "{\"xf_surname\":\"模拟上线验证\",\"eb_souce\":\"1\",\"telephone2\":\"15764101301\",\"birthdaydd\":\"06\",\"xf_mobile\":\"15764101301\",\"identity\":\"CRM\",\"xf_vipcodeprefix\":\"1\",\"xf_address2\":\"330000|330100|330106\",\"xf_address1\":\"浙江省杭州市西湖区西湖旅游景区\",\"xf_sex\":\"F\",\"eb_cardtype\":\"1\",\"telephone\":\"15764101301\",\"xf_issuestore\":\"12312\",\"birthdayyyyy\":\"2013\",\"xf_email\":\"test15764101301@qq.com\",\"defsaleman\":\"testman\",\"xfIssuestaffcode\":\"02342\",\"xf_vipid\":\"23134543\",\"birthdaymm\":\"06\",\"eb_regirstrystore\":\"023322\",\"xf_birthday\":\"2013-06-06 00:00:00\",\"postal\":\"2314\",\"remark1\":\"test\",\"remark2\":\"test\"}";
+
+        SecretKeySpec secretKeySpec = new SecretKeySpec("79622016174910087435617163207911".getBytes(StandardCharsets.UTF_8), "AES");
+        try {
+            Cipher cipher = Cipher.getInstance(ComponentConstants.AES_PKCS5PADDING);
+            cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec);
+            String s = AESUtils.encrypt(origin, cipher);
+            System.out.println(s);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         String soo = AESUtils.encryptNoPadding( "82154558866614574815", "8962201510470905");
 
         String somoo = AESUtils.decryptNoPadding("eZkmKwvwdIjqm0WftKlUhA==", "8962201510470905");
 
-        String ss = AESUtils.decrypt("HDdmklsa+nkQi8K8alVlFA==", "8962201510470905");
+        try {
+            Cipher cipher1 = Cipher.getInstance(ComponentConstants.AES_PKCS5PADDING);
+            cipher1.init(Cipher.DECRYPT_MODE, secretKeySpec);
+            String ss = AESUtils.decrypt("HDdmklsa+nkQi8K8alVlFA==", cipher1);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         Assert.assertTrue(false);
     }
