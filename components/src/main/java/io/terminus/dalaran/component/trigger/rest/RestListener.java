@@ -1,6 +1,7 @@
 package io.terminus.dalaran.component.trigger.rest;
 
 import io.swagger.models.Swagger;
+import io.terminus.dalaran.component.common.ContentType;
 import io.terminus.dalaran.component.common.HttpMethod;
 import io.terminus.dalaran.component.trigger.rest.model.ApiInfo;
 import io.terminus.dalaran.component.trigger.rest.processor.*;
@@ -57,6 +58,9 @@ public class RestListener implements DalaranTrigger<RestConfig>, DalaranTriggerA
             // TODO 目前会多一次序列化, 如果下个节点要求的是非序列化对象, 会有额外的性能开销
             route.marshal().json(JsonLibrary.Fastjson);
         } else {
+            if (config.getContentType() == ContentType.APPLICATION_FORM_URLENCODED) {
+                route.process(new FormDataConvertProcessor());
+            }
             if (config.isEnableSign()) {
                 route.unmarshal().json(JsonLibrary.Fastjson);
                 route.process(new AESSignProcessor(config));
