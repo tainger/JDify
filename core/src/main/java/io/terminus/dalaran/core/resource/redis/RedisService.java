@@ -12,9 +12,11 @@ public class RedisService {
     @Autowired
     private RedisTemplate<String, String> redisTemplate;
 
-    private Boolean setValue(String key, String value) {
+    public Boolean setValue(String key, String value) {
         return redisTemplate.opsForValue().setIfAbsent(key, value, 30, TimeUnit.MINUTES);
     }
 
-
+    public Boolean contains(String key) {
+        return redisTemplate.hasKey(key);
+    }
 }
