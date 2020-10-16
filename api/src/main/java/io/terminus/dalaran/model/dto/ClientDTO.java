@@ -11,4 +11,5 @@ public class ClientDTO extends BasicClientInfo {
     private String secret;
 
     private String description;
+
 }

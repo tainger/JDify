@@ -1,11 +1,13 @@
 package io.terminus.dalaran.console.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import io.terminus.dalaran.console.entity.ClientEntity;
 import io.terminus.dalaran.console.entity.ConnectorEntity;
 import io.terminus.dalaran.console.repository.ConnectorRepository;
 import io.terminus.dalaran.console.service.ConnectorService;
 import io.terminus.dalaran.model.dto.ConnectorDTO;
 import io.terminus.dalaran.model.dto.basic.BasicConnectorInfo;
+import io.terminus.draco.web.autoconfig.context.UserContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -30,6 +32,7 @@ public class ConnectorServiceImpl implements ConnectorService {
     @Override
     public Long create(ConnectorDTO connectorDTO) {
         ConnectorEntity entity = toEntity(connectorDTO);
+        setCreatedBy(entity);
         connectorRepository.save(entity);
         return entity.getId();
     }
@@ -37,6 +40,7 @@ public class ConnectorServiceImpl implements ConnectorService {
     @Override
     public ConnectorDTO update(ConnectorDTO connectorDTO) {
         ConnectorEntity entity = toEntity(connectorDTO);
+        setUpdatedBy(entity);
         connectorRepository.save(entity);
         return toDTO(entity);
     }
@@ -93,6 +97,18 @@ public class ConnectorServiceImpl implements ConnectorService {
         entity.setModuleId(dto.getModuleId());
         entity.setConfig(JSON.toJSONString(dto.getConfig()));
         return entity;
+    }
+
+    private void setCreatedBy(ConnectorEntity connectorEntity){
+        if(UserContext.getUserInfo().getUsername()!=null){
+            connectorEntity.setCreatedBy(UserContext.getUserInfo().getUsername());
+        }
+    }
+
+    private void setUpdatedBy(ConnectorEntity connectorEntity){
+        if(UserContext.getUserInfo().getUsername()!=null){
+            connectorEntity.setUpdatedBy(UserContext.getUserInfo().getUsername());
+        }
     }
 
 }

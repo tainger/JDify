@@ -7,6 +7,7 @@ import com.google.common.collect.Maps;
 import io.terminus.dalaran.DalaranConsoleConstants;
 import io.terminus.dalaran.ServiceType;
 import io.terminus.dalaran.component.processor.mapper.model.MapperConstants;
+import io.terminus.dalaran.console.entity.ClientEntity;
 import io.terminus.dalaran.console.entity.ModelEntity;
 import io.terminus.dalaran.console.entity.ServiceEntity;
 import io.terminus.dalaran.console.repository.ModelRepository;
@@ -21,6 +22,7 @@ import io.terminus.dalaran.model.dto.ModelDTO;
 import io.terminus.dalaran.model.dto.basic.BasicModelInfo;
 import io.terminus.dalaran.model.query.ModelQuery;
 import io.terminus.dalaran.model.schema.*;
+import io.terminus.draco.web.autoconfig.context.UserContext;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -68,7 +70,9 @@ public class ModelManagementServiceImpl implements ModelManagementService {
 
     @Override
     public Long createModel(ModelDTO modelModel) {
-        return modelRepository.save(buildEntity(modelModel)).getId();
+        ModelEntity modelEntity = buildEntity(modelModel);
+        setCreatedBy(modelEntity);
+        return modelRepository.save(modelEntity).getId();
     }
 
     @Override
@@ -78,7 +82,9 @@ public class ModelManagementServiceImpl implements ModelManagementService {
 
     @Override
     public ModelDTO updateModel(ModelDTO modelModel) {
-        modelRepository.save(buildEntity(modelModel));
+        ModelEntity modelEntity = buildEntity(modelModel);
+        setUpdatedBy(modelEntity);
+        modelRepository.save(modelEntity);
         return modelModel;
     }
 
@@ -214,6 +220,12 @@ public class ModelManagementServiceImpl implements ModelManagementService {
         DalaranModelSchema schema = dalaranContext.getDalaranModelTypeContext().getModelType(model.getType()).importTemplateData(dataTemplate, model.getModelSchema());
         model.setModelSchema(JSON.toJSONString(schema));
         modelRepository.save(model);
+        return schema;
+    }
+
+    @Override
+    public DalaranModelSchema importDataTemplateByType(DataTemplate dataTemplate, String type) {
+        DalaranModelSchema schema = dalaranContext.getDalaranModelTypeContext().getModelType(type).importTemplateData(dataTemplate,null);
         return schema;
     }
 
@@ -530,5 +542,17 @@ public class ModelManagementServiceImpl implements ModelManagementService {
                 return FieldType.BOOLEAN;
         }
         return FieldType.STRING;
+    }
+
+    private void setCreatedBy(ModelEntity modelEntity){
+        if(UserContext.getUserInfo().getUsername()!=null){
+            modelEntity.setCreatedBy(UserContext.getUserInfo().getUsername());
+        }
+    }
+
+    private void setUpdatedBy(ModelEntity modelEntity){
+        if(UserContext.getUserInfo().getUsername()!=null){
+            modelEntity.setUpdatedBy(UserContext.getUserInfo().getUsername());
+        }
     }
 }

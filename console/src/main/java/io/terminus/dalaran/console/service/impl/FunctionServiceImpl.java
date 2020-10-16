@@ -1,11 +1,13 @@
 package io.terminus.dalaran.console.service.impl;
 
+import io.terminus.dalaran.console.entity.ClientEntity;
 import io.terminus.dalaran.console.entity.FunctionEntity;
 import io.terminus.dalaran.console.repository.FunctionRepository;
 import io.terminus.dalaran.console.service.FunctionService;
 import io.terminus.dalaran.core.context.DalaranFunctionContext;
 import io.terminus.dalaran.model.dto.FunctionDTO;
 import io.terminus.dalaran.model.dto.basic.BasicFunctionInfo;
+import io.terminus.draco.web.autoconfig.context.UserContext;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -31,6 +33,7 @@ public class FunctionServiceImpl implements FunctionService {
     @Override
     public Long create(FunctionDTO functionDTO) {
         FunctionEntity entity = toEntity(functionDTO);
+        setCreatedBy(entity);
         repository.save(entity);
         functionContext.addCustomFunction(entity.getId(), entity.getType(), entity.getScript(), entity.getParams());
         return entity.getId();
@@ -39,6 +42,7 @@ public class FunctionServiceImpl implements FunctionService {
     @Override
     public FunctionDTO update(FunctionDTO functionDTO) {
         FunctionEntity entity = toEntity(functionDTO);
+        setUpdatedBy(entity);
         repository.save(entity);
         functionContext.addCustomFunction(entity.getId(), entity.getType(), entity.getScript(), entity.getParams());
         return toDTO(entity);
@@ -75,5 +79,17 @@ public class FunctionServiceImpl implements FunctionService {
         FunctionEntity entity = new FunctionEntity();
         BeanUtils.copyProperties(dto, entity);
         return entity;
+    }
+
+    private void setCreatedBy(FunctionEntity functionEntity){
+        if(UserContext.getUserInfo().getUsername()!=null){
+            functionEntity.setCreatedBy(UserContext.getUserInfo().getUsername());
+        }
+    }
+
+    private void setUpdatedBy(FunctionEntity functionEntity){
+        if(UserContext.getUserInfo().getUsername()!=null){
+            functionEntity.setUpdatedBy(UserContext.getUserInfo().getUsername());
+        }
     }
 }

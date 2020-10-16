@@ -21,6 +21,10 @@ public interface ModelImportAPI {
     @PostMapping(value = "/{id}/import/data-template")
     DalaranModelSchema importDataTemplate(@RequestBody DataTemplate dataTemplate, @PathVariable long id);
 
+    @ApiOperation(value = "导入数据模版通过类型")
+    @PostMapping(value = "/{type}/import/data-template-type")
+    DalaranModelSchema importDataTemplateByType(@RequestBody DataTemplate dataTemplate, @PathVariable String type);
+
     @ApiOperation(value = "导入数据模板更新模型结构")
     @PostMapping(value = "/{id}/import/dalaran-schema")
     DalaranModelSchema importDalaranSchema(@RequestBody DalaranModelSchema schema, @PathVariable long id);

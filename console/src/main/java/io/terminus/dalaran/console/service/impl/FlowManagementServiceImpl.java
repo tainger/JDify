@@ -28,6 +28,7 @@ import io.terminus.dalaran.model.flow.FlowValidation;
 import io.terminus.dalaran.model.flow.TriggerFlow;
 import io.terminus.dalaran.model.flow.ValidateMessageLevel;
 import io.terminus.dalaran.model.query.FlowQuery;
+import io.terminus.draco.web.autoconfig.context.UserContext;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
@@ -101,6 +102,7 @@ public class FlowManagementServiceImpl implements FlowManagementService {
         TriggerFlowEntity flowEntity = new TriggerFlowEntity();
         buildEntity(flowModel, flowEntity);
         setFlowStatus(flowEntity);
+        setCreatedBy(flowEntity);
         Long id = flowRepository.save(flowEntity).getId();
         // TODO 这里依赖 loader 有点怪 而且可以异步
         if (flowEntity.getStatus() != FlowStatus.Error) {
@@ -274,6 +276,7 @@ public class FlowManagementServiceImpl implements FlowManagementService {
         TriggerFlowEntity flowEntity = flowEntityOptional.get();
         buildEntity(flowModel, flowEntity);
         setFlowStatus(flowEntity);
+        setUpdatedBy(flowEntity);
         flowRepository.save(flowEntity);
         // TODO 这里依赖 loader 有点怪 而且可以异步
         testFlowInitializer.reloadTestTriggerFlow(flowEntity.getId());
@@ -405,4 +408,17 @@ public class FlowManagementServiceImpl implements FlowManagementService {
             return flowEntity.getName().trim();
         }).collect(Collectors.toList());
     }
+
+    private void setCreatedBy(TriggerFlowEntity triggerFlowEntity){
+        if(UserContext.getUserInfo().getUsername()!=null){
+            triggerFlowEntity.setCreatedBy(UserContext.getUserInfo().getUsername());
+        }
+    }
+
+    private void setUpdatedBy(TriggerFlowEntity triggerFlowEntity){
+        if(UserContext.getUserInfo().getUsername()!=null){
+            triggerFlowEntity.setUpdatedBy(UserContext.getUserInfo().getUsername());
+        }
+    }
+
 }

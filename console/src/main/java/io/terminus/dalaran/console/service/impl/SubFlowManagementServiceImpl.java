@@ -3,6 +3,7 @@ package io.terminus.dalaran.console.service.impl;
 import com.alibaba.fastjson.JSON;
 import io.terminus.dalaran.console.TestFlowInitializer;
 import io.terminus.dalaran.console.convertor.FlowConvertor;
+import io.terminus.dalaran.console.entity.ServiceEntity;
 import io.terminus.dalaran.console.entity.SubFlowEntity;
 import io.terminus.dalaran.console.repository.SubFlowRepository;
 import io.terminus.dalaran.console.service.SubFlowManagementService;
@@ -18,6 +19,7 @@ import io.terminus.dalaran.model.flow.FlowValidation;
 import io.terminus.dalaran.model.flow.SubFlow;
 import io.terminus.dalaran.model.flow.ValidateMessageLevel;
 import io.terminus.dalaran.model.query.FlowQuery;
+import io.terminus.draco.web.autoconfig.context.UserContext;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.BeanUtils;
@@ -52,6 +54,7 @@ public class SubFlowManagementServiceImpl implements SubFlowManagementService {
     public Long createFlow(SubFlowDTO flowModel) {
         SubFlowEntity subFlowEntity = buildEntity(flowModel);
         setFlowStatus(subFlowEntity);
+        setCreatedBy(subFlowEntity);
         subFlowRepository.save(subFlowEntity);
         if (subFlowEntity.getStatus() != FlowStatus.Error) {
             testFlowInitializer.reloadTestSubFlow(subFlowEntity.getId());
@@ -68,6 +71,7 @@ public class SubFlowManagementServiceImpl implements SubFlowManagementService {
     public SubFlowDTO updateFlow(SubFlowDTO flowModel) {
         SubFlowEntity subFlowEntity = buildEntity(flowModel);
         setFlowStatus(subFlowEntity);
+        setUpdatedBy(subFlowEntity);
         subFlowRepository.save(subFlowEntity);
         if (subFlowEntity.getStatus() != FlowStatus.Error) {
             testFlowInitializer.reloadTestSubFlow(subFlowEntity.getId());
@@ -177,5 +181,17 @@ public class SubFlowManagementServiceImpl implements SubFlowManagementService {
         flowEntity.setDescription(model.getDescription());
 
         return flowEntity;
+    }
+
+    private void setCreatedBy(SubFlowEntity subFlowEntity){
+        if(UserContext.getUserInfo().getUsername()!=null){
+            subFlowEntity.setCreatedBy(UserContext.getUserInfo().getUsername());
+        }
+    }
+
+    private void setUpdatedBy(SubFlowEntity subFlowEntity){
+        if(UserContext.getUserInfo().getUsername()!=null){
+            subFlowEntity.setUpdatedBy(UserContext.getUserInfo().getUsername());
+        }
     }
 }

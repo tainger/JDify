@@ -1,5 +1,6 @@
 package io.terminus.dalaran.console.service.impl;
 
+import io.terminus.dalaran.console.entity.ModelEntity;
 import io.terminus.dalaran.console.service.*;
 import io.terminus.dalaran.console.service.jpa.ModuleQueryService;
 import io.terminus.dalaran.core.resource.entity.common.ModuleEntity;
@@ -7,6 +8,7 @@ import io.terminus.dalaran.core.resource.repository.ModuleRepository;
 import io.terminus.dalaran.model.dto.ModuleDTO;
 import io.terminus.dalaran.model.dto.ModuleDetailDTO;
 import io.terminus.dalaran.model.query.ModuleQuery;
+import io.terminus.draco.web.autoconfig.context.UserContext;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,7 +55,9 @@ public class ModuleManagementServiceImpl implements ModuleManagementService {
 
     @Override
     public Long createModule(ModuleDTO moduleModel) {
-        return moduleRepository.save(buildEntity(moduleModel)).getId();
+        ModuleEntity moduleEntity = buildEntity(moduleModel);
+        setCreatedBy(moduleEntity);
+        return moduleRepository.save(moduleEntity).getId();
     }
 
     @Override
@@ -63,7 +67,9 @@ public class ModuleManagementServiceImpl implements ModuleManagementService {
 
     @Override
     public ModuleDTO updateModule(ModuleDTO moduleModel) {
-        moduleRepository.save(buildEntity(moduleModel));
+        ModuleEntity moduleEntity = buildEntity(moduleModel);
+        setUpdatedBy(moduleEntity);
+        moduleRepository.save(moduleEntity);
         return moduleModel;
     }
 
@@ -149,5 +155,17 @@ public class ModuleManagementServiceImpl implements ModuleManagementService {
         moduleModel.setDependencies(entity.getDependencies());
         moduleModel.setDescription(entity.getDescription());
         return moduleModel;
+    }
+
+    private void setCreatedBy(ModuleEntity moduleEntity){
+        if(UserContext.getUserInfo().getUsername()!=null){
+            moduleEntity.setCreatedBy(UserContext.getUserInfo().getUsername());
+        }
+    }
+
+    private void setUpdatedBy(ModuleEntity moduleEntity){
+        if(UserContext.getUserInfo().getUsername()!=null){
+            moduleEntity.setUpdatedBy(UserContext.getUserInfo().getUsername());
+        }
     }
 }

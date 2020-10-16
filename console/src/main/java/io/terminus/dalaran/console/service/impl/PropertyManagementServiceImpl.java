@@ -4,8 +4,10 @@ import io.terminus.dalaran.console.entity.PropertyEntity;
 import io.terminus.dalaran.console.repository.PropertyRepository;
 import io.terminus.dalaran.console.service.PropertyManagementService;
 import io.terminus.dalaran.console.service.jpa.PropertyQueryService;
+import io.terminus.dalaran.core.resource.entity.common.ModuleEntity;
 import io.terminus.dalaran.model.dto.PropertyDTO;
 import io.terminus.dalaran.model.query.PropertyQuery;
+import io.terminus.draco.web.autoconfig.context.UserContext;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,12 +31,16 @@ public class PropertyManagementServiceImpl implements PropertyManagementService 
 
     @Override
     public Long createProperty(PropertyDTO propertyModel) {
-        return propertyRepository.save(buildEntity(propertyModel)).getId();
+        PropertyEntity propertyEntity = buildEntity(propertyModel);
+        setCreatedBy(propertyEntity);
+        return propertyRepository.save(propertyEntity).getId();
     }
 
     @Override
     public PropertyDTO updateProperty(PropertyDTO propertyModel) {
-        propertyRepository.save(buildEntity(propertyModel));
+        PropertyEntity propertyEntity = buildEntity(propertyModel);
+        setUpdatedBy(propertyEntity);
+        propertyRepository.save(propertyEntity);
         return propertyModel;
     }
 
@@ -89,5 +95,17 @@ public class PropertyManagementServiceImpl implements PropertyManagementService 
         propertyEntity.setValue(model.getValue());
         propertyEntity.setDescription(model.getDescription());
         return propertyEntity;
+    }
+
+    private void setCreatedBy(PropertyEntity propertyEntity){
+        if(UserContext.getUserInfo().getUsername()!=null){
+            propertyEntity.setCreatedBy(UserContext.getUserInfo().getUsername());
+        }
+    }
+
+    private void setUpdatedBy(PropertyEntity propertyEntity){
+        if(UserContext.getUserInfo().getUsername()!=null){
+            propertyEntity.setUpdatedBy(UserContext.getUserInfo().getUsername());
+        }
     }
 }

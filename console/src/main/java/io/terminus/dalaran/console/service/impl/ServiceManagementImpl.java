@@ -5,6 +5,7 @@ import io.terminus.dalaran.component.trigger.soap.model.SoapApiInfo;
 import io.terminus.dalaran.config.ServiceInfo;
 import io.terminus.dalaran.console.ServiceDetail;
 import io.terminus.dalaran.console.entity.ModelEntity;
+import io.terminus.dalaran.console.entity.PropertyEntity;
 import io.terminus.dalaran.console.entity.ServiceEntity;
 import io.terminus.dalaran.console.entity.TriggerFlowEntity;
 import io.terminus.dalaran.console.repository.ModelRepository;
@@ -24,6 +25,7 @@ import io.terminus.dalaran.model.dto.ServiceDTO;
 import io.terminus.dalaran.model.dto.basic.BasicServiceInfo;
 import io.terminus.dalaran.model.flow.FlowStatus;
 import io.terminus.dalaran.model.flow.TriggerFlow;
+import io.terminus.draco.web.autoconfig.context.UserContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -65,7 +67,9 @@ public class ServiceManagementImpl implements ServiceManagement {
     @Transactional
     public Long create(ServiceDTO serviceDTO) {
         ServiceDetail serviceDetail = toEntity(serviceDTO);
-        Long serviceId = serviceRepository.save(serviceDetail.getEntity()).getId();
+        ServiceEntity entity = serviceDetail.getEntity();
+        setCreatedBy(entity);
+        Long serviceId = serviceRepository.save(entity).getId();
         serviceDetail.setServiceId(serviceId);
         createModels(serviceDetail);
         return serviceId;
@@ -76,6 +80,7 @@ public class ServiceManagementImpl implements ServiceManagement {
         ServiceDetail serviceDetail = toEntity(serviceDTO);
         ServiceEntity entity = serviceDetail.getEntity();
         serviceDetail.setServiceId(serviceDTO.getId());
+        setUpdatedBy(entity);
         serviceRepository.save(entity);
         createModels(serviceDetail);
         return toDTO(entity);
@@ -207,6 +212,18 @@ public class ServiceManagementImpl implements ServiceManagement {
             TriggerFlow triggerFlow = resourceBuilder.buildTriggerFlow(flowEntity);
             return new SoapApiInfo(triggerFlow);
         }).collect(Collectors.toList());
+    }
+
+    private void setCreatedBy(ServiceEntity serviceEntity){
+        if(UserContext.getUserInfo().getUsername()!=null){
+            serviceEntity.setCreatedBy(UserContext.getUserInfo().getUsername());
+        }
+    }
+
+    private void setUpdatedBy(ServiceEntity serviceEntity){
+        if(UserContext.getUserInfo().getUsername()!=null){
+            serviceEntity.setUpdatedBy(UserContext.getUserInfo().getUsername());
+        }
     }
 
 }

@@ -1,10 +1,12 @@
 package io.terminus.dalaran.console.service.impl;
 
 import io.terminus.dalaran.console.entity.ClientEntity;
+import io.terminus.dalaran.console.entity.TriggerFlowEntity;
 import io.terminus.dalaran.console.repository.ClientRepository;
 import io.terminus.dalaran.console.service.ClientManagementService;
 import io.terminus.dalaran.model.dto.ClientDTO;
 import io.terminus.dalaran.model.dto.basic.BasicClientInfo;
+import io.terminus.draco.web.autoconfig.context.UserContext;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,6 +16,7 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ClientManagementServiceImpl implements ClientManagementService {
@@ -27,6 +30,7 @@ public class ClientManagementServiceImpl implements ClientManagementService {
     @Override
     public Long create(ClientDTO clientDTO) {
         ClientEntity entity = toEntity(clientDTO);
+        setCreatedBy(entity);
         repository.save(entity);
         return entity.getId();
     }
@@ -34,6 +38,7 @@ public class ClientManagementServiceImpl implements ClientManagementService {
     @Override
     public ClientDTO update(ClientDTO clientDTO) {
         ClientEntity entity = toEntity(clientDTO);
+        setUpdatedBy(entity);
         repository.save(entity);
         return toDTO(entity);
     }
@@ -72,5 +77,19 @@ public class ClientManagementServiceImpl implements ClientManagementService {
         ClientEntity entity = new ClientEntity();
         BeanUtils.copyProperties(dto, entity);
         return entity;
+    }
+
+    private void setCreatedBy(ClientEntity clientEntity){
+        if(UserContext.getUserInfo().getUsername()!=null){
+            clientEntity.setCreatedBy(UserContext.getUserInfo().getUsername());
+        }
+    }
+
+    private void setUpdatedBy(ClientEntity clientEntity){
+        Optional<ClientEntity> optionalClientEntity = repository.findById(clientEntity.getId());
+        clientEntity.setCreatedBy(optionalClientEntity.get().getCreatedBy());
+        if(UserContext.getUserInfo().getUsername()!=null){
+            clientEntity.setUpdatedBy(UserContext.getUserInfo().getUsername());
+        }
     }
 }

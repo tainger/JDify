@@ -15,6 +15,7 @@ import io.terminus.dalaran.model.schema.JsonSchema;
 import io.terminus.dalaran.rest.read.ModelReadAPI;
 import io.terminus.dalaran.rest.write.ModelImportAPI;
 import io.terminus.dalaran.rest.write.ModelWriteAPI;
+import org.hibernate.validator.parameternameprovider.ReflectionParameterNameProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
@@ -107,6 +108,12 @@ public class ModelManagementRest implements ModelReadAPI, ModelWriteAPI, ModelIm
     @OnException(code = ResponseMessage.DATA_TEMPLATE_PARSE_ERROR)
     public DalaranModelSchema importDataTemplate(@RequestBody DataTemplate dataTemplate, @PathVariable long id) {
         return modelManagementService.importModelTemplate(dataTemplate, id);
+    }
+
+    @Override
+    @OnException(code = ResponseMessage.DATA_TEMPLATE_PARSE_ERROR)
+    public DalaranModelSchema importDataTemplateByType(@RequestBody DataTemplate dataTemplate, @PathVariable String type){
+        return modelManagementService.importDataTemplateByType(dataTemplate, type);
     }
 
     @Override

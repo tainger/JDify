@@ -14,7 +14,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 @Component
-@WebFilter(filterName = "DalaranLoginCheckFilter", urlPatterns = "/*")
+@WebFilter(filterName = "DalaranLoginCheckFilter", urlPatterns = {"/v2/api-docs", "/swagger-resources/configuration/ui", "/swagger-resources", "/swagger-resources/configuration/security",
+        "/swagger-ui.html", "/webjars/**", "/actuator/**"})
 public class DalaranLoginCheckFilter implements Filter {
 
     private static final int ERROR_CODE  = 403;

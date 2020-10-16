@@ -61,5 +61,7 @@ public interface ModelManagementService {
 
     DalaranModelSchema importModelTemplate(DataTemplate dataTemplate, Long id);
 
+    DalaranModelSchema importDataTemplateByType(DataTemplate dataTemplate, String type);
+
     DalaranModelTemplate buildSwaggerDataTemplate(DalaranModelSchema schema, String type);
 }
