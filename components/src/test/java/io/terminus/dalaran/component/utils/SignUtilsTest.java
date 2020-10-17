@@ -216,6 +216,7 @@ public class SignUtilsTest {
 
     @Test
     public void aes() {
+
         String ssss = "yins";
 
         String da = "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";
@@ -232,15 +233,27 @@ public class SignUtilsTest {
          * 8962201510470905
          */
 
-        String origin = "{\"country\":\"China\",\"city\":\"shanghai\"}";
+        String origin = "Cgw665XzypMHo0LhJm1KXw==";
 
 //        String origin = "{\"xf_surname\":\"模拟上线验证\",\"eb_souce\":\"1\",\"telephone2\":\"15764101301\",\"birthdaydd\":\"06\",\"xf_mobile\":\"15764101301\",\"identity\":\"CRM\",\"xf_vipcodeprefix\":\"1\",\"xf_address2\":\"330000|330100|330106\",\"xf_address1\":\"浙江省杭州市西湖区西湖旅游景区\",\"xf_sex\":\"F\",\"eb_cardtype\":\"1\",\"telephone\":\"15764101301\",\"xf_issuestore\":\"12312\",\"birthdayyyyy\":\"2013\",\"xf_email\":\"test15764101301@qq.com\",\"defsaleman\":\"testman\",\"xfIssuestaffcode\":\"02342\",\"xf_vipid\":\"23134543\",\"birthdaymm\":\"06\",\"eb_regirstrystore\":\"023322\",\"xf_birthday\":\"2013-06-06 00:00:00\",\"postal\":\"2314\",\"remark1\":\"test\",\"remark2\":\"test\"}";
 
-        SecretKeySpec secretKeySpec = new SecretKeySpec("79622016174910087435617163207911".getBytes(StandardCharsets.UTF_8), "AES");
+        // Cgw665XzypMHo0LhJm1KXw==
+        SecretKeySpec secretKeySpec = new SecretKeySpec("7962201617491008".getBytes(StandardCharsets.UTF_8), "AES");
         try {
             Cipher cipher = Cipher.getInstance(ComponentConstants.AES_PKCS5PADDING);
-            cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec);
-            String s = AESUtils.encrypt(origin, cipher);
+            cipher.init(Cipher.DECRYPT_MODE, secretKeySpec);
+            String s = AESUtils.decrypt(origin, cipher);
+            System.out.println(s);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
+        SecretKeySpec sssss = new SecretKeySpec("7962201617491008".getBytes(StandardCharsets.UTF_8), "AES");
+        try {
+            Cipher cipher = Cipher.getInstance(ComponentConstants.AES_PKCS5PADDING);
+            cipher.init(Cipher.ENCRYPT_MODE, sssss);
+            String s = AESUtils.encrypt("15764101403", cipher);
             System.out.println(s);
         } catch (Exception e) {
             e.printStackTrace();
