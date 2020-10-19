@@ -242,7 +242,7 @@ public class SignUtilsTest {
         try {
             Cipher cipher = Cipher.getInstance(ComponentConstants.AES_PKCS5PADDING);
             cipher.init(Cipher.DECRYPT_MODE, secretKeySpec);
-            String s = AESUtils.decrypt(origin, cipher);
+            String s = AESUtils.decrypt(origin, "7962201617491008");
             System.out.println(s);
         } catch (Exception e) {
             e.printStackTrace();
@@ -253,7 +253,7 @@ public class SignUtilsTest {
         try {
             Cipher cipher = Cipher.getInstance(ComponentConstants.AES_PKCS5PADDING);
             cipher.init(Cipher.ENCRYPT_MODE, sssss);
-            String s = AESUtils.encrypt("15764101403", cipher);
+            String s = AESUtils.encrypt("15764101403", "7962201617491008");
             System.out.println(s);
         } catch (Exception e) {
             e.printStackTrace();
@@ -266,7 +266,7 @@ public class SignUtilsTest {
         try {
             Cipher cipher1 = Cipher.getInstance(ComponentConstants.AES_PKCS5PADDING);
             cipher1.init(Cipher.DECRYPT_MODE, secretKeySpec);
-            String ss = AESUtils.decrypt("HDdmklsa+nkQi8K8alVlFA==", cipher1);
+            String ss = AESUtils.decrypt("HDdmklsa+nkQi8K8alVlFA==", "7962201617491008");
         } catch (Exception e) {
             e.printStackTrace();
         }

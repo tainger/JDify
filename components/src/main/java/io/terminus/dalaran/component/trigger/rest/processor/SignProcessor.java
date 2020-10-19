@@ -9,9 +9,6 @@ import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.commons.lang3.StringUtils;
 
-import javax.crypto.Cipher;
-import javax.crypto.spec.SecretKeySpec;
-import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -91,17 +88,15 @@ public class SignProcessor implements Processor {
         return SignUtils.sign(body, authenticator.getDalaranPrivateKey(), authenticator.getSignAlgorithm(), authenticator.getEncryptionAlgorithm());
     }
 
-    public String signAES(String body, SecretKeySpec secretKeySpec) throws Exception {
-        Cipher cipher = Cipher.getInstance(ComponentConstants.AES_PKCS5PADDING);
-        cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec);
-        return AESUtils.encrypt(body, cipher);
+    public String signAES(String body, String secret) throws Exception {
+        return AESUtils.encrypt(body, secret);
     }
 
     public boolean verifyAES(String body, String sign, String secret) throws Exception {
-        SecretKeySpec secretKeySpec = new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), "AES");
-        Cipher cipher = Cipher.getInstance(ComponentConstants.AES_PKCS5PADDING);
-        cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec);
-        return StringUtils.equalsIgnoreCase(sign, AESUtils.encrypt(body, cipher));
+//        SecretKeySpec secretKeySpec = new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), "AES");
+//        Cipher cipher = Cipher.getInstance(ComponentConstants.AES_PKCS5PADDING);
+//        cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec);
+        return StringUtils.equalsIgnoreCase(sign, AESUtils.encrypt(body, secret));
     }
 
     public String buildSignBody(Map<String, Object> in) {
