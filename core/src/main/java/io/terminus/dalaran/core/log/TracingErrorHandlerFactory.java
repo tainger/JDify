@@ -1,6 +1,7 @@
 package io.terminus.dalaran.core.log;
 
 
+import io.terminus.dalaran.core.resource.redis.RedisService;
 import org.apache.camel.*;
 import org.apache.camel.builder.DefaultErrorHandlerBuilder;
 import org.apache.camel.processor.DefaultErrorHandler;
@@ -19,8 +20,11 @@ public class TracingErrorHandlerFactory extends DefaultErrorHandlerBuilder imple
 
     private final DalaranTraceLogger dalaranTraceLogger;
 
-    public TracingErrorHandlerFactory(DalaranTraceLogger dalaranTraceLogger) {
+    private RedisService redisService;
+
+    public TracingErrorHandlerFactory(DalaranTraceLogger dalaranTraceLogger, RedisService redisService) {
         this.dalaranTraceLogger = dalaranTraceLogger;
+        this.redisService = redisService;
     }
 
     @Override
@@ -85,12 +89,14 @@ public class TracingErrorHandlerFactory extends DefaultErrorHandlerBuilder imple
                 }
                 String mainRecordId = exchange.getProperty(LOG_MAIN_RECORD_ID, String.class);
                 tracingLog = exchange.getProperty(tracingKey + mainRecordId, DalaranTracingLog.class);
-                String mainLogRecordHandled = LOG_MAIN_RECORD_ID + LOG_MAIN_RECORD_HANDLED;
+                String mainLogRecordHandled = mainRecordId + LOG_MAIN_RECORD_HANDLED;
                 if (tracingLog == null || !tracingLog.isMain()
-                        || (exchange.getProperty(mainLogRecordHandled) != null && exchange.getProperty(mainLogRecordHandled, Boolean.class))) {
+                        || redisService.contains(mainLogRecordHandled)) {
                     return;
                 }
-                exchange.setProperty(mainLogRecordHandled, true);
+                if (!redisService.setValue(mainLogRecordHandled, "recorded")) {
+                    return;
+                }
             }
             exchange.removeProperty(propertyKey);
             tracingLog.setSuccessful(false);
