@@ -1,5 +1,6 @@
 package io.terminus.dalaran.console.service.impl;
 
+import com.sun.org.apache.xerces.internal.parsers.SecurityConfiguration;
 import io.terminus.dalaran.TracingType;
 import io.terminus.dalaran.console.entity.SubFlowEntity;
 import io.terminus.dalaran.console.entity.TriggerFlowEntity;
@@ -13,12 +14,14 @@ import io.terminus.dalaran.core.resource.repository.TracingLogRepository;
 import io.terminus.dalaran.model.dto.log.MainLogDTO;
 import io.terminus.dalaran.model.dto.log.TracingLogDTO;
 import io.terminus.dalaran.model.query.TracingLogQuery;
+import org.apache.kafka.common.protocol.types.Field;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.criteria.Predicate;
+import javax.persistence.EntityManager;
+import javax.persistence.criteria.*;
 import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.Date;
@@ -42,6 +45,9 @@ public class TracingLogServiceImpl implements TracingLogService {
     @Autowired
     private ModuleManagementService moduleService;
 
+    @Autowired
+    private EntityManager entityManager;
+
     @Override
     public Page<MainLogDTO> triggerLogsPageable(TracingLogQuery query, Integer pageNumber, Integer pageSize) {
         Sort order = new Sort(new Sort.Order(Sort.Direction.DESC, "timestamp"));
@@ -56,6 +62,25 @@ public class TracingLogServiceImpl implements TracingLogService {
         List<TracingLogEntity> logs = tracingLogRepository.findAll(buildSpecification(query), order);
         return logs.stream().map(this::buildTracingMainLog).collect(Collectors.toList());
     }
+
+    @Override
+    public Double getAvgElapsedTime(TracingLogQuery query){
+        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Double> criteriaQuery = builder.createQuery(Double.class);
+        Root<TracingLogEntity> root = criteriaQuery.from(TracingLogEntity.class);
+        List<Predicate> predicates = new ArrayList<>();
+        if(query.getFlowId()!=null){
+            predicates.add(builder.equal(root.get("flowId"),query.getFlowId()));
+        }
+        if(query.getSuccessful()!=null){
+            predicates.add(builder.equal(root.get("successful"),query.getSuccessful()));
+        }
+        criteriaQuery.select(builder.avg(root.get("elapsed"))).where(predicates.toArray(new Predicate[0]));
+        return entityManager.createQuery(criteriaQuery).getSingleResult();
+    }
+
+
+
 
     @Override
     public MainLogDTO getRecordDetail(String recordId) {

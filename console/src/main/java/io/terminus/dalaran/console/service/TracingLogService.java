@@ -12,5 +12,7 @@ public interface TracingLogService {
 
     List<MainLogDTO> triggerLogs(TracingLogQuery query);
 
+    Double getAvgElapsedTime(TracingLogQuery query);
+
     MainLogDTO getRecordDetail(String recordId);
 }

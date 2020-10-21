@@ -5,6 +5,7 @@ import io.terminus.dalaran.console.entity.ClientEntity;
 import io.terminus.dalaran.console.entity.ConnectorEntity;
 import io.terminus.dalaran.console.repository.ConnectorRepository;
 import io.terminus.dalaran.console.service.ConnectorService;
+import io.terminus.dalaran.model.dto.ClientDTO;
 import io.terminus.dalaran.model.dto.ConnectorDTO;
 import io.terminus.dalaran.model.dto.basic.BasicConnectorInfo;
 import io.terminus.draco.web.autoconfig.context.UserContext;
@@ -39,10 +40,9 @@ public class ConnectorServiceImpl implements ConnectorService {
 
     @Override
     public ConnectorDTO update(ConnectorDTO connectorDTO) {
-        ConnectorEntity entity = toEntity(connectorDTO);
-        setUpdatedBy(entity);
-        connectorRepository.save(entity);
-        return toDTO(entity);
+        ConnectorEntity connectorEntity = buildEntity(connectorDTO);
+        connectorRepository.save(connectorEntity);
+        return connectorDTO;
     }
 
     @Override
@@ -105,10 +105,17 @@ public class ConnectorServiceImpl implements ConnectorService {
         }
     }
 
-    private void setUpdatedBy(ConnectorEntity connectorEntity){
+    private ConnectorEntity buildEntity(ConnectorDTO connectorDTO){
+        ConnectorEntity connectorEntity = connectorRepository.findById(connectorDTO.getId()).get();
+        connectorEntity.setModuleId(connectorDTO.getModuleId());
+        connectorEntity.setName(connectorDTO.getName());
+        connectorEntity.setConnectorType(connectorDTO.getConnectorType());
+        connectorEntity.setDescription(connectorDTO.getDescription());
+        connectorEntity.setConfig(JSON.toJSONString(connectorDTO.getConfig()));
         if(UserContext.getUserInfo().getUsername()!=null){
             connectorEntity.setUpdatedBy(UserContext.getUserInfo().getUsername());
         }
+        return connectorEntity;
     }
 
 }

@@ -19,6 +19,9 @@ public interface TracingReadAPI {
     @GetMapping
     List<MainLogDTO> query(TracingLogQuery query);
 
+    @GetMapping("/getAvgTime")
+    Double queryAvgTime(TracingLogQuery query);
+
     @GetMapping("/{recordId}")
     MainLogDTO logDetail(@PathVariable String recordId);
 }

@@ -37,10 +37,9 @@ public class ClientManagementServiceImpl implements ClientManagementService {
 
     @Override
     public ClientDTO update(ClientDTO clientDTO) {
-        ClientEntity entity = toEntity(clientDTO);
-        setUpdatedBy(entity);
-        repository.save(entity);
-        return toDTO(entity);
+        ClientEntity clientEntity = buildEntity(clientDTO);
+        repository.save(clientEntity);
+        return clientDTO;
     }
 
     @Override
@@ -85,11 +84,15 @@ public class ClientManagementServiceImpl implements ClientManagementService {
         }
     }
 
-    private void setUpdatedBy(ClientEntity clientEntity){
-        Optional<ClientEntity> optionalClientEntity = repository.findById(clientEntity.getId());
-        clientEntity.setCreatedBy(optionalClientEntity.get().getCreatedBy());
+    private ClientEntity buildEntity(ClientDTO clientDTO){
+        ClientEntity clientEntity = repository.findById(clientDTO.getId()).get();
+        clientEntity.setName(clientDTO.getName());
+        clientEntity.setAppKey(clientDTO.getAppKey());
+        clientEntity.setSecret(clientDTO.getSecret());
+        clientEntity.setDescription(clientDTO.getDescription());
         if(UserContext.getUserInfo().getUsername()!=null){
             clientEntity.setUpdatedBy(UserContext.getUserInfo().getUsername());
         }
+        return clientEntity;
     }
 }

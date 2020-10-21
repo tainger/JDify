@@ -130,4 +130,6 @@ public class ResponseMessage {
     public static final String TRACE_QUERY_ERROR = "Trace.Log.Query.Exception";
 
     public static final String OSS_FILE_UPLOAD_ERROR = "OSS.Log.Upload.Exception";
+
+    public static final String GET_USER_INFO_ERROR = "Get.UserInfo.Exception";
 }

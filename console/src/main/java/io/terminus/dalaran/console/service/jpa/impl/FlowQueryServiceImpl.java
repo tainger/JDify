@@ -12,10 +12,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
+import javax.persistence.criteria.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -55,8 +52,8 @@ public class FlowQueryServiceImpl implements FlowQueryService {
                 Predicate name = criteriaBuilder.like(root.get("name"), "%" + query.getName() + "%");
                 predicates.add(name);
             }
-
             return criteriaBuilder.and(predicates.toArray(new Predicate[predicates.size()]));
+
 
         };
 

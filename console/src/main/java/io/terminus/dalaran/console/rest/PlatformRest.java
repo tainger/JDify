@@ -20,6 +20,7 @@ import io.terminus.dalaran.rest.read.ReleaseReadAPI;
 import io.terminus.dalaran.rest.write.LoginAPI;
 import io.terminus.dalaran.rest.write.PlatformImportAPI;
 import io.terminus.dalaran.rest.write.ReleaseWriteAPI;
+import io.terminus.draco.api.response.UserInfo;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
@@ -206,5 +207,11 @@ public class PlatformRest implements PlatformInfoAPI, PlatformImportAPI, Platfor
     @OnException(code = ResponseMessage.SERVICE_QUERY_ERROR)
     public List<String> listOperations() {
         return flowManagementService.listTriggerOperations();
+    }
+
+    @Override
+    @OnException(code = ResponseMessage.GET_USER_INFO_ERROR)
+    public UserInfo getUserInfo() {
+        return authorizeService.getUserInfo();
     }
 }

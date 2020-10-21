@@ -16,7 +16,9 @@ import javax.persistence.EntityManager;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
+import javax.swing.text.html.Option;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class FunctionServiceImpl implements FunctionService {
@@ -41,11 +43,10 @@ public class FunctionServiceImpl implements FunctionService {
 
     @Override
     public FunctionDTO update(FunctionDTO functionDTO) {
-        FunctionEntity entity = toEntity(functionDTO);
-        setUpdatedBy(entity);
-        repository.save(entity);
-        functionContext.addCustomFunction(entity.getId(), entity.getType(), entity.getScript(), entity.getParams());
-        return toDTO(entity);
+        FunctionEntity functionEntity = buildEntity(functionDTO);
+        repository.save(functionEntity);
+        functionContext.addCustomFunction(functionEntity.getId(), functionEntity.getType(), functionEntity.getScript(), functionEntity.getParams());
+        return functionDTO;
     }
 
     @Override
@@ -87,9 +88,17 @@ public class FunctionServiceImpl implements FunctionService {
         }
     }
 
-    private void setUpdatedBy(FunctionEntity functionEntity){
+    private FunctionEntity buildEntity(FunctionDTO functionDTO){
+        FunctionEntity functionEntity = repository.findById(functionDTO.getId()).get();
+        functionEntity.setModuleId(functionDTO.getModuleId());
+        functionEntity.setName(functionDTO.getName());
+        functionEntity.setType(functionDTO.getType());
+        functionEntity.setScript(functionDTO.getScript());
+        functionEntity.setParams(functionDTO.getParams());
+        functionEntity.setDescription(functionDTO.getDescription());
         if(UserContext.getUserInfo().getUsername()!=null){
             functionEntity.setUpdatedBy(UserContext.getUserInfo().getUsername());
         }
+        return functionEntity;
     }
 }

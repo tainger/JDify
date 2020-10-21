@@ -157,6 +157,19 @@ public class ModelManagementServiceImpl implements ModelManagementService {
     }
 
     @Override
+    public JsonSchema importExcelNoneId(MultipartFile file) {
+        try {
+            Map<String, ModelField> fields = ExcelUtils.parseFirstSheet(file.getInputStream());
+            JsonSchema schema = new JsonSchema();
+            schema.setFields(fields);
+            return schema;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return new JsonSchema();
+    }
+
+    @Override
     public Map<Long, Map<String, JsonSchema>> multiImportExcel(MultipartFile file, String modelType) {
         try {
             Map<Long, Map<String, JsonSchema>> modelSchema = new HashMap<>();

@@ -51,6 +51,11 @@
             <groupId>org.springframework.data</groupId>
             <artifactId>spring-data-commons</artifactId>
         </dependency>
+        <dependency>
+            <artifactId>draco-web-autoconfigure</artifactId>
+            <groupId>io.terminus.draco</groupId>
+            <version>1.2.3.BUILD-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 
 

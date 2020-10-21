@@ -105,6 +105,12 @@ public class ModelManagementRest implements ModelReadAPI, ModelWriteAPI, ModelIm
     }
 
     @Override
+    @OnException(code = ResponseMessage.EXCEL_PARSE_ERROR)
+    public JsonSchema importExcelNoneId(@RequestParam MultipartFile file) {
+        return modelManagementService.importExcelNoneId(file);
+    }
+
+    @Override
     @OnException(code = ResponseMessage.DATA_TEMPLATE_PARSE_ERROR)
     public DalaranModelSchema importDataTemplate(@RequestBody DataTemplate dataTemplate, @PathVariable long id) {
         return modelManagementService.importModelTemplate(dataTemplate, id);

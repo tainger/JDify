@@ -47,6 +47,8 @@ public interface ModelManagementService {
 
     JsonSchema importExcel(MultipartFile file, Long id);
 
+    JsonSchema importExcelNoneId(MultipartFile file);
+
     Map<Long, Map<String, JsonSchema>> multiImportExcel(MultipartFile file, String modelType);
 
     DalaranModelSchema importDataTemplate(DataTemplate dataTemplate, Long id);

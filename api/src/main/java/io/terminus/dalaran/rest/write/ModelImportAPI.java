@@ -17,6 +17,10 @@ public interface ModelImportAPI {
     @PostMapping(value = "/{id}/import/excel")
     JsonSchema importExcel(@RequestParam MultipartFile file, @PathVariable long id);
 
+    @ApiOperation(value = "导入 Excel 更新模型结构，不需要id")
+    @PostMapping(value = "/import/excel")
+    JsonSchema importExcelNoneId(@RequestParam MultipartFile file);
+
     @ApiOperation(value = "导入数据模板更新模型结构")
     @PostMapping(value = "/{id}/import/data-template")
     DalaranModelSchema importDataTemplate(@RequestBody DataTemplate dataTemplate, @PathVariable long id);

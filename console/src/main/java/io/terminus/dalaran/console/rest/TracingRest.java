@@ -30,6 +30,11 @@ public class TracingRest implements TracingReadAPI {
     }
 
     @OnException(code = ResponseMessage.TRACE_QUERY_ERROR)
+    public Double queryAvgTime(TracingLogQuery query){
+        return tracingLogService.getAvgElapsedTime(query);
+    }
+
+    @OnException(code = ResponseMessage.TRACE_QUERY_ERROR)
     public MainLogDTO logDetail(@PathVariable String recordId) {
         return tracingLogService.getRecordDetail(recordId);
     }

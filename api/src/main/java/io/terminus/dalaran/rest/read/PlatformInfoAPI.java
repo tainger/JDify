@@ -3,6 +3,7 @@ package io.terminus.dalaran.rest.read;
 import io.swagger.annotations.ApiOperation;
 import io.terminus.dalaran.config.*;
 import io.terminus.dalaran.model.function.MappingFunctionInfo;
+import io.terminus.draco.api.response.UserInfo;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -49,4 +50,8 @@ public interface PlatformInfoAPI {
     @ApiOperation(value = "获取 operation 列表")
     @GetMapping(value = "/trigger/soap/operations")
     List<String> listOperations();
+
+    @ApiOperation(value = "获取当前用户信息")
+    @GetMapping(value = "/getUserInfo")
+    UserInfo getUserInfo();
 }
