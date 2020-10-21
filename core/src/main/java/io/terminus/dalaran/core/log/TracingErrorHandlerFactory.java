@@ -81,20 +81,24 @@ public class TracingErrorHandlerFactory extends DefaultErrorHandlerBuilder imple
         }
 
         private void log(Exchange exchange, String tracingKey, String body) {
+            String mainRecordId = exchange.getProperty(LOG_MAIN_RECORD_ID, String.class);
+            String mainLogRecordHandled = mainRecordId + LOG_MAIN_RECORD_HANDLED;
             String propertyKey = tracingKey + exchange.getExchangeId();
             DalaranTracingLog tracingLog = exchange.getProperty(propertyKey, DalaranTracingLog.class);
             if (tracingLog == null) {
                 if (StringUtils.startsWith(propertyKey, PROCESSOR_TRACING_LOG)) {
                     return;
                 }
-                String mainRecordId = exchange.getProperty(LOG_MAIN_RECORD_ID, String.class);
                 tracingLog = exchange.getProperty(tracingKey + mainRecordId, DalaranTracingLog.class);
-                String mainLogRecordHandled = mainRecordId + LOG_MAIN_RECORD_HANDLED;
                 if (tracingLog == null || !tracingLog.isMain()
                         || redisService.contains(mainLogRecordHandled)) {
                     return;
                 }
                 if (!redisService.setValue(mainLogRecordHandled, "recorded")) {
+                    return;
+                }
+            } else {
+                if (tracingLog.isMain() && redisService.contains(mainLogRecordHandled)) {
                     return;
                 }
             }
