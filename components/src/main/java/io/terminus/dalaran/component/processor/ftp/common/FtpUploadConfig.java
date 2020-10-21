@@ -17,13 +17,13 @@ public class FtpUploadConfig implements ConnectorConfig<FtpConnector> {
     @ConfigFieldInfo(label = "Ftp 连接器", inputType = FieldInputType.Connector, connectorType = FtpConnector.class)
     private Long connectorId;
 
-    @ConfigFieldInfo(label = "如果文件已存在", inputType = FieldInputType.Radio, defaultValue = "Override")
+    @ConfigFieldInfo(label = "如果文件已存在", inputType = FieldInputType.Select, defaultValue = "Override")
     private FileExist fileExist;
 
     @ConfigFieldInfo(label = "动态文件名", inputType = FieldInputType.Switch, defaultValue = "false")
     private boolean dynamicFileName = false;
 
-    @ConfigFieldInfo(label = "入参类型", inputType = FieldInputType.Radio, defaultValue = "OBJECT")
+    @ConfigFieldInfo(label = "入参类型", inputType = FieldInputType.Select, defaultValue = "OBJECT")
     private FtpInputType inputType = FtpInputType.OBJECT;
 
     @ConfigFieldInfo(label = "动态路径", inputType = FieldInputType.String, defaultValue = "", required = false)
