@@ -14,7 +14,7 @@ public class BasicFunction implements DalaranBasicComponent {
     @ConfigFieldInfo(label = "函数名称", inputType = FieldInputType.String)
     private String name;
 
-    @ConfigFieldInfo(label = "函数引擎", inputType = FieldInputType.Select)
+    @ConfigFieldInfo(label = "函数引擎", inputType = FieldInputType.Select, defaultValue = "JavaScript")
     private DalaranScriptType type;
 
     @ConfigFieldInfo(label = "函数入参", inputType = FieldInputType.Tag)
