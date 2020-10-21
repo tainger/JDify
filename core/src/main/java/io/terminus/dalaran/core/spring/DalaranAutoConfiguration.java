@@ -11,6 +11,7 @@ import io.terminus.dalaran.core.resource.DalaranResourceBuilder;
 import io.terminus.dalaran.core.resource.DalaranResourceLoader;
 import io.terminus.dalaran.core.resource.DefaultDalaranResourceBuilder;
 import io.terminus.dalaran.core.resource.oss.OSSAccount;
+import io.terminus.dalaran.core.resource.redis.RedisService;
 import org.apache.camel.CamelContext;
 import org.apache.camel.spi.Registry;
 import org.apache.camel.spring.spi.ApplicationContextRegistry;
@@ -90,8 +91,8 @@ public class DalaranAutoConfiguration {
     }
 
     @Bean
-    public TracingErrorHandlerFactory tracingErrorHandlerFactory(DalaranTraceLogger traceLogger) {
-        return new TracingErrorHandlerFactory(traceLogger);
+    public TracingErrorHandlerFactory tracingErrorHandlerFactory(DalaranTraceLogger traceLogger, RedisService redisService) {
+        return new TracingErrorHandlerFactory(traceLogger, redisService);
     }
 
     @Bean

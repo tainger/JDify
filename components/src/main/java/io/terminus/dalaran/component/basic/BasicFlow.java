@@ -19,7 +19,7 @@ public class BasicFlow implements DalaranBasicComponent {
     @ConfigFieldInfo(label = "流程描述", inputType = FieldInputType.String, required = false)
     private String description;
 
-    @ConfigFieldInfo(label = "开启日志", inputType = FieldInputType.Switch)
-    private boolean tracing;
+    @ConfigFieldInfo(label = "开启日志", inputType = FieldInputType.Switch, defaultValue = "false")
+    private boolean tracing = false;
 
 }
