@@ -25,6 +25,9 @@ public class ReleasedResourceLoader implements DalaranResourceLoader {
     private ConnectorReleasedRepository connectorRepository;
 
     @Autowired
+    private LimiterReleasedRepository limiterRepository;
+
+    @Autowired
     private PropertyReleasedRepository propertyRepository;
 
     @Autowired
@@ -94,6 +97,11 @@ public class ReleasedResourceLoader implements DalaranResourceLoader {
     @Override
     public ConnectorReleasedEntity loadConnector(Long connectorId) {
         return connectorRepository.findByVersionAndOriginId(version, connectorId);
+    }
+
+    @Override
+    public LimiterReleasedEntity loadLimiter(Long limiterId) {
+        return limiterRepository.findByVersionAndOriginId(version, limiterId);
     }
 
     @Override

@@ -1,11 +1,9 @@
 package io.terminus.dalaran.console.service.impl;
 
 import com.alibaba.fastjson.JSON;
-import io.terminus.dalaran.console.entity.ClientEntity;
 import io.terminus.dalaran.console.entity.ConnectorEntity;
 import io.terminus.dalaran.console.repository.ConnectorRepository;
 import io.terminus.dalaran.console.service.ConnectorService;
-import io.terminus.dalaran.model.dto.ClientDTO;
 import io.terminus.dalaran.model.dto.ConnectorDTO;
 import io.terminus.dalaran.model.dto.basic.BasicConnectorInfo;
 import io.terminus.draco.web.autoconfig.context.UserContext;

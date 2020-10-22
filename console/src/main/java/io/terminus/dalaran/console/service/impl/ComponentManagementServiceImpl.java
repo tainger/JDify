@@ -6,6 +6,7 @@ import io.terminus.dalaran.model.common.BasicComponentType;
 import io.terminus.dalaran.model.dto.*;
 import io.terminus.dalaran.model.dto.flow.SubFlowDTO;
 import io.terminus.dalaran.model.dto.flow.TriggerFlowDTO;
+import org.apache.camel.spi.AsEndpointUri;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -33,6 +34,9 @@ public class ComponentManagementServiceImpl implements ComponentManagementServic
     @Autowired
     private SubFlowManagementService subFlowManagementService;
 
+    @AsEndpointUri
+    private LimiterService limiterService;
+
     @Autowired
     private ServiceManagement serviceManagement;
 
@@ -57,6 +61,8 @@ public class ComponentManagementServiceImpl implements ComponentManagementServic
                     return serviceManagement.create(JSON.parseObject(componentConfig, ServiceDTO.class));
                 case Module:
                     return moduleManagementService.createModule(JSON.parseObject(componentConfig, ModuleDTO.class));
+                case Limiter:
+                    return limiterService.create(JSON.parseObject(componentConfig, LimiterDTO.class));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -86,6 +92,8 @@ public class ComponentManagementServiceImpl implements ComponentManagementServic
                     return serviceManagement.update(JSON.parseObject(componentConfig, ServiceDTO.class));
                 case Module:
                     return moduleManagementService.updateModule(JSON.parseObject(componentConfig, ModuleDTO.class));
+                case Limiter:
+                    return limiterService.update(JSON.parseObject(componentConfig, LimiterDTO.class));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -121,6 +129,9 @@ public class ComponentManagementServiceImpl implements ComponentManagementServic
                     break;
                 case Module:
                     moduleManagementService.deleteModule(componentId);
+                    break;
+                case Limiter:
+                    limiterService.delete(componentId);
                     break;
             }
         } catch (Exception e) {

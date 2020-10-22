@@ -6,6 +6,6 @@ public enum FieldInputType {
     FileUpload, FileDownload,
     Script, SQL, Expression,
     Connector, Model, SubFlow, Service, ServiceOperation,Limiter,
-    TriggerSelector, ProcessorSelector, ConnectorSelector, ModelSelector, ServiceSelector, ModuleSelector,
+    TriggerSelector, ProcessorSelector, ConnectorSelector, ModelSelector, ServiceSelector, ModuleSelector, LimiterSelector,
     Routes, Pipeline, Branches, ErrorCatch, TrantorModule, TrantorIntegration, TrantorIntegrationPoint
 }

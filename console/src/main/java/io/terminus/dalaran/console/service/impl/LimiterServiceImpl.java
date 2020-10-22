@@ -82,7 +82,12 @@ public class LimiterServiceImpl implements LimiterService {
     }
 
     private LimiterEntity toEntity(LimiterDTO dto) {
-        LimiterEntity entity = new LimiterEntity();
+        LimiterEntity entity;
+        if (dto.getId() != null) {
+            entity = limiterRepository.findById(dto.getId()).get();
+        } else {
+            entity = new LimiterEntity();
+        }
         entity.setId(dto.getId());
         entity.setName(dto.getName());
         entity.setLimiterType(dto.getLimiterType());
