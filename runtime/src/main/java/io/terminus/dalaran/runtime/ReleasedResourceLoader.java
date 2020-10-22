@@ -36,6 +36,9 @@ public class ReleasedResourceLoader implements DalaranResourceLoader {
     @Autowired
     private ClientReleasedRepository clientRepository;
 
+    @Autowired
+    private LimiterReleasedRepository limiterRepository;
+
     @Override
     public List<TriggerFlowReleasedEntity> loadAllTriggerFlow() {
         return releasedTriggerFlowRepository.findByVersion(version);
@@ -94,6 +97,11 @@ public class ReleasedResourceLoader implements DalaranResourceLoader {
     @Override
     public ConnectorReleasedEntity loadConnector(Long connectorId) {
         return connectorRepository.findByVersionAndOriginId(version, connectorId);
+    }
+
+    @Override
+    public LimiterReleasedEntity loadLimiter(Long limiterId) {
+        return limiterRepository.findByVersionAndOriginId(version, limiterId);
     }
 
     @Override

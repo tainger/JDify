@@ -85,6 +85,15 @@ public class ResponseMessage {
 
     public static final String CONNECTOR_DELETE_ERROR = "Connector.Delete.Exception";
 
+    // Limiter处理异常
+    public static final String LIMITER_CREATE_ERROR = "Limiter.Create.Exception";
+
+    public static final String LIMITER_UPDATE_ERROR = "Limiter.Update.Exception";
+
+    public static final String LIMITER_QUERY_ERROR = "Limiter.Query.Exception";
+
+    public static final String LIMITER_DELETE_ERROR = "Limiter.Delete.Exception";
+
     // Module处理异常
     public static final String MODULE_CREATE_ERROR = "Module.Create.Exception";
 

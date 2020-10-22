@@ -26,6 +26,9 @@ public class TestResourceLoader implements DalaranResourceLoader {
     private ConnectorRepository connectorRepository;
 
     @Autowired
+    private LimiterRepository limiterRepository;
+
+    @Autowired
     private PropertyRepository propertyRepository;
 
     @Autowired
@@ -98,6 +101,11 @@ public class TestResourceLoader implements DalaranResourceLoader {
     @Override
     public ConnectorEntity loadConnector(Long connectorId) {
         return connectorRepository.findById(connectorId).get();
+    }
+
+    @Override
+    public LimiterEntity loadLimiter(Long limiterId) {
+        return limiterRepository.findById(limiterId).get();
     }
 
     @Override

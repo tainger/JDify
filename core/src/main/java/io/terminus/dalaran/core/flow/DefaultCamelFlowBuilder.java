@@ -17,6 +17,7 @@ import io.terminus.dalaran.model.RetryConvertFragmentInfo;
 import io.terminus.dalaran.model.component.ProcessorModel;
 import io.terminus.dalaran.model.flow.*;
 import lombok.val;
+import org.apache.camel.CamelContext;
 import org.apache.camel.builder.Builder;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -59,7 +60,7 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
     }
 
     @Override
-    public DalaranRoute buildTriggerFlow(TriggerFlow flow) {
+    public DalaranRoute buildTriggerFlow(TriggerFlow flow, CamelContext camelContext) {
         val triggerComponent = componentContext.getTrigger(flow.getTriggerType());
         val triggerInfo = componentContext.getTriggerInfo(flow.getTriggerType());
 
@@ -82,7 +83,31 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
                 bodyType = flow.getInModel().getModelType();
             }
         }
-        buildFlowRoute(route, flow, TracingType.Flow, bodyType);
+
+//        buildFlowRoute(route, flow, TracingType.Flow, bodyType);
+
+//        DalaranTracer flowTracer = DalaranTracer.buildTracer(traceLogger, TracingType.Flow);
+//        flowTracer.before(route, bodyType);
+        val processorRoute = createRouteDefinition();
+        String processorRouteId = DALARAN_PROCESSOR + flow.getRouteId();
+        processorRoute.setId(processorRouteId);
+        processorRoute.from(DIRECT_PREFIX + processorRouteId);
+        try {
+            camelContext.removeRoute(processorRoute.getId());
+//            buildBreakerFlowRoute(processorRoute, processorRoute, flow, TracingType.Flow, bodyType);
+            buildFlowRoute(processorRoute, flow, TracingType.Flow, bodyType);
+            camelContext.addRouteDefinition(processorRoute);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        if (triggerComponent instanceof DalaranCircuitBreaker) {
+            ((DalaranCircuitBreaker) triggerComponent).buildBreakerConfig(route, processorRouteId, triggerConfig, camelContext, errorHandlerFactory);
+        } else {
+            route.to(DIRECT_PREFIX + processorRouteId);
+        }
+//        flowTracer.after(route);
+
         if (triggerComponent instanceof DalaranTriggerBuildAfterProcessor) {
             ((DalaranTriggerBuildAfterProcessor) triggerComponent).buildAfter(route, triggerConfig);
         }

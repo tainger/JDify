@@ -16,6 +16,9 @@ public final class DalaranConstants {
     public static final String TRACING_FLOW_ID = "DalaranTracingFlowId";
     public static final String TRACING_MODULE_ID = "DalaranTracingModuleId";
 
+    public static final String DALARAN_PROCESSOR = "DalaranProcessorRouteId-";
+
+
 
     public static final String SCATTER_GATHER_EXCHANGE = "DalaranScatterGatherExchange";
     public static final String DALARAN_CONTEXT_EXCHANGE = "DalaranContextExchange";

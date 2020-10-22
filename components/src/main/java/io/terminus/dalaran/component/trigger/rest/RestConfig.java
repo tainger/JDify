@@ -1,14 +1,32 @@
 package io.terminus.dalaran.component.trigger.rest;
 
+import com.alibaba.fastjson.annotation.JSONField;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.terminus.dalaran.FieldInputType;
 import io.terminus.dalaran.component.common.HttpMethod;
+import io.terminus.dalaran.component.limiter.DalaranLimiter;
 import io.terminus.dalaran.core.component.annotation.ConfigFieldInfo;
 import io.terminus.dalaran.core.component.config.AllModelConfig;
+import io.terminus.dalaran.core.component.config.LimiterConfig;
 import io.terminus.dalaran.model.HttpProtocol;
 import lombok.Data;
 
 @Data
-public class RestConfig extends AllModelConfig {
+public class RestConfig extends AllModelConfig implements LimiterConfig<DalaranLimiter> {
+
+    @ConfigFieldInfo(inputType = FieldInputType.Hidden, required = false)
+    @JSONField(serialize = false)
+    @JsonIgnore
+    private DalaranLimiter limiter;
+
+    @ConfigFieldInfo(label = "限流熔断器", inputType = FieldInputType.Limiter, required = false, connectorType = DalaranLimiter.class)
+    private Long limiterId;
+
+    @ConfigFieldInfo(label = "开启限流", inputType = FieldInputType.Switch, defaultValue = "false")
+    private boolean enableLimit = false;
+
+    @ConfigFieldInfo(label = "开启熔断", inputType = FieldInputType.Switch, defaultValue = "false")
+    private boolean enableBreaker = false;
 
     // TODO load by application.yml
     @ConfigFieldInfo(label = "端口", inputType = FieldInputType.Hidden)

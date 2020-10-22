@@ -2,17 +2,28 @@ package io.terminus.dalaran.component.trigger.rest;
 
 import io.swagger.models.Swagger;
 import io.terminus.dalaran.component.common.HttpMethod;
+import io.terminus.dalaran.component.common.LimitOperation;
+import io.terminus.dalaran.component.limiter.DalaranLimiter;
 import io.terminus.dalaran.component.trigger.rest.model.ApiInfo;
-import io.terminus.dalaran.component.trigger.rest.processor.*;
+import io.terminus.dalaran.component.trigger.rest.processor.AESQuerySignProcessor;
+import io.terminus.dalaran.component.trigger.rest.processor.AESSignProcessor;
+import io.terminus.dalaran.component.trigger.rest.processor.MixMethodProcessor;
+import io.terminus.dalaran.component.trigger.rest.processor.QueryStringConvertProcessor;
 import io.terminus.dalaran.component.trigger.rest.utils.RestWordUtils;
 import io.terminus.dalaran.component.trigger.rest.utils.SwaggerUtils;
+import io.terminus.dalaran.core.component.DalaranCircuitBreaker;
 import io.terminus.dalaran.core.component.DalaranTrigger;
 import io.terminus.dalaran.core.component.DalaranTriggerApiDocExport;
 import io.terminus.dalaran.core.component.DalaranTriggerWordDocExport;
 import io.terminus.dalaran.core.component.annotation.Trigger;
 import io.terminus.dalaran.core.context.DalaranClientContext;
+import io.terminus.dalaran.core.flow.DalaranRoute;
+import io.terminus.dalaran.core.log.TracingErrorHandlerFactory;
 import io.terminus.dalaran.model.flow.TriggerFlow;
+import lombok.val;
+import org.apache.camel.CamelContext;
 import org.apache.camel.model.RouteDefinition;
+import org.apache.camel.model.ThrottleDefinition;
 import org.apache.camel.model.dataformat.JsonLibrary;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -21,13 +32,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static io.terminus.dalaran.DalaranConstants.DIRECT_PREFIX;
+
 @Trigger(
         value = {"http-rest-listener", "netty-http-listener"},
         order = 10,
         configType = RestConfig.class,
         bodyType = "JSON"
 )
-public class RestListener implements DalaranTrigger<RestConfig>, DalaranTriggerApiDocExport<Swagger>, DalaranTriggerWordDocExport {
+public class RestListener implements DalaranTrigger<RestConfig>, DalaranTriggerApiDocExport<Swagger>, DalaranTriggerWordDocExport, DalaranCircuitBreaker<RestConfig> {
 
     @Autowired
     private DalaranClientContext clientContext;
@@ -73,6 +86,64 @@ public class RestListener implements DalaranTrigger<RestConfig>, DalaranTriggerA
     @Override
     public File exportWord(Map<String, List<TriggerFlow>> moduleTriggerFlows) {
         return RestWordUtils.buildWordFile(buildApiInfoList(moduleTriggerFlows));
+    }
+
+    @Override
+    public void buildBreakerConfig(RouteDefinition route, String to, RestConfig config, CamelContext camelContext, TracingErrorHandlerFactory errorHandlerFactory) {
+        if (!config.isEnableBreaker() && !config.isEnableLimit()) {
+            route.to(DIRECT_PREFIX + to);
+            return;
+        }
+        DalaranLimiter limiter = config.getLimiter();
+        if (config.isEnableBreaker() && !config.isEnableLimit()) {
+            route.hystrix().hystrixConfiguration()
+                    .circuitBreakerEnabled(true)
+                    .circuitBreakerErrorThresholdPercentage(limiter.getCircuitBreakerErrorPercentage())
+                    .executionTimeoutInMilliseconds(Integer.valueOf(config.getTimeout().toString()))
+                    .circuitBreakerSleepWindowInMilliseconds(limiter.getCircuitBreakerSleepWindowInMilliseconds())
+                    .circuitBreakerRequestVolumeThreshold(limiter.getCircuitBreakerRequestVolumeThreshold()).end()
+                    .to(DIRECT_PREFIX + to).end();
+            return;
+        }
+        if (config.isEnableLimit() && !config.isEnableBreaker()) {
+            ThrottleDefinition throttleDefinition = route.throttle(limiter.getLimitRequestNum()).timePeriodMillis(limiter.getLimitPeriod());
+            if (limiter.getOperation() == LimitOperation.DELAY) {
+                throttleDefinition.asyncDelayed();
+            }
+            if (limiter.getOperation() == LimitOperation.REJECT) {
+                throttleDefinition.rejectExecution(true);
+            }
+            throttleDefinition.to(DIRECT_PREFIX + to).end();
+            return;
+        }
+        val hystrixRoute = new DalaranRoute();
+        hystrixRoute.errorHandler(errorHandlerFactory);
+        String hystrixRouteId = "Hystrix-" + to;
+        hystrixRoute.setId(hystrixRouteId);
+        hystrixRoute.from(DIRECT_PREFIX + hystrixRouteId);
+
+        try {
+            camelContext.removeRoute(hystrixRouteId);
+            hystrixRoute.hystrix().hystrixConfiguration()
+                    .circuitBreakerEnabled(true)
+                    .circuitBreakerErrorThresholdPercentage(limiter.getCircuitBreakerErrorPercentage())
+                    .executionTimeoutInMilliseconds(Integer.valueOf(config.getTimeout().toString()))
+                    .circuitBreakerSleepWindowInMilliseconds(limiter.getCircuitBreakerSleepWindowInMilliseconds())
+                    .circuitBreakerRequestVolumeThreshold(limiter.getCircuitBreakerRequestVolumeThreshold()).end()
+                    .to(DIRECT_PREFIX + to).end();
+            camelContext.addRouteDefinition(hystrixRoute);
+
+            ThrottleDefinition throttleDefinition = route.throttle(limiter.getLimitRequestNum()).timePeriodMillis(limiter.getLimitPeriod());
+            if (limiter.getOperation() == LimitOperation.DELAY) {
+                throttleDefinition.asyncDelayed();
+            }
+            if (limiter.getOperation() == LimitOperation.REJECT) {
+                throttleDefinition.rejectExecution(true);
+            }
+            throttleDefinition.to(DIRECT_PREFIX + hystrixRouteId).end();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private List<ApiInfo> buildApiInfoList(Map<String, List<TriggerFlow>> moduleTriggerFlows) {

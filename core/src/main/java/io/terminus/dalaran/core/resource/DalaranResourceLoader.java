@@ -30,6 +30,8 @@ public interface DalaranResourceLoader {
 
     ConnectorAbstractEntity loadConnector(Long connectorId);
 
+    LimiterAbstractEntity loadLimiter(Long limiterId);
+
     ServiceAbstractEntity loadService(Long serviceId);
 
 }

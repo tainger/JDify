@@ -7,6 +7,7 @@ import io.terminus.dalaran.core.component.annotation.Connector;
 import io.terminus.dalaran.core.component.annotation.DynamicModel;
 import io.terminus.dalaran.core.component.annotation.Processor;
 import io.terminus.dalaran.core.component.annotation.Trigger;
+import io.terminus.dalaran.core.component.annotation.Limiter;
 import io.terminus.dalaran.core.component.config.ConnectorConfig;
 import io.terminus.dalaran.core.context.DalaranComponentContext;
 import io.terminus.dalaran.core.util.ConfigFieldUtils;
@@ -36,6 +37,8 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext {
     private final Map<String, ConnectorInfo> connectorInfoMapping = new ConcurrentHashMap<>();
 
     private final Map<String, BasicComponentInfo> basicComponentInfoMap = new ConcurrentHashMap<>();
+
+    private final Map<String, LimiterInfo> limiterInfoMap = new ConcurrentHashMap<>();
 
     @Override
     public DalaranTrigger getTrigger(String triggerType) {
@@ -100,6 +103,24 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext {
     }
 
     @Override
+    public Collection<LimiterInfo> getAllLimiterInfo() {
+        return limiterInfoMap.values().stream().map(limiterInfo -> {
+            LimiterInfo newLimiterInfo = new LimiterInfo();
+            BeanUtils.copyProperties(limiterInfo, newLimiterInfo);
+            List<DalaranConfigField> fields = new ArrayList<>();
+            for (DalaranConfigField configField : newLimiterInfo.getConfigFields()) {
+                DalaranConfigField i18nField = new DalaranConfigField();
+                fields.add(i18nField);
+                BeanUtils.copyProperties(configField, i18nField);
+                i18nField.setLabel(i18nUtils.getLimiterFieldLabel(limiterInfo.getName(), configField.getName()));
+            }
+            newLimiterInfo.setConfigFields(fields.toArray(new DalaranConfigField[0]));
+            return newLimiterInfo;
+        }).sorted(Comparator.comparingInt(LimiterInfo::getOrder))
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public Collection<ProcessorInfo> getAllProcessorInfo() {
         return processorInfoMapping.values().stream().map(processorInfo -> {
             ProcessorInfo newProcessorInfo = new ProcessorInfo();
@@ -153,7 +174,7 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext {
             triggerInfo.setDescription(triggerAnnotation.description());
 //            triggerInfo.setIsVoid(triggerAnnotation.isVoid());
 
-            Class connectorType = getConnectorType(triggerAnnotation.configType());
+            Class connectorType = getConfigType(triggerAnnotation.configType(), ConnectorConfig.class);
             if (connectorType != null) {
                 Connector connector = (Connector) connectorType.getDeclaredAnnotation(Connector.class);
                 if (connector != null) {
@@ -162,6 +183,17 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext {
                     triggerInfo.setConnectorType(connector.value());
                 }
             }
+
+            Class limiterType = getConfigType(triggerAnnotation.configType(), Limiter.class);
+            if (limiterType != null) {
+                Limiter limiter = (Limiter) limiterType.getDeclaredAnnotation(Limiter.class);
+                if (limiter != null) {
+                    LimiterInfo limiterInfo = buildLimiterInfo(limiterType, limiter, triggerType);
+                    triggerInfo.setLimiterInfo(limiterInfo);
+                    triggerInfo.setLimiterType(limiter.value());
+                }
+            }
+
             if (trigger instanceof DalaranTriggerApiDocExport) {
                 triggerInfo.setApiDocs(true);
             }
@@ -191,7 +223,7 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext {
             processorInfo.setModelType(processorAnnotation.bodyType());
             processorInfo.setDescription(processorAnnotation.description());
 
-            Class connectorType = getConnectorType(processorAnnotation.configType());
+            Class connectorType = getConfigType(processorAnnotation.configType(), ConnectorConfig.class);
             if (connectorType != null) {
                 Connector connector = (Connector) connectorType.getDeclaredAnnotation(Connector.class);
                 if (connector != null) {
@@ -235,13 +267,27 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext {
         return connectorInfo;
     }
 
-    private Class getConnectorType(Class configType) {
-        for (Type genericInterface : configType.getGenericInterfaces()) {
+    private LimiterInfo buildLimiterInfo(Class limiterType, Limiter limiter, String componentName) {
+        LimiterInfo limiterInfo = limiterInfoMap.computeIfAbsent(limiter.value(), key -> {
+            DalaranConfigField[] connectorConfigFields = ConfigFieldUtils.buildConfigFields(limiterType);
+            LimiterInfo newLimiterInfo = new LimiterInfo();
+            newLimiterInfo.setName(limiter.value());
+            newLimiterInfo.setOrder(limiter.order());
+            newLimiterInfo.setConnectorType(limiterType);
+            newLimiterInfo.setConfigFields(connectorConfigFields);
+            return newLimiterInfo;
+        });
+        limiterInfo.addComponent(componentName);
+        return limiterInfo;
+    }
+
+    private Class getConfigType(Class type, Class configType) {
+        for (Type genericInterface : type.getGenericInterfaces()) {
             if (!(genericInterface instanceof ParameterizedType)) {
                 return null;
             }
             Class rawType = (Class) ((ParameterizedType) genericInterface).getRawType();
-            if (rawType != ConnectorConfig.class) {
+            if (rawType != configType) {
                 return null;
             }
             Type[] parameterizedType = ((ParameterizedType) genericInterface).getActualTypeArguments();
