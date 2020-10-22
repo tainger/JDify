@@ -1,6 +1,6 @@
 package io.terminus.dalaran.console.service.impl;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.alibaba.fastjson.JSON;
 import io.terminus.dalaran.console.service.*;
 import io.terminus.dalaran.model.common.BasicComponentType;
 import io.terminus.dalaran.model.dto.*;
@@ -38,26 +38,25 @@ public class ComponentManagementServiceImpl implements ComponentManagementServic
 
     @Override
     public Long create(ComponentDTO componentDTO) {
-        ObjectMapper objectMapper = new ObjectMapper();
         String componentConfig = componentDTO.getConfig();
         try {
             switch (componentDTO.getType()){
                 case Flow:
-                    return flowManagementService.createFlow(objectMapper.readValue(componentConfig, TriggerFlowDTO.class));
+                    return flowManagementService.createFlow(JSON.parseObject(componentConfig, TriggerFlowDTO.class));
                 case Model:
-                    return modelManagementService.createModel(objectMapper.readValue(componentConfig, ModelDTO.class));
+                    return modelManagementService.createModel(JSON.parseObject(componentConfig, ModelDTO.class));
                 case Client:
-                    return clientManagementService.create(objectMapper.readValue(componentConfig, ClientDTO.class));
+                    return clientManagementService.create(JSON.parseObject(componentConfig, ClientDTO.class));
                 case SubFlow:
-                    return subFlowManagementService.createFlow(objectMapper.readValue(componentConfig, SubFlowDTO.class));
+                    return subFlowManagementService.createFlow(JSON.parseObject(componentConfig, SubFlowDTO.class));
                 case Function:
-                    return functionService.create(objectMapper.readValue(componentConfig, FunctionDTO.class));
+                    return functionService.create(JSON.parseObject(componentConfig, FunctionDTO.class));
                 case Connector:
-                    return connectorService.create(objectMapper.readValue(componentConfig, ConnectorDTO.class));
+                    return connectorService.create(JSON.parseObject(componentConfig, ConnectorDTO.class));
                 case Service:
-                    return serviceManagement.create(objectMapper.readValue(componentConfig, ServiceDTO.class));
+                    return serviceManagement.create(JSON.parseObject(componentConfig, ServiceDTO.class));
                 case Module:
-                    return moduleManagementService.createModule(objectMapper.readValue(componentConfig, ModuleDTO.class));
+                    return moduleManagementService.createModule(JSON.parseObject(componentConfig, ModuleDTO.class));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -68,26 +67,25 @@ public class ComponentManagementServiceImpl implements ComponentManagementServic
 
     @Override
     public Object update(ComponentDTO componentDTO) {
-        ObjectMapper objectMapper = new ObjectMapper();
         String componentConfig = componentDTO.getConfig();
         try {
             switch (componentDTO.getType()){
                 case Flow:
-                    return flowManagementService.updateFlow(objectMapper.readValue(componentConfig, TriggerFlowDTO.class));
+                    return flowManagementService.updateFlow(JSON.parseObject(componentConfig, TriggerFlowDTO.class));
                 case Model:
-                    return modelManagementService.updateModel(objectMapper.readValue(componentConfig, ModelDTO.class));
+                    return modelManagementService.updateModel(JSON.parseObject(componentConfig, ModelDTO.class));
                 case Client:
-                    return clientManagementService.update(objectMapper.readValue(componentConfig, ClientDTO.class));
+                    return clientManagementService.update(JSON.parseObject(componentConfig, ClientDTO.class));
                 case SubFlow:
-                    return subFlowManagementService.updateFlow(objectMapper.readValue(componentConfig, SubFlowDTO.class));
+                    return subFlowManagementService.updateFlow(JSON.parseObject(componentConfig, SubFlowDTO.class));
                 case Function:
-                    return functionService.update(objectMapper.readValue(componentConfig, FunctionDTO.class));
+                    return functionService.update(JSON.parseObject(componentConfig, FunctionDTO.class));
                 case Connector:
-                    return connectorService.update(objectMapper.readValue(componentConfig, ConnectorDTO.class));
+                    return connectorService.update(JSON.parseObject(componentConfig, ConnectorDTO.class));
                 case Service:
-                    return serviceManagement.update(objectMapper.readValue(componentConfig, ServiceDTO.class));
+                    return serviceManagement.update(JSON.parseObject(componentConfig, ServiceDTO.class));
                 case Module:
-                    return moduleManagementService.updateModule(objectMapper.readValue(componentConfig, ModuleDTO.class));
+                    return moduleManagementService.updateModule(JSON.parseObject(componentConfig, ModuleDTO.class));
             }
         } catch (Exception e) {
             e.printStackTrace();
