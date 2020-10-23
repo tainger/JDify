@@ -12,6 +12,7 @@ import io.terminus.dalaran.core.resource.entity.basic.BasicFlowEntity;
 import io.terminus.dalaran.core.resource.entity.common.TracingLogEntity;
 import io.terminus.dalaran.core.resource.repository.TracingLogRepository;
 import io.terminus.dalaran.model.dto.log.MainLogDTO;
+import io.terminus.dalaran.model.dto.log.TimeLogDTO;
 import io.terminus.dalaran.model.dto.log.TracingLogDTO;
 import io.terminus.dalaran.model.query.TracingLogQuery;
 import org.apache.kafka.common.protocol.types.Field;
@@ -64,9 +65,9 @@ public class TracingLogServiceImpl implements TracingLogService {
     }
 
     @Override
-    public Double getAvgElapsedTime(TracingLogQuery query){
+    public TimeLogDTO getElapsedTime(TracingLogQuery query){
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<Double> criteriaQuery = builder.createQuery(Double.class);
+        CriteriaQuery<TimeLogDTO> criteriaQuery = builder.createQuery(TimeLogDTO.class);
         Root<TracingLogEntity> root = criteriaQuery.from(TracingLogEntity.class);
         List<Predicate> predicates = new ArrayList<>();
         if(query.getFlowId()!=null){
@@ -75,12 +76,16 @@ public class TracingLogServiceImpl implements TracingLogService {
         if(query.getSuccessful()!=null){
             predicates.add(builder.equal(root.get("successful"),query.getSuccessful()));
         }
-        criteriaQuery.select(builder.avg(root.get("elapsed"))).where(predicates.toArray(new Predicate[0]));
+        if(query.getStartTime()!=null){
+            predicates.add(builder.ge(root.get("timestamp"),query.getStartTime().getTime()));
+        }
+        if(query.getEndTime()!=null){
+            predicates.add(builder.le(root.get("timestamp"),query.getEndTime().getTime()));
+        }
+        criteriaQuery.multiselect(builder.max(root.get("elapsed")),builder.min(root.get("elapsed")),
+                builder.avg(root.get("elapsed")),builder.count(root.get("elapsed"))).where(predicates.toArray(new Predicate[0]));
         return entityManager.createQuery(criteriaQuery).getSingleResult();
     }
-
-
-
 
     @Override
     public MainLogDTO getRecordDetail(String recordId) {

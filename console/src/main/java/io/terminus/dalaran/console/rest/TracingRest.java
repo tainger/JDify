@@ -4,6 +4,7 @@ import io.terminus.dalaran.console.ResponseMessage;
 import io.terminus.dalaran.console.exception.OnException;
 import io.terminus.dalaran.console.service.TracingLogService;
 import io.terminus.dalaran.model.dto.log.MainLogDTO;
+import io.terminus.dalaran.model.dto.log.TimeLogDTO;
 import io.terminus.dalaran.model.query.TracingLogQuery;
 import io.terminus.dalaran.rest.read.TracingReadAPI;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,12 +31,12 @@ public class TracingRest implements TracingReadAPI {
     }
 
     @OnException(code = ResponseMessage.TRACE_QUERY_ERROR)
-    public Double queryAvgTime(TracingLogQuery query){
-        return tracingLogService.getAvgElapsedTime(query);
-    }
-
-    @OnException(code = ResponseMessage.TRACE_QUERY_ERROR)
     public MainLogDTO logDetail(@PathVariable String recordId) {
         return tracingLogService.getRecordDetail(recordId);
+    }
+
+    @OnException(code = ResponseMessage.GET_ELAPSED_TIME_ERROR)
+    public TimeLogDTO getElapsedTime(TracingLogQuery query){
+        return tracingLogService.getElapsedTime(query);
     }
 }

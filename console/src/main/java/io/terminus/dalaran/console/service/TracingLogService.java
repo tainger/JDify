@@ -1,6 +1,7 @@
 package io.terminus.dalaran.console.service;
 
 import io.terminus.dalaran.model.dto.log.MainLogDTO;
+import io.terminus.dalaran.model.dto.log.TimeLogDTO;
 import io.terminus.dalaran.model.query.TracingLogQuery;
 import org.springframework.data.domain.Page;
 
@@ -12,7 +13,7 @@ public interface TracingLogService {
 
     List<MainLogDTO> triggerLogs(TracingLogQuery query);
 
-    Double getAvgElapsedTime(TracingLogQuery query);
-
     MainLogDTO getRecordDetail(String recordId);
+
+    TimeLogDTO getElapsedTime(TracingLogQuery query);
 }

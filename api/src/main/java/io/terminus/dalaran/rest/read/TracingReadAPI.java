@@ -1,6 +1,7 @@
 package io.terminus.dalaran.rest.read;
 
 import io.terminus.dalaran.model.dto.log.MainLogDTO;
+import io.terminus.dalaran.model.dto.log.TimeLogDTO;
 import io.terminus.dalaran.model.query.TracingLogQuery;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,9 +20,9 @@ public interface TracingReadAPI {
     @GetMapping
     List<MainLogDTO> query(TracingLogQuery query);
 
-    @GetMapping("/getAvgTime")
-    Double queryAvgTime(TracingLogQuery query);
-
     @GetMapping("/{recordId}")
     MainLogDTO logDetail(@PathVariable String recordId);
+
+    @GetMapping("/getElapsedTime")
+    TimeLogDTO getElapsedTime(TracingLogQuery query);
 }
