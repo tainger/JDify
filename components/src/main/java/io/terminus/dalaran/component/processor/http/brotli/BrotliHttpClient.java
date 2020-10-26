@@ -6,10 +6,8 @@ import com.google.common.collect.Maps;
 import io.terminus.dalaran.component.processor.http.HttpClientConfig;
 import io.terminus.dalaran.core.component.DalaranProcessor;
 import io.terminus.dalaran.core.component.annotation.Processor;
-import io.terminus.dalaran.core.context.DalaranModelTypeContext;
 import okhttp3.OkHttpClient;
 import org.apache.camel.model.ProcessorDefinition;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -21,11 +19,6 @@ import java.util.concurrent.TimeUnit;
         bodyType = "JSON"
 )
 public class BrotliHttpClient implements DalaranProcessor<HttpClientConfig> {
-
-    @Autowired
-    private DalaranModelTypeContext converterContext;
-
-    private static final String HTTP_URI = "%s4://%s:%s%s?bridgeEndpoint=true";
 
     @Override
     public void configure(ProcessorDefinition route, HttpClientConfig config) {
