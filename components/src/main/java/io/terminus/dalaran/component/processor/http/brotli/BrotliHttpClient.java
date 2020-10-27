@@ -11,6 +11,8 @@ import okhttp3.OkHttpClient;
 import org.apache.camel.model.ProcessorDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.net.ssl.*;
+import java.security.SecureRandom;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -32,6 +34,8 @@ public class BrotliHttpClient implements DalaranProcessor<HttpClientConfig> {
         OkHttpClient client = new OkHttpClient().newBuilder()
                 .connectTimeout(config.getConnector().getTimeout(), TimeUnit.MILLISECONDS)
                 .readTimeout(config.getConnector().getTimeout(), TimeUnit.MILLISECONDS)
+                .sslSocketFactory(createSSLSocketFactory(),new TrustAllCertificates())
+                .hostnameVerifier((s, sslSession) -> true)
                 .build();
         route.process(new BrotliHttpProcessor(config, client));
     }
@@ -43,4 +47,17 @@ public class BrotliHttpClient implements DalaranProcessor<HttpClientConfig> {
         }
         return null;
     }
+
+    private static SSLSocketFactory createSSLSocketFactory() {
+        SSLSocketFactory ssfFactory = null;
+        try {
+            SSLContext sc = SSLContext.getInstance("SSL");
+            sc.init(null, new TrustManager[]{new TrustAllCertificates()}, new SecureRandom());
+            ssfFactory = sc.getSocketFactory();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return ssfFactory;
+    }
+
 }
