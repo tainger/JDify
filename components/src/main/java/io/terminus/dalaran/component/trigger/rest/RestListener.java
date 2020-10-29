@@ -51,7 +51,7 @@ public class RestListener implements DalaranTrigger<RestConfig>, DalaranTriggerA
         }
         if (config.getMethod().isNoBody()) {
             if (config.isEnableSign()) {
-                route.process(new AESQuerySignProcessor(config));
+                route.process(new QueryStringSignProcessor(clientContext.getAllClient(), config.isCheckSign()));
             } else {
                 route.process(new QueryStringConvertProcessor());
             }
@@ -63,7 +63,7 @@ public class RestListener implements DalaranTrigger<RestConfig>, DalaranTriggerA
             }
             if (config.isEnableSign()) {
                 route.unmarshal().json(JsonLibrary.Fastjson);
-                route.process(new AESSignProcessor(config));
+                route.process(new SignProcessor(clientContext.getAllClient(), config.isCheckSign()));
             }
             route.convertBodyTo(String.class);
         }

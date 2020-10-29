@@ -15,8 +15,11 @@ public class RestConfig extends AllModelConfig {
     @ConfigFieldInfo(label = "端口", inputType = FieldInputType.Hidden)
     private Integer port = 8080;
 
-    @ConfigFieldInfo(label = "鉴权签名", inputType = FieldInputType.Switch, defaultValue = "false")
+    @ConfigFieldInfo(label = "开启鉴权", inputType = FieldInputType.Switch, defaultValue = "false")
     private boolean enableSign = false;
+
+    @ConfigFieldInfo(label = "计算签名", inputType = FieldInputType.Switch, defaultValue = "false")
+    private boolean checkSign = false;
 
     @ConfigFieldInfo(label = "密钥", inputType = FieldInputType.Password, required = false)
     private String secret;
