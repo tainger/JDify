@@ -17,7 +17,7 @@ public class BasicLogDTO {
 
     private String flowName;
 
-    private Date createdAt;
+    private String createdAt;
 
     private Date timestamp;
 
