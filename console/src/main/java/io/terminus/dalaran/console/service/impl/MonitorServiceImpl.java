@@ -44,7 +44,7 @@ public class MonitorServiceImpl implements MonitorService {
             ScheduleTaskDetailDTO taskDetail = new ScheduleTaskDetailDTO();
             taskDetail.setTaskName(taskName);
             taskDetail.setExecuteTime(log.getElapsed());
-            taskDetail.setFireTime(log.getTimestamp());
+            taskDetail.setFireTime(log.getCreatedAt());
             taskDetail.setCron(schedulerConfig.getCron());
             taskDetail.setTimeZone(schedulerConfig.getTimezone());
             tasks.add(taskDetail);

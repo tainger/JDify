@@ -109,6 +109,7 @@ public class TracingLogServiceImpl implements TracingLogService {
         MainLogDTO mainLog = new MainLogDTO();
         mainLog.setId(log.getId());
         mainLog.setRecordId(log.getRecordId());
+        mainLog.setCreatedAt(log.getCreatedAt());
         mainLog.setTimestamp(new Date(log.getTimestamp()));
         mainLog.setElapsed(log.getElapsed());
         mainLog.setInputBody(log.getInputBody());
@@ -116,6 +117,7 @@ public class TracingLogServiceImpl implements TracingLogService {
         mainLog.setOutputBody(log.getOutputBody());
         mainLog.setOutputBodyType(log.getOutputBodyType());
         mainLog.setSuccessful(log.isSuccessful());
+
         if (log.getFlowId() != null) {
             mainLog.setFlowId(log.getFlowId());
             BasicFlowEntity flowEntity = null;
