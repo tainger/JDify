@@ -10,8 +10,9 @@ import static io.terminus.dalaran.component.trigger.rest.utils.SignUtils.stopExc
 
 public class QueryStringSignProcessor extends SignProcessor {
 
-    public QueryStringSignProcessor(Map<String, String> clientMapper) {
-        super(clientMapper);
+
+    public QueryStringSignProcessor(Map<String, String> clientMapper, Boolean checkSign) {
+        super(clientMapper, checkSign);
     }
 
     @Override

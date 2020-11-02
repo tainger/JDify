@@ -43,7 +43,7 @@ public class SoapService implements DalaranService<WSDLImportConfig, SoapService
 
     @Override
     public void configure(ProcessorDefinition route, SoapOperationConfig soapOperationConfig) {
-        String uri = String.format(HTTP_URI, "http", soapOperationConfig.getLocation());
+        String uri = String.format(HTTP_URI, soapOperationConfig.getProtocol().toString().toLowerCase(), soapOperationConfig.getLocation());
         if (StringUtils.contains(uri, "?")) {
             uri = uri + "&bridgeEndpoint=true";
         } else {

@@ -2,8 +2,6 @@ package io.terminus.dalaran.model.dto;
 
 import lombok.Data;
 
-import java.util.Date;
-
 @Data
 public class ScheduleTaskDetailDTO {
 
@@ -11,7 +9,7 @@ public class ScheduleTaskDetailDTO {
 
     private String cron;
 
-    private Date fireTime;
+    private String fireTime;
 
     private Long executeTime;
 

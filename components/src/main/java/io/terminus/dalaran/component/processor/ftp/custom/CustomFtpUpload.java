@@ -23,7 +23,7 @@ import java.io.File;
 )
 public class CustomFtpUpload implements DalaranProcessor<CustomFtpUploadConfig> {
 
-    private static final String FTP_ROUTE_URI = "%s:%s:%s/%s?passiveMode=true&fileExist=%s";
+    private static final String FTP_ROUTE_URI = "%s:%s:%s/%s?passiveMode=true&fileExist=%s&stepwise=false&disconnect=true";
 
     private static final String DATA_TEMPLATE_DIR = "/var/tmp";
 

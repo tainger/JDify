@@ -16,6 +16,7 @@ import io.terminus.dalaran.model.dto.log.TimeLogDTO;
 import io.terminus.dalaran.model.dto.log.TracingLogDTO;
 import io.terminus.dalaran.model.query.TracingLogQuery;
 import org.apache.kafka.common.protocol.types.Field;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
@@ -24,10 +25,8 @@ import org.springframework.stereotype.Service;
 import javax.persistence.EntityManager;
 import javax.persistence.criteria.*;
 import javax.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -48,6 +47,8 @@ public class TracingLogServiceImpl implements TracingLogService {
 
     @Autowired
     private EntityManager entityManager;
+
+    private String timeZone = System.getenv("TZ");
 
     @Override
     public Page<MainLogDTO> triggerLogsPageable(TracingLogQuery query, Integer pageNumber, Integer pageSize) {
@@ -139,6 +140,13 @@ public class TracingLogServiceImpl implements TracingLogService {
         MainLogDTO mainLog = new MainLogDTO();
         mainLog.setId(log.getId());
         mainLog.setRecordId(log.getRecordId());
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        if (StringUtils.isNotBlank(timeZone)) {
+            format.setTimeZone(TimeZone.getTimeZone(timeZone));
+        } else {
+            format.setTimeZone(TimeZone.getTimeZone("Asia/Shanghai"));
+        }
+        mainLog.setCreatedAt(format.format(log.getCreatedAt()));
         mainLog.setTimestamp(new Date(log.getTimestamp()));
         mainLog.setElapsed(log.getElapsed());
         mainLog.setInputBody(log.getInputBody());
@@ -146,6 +154,7 @@ public class TracingLogServiceImpl implements TracingLogService {
         mainLog.setOutputBody(log.getOutputBody());
         mainLog.setOutputBodyType(log.getOutputBodyType());
         mainLog.setSuccessful(log.isSuccessful());
+
         if (log.getFlowId() != null) {
             mainLog.setFlowId(log.getFlowId());
             BasicFlowEntity flowEntity = null;

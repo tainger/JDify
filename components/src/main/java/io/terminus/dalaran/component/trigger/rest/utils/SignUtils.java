@@ -1,9 +1,8 @@
 package io.terminus.dalaran.component.trigger.rest.utils;
 
-import com.google.common.base.Charsets;
 import org.apache.camel.Exchange;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.curator.shaded.com.google.common.hash.Hashing;
 import org.apache.http.entity.ContentType;
 
 import java.util.LinkedHashMap;
@@ -16,7 +15,7 @@ import static org.apache.camel.Exchange.HTTP_RESPONSE_CODE;
 public class SignUtils {
 
     public static boolean signEquals(String data, String sign) {
-        String backendSign = Hashing.md5().hashString(data, Charsets.UTF_8).toString();
+        String backendSign = DigestUtils.md5Hex(data);
         return StringUtils.equalsIgnoreCase(sign, backendSign);
     }
 

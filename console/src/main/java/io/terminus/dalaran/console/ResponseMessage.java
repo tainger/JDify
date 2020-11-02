@@ -141,4 +141,6 @@ public class ResponseMessage {
     public static final String OSS_FILE_UPLOAD_ERROR = "OSS.Log.Upload.Exception";
 
     public static final String GET_ELAPSED_TIME_ERROR = "Get.ElapsedTime.Exception";
+
+    public static final String GET_USER_INFO_ERROR = "Get.User.Exception";
 }

@@ -5,10 +5,10 @@ import io.terminus.dalaran.component.common.HttpMethod;
 import io.terminus.dalaran.component.common.LimitOperation;
 import io.terminus.dalaran.component.limiter.DalaranLimiter;
 import io.terminus.dalaran.component.trigger.rest.model.ApiInfo;
-import io.terminus.dalaran.component.trigger.rest.processor.AESQuerySignProcessor;
-import io.terminus.dalaran.component.trigger.rest.processor.AESSignProcessor;
 import io.terminus.dalaran.component.trigger.rest.processor.MixMethodProcessor;
 import io.terminus.dalaran.component.trigger.rest.processor.QueryStringConvertProcessor;
+import io.terminus.dalaran.component.trigger.rest.processor.QueryStringSignProcessor;
+import io.terminus.dalaran.component.trigger.rest.processor.SignProcessor;
 import io.terminus.dalaran.component.trigger.rest.utils.RestWordUtils;
 import io.terminus.dalaran.component.trigger.rest.utils.SwaggerUtils;
 import io.terminus.dalaran.core.component.DalaranCircuitBreaker;
@@ -63,7 +63,7 @@ public class RestListener implements DalaranTrigger<RestConfig>, DalaranTriggerA
         }
         if (config.getMethod().isNoBody()) {
             if (config.isEnableSign()) {
-                route.process(new AESQuerySignProcessor(config));
+                route.process(new QueryStringSignProcessor(clientContext.getAllClient(), config.isCheckSign()));
             } else {
                 route.process(new QueryStringConvertProcessor());
             }
@@ -72,7 +72,7 @@ public class RestListener implements DalaranTrigger<RestConfig>, DalaranTriggerA
         } else {
             if (config.isEnableSign()) {
                 route.unmarshal().json(JsonLibrary.Fastjson);
-                route.process(new AESSignProcessor(config));
+                route.process(new SignProcessor(clientContext.getAllClient(), config.isCheckSign()));
             }
             route.convertBodyTo(String.class);
         }

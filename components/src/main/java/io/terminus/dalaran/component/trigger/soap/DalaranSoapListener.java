@@ -42,7 +42,6 @@ public class DalaranSoapListener implements DalaranTrigger<SoapListenerConfig>, 
                 "://0.0.0.0:" + config.getPort() + config.getPath() +
                 "?chunkedMaxContentLength=104857600&httpMethodRestrict=" + config.getMethod();
         route.from(uri).process(new SoapTriggerProcessor());
-
         if (!config.isEnableSign()) {
             return;
         }
@@ -50,7 +49,7 @@ public class DalaranSoapListener implements DalaranTrigger<SoapListenerConfig>, 
             route.process(new SoapBasicSignProcessor(clientContext.getAllClient()));
         }
         if (config.getAuthType() == SoapAuthType.CUSTOM) {
-            route.process(new QueryStringSignProcessor(clientContext.getAllClient()));
+            route.process(new QueryStringSignProcessor(clientContext.getAllClient(), config.isCheckSign()));
         }
     }
 
