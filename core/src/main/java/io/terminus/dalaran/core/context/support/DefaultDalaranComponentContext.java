@@ -255,10 +255,10 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext {
         ConnectorInfo connectorInfo = connectorInfoMapping.computeIfAbsent(connector.value(), key -> {
             DalaranConfigField[] connectorConfigFields = ConfigFieldUtils.buildConfigFields(classType);
             ConnectorInfo newConnectorInfo = new ConnectorInfo();
-            newConnectorInfo.setName(connector.value());
+            newConnectorInfo.setName(classType.getSimpleName());
             newConnectorInfo.setOrder(connector.order());
             newConnectorInfo.setClassType(classType);
-            newConnectorInfo.setType(classType.getSimpleName());
+            newConnectorInfo.setType(connector.value());
             newConnectorInfo.setConfigFields(connectorConfigFields);
             newConnectorInfo.setDescription(connector.description());
             return newConnectorInfo;
