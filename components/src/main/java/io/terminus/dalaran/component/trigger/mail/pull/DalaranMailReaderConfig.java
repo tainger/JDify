@@ -15,7 +15,7 @@ public class DalaranMailReaderConfig implements ConnectorConfig<MailConnector> {
     @ConfigFieldInfo(label = "Mail 连接器", inputType = FieldInputType.Connector, connectorType = MailConnector.class)
     private Long connectorId;
 
-    @ConfigFieldInfo(label = "读取后删除邮件", inputType = FieldInputType.Radio, defaultValue = "false")
+    @ConfigFieldInfo(label = "读取后删除邮件", inputType = FieldInputType.Switch, defaultValue = "false")
     private Boolean delete;
 
     @ConfigFieldInfo(label = "发件人(逗号分隔)", inputType = FieldInputType.String)

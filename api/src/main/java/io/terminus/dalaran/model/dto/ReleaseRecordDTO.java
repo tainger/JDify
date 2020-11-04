@@ -13,6 +13,8 @@ public class ReleaseRecordDTO {
 
     private boolean successful;
 
+    private boolean enabled;
+
     private String releaseLog;
 
     private Long operator;
