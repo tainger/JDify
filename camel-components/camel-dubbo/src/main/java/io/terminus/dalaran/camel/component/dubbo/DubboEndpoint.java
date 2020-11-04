@@ -56,7 +56,7 @@ public class DubboEndpoint extends ProcessorEndpoint {
     public GenericService getGenericService() {
         if (genericService == null) {
             ReferenceConfig<GenericService> reference = new ReferenceConfig<>();
-//            reference.setApplication(applicationConfig);
+            reference.setApplication(applicationConfig);
             reference.setRegistry(new RegistryConfig(registryAddress));
             reference.setVersion(version);
             reference.setTimeout(timeout);
