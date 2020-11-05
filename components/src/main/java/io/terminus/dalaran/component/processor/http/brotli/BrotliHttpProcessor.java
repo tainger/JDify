@@ -63,6 +63,9 @@ public class BrotliHttpProcessor implements Processor {
             }
         }
         Response response = client.newCall(request).execute();
+        if (response.code() != 200) {
+            throw new RuntimeException("Http Request Error! " + Objects.requireNonNull(response.body()).string());
+        }
         String responseBody = Objects.requireNonNull(response.body()).string();
         log.info("response: " + responseBody);
         exchange.getOut().setBody(responseBody);
