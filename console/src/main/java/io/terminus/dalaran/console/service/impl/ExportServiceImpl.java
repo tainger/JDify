@@ -135,7 +135,7 @@ public class ExportServiceImpl implements ExportService {
 
     @Override
     public Swagger exportSwagger() {
-        List<ApiInfo> apiInfoList = getExportApiInfoList();
+        List<ApiInfo> apiInfoList = getExportApiInfoListNew();
         apiInfoList.forEach(apiInfo -> {
             Object inExample = JSON.parseObject(modelManagementService.buildSwaggerDataTemplate(apiInfo.getInSchema().getModelSchema(), apiInfo.getInSchema().getModelType()).getData());
             Object outExample = JSON.parseObject(modelManagementService.buildSwaggerDataTemplate(apiInfo.getOutSchema().getModelSchema(), apiInfo.getOutSchema().getModelType()).getData());
@@ -217,6 +217,23 @@ public class ExportServiceImpl implements ExportService {
             TriggerFlow triggerFlow = resourceBuilder.buildTriggerFlow(flowEntity);
             return new ApiInfo(module.getName(), triggerFlow);
         }).collect(Collectors.toList());
+    }
+
+    private List<ApiInfo> getExportApiInfoListNew() {
+        List<TriggerFlowEntity> restFlowList = triggerFlowRepository.findByStatusNotAndTriggerType(FlowStatus.Error, "http-rest-listener");
+        List<ApiInfo> apiInfo = new ArrayList<>();
+        restFlowList.stream().forEach(flowEntity->{
+            Optional<ModuleEntity> optional = moduleRepository.findById(flowEntity.getModuleId());
+            ModuleEntity module = new ModuleEntity();
+            if(optional!=null && optional.isPresent()) {
+                module = optional.get();
+            }
+            TriggerFlow triggerFlow = resourceBuilder.buildTriggerFlow(flowEntity);
+            if(triggerFlow.getInModel()!=null && triggerFlow.getOutModel()!=null) {
+                apiInfo.add(new ApiInfo(module.getName(), triggerFlow));
+            }
+        });
+        return apiInfo;
     }
 
     private List<SoapApiInfo> getExportSoapListeners() {
