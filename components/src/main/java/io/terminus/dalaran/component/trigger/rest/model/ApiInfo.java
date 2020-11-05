@@ -27,7 +27,7 @@ public class ApiInfo {
 
     public ApiInfo(String moduleName, TriggerFlow flow) {
         MessageModel inSchema = flow.getInModel();
-        MessageModel outSchema = flow.getInModel();
+        MessageModel outSchema = flow.getOutModel();
         RestConfig restConfig = (RestConfig) flow.getTriggerConfig();
         this.moduleName = moduleName;
         this.name = flow.getName();
@@ -61,12 +61,14 @@ public class ApiInfo {
         param.setDescription(field.getDescription());
         switch (field.getType()) {
             case ARRAY: {
-                if (field.getSubType().isBasicType()) {
-                    ApiParameter subParam = new ApiParameter();
-                    subParam.setType(field.getSubType());
-                    subParam.setDescription(field.getDescription());
-                    param.getSubParameter().put("", subParam);
-                    break;
+                if(field.getSubType()!=null){
+                    if (field.getSubType().isBasicType()) {
+                        ApiParameter subParam = new ApiParameter();
+                        subParam.setType(field.getSubType());
+                        subParam.setDescription(field.getDescription());
+                        param.getSubParameter().put("", subParam);
+                        break;
+                    }
                 }
             }
             case OBJECT: {

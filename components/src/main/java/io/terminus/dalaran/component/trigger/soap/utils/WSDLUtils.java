@@ -89,8 +89,12 @@ public class WSDLUtils {
         soapApiInfos.forEach(soapApiInfo -> {
             MessageModel input = soapApiInfo.getInput();
             MessageModel output = soapApiInfo.getOutput();
-            models.put(input.getName(), input);
-            models.put(output.getName(), output);
+            if(input!=null){
+                models.put(input.getName(), input);
+            }
+            if(output!=null){
+                models.put(output.getName(), output);
+            }
         });
 
         /**
@@ -116,15 +120,16 @@ public class WSDLUtils {
             String apiName = apiInfo.getName().trim();
             PortType pt = definitions.newPortType(SoapConstants.PORT_TYPE + OPERATION_SPLIT + apiName);
             Operation op = pt.newOperation(apiName);
+            if(apiInfo.getInput()==null || apiInfo.getOutput()==null){
+                return;
+            }
             op.newInput(apiInfo.getInput().getName()).setMessage(definitions.getMessage(apiInfo.getInput().getName()));
             op.newOutput(apiInfo.getOutput().getName()).setMessage(definitions.getMessage(apiInfo.getOutput().getName()));
-
             Port port = definitions.newService(SoapConstants.SERVICE_NAME + OPERATION_SPLIT + apiName).newPort(SoapConstants.SERVICE_PORT + OPERATION_SPLIT + apiName);
             Binding binding = port.newBinding(SoapConstants.BINDING + OPERATION_SPLIT + apiName);
             binding.setType(pt);
             SOAPBinding soapBinding = binding.newSOAP11Binding();
             soapBinding.setBinding(binding);
-
             BindingOperation bindingOperation = binding.newBindingOperation(apiName);
             SOAPOperation soapOperation = bindingOperation.newSOAP11Operation();
             soapOperation.setName(apiName);

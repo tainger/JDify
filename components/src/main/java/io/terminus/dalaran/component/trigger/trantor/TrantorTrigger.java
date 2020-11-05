@@ -4,12 +4,14 @@ import io.terminus.dalaran.core.component.DalaranTrigger;
 import io.terminus.dalaran.core.component.annotation.Trigger;
 import org.apache.camel.model.RouteDefinition;
 
+/*
 @Trigger(
         value = "Trantor-Integration",
         order = 11,
         configType = TrantorTriggerConfig.class,
         bodyType = "JSON"
 )
+ */
 public class TrantorTrigger implements DalaranTrigger<TrantorTriggerConfig> {
 
     @Override

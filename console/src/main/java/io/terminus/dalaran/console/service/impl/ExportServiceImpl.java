@@ -222,7 +222,7 @@ public class ExportServiceImpl implements ExportService {
     private List<ApiInfo> getExportApiInfoListNew() {
         List<TriggerFlowEntity> restFlowList = triggerFlowRepository.findByStatusNotAndTriggerType(FlowStatus.Error, "http-rest-listener");
         List<ApiInfo> apiInfo = new ArrayList<>();
-        restFlowList.stream().forEach(flowEntity->{
+        restFlowList.stream().forEach(flowEntity -> {
             Optional<ModuleEntity> optional = moduleRepository.findById(flowEntity.getModuleId());
             ModuleEntity module = new ModuleEntity();
             if(optional!=null && optional.isPresent()) {
