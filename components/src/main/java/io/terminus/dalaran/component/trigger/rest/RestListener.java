@@ -28,6 +28,7 @@ import org.apache.camel.model.dataformat.JsonLibrary;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -80,12 +81,12 @@ public class RestListener implements DalaranTrigger<RestConfig>, DalaranTriggerA
 
     @Override
     public Swagger exportApiDoc(Map<String, List<TriggerFlow>> moduleTriggerFlows) {
-        return SwaggerUtils.buildSwagger(buildApiInfoList(moduleTriggerFlows));
+        return SwaggerUtils.buildSwagger(buildApiInfoListNew(moduleTriggerFlows));
     }
 
     @Override
     public File exportWord(Map<String, List<TriggerFlow>> moduleTriggerFlows) {
-        return RestWordUtils.buildWordFile(buildApiInfoList(moduleTriggerFlows));
+        return RestWordUtils.buildWordFile(buildApiInfoListNew(moduleTriggerFlows));
     }
 
     @Override
@@ -150,5 +151,17 @@ public class RestListener implements DalaranTrigger<RestConfig>, DalaranTriggerA
         return moduleTriggerFlows.entrySet().stream().flatMap(module ->
                 module.getValue().stream().map(flow -> new ApiInfo(module.getKey(), flow))
         ).collect(Collectors.toList());
+    }
+
+    private List<ApiInfo> buildApiInfoListNew(Map<String, List<TriggerFlow>> moduleTriggerFlows) {
+        List<ApiInfo> apiInfo = new ArrayList<>();
+        moduleTriggerFlows.entrySet().stream().forEach(module -> {
+            module.getValue().stream().forEach(flow -> {
+                if(flow.getInModel()!=null && flow.getOutModel()!=null) {
+                    apiInfo.add(new ApiInfo(module.getKey(),flow));
+                }
+            });
+        });
+        return apiInfo;
     }
 }
