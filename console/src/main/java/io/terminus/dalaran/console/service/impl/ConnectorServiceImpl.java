@@ -98,7 +98,7 @@ public class ConnectorServiceImpl implements ConnectorService {
     }
 
     private void setCreatedBy(ConnectorEntity connectorEntity){
-        if(UserContext.getUserInfo().getUsername()!=null){
+        if(UserContext.getUserInfo() != null && UserContext.getUserInfo().getUsername() != null){
             connectorEntity.setCreatedBy(UserContext.getUserInfo().getUsername());
         }
     }

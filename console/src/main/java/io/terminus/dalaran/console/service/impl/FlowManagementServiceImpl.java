@@ -410,13 +410,13 @@ public class FlowManagementServiceImpl implements FlowManagementService {
     }
 
     private void setCreatedBy(TriggerFlowEntity triggerFlowEntity){
-        if(UserContext.getUserInfo().getUsername()!=null){
+        if(UserContext.getUserInfo() != null && UserContext.getUserInfo().getUsername() != null){
             triggerFlowEntity.setCreatedBy(UserContext.getUserInfo().getUsername());
         }
     }
 
     private void setUpdatedBy(TriggerFlowEntity triggerFlowEntity){
-        if(UserContext.getUserInfo().getUsername()!=null){
+        if(UserContext.getUserInfo() != null && UserContext.getUserInfo().getUsername() != null){
             triggerFlowEntity.setUpdatedBy(UserContext.getUserInfo().getUsername());
         }
     }

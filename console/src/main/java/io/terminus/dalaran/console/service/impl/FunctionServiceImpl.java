@@ -1,6 +1,5 @@
 package io.terminus.dalaran.console.service.impl;
 
-import io.terminus.dalaran.console.entity.ClientEntity;
 import io.terminus.dalaran.console.entity.FunctionEntity;
 import io.terminus.dalaran.console.repository.FunctionRepository;
 import io.terminus.dalaran.console.service.FunctionService;
@@ -16,9 +15,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
-import javax.swing.text.html.Option;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class FunctionServiceImpl implements FunctionService {
@@ -83,7 +80,7 @@ public class FunctionServiceImpl implements FunctionService {
     }
 
     private void setCreatedBy(FunctionEntity functionEntity){
-        if(UserContext.getUserInfo().getUsername()!=null){
+        if(UserContext.getUserInfo() != null && UserContext.getUserInfo().getUsername() != null){
             functionEntity.setCreatedBy(UserContext.getUserInfo().getUsername());
         }
     }

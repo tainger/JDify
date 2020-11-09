@@ -5,7 +5,6 @@ import io.terminus.dalaran.component.trigger.soap.model.SoapApiInfo;
 import io.terminus.dalaran.config.ServiceInfo;
 import io.terminus.dalaran.console.ServiceDetail;
 import io.terminus.dalaran.console.entity.ModelEntity;
-import io.terminus.dalaran.console.entity.PropertyEntity;
 import io.terminus.dalaran.console.entity.ServiceEntity;
 import io.terminus.dalaran.console.entity.TriggerFlowEntity;
 import io.terminus.dalaran.console.repository.ModelRepository;
@@ -215,13 +214,13 @@ public class ServiceManagementImpl implements ServiceManagement {
     }
 
     private void setCreatedBy(ServiceEntity serviceEntity){
-        if(UserContext.getUserInfo().getUsername()!=null){
+        if(UserContext.getUserInfo() != null && UserContext.getUserInfo().getUsername() != null){
             serviceEntity.setCreatedBy(UserContext.getUserInfo().getUsername());
         }
     }
 
     private void setUpdatedBy(ServiceEntity serviceEntity){
-        if(UserContext.getUserInfo().getUsername()!=null){
+        if(UserContext.getUserInfo() != null && UserContext.getUserInfo().getUsername() != null){
             serviceEntity.setUpdatedBy(UserContext.getUserInfo().getUsername());
         }
     }

@@ -1,7 +1,6 @@
 package io.terminus.dalaran.console.service.impl;
 
 import io.terminus.dalaran.console.entity.ClientEntity;
-import io.terminus.dalaran.console.entity.TriggerFlowEntity;
 import io.terminus.dalaran.console.repository.ClientRepository;
 import io.terminus.dalaran.console.service.ClientManagementService;
 import io.terminus.dalaran.model.dto.ClientDTO;
@@ -16,7 +15,6 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class ClientManagementServiceImpl implements ClientManagementService {
@@ -79,7 +77,7 @@ public class ClientManagementServiceImpl implements ClientManagementService {
     }
 
     private void setCreatedBy(ClientEntity clientEntity){
-        if(UserContext.getUserInfo().getUsername()!=null){
+        if(UserContext.getUserInfo() != null && UserContext.getUserInfo().getUsername() != null){
             clientEntity.setCreatedBy(UserContext.getUserInfo().getUsername());
         }
     }

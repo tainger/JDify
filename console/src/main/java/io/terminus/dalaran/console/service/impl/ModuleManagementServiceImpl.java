@@ -1,6 +1,5 @@
 package io.terminus.dalaran.console.service.impl;
 
-import io.terminus.dalaran.console.entity.ModelEntity;
 import io.terminus.dalaran.console.service.*;
 import io.terminus.dalaran.console.service.jpa.ModuleQueryService;
 import io.terminus.dalaran.core.resource.entity.common.ModuleEntity;
@@ -158,13 +157,13 @@ public class ModuleManagementServiceImpl implements ModuleManagementService {
     }
 
     private void setCreatedBy(ModuleEntity moduleEntity){
-        if(UserContext.getUserInfo().getUsername()!=null){
+        if(UserContext.getUserInfo() != null && UserContext.getUserInfo().getUsername() != null){
             moduleEntity.setCreatedBy(UserContext.getUserInfo().getUsername());
         }
     }
 
     private void setUpdatedBy(ModuleEntity moduleEntity){
-        if(UserContext.getUserInfo().getUsername()!=null){
+        if(UserContext.getUserInfo() != null && UserContext.getUserInfo().getUsername() != null){
             moduleEntity.setUpdatedBy(UserContext.getUserInfo().getUsername());
         }
     }

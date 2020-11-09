@@ -3,7 +3,6 @@ package io.terminus.dalaran.console.service.impl;
 import com.alibaba.fastjson.JSON;
 import io.terminus.dalaran.console.TestFlowInitializer;
 import io.terminus.dalaran.console.convertor.FlowConvertor;
-import io.terminus.dalaran.console.entity.ServiceEntity;
 import io.terminus.dalaran.console.entity.SubFlowEntity;
 import io.terminus.dalaran.console.repository.SubFlowRepository;
 import io.terminus.dalaran.console.service.SubFlowManagementService;
@@ -184,13 +183,13 @@ public class SubFlowManagementServiceImpl implements SubFlowManagementService {
     }
 
     private void setCreatedBy(SubFlowEntity subFlowEntity){
-        if(UserContext.getUserInfo().getUsername()!=null){
+        if(UserContext.getUserInfo() != null && UserContext.getUserInfo().getUsername() != null){
             subFlowEntity.setCreatedBy(UserContext.getUserInfo().getUsername());
         }
     }
 
     private void setUpdatedBy(SubFlowEntity subFlowEntity){
-        if(UserContext.getUserInfo().getUsername()!=null){
+        if(UserContext.getUserInfo() != null && UserContext.getUserInfo().getUsername() != null){
             subFlowEntity.setUpdatedBy(UserContext.getUserInfo().getUsername());
         }
     }

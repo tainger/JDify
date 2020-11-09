@@ -7,7 +7,6 @@ import com.google.common.collect.Maps;
 import io.terminus.dalaran.DalaranConsoleConstants;
 import io.terminus.dalaran.ServiceType;
 import io.terminus.dalaran.component.processor.mapper.model.MapperConstants;
-import io.terminus.dalaran.console.entity.ClientEntity;
 import io.terminus.dalaran.console.entity.ModelEntity;
 import io.terminus.dalaran.console.entity.ServiceEntity;
 import io.terminus.dalaran.console.repository.ModelRepository;
@@ -21,7 +20,10 @@ import io.terminus.dalaran.model.*;
 import io.terminus.dalaran.model.dto.ModelDTO;
 import io.terminus.dalaran.model.dto.basic.BasicModelInfo;
 import io.terminus.dalaran.model.query.ModelQuery;
-import io.terminus.dalaran.model.schema.*;
+import io.terminus.dalaran.model.schema.CsvModelSchema;
+import io.terminus.dalaran.model.schema.DataTemplate;
+import io.terminus.dalaran.model.schema.JsonSchema;
+import io.terminus.dalaran.model.schema.SoapSchema;
 import io.terminus.draco.web.autoconfig.context.UserContext;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
@@ -557,14 +559,14 @@ public class ModelManagementServiceImpl implements ModelManagementService {
         return FieldType.STRING;
     }
 
-    private void setCreatedBy(ModelEntity modelEntity){
-        if(UserContext.getUserInfo().getUsername()!=null){
+    private void setCreatedBy(ModelEntity modelEntity) {
+        if(UserContext.getUserInfo() != null && UserContext.getUserInfo().getUsername() != null){
             modelEntity.setCreatedBy(UserContext.getUserInfo().getUsername());
         }
     }
 
     private void setUpdatedBy(ModelEntity modelEntity){
-        if(UserContext.getUserInfo().getUsername()!=null){
+        if(UserContext.getUserInfo() != null && UserContext.getUserInfo().getUsername() != null){
             modelEntity.setUpdatedBy(UserContext.getUserInfo().getUsername());
         }
     }
