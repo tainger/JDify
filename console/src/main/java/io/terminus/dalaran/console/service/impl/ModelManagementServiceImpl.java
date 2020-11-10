@@ -255,9 +255,10 @@ public class ModelManagementServiceImpl implements ModelManagementService {
     @Override
     public DalaranModelTemplate buildDataTemplate(DalaranModelSchema schema, Long id) {
         ModelEntity model = modelRepository.findById(id).get();
-        Map fields = schema.getFields();
+       // Map fields = schema.getFields();
         DalaranModelTemplate dalaranModelTemplate = new DalaranModelTemplate();
-        dalaranModelTemplate.setData(dalaranContext.getDalaranModelTypeContext().getModelType(model.getType()).buildTemplateData(fields));
+        DalaranModelSchema modelSchema = JSONObject.parseObject(model.getModelSchema(),DalaranModelSchema.class);
+        dalaranModelTemplate.setData(dalaranContext.getDalaranModelTypeContext().getModelType(model.getType()).buildTemplateData(modelSchema.getFields()));
         dalaranModelTemplate.setType(model.getType());
         return dalaranModelTemplate;
 //        Map<String, ModelField> modelField = schema.getFields();
