@@ -3,9 +3,11 @@ package io.terminus.dalaran.component.trigger.soap;
 import io.terminus.dalaran.component.trigger.rest.processor.QueryStringSignProcessor;
 import io.terminus.dalaran.component.trigger.soap.model.SoapApiInfo;
 import io.terminus.dalaran.component.trigger.soap.model.SoapAuthType;
+import io.terminus.dalaran.component.trigger.soap.model.SoapWordApiInfo;
 import io.terminus.dalaran.component.trigger.soap.processor.SoapBasicSignProcessor;
 import io.terminus.dalaran.component.trigger.soap.processor.SoapTriggerAfterProcessor;
 import io.terminus.dalaran.component.trigger.soap.processor.SoapTriggerProcessor;
+import io.terminus.dalaran.component.trigger.soap.utils.SoapWordUtils;
 import io.terminus.dalaran.component.trigger.soap.utils.WSDLUtils;
 import io.terminus.dalaran.core.component.DalaranTrigger;
 import io.terminus.dalaran.core.component.DalaranTriggerApiDocExport;
@@ -18,6 +20,7 @@ import org.apache.camel.model.RouteDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -63,12 +66,24 @@ public class DalaranSoapListener implements DalaranTrigger<SoapListenerConfig>, 
 
     @Override
     public File exportWord(Map<String, List<TriggerFlow>> moduleTriggerFlows) {
-
-        return null;
+        return SoapWordUtils.buildWordFile(buildApiInfoList(moduleTriggerFlows));
     }
 
     @Override
     public void buildAfter(RouteDefinition route, SoapListenerConfig config) {
         route.process(new SoapTriggerAfterProcessor(config));
+    }
+
+
+    private List<SoapWordApiInfo> buildApiInfoList(Map<String, List<TriggerFlow>> moduleTriggerFlows) {
+        List<SoapWordApiInfo> apiInfo = new ArrayList<>();
+        moduleTriggerFlows.entrySet().stream().forEach(module -> {
+            module.getValue().stream().forEach(flow -> {
+                if(flow.getInModel()!=null && flow.getOutModel()!=null) {
+                    apiInfo.add(new SoapWordApiInfo(module.getKey(),flow));
+                }
+            });
+        });
+        return apiInfo;
     }
 }
