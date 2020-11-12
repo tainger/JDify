@@ -384,8 +384,8 @@ public class FlowManagementServiceImpl implements FlowManagementService {
         flowEntity.setTriggerType(triggerFlow.getTriggerType());
         flowEntity.setTriggerConfig(JSON.toJSONString(triggerFlow.getTriggerConfig()));
         flowEntity.setModuleId(triggerFlow.getModuleId());
-        flowEntity.setInModel(triggerFlow.getInModelId());
-        flowEntity.setOutModel(triggerFlow.getOutModelId());
+        flowEntity.setInModel(Long.valueOf(JSON.toJSONString(triggerFlow.getTriggerConfig().get("inModelId"))));
+        flowEntity.setOutModel(Long.valueOf(JSON.toJSONString(triggerFlow.getTriggerConfig().get("outModelId"))));
         flowEntity.setPipeline(pipeline);
         flowEntity.setTracing(triggerFlow.isTracing());
         flowEntity.setDescription(triggerFlow.getDescription());
