@@ -22,10 +22,10 @@ public class RestConfig extends AllModelConfig implements LimiterConfig<DalaranL
     @ConfigFieldInfo(label = "限流熔断器", inputType = FieldInputType.Limiter, required = false, connectorType = DalaranLimiter.class)
     private Long limiterId;
 
-    @ConfigFieldInfo(label = "开启限流", inputType = FieldInputType.Switch, defaultValue = "false")
+//    @ConfigFieldInfo(label = "开启限流", inputType = FieldInputType.Switch, defaultValue = "false")
     private boolean enableLimit = false;
 
-    @ConfigFieldInfo(label = "开启熔断", inputType = FieldInputType.Switch, defaultValue = "false")
+//    @ConfigFieldInfo(label = "开启熔断", inputType = FieldInputType.Switch, defaultValue = "false")
     private boolean enableBreaker = false;
 
     // TODO load by application.yml
@@ -38,7 +38,7 @@ public class RestConfig extends AllModelConfig implements LimiterConfig<DalaranL
     @ConfigFieldInfo(label = "计算签名", inputType = FieldInputType.Switch, defaultValue = "false")
     private boolean checkSign = false;
 
-    @ConfigFieldInfo(label = "密钥", inputType = FieldInputType.Password, required = false)
+//    @ConfigFieldInfo(label = "密钥", inputType = FieldInputType.Password, required = false)
     private String secret;
 
     @ConfigFieldInfo(label = "协议", inputType = FieldInputType.Radio, defaultValue = "HTTP")

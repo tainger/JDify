@@ -31,7 +31,7 @@ public class CsvModelType implements DalaranModelType<String, CsvModelSchema> {
             }
             String data;
             Object body = exchange.getIn().getBody();
-            if (schema.getType() == CSVModelType.CARSO) {
+            if (schema.getType() == CSVModelType.CARSO || schema.getType() == CSVModelType.CUSTOMIZE) {
                 data = carsoFromObject(body, schema);
             } else {
                 if (body instanceof String) {
@@ -158,7 +158,7 @@ public class CsvModelType implements DalaranModelType<String, CsvModelSchema> {
             String contentStr = new String(content);
             String[] records = contentStr.split(System.lineSeparator());
             List out;
-            if (schema.getType() == CSVModelType.CARSO) {
+            if (schema.getType() == CSVModelType.CARSO || schema.getType() == CSVModelType.CUSTOMIZE) {
                 out = carsoToObject(records, schema);
             } else {
 //                out = new ArrayList<>();
