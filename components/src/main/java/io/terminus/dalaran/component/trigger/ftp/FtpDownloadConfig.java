@@ -28,6 +28,6 @@ public class FtpDownloadConfig extends InModelConfig implements ConnectorConfig<
     @ConfigFieldInfo(label = "文件名, 如果为空则拉取路径下所有文件", inputType = FieldInputType.String, required = false)
     private String fileName;
 
-    @ConfigFieldInfo(label = "", inputType = FieldInputType.Switch, defaultValue = "false")
+//    @ConfigFieldInfo(label = "", inputType = FieldInputType.Switch, defaultValue = "false")
     private boolean fuzzyMatching = false;
 }
