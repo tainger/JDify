@@ -29,13 +29,13 @@ public class SoapListenerConfig extends AllModelConfig {
     @ConfigFieldInfo(label = "超时时间(ms)", inputType = FieldInputType.Integer, defaultValue = "3000")
     private Long timeout = 3000L;
 
-    @ConfigFieldInfo(label = "开启鉴权", inputType = FieldInputType.Switch, defaultValue = "false")
+//    @ConfigFieldInfo(label = "开启鉴权", inputType = FieldInputType.Switch, defaultValue = "false")
     private boolean enableSign = false;
 
-    @ConfigFieldInfo(label = "计算签名", inputType = FieldInputType.Switch, defaultValue = "false")
+//    @ConfigFieldInfo(label = "计算签名", inputType = FieldInputType.Switch, defaultValue = "false")
     private boolean checkSign = false;
 
-    @ConfigFieldInfo(label = "鉴权类型", inputType = FieldInputType.Select, required = false)
+//    @ConfigFieldInfo(label = "鉴权类型", inputType = FieldInputType.Select, required = false)
     private SoapAuthType authType = SoapAuthType.BASIC;
 
     @ConfigFieldInfo(label = "返回体为空", inputType = FieldInputType.Switch, required = false)
