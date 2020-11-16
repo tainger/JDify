@@ -23,6 +23,6 @@ public class AS2ClientConfig extends OutModelConfig implements ConnectorConfig<A
     @ConfigFieldInfo(label = "路径", inputType = FieldInputType.String, defaultValue = "/")
     private String requestUri;
 
-    @ConfigFieldInfo(label = "AS2 Body Type", inputType = FieldInputType.String, defaultValue = "ediMessage")
-    private String bodyType;
+//    @ConfigFieldInfo(label = "AS2 Body Type", inputType = FieldInputType.String, defaultValue = "ediMessage")
+    private String bodyType = "ediMessage";
 }
