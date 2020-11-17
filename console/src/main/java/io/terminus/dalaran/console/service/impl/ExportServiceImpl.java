@@ -147,7 +147,7 @@ public class ExportServiceImpl implements ExportService {
 
     @Override
     public File exportWord() {
-        List<ApiInfo> apiInfoList = getExportApiInfoList();
+        List<ApiInfo> apiInfoList = getExportApiInfoListNew();
         return RestWordUtils.buildWordFile(apiInfoList);
     }
 
