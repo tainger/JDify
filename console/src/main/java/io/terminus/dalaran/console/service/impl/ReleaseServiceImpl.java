@@ -4,6 +4,7 @@ import io.terminus.dalaran.console.convertor.FlowConvertor;
 import io.terminus.dalaran.console.repository.*;
 import io.terminus.dalaran.console.service.ReleaseService;
 import io.terminus.dalaran.core.resource.entity.basic.BasicEntity;
+import io.terminus.dalaran.core.resource.entity.common.ModuleEntity;
 import io.terminus.dalaran.core.resource.entity.common.ReleaseRecordEntity;
 import io.terminus.dalaran.core.resource.entity.released.*;
 import io.terminus.dalaran.core.resource.repository.*;
@@ -17,6 +18,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -77,6 +79,9 @@ public class ReleaseServiceImpl implements ReleaseService {
     @Autowired
     private ServiceReleasedRepository serviceReleasedRepository;
 
+    @Autowired
+    private  ModuleRepository moduleRepository;
+
     private final FlowConvertor flowConvertor = new FlowConvertor();
 
     @Override
@@ -96,7 +101,10 @@ public class ReleaseServiceImpl implements ReleaseService {
         recordEntity.setSuccessful(true);
         releaseRecordRepository.save(recordEntity);
 
-        List<TriggerFlowReleasedEntity> releasedTriggerFlowEntities = toReleasedData(triggerFlowRepository.findAll(), TriggerFlowReleasedEntity.class, requestDTO.getVersion());
+        List<ModuleEntity> moduleEntities = moduleRepository.findAll();
+        List<TriggerFlowReleasedEntity> releasedTriggerFlowEntities = new ArrayList<>();
+        moduleEntities.stream().forEach(moduleEntity -> releasedTriggerFlowEntities.addAll(toReleasedData(triggerFlowRepository.findByModuleId(moduleEntity.getId()),TriggerFlowReleasedEntity.class, requestDTO.getVersion())));
+       // List<TriggerFlowReleasedEntity> releasedTriggerFlowEntities = toReleasedData(triggerFlowRepository.findAll(), TriggerFlowReleasedEntity.class, requestDTO.getVersion());
         triggerFlowReleasedRepository.saveAll(releasedTriggerFlowEntities);
 
         List<SubFlowReleasedEntity> releasedSubFlowEntities = toReleasedData(subFlowRepository.findAll(), SubFlowReleasedEntity.class, requestDTO.getVersion());
