@@ -8,6 +8,7 @@ import io.swagger.models.properties.*;
 import io.terminus.dalaran.component.trigger.rest.model.ApiInfo;
 import io.terminus.dalaran.component.trigger.rest.model.ApiParameter;
 import io.terminus.dalaran.component.trigger.rest.model.DalaranSwaggerModel;
+import org.apache.commons.lang.StringUtils;
 
 import java.util.*;
 
@@ -16,26 +17,35 @@ public class SwaggerUtils {
     public static Swagger buildSwagger(List<ApiInfo> apiInfoList) {
         Swagger swagger = new Swagger();
         swagger.setPaths(new LinkedHashMap<>());
+        List<Tag> tagList = new ArrayList<>();
         for (ApiInfo apiInfo : apiInfoList) {
-            Path path = swagger.getPaths().computeIfAbsent(apiInfo.getPath(), p -> new Path());
-            Operation operation = new Operation();
-            path.set(apiInfo.getMethod().toString().toLowerCase(), operation);
+            if(StringUtils.isNotBlank(apiInfo.getModuleName())) {
+                Path path = swagger.getPaths().computeIfAbsent(apiInfo.getPath(), p -> new Path());
+                Operation operation = new Operation();
+                path.set(apiInfo.getMethod().toString().toLowerCase(), operation);
 
-            operation.setSummary(apiInfo.getName());
-            operation.setDescription(apiInfo.getDescription());
-            operation.addTag(apiInfo.getModuleName());
-            operation.addConsumes("application/json");
-            Response response = new Response();
-            operation.addResponse("200", response);
-            response.description("OK");
-            response.setSchema(toSwaggerProperty(apiInfo.getOutput()));
-            response.getSchema().setExample(apiInfo.getOutExample());
-            if (apiInfo.getMethod().isNoBody()) {
-                operation.setParameters(toQueryParameter(apiInfo.getInput()));
-            } else {
-                operation.addParameter(toBodyParameter(apiInfo.getInput(), apiInfo.getInExample()));
+                Tag tag = new Tag();
+                tag.setName(apiInfo.getModuleName());
+                tag.setDescription(apiInfo.getDescription());
+                tagList.add(tag);
+
+                operation.setSummary(apiInfo.getName());
+                operation.setDescription(apiInfo.getDescription());
+                operation.addTag(apiInfo.getModuleName());
+                operation.addConsumes("application/json");
+                Response response = new Response();
+                operation.addResponse("200", response);
+                response.description("OK");
+                response.setSchema(toSwaggerProperty(apiInfo.getOutput()));
+                response.getSchema().setExample(apiInfo.getOutExample());
+                if (apiInfo.getMethod().isNoBody()) {
+                    operation.setParameters(toQueryParameter(apiInfo.getInput()));
+                } else {
+                    operation.addParameter(toBodyParameter(apiInfo.getInput(), apiInfo.getInExample()));
+                }
             }
         }
+        swagger.setTags(tagList);
         return swagger;
     }
 
