@@ -10,7 +10,7 @@ import lombok.Data;
 @Data
 public class CustomFtpUploadConfig extends FtpUploadConfig implements ConnectorConfig<FtpConnector> {
 
-//    @ConfigFieldInfo(label = "模板文件路径", inputType = FieldInputType.FileUpload, required = false)
-    @ConfigFieldInfo(label = "模板文件路径", inputType = FieldInputType.String, required = false)
+    @ConfigFieldInfo(label = "模板文件路径", inputType = FieldInputType.FileUpload, required = false)
+//    @ConfigFieldInfo(label = "模板文件路径", inputType = FieldInputType.String, required = false)
     private String templateUri;
 }
