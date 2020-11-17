@@ -27,6 +27,13 @@ public class SqlProcessor implements DalaranProcessor<SqlConfig> {
         if (!beanFactory.containsSingleton(dataSourceBeanName)) {
             DataSource dataSource = buildDataSource(config.getConnector());
             beanFactory.registerSingleton(dataSourceBeanName, dataSource);
+        } else {
+            org.apache.tomcat.jdbc.pool.DataSource old = (org.apache.tomcat.jdbc.pool.DataSource) beanFactory.getSingleton(dataSourceBeanName);
+            if (old != null && !equals(old, config.getConnector())) {
+                old.close();
+                DataSource dataSource = buildDataSource(config.getConnector());
+                beanFactory.registerSingleton(dataSourceBeanName, dataSource);
+            }
         }
         // TODO 目前取值只支持一级, 后面可用通过实现 SqlPrepareStatementStrategy 来扩展
         String uri;
@@ -96,5 +103,16 @@ public class SqlProcessor implements DalaranProcessor<SqlConfig> {
         String[] replace = {" ", " ", " "};
         originSql = StringUtils.replaceEachRepeatedly(originSql, ignore, replace);
         return originSql;
+    }
+
+    private Boolean equals(org.apache.tomcat.jdbc.pool.DataSource old, SqlDataSourceConnector connector) {
+        String oldValue = old.getDriverClassName() + old.getUrl()
+                + old.getUsername() + old.getPassword() + old.getMaxIdle()
+                + old.getMinIdle() + old.getMaxWait() + old.getInitialSize();
+        org.apache.tomcat.jdbc.pool.DataSource current = (org.apache.tomcat.jdbc.pool.DataSource)buildDataSource(connector);
+        String currentValue = current.getDriverClassName() + current.getUrl() +
+                current.getUsername() + current.getPassword() + current.getMaxIdle()
+                + current.getMinIdle() + current.getMaxWait() + current.getInitialSize();
+        return StringUtils.equalsIgnoreCase(oldValue, currentValue);
     }
 }

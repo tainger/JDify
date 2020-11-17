@@ -61,6 +61,7 @@ public class RocketMQProducer extends DefaultProducer {
             } else {
                 producer.setAccessChannel(AccessChannel.LOCAL);
             }
+            producer.setInstanceName(endpoint.getNameServer());
             producer.setNamesrvAddr(endpoint.getNameServer());
             producer.setSendMsgTimeout(endpoint.getTimeout());
             producer.setMaxMessageSize(41943040);
