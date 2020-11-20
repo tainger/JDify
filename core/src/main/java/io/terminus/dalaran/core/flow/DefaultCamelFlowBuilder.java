@@ -1,5 +1,6 @@
 package io.terminus.dalaran.core.flow;
 
+import com.alibaba.fastjson.JSONObject;
 import io.terminus.dalaran.DalaranConstants;
 import io.terminus.dalaran.TracingType;
 import io.terminus.dalaran.config.ComponentInfo;
@@ -176,31 +177,41 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
         return route;
     }
 
-    @Override
-    public List<FlowValidation> validateFlow(BasicFlow flow) {
-        MessageModel lastModel = flow.getInModel();
-        List<FlowValidation> validateMessages = new ArrayList<>();
-        // TODO 检查模型, 提示模型不匹配以及加入 Mapper 的建议
-        for (ProcessorModel processorModel : flow.getPipeline()) {
+    public List<FlowValidation> validatePipeline(List<ProcessorModel> pipeline,List<FlowValidation> validateMessages){
+        for(ProcessorModel processorModel : pipeline){
             DalaranProcessor processor = componentContext.getProcessor(processorModel.getType());
             ProcessorInfo processorInfo = componentContext.getProcessorInfo(processorModel.getType());
-            List<FlowValidation> processorMessageList = validate(processorInfo, processorModel.getConfig());
+            String json = JSONObject.toJSONString(processorModel.getConfig());
+            JSONObject jsonObject;
+            if (json.startsWith("\"")) {
+                jsonObject = JSONObject.parseObject(processorModel.getConfig().toString());
+            }else {
+                jsonObject = JSONObject.parseObject(json);
+            }
+            if(jsonObject.containsKey("pipeline")){
+                validatePipeline((jsonObject.getJSONArray("pipeline")).toJavaList(ProcessorModel.class),validateMessages);
+            }
+            List<FlowValidation> processorMessageList = validate(processorInfo, jsonObject);
             if (processor instanceof DalaranComponentValidator) {
                 List<FlowValidation> processorCustomMessageList = ((DalaranComponentValidator) processor).validate(processorModel.getConfig());
                 processorMessageList.addAll(processorCustomMessageList);
-            }
-            if (lastModel != null && !lastModel.equals(processorModel.getInModel())) {
-                FlowValidation message = FlowValidationBuilder.newBuilder()
-                        .message(MODEL_NOT_EQUALLY).suggest(ADD_MAPPER).build();
-                processorMessageList.add(message);
             }
             processorMessageList.forEach(message -> {
                 message.setTargetType(Processor);
                 message.setTargetId(processorModel.getId());
             });
-            lastModel = processorModel.getOutModel();
             validateMessages.addAll(processorMessageList);
         }
+        return validateMessages;
+    }
+
+    @Override
+    public List<FlowValidation> validateFlow(BasicFlow flow) {
+        MessageModel lastModel = flow.getInModel();
+        List<FlowValidation> validateMessages = new ArrayList<>();
+        // TODO 检查模型, 提示模型不匹配以及加入 Mapper 的建议
+        validateMessages = validatePipeline(flow.getPipeline(),validateMessages);
+
         if (flow instanceof TriggerFlow) {
             TriggerFlow triggerFlow = ((TriggerFlow) flow);
             DalaranTrigger trigger = componentContext.getTrigger(triggerFlow.getTriggerType());

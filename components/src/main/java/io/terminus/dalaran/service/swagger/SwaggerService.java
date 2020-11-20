@@ -253,7 +253,8 @@ public class SwaggerService implements DalaranService<SwaggerImportConfig, Swagg
                     Model subModel = definitions.get(((RefProperty) property).getSimpleRef());
                     if (subModel instanceof ModelImpl) {
                         field.setType(getFieldType(((ModelImpl) subModel).getType()));
-                        subModel.getProperties().forEach((key, subField) -> subFields.put(key, buildField(subField, definitions)));
+                        //暂时注释，还有问题
+                        // subModel.getProperties().forEach((key, subField) -> subFields.put(key, buildField(subField, definitions)));
                     }
                 }
                 break;
