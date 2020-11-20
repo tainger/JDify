@@ -109,7 +109,13 @@ public class DalaranMailSenderProcessor implements Processor {
         }
         helper.setSubject(config.getSubject());
 
-        ByteArrayResource byteArrayResource = new ByteArrayResource((byte[])body);
+        byte[] in;
+        if (body instanceof byte[]) {
+            in = (byte[])body;
+        } else {
+            in = body.toString().getBytes();
+        }
+        ByteArrayResource byteArrayResource = new ByteArrayResource(in);
         helper.addAttachment(fileName, byteArrayResource, type);
 
 //        helper.addAttachment("DalaranFile", new DataHandler(body, type));
