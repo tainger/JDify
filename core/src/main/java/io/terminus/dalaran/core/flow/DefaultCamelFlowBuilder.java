@@ -15,7 +15,9 @@ import io.terminus.dalaran.core.log.DalaranTracer;
 import io.terminus.dalaran.core.log.TracingErrorHandlerFactory;
 import io.terminus.dalaran.model.MessageModel;
 import io.terminus.dalaran.model.RetryConvertFragmentInfo;
+import io.terminus.dalaran.model.component.FlowValidationModel;
 import io.terminus.dalaran.model.component.ProcessorModel;
+import io.terminus.dalaran.model.component.RoutesModel;
 import io.terminus.dalaran.model.flow.*;
 import lombok.val;
 import org.apache.camel.CamelContext;
@@ -177,7 +179,7 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
         return route;
     }
 
-    public List<FlowValidation> validatePipeline(List<ProcessorModel> pipeline,List<FlowValidation> validateMessages){
+    public FlowValidationModel validatePipeline(List<ProcessorModel> pipeline,List<FlowValidation> validateMessages,MessageModel lastModel,FlowValidationModel flowValidationModel){
         for(ProcessorModel processorModel : pipeline){
             DalaranProcessor processor = componentContext.getProcessor(processorModel.getType());
             ProcessorInfo processorInfo = componentContext.getProcessorInfo(processorModel.getType());
@@ -188,30 +190,56 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
             }else {
                 jsonObject = JSONObject.parseObject(json);
             }
+            if(jsonObject.containsKey("routes")){
+                List<RoutesModel> routesModelList = jsonObject.getJSONArray("routes").toJavaList(RoutesModel.class);
+                for(RoutesModel routesModel : routesModelList) {
+                    String pipelineJson = JSONObject.toJSONString(routesModel);
+                    JSONObject pipelineJsonObject;
+                    if (json.startsWith("\"")) {
+                        pipelineJsonObject = JSONObject.parseObject(routesModel.toString());
+                    }else {
+                        pipelineJsonObject = JSONObject.parseObject(pipelineJson);
+                    }
+                    if((pipelineJsonObject.getJSONArray("pipeline"))!=null) {
+                        validatePipeline((pipelineJsonObject.getJSONArray("pipeline")).toJavaList(ProcessorModel.class),validateMessages,lastModel,flowValidationModel);
+                    }
+                }
+            }
             if(jsonObject.containsKey("pipeline")){
-                validatePipeline((jsonObject.getJSONArray("pipeline")).toJavaList(ProcessorModel.class),validateMessages);
+                validatePipeline((jsonObject.getJSONArray("pipeline")).toJavaList(ProcessorModel.class),validateMessages,lastModel,flowValidationModel);
             }
             List<FlowValidation> processorMessageList = validate(processorInfo, jsonObject);
             if (processor instanceof DalaranComponentValidator) {
                 List<FlowValidation> processorCustomMessageList = ((DalaranComponentValidator) processor).validate(processorModel.getConfig());
                 processorMessageList.addAll(processorCustomMessageList);
             }
+//            if (lastModel != null && !lastModel.equals(processorModel.getInModel())) {
+//                FlowValidation message = FlowValidationBuilder.newBuilder()
+//                        .message(MODEL_NOT_EQUALLY).suggest(ADD_MAPPER).build();
+//                processorMessageList.add(message);
+//            }
             processorMessageList.forEach(message -> {
                 message.setTargetType(Processor);
                 message.setTargetId(processorModel.getId());
             });
+            lastModel = processorModel.getOutModel();
             validateMessages.addAll(processorMessageList);
         }
-        return validateMessages;
+        flowValidationModel.setFlowValidation(validateMessages);
+        flowValidationModel.setLastModel(lastModel);
+        return flowValidationModel;
     }
+
 
     @Override
     public List<FlowValidation> validateFlow(BasicFlow flow) {
         MessageModel lastModel = flow.getInModel();
         List<FlowValidation> validateMessages = new ArrayList<>();
         // TODO 检查模型, 提示模型不匹配以及加入 Mapper 的建议
-        validateMessages = validatePipeline(flow.getPipeline(),validateMessages);
-
+        FlowValidationModel flowValidationModel = new FlowValidationModel();
+        flowValidationModel = validatePipeline(flow.getPipeline(),validateMessages,lastModel,flowValidationModel);
+        validateMessages = flowValidationModel.getFlowValidation();
+        lastModel = flowValidationModel.getLastModel();
         if (flow instanceof TriggerFlow) {
             TriggerFlow triggerFlow = ((TriggerFlow) flow);
             DalaranTrigger trigger = componentContext.getTrigger(triggerFlow.getTriggerType());

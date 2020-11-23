@@ -9,7 +9,9 @@ import io.terminus.dalaran.console.repository.TriggerFlowRepository;
 import io.terminus.dalaran.console.service.ModuleManagementService;
 import io.terminus.dalaran.console.service.TracingLogService;
 import io.terminus.dalaran.core.resource.entity.basic.BasicFlowEntity;
+import io.terminus.dalaran.core.resource.entity.common.ModuleEntity;
 import io.terminus.dalaran.core.resource.entity.common.TracingLogEntity;
+import io.terminus.dalaran.core.resource.repository.ModuleRepository;
 import io.terminus.dalaran.core.resource.repository.TracingLogRepository;
 import io.terminus.dalaran.model.dto.log.MainLogDTO;
 import io.terminus.dalaran.model.dto.log.TimeLogDTO;
@@ -48,6 +50,9 @@ public class TracingLogServiceImpl implements TracingLogService {
     @Autowired
     private EntityManager entityManager;
 
+    @Autowired
+    private ModuleRepository moduleRepository;
+
     private String timeZone = System.getenv("TZ");
 
     @Override
@@ -55,14 +60,14 @@ public class TracingLogServiceImpl implements TracingLogService {
         Sort order = new Sort(new Sort.Order(Sort.Direction.DESC, "timestamp"));
         Pageable pageable = PageRequest.of(pageNumber - 1, pageSize, order);
         Page<TracingLogEntity> logs = tracingLogRepository.findAll(buildSpecification(query), pageable);
-        return new PageImpl<>(logs.stream().map(this::buildTracingMainLog).collect(Collectors.toList()), pageable, logs.getTotalElements());
+        return new PageImpl<>(logs.stream().map(this::buildTracingMainLog).filter(log->log!=null).collect(Collectors.toList()), pageable, logs.getTotalElements());
     }
 
     @Override
     public List<MainLogDTO> triggerLogs(TracingLogQuery query) {
         Sort order = new Sort(new Sort.Order(Sort.Direction.DESC, "timestamp"));
         List<TracingLogEntity> logs = tracingLogRepository.findAll(buildSpecification(query), order);
-        return logs.stream().map(this::buildTracingMainLog).collect(Collectors.toList());
+        return logs.stream().map(this::buildTracingMainLog).filter(log->log!=null).collect(Collectors.toList());
     }
 
     @Override
@@ -175,9 +180,14 @@ public class TracingLogServiceImpl implements TracingLogService {
                     break;
             }
             if (flowEntity != null) {
-                mainLog.setFlowName(flowEntity.getName());
-                mainLog.setModuleId(flowEntity.getModuleId());
-                mainLog.setModuleName(moduleService.getModuleName(flowEntity.getModuleId()));
+                String moduleName = moduleService.getModuleName(flowEntity.getModuleId());
+                if(moduleName!=null) {
+                    mainLog.setFlowName(flowEntity.getName());
+                    mainLog.setModuleId(flowEntity.getModuleId());
+                    mainLog.setModuleName(moduleName);
+                }else {
+                    return null;
+                }
             }
         }
         return mainLog;

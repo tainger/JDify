@@ -121,7 +121,11 @@ public class ModuleManagementServiceImpl implements ModuleManagementService {
 
     @Override
     public String getModuleName(@NotNull Long moduleId) {
-        ModuleEntity entity = moduleRepository.findById(moduleId).get();
+        Optional<ModuleEntity> optional = moduleRepository.findById(moduleId);
+        ModuleEntity entity = new ModuleEntity();
+        if(optional!=null && optional.isPresent()) {
+            entity = optional.get();
+        }
         if (entity == null) {
             return null;
         }

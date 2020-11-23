@@ -19,6 +19,7 @@ import io.terminus.dalaran.core.component.annotation.Trigger;
 import io.terminus.dalaran.core.context.DalaranClientContext;
 import io.terminus.dalaran.core.flow.DalaranRoute;
 import io.terminus.dalaran.core.log.TracingErrorHandlerFactory;
+import io.terminus.dalaran.model.HttpProtocol;
 import io.terminus.dalaran.model.flow.TriggerFlow;
 import lombok.val;
 import org.apache.camel.CamelContext;
@@ -55,6 +56,9 @@ public class RestListener implements DalaranTrigger<RestConfig>, DalaranTriggerA
             uri += "&httpMethodRestrict=" + config.getMethod();
         } else {
             uri += "&httpMethodRestrict=GET,POST";
+        }
+        if (config.getProtocol().equals(HttpProtocol.HTTPS)) {
+            uri += "&ssl=true";
         }
         route.from(uri);
         if (config.getMethod() == HttpMethod.MIX) {
