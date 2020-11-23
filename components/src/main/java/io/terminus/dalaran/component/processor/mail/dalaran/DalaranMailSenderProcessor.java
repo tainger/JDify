@@ -46,7 +46,7 @@ public class DalaranMailSenderProcessor implements Processor {
             byte[] fileContent = FileUtils.readFileToByteArray(file);
             sendSmtp(senderInfo.getFileName(), senderInfo.getEmailUrl(), fileContent, "application/excel");
         } else {
-            sendSmtp("", config.getSendTo(), JSON.toJSONString(in), "text/plain");
+            send(config.getSendTo(), JSON.toJSONString(in), "text/plain");
         }
     }
 
@@ -125,7 +125,7 @@ public class DalaranMailSenderProcessor implements Processor {
     }
 
 
-        private Properties buildProperties(String host, MailProtocol protocol) {
+    private Properties buildProperties(String host, MailProtocol protocol) {
         Properties props = new Properties();
         switch (protocol) {
             case SMTPS:
