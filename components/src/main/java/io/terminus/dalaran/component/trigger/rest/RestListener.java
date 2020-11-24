@@ -26,9 +26,22 @@ import org.apache.camel.CamelContext;
 import org.apache.camel.model.RouteDefinition;
 import org.apache.camel.model.ThrottleDefinition;
 import org.apache.camel.model.dataformat.JsonLibrary;
+import org.apache.camel.util.jsse.KeyManagersParameters;
+import org.apache.camel.util.jsse.KeyStoreParameters;
+import org.apache.camel.util.jsse.SSLContextParameters;
+import org.apache.camel.util.jsse.TrustManagersParameters;
+import org.apache.commons.io.FileUtils;
+import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
+import org.apache.http.ssl.SSLContextBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 
+import javax.net.ssl.SSLContext;
 import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+import java.security.GeneralSecurityException;
+import java.security.KeyManagementException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -49,16 +62,17 @@ public class RestListener implements DalaranTrigger<RestConfig>, DalaranTriggerA
 
     @Override
     public void buildFromRoute(RouteDefinition route, RestConfig config) {
-        String uri = "netty4-http:" + config.getProtocol().name().toLowerCase() +
+        String protocol = config.getProtocol().name();
+        if(config.getProtocol().equals(HttpProtocol.HTTPS)){
+            protocol = HttpProtocol.HTTP.name();
+        }
+        String uri = "netty4-http:" + protocol.toLowerCase() +
                 "://0.0.0.0:" + config.getPort() + config.getPath() +
                 "?chunkedMaxContentLength=104857600";
         if (config.getMethod() != HttpMethod.MIX) {
             uri += "&httpMethodRestrict=" + config.getMethod();
         } else {
             uri += "&httpMethodRestrict=GET,POST";
-        }
-        if (config.getProtocol().equals(HttpProtocol.HTTPS)) {
-            uri += "&ssl=true";
         }
         route.from(uri);
         if (config.getMethod() == HttpMethod.MIX) {
@@ -81,6 +95,43 @@ public class RestListener implements DalaranTrigger<RestConfig>, DalaranTriggerA
             }
             route.convertBodyTo(String.class);
         }
+    }
+
+    public static void getJksFile(String url) {
+        String fileName = "/tmp/server.jks";
+        File file = new File(fileName);
+        try {
+            file.createNewFile();
+            URL httpUrl = new URL(url);
+            FileUtils.copyURLToFile(httpUrl, file);
+        }catch (Exception e){
+
+        }
+    }
+
+    public static SSLContextParameters sslParameters() throws KeyManagementException, GeneralSecurityException, IOException {
+        getJksFile("https://dalaran-oss-test.oss-cn-hangzhou.aliyuncs.com/server.jks?Expires=1606123386&OSSAccessKeyId=TMP.3KhWVu4meh9MHAFkue8nEikdGecUUb7zxNYUBu8yedc3pBbLwRswDg4HdcQTN6QnpFHjStVMAG9ThtbC5taaj1dBgXHcaN&Signature=sCMMxUsm9dwBDDJZ5Flpv6U98bY%3D");
+        KeyStoreParameters ksp = new KeyStoreParameters();
+        ksp.setResource("/tmp/server.jks");
+        ksp.setPassword("963168");
+
+        KeyManagersParameters kmp = new KeyManagersParameters();
+        kmp.setKeyStore(ksp);
+        kmp.setKeyPassword("963168");
+
+        SSLContextParameters scp = new SSLContextParameters();
+        scp.setKeyManagers(kmp);
+
+        SSLContextBuilder builder = new SSLContextBuilder();
+        builder.loadTrustMaterial(null, new TrustSelfSignedStrategy());
+        SSLContext sslcontext = builder.build();
+        scp.createSSLContext().setDefault(sslcontext);
+
+        TrustManagersParameters tmp = new TrustManagersParameters();
+        tmp.setKeyStore(ksp);
+        scp.setTrustManagers(tmp);
+
+        return scp;
     }
 
     @Override
