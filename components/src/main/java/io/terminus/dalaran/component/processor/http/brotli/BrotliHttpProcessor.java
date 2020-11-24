@@ -31,7 +31,12 @@ public class BrotliHttpProcessor implements Processor {
 
     @Override
     public void process(Exchange exchange) throws Exception {
-        String url = config.getConnector().getProtocol().name().toLowerCase() + "://" + config.getConnector().getHost() + ":" + config.getConnector().getPort() + config.getPath();
+        String url = "";
+        if (config.getConnector().getProtocol().name().equals("HTTPS")){
+            url = config.getConnector().getProtocol().name().toLowerCase() + "://" + config.getConnector().getHost() + config.getPath();
+        }else {
+            url = config.getConnector().getProtocol().name().toLowerCase() + "://" + config.getConnector().getHost() + ":" + config.getConnector().getPort() + config.getPath();
+        }
         log.info("url: " + url);
         Request request;
         HttpUrl.Builder httpBuilder = HttpUrl.parse(url).newBuilder();
