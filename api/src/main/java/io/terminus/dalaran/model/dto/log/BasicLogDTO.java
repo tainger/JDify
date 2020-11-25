@@ -30,4 +30,6 @@ public class BasicLogDTO {
     private String inputBody;
 
     private String outputBody;
+
+    private String version;
 }

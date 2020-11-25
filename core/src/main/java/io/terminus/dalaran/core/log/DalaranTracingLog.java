@@ -32,4 +32,6 @@ public class DalaranTracingLog {
     private String outputBodyType;
 
     private Long moduleId;
+
+    private String version;
 }

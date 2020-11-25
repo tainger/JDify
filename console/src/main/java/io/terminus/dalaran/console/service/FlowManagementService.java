@@ -40,6 +40,9 @@ public interface FlowManagementService {
     @Nullable
     TriggerFlowDTO getById(Long flowId);
 
+    @Nullable
+    TriggerFlowDTO getByIdVersion(Long flowId,String version);
+
     Long copyFlow(CopyFlow copyFlow) throws FlowNotExistException;
 
     List<FlowValidation> validateFlow(TriggerFlowDTO model);

@@ -2,7 +2,9 @@ package io.terminus.dalaran.runtime;
 
 import io.terminus.dalaran.core.log.DalaranTraceLogger;
 import io.terminus.dalaran.core.log.DalaranTracingLog;
+import io.terminus.dalaran.core.resource.entity.common.ReleaseRecordEntity;
 import io.terminus.dalaran.core.resource.entity.common.TracingLogEntity;
+import io.terminus.dalaran.core.resource.repository.ReleaseRecordRepository;
 import io.terminus.dalaran.core.resource.repository.TracingLogRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -16,6 +18,9 @@ public class DefaultJpaDalaranTraceLogger implements DalaranTraceLogger {
 
     @Autowired
     private TracingLogRepository tracingLogRepository;
+
+    @Autowired
+    private ReleaseRecordRepository releaseRecordRepository;
 
     private BlockingQueue<DalaranTracingLog> logQueue = new LinkedBlockingQueue<>();
 
@@ -31,12 +36,18 @@ public class DefaultJpaDalaranTraceLogger implements DalaranTraceLogger {
             for (; ; ) {
                 try {
                     DalaranTracingLog tracingLog = logQueue.take();
+                    tracingLog.setVersion(getCurrentVersion());
                     tracingLogRepository.save(toEntity(tracingLog));
                 } catch (Throwable e) {
                     e.printStackTrace();
                 }
             }
         }).start();
+    }
+
+    public String getCurrentVersion() {
+        ReleaseRecordEntity recordEntity = releaseRecordRepository.findByEnabledTrue();
+        return recordEntity.getVersion();
     }
 
     private TracingLogEntity toEntity(DalaranTracingLog tracingLog) {

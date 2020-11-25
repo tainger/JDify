@@ -60,4 +60,6 @@ public class TracingLogEntity {
     @CreatedDate
     @Column(columnDefinition = "timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP")
     private Date createdAt;
+
+    private String version;
 }

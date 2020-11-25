@@ -99,6 +99,12 @@ public class FlowManagementRest implements FlowReadAPI, FlowWriteAPI {
 
     @Override
     @OnException(code = ResponseMessage.FLOW_QUERY_ERROR)
+    public TriggerFlowDTO getByIdVersion(Long id,String version) {
+        return flowManagementService.getByIdVersion(id,version);
+    }
+
+    @Override
+    @OnException(code = ResponseMessage.FLOW_QUERY_ERROR)
     public List<TriggerFlowDTO> query(FlowQuery query) {
         return flowManagementService.queryFlows(query);
     }

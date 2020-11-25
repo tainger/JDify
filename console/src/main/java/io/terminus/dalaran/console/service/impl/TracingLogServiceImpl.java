@@ -159,6 +159,7 @@ public class TracingLogServiceImpl implements TracingLogService {
         mainLog.setOutputBody(log.getOutputBody());
         mainLog.setOutputBodyType(log.getOutputBodyType());
         mainLog.setSuccessful(log.isSuccessful());
+        mainLog.setVersion(log.getVersion());
 
         if (log.getFlowId() != null) {
             mainLog.setFlowId(log.getFlowId());
@@ -204,6 +205,7 @@ public class TracingLogServiceImpl implements TracingLogService {
         tracingLog.setOutputBody(log.getOutputBody());
         tracingLog.setOutputBodyType(log.getOutputBodyType());
         tracingLog.setSuccessful(log.isSuccessful());
+        tracingLog.setVersion(log.getVersion());
 
         tracingLog.setProcessorId(log.getProcessorId());
         tracingLog.setFlowId(log.getFlowId());
