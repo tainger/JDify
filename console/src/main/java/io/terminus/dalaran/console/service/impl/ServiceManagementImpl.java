@@ -206,7 +206,7 @@ public class ServiceManagementImpl implements ServiceManagement {
     }
 
     private List<SoapApiInfo> getExportSoapListeners() {
-        List<TriggerFlowEntity> soapFlowList = triggerFlowRepository.findByStatusNotAndTriggerType(FlowStatus.Error, "soap-listener");
+        List<TriggerFlowEntity> soapFlowList = triggerFlowRepository.findByStatusNotAndTriggerTypeAndIsExistTrue(FlowStatus.Error, "soap-listener");
         return soapFlowList.stream().map(flowEntity -> {
             TriggerFlow triggerFlow = resourceBuilder.buildTriggerFlow(flowEntity);
             return new SoapApiInfo(triggerFlow);

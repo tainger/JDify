@@ -28,4 +28,6 @@ public class ModuleEntity extends BasicEntity {
     @Convert(converter = ListToJsonConverter.class)
     @Column(name = "dependency_ids")
     private List<Long> dependencies = new ArrayList<>();
+
+    private boolean isExist;
 }

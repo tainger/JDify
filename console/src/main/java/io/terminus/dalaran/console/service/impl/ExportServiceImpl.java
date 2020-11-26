@@ -99,6 +99,9 @@ public class ExportServiceImpl implements ExportService {
     public void importAll(ExportData exportData) throws IOException {
         truncateTable();
 
+        exportData.getModules().forEach(module -> module.setExist(true));
+        exportData.getModels().forEach(model -> model.setExist(true));
+        exportData.getTriggerFlows().forEach(triggerFlow -> triggerFlow.setExist(true));
         moduleRepository.saveAll(exportData.getModules());
         modelRepository.saveAll(exportData.getModels());
         triggerFlowRepository.saveAll(exportData.getTriggerFlows());
@@ -120,9 +123,9 @@ public class ExportServiceImpl implements ExportService {
     @Override
     public ExportData exportAll() {
         ExportData exportData = new ExportData();
-        exportData.setModules(moduleRepository.findAll());
-        exportData.setModels(modelRepository.findAll());
-        exportData.setTriggerFlows(triggerFlowRepository.findAll());
+        exportData.setModules(moduleRepository.findByIsExistTrue());
+        exportData.setModels(modelRepository.findByIsExistTrue());
+        exportData.setTriggerFlows(triggerFlowRepository.findByIsExistTrue());
         exportData.setSubFlows(subFlowRepository.findAll());
         exportData.setServices(serviceRepository.findAll());
         exportData.setFunctions(functionRepository.findAll());
@@ -193,7 +196,7 @@ public class ExportServiceImpl implements ExportService {
     }
 
     private Map<String, List<TriggerFlow>> buildModuleTriggerFlowList(String triggerType) {
-        List<TriggerFlowEntity> restFlowList = triggerFlowRepository.findByStatusNotAndTriggerType(FlowStatus.Error, triggerType);
+        List<TriggerFlowEntity> restFlowList = triggerFlowRepository.findByStatusNotAndTriggerTypeAndIsExistTrue(FlowStatus.Error, triggerType);
         Map<String, List<TriggerFlow>> moduleTriggerFlowList = new HashMap<>();
         for (TriggerFlowEntity flowEntity : restFlowList) {
             Optional<ModuleEntity> moduleOptional = moduleRepository.findById(flowEntity.getModuleId());
@@ -211,7 +214,7 @@ public class ExportServiceImpl implements ExportService {
     }
 
     private List<ApiInfo> getExportApiInfoList() {
-        List<TriggerFlowEntity> restFlowList = triggerFlowRepository.findByStatusNotAndTriggerType(FlowStatus.Error, "http-rest-listener");
+        List<TriggerFlowEntity> restFlowList = triggerFlowRepository.findByStatusNotAndTriggerTypeAndIsExistTrue(FlowStatus.Error, "http-rest-listener");
         return restFlowList.stream().map(flowEntity -> {
             ModuleEntity module = moduleRepository.findById(flowEntity.getModuleId()).get();
             TriggerFlow triggerFlow = resourceBuilder.buildTriggerFlow(flowEntity);
@@ -220,7 +223,7 @@ public class ExportServiceImpl implements ExportService {
     }
 
     private List<ApiInfo> getExportApiInfoListNew() {
-        List<TriggerFlowEntity> restFlowList = triggerFlowRepository.findByStatusNotAndTriggerType(FlowStatus.Error, "http-rest-listener");
+        List<TriggerFlowEntity> restFlowList = triggerFlowRepository.findByStatusNotAndTriggerTypeAndIsExistTrue(FlowStatus.Error, "http-rest-listener");
         List<ApiInfo> apiInfo = new ArrayList<>();
         restFlowList.stream().forEach(flowEntity -> {
             Optional<ModuleEntity> optional = moduleRepository.findById(flowEntity.getModuleId());
@@ -237,7 +240,7 @@ public class ExportServiceImpl implements ExportService {
     }
 
     private List<SoapApiInfo> getExportSoapListeners() {
-        List<TriggerFlowEntity> soapFlowList = triggerFlowRepository.findByStatusNotAndTriggerType(FlowStatus.Error, "soap-listener");
+        List<TriggerFlowEntity> soapFlowList = triggerFlowRepository.findByStatusNotAndTriggerTypeAndIsExistTrue(FlowStatus.Error, "soap-listener");
         return soapFlowList.stream().map(flowEntity -> {
             TriggerFlow triggerFlow = resourceBuilder.buildTriggerFlow(flowEntity);
             return new SoapApiInfo(triggerFlow);
@@ -245,7 +248,7 @@ public class ExportServiceImpl implements ExportService {
     }
 
     private SoapApiInfo getApiInfoByOperation(String operation) {
-        List<TriggerFlowEntity> soapFlowList = triggerFlowRepository.findByStatusNotAndTriggerType(FlowStatus.Error, "soap-listener");
+        List<TriggerFlowEntity> soapFlowList = triggerFlowRepository.findByStatusNotAndTriggerTypeAndIsExistTrue(FlowStatus.Error, "soap-listener");
         Optional<SoapApiInfo> soapApiInfo = soapFlowList.stream().filter(triggerFlowEntity ->
                 StringUtils.equals(triggerFlowEntity.getName().trim(), operation)
         ).findFirst().map(flowEntity -> {

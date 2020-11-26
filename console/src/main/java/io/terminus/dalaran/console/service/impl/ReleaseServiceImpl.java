@@ -101,16 +101,16 @@ public class ReleaseServiceImpl implements ReleaseService {
         recordEntity.setSuccessful(true);
         releaseRecordRepository.save(recordEntity);
 
-        List<ModuleEntity> moduleEntities = moduleRepository.findAll();
+        List<ModuleEntity> moduleEntities = moduleRepository.findByIsExistTrue();
         List<TriggerFlowReleasedEntity> releasedTriggerFlowEntities = new ArrayList<>();
-        moduleEntities.stream().forEach(moduleEntity -> releasedTriggerFlowEntities.addAll(toReleasedData(triggerFlowRepository.findByModuleId(moduleEntity.getId()),TriggerFlowReleasedEntity.class, requestDTO.getVersion())));
+        moduleEntities.stream().forEach(moduleEntity -> releasedTriggerFlowEntities.addAll(toReleasedData(triggerFlowRepository.findByModuleIdAndIsExistTrue(moduleEntity.getId()),TriggerFlowReleasedEntity.class, requestDTO.getVersion())));
        // List<TriggerFlowReleasedEntity> releasedTriggerFlowEntities = toReleasedData(triggerFlowRepository.findAll(), TriggerFlowReleasedEntity.class, requestDTO.getVersion());
         triggerFlowReleasedRepository.saveAll(releasedTriggerFlowEntities);
 
         List<SubFlowReleasedEntity> releasedSubFlowEntities = toReleasedData(subFlowRepository.findAll(), SubFlowReleasedEntity.class, requestDTO.getVersion());
         subFlowReleasedRepository.saveAll(releasedSubFlowEntities);
 
-        List<ModelReleasedEntity> releasedModelEntities = toReleasedData(modelRepository.findAll(), ModelReleasedEntity.class, requestDTO.getVersion());
+        List<ModelReleasedEntity> releasedModelEntities = toReleasedData(modelRepository.findByIsExistTrue(), ModelReleasedEntity.class, requestDTO.getVersion());
         modelReleasedRepository.saveAll(releasedModelEntities);
 
         List<ConnectorReleasedEntity> releasedConnectorEntities = toReleasedData(connectorRepository.findAll(), ConnectorReleasedEntity.class, requestDTO.getVersion());

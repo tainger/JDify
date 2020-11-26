@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 public class TestResourceLoader implements DalaranResourceLoader {
@@ -45,7 +46,7 @@ public class TestResourceLoader implements DalaranResourceLoader {
 
     @Override
     public List<TriggerFlowEntity> loadAllTriggerFlow() {
-        return triggerFlowRepository.findAll();
+        return triggerFlowRepository.findByIsExistTrue();
     }
 
     @Override
@@ -55,7 +56,7 @@ public class TestResourceLoader implements DalaranResourceLoader {
 
     @Override
     public List<TriggerFlowEntity> loadAvailableTriggerFlow() {
-        return triggerFlowRepository.findByStatusNot(FlowStatus.Error);
+        return triggerFlowRepository.findByStatusNotAndIsExistTrue(FlowStatus.Error);
     }
 
     @Override
@@ -65,7 +66,7 @@ public class TestResourceLoader implements DalaranResourceLoader {
 
     @Override
     public List<TriggerFlowEntity> loadAvailableTriggerFlowByTriggerType(String triggerType) {
-        return triggerFlowRepository.findByStatusNotAndTriggerType(FlowStatus.Error, triggerType);
+        return triggerFlowRepository.findByStatusNotAndTriggerTypeAndIsExistTrue(FlowStatus.Error, triggerType);
     }
 
     @Override
@@ -100,7 +101,11 @@ public class TestResourceLoader implements DalaranResourceLoader {
 
     @Override
     public ConnectorEntity loadConnector(Long connectorId) {
-        return connectorRepository.findById(connectorId).get();
+        Optional<ConnectorEntity> optional = connectorRepository.findById(connectorId);
+        if(optional!=null && optional.isPresent()) {
+            return optional.get();
+        }
+        return null;
     }
 
     @Override

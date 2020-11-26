@@ -1,5 +1,9 @@
 package io.terminus.dalaran.console.service.impl;
 
+import io.terminus.dalaran.console.entity.ModelEntity;
+import io.terminus.dalaran.console.entity.TriggerFlowEntity;
+import io.terminus.dalaran.console.repository.ModelRepository;
+import io.terminus.dalaran.console.repository.TriggerFlowRepository;
 import io.terminus.dalaran.console.service.*;
 import io.terminus.dalaran.console.service.jpa.ModuleQueryService;
 import io.terminus.dalaran.core.resource.entity.common.ModuleEntity;
@@ -52,6 +56,12 @@ public class ModuleManagementServiceImpl implements ModuleManagementService {
     @Autowired
     private ServiceManagement serviceManagement;
 
+    @Autowired
+    private TriggerFlowRepository flowRepository;
+
+    @Autowired
+    private ModelRepository modelRepository;
+
     @Override
     public Long createModule(ModuleDTO moduleModel) {
         ModuleEntity moduleEntity = buildEntity(moduleModel);
@@ -61,7 +71,21 @@ public class ModuleManagementServiceImpl implements ModuleManagementService {
 
     @Override
     public void deleteModule(Long moduleId) {
-        moduleRepository.deleteById(moduleId);
+        ModuleEntity moduleEntity = moduleRepository.findById(moduleId).get();
+        moduleEntity.setExist(false);
+        moduleRepository.save(moduleEntity);
+
+        List<TriggerFlowEntity> triggerFlowEntityList = flowRepository.findByModuleIdAndIsExistTrue(moduleId);
+        for(TriggerFlowEntity triggerFlowEntity: triggerFlowEntityList) {
+            triggerFlowEntity.setExist(false);
+            flowRepository.save(triggerFlowEntity);
+        }
+
+        List<ModelEntity> modelEntityList = modelRepository.findByModuleIdAndIsExistTrue(moduleId);
+        for(ModelEntity modelEntity:modelEntityList) {
+            modelEntity.setExist(false);
+            modelRepository.save(modelEntity);
+        }
     }
 
     @Override
@@ -74,7 +98,7 @@ public class ModuleManagementServiceImpl implements ModuleManagementService {
 
     @Override
     public List<ModuleDTO> list() {
-        List<ModuleEntity> entities = moduleRepository.findAll();
+        List<ModuleEntity> entities = moduleRepository.findByIsExistTrue();
         List<ModuleDTO> models = new LinkedList<>();
 
         for (ModuleEntity entity : entities) {
@@ -148,6 +172,7 @@ public class ModuleManagementServiceImpl implements ModuleManagementService {
         }
         moduleEntity.setDependencies(model.getDependencies());
         moduleEntity.setDescription(model.getDescription());
+        moduleEntity.setExist(true);
         return moduleEntity;
     }
 

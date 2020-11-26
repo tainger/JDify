@@ -17,6 +17,8 @@ public class BasicFlowInfo {
 
     private String triggerType;
 
+    private boolean isExist;
+
     public BasicFlowInfo() {
     }
 
