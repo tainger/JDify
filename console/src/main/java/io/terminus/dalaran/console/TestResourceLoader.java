@@ -51,7 +51,7 @@ public class TestResourceLoader implements DalaranResourceLoader {
 
     @Override
     public List<SubFlowEntity> loadAllSubFlow() {
-        return subFlowRepository.findAll();
+        return subFlowRepository.findByIsExistTrue();
     }
 
     @Override

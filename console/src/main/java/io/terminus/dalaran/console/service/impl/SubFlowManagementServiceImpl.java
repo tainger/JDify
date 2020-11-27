@@ -27,6 +27,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -63,7 +64,10 @@ public class SubFlowManagementServiceImpl implements SubFlowManagementService {
 
     @Override
     public void deleteFlow(Long flowId) {
-        subFlowRepository.deleteById(flowId);
+        Optional<SubFlowEntity> optional = subFlowRepository.findById(flowId);
+        SubFlowEntity subFlowEntity = optional.get();
+        subFlowEntity.setExist(false);
+        subFlowRepository.save(subFlowEntity);
     }
 
     @Override
@@ -86,7 +90,7 @@ public class SubFlowManagementServiceImpl implements SubFlowManagementService {
 
     @Override
     public List<SubFlowDTO> list() {
-        List<SubFlowEntity> entities = subFlowRepository.findAll();
+        List<SubFlowEntity> entities = subFlowRepository.findByIsExistTrue();
         List<SubFlowDTO> models = new LinkedList<>();
         for (SubFlowEntity entity : entities) {
             models.add(flowConvertor.toDTO(entity));
@@ -178,6 +182,7 @@ public class SubFlowManagementServiceImpl implements SubFlowManagementService {
         flowEntity.setOutModel(model.getOutModelId());
         flowEntity.setPipeline(pipeline);
         flowEntity.setDescription(model.getDescription());
+        flowEntity.setExist(true);
 
         return flowEntity;
     }

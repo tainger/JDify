@@ -107,7 +107,7 @@ public class ReleaseServiceImpl implements ReleaseService {
        // List<TriggerFlowReleasedEntity> releasedTriggerFlowEntities = toReleasedData(triggerFlowRepository.findAll(), TriggerFlowReleasedEntity.class, requestDTO.getVersion());
         triggerFlowReleasedRepository.saveAll(releasedTriggerFlowEntities);
 
-        List<SubFlowReleasedEntity> releasedSubFlowEntities = toReleasedData(subFlowRepository.findAll(), SubFlowReleasedEntity.class, requestDTO.getVersion());
+        List<SubFlowReleasedEntity> releasedSubFlowEntities = toReleasedData(subFlowRepository.findByIsExistTrue(), SubFlowReleasedEntity.class, requestDTO.getVersion());
         subFlowReleasedRepository.saveAll(releasedSubFlowEntities);
 
         List<ModelReleasedEntity> releasedModelEntities = toReleasedData(modelRepository.findByIsExistTrue(), ModelReleasedEntity.class, requestDTO.getVersion());

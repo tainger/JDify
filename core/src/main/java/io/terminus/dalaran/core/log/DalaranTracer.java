@@ -3,8 +3,6 @@ package io.terminus.dalaran.core.log;
 import com.alibaba.fastjson.JSON;
 import io.terminus.dalaran.DalaranConstants;
 import io.terminus.dalaran.TracingType;
-import io.terminus.dalaran.core.resource.entity.common.ReleaseRecordEntity;
-import io.terminus.dalaran.core.resource.repository.ReleaseRecordRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
@@ -13,7 +11,6 @@ import org.apache.camel.model.RouteDefinition;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.entity.StringEntity;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
 import java.io.InputStream;

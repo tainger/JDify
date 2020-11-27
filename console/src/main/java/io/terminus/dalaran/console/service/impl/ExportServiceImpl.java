@@ -102,6 +102,7 @@ public class ExportServiceImpl implements ExportService {
         exportData.getModules().forEach(module -> module.setExist(true));
         exportData.getModels().forEach(model -> model.setExist(true));
         exportData.getTriggerFlows().forEach(triggerFlow -> triggerFlow.setExist(true));
+        exportData.getSubFlows().forEach(subFlow -> subFlow.setExist(true));
         moduleRepository.saveAll(exportData.getModules());
         modelRepository.saveAll(exportData.getModels());
         triggerFlowRepository.saveAll(exportData.getTriggerFlows());
@@ -126,7 +127,7 @@ public class ExportServiceImpl implements ExportService {
         exportData.setModules(moduleRepository.findByIsExistTrue());
         exportData.setModels(modelRepository.findByIsExistTrue());
         exportData.setTriggerFlows(triggerFlowRepository.findByIsExistTrue());
-        exportData.setSubFlows(subFlowRepository.findAll());
+        exportData.setSubFlows(subFlowRepository.findByIsExistTrue());
         exportData.setServices(serviceRepository.findAll());
         exportData.setFunctions(functionRepository.findAll());
         exportData.setConnectors(connectorRepository.findAll());
@@ -150,8 +151,13 @@ public class ExportServiceImpl implements ExportService {
 
     @Override
     public File exportWord() {
-        List<ApiInfo> apiInfoList = getExportApiInfoListNew();
-        return RestWordUtils.buildWordFile(apiInfoList);
+        String triggerType = "http-rest-listener";
+        DalaranTrigger trigger = componentContext.getTrigger(triggerType);
+        if (trigger instanceof DalaranTriggerWordDocExport) {
+            Map<String, List<TriggerFlow>> moduleTriggerFlowList = buildModuleTriggerFlowList(triggerType);
+            return ((DalaranTriggerWordDocExport) trigger).exportWord(moduleTriggerFlowList);
+        }
+        return null;
     }
 
     @Override

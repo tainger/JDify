@@ -26,6 +26,7 @@ public interface PlatformExportAPI {
     @GetMapping(value = "/export/swagger")
     Swagger exportSwagger();
 
+    @CrossOrigin
     @ApiOperation(value = "导出 Word Rest API Docs")
     @GetMapping(value = "/export/word")
     ResponseEntity exportWord();
