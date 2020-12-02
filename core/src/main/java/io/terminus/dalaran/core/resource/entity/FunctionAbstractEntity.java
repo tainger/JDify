@@ -32,4 +32,7 @@ public abstract class FunctionAbstractEntity extends BasicEntity {
     @Column(nullable = false, length = 256)
     private List<String> params;
 
+    @Column(nullable = false)
+    private boolean isExist;
+
 }

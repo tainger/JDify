@@ -45,7 +45,9 @@ public class ConnectorServiceImpl implements ConnectorService {
 
     @Override
     public void delete(Long connectorId) {
-        connectorRepository.deleteById(connectorId);
+        ConnectorEntity entity = connectorRepository.findById(connectorId).get();
+        entity.setExist(false);
+        connectorRepository.save(entity);
     }
 
     @Override
@@ -60,7 +62,7 @@ public class ConnectorServiceImpl implements ConnectorService {
         CriteriaQuery<BasicConnectorInfo> criteriaQuery = builder.createQuery(BasicConnectorInfo.class);
         Root<ConnectorEntity> root = criteriaQuery.from(ConnectorEntity.class);
         criteriaQuery.multiselect(root.get("id"), root.get("moduleId"), root.get("name"), root.get("connectorType"))
-                .where(builder.equal(root.get("moduleId"), moduleId));
+                .where(builder.equal(root.get("moduleId"), moduleId), builder.equal(root.get("isExist"),true));
         return entityManager.createQuery(criteriaQuery).getResultList();
     }
 
@@ -70,7 +72,7 @@ public class ConnectorServiceImpl implements ConnectorService {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<BasicConnectorInfo> criteriaQuery = builder.createQuery(BasicConnectorInfo.class);
         Root<ConnectorEntity> root = criteriaQuery.from(ConnectorEntity.class);
-        Predicate where = builder.and(builder.equal(root.get("connectorType"), connectorType));
+        Predicate where = builder.and(builder.equal(root.get("connectorType"), connectorType), builder.equal(root.get("isExist"),true));
         criteriaQuery.multiselect(root.get("id"), root.get("moduleId"), root.get("name"), root.get("connectorType")).where(where);
         return entityManager.createQuery(criteriaQuery).getResultList();
     }
@@ -83,6 +85,7 @@ public class ConnectorServiceImpl implements ConnectorService {
         dto.setDescription(entity.getDescription());
         dto.setModuleId(entity.getModuleId());
         dto.setConfig(JSON.parseObject(entity.getConfig(), Map.class));
+        dto.setExist(true);
         return dto;
     }
 
@@ -94,6 +97,7 @@ public class ConnectorServiceImpl implements ConnectorService {
         entity.setDescription(dto.getDescription());
         entity.setModuleId(dto.getModuleId());
         entity.setConfig(JSON.toJSONString(dto.getConfig()));
+        entity.setExist(true);
         return entity;
     }
 

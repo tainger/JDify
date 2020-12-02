@@ -24,4 +24,7 @@ public abstract class ConnectorAbstractEntity extends BasicEntity {
 
     @Column(nullable = false, columnDefinition = "TEXT")
     private String config;
+
+    @Column(nullable = false)
+    private boolean isExist;
 }

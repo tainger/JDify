@@ -14,6 +14,7 @@ public class BasicFunctionInfo {
     private String description;
     private MappingFunctionType type;
     private List<String> params;
+    private boolean isExist;
 
     public BasicFunctionInfo() {
     }
