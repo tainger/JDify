@@ -9,11 +9,13 @@ import java.util.List;
 
 public interface TriggerFlowRepository extends JpaRepository<TriggerFlowEntity, Long>, JpaSpecificationExecutor<TriggerFlowEntity> {
 
-    List<TriggerFlowEntity> findByStatusNotAndTriggerType(FlowStatus status, String triggerType);
-
-    List<TriggerFlowEntity> findByStatusNot(FlowStatus status);
+    List<TriggerFlowEntity> findByStatusNotAndIsExistTrue(FlowStatus status);
 
     TriggerFlowEntity findByName(String name);
 
-    List<TriggerFlowEntity> findByModuleId(Long moduleId);
+    List<TriggerFlowEntity> findByModuleIdAndIsExistTrue(Long moduleId);
+
+    List<TriggerFlowEntity> findByIsExistTrue();
+
+    List<TriggerFlowEntity> findByStatusNotAndTriggerTypeAndIsExistTrue(FlowStatus status, String triggerType);
 }

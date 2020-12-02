@@ -53,6 +53,8 @@ public class ModelQueryServiceImpl implements ModelQueryService {
                 Predicate name = criteriaBuilder.like(root.get("name"), "%" + query.getName() + "%");
                 predicates.add(name);
             }
+            Predicate isExist = criteriaBuilder.equal(root.get("isExist"),true);
+            predicates.add(isExist);
 
             return criteriaBuilder.and(predicates.toArray(new Predicate[predicates.size()]));
         };
@@ -66,7 +68,8 @@ public class ModelQueryServiceImpl implements ModelQueryService {
         CriteriaQuery<BasicModelInfo> criteriaQuery = builder.createQuery(BasicModelInfo.class);
         Root<ModelEntity> root = criteriaQuery.from(ModelEntity.class);
         criteriaQuery.multiselect(root.get("id"), root.get("moduleId"), root.get("name"), root.get("type"))
-                .where(builder.equal(root.get("moduleId"), moduleId), builder.and(), root.get("targetType").in(ModelTargetType.editableTypes()));
+                .where(builder.equal(root.get("moduleId"), moduleId), builder.and(), root.get("targetType").in(ModelTargetType.editableTypes())
+                , builder.equal(root.get("isExist"), true));
         return entityManager.createQuery(criteriaQuery).getResultList();
     }
 }

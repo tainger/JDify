@@ -18,6 +18,10 @@ public interface FlowReadAPI {
     @GetMapping(value = "/{id}")
     TriggerFlowDTO getById(@PathVariable Long id);
 
+    @ApiOperation(value = "根据 ID、版本 获取集成流")
+    @GetMapping(value = "/byIdVersion")
+    TriggerFlowDTO getByIdVersion(Long id,String version);
+
     @ApiOperation(value = "条件查询集成流")
     @GetMapping(value = "/query")
     List<TriggerFlowDTO> query(FlowQuery query);

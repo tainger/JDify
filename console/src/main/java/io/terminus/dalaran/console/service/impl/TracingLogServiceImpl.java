@@ -60,14 +60,14 @@ public class TracingLogServiceImpl implements TracingLogService {
         Sort order = new Sort(new Sort.Order(Sort.Direction.DESC, "timestamp"));
         Pageable pageable = PageRequest.of(pageNumber - 1, pageSize, order);
         Page<TracingLogEntity> logs = tracingLogRepository.findAll(buildSpecification(query), pageable);
-        return new PageImpl<>(logs.stream().map(this::buildTracingMainLog).filter(log->log!=null).collect(Collectors.toList()), pageable, logs.getTotalElements());
+        return new PageImpl<>(logs.stream().map(this::buildTracingMainLog).collect(Collectors.toList()), pageable, logs.getTotalElements());
     }
 
     @Override
     public List<MainLogDTO> triggerLogs(TracingLogQuery query) {
         Sort order = new Sort(new Sort.Order(Sort.Direction.DESC, "timestamp"));
         List<TracingLogEntity> logs = tracingLogRepository.findAll(buildSpecification(query), order);
-        return logs.stream().map(this::buildTracingMainLog).filter(log->log!=null).collect(Collectors.toList());
+        return logs.stream().map(this::buildTracingMainLog).collect(Collectors.toList());
     }
 
     @Override
@@ -159,6 +159,7 @@ public class TracingLogServiceImpl implements TracingLogService {
         mainLog.setOutputBody(log.getOutputBody());
         mainLog.setOutputBodyType(log.getOutputBodyType());
         mainLog.setSuccessful(log.isSuccessful());
+        mainLog.setVersion(log.getVersion());
 
         if (log.getFlowId() != null) {
             mainLog.setFlowId(log.getFlowId());
@@ -181,12 +182,10 @@ public class TracingLogServiceImpl implements TracingLogService {
             }
             if (flowEntity != null) {
                 String moduleName = moduleService.getModuleName(flowEntity.getModuleId());
+                mainLog.setFlowName(flowEntity.getName());
+                mainLog.setModuleId(flowEntity.getModuleId());
                 if(moduleName!=null) {
-                    mainLog.setFlowName(flowEntity.getName());
-                    mainLog.setModuleId(flowEntity.getModuleId());
                     mainLog.setModuleName(moduleName);
-                }else {
-                    return null;
                 }
             }
         }
@@ -204,6 +203,7 @@ public class TracingLogServiceImpl implements TracingLogService {
         tracingLog.setOutputBody(log.getOutputBody());
         tracingLog.setOutputBodyType(log.getOutputBodyType());
         tracingLog.setSuccessful(log.isSuccessful());
+        tracingLog.setVersion(log.getVersion());
 
         tracingLog.setProcessorId(log.getProcessorId());
         tracingLog.setFlowId(log.getFlowId());

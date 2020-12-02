@@ -196,7 +196,6 @@ public class DalaranTracer {
             } else {
                 tracingLog.setChildRecordId(currentId);
             }
-
             tracingLog.setTracingType(tracingType);
             tracingLog.setFlowId(exchange.getProperty(TRACING_FLOW_ID, Long.class));
             tracingLog.setModuleId(exchange.getProperty(TRACING_MODULE_ID, Long.class));

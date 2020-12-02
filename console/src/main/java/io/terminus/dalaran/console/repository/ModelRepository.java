@@ -23,4 +23,12 @@ public interface ModelRepository extends JpaRepository<ModelEntity, Long>, JpaSp
     List<ModelEntity> findByTargetTypeInAndModuleId(List<ModelTargetType> types, Long moduleId);
 
     List<ModelEntity> findByModuleId(Long moduleId);
+
+    List<ModelEntity> findByIsExistTrue();
+
+    List<ModelEntity> findByTargetTypeInAndIsExistTrue(List<ModelTargetType> types);
+
+    List<ModelEntity> findByTargetTypeInAndModuleIdAndIsExistTrue(List<ModelTargetType> types, Long moduleId);
+
+    List<ModelEntity> findByModuleIdAndIsExistTrue(Long moduleId);
 }

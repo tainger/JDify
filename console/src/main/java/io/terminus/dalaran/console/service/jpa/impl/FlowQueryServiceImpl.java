@@ -52,6 +52,9 @@ public class FlowQueryServiceImpl implements FlowQueryService {
                 Predicate name = criteriaBuilder.like(root.get("name"), "%" + query.getName() + "%");
                 predicates.add(name);
             }
+            Predicate isExist = criteriaBuilder.equal(root.get("isExist"),true);
+            predicates.add(isExist);
+
             return criteriaBuilder.and(predicates.toArray(new Predicate[predicates.size()]));
 
 
@@ -75,7 +78,8 @@ public class FlowQueryServiceImpl implements FlowQueryService {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<BasicFlowInfo> criteriaQuery = builder.createQuery(BasicFlowInfo.class);
         Root<TriggerFlowEntity> root = criteriaQuery.from(TriggerFlowEntity.class);
-        criteriaQuery.multiselect(root.get("id"), root.get("moduleId"), root.get("name"), root.get("status"), root.get("triggerType")).where(builder.equal(root.get("moduleId"), moduleId));
+        criteriaQuery.multiselect(root.get("id"), root.get("moduleId"), root.get("name"), root.get("status"), root.get("triggerType"))
+                .where(builder.equal(root.get("moduleId"), moduleId), builder.equal(root.get("isExist"),true));
         return entityManager.createQuery(criteriaQuery).getResultList();
     }
 }

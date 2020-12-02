@@ -17,7 +17,9 @@ import io.terminus.dalaran.core.context.DalaranContext;
 import io.terminus.dalaran.core.flow.DalaranFlowBuilder;
 import io.terminus.dalaran.core.resource.DalaranResourceBuilder;
 import io.terminus.dalaran.core.resource.entity.common.ProcessorEntity;
+import io.terminus.dalaran.core.resource.entity.released.TriggerFlowReleasedEntity;
 import io.terminus.dalaran.core.resource.repository.ModuleRepository;
+import io.terminus.dalaran.core.resource.repository.TriggerFlowReleasedRepository;
 import io.terminus.dalaran.exception.flow.FlowNotExistException;
 import io.terminus.dalaran.model.dto.*;
 import io.terminus.dalaran.model.dto.basic.BasicFlowInfo;
@@ -73,6 +75,9 @@ public class FlowManagementServiceImpl implements FlowManagementService {
 
     @Autowired
     private ModelManagementService modelService;
+
+    @Autowired
+    private TriggerFlowReleasedRepository triggerFlowReleasedRepository;
 
     private final FlowConvertor flowConvertor = new FlowConvertor();
 
@@ -261,7 +266,10 @@ public class FlowManagementServiceImpl implements FlowManagementService {
 
     @Override
     public void deleteFlow(Long flowId) {
-        flowRepository.deleteById(flowId);
+        Optional<TriggerFlowEntity> flowEntityOptional = flowRepository.findById(flowId);
+        TriggerFlowEntity flowEntity = flowEntityOptional.get();
+        flowEntity.setExist(false);
+        flowRepository.save(flowEntity);
     }
 
     @Override
@@ -285,7 +293,7 @@ public class FlowManagementServiceImpl implements FlowManagementService {
 
     @Override
     public List<TriggerFlowDTO> list() {
-        List<TriggerFlowEntity> entities = flowRepository.findAll();
+        List<TriggerFlowEntity> entities = flowRepository.findByIsExistTrue();
         List<TriggerFlowDTO> models = new LinkedList<>();
         for (TriggerFlowEntity entity : entities) {
             models.add(flowConvertor.toDTO(entity));
@@ -315,6 +323,13 @@ public class FlowManagementServiceImpl implements FlowManagementService {
     public TriggerFlowDTO getById(Long flowId) {
         Optional<TriggerFlowEntity> flowEntityOptional = flowRepository.findById(flowId);
         return flowEntityOptional.map(flowConvertor::toDTO).orElse(null);
+    }
+
+    @Nullable
+    @Override
+    public TriggerFlowDTO getByIdVersion(Long flowId,String version) {
+        TriggerFlowReleasedEntity triggerFlowReleasedEntity = triggerFlowReleasedRepository.findByVersionAndOriginId(version,flowId);
+        return flowConvertor.releaseToDTO(triggerFlowReleasedEntity);
     }
 
     @Override
@@ -358,6 +373,7 @@ public class FlowManagementServiceImpl implements FlowManagementService {
             flowStatus = FlowStatus.Available;
         }
         flowEntity.setStatus(flowStatus);
+        flowEntity.setExist(true);
     }
 
     private List<FlowValidation> validateFlow(TriggerFlowEntity entity) {
@@ -407,7 +423,7 @@ public class FlowManagementServiceImpl implements FlowManagementService {
     }
 
     private List<String> getSoapOperations() {
-        List<TriggerFlowEntity> soapFlowList = flowRepository.findByStatusNotAndTriggerType(FlowStatus.Error, "soap-listener");
+        List<TriggerFlowEntity> soapFlowList = flowRepository.findByStatusNotAndTriggerTypeAndIsExistTrue(FlowStatus.Error, "soap-listener");
         return soapFlowList.stream().map(flowEntity -> {
             return flowEntity.getName().trim();
         }).collect(Collectors.toList());

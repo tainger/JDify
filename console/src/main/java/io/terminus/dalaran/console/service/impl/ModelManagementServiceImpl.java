@@ -79,7 +79,9 @@ public class ModelManagementServiceImpl implements ModelManagementService {
 
     @Override
     public void deleteModel(Long modelId) {
-        modelRepository.deleteById(modelId);
+        ModelEntity modelEntity = modelRepository.findById(modelId).get();
+        modelEntity.setExist(false);
+        modelRepository.save(modelEntity);
     }
 
     @Override
@@ -98,25 +100,25 @@ public class ModelManagementServiceImpl implements ModelManagementService {
 
     @Override
     public List<ModelDTO> list() {
-        List<ModelEntity> entities = modelRepository.findAll();
+        List<ModelEntity> entities = modelRepository.findByIsExistTrue();
         return entities.stream().map(this::buildModel).collect(Collectors.toList());
     }
 
     @Override
     public List<ModelDTO> listByModuleId(Long moduleId) {
-        List<ModelEntity> entities = modelRepository.findByModuleId(moduleId);
+        List<ModelEntity> entities = modelRepository.findByModuleIdAndIsExistTrue(moduleId);
         return entities.stream().map(this::buildModel).collect(Collectors.toList());
     }
 
     @Override
     public List<ModelDTO> listEditableModel() {
-        List<ModelEntity> entities = modelRepository.findByTargetTypeIn(ModelTargetType.editableTypes());
+        List<ModelEntity> entities = modelRepository.findByTargetTypeInAndIsExistTrue(ModelTargetType.editableTypes());
         return entities.stream().map(this::buildModel).collect(Collectors.toList());
     }
 
     @Override
     public List<ModelDTO> listEditableModelByModuleId(Long moduleId) {
-        List<ModelEntity> entities = modelRepository.findByTargetTypeInAndModuleId(ModelTargetType.editableTypes(), moduleId);
+        List<ModelEntity> entities = modelRepository.findByTargetTypeInAndModuleIdAndIsExistTrue(ModelTargetType.editableTypes(), moduleId);
         return entities.stream().map(this::buildModel).collect(Collectors.toList());
     }
 
@@ -127,7 +129,7 @@ public class ModelManagementServiceImpl implements ModelManagementService {
 
     @Override
     public Map<String, ClassificationModel> listClassificationModels(Long moduleId) {
-        List<ModelEntity> entities = modelRepository.findByModuleId(moduleId);
+        List<ModelEntity> entities = modelRepository.findByModuleIdAndIsExistTrue(moduleId);
         List<ModelDTO> models = entities.stream().map(this::buildModel).collect(Collectors.toList());
         return buildClassificationModel(models);
     }
@@ -183,6 +185,7 @@ public class ModelManagementServiceImpl implements ModelManagementService {
                 model.setModelSchema(JSON.toJSONString(schema));
                 model.setName(entry.getKey());
                 model.setType(modelType);
+                model.setExist(true);
                 modelRepository.save(model);
                 Map<String, JsonSchema> singleSchema = new HashMap<>();
                 singleSchema.put(entry.getKey(), schema);
@@ -479,6 +482,7 @@ public class ModelManagementServiceImpl implements ModelManagementService {
         modelEntity.setModuleId(model.getModuleId());
         modelEntity.setTargetId(model.getTargetId());
         modelEntity.setTargetType(model.getTargetType());
+        modelEntity.setExist(true);
         return modelEntity;
     }
 

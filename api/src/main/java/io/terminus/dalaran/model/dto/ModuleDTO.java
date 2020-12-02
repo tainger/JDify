@@ -19,4 +19,6 @@ public class ModuleDTO {
     private List<Long> dependencies;
 
     private String description;
+
+    private boolean isExist;
 }

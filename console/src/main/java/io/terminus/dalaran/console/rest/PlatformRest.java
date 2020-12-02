@@ -156,6 +156,9 @@ public class PlatformRest implements PlatformInfoAPI, PlatformImportAPI, Platfor
     @OnException(code = ResponseMessage.SWAGGER_EXPORT_ERROR)
     public ResponseEntity exportWord() {
         File file = exportService.exportWord();
+        if (file == null) {
+            return null;
+        }
         String currentDate = DateFormatUtils.format(new Date(), "yyyy-MM-dd HH:mm:ss");
         FileSystemResource fileResource = new FileSystemResource(file);
         return ResponseEntity.ok()

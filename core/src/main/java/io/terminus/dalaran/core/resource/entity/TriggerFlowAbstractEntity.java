@@ -18,4 +18,5 @@ public abstract class TriggerFlowAbstractEntity extends BasicFlowEntity {
 
     private boolean tracing;
 
+    private boolean isExist;
 }
