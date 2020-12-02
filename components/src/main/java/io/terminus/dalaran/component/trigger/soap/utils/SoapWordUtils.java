@@ -1,8 +1,5 @@
 package io.terminus.dalaran.component.trigger.soap.utils;
 
-import io.terminus.dalaran.component.trigger.rest.model.ApiInfo;
-import io.terminus.dalaran.component.trigger.rest.model.ApiParameter;
-import io.terminus.dalaran.component.trigger.soap.model.SoapApiInfo;
 import io.terminus.dalaran.component.trigger.soap.model.SoapApiParameter;
 import io.terminus.dalaran.component.trigger.soap.model.SoapWordApiInfo;
 import lombok.val;

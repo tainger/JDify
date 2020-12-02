@@ -27,6 +27,7 @@
         <module>client</module>
         <module>as2</module>
         <module>dalaran-mapper-sdk</module>
+        <module>dalaran-component</module>
     </modules>
 
     <properties>

@@ -1,6 +1,6 @@
 package io.terminus.dalaran.component.trigger.soap;
 
-import io.terminus.dalaran.component.trigger.rest.processor.QueryStringSignProcessor;
+import io.terminus.dalaran.component.http.trigger.processor.QueryStringSignProcessor;
 import io.terminus.dalaran.component.trigger.soap.model.SoapApiInfo;
 import io.terminus.dalaran.component.trigger.soap.model.SoapAuthType;
 import io.terminus.dalaran.component.trigger.soap.model.SoapWordApiInfo;

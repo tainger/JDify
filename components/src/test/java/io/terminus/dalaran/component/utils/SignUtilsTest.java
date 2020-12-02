@@ -4,10 +4,10 @@
 //import com.google.gson.Gson;
 //import com.google.gson.JsonObject;
 //import io.terminus.dalaran.ComponentConstants;
-//import io.terminus.dalaran.component.trigger.rest.model.EncryptionAlgorithm;
-//import io.terminus.dalaran.component.trigger.rest.model.SignAlgorithm;
-//import io.terminus.dalaran.component.trigger.rest.model.SignAuthenticatorInfo;
-//import io.terminus.dalaran.component.trigger.rest.processor.SignProcessor;
+//import io.terminus.dalaran.component.http.trigger.model.EncryptionAlgorithm;
+//import io.terminus.dalaran.component.http.trigger.model.SignAlgorithm;
+//import io.terminus.dalaran.component.http.trigger.model.SignAuthenticatorInfo;
+//import io.terminus.dalaran.component.http.trigger.processor.SignProcessor;
 //import org.apache.commons.codec.digest.DigestUtils;
 //import org.junit.Assert;
 //import org.junit.Test;
