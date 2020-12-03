@@ -48,7 +48,9 @@ public class FunctionServiceImpl implements FunctionService {
 
     @Override
     public void delete(Long functionId) {
-        repository.deleteById(functionId);
+        FunctionEntity functionEntity = repository.findById(functionId).get();
+        functionEntity.setExist(false);
+        repository.save(functionEntity);
     }
 
     @Override
@@ -63,19 +65,22 @@ public class FunctionServiceImpl implements FunctionService {
         CriteriaQuery<BasicFunctionInfo> criteriaQuery = builder.createQuery(BasicFunctionInfo.class);
         Root<FunctionEntity> root = criteriaQuery.from(FunctionEntity.class);
         criteriaQuery.multiselect(root.get("id"), root.get("moduleId"), root.get("name"), root.get("description"),
-                root.get("type"), root.get("params")).where(builder.equal(root.get("moduleId"), moduleId));
+                root.get("type"), root.get("params")).where(builder.equal(root.get("moduleId"), moduleId),
+                builder.equal(root.get("isExist"),true));
         return entityManager.createQuery(criteriaQuery).getResultList();
     }
 
     private FunctionDTO toDTO(FunctionEntity entity) {
         FunctionDTO dto = new FunctionDTO();
         BeanUtils.copyProperties(entity, dto);
+        dto.setExist(true);
         return dto;
     }
 
     private FunctionEntity toEntity(FunctionDTO dto) {
         FunctionEntity entity = new FunctionEntity();
         BeanUtils.copyProperties(dto, entity);
+        entity.setExist(true);
         return entity;
     }
 

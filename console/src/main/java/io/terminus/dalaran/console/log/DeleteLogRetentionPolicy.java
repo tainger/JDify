@@ -46,6 +46,7 @@ public class DeleteLogRetentionPolicy implements LogRetentionPolicy {
                 "  `tracing_type` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,\n" +
                 "  `main_record_id` varchar(256) COLLATE utf8mb4_unicode_ci DEFAULT NULL,\n" +
                 "  `child_record_id` varchar(256) COLLATE utf8mb4_unicode_ci DEFAULT NULL,\n" +
+                "  `version` varchar(256) COLLATE utf8mb4_unicode_ci DEFAULT NULL,\n" +
                 "  PRIMARY KEY (`id`),\n" +
                 "  KEY `recordId` (`record_id`),\n" +
                 "  KEY `flowId` (`flow_id`)\n" +

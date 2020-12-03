@@ -25,4 +25,7 @@ public abstract class ClientAbstractEntity extends BasicEntity {
     @Column(columnDefinition = "TEXT")
     private String description;
 
+    @Column(nullable = false)
+    private boolean isExist;
+
 }

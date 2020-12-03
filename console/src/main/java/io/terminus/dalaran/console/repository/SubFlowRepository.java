@@ -9,7 +9,10 @@ import java.util.List;
 
 public interface SubFlowRepository extends JpaRepository<SubFlowEntity, Long>, JpaSpecificationExecutor<SubFlowEntity> {
 
-    List<SubFlowEntity> findByStatusNot(FlowStatus error);
-
     List<SubFlowEntity> findByIsExistTrue();
+
+    List<SubFlowEntity> findByModuleIdAndIsExistTrue(Long moduleId);
+
+    List<SubFlowEntity> findByStatusNotAndIsExistTrue(FlowStatus error);
+
 }

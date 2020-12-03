@@ -61,7 +61,7 @@ public class TestResourceLoader implements DalaranResourceLoader {
 
     @Override
     public List<SubFlowEntity> loadAvailableSubFlow() {
-        return subFlowRepository.findByStatusNot(FlowStatus.Error);
+        return subFlowRepository.findByStatusNotAndIsExistTrue(FlowStatus.Error);
     }
 
     @Override
@@ -76,12 +76,12 @@ public class TestResourceLoader implements DalaranResourceLoader {
 
     @Override
     public List<FunctionEntity> loadAllFunctions() {
-        return functionRepository.findAll();
+        return functionRepository.findByIsExistTrue();
     }
 
     @Override
     public List<ClientEntity> loadAllClient() {
-        return clientRepository.findAll();
+        return clientRepository.findByIsExistTrue();
     }
 
     @Override
