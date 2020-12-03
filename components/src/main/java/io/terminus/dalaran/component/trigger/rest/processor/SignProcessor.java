@@ -42,9 +42,9 @@ public class SignProcessor implements Processor {
             stopExchangeOnInvalidAppKey(exchange);
             return;
         }
-        body.put(AUTH_APP_SECRET, secret);
         String sign = body.get(AUTH_SIGN);
         if (checkSign && !StringUtils.isEmpty(sign)) {
+            body.put(AUTH_APP_SECRET, secret);
             Map<String, String> sortedBody = new TreeMap<>(body);
             sortedBody.remove(AUTH_SIGN);
 
@@ -56,6 +56,9 @@ public class SignProcessor implements Processor {
                 setOutBody(exchange, body);
                 return;
             }
+            stopExchangeOnMissingSign(exchange);
+            return;
+        } else if (!checkSign && !secret.equals(body.get(AUTH_APP_SECRET))) {
             stopExchangeOnMissingSign(exchange);
             return;
         }
