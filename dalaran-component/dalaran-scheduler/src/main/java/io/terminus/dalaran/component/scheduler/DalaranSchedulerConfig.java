@@ -1,0 +1,27 @@
+package io.terminus.dalaran.component.scheduler;
+
+import io.terminus.dalaran.FieldInputType;
+import io.terminus.dalaran.core.component.annotation.ConfigFieldInfo;
+import lombok.Data;
+
+@Data
+public class DalaranSchedulerConfig {
+
+    @ConfigFieldInfo(label = "调度任务名", inputType = FieldInputType.String)
+    private String taskName;
+
+    @ConfigFieldInfo(label = "Cron 表达式", inputType = FieldInputType.String)
+    private String cron;
+
+    @ConfigFieldInfo(label = "正在执行则不触发", inputType = FieldInputType.Switch, defaultValue = "false")
+    private Boolean stateful = false;
+
+//    @ConfigFieldInfo(label = "流程停止后删除任务", inputType = FieldInputType.Switch, defaultValue = "false")
+    private Boolean deleteJob = false;
+
+//    @ConfigFieldInfo(label = "流程停止后中止任务", inputType = FieldInputType.Switch, defaultValue = "true")
+    private Boolean pauseJob = true;
+
+    @ConfigFieldInfo(label = "时区", inputType = FieldInputType.String, required = false)
+    private String timezone = "Asia/Shanghai";
+}

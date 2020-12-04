@@ -1,4 +1,4 @@
-package io.terminus.dalaran.component.utils;
+package io.terminus.dalaran.component.mail.utils;
 
 import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSClientBuilder;

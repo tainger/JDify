@@ -5,7 +5,7 @@ import com.sun.mail.util.MailSSLSocketFactory;
 import io.terminus.dalaran.component.common.MailProtocol;
 import io.terminus.dalaran.component.mail.camel.DalaranMailSenderConfig;
 import io.terminus.dalaran.component.mail.camel.MailSenderInfo;
-import io.terminus.dalaran.component.utils.OSSUtils;
+import io.terminus.dalaran.component.mail.utils.OSSUtils;
 import io.terminus.dalaran.core.resource.oss.OSSAccount;
 import lombok.val;
 import org.apache.camel.Exchange;

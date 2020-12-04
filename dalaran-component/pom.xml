@@ -5,7 +5,7 @@
     <parent>
         <artifactId>dalaran-parent</artifactId>
         <groupId>io.terminus</groupId>
-        <version>2.4.5-SNAPSHOT</version>
+        <version>2.4.5.2-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -13,7 +13,7 @@
     <packaging>pom</packaging>
     <modules>
         <module>dalaran-http</module>
-        <module>dalaran-component-common</module>
+        <module>dalaran-common</module>
         <module>dalaran-function</module>
         <module>dalaran-mapper</module>
         <module>dalaran-rocketmq</module>
@@ -22,7 +22,19 @@
         <module>dalaran-soap</module>
         <module>dalaran-mail</module>
         <module>dalaran-ftp</module>
+        <module>dalaran-route</module>
+        <module>dalaran-loopwhile</module>
+        <module>dalaran-foreach</module>
+        <module>dalaran-sql</module>
+        <module>dalaran-service</module>
+        <module>dalaran-errorcatch</module>
+        <module>dalaran-scheduler</module>
+        <module>dalaran-script</module>
+        <module>dalaran-as2</module>
+        <module>dalaran-retry</module>
+        <module>dalaran-subflow</module>
+        <module>dalaran-multicast</module>
+        <module>dalaran-end</module>
     </modules>
-
 
 </project>

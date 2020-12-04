@@ -1,9 +1,9 @@
 package io.terminus.dalaran.component.connector;
 
 import io.terminus.dalaran.FieldInputType;
-import io.terminus.dalaran.component.processor.sql.Database;
 import io.terminus.dalaran.core.component.annotation.ConfigFieldInfo;
 import io.terminus.dalaran.core.component.annotation.Connector;
+import io.terminus.dalaran.model.Database;
 import lombok.Data;
 
 @Data

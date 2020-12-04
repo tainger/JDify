@@ -1,4 +1,4 @@
-package io.terminus.dalaran.component.processor.sql;
+package io.terminus.dalaran.component.sql;
 
 public enum Database {
     MYSQL,

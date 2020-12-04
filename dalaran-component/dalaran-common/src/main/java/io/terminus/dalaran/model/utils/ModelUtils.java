@@ -4,7 +4,6 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Maps;
 import io.terminus.dalaran.ComponentConstants;
-import io.terminus.dalaran.component.processor.mapper.model.MapperConstants;
 import io.terminus.dalaran.model.DalaranModelSchema;
 import io.terminus.dalaran.model.FieldType;
 import io.terminus.dalaran.model.ModelField;
@@ -12,12 +11,14 @@ import org.apache.commons.collections.CollectionUtils;
 
 import java.util.*;
 
+import static io.terminus.dalaran.ComponentConstants.MODEL_FIELD_ROOT;
+
 public class ModelUtils {
 
     public static Map<String, ModelField> parseDataTemplate(Object body) {
         SortedMap<String, ModelField> root = new TreeMap<>();
         ModelField modelField = new ModelField();
-        root.put(MapperConstants.MODEL_ROOT, modelField);
+        root.put(MODEL_FIELD_ROOT, modelField);
         String type = body.getClass().getTypeName();
         if (isComplexType(type)) {
             buildModel(body, type, modelField);
@@ -94,7 +95,7 @@ public class ModelUtils {
 
     public static Object buildBody(DalaranModelSchema schema) {
         Map<String, ModelField> modelField = schema.getFields();
-        ModelField root = modelField.get(ComponentConstants.MODEL_FIELD_ROOT);
+        ModelField root = modelField.get(MODEL_FIELD_ROOT);
         return buildTemplateBody(root, "");
     }
 

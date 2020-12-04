@@ -1,10 +1,10 @@
 package io.terminus.dalaran.component.basic;
 
 import io.terminus.dalaran.FieldInputType;
-import io.terminus.dalaran.component.processor.script.DalaranScriptType;
 import io.terminus.dalaran.core.component.DalaranBasicComponent;
 import io.terminus.dalaran.core.component.annotation.ConfigFieldInfo;
 import io.terminus.dalaran.core.component.annotation.DynamicModel;
+import io.terminus.dalaran.model.DalaranScriptType;
 import lombok.Data;
 
 @Data
