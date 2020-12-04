@@ -1,9 +1,12 @@
 package io.terminus.dalaran.component.processor.mapper;
 
+import com.alibaba.fastjson.JSONObject;
 import io.terminus.dalaran.component.processor.mapper.model.*;
 import io.terminus.dalaran.core.component.DalaranComponentValidator;
 import io.terminus.dalaran.core.component.DalaranProcessor;
 import io.terminus.dalaran.core.component.annotation.Processor;
+import io.terminus.dalaran.core.component.config.DalaranMapperConfig;
+import io.terminus.dalaran.core.component.model.*;
 import io.terminus.dalaran.core.context.DalaranContext;
 import io.terminus.dalaran.core.context.DalaranFunctionContext;
 import io.terminus.dalaran.model.FieldType;
@@ -229,6 +232,13 @@ public class DalaranMessageMapper implements DalaranProcessor<DalaranMapperConfi
             });
         }
         return sourcePaths;
+    }
+
+    public static void main(String args[]) {
+        String json = "{\"inModelId\":33,\"messageMapping\":{\"root.response.name\":{\"mappingType\":\"FUNCTION\",\"value\":{\"id\":\"StringToUpper\",\"params\":{\"StringToUpper_khvvzef12jhstr\":{\"type\":\"DYNAMIC\",\"value\":\"root.request.name\"}},\"temKey\":\"StringToUpper_khvvzef12jh\",\"type\":\"STATIC\"}},\"root.response.result.orderId\":{\"mappingType\":\"FUNCTION\",\"value\":{\"id\":\"StringAppend\",\"params\":{\"StringAppend_khvvyievbgdstr2\":{\"type\":\"DYNAMIC\",\"value\":\"root.request.code\"},\"StringAppend_khvvyievbgdstr1\":{\"type\":\"DYNAMIC\",\"value\":\"root.request.id\"}},\"temKey\":\"StringAppend_khvvyievbgd\",\"type\":\"STATIC\"}},\"root.response.result.description\":{\"mappingType\":\"STATIC\",\"value\":\"描述\"}},\"outModelId\":34}";
+        JSONObject jsonObject = JSONObject.parseObject(json);
+        DalaranMapperConfig config = jsonObject.toJavaObject(DalaranMapperConfig.class);
+        System.out.println(config);
     }
 
     @Override

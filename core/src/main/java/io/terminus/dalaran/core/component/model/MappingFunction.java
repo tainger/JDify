@@ -1,12 +1,9 @@
-package io.terminus.dalaran.component.processor.mapper.model;
+package io.terminus.dalaran.core.component.model;
 
 import lombok.Data;
 
 import java.util.Map;
 
-/**
- * Created by jingdi on 2019/7/18
- */
 @Data
 public class MappingFunction {
 
