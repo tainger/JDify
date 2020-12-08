@@ -14,7 +14,6 @@ import io.terminus.dalaran.core.resource.entity.common.ReleaseRecordEntity;
 import io.terminus.dalaran.core.resource.entity.released.*;
 import io.terminus.dalaran.core.resource.repository.ModuleRepository;
 import io.terminus.dalaran.core.resource.repository.ReleaseRecordRepository;
-import io.terminus.dalaran.core.resource.repository.TriggerFlowAbstractRepository;
 import io.terminus.dalaran.model.flow.SubFlow;
 import io.terminus.dalaran.model.flow.TriggerFlow;
 import lombok.extern.slf4j.Slf4j;
@@ -27,9 +26,6 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.stream.Collectors;
-
-import static io.terminus.dalaran.DalaranConstants.DALARAN_PROCESSOR;
-import static io.terminus.dalaran.DalaranConstants.FLOW_PREFIX;
 
 @Slf4j
 public class ReleasedFlowInitializer implements DalaranStarter {
@@ -51,9 +47,6 @@ public class ReleasedFlowInitializer implements DalaranStarter {
 
     @Autowired
     private CamelContext camelContext;
-
-    @Autowired
-    private TriggerFlowAbstractRepository triggerFlowAbstractRepository;
 
     private Swagger swagger;
 
@@ -120,12 +113,6 @@ public class ReleasedFlowInitializer implements DalaranStarter {
                     e.printStackTrace();
                 }
             }
-
-//            List<TriggerFlowCoreEntity> triggerFlowEntities = triggerFlowAbstractRepository.findByIsExistFalse();
-//            for(TriggerFlowCoreEntity triggerFlowCoreEntity : triggerFlowEntities) {
-//                dalaranContext.removeFlow(FLOW_PREFIX + triggerFlowCoreEntity.getId());
-//                dalaranContext.removeFlow(DALARAN_PROCESSOR + FLOW_PREFIX + triggerFlowCoreEntity.getId());
-//            }
 
             List<TriggerFlowReleasedEntity> triggerFlows = resourceLoader.loadAvailableTriggerFlow();
             for (TriggerFlowReleasedEntity triggerFlowEntity : triggerFlows) {
