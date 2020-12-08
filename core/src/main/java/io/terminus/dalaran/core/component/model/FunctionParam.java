@@ -1,4 +1,4 @@
-package io.terminus.dalaran.component.processor.mapper.model;
+package io.terminus.dalaran.core.component.model;
 
 import lombok.Data;
 

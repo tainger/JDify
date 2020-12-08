@@ -1,12 +1,8 @@
-package io.terminus.dalaran.component.processor.mapper.model;
+package io.terminus.dalaran.core.component.model;
 
 import com.alibaba.fastjson.annotation.JSONField;
-import io.terminus.dalaran.component.processor.mapper.model.convert.MapperValueDeserializer;
 import lombok.Data;
 
-/**
- * Created by jingdi on 2019/5/8
- */
 @Data
 public class SimpleMapping<T> {
 
