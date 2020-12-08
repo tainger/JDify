@@ -1,7 +1,7 @@
 package io.terminus.dalaran.console.service.impl;
 
 import com.alibaba.fastjson.JSON;
-import io.terminus.dalaran.component.trigger.soap.model.SoapApiInfo;
+import io.terminus.dalaran.component.soap.trigger.model.SoapApiInfo;
 import io.terminus.dalaran.config.ServiceInfo;
 import io.terminus.dalaran.console.ServiceDetail;
 import io.terminus.dalaran.console.entity.ModelEntity;

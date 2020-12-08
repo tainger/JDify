@@ -2,7 +2,7 @@ package io.terminus.dalaran.console.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import io.terminus.dalaran.TracingType;
-import io.terminus.dalaran.component.trigger.scheduler.DalaranSchedulerConfig;
+import io.terminus.dalaran.component.scheduler.DalaranSchedulerConfig;
 import io.terminus.dalaran.console.entity.TriggerFlowEntity;
 import io.terminus.dalaran.console.repository.TriggerFlowRepository;
 import io.terminus.dalaran.console.service.MonitorService;

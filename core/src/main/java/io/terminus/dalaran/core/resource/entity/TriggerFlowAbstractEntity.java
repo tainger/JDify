@@ -16,7 +16,6 @@ public abstract class TriggerFlowAbstractEntity extends BasicFlowEntity {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String triggerConfig;
 
+    @Column(nullable = false)
     private boolean tracing;
-
-    private boolean isExist;
 }

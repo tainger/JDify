@@ -18,14 +18,143 @@
             <version>${project.version}</version>
         </dependency>
 
-
         <dependency>
             <groupId>io.terminus</groupId>
-            <artifactId>dalaran-components</artifactId>
+            <artifactId>dalaran-http</artifactId>
             <version>${project.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>io.terminus</groupId>
+            <artifactId>dalaran-common</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
+        <dependency>
+            <groupId>io.terminus</groupId>
+            <artifactId>dalaran-function</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.terminus</groupId>
+            <artifactId>dalaran-mapper</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.terminus</groupId>
+            <artifactId>dalaran-rocketmq</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.terminus</groupId>
+            <artifactId>dalaran-dubbo</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.terminus</groupId>
+            <artifactId>dalaran-kafka</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.terminus</groupId>
+            <artifactId>dalaran-soap</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.terminus</groupId>
+            <artifactId>dalaran-mail</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.terminus</groupId>
+            <artifactId>dalaran-ftp</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.terminus</groupId>
+            <artifactId>dalaran-route</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.terminus</groupId>
+            <artifactId>dalaran-loopwhile</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.terminus</groupId>
+            <artifactId>dalaran-foreach</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.terminus</groupId>
+            <artifactId>dalaran-sql</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.terminus</groupId>
+            <artifactId>dalaran-service</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.terminus</groupId>
+            <artifactId>dalaran-errorcatch</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.terminus</groupId>
+            <artifactId>dalaran-scheduler</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.terminus</groupId>
+            <artifactId>dalaran-script</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.terminus</groupId>
+            <artifactId>dalaran-as2</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.terminus</groupId>
+            <artifactId>dalaran-retry</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.terminus</groupId>
+            <artifactId>dalaran-subflow</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.terminus</groupId>
+            <artifactId>dalaran-multicast</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.terminus</groupId>
+            <artifactId>dalaran-end</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -67,6 +196,22 @@
                 <exclusion>
                     <groupId>net.bytebuddy</groupId>
                     <artifactId>byte-buddy</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.logging.log4j</groupId>
+                    <artifactId>log4j-api</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.logging.log4j</groupId>
+                    <artifactId>log4j-core</artifactId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>log4j-slf4j-impl</artifactId>
+                    <groupId>org.apache.logging.log4j</groupId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-api</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>

@@ -5,7 +5,6 @@ import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -17,6 +16,9 @@ public class BasicEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(nullable = false, columnDefinition="bit(1) default true")
+    private boolean isExist = true;
 
     @CreatedDate
     @Column(columnDefinition = "timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP")

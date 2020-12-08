@@ -40,6 +40,4 @@ public abstract class ModelAbstractEntity extends BasicEntity {
 
     @Column(columnDefinition = "TEXT")
     private String description;
-
-    private boolean isExist;
 }
