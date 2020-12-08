@@ -29,11 +29,8 @@ public class TracingLogEntity {
     @Column(nullable = false)
     private Long elapsed;
 
-    @Column(nullable = false, length = 256)
+    @Column(nullable = false, length = 128)
     private String recordId;
-
-    @Column(length = 256)
-    private String childRecordId;
 
     @Column(nullable = false)
     private boolean successful;
@@ -42,19 +39,19 @@ public class TracingLogEntity {
     private boolean main;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = false, length = 32)
     private TracingType tracingType;
 
     @Column(columnDefinition = "LONGTEXT")
     private String inputBody;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 32)
     private String inputBodyType;
 
     @Column(columnDefinition = "LONGTEXT")
     private String outputBody;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 32)
     private String outputBodyType;
 
     @CreatedDate

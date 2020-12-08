@@ -15,8 +15,6 @@ public class DalaranTracingLog {
 
     private String recordId;
 
-    private String childRecordId;
-
     private boolean successful;
 
     private boolean main;

@@ -190,12 +190,6 @@ public class DalaranTracer {
                 tracingLog.setRecordId(recordId);
             }
 
-            Boolean camelMulticastComplete = exchange.getProperty(CAMEL_MULTICAST_COMPLETE, Boolean.class);
-            if (camelMulticastComplete != null && parentId != null) {
-                tracingLog.setChildRecordId(parentId);
-            } else {
-                tracingLog.setChildRecordId(currentId);
-            }
             tracingLog.setTracingType(tracingType);
             tracingLog.setFlowId(exchange.getProperty(TRACING_FLOW_ID, Long.class));
             tracingLog.setModuleId(exchange.getProperty(TRACING_MODULE_ID, Long.class));
