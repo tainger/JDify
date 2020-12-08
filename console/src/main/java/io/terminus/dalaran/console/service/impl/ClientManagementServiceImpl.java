@@ -42,7 +42,9 @@ public class ClientManagementServiceImpl implements ClientManagementService {
 
     @Override
     public void delete(Long appKey) {
-        repository.deleteById(appKey);
+        ClientEntity entity = repository.findById(appKey).get();
+        entity.setExist(false);
+        repository.save(entity);
     }
 
     @Override
@@ -60,7 +62,7 @@ public class ClientManagementServiceImpl implements ClientManagementService {
         CriteriaQuery<BasicClientInfo> criteriaQuery = builder.createQuery(BasicClientInfo.class);
         Root<ClientEntity> root = criteriaQuery.from(ClientEntity.class);
         criteriaQuery.multiselect(root.get("id"), root.get("moduleId"), root.get("name"))
-                .where(builder.equal(root.get("moduleId"), moduleId));
+                .where(builder.equal(root.get("moduleId"), moduleId) , builder.equal(root.get("isExist"), true));
         return entityManager.createQuery(criteriaQuery).getResultList();
     }
 
@@ -73,6 +75,7 @@ public class ClientManagementServiceImpl implements ClientManagementService {
     private ClientEntity toEntity(ClientDTO dto) {
         ClientEntity entity = new ClientEntity();
         BeanUtils.copyProperties(dto, entity);
+        entity.setExist(true);
         return entity;
     }
 
@@ -91,6 +94,7 @@ public class ClientManagementServiceImpl implements ClientManagementService {
         if(UserContext.getUserInfo().getUsername()!=null){
             clientEntity.setUpdatedBy(UserContext.getUserInfo().getUsername());
         }
+        clientEntity.setExist(true);
         return clientEntity;
     }
 }

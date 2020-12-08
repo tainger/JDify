@@ -38,24 +38,27 @@ public class SignProcessor implements Processor {
             return;
         }
         String secret = clientMapper.get(appKey);
-        if (StringUtils.isEmpty(secret) || !secret.equals(body.get(AUTH_APP_SECRET))) {
+        if (StringUtils.isEmpty(secret)) {
             stopExchangeOnInvalidAppKey(exchange);
             return;
         }
-
         String sign = body.get(AUTH_SIGN);
         if (checkSign && !StringUtils.isEmpty(sign)) {
+            body.put(AUTH_APP_SECRET, secret);
             Map<String, String> sortedBody = new TreeMap<>(body);
             sortedBody.remove(AUTH_SIGN);
 
             String bodyString = sortedBody.entrySet().stream()
                     .map(entry -> entry.getKey() + "=" + entry.getValue())
-                    .collect(Collectors.joining("&")) + secret;
+                    .collect(Collectors.joining("&"));
 
             if (SignUtils.signEquals(bodyString, sign)) {
                 setOutBody(exchange, body);
                 return;
             }
+            stopExchangeOnMissingSign(exchange);
+            return;
+        } else if (!checkSign && !secret.equals(body.get(AUTH_APP_SECRET))) {
             stopExchangeOnMissingSign(exchange);
             return;
         }

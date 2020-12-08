@@ -87,7 +87,9 @@ public class ServiceManagementImpl implements ServiceManagement {
 
     @Override
     public void delete(Long serviceId) {
-        serviceRepository.deleteById(serviceId);
+        ServiceEntity entity = serviceRepository.findById(serviceId).get();
+        entity.setExist(false);
+        serviceRepository.save(entity);
     }
 
     @Override
@@ -97,7 +99,7 @@ public class ServiceManagementImpl implements ServiceManagement {
 
     @Override
     public List<ServiceDTO> list() {
-        return serviceRepository.findAll().stream().map(this::toDTO).collect(Collectors.toList());
+        return serviceRepository.findByIsExistTrue().stream().map(this::toDTO).collect(Collectors.toList());
     }
 
     @Override
@@ -114,7 +116,7 @@ public class ServiceManagementImpl implements ServiceManagement {
         CriteriaQuery<BasicServiceInfo> criteriaQuery = builder.createQuery(BasicServiceInfo.class);
         Root<ServiceEntity> root = criteriaQuery.from(ServiceEntity.class);
         criteriaQuery.multiselect(root.get("id"), root.get("moduleId"), root.get("type"), root.get("name"))
-                .where(builder.equal(root.get("moduleId"), moduleId));
+                .where(builder.equal(root.get("moduleId"), moduleId), builder.equal(root.get("isExist"),true));
         return entityManager.createQuery(criteriaQuery).getResultList();
     }
 
@@ -152,6 +154,7 @@ public class ServiceManagementImpl implements ServiceManagement {
         DalaranService dalaranService = serviceContext.getService(dto.getType());
         Object serviceConfig = dalaranService.importConfig(importConfig);
         entity.setServiceConfig(JSON.toJSONString(serviceConfig));
+        entity.setExist(true);
         serviceDetail.setEntity(entity);
         serviceDetail.setDalaranService(dalaranService);
         serviceDetail.setImportConfig(importConfig);

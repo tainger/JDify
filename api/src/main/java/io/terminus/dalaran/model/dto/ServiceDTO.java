@@ -16,4 +16,6 @@ public class ServiceDTO extends BasicServiceInfo {
     private Map<String, Object> serviceConfig;
 
     private String description;
+
+    private boolean isExist;
 }

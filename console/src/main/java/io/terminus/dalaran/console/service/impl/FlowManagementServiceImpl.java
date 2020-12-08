@@ -14,6 +14,7 @@ import io.terminus.dalaran.console.service.FlowManagementService;
 import io.terminus.dalaran.console.service.ModelManagementService;
 import io.terminus.dalaran.console.service.jpa.FlowQueryService;
 import io.terminus.dalaran.core.context.DalaranContext;
+import io.terminus.dalaran.core.context.support.DefaultDalaranCamelContext;
 import io.terminus.dalaran.core.flow.DalaranFlowBuilder;
 import io.terminus.dalaran.core.resource.DalaranResourceBuilder;
 import io.terminus.dalaran.core.resource.entity.common.ProcessorEntity;
@@ -41,6 +42,9 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static io.terminus.dalaran.DalaranConstants.DALARAN_PROCESSOR;
+import static io.terminus.dalaran.DalaranConstants.FLOW_PREFIX;
 
 @Service
 @Transactional
@@ -78,6 +82,7 @@ public class FlowManagementServiceImpl implements FlowManagementService {
 
     @Autowired
     private TriggerFlowReleasedRepository triggerFlowReleasedRepository;
+
 
     private final FlowConvertor flowConvertor = new FlowConvertor();
 
@@ -270,6 +275,8 @@ public class FlowManagementServiceImpl implements FlowManagementService {
         TriggerFlowEntity flowEntity = flowEntityOptional.get();
         flowEntity.setExist(false);
         flowRepository.save(flowEntity);
+//        dalaranContext.removeFlow(FLOW_PREFIX + flowId);
+//        dalaranContext.removeFlow(DALARAN_PROCESSOR + FLOW_PREFIX + flowId);
     }
 
     @Override

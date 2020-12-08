@@ -113,19 +113,19 @@ public class ReleaseServiceImpl implements ReleaseService {
         List<ModelReleasedEntity> releasedModelEntities = toReleasedData(modelRepository.findByIsExistTrue(), ModelReleasedEntity.class, requestDTO.getVersion());
         modelReleasedRepository.saveAll(releasedModelEntities);
 
-        List<ConnectorReleasedEntity> releasedConnectorEntities = toReleasedData(connectorRepository.findAll(), ConnectorReleasedEntity.class, requestDTO.getVersion());
+        List<ConnectorReleasedEntity> releasedConnectorEntities = toReleasedData(connectorRepository.findByIsExistTrue(), ConnectorReleasedEntity.class, requestDTO.getVersion());
         connectorReleasedRepository.saveAll(releasedConnectorEntities);
 
         List<PropertyReleasedEntity> releasedPropertyEntities = toReleasedData(propertyRepository.findAll(), PropertyReleasedEntity.class, requestDTO.getVersion());
         propertyReleasedRepository.saveAll(releasedPropertyEntities);
 
-        List<FunctionReleasedEntity> releasedFunctionEntities = toReleasedData(functionRepository.findAll(), FunctionReleasedEntity.class, requestDTO.getVersion());
+        List<FunctionReleasedEntity> releasedFunctionEntities = toReleasedData(functionRepository.findByIsExistTrue(), FunctionReleasedEntity.class, requestDTO.getVersion());
         functionReleasedRepository.saveAll(releasedFunctionEntities);
 
-        List<ClientReleasedEntity> releasedClientEntities = toReleasedData(clientRepository.findAll(), ClientReleasedEntity.class, requestDTO.getVersion());
+        List<ClientReleasedEntity> releasedClientEntities = toReleasedData(clientRepository.findByIsExistTrue(), ClientReleasedEntity.class, requestDTO.getVersion());
         clientReleasedRepository.saveAll(releasedClientEntities);
 
-        List<ServiceReleasedEntity> releasedServiceEntities = toReleasedData(serviceRepository.findAll(), ServiceReleasedEntity.class, requestDTO.getVersion());
+        List<ServiceReleasedEntity> releasedServiceEntities = toReleasedData(serviceRepository.findByIsExistTrue(), ServiceReleasedEntity.class, requestDTO.getVersion());
         serviceReleasedRepository.saveAll(releasedServiceEntities);
 
         return toDTO(recordEntity);

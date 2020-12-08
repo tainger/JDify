@@ -27,5 +27,8 @@ public abstract class ServiceAbstractEntity extends BasicEntity {
 
     @Column(columnDefinition = "TEXT")
     private String description;
+
+    @Column(nullable = false)
+    private boolean isExist;
 }
 

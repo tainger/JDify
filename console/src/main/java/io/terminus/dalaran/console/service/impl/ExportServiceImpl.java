@@ -102,6 +102,10 @@ public class ExportServiceImpl implements ExportService {
         exportData.getModels().forEach(model -> model.setExist(true));
         exportData.getTriggerFlows().forEach(triggerFlow -> triggerFlow.setExist(true));
         exportData.getSubFlows().forEach(subFlow -> subFlow.setExist(true));
+        exportData.getServices().forEach(service -> service.setExist(true));
+        exportData.getClients().forEach(client -> client.setExist(true));
+        exportData.getConnectors().forEach(connector -> connector.setExist(true));
+        exportData.getFunctions().forEach(function -> function.setExist(true));
         moduleRepository.saveAll(exportData.getModules());
         modelRepository.saveAll(exportData.getModels());
         triggerFlowRepository.saveAll(exportData.getTriggerFlows());
@@ -127,10 +131,10 @@ public class ExportServiceImpl implements ExportService {
         exportData.setModels(modelRepository.findByIsExistTrue());
         exportData.setTriggerFlows(triggerFlowRepository.findByIsExistTrue());
         exportData.setSubFlows(subFlowRepository.findByIsExistTrue());
-        exportData.setServices(serviceRepository.findAll());
-        exportData.setFunctions(functionRepository.findAll());
-        exportData.setConnectors(connectorRepository.findAll());
-        exportData.setClients(clientRepository.findAll());
+        exportData.setServices(serviceRepository.findByIsExistTrue());
+        exportData.setFunctions(functionRepository.findByIsExistTrue());
+        exportData.setConnectors(connectorRepository.findByIsExistTrue());
+        exportData.setClients(clientRepository.findByIsExistTrue());
         exportData.setProperties(propertyRepository.findAll());
         exportData.setTrantorEntities(trantorRepository.findAll());
         return exportData;

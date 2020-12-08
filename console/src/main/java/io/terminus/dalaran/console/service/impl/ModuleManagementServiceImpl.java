@@ -1,9 +1,7 @@
 package io.terminus.dalaran.console.service.impl;
 
-import io.terminus.dalaran.console.entity.ModelEntity;
-import io.terminus.dalaran.console.entity.TriggerFlowEntity;
-import io.terminus.dalaran.console.repository.ModelRepository;
-import io.terminus.dalaran.console.repository.TriggerFlowRepository;
+import io.terminus.dalaran.console.entity.*;
+import io.terminus.dalaran.console.repository.*;
 import io.terminus.dalaran.console.service.*;
 import io.terminus.dalaran.console.service.jpa.ModuleQueryService;
 import io.terminus.dalaran.core.resource.entity.common.ModuleEntity;
@@ -62,6 +60,21 @@ public class ModuleManagementServiceImpl implements ModuleManagementService {
     @Autowired
     private ModelRepository modelRepository;
 
+    @Autowired
+    private ClientRepository clientRepository;
+
+    @Autowired
+    private SubFlowRepository subFlowRepository;
+
+    @Autowired
+    private ServiceRepository serviceRepository;
+
+    @Autowired
+    private ConnectorRepository connectorRepository;
+
+    @Autowired
+    private FunctionRepository functionRepository;
+
     @Override
     public Long createModule(ModuleDTO moduleModel) {
         ModuleEntity moduleEntity = buildEntity(moduleModel);
@@ -85,6 +98,36 @@ public class ModuleManagementServiceImpl implements ModuleManagementService {
         for(ModelEntity modelEntity:modelEntityList) {
             modelEntity.setExist(false);
             modelRepository.save(modelEntity);
+        }
+
+        List<SubFlowEntity> subFlowEntityList = subFlowRepository.findByModuleIdAndIsExistTrue(moduleId);
+        for(SubFlowEntity subFlowEntity:subFlowEntityList) {
+            subFlowEntity.setExist(false);
+            subFlowRepository.save(subFlowEntity);
+        }
+
+        List<ClientEntity> clientEntityList = clientRepository.findByModuleIdAndIsExistTrue(moduleId);
+        for(ClientEntity clientEntity:clientEntityList) {
+            clientEntity.setExist(false);
+            clientRepository.save(clientEntity);
+        }
+
+        List<ServiceEntity> serviceEntityList = serviceRepository.findByModuleIdAndIsExistTrue(moduleId);
+        for(ServiceEntity serviceEntity:serviceEntityList) {
+            serviceEntity.setExist(false);
+            serviceRepository.save(serviceEntity);
+        }
+
+        List<ConnectorEntity> connectorEntityList = connectorRepository.findByModuleIdAndIsExistTrue(moduleId);
+        for(ConnectorEntity connectorEntity:connectorEntityList) {
+            connectorEntity.setExist(false);
+            connectorRepository.save(connectorEntity);
+        }
+
+        List<FunctionEntity> functionEntityList = functionRepository.findByModuleIdAndIsExistTrue(moduleId);
+        for(FunctionEntity functionEntity:functionEntityList) {
+            functionEntity.setExist(false);
+            functionRepository.save(functionEntity);
         }
     }
 

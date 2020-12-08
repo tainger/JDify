@@ -46,7 +46,7 @@ public class DalaranMailSenderProcessor implements Processor {
             byte[] fileContent = FileUtils.readFileToByteArray(file);
             sendSmtp(senderInfo.getFileName(), senderInfo.getEmailUrl(), fileContent, "application/excel");
         } else {
-            send(config.getSendTo(), JSON.toJSONString(in), "text/plain");
+            sendSmtp("DalaranFile", config.getSendTo(), JSON.toJSONString(in), "text/plain");
         }
     }
 
