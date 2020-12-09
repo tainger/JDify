@@ -28,6 +28,7 @@
         <module>as2</module>
         <module>dalaran-mapper-sdk</module>
         <module>dalaran-component</module>
+        <module>resource-core</module>
     </modules>
 
     <properties>

@@ -2,7 +2,7 @@ package io.terminus.dalaran.component.as2.trigger;
 
 import io.terminus.dalaran.core.component.DalaranTrigger;
 import io.terminus.dalaran.core.component.annotation.Trigger;
-import io.terminus.dalaran.core.resource.oss.OSSAccount;
+import io.terminus.dalaran.core.oss.OSSAccount;
 import org.apache.camel.CamelContext;
 import org.apache.camel.component.as2.AS2Component;
 import org.apache.camel.component.as2.AS2Configuration;

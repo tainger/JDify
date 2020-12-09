@@ -4,7 +4,7 @@ import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSClientBuilder;
 import com.aliyun.oss.model.GetObjectRequest;
 import io.terminus.dalaran.component.connector.AS2Connector;
-import io.terminus.dalaran.core.resource.oss.OSSAccount;
+import io.terminus.dalaran.core.oss.OSSAccount;
 import lombok.Data;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.openssl.PEMDecryptorProvider;

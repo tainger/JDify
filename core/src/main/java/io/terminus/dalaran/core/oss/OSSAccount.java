@@ -1,4 +1,4 @@
-package io.terminus.dalaran.core.resource.oss;
+package io.terminus.dalaran.core.oss;
 
 import lombok.Data;
 

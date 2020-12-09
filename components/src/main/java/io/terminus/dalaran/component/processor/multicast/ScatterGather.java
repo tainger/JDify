@@ -8,7 +8,7 @@ import io.terminus.dalaran.core.context.DalaranContext;
 import io.terminus.dalaran.core.context.DalaranModelTypeContext;
 import io.terminus.dalaran.core.flow.DalaranFlowBuilder;
 import io.terminus.dalaran.core.flow.DalaranRoute;
-import io.terminus.dalaran.core.resource.DalaranResourceBuilder;
+import io.terminus.dalaran.core.flow.DalaranFragmentBuilder;
 import io.terminus.dalaran.model.component.ComponentModel;
 import io.terminus.dalaran.model.flow.BasicFlow;
 import io.terminus.dalaran.model.flow.FlowFragment;
@@ -41,7 +41,7 @@ public class ScatterGather implements DalaranProcessor<List<String>>, DalaranPro
     private DalaranModelTypeContext converterContext;
 
     @Autowired
-    private DalaranResourceBuilder resourceBuilder;
+    private DalaranFragmentBuilder fragmentBuilder;
 
     public void configure(ProcessorDefinition route, List<String> branches) {
         MulticastDefinition multicastDefinition = route.multicast(new ScatterGatherAggregationStrategy(), true);
@@ -64,7 +64,7 @@ public class ScatterGather implements DalaranProcessor<List<String>>, DalaranPro
         for (int i = 0; i < branches.size(); i++) {
             val branch = branches.get(i);
             String fragmentId = component.getId() + DELIMITER + i;
-            FlowFragment fragment = resourceBuilder.buildFlowFragment(branch.getPipeline(), component.getInModel(),
+            FlowFragment fragment = fragmentBuilder.buildFlowFragment(branch.getPipeline(), component.getInModel(),
                     component.getOutModel(), flow.getId(), fragmentId, flow.isTracing());
             DalaranRoute fragmentRoute = flowBuilder.buildFlowFragment(fragment);
 

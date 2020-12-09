@@ -5,7 +5,7 @@ import io.terminus.dalaran.core.component.DalaranProcessor;
 import io.terminus.dalaran.core.component.DalaranProcessorConfigCustomConverter;
 import io.terminus.dalaran.core.component.annotation.Processor;
 import io.terminus.dalaran.core.context.DalaranContext;
-import io.terminus.dalaran.core.resource.DalaranResourceBuilder;
+import io.terminus.dalaran.core.flow.DalaranFragmentBuilder;
 import io.terminus.dalaran.model.component.ComponentModel;
 import io.terminus.dalaran.model.flow.BasicFlow;
 import io.terminus.dalaran.model.flow.FlowFragment;
@@ -35,7 +35,7 @@ public class DalaranRouter implements DalaranProcessor<Map<String, String>>, Dal
     private DalaranContext dalaranContext;
 
     @Autowired
-    private DalaranResourceBuilder resourceBuilder;
+    private DalaranFragmentBuilder fragmentBuilder;
 
     public void configure(ProcessorDefinition route, Map<String, String> config) {
         ChoiceDefinition choiceDefinition = route.choice();
@@ -71,7 +71,7 @@ public class DalaranRouter implements DalaranProcessor<Map<String, String>>, Dal
             }
 
             String fragmentId = component.getId() + DELIMITER + i;
-            FlowFragment fragment = resourceBuilder.buildFlowFragment(route.getPipeline(), component.getInModel(),
+            FlowFragment fragment = fragmentBuilder.buildFlowFragment(route.getPipeline(), component.getInModel(),
                     component.getOutModel(), flow.getId(), fragmentId, flow.isTracing());
             dalaranContext.addFragmentFlow(fragment);
 

@@ -1,7 +1,5 @@
 package io.terminus.dalaran.core.log;
 
-
-import io.terminus.dalaran.core.resource.redis.RedisService;
 import org.apache.camel.*;
 import org.apache.camel.builder.DefaultErrorHandlerBuilder;
 import org.apache.camel.processor.DefaultErrorHandler;
@@ -11,7 +9,7 @@ import org.apache.camel.spi.RouteContext;
 import org.apache.camel.util.AsyncProcessorHelper;
 import org.apache.camel.util.CamelLogger;
 import org.apache.commons.lang3.StringUtils;
-
+import io.terminus.dalaran.core.cache.*;
 import java.util.concurrent.ScheduledExecutorService;
 
 import static io.terminus.dalaran.DalaranConstants.*;
@@ -20,11 +18,11 @@ public class TracingErrorHandlerFactory extends DefaultErrorHandlerBuilder imple
 
     private final DalaranTraceLogger dalaranTraceLogger;
 
-    private RedisService redisService;
+    private CacheManager cacheManager;
 
-    public TracingErrorHandlerFactory(DalaranTraceLogger dalaranTraceLogger, RedisService redisService) {
+    public TracingErrorHandlerFactory(DalaranTraceLogger dalaranTraceLogger, CacheManager cacheManager) {
         this.dalaranTraceLogger = dalaranTraceLogger;
-        this.redisService = redisService;
+        this.cacheManager = cacheManager;
     }
 
     @Override
@@ -91,14 +89,14 @@ public class TracingErrorHandlerFactory extends DefaultErrorHandlerBuilder imple
                 }
                 tracingLog = exchange.getProperty(tracingKey + mainRecordId, DalaranTracingLog.class);
                 if (tracingLog == null || !tracingLog.isMain()
-                        || redisService.contains(mainLogRecordHandled)) {
+                        || cacheManager.contains(mainLogRecordHandled)) {
                     return;
                 }
-                if (!redisService.setValue(mainLogRecordHandled, "recorded")) {
+                if (!cacheManager.put(mainLogRecordHandled, "recorded")) {
                     return;
                 }
             } else {
-                if (tracingLog.isMain() && redisService.contains(mainLogRecordHandled)) {
+                if (tracingLog.isMain() && cacheManager.contains(mainLogRecordHandled)) {
                     return;
                 }
             }

@@ -8,7 +8,7 @@ import freemarker.template.Template;
 import io.terminus.dalaran.component.connector.FtpConnector;
 import io.terminus.dalaran.core.component.DalaranProcessor;
 import io.terminus.dalaran.core.component.annotation.Processor;
-import io.terminus.dalaran.core.resource.oss.OSSAccount;
+import io.terminus.dalaran.core.oss.OSSAccount;
 import org.apache.camel.model.ProcessorDefinition;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
