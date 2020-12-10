@@ -1,4 +1,4 @@
-package io.terminus.dalaran.mapper.function.number;
+package io.terminus.dalaran.function.number;
 
 
 import io.terminus.dalaran.mapper.annotation.FunctionFilter;

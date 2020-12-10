@@ -1,9 +1,9 @@
-package io.terminus.dalaran.mapper.function.xml;
+package io.terminus.dalaran.function.xml;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import io.terminus.dalaran.mapper.annotation.FunctionFilter;
-import io.terminus.dalaran.mapper.function.model.FunctionConstants;
+import io.terminus.dalaran.function.model.FunctionConstants;
 import io.terminus.dalaran.model.annotation.MappingFunction;
 import org.apache.commons.lang3.StringUtils;
 

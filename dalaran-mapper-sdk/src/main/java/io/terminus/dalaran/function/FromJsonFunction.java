@@ -1,4 +1,4 @@
-package io.terminus.dalaran.mapper.function;
+package io.terminus.dalaran.function;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.terminus.dalaran.mapper.annotation.FunctionFilter;

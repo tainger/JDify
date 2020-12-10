@@ -1,16 +1,16 @@
-package io.terminus.dalaran.mapper.function.string;
+package io.terminus.dalaran.function.string;
 
 import io.terminus.dalaran.mapper.annotation.FunctionFilter;
 import io.terminus.dalaran.model.annotation.MappingFunction;
 import org.apache.commons.lang3.StringUtils;
 
 @FunctionFilter
-@MappingFunction(value = "StringToUpper", description = "将入参字符串转换为大写")
-public class StringToUpper {
+@MappingFunction(value = "StringTrim", description = "删除入参字符串的前后空格")
+public class StringTrim {
     public Object execute(String str) {
-        if (StringUtils.isBlank(str)) {
+        if (StringUtils.isEmpty(str)) {
             return str;
         }
-        return str.toUpperCase();
+        return str.trim();
     }
 }

@@ -1,4 +1,4 @@
-package io.terminus.dalaran.mapper.function.date;
+package io.terminus.dalaran.function.date;
 
 import io.terminus.dalaran.mapper.annotation.FunctionFilter;
 import io.terminus.dalaran.model.annotation.MappingFunction;

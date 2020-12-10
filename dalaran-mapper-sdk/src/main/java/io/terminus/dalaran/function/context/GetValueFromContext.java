@@ -1,4 +1,4 @@
-package io.terminus.dalaran.mapper.function.context;
+package io.terminus.dalaran.function.context;
 
 import io.terminus.dalaran.mapper.annotation.FunctionFilter;
 import io.terminus.dalaran.model.annotation.ContainsContextFunction;

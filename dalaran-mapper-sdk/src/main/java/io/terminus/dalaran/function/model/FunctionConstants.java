@@ -1,4 +1,4 @@
-package io.terminus.dalaran.mapper.function.model;
+package io.terminus.dalaran.function.model;
 
 public class FunctionConstants {
 

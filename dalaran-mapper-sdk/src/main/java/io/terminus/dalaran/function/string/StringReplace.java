@@ -1,4 +1,4 @@
-package io.terminus.dalaran.mapper.function.string;
+package io.terminus.dalaran.function.string;
 
 import io.terminus.dalaran.mapper.annotation.FunctionFilter;
 import io.terminus.dalaran.model.annotation.MappingFunction;
