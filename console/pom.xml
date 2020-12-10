@@ -15,7 +15,7 @@
 
         <dependency>
             <groupId>io.terminus</groupId>
-            <artifactId>resource-core</artifactId>
+            <artifactId>dalaran-resource-core</artifactId>
             <version>${project.version}</version>
         </dependency>
 

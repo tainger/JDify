@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>dalaran-core</artifactId>
+    <artifactId>dalaran-flow-core</artifactId>
     <build>
         <plugins>
             <plugin>
