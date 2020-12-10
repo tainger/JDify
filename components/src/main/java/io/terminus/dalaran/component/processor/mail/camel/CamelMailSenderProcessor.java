@@ -3,7 +3,7 @@ package io.terminus.dalaran.component.processor.mail.camel;
 import com.alibaba.fastjson.JSON;
 import io.terminus.dalaran.ComponentConstants;
 import io.terminus.dalaran.component.utils.OSSUtils;
-import io.terminus.dalaran.core.resource.oss.OSSAccount;
+import io.terminus.dalaran.core.oss.OSSAccount;
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.apache.camel.Processor;

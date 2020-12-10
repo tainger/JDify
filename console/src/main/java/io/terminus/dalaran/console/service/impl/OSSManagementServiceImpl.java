@@ -3,7 +3,7 @@ package io.terminus.dalaran.console.service.impl;
 import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSClientBuilder;
 import io.terminus.dalaran.console.service.OSSManagementService;
-import io.terminus.dalaran.core.resource.oss.OSSAccount;
+import io.terminus.dalaran.core.oss.OSSAccount;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;

@@ -6,7 +6,7 @@ import io.terminus.dalaran.component.common.MailProtocol;
 import io.terminus.dalaran.component.mail.camel.DalaranMailSenderConfig;
 import io.terminus.dalaran.component.mail.camel.MailSenderInfo;
 import io.terminus.dalaran.component.mail.utils.OSSUtils;
-import io.terminus.dalaran.core.resource.oss.OSSAccount;
+import io.terminus.dalaran.core.oss.*;
 import lombok.val;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;

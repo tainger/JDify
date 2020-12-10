@@ -3,7 +3,7 @@ package io.terminus.dalaran.component.processor.retry;
 import io.terminus.dalaran.FieldInputType;
 import io.terminus.dalaran.core.component.annotation.ConfigFieldInfo;
 import io.terminus.dalaran.core.component.config.OutModelConfig;
-import io.terminus.dalaran.core.resource.entity.common.ProcessorEntity;
+import io.terminus.dalaran.model.component.ProcessorRouteInfo;
 import lombok.Data;
 
 import java.util.List;
@@ -18,5 +18,5 @@ public class RetryConfig extends OutModelConfig {
     private Integer retryDelay;
 
     @ConfigFieldInfo(inputType = FieldInputType.Pipeline)
-    private List<ProcessorEntity> pipeline;
+    private List<ProcessorRouteInfo> pipeline;
 }

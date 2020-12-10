@@ -20,6 +20,12 @@
 
         <dependency>
             <groupId>io.terminus</groupId>
+            <artifactId>resource-core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.terminus</groupId>
             <artifactId>dalaran-http</artifactId>
             <version>${project.version}</version>
         </dependency>

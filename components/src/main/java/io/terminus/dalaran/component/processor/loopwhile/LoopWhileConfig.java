@@ -2,7 +2,7 @@ package io.terminus.dalaran.component.processor.loopwhile;
 
 import io.terminus.dalaran.FieldInputType;
 import io.terminus.dalaran.core.component.annotation.ConfigFieldInfo;
-import io.terminus.dalaran.core.resource.entity.common.ProcessorEntity;
+import io.terminus.dalaran.model.component.ProcessorRouteInfo;
 import lombok.Data;
 
 import java.util.List;
@@ -14,5 +14,5 @@ public class LoopWhileConfig {
     private String expression;
 
     @ConfigFieldInfo(inputType = FieldInputType.Pipeline)
-    private List<ProcessorEntity> pipeline;
+    private List<ProcessorRouteInfo> pipeline;
 }

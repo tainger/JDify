@@ -3,7 +3,7 @@ package io.terminus.dalaran.component.errorcatch;
 import io.terminus.dalaran.FieldInputType;
 import io.terminus.dalaran.core.component.annotation.ConfigFieldInfo;
 import io.terminus.dalaran.core.component.config.OutModelConfig;
-import io.terminus.dalaran.core.resource.entity.common.ProcessorEntity;
+import io.terminus.dalaran.model.component.ProcessorRouteInfo;
 import lombok.Data;
 
 import java.util.List;
@@ -15,6 +15,6 @@ public class ErrorCatchConfig extends OutModelConfig {
 
     @Data
     class Route {
-        private List<ProcessorEntity> pipeline;
+        private List<ProcessorRouteInfo> pipeline;
     }
 }

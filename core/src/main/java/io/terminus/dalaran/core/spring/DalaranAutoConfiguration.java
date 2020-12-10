@@ -1,5 +1,6 @@
 package io.terminus.dalaran.core.spring;
 
+import io.terminus.dalaran.core.cache.*;
 import io.terminus.dalaran.core.component.config.CustomCamelContext;
 import io.terminus.dalaran.core.context.*;
 import io.terminus.dalaran.core.context.support.*;
@@ -7,11 +8,6 @@ import io.terminus.dalaran.core.flow.DalaranFlowBuilder;
 import io.terminus.dalaran.core.flow.DefaultCamelFlowBuilder;
 import io.terminus.dalaran.core.log.DalaranTraceLogger;
 import io.terminus.dalaran.core.log.TracingErrorHandlerFactory;
-import io.terminus.dalaran.core.resource.DalaranResourceBuilder;
-import io.terminus.dalaran.core.resource.DalaranResourceLoader;
-import io.terminus.dalaran.core.resource.DefaultDalaranResourceBuilder;
-import io.terminus.dalaran.core.resource.oss.OSSAccount;
-import io.terminus.dalaran.core.resource.redis.RedisService;
 import org.apache.camel.CamelContext;
 import org.apache.camel.spi.Registry;
 import org.apache.camel.spring.spi.ApplicationContextRegistry;
@@ -45,15 +41,6 @@ public class DalaranAutoConfiguration {
         return new DefaultDalaranCamelContext(camelContext, flowBuilder);
     }
 
-    @Bean
-    public DalaranResourceBuilder dalaranResourceBuilder(
-            DalaranResourceLoader resourceLoader,
-            DalaranComponentContext componentContext,
-            DalaranModelTypeContext converterContext,
-            DalaranServiceContext serviceContext
-    ) {
-        return new DefaultDalaranResourceBuilder(resourceLoader, componentContext, converterContext, serviceContext);
-    }
 
     @Bean("component-loader")
     public BeanPostProcessor beanPostProcessor(
@@ -91,8 +78,8 @@ public class DalaranAutoConfiguration {
     }
 
     @Bean
-    public TracingErrorHandlerFactory tracingErrorHandlerFactory(DalaranTraceLogger traceLogger, RedisService redisService) {
-        return new TracingErrorHandlerFactory(traceLogger, redisService);
+    public TracingErrorHandlerFactory tracingErrorHandlerFactory(DalaranTraceLogger traceLogger, CacheManager cacheManager) {
+        return new TracingErrorHandlerFactory(traceLogger, cacheManager);
     }
 
     @Bean
@@ -105,10 +92,6 @@ public class DalaranAutoConfiguration {
         return new DefaultCamelFlowBuilder(traceLogger, errorHandlerFactory, converterContext, componentContext);
     }
 
-    @Bean
-    public OSSAccount ossAccount(@Value("${oss.endpoint}") String endpoint, @Value("${oss.accessId}") String accessId, @Value("${oss.accessSecret}") String accessSecret, @Value("${oss.bucketName}") String bucketName, @Value("${oss.rootDir}") String rootDir) {
-        return new OSSAccount(endpoint, accessId, accessSecret, bucketName, rootDir);
-    }
 
 //    @Bean
 //    public HttpComponent httpComponent() {

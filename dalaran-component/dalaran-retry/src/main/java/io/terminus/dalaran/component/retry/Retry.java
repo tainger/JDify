@@ -6,7 +6,7 @@ import io.terminus.dalaran.core.component.annotation.Processor;
 import io.terminus.dalaran.core.context.DalaranContext;
 import io.terminus.dalaran.core.flow.DalaranFlowBuilder;
 import io.terminus.dalaran.core.flow.DalaranRoute;
-import io.terminus.dalaran.core.resource.DalaranResourceBuilder;
+import io.terminus.dalaran.core.flow.DalaranFragmentBuilder;
 import io.terminus.dalaran.model.RetryConvertFragmentInfo;
 import io.terminus.dalaran.model.component.ComponentModel;
 import io.terminus.dalaran.model.flow.BasicFlow;
@@ -29,7 +29,7 @@ public class Retry implements DalaranProcessor<RetryConvertFragmentInfo>, Dalara
     private DalaranFlowBuilder<DalaranRoute> flowBuilder;
 
     @Autowired
-    private DalaranResourceBuilder resourceBuilder;
+    private DalaranFragmentBuilder fragmentBuilder;
 
     @Override
     public void configure(ProcessorDefinition route, RetryConvertFragmentInfo fragment) {
@@ -38,7 +38,7 @@ public class Retry implements DalaranProcessor<RetryConvertFragmentInfo>, Dalara
 
     @Override
     public RetryConvertFragmentInfo convert(RetryConfig config, ComponentModel component, BasicFlow flow) {
-        FlowFragment fragment = resourceBuilder.buildFlowFragment(config.getPipeline(), component.getInModel(),
+        FlowFragment fragment = fragmentBuilder.buildFlowFragment(config.getPipeline(), component.getInModel(),
                 component.getOutModel(), flow.getId(), component.getId(), flow.isTracing());
         DalaranRoute retryRoute = flowBuilder.buildFlowFragment(fragment);
         retryRoute.onException(Throwable.class).maximumRedeliveries(config.getMaxRetry()).redeliveryDelay(config.getRetryDelay());

@@ -3,7 +3,7 @@ package io.terminus.dalaran.component.router;
 import io.terminus.dalaran.FieldInputType;
 import io.terminus.dalaran.core.component.annotation.ConfigFieldInfo;
 import io.terminus.dalaran.core.component.config.OutModelConfig;
-import io.terminus.dalaran.core.resource.entity.common.ProcessorEntity;
+import io.terminus.dalaran.model.component.ProcessorRouteInfo;
 import lombok.Data;
 
 import java.util.List;
@@ -20,7 +20,7 @@ class DalaranRouterConfig extends OutModelConfig {
 
         private String expression;
 
-        private List<ProcessorEntity> pipeline;
+        private List<ProcessorRouteInfo> pipeline;
     }
 
     public List<Route> getRoutes() {

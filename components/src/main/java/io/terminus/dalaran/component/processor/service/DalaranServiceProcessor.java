@@ -7,10 +7,10 @@ import io.terminus.dalaran.core.component.DalaranService;
 import io.terminus.dalaran.core.component.annotation.Processor;
 import io.terminus.dalaran.core.component.config.ServiceOperationConfig;
 import io.terminus.dalaran.core.context.DalaranServiceContext;
-import io.terminus.dalaran.core.resource.DalaranResourceBuilder;
-import io.terminus.dalaran.core.resource.DalaranResourceLoader;
-import io.terminus.dalaran.core.resource.entity.ServiceAbstractEntity;
+import io.terminus.dalaran.core.flow.DalaranServiceBuilder;
+import io.terminus.dalaran.core.flow.DalaranServiceLoader;
 import io.terminus.dalaran.model.component.ComponentModel;
+import io.terminus.dalaran.model.component.ServiceInfo;
 import io.terminus.dalaran.model.component.ServiceOperation;
 import io.terminus.dalaran.model.flow.BasicFlow;
 import io.terminus.dalaran.model.flow.FlowValidation;
@@ -35,15 +35,15 @@ public class DalaranServiceProcessor implements DalaranProcessor<DalaranServiceO
 
     private final DalaranServiceContext serviceContext;
 
-    private final DalaranResourceBuilder resourceBuilder;
+    private final DalaranServiceBuilder serviceBuilder;
 
-    private final DalaranResourceLoader resourceLoader;
+    private final DalaranServiceLoader serviceLoader;
 
     @Autowired
-    public DalaranServiceProcessor(DalaranServiceContext serviceContext, DalaranResourceBuilder resourceBuilder, DalaranResourceLoader resourceLoader) {
+    public DalaranServiceProcessor(DalaranServiceContext serviceContext, DalaranServiceBuilder serviceBuilder, DalaranServiceLoader serviceLoader) {
         this.serviceContext = serviceContext;
-        this.resourceBuilder = resourceBuilder;
-        this.resourceLoader = resourceLoader;
+        this.serviceBuilder = serviceBuilder;
+        this.serviceLoader = serviceLoader;
     }
 
     @Override
@@ -53,15 +53,15 @@ public class DalaranServiceProcessor implements DalaranProcessor<DalaranServiceO
 
     @Override
     public DalaranServiceOperation convert(ServiceOperationConfig config, ComponentModel component, BasicFlow flow) {
-        ServiceAbstractEntity serviceEntity = resourceLoader.loadService(config.getServiceId());
+        ServiceInfo serviceEntity = serviceLoader.loadService(config.getServiceId());
         DalaranService dalaranService = serviceContext.getService(serviceEntity.getType());
-        Object serviceConfig = resourceBuilder.buildServiceConfig(serviceEntity);
+        Object serviceConfig = serviceBuilder.buildServiceConfig(serviceEntity);
         ServiceOperation operationConfig = dalaranService.getOperationConfig(serviceConfig, config.getOperation());
         DalaranServiceOperation serviceOperation = new DalaranServiceOperation();
         serviceOperation.setDalaranService(dalaranService);
         serviceOperation.setOperationConfig(operationConfig);
-        serviceOperation.setInModel(resourceBuilder.buildModel((operationConfig.getInModelId())));
-        serviceOperation.setOutModel(resourceBuilder.buildModel(operationConfig.getOutModelId()));
+        serviceOperation.setInModel(serviceBuilder.buildModel((operationConfig.getInModelId())));
+        serviceOperation.setOutModel(serviceBuilder.buildModel(operationConfig.getOutModelId()));
         return serviceOperation;
     }
 
@@ -71,21 +71,21 @@ public class DalaranServiceProcessor implements DalaranProcessor<DalaranServiceO
         if (config.getServiceId() == null) {
             return messages;
         }
-        ServiceAbstractEntity serviceEntity = resourceLoader.loadService(config.getServiceId());
+        ServiceInfo serviceEntity = serviceLoader.loadService(config.getServiceId());
         if (serviceEntity == null) {
             messages.add(FlowValidationBuilder.newBuilder().field("serviceId").message(SERVICE_NOT_EXIST).build());
             return messages;
         }
         DalaranService dalaranService = serviceContext.getService(serviceEntity.getType());
-        Object serviceConfig = resourceBuilder.buildServiceConfig(serviceEntity);
+        Object serviceConfig = serviceBuilder.buildServiceConfig(serviceEntity);
         ServiceOperation operationConfig = dalaranService.getOperationConfig(serviceConfig, config.getOperation());
         if (operationConfig == null) {
             messages.add(FlowValidationBuilder.newBuilder().field("operation").message(OPERATION_NOT_EXIST).build());
             return messages;
         }
         DalaranServiceOperation serviceOperation = new DalaranServiceOperation();
-        serviceOperation.setInModel(resourceBuilder.buildModel((operationConfig.getInModelId())));
-        serviceOperation.setOutModel(resourceBuilder.buildModel(operationConfig.getOutModelId()));
+        serviceOperation.setInModel(serviceBuilder.buildModel((operationConfig.getInModelId())));
+        serviceOperation.setOutModel(serviceBuilder.buildModel(operationConfig.getOutModelId()));
         return messages;
     }
 }

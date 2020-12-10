@@ -3,7 +3,7 @@ package io.terminus.dalaran.component.as2.processor;
 import io.terminus.dalaran.component.as2.trigger.CertificateConfig;
 import io.terminus.dalaran.core.component.DalaranProcessor;
 import io.terminus.dalaran.core.component.annotation.Processor;
-import io.terminus.dalaran.core.resource.oss.OSSAccount;
+import io.terminus.dalaran.core.oss.OSSAccount;
 import org.apache.camel.CamelContext;
 import org.apache.camel.builder.Builder;
 import org.apache.camel.component.as2.AS2Component;
