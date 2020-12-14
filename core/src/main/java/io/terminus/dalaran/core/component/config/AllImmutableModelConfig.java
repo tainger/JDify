@@ -8,8 +8,8 @@ import lombok.Data;
 public class AllImmutableModelConfig extends ImmutableModelConfig {
 
     @ConfigFieldInfo(label = "输入结构", inputType = FieldInputType.Model, readonly = true)
-    private Long inModelId;
+    private String inModelId;
 
     @ConfigFieldInfo(label = "输出结构", inputType = FieldInputType.Model, readonly = true)
-    private Long outModelId;
+    private String outModelId;
 }

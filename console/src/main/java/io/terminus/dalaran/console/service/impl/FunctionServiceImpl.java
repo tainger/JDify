@@ -34,7 +34,7 @@ public class FunctionServiceImpl implements FunctionService {
         FunctionEntity entity = toEntity(functionDTO);
         setCreatedBy(entity);
         repository.save(entity);
-        functionContext.addCustomFunction(entity.getId(), entity.getType(), entity.getScript(), entity.getParams());
+        functionContext.addCustomFunction(String.valueOf(entity.getId()), entity.getType(), entity.getScript(), entity.getParams());
         return entity.getId();
     }
 
@@ -42,7 +42,7 @@ public class FunctionServiceImpl implements FunctionService {
     public FunctionDTO update(FunctionDTO functionDTO) {
         FunctionEntity functionEntity = buildEntity(functionDTO);
         repository.save(functionEntity);
-        functionContext.addCustomFunction(functionEntity.getId(), functionEntity.getType(), functionEntity.getScript(), functionEntity.getParams());
+        functionContext.addCustomFunction(String.valueOf(functionEntity.getId()), functionEntity.getType(), functionEntity.getScript(), functionEntity.getParams());
         return functionDTO;
     }
 

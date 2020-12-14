@@ -5,7 +5,7 @@ import lombok.Data;
 @Data
 public class ServiceInfo {
 
-    private Long moduleId;
+    private String moduleId;
 
     private String name;
 

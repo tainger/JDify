@@ -191,8 +191,8 @@ public class DalaranTracer {
             }
 
             tracingLog.setTracingType(tracingType);
-            tracingLog.setFlowId(exchange.getProperty(TRACING_FLOW_ID, Long.class));
-            tracingLog.setModuleId(exchange.getProperty(TRACING_MODULE_ID, Long.class));
+            tracingLog.setFlowId(exchange.getProperty(TRACING_FLOW_ID, String.class));
+            tracingLog.setModuleId(exchange.getProperty(TRACING_MODULE_ID, String.class));
             tracingLog.setProcessorId(processorId);
             tracingLog.setTimestamp(System.currentTimeMillis());
             tracingLog.setInputBody(checkLogSize(extractBody(exchange.getIn().getBody())));

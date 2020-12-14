@@ -21,8 +21,8 @@ public class DefaultDalaranServiceBuilder implements DalaranServiceBuilder {
     }
 
     @Override
-    public MessageModel buildModel(Long modelId) {
-        return resourceBuilder.buildModel(modelId);
+    public MessageModel buildModel(String modelId) {
+        return resourceBuilder.buildModel(Long.valueOf(modelId));
     }
 
     private ServiceAbstractEntity toEntity(ServiceInfo serviceInfo) {

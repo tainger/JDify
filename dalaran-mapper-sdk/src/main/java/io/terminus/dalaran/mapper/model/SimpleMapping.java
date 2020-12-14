@@ -1,7 +1,6 @@
 package io.terminus.dalaran.mapper.model;
 
 import com.alibaba.fastjson.annotation.JSONField;
-import io.terminus.dalaran.mapper.model.convert.MapperValueDeserializer;
 import lombok.Data;
 
 /**

@@ -4,5 +4,5 @@ import io.terminus.dalaran.model.component.ServiceInfo;
 
 public interface DalaranServiceLoader {
 
-    ServiceInfo loadService(Long serviceId);
+    ServiceInfo loadService(String serviceId);
 }

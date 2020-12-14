@@ -1,9 +1,7 @@
-package io.terminus.dalaran.mapper.model.convert;
+package io.terminus.dalaran.mapper.model;
 
 import com.alibaba.fastjson.parser.DefaultJSONParser;
 import com.alibaba.fastjson.parser.deserializer.ObjectDeserializer;
-import io.terminus.dalaran.mapper.model.MappingFunction;
-import io.terminus.dalaran.mapper.model.SimpleMapping;
 
 import java.lang.reflect.Type;
 

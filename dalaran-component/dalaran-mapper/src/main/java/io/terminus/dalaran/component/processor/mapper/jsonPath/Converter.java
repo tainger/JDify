@@ -365,7 +365,7 @@ public class Converter {
                     }
                     return dalaranContext.getDalaranFunctionContext().executeStaticFunction(function.getId(), values.toArray());
                 case CUSTOM:
-                    return dalaranContext.getDalaranFunctionContext().executeCustomFunction(Long.valueOf(function.getId()), values.toArray());
+                    return dalaranContext.getDalaranFunctionContext().executeCustomFunction(function.getId(), values.toArray());
             }
             return null;
         } catch (Exception e) {

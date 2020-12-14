@@ -7,5 +7,5 @@ public interface DalaranServiceBuilder {
 
     Object buildServiceConfig(ServiceInfo serviceInfo);
 
-    MessageModel buildModel(Long modelId);
+    MessageModel buildModel(String modelId);
 }

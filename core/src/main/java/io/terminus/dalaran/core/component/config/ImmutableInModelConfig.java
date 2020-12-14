@@ -11,10 +11,10 @@ import lombok.Data;
 public class ImmutableInModelConfig {
 
     @ConfigFieldInfo(label = "输入结构", inputType = FieldInputType.Model, readonly = true)
-    private Long inModelId;
+    private String inModelId;
 
     @ConfigFieldInfo(label = "输出结构", inputType = FieldInputType.Model)
-    private Long outModelId;
+    private String outModelId;
 
     @ConfigFieldInfo(inputType = FieldInputType.Hidden)
     @JSONField(serialize = false)

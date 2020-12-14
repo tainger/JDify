@@ -112,7 +112,7 @@ public class DefaultDalaranResourceBuilder implements DalaranResourceBuilder {
         }
 
         FlowFragment fragment = new FlowFragment();
-        fragment.setId(flowId);
+        fragment.setId(String.valueOf(flowId));
         fragment.setFragmentId(fragmentId);
         fragment.setPipeline(pipeline);
         fragment.setInModel(inModel);
@@ -171,9 +171,9 @@ public class DefaultDalaranResourceBuilder implements DalaranResourceBuilder {
 
     private void buildFlow(BasicFlow flow, BasicFlowEntity flowEntity) {
         if (flowEntity instanceof ReleasedEntity) {
-            flow.setId(((ReleasedEntity) flowEntity).getOriginId());
+            flow.setId(String.valueOf(((ReleasedEntity) flowEntity).getOriginId()));
         } else {
-            flow.setId(flowEntity.getId());
+            flow.setId(String.valueOf(flowEntity.getId()));
         }
         flow.setInModel(buildModel(flowEntity.getInModel()));
         flow.setOutModel(buildModel(flowEntity.getOutModel()));
@@ -218,11 +218,11 @@ public class DefaultDalaranResourceBuilder implements DalaranResourceBuilder {
         }
         if (config instanceof ServiceOperationConfig) {
             ServiceOperationConfig serviceOperationConfig = (ServiceOperationConfig) config;
-            Long serviceId = serviceOperationConfig.getServiceId();
+            Long serviceId = Long.valueOf(serviceOperationConfig.getServiceId());
             if (serviceId != null) {
                 ServiceOperation service = buildService(serviceId, serviceOperationConfig.getOperation());
-                serviceOperationConfig.setInModel(buildModel((service.getInModelId())));
-                serviceOperationConfig.setOutModel(buildModel(service.getOutModelId()));
+                serviceOperationConfig.setInModel(buildModel(Long.valueOf(service.getInModelId())));
+                serviceOperationConfig.setOutModel(buildModel(Long.valueOf(service.getOutModelId())));
             }
         }
         MessageModel outModel = injectModel(config, lastOutModel);
@@ -236,7 +236,7 @@ public class DefaultDalaranResourceBuilder implements DalaranResourceBuilder {
             OutModelConfig outModelConfig = (OutModelConfig) config;
             outModelConfig.setInModel(lastOutModel);
             if (outModelConfig.getOutModelId() != null) {
-                lastOutModel = buildModel(outModelConfig.getOutModelId());
+                lastOutModel = buildModel(Long.valueOf(outModelConfig.getOutModelId()));
                 outModelConfig.setOutModel(lastOutModel);
             }
         } else if (config instanceof ImmutableModelConfig) {
@@ -244,25 +244,25 @@ public class DefaultDalaranResourceBuilder implements DalaranResourceBuilder {
         }
         if (config instanceof AllModelConfig) {
             AllModelConfig allModelConfig = (AllModelConfig) config;
-            allModelConfig.setInModel(buildModel(allModelConfig.getInModelId()));
+            allModelConfig.setInModel(buildModel(Long.valueOf(allModelConfig.getInModelId())));
             if (allModelConfig.getOutModelId() != null) {
-                lastOutModel = buildModel(allModelConfig.getOutModelId());
+                lastOutModel = buildModel(Long.valueOf(allModelConfig.getOutModelId()));
                 allModelConfig.setOutModel(lastOutModel);
             }
         }
         if (config instanceof AllImmutableModelConfig) {
             AllImmutableModelConfig allImmutableModelConfig = (AllImmutableModelConfig) config;
-            allImmutableModelConfig.setInModel(buildModel(allImmutableModelConfig.getInModelId()));
+            allImmutableModelConfig.setInModel(buildModel(Long.valueOf(allImmutableModelConfig.getInModelId())));
             if (allImmutableModelConfig.getOutModelId() != null) {
-                lastOutModel = buildModel(allImmutableModelConfig.getOutModelId());
+                lastOutModel = buildModel(Long.valueOf(allImmutableModelConfig.getOutModelId()));
                 allImmutableModelConfig.setOutModel(lastOutModel);
             }
         }
         if (config instanceof ImmutableInModelConfig) {
             ImmutableInModelConfig immutableInModelConfig = (ImmutableInModelConfig) config;
-            immutableInModelConfig.setInModel(buildModel(immutableInModelConfig.getInModelId()));
+            immutableInModelConfig.setInModel(buildModel(Long.valueOf(immutableInModelConfig.getInModelId())));
             if (immutableInModelConfig.getOutModelId() != null) {
-                lastOutModel = buildModel(immutableInModelConfig.getOutModelId());
+                lastOutModel = buildModel(Long.valueOf(immutableInModelConfig.getOutModelId()));
                 immutableInModelConfig.setOutModel(lastOutModel);
             }
         }

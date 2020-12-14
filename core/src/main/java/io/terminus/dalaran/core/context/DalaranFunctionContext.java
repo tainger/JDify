@@ -11,11 +11,11 @@ public interface DalaranFunctionContext {
 
     Object executeStaticFunction(String functionKey, Object[] params);
 
-    Object executeCustomFunction(Long id, Object[] params);
+    Object executeCustomFunction(String id, Object[] params);
 
     void addStaticFunction(String key, String desc, Object bean, Method method);
 
-    void addCustomFunction(Long id, MappingFunctionType type, String script, List<String> params);
+    void addCustomFunction(String id, MappingFunctionType type, String script, List<String> params);
 
     Collection<MappingFunctionInfo> allFunctionInfo();
 

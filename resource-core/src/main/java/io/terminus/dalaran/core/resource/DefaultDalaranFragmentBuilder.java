@@ -20,7 +20,7 @@ public class DefaultDalaranFragmentBuilder implements DalaranFragmentBuilder {
     }
 
     @Override
-    public FlowFragment buildFlowFragment(List<ProcessorRouteInfo> pipelineEntityList, MessageModel inModel, MessageModel outModel, Long flowId, String fragmentId, Boolean tracing) {
+    public FlowFragment buildFlowFragment(List<ProcessorRouteInfo> pipelineEntityList, MessageModel inModel, MessageModel outModel, String flowId, String fragmentId, Boolean tracing) {
 
         MessageModel fragmentLastOutModel = outModel;
         List<ProcessorModel> pipeline = new ArrayList<>();

@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 public class DalaranTracingLog {
-    private Long flowId;
+    private String flowId;
 
     private String processorId;
 
@@ -29,7 +29,7 @@ public class DalaranTracingLog {
 
     private String outputBodyType;
 
-    private Long moduleId;
+    private String moduleId;
 
     private String version;
 }

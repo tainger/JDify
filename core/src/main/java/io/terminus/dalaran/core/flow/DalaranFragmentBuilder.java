@@ -8,5 +8,5 @@ import java.util.List;
 
 public interface DalaranFragmentBuilder {
 
-    FlowFragment buildFlowFragment(List<ProcessorRouteInfo> pipelineEntityList, MessageModel inModel, MessageModel outModel, Long flowId, String fragmentId, Boolean tracing);
+    FlowFragment buildFlowFragment(List<ProcessorRouteInfo> pipelineEntityList, MessageModel inModel, MessageModel outModel, String flowId, String fragmentId, Boolean tracing);
 }

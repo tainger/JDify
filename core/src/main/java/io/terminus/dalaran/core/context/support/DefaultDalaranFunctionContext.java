@@ -24,7 +24,7 @@ public class DefaultDalaranFunctionContext implements DalaranFunctionContext {
 
     private final Map<String, MappingFunctionInfo> scriptFunctionMapper = new HashMap<>();
 
-    private final Map<Long, Invocable> scriptFunctions = new HashMap<>();
+    private final Map<String, Invocable> scriptFunctions = new HashMap<>();
 
     private final static String FUNCTION_NAME = "execute";
 
@@ -45,7 +45,7 @@ public class DefaultDalaranFunctionContext implements DalaranFunctionContext {
     }
 
     @Override
-    public Object executeCustomFunction(Long id, Object[] params) {
+    public Object executeCustomFunction(String id, Object[] params) {
         try {
             // TODO function not found exception
             Object result = scriptFunctions.get(id).invokeFunction(FUNCTION_NAME, params);
@@ -92,7 +92,7 @@ public class DefaultDalaranFunctionContext implements DalaranFunctionContext {
     }
 
     @Override
-    public void addCustomFunction(Long id, MappingFunctionType type, String script, List<String> params) {
+    public void addCustomFunction(String id, MappingFunctionType type, String script, List<String> params) {
         MappingFunctionInfo functionInfo = new MappingFunctionInfo();
         String functionName = String.valueOf(id);
         functionInfo.setName(functionName);

@@ -7,7 +7,7 @@ public class ServiceOperation {
 
     private String operationKey;
 
-    private Long inModelId;
+    private String inModelId;
 
-    private Long outModelId;
+    private String outModelId;
 }

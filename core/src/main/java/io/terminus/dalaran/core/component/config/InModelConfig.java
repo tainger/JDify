@@ -8,5 +8,5 @@ import lombok.Data;
 public class InModelConfig extends ComponentModelConfig {
 
     @ConfigFieldInfo(label = "输入结构", inputType = FieldInputType.Model, required = false)
-    private Long inModelId;
+    private String inModelId;
 }

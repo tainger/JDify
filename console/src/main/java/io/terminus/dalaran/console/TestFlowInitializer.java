@@ -50,7 +50,7 @@ public class TestFlowInitializer implements DalaranStarter {
         List<FunctionEntity> functions = resourceLoader.loadAllFunctions();
         for (FunctionEntity function : functions) {
             try {
-                dalaranContext.getDalaranFunctionContext().addCustomFunction(function.getId(), function.getType(),
+                dalaranContext.getDalaranFunctionContext().addCustomFunction(String.valueOf(function.getId()), function.getType(),
                         function.getScript(), function.getParams());
             } catch (Exception e) {
                 e.printStackTrace();

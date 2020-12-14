@@ -175,8 +175,8 @@ public class ServiceManagementImpl implements ServiceManagement {
             ServiceOperationModel operationModel = dalaranService.buildOperationModel(importConfig, operation);
             Long inModelId = buildModel(operationModel.getInModel(), operationModel.getInputName(), moduleId, serviceId, models);
             Long outModelId = buildModel(operationModel.getOutModel(), operationModel.getOutputName(), moduleId, serviceId, models);
-            operation.setInModelId(inModelId);
-            operation.setOutModelId(outModelId);
+            operation.setInModelId(String.valueOf(inModelId));
+            operation.setOutModelId(String.valueOf(outModelId));
         });
         entity.setServiceConfig(JSON.toJSONString(serviceConfig));
         serviceRepository.save(entity);

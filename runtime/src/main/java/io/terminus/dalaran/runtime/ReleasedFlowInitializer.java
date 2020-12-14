@@ -107,7 +107,7 @@ public class ReleasedFlowInitializer implements DalaranStarter {
             List<FunctionReleasedEntity> functions = resourceLoader.loadAllFunctions();
             for (FunctionReleasedEntity function : functions) {
                 try {
-                    dalaranContext.getDalaranFunctionContext().addCustomFunction(function.getOriginId(), function.getType(),
+                    dalaranContext.getDalaranFunctionContext().addCustomFunction(String.valueOf(function.getOriginId()), function.getType(),
                             function.getScript(), function.getParams());
                 } catch (Exception e) {
                     e.printStackTrace();

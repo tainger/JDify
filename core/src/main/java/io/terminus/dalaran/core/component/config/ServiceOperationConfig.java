@@ -8,7 +8,7 @@ import lombok.Data;
 public class ServiceOperationConfig extends ImmutableModelConfig {
 
     @ConfigFieldInfo(label = "服务", inputType = FieldInputType.Service)
-    private Long serviceId;
+    private String serviceId;
 
     @ConfigFieldInfo(label = "操作", inputType = FieldInputType.ServiceOperation)
     private String operation;

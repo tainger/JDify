@@ -15,7 +15,7 @@ import static io.terminus.dalaran.DalaranConstants.DIRECT_PREFIX;
 public class BasicFlow {
 
     @NotNull
-    private Long id;
+    private String id;
 
     private Long moduleId;
 
