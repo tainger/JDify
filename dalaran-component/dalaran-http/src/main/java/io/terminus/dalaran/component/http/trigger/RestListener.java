@@ -3,7 +3,6 @@ package io.terminus.dalaran.component.http.trigger;
 import io.swagger.models.Swagger;
 import io.terminus.dalaran.component.common.HttpMethod;
 import io.terminus.dalaran.component.common.LimitOperation;
-import io.terminus.dalaran.component.limiter.DalaranLimiter;
 import io.terminus.dalaran.component.http.trigger.model.ApiInfo;
 import io.terminus.dalaran.component.http.trigger.processor.MixMethodProcessor;
 import io.terminus.dalaran.component.http.trigger.processor.QueryStringConvertProcessor;
@@ -11,6 +10,7 @@ import io.terminus.dalaran.component.http.trigger.processor.QueryStringSignProce
 import io.terminus.dalaran.component.http.trigger.processor.SignProcessor;
 import io.terminus.dalaran.component.http.trigger.utils.RestWordUtils;
 import io.terminus.dalaran.component.http.trigger.utils.SwaggerUtils;
+import io.terminus.dalaran.component.limiter.DalaranLimiter;
 import io.terminus.dalaran.core.component.DalaranCircuitBreaker;
 import io.terminus.dalaran.core.component.DalaranTrigger;
 import io.terminus.dalaran.core.component.DalaranTriggerApiDocExport;
@@ -26,25 +26,12 @@ import org.apache.camel.CamelContext;
 import org.apache.camel.model.RouteDefinition;
 import org.apache.camel.model.ThrottleDefinition;
 import org.apache.camel.model.dataformat.JsonLibrary;
-import org.apache.camel.util.jsse.KeyManagersParameters;
-import org.apache.camel.util.jsse.KeyStoreParameters;
-import org.apache.camel.util.jsse.SSLContextParameters;
-import org.apache.camel.util.jsse.TrustManagersParameters;
-import org.apache.commons.io.FileUtils;
-import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
-import org.apache.http.ssl.SSLContextBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.net.ssl.SSLContext;
 import java.io.File;
-import java.io.IOException;
-import java.net.URL;
-import java.security.GeneralSecurityException;
-import java.security.KeyManagementException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static io.terminus.dalaran.DalaranConstants.DIRECT_PREFIX;
 
@@ -96,51 +83,14 @@ public class RestListener implements DalaranTrigger<RestConfig>, DalaranTriggerA
         }
     }
 
-    public static void getJksFile(String url) {
-        String fileName = "/tmp/server.jks";
-        File file = new File(fileName);
-        try {
-            file.createNewFile();
-            URL httpUrl = new URL(url);
-            FileUtils.copyURLToFile(httpUrl, file);
-        }catch (Exception e){
-
-        }
-    }
-
-    public static SSLContextParameters sslParameters() throws KeyManagementException, GeneralSecurityException, IOException {
-        getJksFile("https://dalaran-oss-test.oss-cn-hangzhou.aliyuncs.com/server.jks?Expires=1606123386&OSSAccessKeyId=TMP.3KhWVu4meh9MHAFkue8nEikdGecUUb7zxNYUBu8yedc3pBbLwRswDg4HdcQTN6QnpFHjStVMAG9ThtbC5taaj1dBgXHcaN&Signature=sCMMxUsm9dwBDDJZ5Flpv6U98bY%3D");
-        KeyStoreParameters ksp = new KeyStoreParameters();
-        ksp.setResource("/tmp/server.jks");
-        ksp.setPassword("963168");
-
-        KeyManagersParameters kmp = new KeyManagersParameters();
-        kmp.setKeyStore(ksp);
-        kmp.setKeyPassword("963168");
-
-        SSLContextParameters scp = new SSLContextParameters();
-        scp.setKeyManagers(kmp);
-
-        SSLContextBuilder builder = new SSLContextBuilder();
-        builder.loadTrustMaterial(null, new TrustSelfSignedStrategy());
-        SSLContext sslcontext = builder.build();
-        scp.createSSLContext().setDefault(sslcontext);
-
-        TrustManagersParameters tmp = new TrustManagersParameters();
-        tmp.setKeyStore(ksp);
-        scp.setTrustManagers(tmp);
-
-        return scp;
-    }
-
     @Override
     public Swagger exportApiDoc(Map<String, List<TriggerFlow>> moduleTriggerFlows) {
-        return SwaggerUtils.buildSwagger(buildApiInfoListNew(moduleTriggerFlows));
+        return SwaggerUtils.buildSwagger(buildApiInfoList(moduleTriggerFlows));
     }
 
     @Override
     public File exportWord(Map<String, List<TriggerFlow>> moduleTriggerFlows) {
-        return RestWordUtils.buildWordFile(buildApiInfoListNew(moduleTriggerFlows));
+        return RestWordUtils.buildWordFile(buildApiInfoList(moduleTriggerFlows));
     }
 
     @Override
@@ -202,12 +152,6 @@ public class RestListener implements DalaranTrigger<RestConfig>, DalaranTriggerA
     }
 
     private List<ApiInfo> buildApiInfoList(Map<String, List<TriggerFlow>> moduleTriggerFlows) {
-        return moduleTriggerFlows.entrySet().stream().flatMap(module ->
-                module.getValue().stream().map(flow -> new ApiInfo(module.getKey(), flow))
-        ).collect(Collectors.toList());
-    }
-
-    private List<ApiInfo> buildApiInfoListNew(Map<String, List<TriggerFlow>> moduleTriggerFlows) {
         List<ApiInfo> apiInfo = new ArrayList<>();
         moduleTriggerFlows.entrySet().stream().forEach(module -> {
             module.getValue().stream().forEach(flow -> {

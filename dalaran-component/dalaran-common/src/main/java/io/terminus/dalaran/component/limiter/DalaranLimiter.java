@@ -10,9 +10,6 @@ import lombok.Data;
 @Limiter(value = "BasicLimiter")
 public class DalaranLimiter {
 
-//    @ConfigFieldInfo(label = "开启限流", inputType = FieldInputType.Switch, defaultValue = "false")
-//    private boolean enableLimit = false;
-
     @ConfigFieldInfo(label = "限流周期", inputType = FieldInputType.Integer, required = false)
     private Integer limitPeriod = 1000;
 
@@ -21,9 +18,6 @@ public class DalaranLimiter {
 
     @ConfigFieldInfo(label = "限流操作", inputType = FieldInputType.Radio, defaultValue = "DELAY")
     private LimitOperation operation = LimitOperation.DELAY;
-
-//    @ConfigFieldInfo(label = "开启熔断", inputType = FieldInputType.Switch, defaultValue = "false")
-//    private boolean enableBreaker = false;
 
     @ConfigFieldInfo(label = "异常占比", inputType = FieldInputType.Integer, required = false)
     private Integer circuitBreakerErrorPercentage = 50;
