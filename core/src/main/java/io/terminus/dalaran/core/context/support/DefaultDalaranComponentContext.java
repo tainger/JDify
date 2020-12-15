@@ -3,12 +3,9 @@ package io.terminus.dalaran.core.context.support;
 import io.terminus.dalaran.ComponentType;
 import io.terminus.dalaran.config.*;
 import io.terminus.dalaran.core.component.*;
-import io.terminus.dalaran.core.component.annotation.Connector;
-import io.terminus.dalaran.core.component.annotation.DynamicModel;
-import io.terminus.dalaran.core.component.annotation.Processor;
-import io.terminus.dalaran.core.component.annotation.Trigger;
-import io.terminus.dalaran.core.component.annotation.Limiter;
+import io.terminus.dalaran.core.component.annotation.*;
 import io.terminus.dalaran.core.component.config.ConnectorConfig;
+import io.terminus.dalaran.core.component.config.LimiterConfig;
 import io.terminus.dalaran.core.context.DalaranComponentContext;
 import io.terminus.dalaran.core.util.ConfigFieldUtils;
 import io.terminus.dalaran.core.util.I18nUtils;
@@ -184,7 +181,7 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext {
                 }
             }
 
-            Class limiterType = getConfigType(triggerAnnotation.configType(), Limiter.class);
+            Class limiterType = getConfigType(triggerAnnotation.configType(), LimiterConfig.class);
             if (limiterType != null) {
                 Limiter limiter = (Limiter) limiterType.getDeclaredAnnotation(Limiter.class);
                 if (limiter != null) {

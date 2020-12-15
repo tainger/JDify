@@ -24,4 +24,6 @@ public @interface ConfigFieldInfo {
     FieldInputType inputType() default FieldInputType.Auto;
 
     Class connectorType() default Void.class;
+
+    Class limiterType() default Void.class;
 }

@@ -7,8 +7,9 @@ import io.terminus.dalaran.core.resource.entity.common.TracingLogEntity;
 import io.terminus.dalaran.core.resource.repository.ReleaseRecordRepository;
 import io.terminus.dalaran.core.resource.repository.TracingLogRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
+import org.apache.commons.beanutils.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+
 import javax.annotation.PostConstruct;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -52,7 +53,11 @@ public class DefaultJpaDalaranTraceLogger implements DalaranTraceLogger {
 
     private TracingLogEntity toEntity(DalaranTracingLog tracingLog) {
         TracingLogEntity logEntity = new TracingLogEntity();
-        BeanUtils.copyProperties(tracingLog, logEntity);
+        try {
+            BeanUtils.copyProperties(logEntity, tracingLog);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return logEntity;
     }
 }

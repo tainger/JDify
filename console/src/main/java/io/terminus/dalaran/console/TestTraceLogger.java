@@ -5,7 +5,7 @@ import io.terminus.dalaran.core.log.DalaranTracingLog;
 import io.terminus.dalaran.core.resource.entity.common.TracingLogEntity;
 import io.terminus.dalaran.core.resource.repository.TracingLogRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
+import org.apache.commons.beanutils.BeanUtils;
 
 @Slf4j
 public class TestTraceLogger implements DalaranTraceLogger {
@@ -23,7 +23,11 @@ public class TestTraceLogger implements DalaranTraceLogger {
 
     private TracingLogEntity toEntity(DalaranTracingLog tracingLog) {
         TracingLogEntity logEntity = new TracingLogEntity();
-        BeanUtils.copyProperties(tracingLog, logEntity);
+        try {
+            BeanUtils.copyProperties(logEntity, tracingLog);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return logEntity;
     }
 }

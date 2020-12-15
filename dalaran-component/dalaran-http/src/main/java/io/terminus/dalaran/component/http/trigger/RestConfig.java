@@ -19,7 +19,7 @@ public class RestConfig extends AllModelConfig implements LimiterConfig<DalaranL
     @JsonIgnore
     private DalaranLimiter limiter;
 
-    @ConfigFieldInfo(label = "限流熔断器", inputType = FieldInputType.Limiter, required = false, connectorType = DalaranLimiter.class)
+    @ConfigFieldInfo(label = "限流熔断器", inputType = FieldInputType.Limiter, required = false, limiterType = DalaranLimiter.class)
     private Long limiterId;
 
 //    @ConfigFieldInfo(label = "开启限流", inputType = FieldInputType.Switch, defaultValue = "false")
