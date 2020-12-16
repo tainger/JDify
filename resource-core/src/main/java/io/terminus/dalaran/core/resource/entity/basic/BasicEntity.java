@@ -22,7 +22,7 @@ public class BasicEntity {
 
     @CreatedDate
     @Column(columnDefinition = "timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP")
-    private Date createdAt;
+    private Date createdAt = new Date();
 
     @LastModifiedDate
     @Column(columnDefinition = "timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
