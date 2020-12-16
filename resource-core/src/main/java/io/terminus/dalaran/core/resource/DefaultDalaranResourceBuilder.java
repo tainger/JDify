@@ -23,6 +23,7 @@ import io.terminus.dalaran.model.flow.FlowFragment;
 import io.terminus.dalaran.model.flow.SubFlow;
 import io.terminus.dalaran.model.flow.TriggerFlow;
 import lombok.val;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringSubstitutor;
 
 import java.util.ArrayList;
@@ -235,7 +236,7 @@ public class DefaultDalaranResourceBuilder implements DalaranResourceBuilder {
         if (config instanceof OutModelConfig) {
             OutModelConfig outModelConfig = (OutModelConfig) config;
             outModelConfig.setInModel(lastOutModel);
-            if (outModelConfig.getOutModelId() != null) {
+            if (StringUtils.isNotBlank(outModelConfig.getOutModelId())) {
                 lastOutModel = buildModel(Long.valueOf(outModelConfig.getOutModelId()));
                 outModelConfig.setOutModel(lastOutModel);
             }
@@ -245,7 +246,7 @@ public class DefaultDalaranResourceBuilder implements DalaranResourceBuilder {
         if (config instanceof AllModelConfig) {
             AllModelConfig allModelConfig = (AllModelConfig) config;
             allModelConfig.setInModel(buildModel(Long.valueOf(allModelConfig.getInModelId())));
-            if (allModelConfig.getOutModelId() != null) {
+            if (StringUtils.isNotBlank(allModelConfig.getOutModelId())) {
                 lastOutModel = buildModel(Long.valueOf(allModelConfig.getOutModelId()));
                 allModelConfig.setOutModel(lastOutModel);
             }
@@ -253,7 +254,7 @@ public class DefaultDalaranResourceBuilder implements DalaranResourceBuilder {
         if (config instanceof AllImmutableModelConfig) {
             AllImmutableModelConfig allImmutableModelConfig = (AllImmutableModelConfig) config;
             allImmutableModelConfig.setInModel(buildModel(Long.valueOf(allImmutableModelConfig.getInModelId())));
-            if (allImmutableModelConfig.getOutModelId() != null) {
+            if (StringUtils.isNotBlank(allImmutableModelConfig.getOutModelId())) {
                 lastOutModel = buildModel(Long.valueOf(allImmutableModelConfig.getOutModelId()));
                 allImmutableModelConfig.setOutModel(lastOutModel);
             }
@@ -261,7 +262,7 @@ public class DefaultDalaranResourceBuilder implements DalaranResourceBuilder {
         if (config instanceof ImmutableInModelConfig) {
             ImmutableInModelConfig immutableInModelConfig = (ImmutableInModelConfig) config;
             immutableInModelConfig.setInModel(buildModel(Long.valueOf(immutableInModelConfig.getInModelId())));
-            if (immutableInModelConfig.getOutModelId() != null) {
+            if (StringUtils.isNotBlank(immutableInModelConfig.getOutModelId())) {
                 lastOutModel = buildModel(Long.valueOf(immutableInModelConfig.getOutModelId()));
                 immutableInModelConfig.setOutModel(lastOutModel);
             }
