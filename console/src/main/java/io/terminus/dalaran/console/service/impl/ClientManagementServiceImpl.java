@@ -91,7 +91,7 @@ public class ClientManagementServiceImpl implements ClientManagementService {
         clientEntity.setAppKey(clientDTO.getAppKey());
         clientEntity.setSecret(clientDTO.getSecret());
         clientEntity.setDescription(clientDTO.getDescription());
-        if(UserContext.getUserInfo().getUsername()!=null){
+        if(UserContext.getUserInfo() != null && UserContext.getUserInfo().getUsername() != null) {
             clientEntity.setUpdatedBy(UserContext.getUserInfo().getUsername());
         }
         clientEntity.setExist(true);

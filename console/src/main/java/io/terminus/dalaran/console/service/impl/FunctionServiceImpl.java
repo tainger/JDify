@@ -98,7 +98,7 @@ public class FunctionServiceImpl implements FunctionService {
         functionEntity.setScript(functionDTO.getScript());
         functionEntity.setParams(functionDTO.getParams());
         functionEntity.setDescription(functionDTO.getDescription());
-        if(UserContext.getUserInfo().getUsername()!=null){
+        if(UserContext.getUserInfo() != null && UserContext.getUserInfo().getUsername() != null){
             functionEntity.setUpdatedBy(UserContext.getUserInfo().getUsername());
         }
         return functionEntity;

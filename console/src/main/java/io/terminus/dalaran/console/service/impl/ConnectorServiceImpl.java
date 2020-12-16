@@ -114,7 +114,7 @@ public class ConnectorServiceImpl implements ConnectorService {
         connectorEntity.setConnectorType(connectorDTO.getConnectorType());
         connectorEntity.setDescription(connectorDTO.getDescription());
         connectorEntity.setConfig(JSON.toJSONString(connectorDTO.getConfig()));
-        if(UserContext.getUserInfo().getUsername()!=null){
+        if(UserContext.getUserInfo() != null && UserContext.getUserInfo().getUsername()!=null){
             connectorEntity.setUpdatedBy(UserContext.getUserInfo().getUsername());
         }
         return connectorEntity;
