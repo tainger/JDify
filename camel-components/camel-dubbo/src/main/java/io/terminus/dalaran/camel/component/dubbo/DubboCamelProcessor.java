@@ -3,6 +3,10 @@ package io.terminus.dalaran.camel.component.dubbo;
 import org.apache.camel.Exchange;
 import org.apache.camel.impl.DefaultProducer;
 import org.apache.dubbo.common.utils.StringUtils;
+import org.apache.dubbo.config.ReferenceConfig;
+import org.apache.dubbo.config.RegistryConfig;
+import org.apache.dubbo.rpc.RpcException;
+import org.apache.dubbo.rpc.service.GenericService;
 
 public class DubboCamelProcessor extends DefaultProducer {
 
@@ -22,11 +26,41 @@ public class DubboCamelProcessor extends DefaultProducer {
         Object arg = exchange.getIn().getBody();
         Object result;
         if (StringUtils.isNotEmpty(parameterType)) {
-            result = endpoint.getGenericService().$invoke(method, new String[]{parameterType}, new Object[]{arg});
+            try {
+                result = endpoint.getGenericService().$invoke(method, new String[]{parameterType}, new Object[]{arg});
+            } catch (RpcException e) {
+                e.printStackTrace();
+                GenericService genericService = refreshService();
+                endpoint.setGenericService(genericService);
+                result = endpoint.getGenericService().$invoke(method, new String[]{parameterType}, new Object[]{arg});
+            }
         } else {
-            result = endpoint.getGenericService().$invoke(method, new String[]{}, new Object[]{});
+            try {
+                result = endpoint.getGenericService().$invoke(method, new String[]{}, new Object[]{});
+            } catch (RpcException e) {
+                e.printStackTrace();
+                GenericService genericService = refreshService();
+                endpoint.setGenericService(genericService);
+                result = genericService.$invoke(method, new String[]{}, new Object[]{});
+            }
         }
         exchange.getOut().setBody(result);
         exchange.getOut().setHeaders(exchange.getIn().getHeaders());
+    }
+
+    private GenericService refreshService() {
+        ReferenceConfig<GenericService> reference = new ReferenceConfig<>();
+        reference.setApplication(endpoint.getApplicationConfig());
+        reference.setRegistry(new RegistryConfig(endpoint.getRegistryAddress()));
+        reference.setVersion(endpoint.getVersion());
+        reference.setTimeout(endpoint.getTimeout());
+        reference.setInterface(endpoint.getServiceId());
+        reference.setCheck(false);
+        reference.setGeneric(true);
+        reference.setRetries(endpoint.getRetries());
+        if (endpoint.getVersion().length() > 6) {
+            reference.setOwner(endpoint.getVersion().substring(6));
+        }
+        return reference.get();
     }
 }

@@ -168,4 +168,8 @@ public class DubboEndpoint extends ProcessorEndpoint {
     public void setThreads(Integer threads) {
         this.threads = threads;
     }
+
+    public void setGenericService(GenericService genericService) {
+        this.genericService = genericService;
+    }
 }
