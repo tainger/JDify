@@ -47,8 +47,11 @@ public class OKHttpProcessor implements Processor {
         }
 
         if (config.getMethod() == HttpMethod.GET) {
-            Map<String, String> params = buildQueryString(exchange.getIn().getBody());
-            params.forEach(httpBuilder::addQueryParameter);
+            Map<String, Object> params = buildQueryString(exchange.getIn().getBody());
+            //params.forEach(httpBuilder::addQueryParameter);
+            for(String string:params.keySet()) {
+                httpBuilder.addQueryParameter(string,params.get(string).toString());
+            }
             request = new Request.Builder().url(httpBuilder.build()).headers(headers).build();
         } else {
             if (StringUtils.isNotBlank(config.getQueryParams())) {
@@ -76,7 +79,7 @@ public class OKHttpProcessor implements Processor {
         exchange.getOut().setBody(responseBody);
     }
 
-    private Map<String, String> buildQueryString(Object obj) throws Exception {
+    private Map<String, Object> buildQueryString(Object obj) throws Exception {
         if (obj == null) {
             return null;
         }

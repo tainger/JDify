@@ -11,6 +11,7 @@ import io.terminus.dalaran.core.component.config.ConnectorConfig;
 import io.terminus.dalaran.core.component.config.OutModelConfig;
 import lombok.Data;
 
+
 @Data
 public class HttpClientConfig extends OutModelConfig implements ConnectorConfig<RestClientConnector> {
 
@@ -39,5 +40,10 @@ public class HttpClientConfig extends OutModelConfig implements ConnectorConfig<
 
     @ConfigFieldInfo(label = "Add Last Headers", inputType = FieldInputType.Switch, required = false)
     private Boolean addLastHeaders = false;
+
+    @ConfigFieldInfo(label = "SSL Certificate", inputType = FieldInputType.FileUpload, required = false)
+    private String sslCertificate;
+
+
 
 }
