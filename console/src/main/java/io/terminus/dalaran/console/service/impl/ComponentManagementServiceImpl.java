@@ -6,7 +6,6 @@ import io.terminus.dalaran.model.common.BasicComponentType;
 import io.terminus.dalaran.model.dto.*;
 import io.terminus.dalaran.model.dto.flow.SubFlowDTO;
 import io.terminus.dalaran.model.dto.flow.TriggerFlowDTO;
-import org.apache.camel.spi.AsEndpointUri;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -34,7 +33,7 @@ public class ComponentManagementServiceImpl implements ComponentManagementServic
     @Autowired
     private SubFlowManagementService subFlowManagementService;
 
-    @AsEndpointUri
+    @Autowired
     private LimiterService limiterService;
 
     @Autowired

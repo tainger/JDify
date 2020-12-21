@@ -266,12 +266,13 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext {
 
     private LimiterInfo buildLimiterInfo(Class limiterType, Limiter limiter, String componentName) {
         LimiterInfo limiterInfo = limiterInfoMap.computeIfAbsent(limiter.value(), key -> {
-            DalaranConfigField[] connectorConfigFields = ConfigFieldUtils.buildConfigFields(limiterType);
+            DalaranConfigField[] limiterFields = ConfigFieldUtils.buildConfigFields(limiterType);
             LimiterInfo newLimiterInfo = new LimiterInfo();
             newLimiterInfo.setName(limiter.value());
             newLimiterInfo.setOrder(limiter.order());
-            newLimiterInfo.setConnectorType(limiterType);
-            newLimiterInfo.setConfigFields(connectorConfigFields);
+            newLimiterInfo.setClassType(limiterType);
+            newLimiterInfo.setType(limiter.value());
+            newLimiterInfo.setConfigFields(limiterFields);
             return newLimiterInfo;
         });
         limiterInfo.addComponent(componentName);
