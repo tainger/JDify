@@ -106,6 +106,11 @@ public class PlatformRest implements PlatformInfoAPI, PlatformImportAPI, Platfor
     }
 
     @Override
+    public Collection<LimiterInfo> listLimiterInfo() {
+        return dalaranContext.getDalaranComponentContext().getAllLimiterInfo();
+    }
+
+    @Override
     public Collection<BasicComponentInfo> listBasicComponentInfo() {
         return dalaranContext.getDalaranComponentContext().getAllBasicComponentInfo();
     }

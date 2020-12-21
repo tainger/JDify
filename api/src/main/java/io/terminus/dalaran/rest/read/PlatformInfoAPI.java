@@ -30,6 +30,10 @@ public interface PlatformInfoAPI {
     @GetMapping(value = "/connector")
     Collection<ConnectorInfo> listConnectorInfo();
 
+    @ApiOperation(value = "获取限流熔断器配置结构")
+    @GetMapping(value = "/limiter")
+    Collection<LimiterInfo> listLimiterInfo();
+
     @ApiOperation(value = "获取新增或更新组件所需的基本结构")
     @GetMapping(value = "/basicComponent")
     Collection<BasicComponentInfo> listBasicComponentInfo();
