@@ -46,6 +46,9 @@ public class ModuleManagementServiceImpl implements ModuleManagementService {
     private ConnectorService connectorService;
 
     @Autowired
+    private LimiterService limiterService;
+
+    @Autowired
     private FunctionService functionService;
 
     @Autowired
@@ -183,6 +186,7 @@ public class ModuleManagementServiceImpl implements ModuleManagementService {
         moduleDetail.setServices(serviceManagement.listBasicInfoByModuleId(moduleId));
         moduleDetail.setFunctions(functionService.listBasicInfoByModuleId(moduleId));
         moduleDetail.setClients(clientService.listBasicInfoByModuleId(moduleId));
+        moduleDetail.setLimiters(limiterService.listBasicInfoByModuleId(moduleId));
         return moduleDetail;
     }
 

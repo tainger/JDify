@@ -21,5 +21,5 @@ public @interface ModelFieldInfo {
 
     boolean readonly() default false;
 
-    FieldInputType inputType() default FieldInputType.Auto;
+    String inputType() default FieldInputType.Auto;
 }

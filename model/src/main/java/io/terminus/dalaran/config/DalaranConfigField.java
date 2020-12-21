@@ -1,6 +1,5 @@
 package io.terminus.dalaran.config;
 
-import io.terminus.dalaran.FieldInputType;
 import lombok.Data;
 
 import java.util.Map;
@@ -10,7 +9,7 @@ public class DalaranConfigField {
 
     private String name;
 
-    private FieldInputType inputType;
+    private String inputType;
 
     private String reusableConfig;
 

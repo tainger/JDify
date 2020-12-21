@@ -19,6 +19,8 @@ public class ModuleDetailDTO extends ModuleDTO {
 
     private List<BasicConnectorInfo> connectors;
 
+    private List<BasicLimiterInfo> limiters;
+
     private List<BasicServiceInfo> services;
 
     private List<BasicFunctionInfo> functions;
