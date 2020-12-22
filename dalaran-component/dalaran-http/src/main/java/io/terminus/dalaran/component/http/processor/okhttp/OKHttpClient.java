@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
-import java.security.SecureRandom;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateFactory;
 import java.util.Arrays;
@@ -50,14 +49,11 @@ public class OKHttpClient implements DalaranProcessor<HttpClientConfig> {
             try {
                 X509TrustManager trustManager;
                 SSLSocketFactory sslSocketFactory;
-                try {
-                    trustManager = trustManagerForCertificates(trustedCertificatesInputStream(ossAccount,dir));
-                    SSLContext sslContext = SSLContext.getInstance("TLS");
-                    sslContext.init(null, new TrustManager[] { trustManager }, null);
-                    sslSocketFactory = sslContext.getSocketFactory();
-                } catch (GeneralSecurityException e) {
-                    throw new RuntimeException(e);
-                }
+                trustManager = trustManagerForCertificates(trustedCertificatesInputStream(config.getSslCertificate(), ossAccount, dir));
+                SSLContext sslContext = SSLContext.getInstance("TLS");
+                sslContext.init(null, new TrustManager[] { trustManager }, null);
+                sslSocketFactory = sslContext.getSocketFactory();
+
                 OkHttpClient client = new OkHttpClient().newBuilder()
                         .connectTimeout(config.getConnector().getTimeout(), TimeUnit.MILLISECONDS)
                         .readTimeout(config.getConnector().getTimeout(), TimeUnit.MILLISECONDS)
@@ -84,8 +80,7 @@ public class OKHttpClient implements DalaranProcessor<HttpClientConfig> {
         return null;
     }
 
-    private InputStream trustedCertificatesInputStream(OSSAccount ossAccount, File dir) throws Exception{
-        String object = "dalaran/carso/cnsmsbmpapiqa.hrbl.net.crt";
+    private InputStream trustedCertificatesInputStream(String object, OSSAccount ossAccount, File dir) throws Exception{
         String fileName = "dalaran-" + object.hashCode();
         File tempFile = File.createTempFile(fileName, ".crt", dir);
         OSS ossClient = new OSSClientBuilder().build(ossAccount.getEndpoint(), ossAccount.getAccessId(), ossAccount.getAccessSecret());
