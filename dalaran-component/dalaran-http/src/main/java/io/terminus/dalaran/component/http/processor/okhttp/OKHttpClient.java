@@ -48,12 +48,20 @@ public class OKHttpClient implements DalaranProcessor<HttpClientConfig> {
             log.info("ossAccount: " + ossAccount.getBucketName());
             File dir = new File("/var/tmp");
             try {
-                File file = getSslCertificate(config.getSslCertificate(),ossAccount,dir);
-                log.info("fileSize: " + file.length());
+                X509TrustManager trustManager;
+                SSLSocketFactory sslSocketFactory;
+                try {
+                    trustManager = trustManagerForCertificates(trustedCertificatesInputStream(ossAccount,dir));
+                    SSLContext sslContext = SSLContext.getInstance("TLS");
+                    sslContext.init(null, new TrustManager[] { trustManager }, null);
+                    sslSocketFactory = sslContext.getSocketFactory();
+                } catch (GeneralSecurityException e) {
+                    throw new RuntimeException(e);
+                }
                 OkHttpClient client = new OkHttpClient().newBuilder()
                         .connectTimeout(config.getConnector().getTimeout(), TimeUnit.MILLISECONDS)
                         .readTimeout(config.getConnector().getTimeout(), TimeUnit.MILLISECONDS)
-                        .sslSocketFactory(getSSlSocketFactory(file), trustManagerForCertificates(file))
+                        .sslSocketFactory(sslSocketFactory, trustManager)
                         .build();
                 route.process(new OKHttpProcessor(config, client));
             } catch (Exception e) {
@@ -76,47 +84,23 @@ public class OKHttpClient implements DalaranProcessor<HttpClientConfig> {
         return null;
     }
 
-    private static SSLSocketFactory createSSLSocketFactory() {
-        SSLSocketFactory ssfFactory = null;
-        try {
-            SSLContext sc = SSLContext.getInstance("SSL");
-            sc.init(null, new TrustManager[]{new TrustAllCertificates()}, new SecureRandom());
-            ssfFactory = sc.getSocketFactory();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return ssfFactory;
-    }
-
-    public File getSslCertificate(String fileKey, OSSAccount ossAccount, File dir) throws Exception{
-        String fileName = "dalaran-" + fileKey.hashCode();
+    private InputStream trustedCertificatesInputStream(OSSAccount ossAccount, File dir) throws Exception{
+        String object = "dalaran/carso/cnsmsbmpapiqa.hrbl.net.crt";
+        String fileName = "dalaran-" + object.hashCode();
         File tempFile = File.createTempFile(fileName, ".crt", dir);
         OSS ossClient = new OSSClientBuilder().build(ossAccount.getEndpoint(), ossAccount.getAccessId(), ossAccount.getAccessSecret());
-        ossClient.getObject(new GetObjectRequest(ossAccount.getBucketName(), fileKey), tempFile);
-        return tempFile;
-    }
-
-    public SSLSocketFactory getSSlSocketFactory(File file) {
-        SSLContext sslContext;
-        X509TrustManager trustManager;
-        try {
-            trustManager = trustManagerForCertificates(file);
-            sslContext = SSLContext.getInstance("TLS");
-            //使用构建出的trustManger初始化SSLContext对象
-            sslContext.init(null, new TrustManager[]{trustManager}, null);
-        } catch (GeneralSecurityException e) {
-            throw new RuntimeException(e);
-        }
-        return sslContext.getSocketFactory();
-    }
-
-    private X509TrustManager trustManagerForCertificates(File file) throws GeneralSecurityException {
+        ossClient.getObject(new GetObjectRequest(ossAccount.getBucketName(), object), tempFile);
         InputStream in = null;
         try {
-            in = new FileInputStream(file);
+            in = new FileInputStream(tempFile);
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return in;
+    }
+
+    private X509TrustManager trustManagerForCertificates(InputStream in) throws GeneralSecurityException {
+
         CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
         //通过证书工厂得到自签证书对象集合
         Collection<? extends Certificate> certificates = certificateFactory.generateCertificates(in);
@@ -150,7 +134,7 @@ public class OKHttpClient implements DalaranProcessor<HttpClientConfig> {
 
     private KeyStore newEmptyKeyStore(char[] password) throws GeneralSecurityException {
         try {
-            KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
+            KeyStore keyStore = KeyStore.getInstance("PKCS12");
             InputStream in = null; // By convention, 'null' creates an empty key store.
             keyStore.load(null, password);
             return keyStore;

@@ -40,7 +40,5 @@ public class HttpClientConfig extends OutModelConfig implements ConnectorConfig<
     @ConfigFieldInfo(label = "Add Last Headers", inputType = FieldInputType.Switch, required = false)
     private Boolean addLastHeaders = false;
 
-    @ConfigFieldInfo(label = "SSL Certificate", inputType = FieldInputType.FileUpload, required = false)
-    private String sslCertificate;
 
 }
