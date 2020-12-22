@@ -4,6 +4,7 @@ import io.terminus.dalaran.FieldInputType;
 import io.terminus.dalaran.config.DalaranConfigField;
 import io.terminus.dalaran.core.component.annotation.ConfigFieldInfo;
 import lombok.val;
+import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -18,7 +19,7 @@ public class ConfigFieldUtils {
 
         for (Field field : configClass.getDeclaredFields()) {
             ConfigFieldInfo configFieldInfo = field.getDeclaredAnnotation(ConfigFieldInfo.class);
-            if (configFieldInfo != null && configFieldInfo.inputType() != FieldInputType.Hidden) {
+            if (configFieldInfo != null && !StringUtils.equals(configFieldInfo.inputType(), FieldInputType.Hidden)) {
                 DalaranConfigField configField = new DalaranConfigField();
                 configField.setName(field.getName());
                 configField.setInputType(configFieldInfo.inputType());
