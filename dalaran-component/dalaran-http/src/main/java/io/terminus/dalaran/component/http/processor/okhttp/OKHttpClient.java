@@ -129,7 +129,7 @@ public class OKHttpClient implements DalaranProcessor<HttpClientConfig> {
 
     private KeyStore newEmptyKeyStore(char[] password) throws GeneralSecurityException {
         try {
-            KeyStore keyStore = KeyStore.getInstance("PKCS12");
+            KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
             InputStream in = null; // By convention, 'null' creates an empty key store.
             keyStore.load(null, password);
             return keyStore;
