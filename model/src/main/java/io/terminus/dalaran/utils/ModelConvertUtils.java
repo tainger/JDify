@@ -7,11 +7,6 @@ import java.util.Map;
 public class ModelConvertUtils {
 
     public static DalaranModelSchema convertSchema(String modelType, Map<String, Object> schema) {
-        switch (modelType){
-            case "JSON":
-            case "OBJECT":
-            case "SOAP":
-            case "CSV":
-        }
+        return null;
     }
 }
