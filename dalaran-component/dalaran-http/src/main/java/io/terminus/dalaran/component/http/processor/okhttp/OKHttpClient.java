@@ -13,6 +13,7 @@ import io.terminus.dalaran.core.oss.OSSAccount;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
 import org.apache.camel.model.ProcessorDefinition;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.net.ssl.*;
@@ -43,7 +44,7 @@ public class OKHttpClient implements DalaranProcessor<HttpClientConfig> {
 
     @Override
     public void configure(ProcessorDefinition route, HttpClientConfig config) {
-        if(config.getConnector().getProtocol().name().equals("HTTPS")) {
+        if(config.getConnector().getProtocol().name().equals("HTTPS") && StringUtils.isNotBlank(config.getSslCertificate())) {
             log.info("ossAccount: " + ossAccount.getBucketName());
             File dir = new File("/var/tmp");
             try {
@@ -129,8 +130,7 @@ public class OKHttpClient implements DalaranProcessor<HttpClientConfig> {
 
     private KeyStore newEmptyKeyStore(char[] password) throws GeneralSecurityException {
         try {
-            KeyStore keyStore = KeyStore.getInstance("PKCS12");
-            InputStream in = null; // By convention, 'null' creates an empty key store.
+            KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
             keyStore.load(null, password);
             return keyStore;
         } catch (IOException e) {
