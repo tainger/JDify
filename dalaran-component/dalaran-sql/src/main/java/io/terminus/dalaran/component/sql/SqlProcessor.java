@@ -23,17 +23,11 @@ public class SqlProcessor implements DalaranProcessor<SqlConfig> {
 
     @Override
     public void configure(ProcessorDefinition route, SqlConfig config) {
-        String dataSourceBeanName = getDataSourceBeanName(config.getConnectorId());
+//        String dataSourceBeanName = getDataSourceBeanName(config.getConnectorId());
+        String dataSourceBeanName = config.getConnector().toString();
         if (!beanFactory.containsSingleton(dataSourceBeanName)) {
             DataSource dataSource = buildDataSource(config.getConnector());
             beanFactory.registerSingleton(dataSourceBeanName, dataSource);
-        } else {
-            org.apache.tomcat.jdbc.pool.DataSource old = (org.apache.tomcat.jdbc.pool.DataSource) beanFactory.getSingleton(dataSourceBeanName);
-            if (old != null && !equals(old, config.getConnector())) {
-                old.close();
-                DataSource dataSource = buildDataSource(config.getConnector());
-                beanFactory.registerSingleton(dataSourceBeanName, dataSource);
-            }
         }
         // TODO 目前取值只支持一级, 后面可用通过实现 SqlPrepareStatementStrategy 来扩展
         String uri;

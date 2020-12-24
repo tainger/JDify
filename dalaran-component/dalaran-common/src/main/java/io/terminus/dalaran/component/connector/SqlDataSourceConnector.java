@@ -36,4 +36,18 @@ public class SqlDataSourceConnector {
     private int maxWait = 10000;
     @ConfigFieldInfo(label = "初始化线程数", inputType = FieldInputType.Integer, defaultValue = "5")
     private int initialSize = 10;
+
+    @Override
+    public String toString() {
+        return "SqlDataSource-" + databaseType +
+                "&" + host +
+                "&" + port +
+                "&" + username +
+                "&" + password +
+                "&" + schema +
+                "&" + minIdle +
+                "&" + maxIdle +
+                "&" + maxWait +
+                "&" + initialSize;
+    }
 }
