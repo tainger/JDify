@@ -5,6 +5,7 @@ import io.terminus.dalaran.core.component.annotation.ConfigFieldInfo;
 import io.terminus.dalaran.core.component.annotation.Connector;
 import io.terminus.dalaran.model.Database;
 import lombok.Data;
+import org.apache.commons.codec.digest.DigestUtils;
 
 @Data
 @Connector("DataBase")
@@ -39,7 +40,7 @@ public class SqlDataSourceConnector {
 
     @Override
     public String toString() {
-        return "SqlDataSource-" + databaseType +
+        String dataSource = databaseType +
                 "&" + host +
                 "&" + port +
                 "&" + username +
@@ -49,5 +50,6 @@ public class SqlDataSourceConnector {
                 "&" + maxIdle +
                 "&" + maxWait +
                 "&" + initialSize;
+        return "SqlDataSource-" + DigestUtils.md5Hex(dataSource);
     }
 }
