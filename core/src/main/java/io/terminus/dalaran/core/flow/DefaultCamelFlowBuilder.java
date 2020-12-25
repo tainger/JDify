@@ -74,7 +74,10 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
         }
 
         val route = createRouteDefinition();
+
+        Map context = new HashMap<>();
         route.setId(flow.getRouteId());
+        route.setProperty(DALARAN_CONTEXT_EXCHANGE, Builder.constant(context));
         route.setProperty(TRACING_FLOW_ID).constant(flow.getId());
         route.setProperty(TRACING_MODULE_ID).constant(flow.getModuleId());
         triggerComponent.buildFromRoute(route, triggerConfig);
@@ -311,8 +314,6 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
 
     // TODO 这里还是比较乱的...
     private void buildFlowRoute(DalaranRoute route, BasicFlow flow, TracingType flowTracingType, @NotNull String currentBodyType) {
-        Map context = new HashMap<>();
-        route.setProperty(DALARAN_CONTEXT_EXCHANGE, Builder.constant(context));
         DalaranTracer flowTracer = null;
         if (flow.isTracing() && flowTracingType != null) {
             flowTracer = DalaranTracer.buildTracer(traceLogger, flowTracingType);
