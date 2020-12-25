@@ -74,7 +74,10 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
         }
 
         val route = createRouteDefinition();
+
+        Map context = new HashMap<>();
         route.setId(flow.getRouteId());
+        route.setProperty(DALARAN_CONTEXT_EXCHANGE, Builder.constant(context));
         route.setProperty(TRACING_FLOW_ID).constant(flow.getId());
         route.setProperty(TRACING_MODULE_ID).constant(flow.getModuleId());
         triggerComponent.buildFromRoute(route, triggerConfig);
@@ -396,8 +399,6 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
 
     private DalaranRoute createRouteDefinition(BasicFlow flow) {
         val route = createRouteDefinition();
-        Map context = new HashMap<>();
-        route.setProperty(DALARAN_CONTEXT_EXCHANGE, Builder.constant(context));
         route.setId(flow.getRouteId());
         route.from(flow.getDirectRouteUri());
         return route;
@@ -405,8 +406,6 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
 
     private DalaranRoute createRouteDefinition() {
         DalaranRoute route = new DalaranRoute();
-        Map context = new HashMap<>();
-        route.setProperty(DALARAN_CONTEXT_EXCHANGE, Builder.constant(context));
         route.errorHandler(errorHandlerFactory);
         return route;
     }
