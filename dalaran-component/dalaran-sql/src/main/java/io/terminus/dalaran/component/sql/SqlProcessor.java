@@ -24,6 +24,7 @@ public class SqlProcessor implements DalaranProcessor<SqlConfig> {
     @Override
     public void configure(ProcessorDefinition route, SqlConfig config) {
 //        String dataSourceBeanName = getDataSourceBeanName(config.getConnectorId());
+        // todo 需要把被替换的data source bean做清理
         String dataSourceBeanName = config.getConnector().toString();
         if (!beanFactory.containsSingleton(dataSourceBeanName)) {
             DataSource dataSource = buildDataSource(config.getConnector());

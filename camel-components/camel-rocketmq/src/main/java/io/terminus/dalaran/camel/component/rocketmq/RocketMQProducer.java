@@ -50,29 +50,29 @@ public class RocketMQProducer extends DefaultProducer {
     @Override
     protected void doStart() throws Exception {
         super.doStart();
-        if (producer == null) {
-            RPCHook rpcHook = null;
-            if (StringUtils.isNotBlank(endpoint.getAccessKey()) && StringUtils.isNotBlank(endpoint.getSecretKey())) {
-                rpcHook = new AclClientRPCHook(new SessionCredentials(endpoint.getAccessKey(), endpoint.getSecretKey()));
-            }
-            producer = new DefaultMQProducer(endpoint.getGroupId(), rpcHook);
-            if (endpoint.getUseAliCloudOns()) {
-                producer.setAccessChannel(AccessChannel.CLOUD);
-            } else {
-                producer.setAccessChannel(AccessChannel.LOCAL);
-            }
-            producer.setInstanceName(endpoint.getNameServer());
-            producer.setNamesrvAddr(endpoint.getNameServer());
-            producer.setSendMsgTimeout(endpoint.getTimeout());
-            producer.setMaxMessageSize(41943040);
-            producer.start();
+        RPCHook rpcHook = null;
+        if (StringUtils.isNotBlank(endpoint.getAccessKey()) && StringUtils.isNotBlank(endpoint.getSecretKey())) {
+            rpcHook = new AclClientRPCHook(new SessionCredentials(endpoint.getAccessKey(), endpoint.getSecretKey()));
         }
+        producer = new DefaultMQProducer(endpoint.getGroupId(), rpcHook);
+        if (endpoint.getUseAliCloudOns()) {
+            producer.setAccessChannel(AccessChannel.CLOUD);
+        } else {
+            producer.setAccessChannel(AccessChannel.LOCAL);
+        }
+        producer.setInstanceName(endpoint.getNameServer());
+        producer.setNamesrvAddr(endpoint.getNameServer());
+        producer.setSendMsgTimeout(endpoint.getTimeout());
+        producer.setMaxMessageSize(41943040);
+        producer.start();
     }
 
     @Override
     protected void doStop() throws Exception {
         super.doStop();
-        producer.shutdown();
+        if (producer != null) {
+            producer.shutdown();
+        }
     }
 
     @Override
