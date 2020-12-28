@@ -19,7 +19,7 @@ public class JsonModelType implements DalaranModelType<String, JsonSchema> {
     @Override
     public void fromObject(ProcessorDefinition route, JsonSchema schema) {
         route.process(new JsonMarshalPreProcessor());
-        route.marshal().json(JsonLibrary.Fastjson);
+//        route.marshal().json(JsonLibrary.Fastjson);
     }
 
     @Override
