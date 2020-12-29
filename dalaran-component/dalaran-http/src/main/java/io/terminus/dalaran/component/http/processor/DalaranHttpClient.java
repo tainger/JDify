@@ -21,7 +21,7 @@ import static org.apache.camel.Exchange.*;
 
 @Processor(
         value = "http-client",
-        order = 11,
+        order = 7,
         configType = HttpClientConfig.class,
         bodyType = "JSON"
 )

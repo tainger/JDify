@@ -12,6 +12,7 @@ import io.terminus.dalaran.core.context.DalaranContext;
 import io.terminus.dalaran.model.DalaranAccount;
 import io.terminus.dalaran.model.dto.ReleaseRecordDTO;
 import io.terminus.dalaran.model.dto.ReleaseRequestDTO;
+import io.terminus.dalaran.model.dto.flow.ReleaseFlowDTO;
 import io.terminus.dalaran.model.dto.flow.TriggerFlowDTO;
 import io.terminus.dalaran.model.function.MappingFunctionInfo;
 import io.terminus.dalaran.rest.read.PlatformExportAPI;
@@ -65,7 +66,7 @@ public class PlatformRest implements PlatformInfoAPI, PlatformImportAPI, Platfor
 
     @Override
     @OnException(code = ResponseMessage.VERSION_QUERY_ERROR)
-    public List<TriggerFlowDTO> triggerFlowList(@PathVariable String version) {
+    public List<ReleaseFlowDTO> triggerFlowList(@PathVariable String version) {
         return releaseService.listReleasedTriggerFlowDTO(version);
     }
 

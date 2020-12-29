@@ -32,7 +32,7 @@ import java.util.concurrent.TimeUnit;
 
 @Processor(
         value = "BrotliHttpClient",
-        order = 10,
+        order = 8,
         configType = HttpClientConfig.class,
         bodyType = "JSON"
 )
