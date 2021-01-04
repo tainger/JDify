@@ -3,6 +3,7 @@ package io.terminus.dalaran.core.resource;
 import io.terminus.dalaran.core.flow.DalaranServiceLoader;
 import io.terminus.dalaran.core.resource.entity.ServiceAbstractEntity;
 import io.terminus.dalaran.model.component.ServiceInfo;
+import org.apache.commons.lang3.StringUtils;
 
 public class DefaultDalaranServiceLoader implements DalaranServiceLoader {
 
@@ -14,6 +15,9 @@ public class DefaultDalaranServiceLoader implements DalaranServiceLoader {
 
     @Override
     public ServiceInfo loadService(String serviceId) {
+        if (StringUtils.isBlank(serviceId)) {
+            return null;
+        }
         ServiceAbstractEntity entity = resourceLoader.loadService(Long.valueOf(serviceId));
         return toDTO(entity);
     }

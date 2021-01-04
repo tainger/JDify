@@ -7,7 +7,7 @@ import lombok.Data;
 @Data
 public class WebServiceClientConfig {
 
-    @ConfigFieldInfo(label = "nameSpace", inputType = FieldInputType.String, defaultValue = "http://")
+    @ConfigFieldInfo(label = "nameSpace", inputType = FieldInputType.String)
     private String nameSpace;
 
     @ConfigFieldInfo(label = "serviceName", inputType = FieldInputType.String)
@@ -16,11 +16,14 @@ public class WebServiceClientConfig {
     @ConfigFieldInfo(label = "portName", inputType = FieldInputType.String)
     private String portName;
 
-    @ConfigFieldInfo(label = "soapActionUri", inputType = FieldInputType.String, defaultValue = "http://")
+    @ConfigFieldInfo(label = "soapActionUri", inputType = FieldInputType.String)
     private String soapActionUri;
 
     @ConfigFieldInfo(label = "endpoint", inputType = FieldInputType.String)
     private String endpoint;
+
+    @ConfigFieldInfo(label = "reqSoap", inputType = FieldInputType.String)
+    private String reqSoap;
 
     @ConfigFieldInfo(label = "服务名", inputType = FieldInputType.String)
     private String api;
