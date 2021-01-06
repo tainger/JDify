@@ -30,11 +30,13 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import static io.terminus.dalaran.DalaranConstants.UNKNOWN_MODEL_TYPE;
+
 @Processor(
         value = "BrotliHttpClient",
         order = 8,
         configType = HttpClientConfig.class,
-        bodyType = "JSON"
+        bodyType = UNKNOWN_MODEL_TYPE
 )
 @Slf4j
 public class OKHttpClient implements DalaranProcessor<HttpClientConfig> {
