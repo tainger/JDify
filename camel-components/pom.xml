@@ -14,6 +14,7 @@
     <modules>
         <module>camel-dubbo</module>
         <module>camel-rocketmq</module>
+        <module>camel-elasticjob</module>
     </modules>
 
     <dependencies>
