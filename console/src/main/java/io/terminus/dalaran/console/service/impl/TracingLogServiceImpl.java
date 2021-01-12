@@ -1,6 +1,5 @@
 package io.terminus.dalaran.console.service.impl;
 
-import com.sun.org.apache.xerces.internal.parsers.SecurityConfiguration;
 import io.terminus.dalaran.TracingType;
 import io.terminus.dalaran.console.entity.SubFlowEntity;
 import io.terminus.dalaran.console.entity.TriggerFlowEntity;
@@ -9,7 +8,6 @@ import io.terminus.dalaran.console.repository.TriggerFlowRepository;
 import io.terminus.dalaran.console.service.ModuleManagementService;
 import io.terminus.dalaran.console.service.TracingLogService;
 import io.terminus.dalaran.core.resource.entity.basic.BasicFlowEntity;
-import io.terminus.dalaran.core.resource.entity.common.ModuleEntity;
 import io.terminus.dalaran.core.resource.entity.common.TracingLogEntity;
 import io.terminus.dalaran.core.resource.repository.ModuleRepository;
 import io.terminus.dalaran.core.resource.repository.TracingLogRepository;
@@ -17,7 +15,6 @@ import io.terminus.dalaran.model.dto.log.MainLogDTO;
 import io.terminus.dalaran.model.dto.log.TimeLogDTO;
 import io.terminus.dalaran.model.dto.log.TracingLogDTO;
 import io.terminus.dalaran.model.query.TracingLogQuery;
-import org.apache.kafka.common.protocol.types.Field;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;

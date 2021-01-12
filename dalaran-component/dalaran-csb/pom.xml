@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>dalaran-mapper</artifactId>
+    <artifactId>dalaran-csb</artifactId>
 
     <dependencies>
         <dependency>
@@ -17,17 +17,25 @@
             <artifactId>dalaran-flow-core</artifactId>
             <version>${project.version}</version>
         </dependency>
+
         <dependency>
-            <groupId>io.terminus</groupId>
-            <artifactId>dalaran-common</artifactId>
-            <version>${project.version}</version>
+            <groupId>com.alibaba.csb.sdk</groupId>
+            <artifactId>http-client</artifactId>
+            <version>1.1.5.9</version>
         </dependency>
+
         <dependency>
-            <groupId>io.terminus</groupId>
-            <artifactId>dalaran-resource-core</artifactId>
-            <version>2.4.5-SNAPSHOT</version>
-            <scope>compile</scope>
+            <groupId>com.alibaba.csb.sdk</groupId>
+            <artifactId>ws-client</artifactId>
+            <version>1.1.5.9</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>22.0</version>
         </dependency>
     </dependencies>
+
 
 </project>

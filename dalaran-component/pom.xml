@@ -35,6 +35,7 @@
         <module>dalaran-subflow</module>
         <module>dalaran-multicast</module>
         <module>dalaran-end</module>
+        <module>dalaran-csb</module>
     </modules>
 
 </project>

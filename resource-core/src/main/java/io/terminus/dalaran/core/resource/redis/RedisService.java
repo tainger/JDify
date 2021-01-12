@@ -13,10 +13,38 @@ public class RedisService {
     private RedisTemplate<String, String> redisTemplate;
 
     public Boolean setValue(String key, String value) {
-        return redisTemplate.opsForValue().setIfAbsent(key, value, 30, TimeUnit.MINUTES);
+        try {
+            return redisTemplate.opsForValue().setIfAbsent(key, value, 30, TimeUnit.MINUTES);
+        } catch (Exception e) {
+            return redisTemplate.opsForValue().setIfAbsent(key, value, 30, TimeUnit.MINUTES);
+        }
+    }
+
+    public Boolean setValue(String key, String value, long timeout) {
+        try {
+            return redisTemplate.opsForValue().setIfAbsent(key, value, timeout, TimeUnit.MINUTES);
+        } catch (Exception e) {
+            return redisTemplate.opsForValue().setIfAbsent(key, value, timeout, TimeUnit.MINUTES);
+        }
+    }
+
+    public String getValue(String key) {
+        try {
+            return redisTemplate.opsForValue().get(key);
+        } catch (Exception e) {
+            return redisTemplate.opsForValue().get(key);
+        }
+    }
+
+    public Boolean setValue(String key, String value, Long timeout) {
+        return redisTemplate.opsForValue().setIfAbsent(key, value, timeout, TimeUnit.SECONDS);
     }
 
     public Boolean contains(String key) {
-        return redisTemplate.hasKey(key);
+        try {
+            return redisTemplate.hasKey(key);
+        } catch (Exception e) {
+            return redisTemplate.hasKey(key);
+        }
     }
 }
