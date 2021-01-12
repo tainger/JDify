@@ -1,5 +1,7 @@
 package io.terminus.dalaran.component.processor.mapper;
 
+import com.alibaba.fastjson.JSON;
+import io.terminus.dalaran.DalaranConstants;
 import io.terminus.dalaran.component.processor.mapper.model.*;
 import io.terminus.dalaran.core.component.DalaranComponentValidator;
 import io.terminus.dalaran.core.component.DalaranProcessor;
@@ -8,6 +10,11 @@ import io.terminus.dalaran.core.component.config.DalaranMapperConfig;
 import io.terminus.dalaran.core.component.model.*;
 import io.terminus.dalaran.core.context.DalaranContext;
 import io.terminus.dalaran.core.context.DalaranFunctionContext;
+import io.terminus.dalaran.core.context.DalaranModelTypeContext;
+import io.terminus.dalaran.core.resource.DalaranResourceLoader;
+import io.terminus.dalaran.core.resource.entity.ModelAbstractEntity;
+import io.terminus.dalaran.core.resource.entity.PropertyAbstractEntity;
+import io.terminus.dalaran.model.DalaranModelSchema;
 import io.terminus.dalaran.model.FieldType;
 import io.terminus.dalaran.model.MessageModel;
 import io.terminus.dalaran.model.ModelField;
@@ -15,10 +22,12 @@ import io.terminus.dalaran.model.flow.FlowValidation;
 import io.terminus.dalaran.model.flow.FlowValidationBuilder;
 import io.terminus.dalaran.model.function.MappingFunctionInfo;
 import lombok.Data;
+import lombok.val;
 import org.apache.camel.model.ProcessorDefinition;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.text.StringSubstitutor;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.*;
@@ -39,6 +48,12 @@ public class DalaranMessageMapper implements DalaranProcessor<DalaranMapperConfi
 
     @Autowired
     private DalaranContext dalaranContext;
+
+    @Autowired
+    private DalaranResourceLoader resourceLoader;
+
+    @Autowired
+    private DalaranModelTypeContext converterContext;
 
     @Override
     public void configure(ProcessorDefinition route, DalaranMapperConfig config) {
@@ -233,23 +248,71 @@ public class DalaranMessageMapper implements DalaranProcessor<DalaranMapperConfi
         return sourcePaths;
     }
 
+    public MessageModel buildModel(ModelAbstractEntity modelEntity) {
+        if (modelEntity != null) {
+            val model = new MessageModel();
+            String modelType = modelEntity.getType();
+            model.setModelType(modelType);
+            model.setName(modelEntity.getName());
+            Class<? extends DalaranModelSchema> schemaType = converterContext.getModelSchema(modelType);
+            DalaranModelSchema modelSchema = buildConfig(modelEntity.getModelSchema(), schemaType);
+            model.setModelSchema(modelSchema);
+            return model;
+        }
+        return null;
+    }
+
+    private <T> T buildConfig(String configValue, Class<T> configType) {
+        String replacedConfig = replaceProperties(configValue, getProperties());
+        return JSON.parseObject(replacedConfig, configType);
+    }
+
+    private String replaceProperties(String configValue, Map<String, String> properties) {
+        StringSubstitutor stringSubstitutor = new StringSubstitutor(properties, DalaranConstants.ENV_REPLACE_PREFIX, DalaranConstants.ENV_REPLACE_SUFFIX);
+        return stringSubstitutor.replace(configValue);
+    }
+
+    private Map<String, String> getProperties() {
+        Map<String, String> properties = new HashMap<>(System.getenv());
+        for (PropertyAbstractEntity propertyEntity : resourceLoader.loadAllProperties()) {
+            properties.put(propertyEntity.getName(), propertyEntity.getValue());
+        }
+        return properties;
+    }
+
     @Override
     public List<FlowValidation> validate(DalaranMapperConfig config) {
         List<FlowValidation> validations = new ArrayList<>();
         MessageModel inModel = config.getInModel();
         MessageModel outModel = config.getOutModel();
+        String inModelId = config.getInModelId();
+        String outModelId = config.getOutModelId();
         Map<String, SimpleMapping> mappings = config.getMessageMapping();
 
         if (inModel == null || outModel == null) {
-            validations.add(FlowValidationBuilder.newBuilder()
-                    .field(MapperConstants.MAPPER_MODEL)
-                    .message(MODEL_NOT_NULL).build());
-            return validations;
+            if(StringUtils.isBlank(inModelId) || StringUtils.isBlank(outModelId)) {
+                validations.add(FlowValidationBuilder.newBuilder()
+                        .field(MapperConstants.MAPPER_MODEL)
+                        .message(MODEL_NOT_NULL).build());
+                return validations;
+            }
+            ModelAbstractEntity inModelEntity = resourceLoader.loadModel(Long.parseLong(inModelId));
+            inModel = buildModel(inModelEntity);
+            ModelAbstractEntity outModelEntity = resourceLoader.loadModel(Long.parseLong(outModelId));
+            outModel = buildModel(outModelEntity);
+            if(inModel == null || outModel == null) {
+                validations.add(FlowValidationBuilder.newBuilder()
+                        .field(MapperConstants.MAPPER_MODEL)
+                        .message(MODEL_NOT_NULL).build());
+                return validations;
+            }
         }
 
         if (MapUtils.isEmpty(mappings)) {
             return validations;
         }
+        MessageModel finalInModel = inModel;
+        MessageModel finalOutModel = outModel;
         mappings.forEach((destinationPath, simpleMapping) -> {
             if (simpleMapping.getMappingType() == MappingType.FUNCTION) {
                 MappingFunction function = (MappingFunction) simpleMapping.getValue();
@@ -267,7 +330,7 @@ public class DalaranMessageMapper implements DalaranProcessor<DalaranMapperConfi
                                 .message(MAPPER_FUNCTION_PARAM_NOT_NULL).build();
                         validations.add(validation);
                     } else {
-                        FlowValidation validation = checkArrayFields(param.getValue().toString(), inModel, destinationPath, outModel);
+                        FlowValidation validation = checkArrayFields(param.getValue(), finalInModel, destinationPath, finalOutModel);
                         if (validation != null) {
                             validations.add(validation);
                         }
@@ -282,7 +345,7 @@ public class DalaranMessageMapper implements DalaranProcessor<DalaranMapperConfi
                     validation.setField(destinationPath);
                     validations.add(validation);
                 } else {
-                    FlowValidation validation = checkArrayFields(sourcePath, inModel, destinationPath, outModel);
+                    FlowValidation validation = checkArrayFields(sourcePath, finalInModel, destinationPath, finalOutModel);
                     if (validation != null) {
                         validations.add(validation);
                     }

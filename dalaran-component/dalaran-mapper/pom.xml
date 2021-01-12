@@ -22,6 +22,12 @@
             <artifactId>dalaran-common</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>io.terminus</groupId>
+            <artifactId>dalaran-resource-core</artifactId>
+            <version>2.4.5-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 
 </project>
