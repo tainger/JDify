@@ -11,6 +11,9 @@ import org.apache.dubbo.config.ReferenceConfig;
 import org.apache.dubbo.config.RegistryConfig;
 import org.apache.dubbo.rpc.service.GenericService;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @UriEndpoint(firstVersion = "1.0.0", scheme = "dubbo", title = "Dubbo", syntax = "dubbo:application", label = "rpc")
 public class DubboEndpoint extends ProcessorEndpoint {
 
@@ -64,6 +67,9 @@ public class DubboEndpoint extends ProcessorEndpoint {
             reference.setCheck(false);
             reference.setGeneric(true);
             reference.setRetries(retries);
+            Map<String, String> params = new HashMap<>();
+            params.put("send.reconnect", "true");
+            reference.setParameters(params);
             if (version.length() > 6) {
                 reference.setOwner(version.substring(6));
             }

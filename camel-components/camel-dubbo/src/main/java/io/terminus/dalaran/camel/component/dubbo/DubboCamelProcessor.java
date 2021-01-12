@@ -8,6 +8,9 @@ import org.apache.dubbo.config.RegistryConfig;
 import org.apache.dubbo.rpc.RpcException;
 import org.apache.dubbo.rpc.service.GenericService;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class DubboCamelProcessor extends DefaultProducer {
 
     private final DubboEndpoint endpoint;
@@ -32,7 +35,7 @@ public class DubboCamelProcessor extends DefaultProducer {
                 e.printStackTrace();
                 GenericService genericService = refreshService();
                 endpoint.setGenericService(genericService);
-                result = endpoint.getGenericService().$invoke(method, new String[]{parameterType}, new Object[]{arg});
+                result = genericService.$invoke(method, new String[]{parameterType}, new Object[]{arg});
             }
         } else {
             try {
@@ -58,6 +61,9 @@ public class DubboCamelProcessor extends DefaultProducer {
         reference.setCheck(false);
         reference.setGeneric(true);
         reference.setRetries(endpoint.getRetries());
+        Map<String, String> params = new HashMap<>();
+        params.put("send.reconnect", "true");
+        reference.setParameters(params);
         if (endpoint.getVersion().length() > 6) {
             reference.setOwner(endpoint.getVersion().substring(6));
         }
