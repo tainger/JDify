@@ -49,13 +49,13 @@ public class OKHttpProcessor implements Processor {
         if (config.getMethod() == HttpMethod.GET) {
             Map<String, Object> params = buildQueryString(exchange.getIn().getBody());
             //params.forEach(httpBuilder::addQueryParameter);
-            for(String string:params.keySet()) {
-                httpBuilder.addQueryParameter(string,params.get(string).toString());
+            for(String string: params.keySet()) {
+                httpBuilder.addQueryParameter(string, params.get(string).toString());
             }
             request = new Request.Builder().url(httpBuilder.build()).headers(headers).build();
         } else {
             if (StringUtils.isNotBlank(config.getQueryParams())) {
-                url += url + Joiner.on("&").withKeyValueSeparator("=").join(buildValues(exchange, config.getQueryParams()));
+                url += Joiner.on("&").withKeyValueSeparator("=").join(buildValues(exchange, config.getQueryParams()));
             }
             switch (config.getContentType()) {
                 case APPLICATION_FORM_URLENCODED:
