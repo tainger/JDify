@@ -7,6 +7,7 @@ import com.google.common.collect.Maps;
 import io.terminus.dalaran.component.common.HttpMethod;
 import io.terminus.dalaran.component.http.processor.HttpClientConfig;
 import lombok.extern.slf4j.Slf4j;
+import lombok.var;
 import okhttp3.*;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
@@ -64,6 +65,13 @@ public class OKHttpProcessor implements Processor {
                     formBody.forEach((k, v) -> form.add(k, v));
                     FormBody requestBody = form.build();
                     request = new Request.Builder().url(url).headers(headers).post(requestBody).build();
+                    break;
+                case MULTIPART_FORM_DATA:
+                    Map<String, String> formData = buildValues(exchange, config.getFormData());
+                    var multipartBuilder = new MultipartBody.Builder();
+                    formData.forEach((k, v) -> multipartBuilder.addFormDataPart(k, v));
+                    MultipartBody multipartBody =  multipartBuilder.setType(MultipartBody.FORM).build();
+                    request = new Request.Builder().url(url).headers(headers).post(multipartBody).build();
                     break;
                 default:
                     RequestBody body = RequestBody.create(MediaType.parse("application/json"), buildRequestBody(exchange.getIn().getBody()));
