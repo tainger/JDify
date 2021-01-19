@@ -1,9 +1,9 @@
 package io.terminus.dalaran.component.trigger.soap.utils;
 
 import com.google.common.base.Charsets;
+import com.google.common.hash.Hashing;
 import org.apache.camel.Exchange;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.curator.shaded.com.google.common.hash.Hashing;
 import org.apache.http.entity.ContentType;
 
 import static org.apache.camel.Exchange.CONTENT_TYPE;

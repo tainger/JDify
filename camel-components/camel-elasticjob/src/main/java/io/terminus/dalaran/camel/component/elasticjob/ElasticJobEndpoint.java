@@ -19,7 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
-@UriEndpoint(firstVersion = "1.0.0", scheme = "elasticjob", title = "ElasticJob", syntax = "elasticjob:serverLists", label = "schedule")
+@UriEndpoint(firstVersion = "1.0.0", scheme = "elasticjob", title = "ElasticJob", syntax = "elasticjob:jobName", label = "schedule")
 public class ElasticJobEndpoint extends ProcessorEndpoint {
 
     @Autowired
@@ -79,8 +79,8 @@ public class ElasticJobEndpoint extends ProcessorEndpoint {
         this.cron = cron;
     }
 
-    public ElasticJobEndpoint() {
-
+    public ElasticJobEndpoint(String uri, ElasticJobComponent component) {
+        super(uri, component);
     }
 
     @Override

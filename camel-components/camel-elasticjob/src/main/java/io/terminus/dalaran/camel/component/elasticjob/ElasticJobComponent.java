@@ -6,8 +6,9 @@ import org.apache.camel.impl.DefaultComponent;
 import java.util.Map;
 
 public class ElasticJobComponent extends DefaultComponent {
+
     @Override
     protected Endpoint createEndpoint(String uri, String remaining, Map<String, Object> parameters) {
-        return new ElasticJobEndpoint();
+        return new ElasticJobEndpoint(uri, this);
     }
 }

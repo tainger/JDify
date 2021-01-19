@@ -19,17 +19,18 @@ public class ElasticJob implements SimpleJob {
 
     @Override
     public void execute(ShardingContext shardingContext) {
-        Exchange exchange = null;
-        try {
-            exchange = endpoint.createExchange();
-            exchange.setIn(new ElasticJobMessage(exchange, shardingContext));
-            endpoint.getConsumerLoadBalancer().process(exchange);
-        }catch (Exception e) {
-            if (exchange != null) {
-                LOG.error(CamelExchangeException.createExceptionMessage("Error processing exchange", exchange, e));
-            } else {
-                LOG.error("Failed to execute ElasticJob.", e);
-            }
-        }
+        new ElasticJobProcessor(endpoint);
+//        Exchange exchange = null;
+//        try {
+//            exchange = endpoint.createExchange();
+//            exchange.setIn(new ElasticJobMessage(exchange, shardingContext));
+//            endpoint.getConsumerLoadBalancer().process(exchange);
+//        }catch (Exception e) {
+//            if (exchange != null) {
+//                LOG.error(CamelExchangeException.createExceptionMessage("Error processing exchange", exchange, e));
+//            } else {
+//                LOG.error("Failed to execute ElasticJob.", e);
+//            }
+//        }
     }
 }

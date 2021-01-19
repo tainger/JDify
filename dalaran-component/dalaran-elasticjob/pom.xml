@@ -3,34 +3,31 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>dalaran-parent</artifactId>
+        <artifactId>dalaran-component</artifactId>
         <groupId>io.terminus</groupId>
         <version>2.4.6-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>dalaran-resource-core</artifactId>
-
+    <artifactId>dalaran-elasticjob</artifactId>
     <dependencies>
         <dependency>
             <groupId>io.terminus</groupId>
             <artifactId>dalaran-flow-core</artifactId>
+            <version>2.4.6-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.terminus</groupId>
+            <artifactId>dalaran-common</artifactId>
             <version>${project.version}</version>
         </dependency>
-
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-jpa</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-redis</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-            <version>${mysql.connector.version}</version>
+            <groupId>io.terminus</groupId>
+            <artifactId>camel-elasticjob</artifactId>
+            <version>${project.version}</version>
         </dependency>
     </dependencies>
+
 
 </project>
