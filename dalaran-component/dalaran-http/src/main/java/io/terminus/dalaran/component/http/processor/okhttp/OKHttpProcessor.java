@@ -64,18 +64,36 @@ public class OKHttpProcessor implements Processor {
                     FormBody.Builder form = new FormBody.Builder();
                     formBody.forEach((k, v) -> form.add(k, v));
                     FormBody requestBody = form.build();
-                    request = new Request.Builder().url(url).headers(headers).post(requestBody).build();
+                    if (config.getMethod() == HttpMethod.PUT) {
+                        request = new Request.Builder().url(url).headers(headers).put(requestBody).build();
+                    } else if (config.getMethod() == HttpMethod.DELETE) {
+                        request = new Request.Builder().url(url).headers(headers).delete(requestBody).build();
+                    } else {
+                        request = new Request.Builder().url(url).headers(headers).post(requestBody).build();
+                    }
                     break;
                 case MULTIPART_FORM_DATA:
                     Map<String, String> formData = buildValues(exchange, config.getFormData());
                     var multipartBuilder = new MultipartBody.Builder();
                     formData.forEach((k, v) -> multipartBuilder.addFormDataPart(k, v));
                     MultipartBody multipartBody =  multipartBuilder.setType(MultipartBody.FORM).build();
-                    request = new Request.Builder().url(url).headers(headers).post(multipartBody).build();
+                    if (config.getMethod() == HttpMethod.PUT) {
+                        request = new Request.Builder().url(url).headers(headers).put(multipartBody).build();
+                    } else if (config.getMethod() == HttpMethod.DELETE) {
+                        request = new Request.Builder().url(url).headers(headers).delete(multipartBody).build();
+                    } else {
+                        request = new Request.Builder().url(url).headers(headers).post(multipartBody).build();
+                    }
                     break;
                 default:
                     RequestBody body = RequestBody.create(MediaType.parse("application/json"), buildRequestBody(exchange.getIn().getBody()));
-                    request = new Request.Builder().url(url).headers(headers).post(body).build();
+                    if (config.getMethod() == HttpMethod.PUT) {
+                        request = new Request.Builder().url(url).headers(headers).put(body).build();
+                    } else if (config.getMethod() == HttpMethod.DELETE) {
+                        request = new Request.Builder().url(url).headers(headers).delete(body).build();
+                    } else {
+                        request = new Request.Builder().url(url).headers(headers).post(body).build();
+                    }
             }
         }
         log.info("url: " + url);
