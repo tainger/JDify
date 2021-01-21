@@ -64,18 +64,18 @@ public class OKHttpProcessor implements Processor {
                     FormBody.Builder form = new FormBody.Builder();
                     formBody.forEach((k, v) -> form.add(k, v));
                     FormBody requestBody = form.build();
-                    request = new Request.Builder().url(url).headers(headers).post(requestBody).build();
+                    request = makeRequest(url, headers, config.getMethod(), requestBody);
                     break;
                 case MULTIPART_FORM_DATA:
                     Map<String, String> formData = buildValues(exchange, config.getFormData());
                     var multipartBuilder = new MultipartBody.Builder();
                     formData.forEach((k, v) -> multipartBuilder.addFormDataPart(k, v));
                     MultipartBody multipartBody =  multipartBuilder.setType(MultipartBody.FORM).build();
-                    request = new Request.Builder().url(url).headers(headers).post(multipartBody).build();
+                    request = makeRequest(url, headers, config.getMethod(), multipartBody);
                     break;
                 default:
                     RequestBody body = RequestBody.create(MediaType.parse("application/json"), buildRequestBody(exchange.getIn().getBody()));
-                    request = new Request.Builder().url(url).headers(headers).post(body).build();
+                    request = makeRequest(url, headers, config.getMethod(), body);
             }
         }
         log.info("url: " + url);
@@ -86,6 +86,18 @@ public class OKHttpProcessor implements Processor {
         String responseBody = Objects.requireNonNull(response.body()).string();
         log.info("response: " + responseBody);
         exchange.getOut().setBody(responseBody);
+    }
+
+    public Request makeRequest(String url, Headers headers, HttpMethod method, RequestBody requestBody) {
+        Request request;
+        if (method == HttpMethod.PUT) {
+            request = new Request.Builder().url(url).headers(headers).put(requestBody).build();
+        } else if (method == HttpMethod.DELETE) {
+            request = new Request.Builder().url(url).headers(headers).delete(requestBody).build();
+        } else {
+            request = new Request.Builder().url(url).headers(headers).post(requestBody).build();
+        }
+        return request;
     }
 
     private Map<String, Object> buildQueryString(Object obj) throws Exception {
