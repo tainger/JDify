@@ -1,7 +1,7 @@
 package io.terminus.dalaran.camel.component.elasticjob;
 
-import org.apache.camel.CamelExchangeException;
 import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
 import org.apache.shardingsphere.elasticjob.api.ShardingContext;
 import org.apache.shardingsphere.elasticjob.simple.job.SimpleJob;
 import org.slf4j.Logger;
@@ -13,24 +13,22 @@ public class ElasticJob implements SimpleJob {
 
     private ElasticJobEndpoint endpoint;
 
-    public ElasticJob(ElasticJobEndpoint endpoint) {
+    private Processor processor;
+
+    public ElasticJob(ElasticJobEndpoint endpoint, Processor processor) {
         this.endpoint = endpoint;
+        this.processor = processor;
     }
 
     @Override
     public void execute(ShardingContext shardingContext) {
-        new ElasticJobProcessor(endpoint);
-//        Exchange exchange = null;
-//        try {
-//            exchange = endpoint.createExchange();
-//            exchange.setIn(new ElasticJobMessage(exchange, shardingContext));
-//            endpoint.getConsumerLoadBalancer().process(exchange);
-//        }catch (Exception e) {
-//            if (exchange != null) {
-//                LOG.error(CamelExchangeException.createExceptionMessage("Error processing exchange", exchange, e));
-//            } else {
-//                LOG.error("Failed to execute ElasticJob.", e);
-//            }
-//        }
+        LOG.info("execute test");
+        Exchange exchange = endpoint.createExchange();
+        try {
+            processor.process(exchange);
+        }catch (Exception e){
+            LOG.info("process fail");
+            e.printStackTrace();
+        }
     }
 }

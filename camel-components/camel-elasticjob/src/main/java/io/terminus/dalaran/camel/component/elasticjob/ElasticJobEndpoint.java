@@ -79,8 +79,7 @@ public class ElasticJobEndpoint extends ProcessorEndpoint {
         this.cron = cron;
     }
 
-    public ElasticJobEndpoint(String uri, ElasticJobComponent component) {
-        super(uri, component);
+    public ElasticJobEndpoint() {
     }
 
     @Override
@@ -88,83 +87,15 @@ public class ElasticJobEndpoint extends ProcessorEndpoint {
         return "elasticjob://" + serverLists + "." + namespace + "." + jobName + "." + cron;
     }
 
-    public void addJobInScheduler () throws Exception{
-        new ScheduleJobBootstrap(createRegistryCenter(), new ElasticJob(this), createJobConfiguration()).schedule();
-        jobAdded.set(true);
-    }
-
-    private void removeJobInScheduler() throws Exception {
-        jobOperateAPI.remove(jobName,serverLists);
-        jobAdded.set(false);
-    }
-
-    private void disableJobInScheduler() throws Exception {
-        if (jobPaused.get()) {
-            return;
-        }
-        jobPaused.set(true);
-        jobOperateAPI.disable(jobName,serverLists);
-    }
-
-    private void enableJobInScheduler() throws Exception {
-        if (!jobPaused.get()) {
-            return;
-        }
-        jobPaused.set(false);
-        jobOperateAPI.enable(jobName,serverLists);
-    }
-
-    private CoordinatorRegistryCenter createRegistryCenter() {
-        CoordinatorRegistryCenter regCenter = new ZookeeperRegistryCenter(new ZookeeperConfiguration(serverLists, namespace));
-        regCenter.init();
-        return regCenter;
-    }
-
-    private JobConfiguration createJobConfiguration() {
-        return JobConfiguration.newBuilder(jobName, 1).cron(cron).jobErrorHandlerType("LOG").build();
-    }
-
     @Override
-    public Producer createProducer() throws Exception {
+    public Producer createProducer() {
         throw new UnsupportedOperationException("elasticjob producer is not supported.");
     }
 
     @Override
     public Consumer createConsumer(Processor processor) throws Exception {
-        return super.createConsumer(processor);
-    }
-
-    @Override
-    protected void doStart() throws Exception {
-        addJobInScheduler();
-    }
-
-    @Override
-    protected void doStop() throws Exception {
-        removeJobInScheduler();
-    }
-
-    public LoadBalancer getConsumerLoadBalancer() {
-        if (consumerLoadBalancer == null) {
-            consumerLoadBalancer = new RoundRobinLoadBalancer();
-        }
-        return consumerLoadBalancer;
-    }
-
-    public void onConsumerStart(ElasticJobConsumer consumer) throws Exception{
-        getConsumerLoadBalancer().addProcessor(consumer.getProcessor());
-        if (!jobAdded.get()) {
-            addJobInScheduler();
-        } else {
-            enableJobInScheduler();
-        }
-    }
-
-    public void onConsumerStop(ElasticJobConsumer consumer) throws Exception{
-        getConsumerLoadBalancer().removeProcessor(consumer.getProcessor());
-        if (jobAdded.get()) {
-            disableJobInScheduler();
-        }
+        ElasticJobConsumer consumer = new ElasticJobConsumer(this, processor);
+        return consumer;
     }
 
 }

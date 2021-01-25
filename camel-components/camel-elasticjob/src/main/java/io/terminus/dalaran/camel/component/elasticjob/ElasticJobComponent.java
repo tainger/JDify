@@ -9,6 +9,6 @@ public class ElasticJobComponent extends DefaultComponent {
 
     @Override
     protected Endpoint createEndpoint(String uri, String remaining, Map<String, Object> parameters) {
-        return new ElasticJobEndpoint(uri, this);
+        return new ElasticJobEndpoint();
     }
 }
