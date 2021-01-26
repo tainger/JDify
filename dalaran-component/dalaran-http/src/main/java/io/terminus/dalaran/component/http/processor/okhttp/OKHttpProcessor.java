@@ -32,11 +32,12 @@ public class OKHttpProcessor implements Processor {
 
     @Override
     public void process(Exchange exchange) throws Exception {
+        String path = buildPath(config.getPath(), exchange);
         String url = "";
         if (config.getConnector().getProtocol().name().equals("HTTPS")){
-            url = config.getConnector().getProtocol().name().toLowerCase() + "://" + config.getConnector().getHost() + config.getPath();
-        }else {
-            url = config.getConnector().getProtocol().name().toLowerCase() + "://" + config.getConnector().getHost() + ":" + config.getConnector().getPort() + config.getPath();
+            url = config.getConnector().getProtocol().name().toLowerCase() + "://" + config.getConnector().getHost() + path;
+        } else {
+            url = config.getConnector().getProtocol().name().toLowerCase() + "://" + config.getConnector().getHost() + ":" + config.getConnector().getPort() + path;
         }
         log.info("url: " + url);
         Request request;
@@ -144,5 +145,27 @@ public class OKHttpProcessor implements Processor {
         } else {
             return JSON.parseObject(JSON.toJSONString(body), Map.class);
         }
+    }
+
+    private String buildPath(String path, Exchange exchange) {
+        if (!StringUtils.contains(path, "{") || !StringUtils.contains(path, "}")) {
+            return path;
+        }
+        String contextKey = "DalaranContextExchange" + exchange.getExchangeId();
+        Map<String, Object> contextValues = (Map)exchange.getProperties().get(contextKey);
+        StringBuilder pathBuilder = new StringBuilder(path);
+        String[] params = StringUtils.split(path, "/");
+        for (String param: params) {
+            if (!StringUtils.contains(param, "{") || !StringUtils.contains(param, "}")) {
+                continue;
+            }
+            String paramKey = StringUtils.substring(param, 1, param.length() - 1);
+            if (contextValues.containsKey(paramKey)) {
+                String pathValue = contextValues.get(paramKey).toString();
+                pathBuilder = new StringBuilder(StringUtils.replace(pathBuilder.toString(), param, pathValue));
+
+            }
+        }
+        return pathBuilder.toString();
     }
 }
