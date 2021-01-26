@@ -47,6 +47,10 @@ public class ElasticJobEndpoint extends ProcessorEndpoint {
     @Metadata(required = "true")
     private String cron;
 
+    @UriParam(description = "作业分片总数", javaType = "java.lang.Integer")
+    @Metadata(required = "true")
+    private Integer shardingTotalCount;
+
     public String getServerLists() {
         return serverLists;
     }
@@ -77,6 +81,14 @@ public class ElasticJobEndpoint extends ProcessorEndpoint {
 
     public void setCron(String cron) {
         this.cron = cron;
+    }
+
+    public Integer getShardingTotalCount() {
+        return shardingTotalCount;
+    }
+
+    public void setShardingTotalCount(Integer shardingTotalCount) {
+        this.shardingTotalCount = shardingTotalCount;
     }
 
     public ElasticJobEndpoint() {

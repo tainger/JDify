@@ -96,43 +96,6 @@ public class RestListener implements DalaranTrigger<RestConfig>, DalaranTriggerA
         }
     }
 
-    public static void getJksFile(String url) {
-        String fileName = "/tmp/server.jks";
-        File file = new File(fileName);
-        try {
-            file.createNewFile();
-            URL httpUrl = new URL(url);
-            FileUtils.copyURLToFile(httpUrl, file);
-        }catch (Exception e){
-
-        }
-    }
-
-    public static SSLContextParameters sslParameters() throws KeyManagementException, GeneralSecurityException, IOException {
-        getJksFile("https://dalaran-oss-test.oss-cn-hangzhou.aliyuncs.com/server.jks?Expires=1606123386&OSSAccessKeyId=TMP.3KhWVu4meh9MHAFkue8nEikdGecUUb7zxNYUBu8yedc3pBbLwRswDg4HdcQTN6QnpFHjStVMAG9ThtbC5taaj1dBgXHcaN&Signature=sCMMxUsm9dwBDDJZ5Flpv6U98bY%3D");
-        KeyStoreParameters ksp = new KeyStoreParameters();
-        ksp.setResource("/tmp/server.jks");
-        ksp.setPassword("963168");
-
-        KeyManagersParameters kmp = new KeyManagersParameters();
-        kmp.setKeyStore(ksp);
-        kmp.setKeyPassword("963168");
-
-        SSLContextParameters scp = new SSLContextParameters();
-        scp.setKeyManagers(kmp);
-
-        SSLContextBuilder builder = new SSLContextBuilder();
-        builder.loadTrustMaterial(null, new TrustSelfSignedStrategy());
-        SSLContext sslcontext = builder.build();
-        scp.createSSLContext().setDefault(sslcontext);
-
-        TrustManagersParameters tmp = new TrustManagersParameters();
-        tmp.setKeyStore(ksp);
-        scp.setTrustManagers(tmp);
-
-        return scp;
-    }
-
     @Override
     public Swagger exportApiDoc(Map<String, List<TriggerFlow>> moduleTriggerFlows) {
         return SwaggerUtils.buildSwagger(buildApiInfoListNew(moduleTriggerFlows));

@@ -19,4 +19,7 @@ public class ElasticJobConfig {
     @ConfigFieldInfo(label = "cron", inputType = FieldInputType.String)
     private String cron;
 
+    @ConfigFieldInfo(label = "作业分片总数", inputType = FieldInputType.Integer)
+    private Integer shardingTotalCount;
+
 }
