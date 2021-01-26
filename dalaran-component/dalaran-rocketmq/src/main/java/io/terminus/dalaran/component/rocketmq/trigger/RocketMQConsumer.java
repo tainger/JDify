@@ -17,14 +17,14 @@ import org.apache.camel.model.RouteDefinition;
 public class RocketMQConsumer implements DalaranTrigger<RocketMQConsumerConfig> {
 
     private static final String CAMEL_ROCKET_MQ_URI = "rocketmq:?nameServer=%s&groupId=%s&topic=%s&tags=%s&useAliCloudOns=%s" +
-            "&accessKey=%s&secretKey=%s&autocommit=%s";
+            "&accessKey=%s&secretKey=%s&autocommit=%s&consumerType=%s";
 
     @Override
     public void buildFromRoute(RouteDefinition route, RocketMQConsumerConfig config) {
         RocketMQConnector connector = config.getConnector();
         String uri = String.format(CAMEL_ROCKET_MQ_URI, connector.getNameServer(), config.getConsumerGroup(),
                 config.getTopic(), config.getTags(), connector.getUseAliCloudOns(),
-                connector.getAccessKey(), connector.getSecretKey(), config.isAutocommit());
+                connector.getAccessKey(), connector.getSecretKey(), config.isAutocommit(), config.getConsumerType().name());
         route.from(uri);
     }
 }

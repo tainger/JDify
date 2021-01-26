@@ -26,6 +26,9 @@ public class RocketMQEndpoint extends ProcessorEndpoint {
     @UriParam(description = "consumer/producer tags", javaType = "java.lang.String")
     private String tags;
 
+    @UriParam(description = "consumer type", javaType = "java.lang.String")
+    private String consumerType;
+
     @UriParam(description = "timeout", javaType = "java.lang.Integer")
     private Integer timeout;
 
@@ -170,5 +173,13 @@ public class RocketMQEndpoint extends ProcessorEndpoint {
 
     public void setAsync(Boolean async) {
         this.async = async;
+    }
+
+    public String getConsumerType() {
+        return consumerType;
+    }
+
+    public void setConsumerType(String consumerType) {
+        this.consumerType = consumerType;
     }
 }
