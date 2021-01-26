@@ -11,6 +11,7 @@ import io.terminus.dalaran.core.component.DalaranProcessor;
 import io.terminus.dalaran.core.component.annotation.Processor;
 import io.terminus.dalaran.core.oss.OSSAccount;
 import lombok.extern.slf4j.Slf4j;
+import okhttp3.ConnectionSpec;
 import okhttp3.OkHttpClient;
 import org.apache.camel.model.ProcessorDefinition;
 import org.apache.commons.lang3.StringUtils;
@@ -61,6 +62,7 @@ public class OKHttpClient implements DalaranProcessor<HttpClientConfig> {
                         .connectTimeout(config.getConnector().getTimeout(), TimeUnit.MILLISECONDS)
                         .readTimeout(config.getConnector().getTimeout(), TimeUnit.MILLISECONDS)
                         .sslSocketFactory(sslSocketFactory, trustManager)
+                        .connectionSpecs(Arrays.asList(ConnectionSpec.COMPATIBLE_TLS))
                         .build();
                 route.process(new OKHttpProcessor(config, client));
             } catch (Exception e) {
