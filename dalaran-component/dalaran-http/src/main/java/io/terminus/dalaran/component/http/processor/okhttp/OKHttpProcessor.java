@@ -57,7 +57,10 @@ public class OKHttpProcessor implements Processor {
             request = new Request.Builder().url(httpBuilder.build()).headers(headers).build();
         } else {
             if (StringUtils.isNotBlank(config.getQueryParams())) {
-                url += "?" + Joiner.on("&").withKeyValueSeparator("=").join(buildValues(exchange, config.getQueryParams()));
+                if (!StringUtils.endsWith(url, "?")) {
+                    url += "?";
+                }
+                url += Joiner.on("&").withKeyValueSeparator("=").join(buildValues(exchange, config.getQueryParams()));
             }
             switch (config.getContentType()) {
                 case APPLICATION_FORM_URLENCODED:
