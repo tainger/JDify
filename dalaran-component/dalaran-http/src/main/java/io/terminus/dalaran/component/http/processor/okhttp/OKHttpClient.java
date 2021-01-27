@@ -70,6 +70,7 @@ public class OKHttpClient implements DalaranProcessor<OKHttpClientConfig> {
                         .connectTimeout(config.getConnector().getTimeout(), TimeUnit.MILLISECONDS)
                         .readTimeout(config.getConnector().getTimeout(), TimeUnit.MILLISECONDS)
                         .sslSocketFactory(createSSLSocketFactory(),new TrustAllCertificates())
+                        .connectionSpecs(Arrays.asList(ConnectionSpec.COMPATIBLE_TLS))
                         .hostnameVerifier((s, sslSession) -> true)
                         .build();
                 route.process(new OKHttpProcessor(config, client));
