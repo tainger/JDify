@@ -96,7 +96,7 @@ public class ElasticJobEndpoint extends ProcessorEndpoint {
 
     @Override
     protected String createEndpointUri() {
-        return "elasticjob://" + serverLists + "." + namespace + "." + jobName + "." + cron;
+        return "elasticjob://" + serverLists + "." + namespace + "." + jobName + "." + cron + "." + shardingTotalCount;
     }
 
     @Override

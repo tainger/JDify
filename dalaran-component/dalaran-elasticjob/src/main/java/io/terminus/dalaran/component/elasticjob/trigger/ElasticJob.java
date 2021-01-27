@@ -22,6 +22,7 @@ public class ElasticJob implements DalaranTrigger<ElasticJobConfig> {
         options.put("namespace", config.getNamespace());
         options.put("jobName", config.getJobName());
         options.put("cron", config.getCron());
+        options.put("shardingTotalCount", config.getShardingTotalCount());
         String optionsString = UriUtils.buildOptionsQueryString(options);
         String uri = "elasticjob://" + config.getJobName() + optionsString;
         route.from(uri);

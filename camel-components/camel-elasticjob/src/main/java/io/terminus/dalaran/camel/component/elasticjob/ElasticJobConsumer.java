@@ -45,6 +45,6 @@ public class ElasticJobConsumer extends DefaultConsumer {
     }
 
     private JobConfiguration createJobConfiguration() {
-        return JobConfiguration.newBuilder(endpoint.getJobName(), 1).cron(endpoint.getCron()).jobErrorHandlerType("LOG").build();
+        return JobConfiguration.newBuilder(endpoint.getJobName(), endpoint.getShardingTotalCount()).cron(endpoint.getCron()).jobErrorHandlerType("LOG").build();
     }
 }
