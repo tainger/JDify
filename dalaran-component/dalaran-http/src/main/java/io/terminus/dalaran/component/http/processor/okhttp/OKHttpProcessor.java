@@ -21,11 +21,11 @@ import java.util.Objects;
 @Slf4j
 public class OKHttpProcessor implements Processor {
 
-    private HttpClientConfig config;
+    private OKHttpClientConfig config;
 
     private OkHttpClient client;
 
-    public OKHttpProcessor(HttpClientConfig config, OkHttpClient client) {
+    public OKHttpProcessor(OKHttpClientConfig config, OkHttpClient client) {
         this.config = config;
         this.client = client;
     }
