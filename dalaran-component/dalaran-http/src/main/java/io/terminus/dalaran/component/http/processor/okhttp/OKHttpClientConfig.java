@@ -1,4 +1,4 @@
-package io.terminus.dalaran.component.http.processor;
+package io.terminus.dalaran.component.http.processor.okhttp;
 
 import com.alibaba.fastjson.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -12,7 +12,7 @@ import io.terminus.dalaran.core.component.config.OutModelConfig;
 import lombok.Data;
 
 @Data
-public class HttpClientConfig extends OutModelConfig implements ConnectorConfig<RestClientConnector> {
+public class OKHttpClientConfig extends OutModelConfig implements ConnectorConfig<RestClientConnector> {
 
     @ConfigFieldInfo(inputType = FieldInputType.Hidden)
     @JSONField(serialize = false)
@@ -43,4 +43,9 @@ public class HttpClientConfig extends OutModelConfig implements ConnectorConfig<
     @ConfigFieldInfo(label = "Add Last Headers", inputType = FieldInputType.Switch, required = false)
     private Boolean addLastHeaders = false;
 
+    @ConfigFieldInfo(label = "是否校验证书", inputType = FieldInputType.Switch, required = false)
+    private Boolean checkCertificate = true;
+
+    @ConfigFieldInfo(label = "SSL Certificate", inputType = FieldInputType.FileUpload, required = false)
+    private String sslCertificate;
 }
