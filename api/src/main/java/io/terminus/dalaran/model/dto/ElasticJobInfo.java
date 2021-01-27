@@ -1,9 +1,14 @@
 package io.terminus.dalaran.model.dto;
 
+import io.terminus.dalaran.model.flow.FlowStatus;
 import lombok.Data;
 
 @Data
 public class ElasticJobInfo {
+
+    private Long flowId;
+
+    private FlowStatus jobStatus;
 
     private String serverLists;
 
@@ -13,5 +18,5 @@ public class ElasticJobInfo {
 
     private String cron;
 
-    private String shardingTotalCount;
+    private Integer shardingTotalCount;
 }

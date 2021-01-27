@@ -11,7 +11,9 @@ import io.terminus.dalaran.model.dto.ElasticJobInfo;
 import io.terminus.dalaran.model.flow.FlowStatus;
 import io.terminus.dalaran.response.ResponseErrorMsg;
 import io.terminus.dalaran.response.ResponseResult;
+import org.apache.shardingsphere.elasticjob.infra.pojo.JobConfigurationPOJO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -35,14 +37,11 @@ public class ElasticJobServiceImpl implements ElasticJobService {
         if (triggerFlowReleasedEntity == null) {
             return null;
         }
-        return triggerFlowReleasedEntity.stream().map(entiity-> JSONObject.parseObject(entiity.getTriggerConfig(), ElasticJobInfo.class)).collect(Collectors.toList());
+        return triggerFlowReleasedEntity.stream().map(this::buildJobInfo).collect(Collectors.toList());
     }
 
     @Override
     public ResponseResult trigger(ElasticJobInfo elasticJobInfo) {
-        if (elasticJobInfo == null) {
-            return fail(ResponseErrorMsg.REQUESTBODY_IS_NULL);
-        }
         try {
             jobAPIService.getJobOperatorAPI(elasticJobInfo).trigger(elasticJobInfo.getJobName());
             return success();
@@ -54,9 +53,6 @@ public class ElasticJobServiceImpl implements ElasticJobService {
 
     @Override
     public ResponseResult disable(ElasticJobInfo elasticJobInfo) {
-        if (elasticJobInfo == null) {
-            return fail(ResponseErrorMsg.REQUESTBODY_IS_NULL);
-        }
         try {
             jobAPIService.getJobOperatorAPI(elasticJobInfo).disable(elasticJobInfo.getJobName(), null);
             return success();
@@ -68,9 +64,6 @@ public class ElasticJobServiceImpl implements ElasticJobService {
 
     @Override
     public ResponseResult enable(ElasticJobInfo elasticJobInfo) {
-        if (elasticJobInfo == null) {
-            return fail(ResponseErrorMsg.REQUESTBODY_IS_NULL);
-        }
         try {
             jobAPIService.getJobOperatorAPI(elasticJobInfo).enable(elasticJobInfo.getJobName(), null);
             return success();
@@ -80,6 +73,16 @@ public class ElasticJobServiceImpl implements ElasticJobService {
         }
     }
 
+    @Override
+    public ResponseResult update(ElasticJobInfo elasticJobInfo) {
+        try {
+            jobAPIService.getJobConfigurationAPI(elasticJobInfo).updateJobConfiguration(buildJobConfig(elasticJobInfo));
+            return success();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return fail(ResponseErrorMsg.UPDATE_JOB_ERROR);
+        }
+    }
 
     private ResponseResult fail(String errorMsg) {
         ResponseResult result = new ResponseResult();
@@ -97,6 +100,22 @@ public class ElasticJobServiceImpl implements ElasticJobService {
     public String getCurrentVersion() {
         ReleaseRecordEntity recordEntity = releaseRecordRepository.findByEnabledTrue();
         return recordEntity.getVersion();
+    }
+
+    private ElasticJobInfo buildJobInfo(TriggerFlowReleasedEntity entity) {
+        ElasticJobInfo elasticJobInfo;
+        elasticJobInfo = JSONObject.parseObject(entity.getTriggerConfig(), ElasticJobInfo.class);
+        elasticJobInfo.setFlowId(entity.getOriginId());
+        elasticJobInfo.setJobStatus(entity.getStatus());
+        return elasticJobInfo;
+    }
+
+    private JobConfigurationPOJO buildJobConfig(ElasticJobInfo info) {
+        JobConfigurationPOJO jobConfigurationPOJO = new JobConfigurationPOJO();
+        jobConfigurationPOJO.setJobName(info.getJobName());
+        jobConfigurationPOJO.setCron(info.getCron());
+        jobConfigurationPOJO.setShardingTotalCount(info.getShardingTotalCount());
+        return jobConfigurationPOJO;
     }
 
 }

@@ -14,4 +14,6 @@ public interface ElasticJobService {
     ResponseResult disable(ElasticJobInfo elasticJobInfo);
 
     ResponseResult enable(ElasticJobInfo elasticJobInfo);
+
+    ResponseResult update(ElasticJobInfo elasticJobInfo);
 }

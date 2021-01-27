@@ -23,4 +23,8 @@ public interface ElasticJobWriteAPI {
     @PostMapping(value = "/enable")
     ResponseResult enable(@RequestBody ElasticJobInfo elasticJobInfo);
 
+    @ApiOperation(value = "更新该任务")
+    @PostMapping(value = "/update")
+    ResponseResult update(@RequestBody ElasticJobInfo elasticJobInfo);
+
 }
