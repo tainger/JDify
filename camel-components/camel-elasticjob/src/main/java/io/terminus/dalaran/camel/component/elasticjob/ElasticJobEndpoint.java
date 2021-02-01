@@ -4,32 +4,17 @@ import org.apache.camel.Consumer;
 import org.apache.camel.Processor;
 import org.apache.camel.Producer;
 import org.apache.camel.impl.ProcessorEndpoint;
-import org.apache.camel.processor.loadbalancer.LoadBalancer;
-import org.apache.camel.processor.loadbalancer.RoundRobinLoadBalancer;
 import org.apache.camel.spi.Metadata;
 import org.apache.camel.spi.UriEndpoint;
 import org.apache.camel.spi.UriParam;
-import org.apache.shardingsphere.elasticjob.api.JobConfiguration;
-import org.apache.shardingsphere.elasticjob.lite.api.bootstrap.impl.ScheduleJobBootstrap;
 import org.apache.shardingsphere.elasticjob.lite.lifecycle.api.JobOperateAPI;
-import org.apache.shardingsphere.elasticjob.reg.base.CoordinatorRegistryCenter;
-import org.apache.shardingsphere.elasticjob.reg.zookeeper.ZookeeperConfiguration;
-import org.apache.shardingsphere.elasticjob.reg.zookeeper.ZookeeperRegistryCenter;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.concurrent.atomic.AtomicBoolean;
 
 @UriEndpoint(firstVersion = "1.0.0", scheme = "elasticjob", title = "ElasticJob", syntax = "elasticjob:jobName", label = "schedule")
 public class ElasticJobEndpoint extends ProcessorEndpoint {
 
     @Autowired
     private JobOperateAPI jobOperateAPI;
-
-    private LoadBalancer consumerLoadBalancer;
-
-    private final AtomicBoolean jobAdded = new AtomicBoolean(false);
-
-    private final AtomicBoolean jobPaused = new AtomicBoolean(false);
 
     @UriParam(description = "连接 ZooKeeper 服务器的列表", javaType = "java.lang.String")
     @Metadata(required = "true")
@@ -50,6 +35,18 @@ public class ElasticJobEndpoint extends ProcessorEndpoint {
     @UriParam(description = "作业分片总数", javaType = "java.lang.Integer")
     @Metadata(required = "true")
     private Integer shardingTotalCount;
+
+    @UriParam(description = "数据库url", javaType = "java.lang.String")
+    @Metadata(required = "true")
+    private String url;
+
+    @UriParam(description = "数据库用户名", javaType = "java.lang.String")
+    @Metadata(required = "true")
+    private String username;
+
+    @UriParam(description = "数据库密码", javaType = "java.lang.String")
+    @Metadata(required = "true")
+    private String password;
 
     public String getServerLists() {
         return serverLists;
@@ -91,12 +88,37 @@ public class ElasticJobEndpoint extends ProcessorEndpoint {
         this.shardingTotalCount = shardingTotalCount;
     }
 
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
     public ElasticJobEndpoint() {
     }
 
     @Override
     protected String createEndpointUri() {
-        return "elasticjob://" + serverLists + "." + namespace + "." + jobName + "." + cron + "." + shardingTotalCount;
+        return "elasticjob://" + serverLists + "." + namespace + "." + jobName + "." + cron + "." + shardingTotalCount
+                + "." + url + "." + username + "." + password;
     }
 
     @Override

@@ -4,19 +4,11 @@ import io.terminus.dalaran.model.flow.FlowStatus;
 import lombok.Data;
 
 @Data
-public class ElasticJobInfo {
+public class ElasticJobInfo extends ElasticJobConfigInfo{
 
     private Long flowId;
 
     private FlowStatus jobStatus;
 
-    private String serverLists;
-
-    private String namespace;
-
-    private String jobName;
-
-    private String cron;
-
-    private Integer shardingTotalCount;
+    private String version;
 }
