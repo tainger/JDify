@@ -27,4 +27,8 @@ public class SoapClientConnector {
 
     @ConfigFieldInfo(label = "密码", inputType = FieldInputType.Password, required = false)
     private String password;
+
+    @ConfigFieldInfo(label = "超时时间", inputType = FieldInputType.Integer, defaultValue = "5000")
+    private Long timeout = 5000L;
+
 }
