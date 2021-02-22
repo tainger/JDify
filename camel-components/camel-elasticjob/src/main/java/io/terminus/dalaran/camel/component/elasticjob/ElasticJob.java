@@ -22,12 +22,10 @@ public class ElasticJob implements SimpleJob {
 
     @Override
     public void execute(ShardingContext shardingContext) {
-        LOG.info("execute test");
         Exchange exchange = endpoint.createExchange();
         try {
             processor.process(exchange);
         }catch (Exception e){
-            LOG.info("process fail");
             e.printStackTrace();
         }
     }

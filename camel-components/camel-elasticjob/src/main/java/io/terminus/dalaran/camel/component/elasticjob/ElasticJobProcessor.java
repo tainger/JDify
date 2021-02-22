@@ -1,6 +1,5 @@
 package io.terminus.dalaran.camel.component.elasticjob;
 
-import org.apache.camel.CamelExchangeException;
 import org.apache.camel.Exchange;
 import org.apache.camel.impl.DefaultProducer;
 
