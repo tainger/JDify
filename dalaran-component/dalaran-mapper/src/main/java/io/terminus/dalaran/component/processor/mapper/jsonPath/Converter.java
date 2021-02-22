@@ -1,5 +1,7 @@
 package io.terminus.dalaran.component.processor.mapper.jsonPath;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.JSONPath;
 import com.google.common.collect.Lists;
 import io.terminus.dalaran.component.common.exception.FieldParseException;
@@ -16,6 +18,7 @@ import org.apache.camel.Exchange;
 import org.apache.commons.beanutils.ConvertUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.io.IOUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -29,7 +32,7 @@ import static io.terminus.dalaran.DalaranConstants.DALARAN_CONTEXT_EXCHANGE;
 public class Converter {
 
     public static Map<String, Object> convert(DalaranMappingConfig mappingConfig, Exchange exchange, DalaranContext dalaranContext) {
-        Object source = exchange.getIn().getBody();
+        Object source = parseBody(exchange.getIn().getBody());
         Map<String, Object> destination = new HashMap<>();
         List<MessageMapping> messageMappings = mappingConfig.getMessageMappings();
         SimpleMappingField sourceRoot = mappingConfig.getSourceRoot();
@@ -372,5 +375,26 @@ public class Converter {
             e.printStackTrace();
             throw new MapperFunctionExecuteException("Mapper function execute error. function: " + function.getId() + ", params: " + Arrays.toString(values.toArray()) + ", message: " + e.getMessage());
         }
+    }
+
+    private static Object parseBody(Object in) {
+        JSON out = new JSONObject();
+        if (in == null) {
+            return out;
+        }
+        try {
+            if (in instanceof byte[]) {
+                out = (JSON)JSON.parse(IOUtils.toString((byte[]) in));
+            } else if (in instanceof String) {
+                out = (JSON)JSON.parse((String)in);
+            } else if (in instanceof char[]) {
+                out = (JSON)JSON.parse(Arrays.toString(((char[]) in)));
+            } else {
+                out = (JSON)JSON.parse(JSON.toJSONString(in));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return out;
     }
 }
