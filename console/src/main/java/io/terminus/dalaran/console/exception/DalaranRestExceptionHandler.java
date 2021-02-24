@@ -27,22 +27,25 @@ public class DalaranRestExceptionHandler {
         ex.printStackTrace();
         ErrorMessage message = new ErrorMessage();
         if (ex instanceof DalaranRestException || ex instanceof DalaranRuntimeException) {
-            response.setStatus(599);
+            response.setStatus(500);
             message.setExceptionType(ex.getClass().getCanonicalName());
             message.setCode(((DalaranThrowable) ex).getCode());
             message.setLocalMessage(i18nUtils.getExceptionMessage(message.getCode()));
             message.setExceptionMessage(ex.getMessage());
+            message.setCause(ex.getCause().toString());
         } else {
             OnException exceptionMessage = method.getMethodAnnotation(OnException.class);
             if (exceptionMessage != null) {
-                response.setStatus(599);
+                response.setStatus(500);
                 message.setExceptionType(exceptionMessage.exception().getCanonicalName());
                 message.setCode(exceptionMessage.code());
                 message.setLocalMessage(i18nUtils.getExceptionMessage(exceptionMessage.code()));
                 message.setExceptionMessage(exceptionMessage.exceptionMessage());
             } else {
+                response.setStatus(500);
                 message.setLocalMessage(ex.getMessage());
                 message.setExceptionMessage(ex.getMessage());
+                message.setCause(ex.getCause().toString());
             }
         }
         return message;
