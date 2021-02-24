@@ -315,7 +315,7 @@ public class DalaranMessageMapper implements DalaranProcessor<DalaranMapperConfi
         MessageModel finalOutModel = outModel;
         mappings.forEach((destinationPath, simpleMapping) -> {
             if (simpleMapping.getMappingType() == MappingType.FUNCTION) {
-                MappingFunction function = (MappingFunction) simpleMapping.getValue();
+                MappingFunction function = JSON.parseObject(JSON.toJSONString(simpleMapping.getValue()), MappingFunction.class);
                 Map<String, FunctionParam> params = function.getParams();
                 if (MapUtils.isEmpty(params)) {
                     return;
