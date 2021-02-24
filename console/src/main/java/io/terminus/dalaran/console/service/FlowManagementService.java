@@ -41,7 +41,7 @@ public interface FlowManagementService {
     TriggerFlowDTO getById(Long flowId);
 
     @Nullable
-    TriggerFlowDTO getByIdVersion(Long flowId,String version);
+    TriggerFlowDTO getByIdVersion(Long flowId,String version) throws FlowNotExistException;
 
     Long copyFlow(CopyFlow copyFlow) throws FlowNotExistException;
 

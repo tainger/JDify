@@ -5,6 +5,7 @@ import org.apache.camel.impl.DefaultConsumer;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.apache.shardingsphere.elasticjob.api.JobConfiguration;
 import org.apache.shardingsphere.elasticjob.lite.api.bootstrap.impl.ScheduleJobBootstrap;
+import org.apache.shardingsphere.elasticjob.lite.lifecycle.api.JobAPIFactory;
 import org.apache.shardingsphere.elasticjob.lite.lifecycle.api.JobOperateAPI;
 import org.apache.shardingsphere.elasticjob.reg.base.CoordinatorRegistryCenter;
 import org.apache.shardingsphere.elasticjob.reg.zookeeper.ZookeeperConfiguration;
@@ -31,13 +32,16 @@ public class ElasticJobConsumer extends DefaultConsumer {
     @Override
     protected void doStart() throws Exception {
         super.doStart();
+        log.info("elastic-job do start");
         new ScheduleJobBootstrap(createRegistryCenter(), new ElasticJob(endpoint, processor), createJobConfiguration()).schedule();
     }
 
     @Override
     protected void doStop() throws Exception {
         super.doStop();
-        jobOperateAPI.remove(endpoint.getJobName(), endpoint.getServerLists());
+//        jobOperateAPI.remove(endpoint.getJobName(), endpoint.getServerLists());
+        log.info("elastic-job do stop");
+        JobAPIFactory.createJobOperateAPI(endpoint.getServerLists(), endpoint.getNamespace(), null).disable(endpoint.getJobName(), null);
     }
 
     private CoordinatorRegistryCenter createRegistryCenter() {

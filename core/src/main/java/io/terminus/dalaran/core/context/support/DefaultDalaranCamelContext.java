@@ -63,7 +63,6 @@ public class DefaultDalaranCamelContext implements DalaranContext<DalaranRoute> 
     @Override
     public void addTriggerFlow(TriggerFlow flow) {
         try {
-            camelContext.removeRoute(FLOW_PREFIX + flow.getId());
             DalaranRoute route = flowBuilder.buildTriggerFlow(flow, camelContext);
             log.info("load trigger flow [{}], steps: {}", route.getId(), route.getSteps());
             camelContext.addRouteDefinition(route);
@@ -75,6 +74,16 @@ public class DefaultDalaranCamelContext implements DalaranContext<DalaranRoute> 
     @Override
     public void addTriggerFlows(List<TriggerFlow> flows) {
         flows.forEach(this::addTriggerFlow);
+    }
+
+    @Override
+    public void removeTriggerFlow(TriggerFlow flow) {
+        try {
+            camelContext.removeRoute(FLOW_PREFIX + flow.getId());
+            log.info("remove trigger flow ,flowId:" + flow.getId());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -114,10 +123,19 @@ public class DefaultDalaranCamelContext implements DalaranContext<DalaranRoute> 
     @Override
     public void addSubFlow(SubFlow flow) {
         try {
-            camelContext.removeRoute(flow.getRouteId());
             DalaranRoute route = flowBuilder.buildSubFLow(flow);
             log.info("load sub flow [{}], steps: {}", route.getId(), route.getSteps());
             camelContext.addRouteDefinition(route);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void removeSubFlow(SubFlow flow) {
+        try {
+            camelContext.removeRoute(flow.getRouteId());
+            log.info("remove sub flow ,flow [{}]", flow.getRouteId());
         } catch (Exception e) {
             e.printStackTrace();
         }

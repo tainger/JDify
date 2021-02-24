@@ -8,7 +8,5 @@ public class ElasticJobInfo extends ElasticJobConfigInfo{
 
     private Long flowId;
 
-    private FlowStatus jobStatus;
-
-    private String version;
+    private boolean isOnline;
 }

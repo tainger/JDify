@@ -16,6 +16,8 @@ public class ReleaseRecordEntity extends BasicEntity {
     @Column(unique = true, nullable = false, length = 64)
     private String version;
 
+    private String lastVersion;
+
     @Column(nullable = false)
     private boolean successful;
 

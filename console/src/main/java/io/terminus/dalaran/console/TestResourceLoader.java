@@ -60,7 +60,17 @@ public class TestResourceLoader implements DalaranResourceLoader {
     }
 
     @Override
+    public List<TriggerFlowEntity> loadLastVersionAvailableTriggerFlow() {
+        return triggerFlowRepository.findByStatusNotAndIsExistTrue(FlowStatus.Error);
+    }
+
+    @Override
     public List<SubFlowEntity> loadAvailableSubFlow() {
+        return subFlowRepository.findByStatusNotAndIsExistTrue(FlowStatus.Error);
+    }
+
+    @Override
+    public List<SubFlowEntity> loadLastVersionAvailableSubFlow() {
         return subFlowRepository.findByStatusNotAndIsExistTrue(FlowStatus.Error);
     }
 

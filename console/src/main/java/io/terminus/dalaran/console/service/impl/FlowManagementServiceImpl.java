@@ -113,6 +113,7 @@ public class FlowManagementServiceImpl implements FlowManagementService {
         buildEntity(flowModel, flowEntity);
         setFlowStatus(flowEntity);
         setCreatedBy(flowEntity);
+        flowEntity.setOnline(true);
         Long id = flowRepository.save(flowEntity).getId();
         // TODO 这里依赖 loader 有点怪 而且可以异步
         if (flowEntity.getStatus() != FlowStatus.Error) {
@@ -334,8 +335,11 @@ public class FlowManagementServiceImpl implements FlowManagementService {
 
     @Nullable
     @Override
-    public TriggerFlowDTO getByIdVersion(Long flowId,String version) {
+    public TriggerFlowDTO getByIdVersion(Long flowId,String version) throws FlowNotExistException{
         TriggerFlowReleasedEntity triggerFlowReleasedEntity = triggerFlowReleasedRepository.findByVersionAndOriginId(version,flowId);
+        if (triggerFlowReleasedEntity == null) {
+            throw new FlowNotExistException();
+        }
         return flowConvertor.releaseToDTO(triggerFlowReleasedEntity);
     }
 

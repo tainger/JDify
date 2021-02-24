@@ -12,5 +12,7 @@ public interface SubFlowReleasedRepository extends JpaRepository<SubFlowReleased
 
     List<SubFlowReleasedEntity> findByVersionAndStatusNot(String version, FlowStatus status);
 
+    List<SubFlowReleasedEntity> findByVersionAndStatusNotAndIsOnlineTrue(String version, FlowStatus status);
+
     SubFlowReleasedEntity findByVersionAndOriginId(String version, Long subFlowId);
 }

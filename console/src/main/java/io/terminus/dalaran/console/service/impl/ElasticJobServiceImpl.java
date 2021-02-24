@@ -51,11 +51,11 @@ public class ElasticJobServiceImpl implements ElasticJobService {
 
     @Override
     public List<ElasticJobInfo> list() {
-        List<TriggerFlowReleasedEntity> triggerFlowReleasedEntity = releasedTriggerFlowRepository.findByVersionAndTriggerType(getCurrentVersion(), "elastic-job");
-        if (triggerFlowReleasedEntity == null) {
+        List<TriggerFlowEntity> triggerFlowEntities = triggerFlowRepository.findByStatusNotAndTriggerTypeAndIsExistTrue(FlowStatus.Error, "elastic-job");
+        if (triggerFlowEntities == null) {
             return null;
         }
-        return triggerFlowReleasedEntity.stream().map(this::buildJobInfo).collect(Collectors.toList());
+        return triggerFlowEntities.stream().map(this::buildJobInfo).collect(Collectors.toList());
     }
 
     @Override
@@ -73,7 +73,7 @@ public class ElasticJobServiceImpl implements ElasticJobService {
     public ResponseResult disable(ElasticJobInfo elasticJobInfo) {
         try {
             jobAPIService.getJobOperatorAPI(elasticJobInfo).disable(elasticJobInfo.getJobName(), null);
-            return updateStatus(elasticJobInfo, FlowStatus.Error);
+            return updateStatus(elasticJobInfo, false);
         } catch (Exception e) {
             e.printStackTrace();
             return fail(ResponseErrorMsg.DISABLE_JOB_ERROR);
@@ -84,21 +84,10 @@ public class ElasticJobServiceImpl implements ElasticJobService {
     public ResponseResult enable(ElasticJobInfo elasticJobInfo) {
         try {
             jobAPIService.getJobOperatorAPI(elasticJobInfo).enable(elasticJobInfo.getJobName(), null);
-            return updateStatus(elasticJobInfo, FlowStatus.Available);
+            return updateStatus(elasticJobInfo, true);
         } catch (Exception e) {
             e.printStackTrace();
             return fail(ResponseErrorMsg.ENABLE_JOB_ERROR);
-        }
-    }
-
-    @Override
-    public ResponseResult update(ElasticJobInfo elasticJobInfo) {
-        try {
-            jobAPIService.getJobConfigurationAPI(elasticJobInfo).updateJobConfiguration(buildJobConfig(elasticJobInfo));
-            return updateJobInfo(elasticJobInfo);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return fail(ResponseErrorMsg.UPDATE_JOB_ERROR);
         }
     }
 
@@ -110,41 +99,17 @@ public class ElasticJobServiceImpl implements ElasticJobService {
         return new PageImpl<>(page.stream().map(this::buildJobLog).collect(Collectors.toList()), pageable, page.getTotalElements());
     }
 
-    public ResponseResult updateJobInfo(ElasticJobInfo sourceJobInfo) {
-        Long flowId = sourceJobInfo.getFlowId();
-        if (flowId == null) {
-            return fail(ResponseErrorMsg.FLOW_ID_NULL);
-        }
-        TriggerFlowReleasedEntity triggerFlowReleasedEntity = releasedTriggerFlowRepository.findByVersionAndOriginId(sourceJobInfo.getVersion(), flowId);
-        ElasticJobConfigInfo targetJobInfo = new ElasticJobConfigInfo();
-        BeanUtils.copyProperties(sourceJobInfo, targetJobInfo);
-        String triggerConfig = JSONObject.toJSONString(targetJobInfo);
-        triggerFlowReleasedEntity.setTriggerConfig(triggerConfig);
-        releasedTriggerFlowRepository.save(triggerFlowReleasedEntity);
-        Optional<TriggerFlowEntity> triggerFlowEntityOptional = triggerFlowRepository.findById(flowId);
-        if (!triggerFlowEntityOptional.isPresent()) {
-            return fail(ResponseErrorMsg.FLOW_IS_NULL);
-        }
-        TriggerFlowEntity triggerFlowEntity = triggerFlowEntityOptional.get();
-        triggerFlowEntity.setTriggerConfig(triggerConfig);
-        triggerFlowRepository.save(triggerFlowEntity);
-        return success();
-    }
-
-    public ResponseResult updateStatus(ElasticJobInfo elasticJobInfo, FlowStatus status) {
+    public ResponseResult updateStatus(ElasticJobInfo elasticJobInfo, boolean isOnline) {
         Long flowId = elasticJobInfo.getFlowId();
         if (flowId == null) {
             return fail(ResponseErrorMsg.FLOW_ID_NULL);
         }
-        TriggerFlowReleasedEntity triggerFlowReleasedEntity = releasedTriggerFlowRepository.findByVersionAndOriginId(elasticJobInfo.getVersion(), flowId);
-        triggerFlowReleasedEntity.setStatus(status);
-        releasedTriggerFlowRepository.save(triggerFlowReleasedEntity);
         Optional<TriggerFlowEntity> triggerFlowEntityOptional = triggerFlowRepository.findById(flowId);
         if (!triggerFlowEntityOptional.isPresent()) {
             return fail(ResponseErrorMsg.FLOW_IS_NULL);
         }
         TriggerFlowEntity triggerFlowEntity = triggerFlowEntityOptional.get();
-        triggerFlowEntity.setStatus(status);
+        triggerFlowEntity.setOnline(isOnline);
         triggerFlowRepository.save(triggerFlowEntity);
         return success();
     }
@@ -162,17 +127,11 @@ public class ElasticJobServiceImpl implements ElasticJobService {
         return result;
     }
 
-    public String getCurrentVersion() {
-        ReleaseRecordEntity recordEntity = releaseRecordRepository.findByEnabledTrue();
-        return recordEntity.getVersion();
-    }
-
-    private ElasticJobInfo buildJobInfo(TriggerFlowReleasedEntity entity) {
+    private ElasticJobInfo buildJobInfo(TriggerFlowEntity entity) {
         ElasticJobInfo elasticJobInfo;
         elasticJobInfo = JSONObject.parseObject(entity.getTriggerConfig(), ElasticJobInfo.class);
-        elasticJobInfo.setFlowId(entity.getOriginId());
-        elasticJobInfo.setJobStatus(entity.getStatus());
-        elasticJobInfo.setVersion(entity.getVersion());
+        elasticJobInfo.setFlowId(entity.getId());
+        elasticJobInfo.setOnline(entity.isOnline());
         return elasticJobInfo;
     }
 

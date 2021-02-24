@@ -18,7 +18,5 @@ public interface ElasticJobService {
 
     ResponseResult enable(ElasticJobInfo elasticJobInfo);
 
-    ResponseResult update(ElasticJobInfo elasticJobInfo);
-
     Page<ElasticJobLogDTO> jobLog(ElasticJobLogQuery elasticJobLogQuery, Integer pageNumber, Integer pageSize);
 }

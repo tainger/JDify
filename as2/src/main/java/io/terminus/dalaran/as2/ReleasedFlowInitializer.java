@@ -93,6 +93,7 @@ public class ReleasedFlowInitializer implements DalaranStarter {
                 return;
             }
             resourceLoader.setVersion(recordEntity.getVersion());
+            resourceLoader.setLastVersion(recordEntity.getLastVersion());
 
             // load client info
             List<ClientReleasedEntity> clients = resourceLoader.loadAllClient();
@@ -116,8 +117,21 @@ public class ReleasedFlowInitializer implements DalaranStarter {
             }
 
             List<TriggerFlowReleasedEntity> triggerFlows = resourceLoader.loadAvailableTriggerFlow();
+            List<TriggerFlowReleasedEntity> lastVersionTriggerFlows = resourceLoader.loadLastVersionAvailableTriggerFlow();
+
+            for (TriggerFlowReleasedEntity triggerFlowEntity : lastVersionTriggerFlows) {
+                if (triggerFlowEntity.getTriggerType().equalsIgnoreCase("as2-server")) {
+                    continue;
+                }
+                try {
+                    TriggerFlow triggerFlow = resourceBuilder.buildTriggerFlow(triggerFlowEntity);
+                    dalaranContext.removeTriggerFlow(triggerFlow);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
             for (TriggerFlowReleasedEntity triggerFlowEntity : triggerFlows) {
-                if (!triggerFlowEntity.getTriggerType().equalsIgnoreCase("as2-server")) {
+                if (triggerFlowEntity.getTriggerType().equalsIgnoreCase("as2-server")) {
                     continue;
                 }
                 try {
@@ -130,6 +144,15 @@ public class ReleasedFlowInitializer implements DalaranStarter {
             }
 
             List<SubFlowReleasedEntity> subFLows = resourceLoader.loadAvailableSubFlow();
+            List<SubFlowReleasedEntity> lastVersionSubFLows = resourceLoader.loadLastVersionAvailableSubFlow();
+            for (SubFlowReleasedEntity subFlowEntity : lastVersionSubFLows) {
+                try {
+                    SubFlow subFlow = resourceBuilder.buildSubFlow(subFlowEntity);
+                    dalaranContext.removeSubFlow(subFlow);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
             for (SubFlowReleasedEntity subFlowEntity : subFLows) {
                 try {
                     SubFlow subFlow = resourceBuilder.buildSubFlow(subFlowEntity);
