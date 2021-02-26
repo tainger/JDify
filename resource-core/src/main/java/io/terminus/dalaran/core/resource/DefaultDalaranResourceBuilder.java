@@ -88,7 +88,7 @@ public class DefaultDalaranResourceBuilder implements DalaranResourceBuilder {
             LimiterConfig limiterConfig = (LimiterConfig) config;
             Long limiterId = limiterConfig.getLimiterId();
             if (limiterId != null) {
-                Object limiter = buildLimiterConfig(limiterId, triggerInfo.getConnectorInfo().getClassType());
+                Object limiter = buildLimiterConfig(limiterId, triggerInfo.getLimiterInfo().getClassType());
                 limiterConfig.setLimiter(limiter);
             }
         }
