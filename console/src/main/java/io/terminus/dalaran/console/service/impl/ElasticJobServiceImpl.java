@@ -70,28 +70,6 @@ public class ElasticJobServiceImpl implements ElasticJobService {
     }
 
     @Override
-    public ResponseResult disable(ElasticJobInfo elasticJobInfo) {
-        try {
-            jobAPIService.getJobOperatorAPI(elasticJobInfo).disable(elasticJobInfo.getJobName(), null);
-            return updateStatus(elasticJobInfo, false);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return fail(ResponseErrorMsg.DISABLE_JOB_ERROR);
-        }
-    }
-
-    @Override
-    public ResponseResult enable(ElasticJobInfo elasticJobInfo) {
-        try {
-            jobAPIService.getJobOperatorAPI(elasticJobInfo).enable(elasticJobInfo.getJobName(), null);
-            return updateStatus(elasticJobInfo, true);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return fail(ResponseErrorMsg.ENABLE_JOB_ERROR);
-        }
-    }
-
-    @Override
     public Page<ElasticJobLogDTO> jobLog(ElasticJobLogQuery elasticJobLogQuery, Integer pageNumber, Integer pageSize) {
         Sort order = new Sort(Sort.Direction.DESC, "startTime");
         Pageable pageable = PageRequest.of(pageNumber - 1, pageSize, order);
