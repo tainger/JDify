@@ -15,12 +15,4 @@ public interface ElasticJobWriteAPI {
     @PostMapping(value = "/trigger")
     ResponseResult trigger(@RequestBody ElasticJobInfo elasticJobInfo);
 
-    @ApiOperation(value = "失效该任务")
-    @PostMapping(value = "/disable")
-    ResponseResult disable(@RequestBody ElasticJobInfo elasticJobInfo);
-
-    @ApiOperation(value = "生效该任务")
-    @PostMapping(value = "/enable")
-    ResponseResult enable(@RequestBody ElasticJobInfo elasticJobInfo);
-
 }

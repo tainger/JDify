@@ -11,6 +11,7 @@ import io.terminus.dalaran.model.dto.flow.ImportFlowDTO;
 import io.terminus.dalaran.model.dto.flow.TriggerFlowDTO;
 import io.terminus.dalaran.model.flow.FlowValidation;
 import io.terminus.dalaran.model.query.FlowQuery;
+import io.terminus.dalaran.response.ResponseResult;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -48,4 +49,8 @@ public interface FlowManagementService {
     List<FlowValidation> validateFlow(TriggerFlowDTO model);
 
     List<String> listTriggerOperations();
+
+    ResponseResult offline(Long flowId);
+
+    ResponseResult online(Long flowId);
 }

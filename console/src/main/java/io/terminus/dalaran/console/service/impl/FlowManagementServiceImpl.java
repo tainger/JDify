@@ -31,6 +31,8 @@ import io.terminus.dalaran.model.flow.FlowValidation;
 import io.terminus.dalaran.model.flow.TriggerFlow;
 import io.terminus.dalaran.model.flow.ValidateMessageLevel;
 import io.terminus.dalaran.model.query.FlowQuery;
+import io.terminus.dalaran.response.ResponseErrorMsg;
+import io.terminus.dalaran.response.ResponseResult;
 import io.terminus.draco.web.autoconfig.context.UserContext;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -370,6 +372,40 @@ public class FlowManagementServiceImpl implements FlowManagementService {
         return getSoapOperations();
     }
 
+    @Override
+    public ResponseResult offline(Long flowId) {
+        try {
+            return isOnline(flowId, false);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return fail(ResponseErrorMsg.OFFLINE_FLOW_ERROR);
+        }
+    }
+
+    @Override
+    public ResponseResult online(Long flowId) {
+        try {
+            return isOnline(flowId, true);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return fail(ResponseErrorMsg.ONLINE_FLOW_ERROR);
+        }
+    }
+
+    public ResponseResult isOnline(Long flowId, boolean isOnline) {
+        if (flowId == null) {
+            return fail(ResponseErrorMsg.FLOW_ID_NULL);
+        }
+        Optional<TriggerFlowEntity> triggerFlowEntityOptional = flowRepository.findById(flowId);
+        if (!triggerFlowEntityOptional.isPresent()) {
+            return fail(ResponseErrorMsg.FLOW_IS_NULL);
+        }
+        TriggerFlowEntity triggerFlowEntity = triggerFlowEntityOptional.get();
+        triggerFlowEntity.setOnline(isOnline);
+        flowRepository.save(triggerFlowEntity);
+        return success();
+    }
+
     private void setFlowStatus(TriggerFlowEntity flowEntity) {
         FlowStatus flowStatus = null;
         for (FlowValidation flowValidation : validateFlow(flowEntity)) {
@@ -450,6 +486,19 @@ public class FlowManagementServiceImpl implements FlowManagementService {
         if(UserContext.getUserInfo() != null && UserContext.getUserInfo().getUsername() != null){
             triggerFlowEntity.setUpdatedBy(UserContext.getUserInfo().getUsername());
         }
+    }
+
+    private ResponseResult fail(String errorMsg) {
+        ResponseResult result = new ResponseResult();
+        result.setSuccess(false);
+        result.setErrorMsg(errorMsg);
+        return result;
+    }
+
+    private ResponseResult success() {
+        ResponseResult result = new ResponseResult();
+        result.setSuccess(true);
+        return result;
     }
 
 }

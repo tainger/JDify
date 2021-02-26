@@ -14,9 +14,5 @@ public interface ElasticJobService {
 
     ResponseResult trigger(ElasticJobInfo elasticJobInfo);
 
-    ResponseResult disable(ElasticJobInfo elasticJobInfo);
-
-    ResponseResult enable(ElasticJobInfo elasticJobInfo);
-
     Page<ElasticJobLogDTO> jobLog(ElasticJobLogQuery elasticJobLogQuery, Integer pageNumber, Integer pageSize);
 }

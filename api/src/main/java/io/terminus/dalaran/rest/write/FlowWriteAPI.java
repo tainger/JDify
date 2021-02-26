@@ -10,6 +10,7 @@ import io.terminus.dalaran.model.dto.ImportProcessorDTO;
 import io.terminus.dalaran.model.dto.ImportProcessorResult;
 import io.terminus.dalaran.model.dto.flow.ImportFlowDTO;
 import io.terminus.dalaran.model.dto.flow.TriggerFlowDTO;
+import io.terminus.dalaran.response.ResponseResult;
 import org.springframework.web.bind.annotation.*;
 
 @RequestMapping(value = "/api/flow", produces = {"application/json; charset=UTF-8"})
@@ -38,4 +39,12 @@ public interface FlowWriteAPI {
     @ApiOperation(value = "快速创建处理器")
     @PostMapping(value = "/importProcessor")
     ImportProcessorResult importProcessor(@RequestBody ImportProcessorDTO model);
+
+    @ApiOperation(value = "下线该流程")
+    @PostMapping(value = "/offline")
+    ResponseResult offline(@RequestParam Long id);
+
+    @ApiOperation(value = "上线该流程")
+    @PostMapping(value = "/online")
+    ResponseResult online(@RequestParam Long id);
 }

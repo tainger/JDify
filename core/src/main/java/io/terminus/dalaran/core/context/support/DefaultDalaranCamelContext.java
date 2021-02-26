@@ -11,6 +11,7 @@ import io.terminus.dalaran.model.flow.TriggerFlow;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.camel.CamelContext;
 import org.apache.camel.impl.DefaultProducerTemplate;
+import org.apache.camel.model.RouteDefinition;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -79,8 +80,9 @@ public class DefaultDalaranCamelContext implements DalaranContext<DalaranRoute> 
     @Override
     public void removeTriggerFlow(TriggerFlow flow) {
         try {
-            camelContext.removeRoute(FLOW_PREFIX + flow.getId());
-            log.info("remove trigger flow ,flowId:" + flow.getId());
+            RouteDefinition route = camelContext.getRouteDefinition(flow.getRouteId());
+            camelContext.removeRouteDefinition(route);
+            log.info("remove trigger flow ,flow [{}]:", flow.getRouteId());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -134,7 +136,8 @@ public class DefaultDalaranCamelContext implements DalaranContext<DalaranRoute> 
     @Override
     public void removeSubFlow(SubFlow flow) {
         try {
-            camelContext.removeRoute(flow.getRouteId());
+            RouteDefinition route = camelContext.getRouteDefinition(flow.getRouteId());
+            camelContext.removeRouteDefinition(route);
             log.info("remove sub flow ,flow [{}]", flow.getRouteId());
         } catch (Exception e) {
             e.printStackTrace();

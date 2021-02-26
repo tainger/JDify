@@ -34,14 +34,4 @@ public class ElasticJobRest implements ElasticJobReadAPI, ElasticJobWriteAPI {
     public ResponseResult trigger(@RequestBody ElasticJobInfo elasticJobInfo) {
         return elasticJobService.trigger(elasticJobInfo);
     }
-
-    @Override
-    public ResponseResult disable(@RequestBody ElasticJobInfo elasticJobInfo) {
-        return elasticJobService.disable(elasticJobInfo);
-    }
-
-    @Override
-    public ResponseResult enable(@RequestBody ElasticJobInfo elasticJobInfo) {
-        return elasticJobService.enable(elasticJobInfo);
-    }
 }

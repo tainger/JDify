@@ -32,16 +32,13 @@ public class ElasticJobConsumer extends DefaultConsumer {
     @Override
     protected void doStart() throws Exception {
         super.doStart();
-        log.info("elastic-job do start");
         new ScheduleJobBootstrap(createRegistryCenter(), new ElasticJob(endpoint, processor), createJobConfiguration()).schedule();
     }
 
     @Override
     protected void doStop() throws Exception {
         super.doStop();
-//        jobOperateAPI.remove(endpoint.getJobName(), endpoint.getServerLists());
-        log.info("elastic-job do stop");
-        JobAPIFactory.createJobOperateAPI(endpoint.getServerLists(), endpoint.getNamespace(), null).disable(endpoint.getJobName(), null);
+        new ScheduleJobBootstrap(createRegistryCenter(), new ElasticJob(endpoint, processor), createJobConfiguration()).shutdown();
     }
 
     private CoordinatorRegistryCenter createRegistryCenter() {
