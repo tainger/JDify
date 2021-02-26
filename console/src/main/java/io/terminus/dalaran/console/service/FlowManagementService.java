@@ -50,7 +50,7 @@ public interface FlowManagementService {
 
     List<String> listTriggerOperations();
 
-    ResponseResult offline(Long flowId);
+    ResponseResult offline(TriggerFlowDTO flowDTO);
 
-    ResponseResult online(Long flowId);
+    ResponseResult online(TriggerFlowDTO flowDTO);
 }

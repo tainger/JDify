@@ -81,13 +81,13 @@ public class FlowManagementRest implements FlowReadAPI, FlowWriteAPI {
     }
 
     @Override
-    public ResponseResult offline(Long flowId) {
-        return flowManagementService.offline(flowId);
+    public ResponseResult offline(TriggerFlowDTO flowDTO) {
+        return flowManagementService.offline(flowDTO);
     }
 
     @Override
-    public ResponseResult online(Long flowId) {
-        return flowManagementService.online(flowId);
+    public ResponseResult online(TriggerFlowDTO flowDTO) {
+        return flowManagementService.online(flowDTO);
     }
 
     @Override

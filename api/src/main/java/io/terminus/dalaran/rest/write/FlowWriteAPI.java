@@ -42,9 +42,9 @@ public interface FlowWriteAPI {
 
     @ApiOperation(value = "下线该流程")
     @PostMapping(value = "/offline")
-    ResponseResult offline(@RequestParam Long id);
+    ResponseResult offline(@RequestBody TriggerFlowDTO flowDTO);
 
     @ApiOperation(value = "上线该流程")
     @PostMapping(value = "/online")
-    ResponseResult online(@RequestParam Long id);
+    ResponseResult online(@RequestBody TriggerFlowDTO flowDTO);
 }

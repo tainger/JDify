@@ -373,9 +373,9 @@ public class FlowManagementServiceImpl implements FlowManagementService {
     }
 
     @Override
-    public ResponseResult offline(Long flowId) {
+    public ResponseResult offline(TriggerFlowDTO flowDTO) {
         try {
-            return isOnline(flowId, false);
+            return isOnline(flowDTO, false);
         } catch (Exception e) {
             e.printStackTrace();
             return fail(ResponseErrorMsg.OFFLINE_FLOW_ERROR);
@@ -383,16 +383,17 @@ public class FlowManagementServiceImpl implements FlowManagementService {
     }
 
     @Override
-    public ResponseResult online(Long flowId) {
+    public ResponseResult online(TriggerFlowDTO flowDTO) {
         try {
-            return isOnline(flowId, true);
+            return isOnline(flowDTO, true);
         } catch (Exception e) {
             e.printStackTrace();
             return fail(ResponseErrorMsg.ONLINE_FLOW_ERROR);
         }
     }
 
-    public ResponseResult isOnline(Long flowId, boolean isOnline) {
+    public ResponseResult isOnline(TriggerFlowDTO flowDTO, boolean isOnline) {
+        Long flowId = flowDTO.getId();
         if (flowId == null) {
             return fail(ResponseErrorMsg.FLOW_ID_NULL);
         }
