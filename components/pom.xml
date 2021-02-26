@@ -311,6 +311,12 @@
             <artifactId>spring-context-support</artifactId>
             <version>5.1.9.RELEASE</version>
         </dependency>
+        <dependency>
+            <groupId>io.terminus</groupId>
+            <artifactId>dalaran-resource-core</artifactId>
+            <version>2.4.5-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 
 </project>

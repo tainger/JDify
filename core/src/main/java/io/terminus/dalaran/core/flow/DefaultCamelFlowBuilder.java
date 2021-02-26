@@ -9,6 +9,8 @@ import io.terminus.dalaran.config.ProcessorInfo;
 import io.terminus.dalaran.config.TriggerInfo;
 import io.terminus.dalaran.core.component.*;
 import io.terminus.dalaran.core.component.config.DalaranMapperConfig;
+import io.terminus.dalaran.core.component.config.ErrorCatchConfig;
+import io.terminus.dalaran.core.component.config.ServiceOperationConfig;
 import io.terminus.dalaran.core.context.DalaranComponentContext;
 import io.terminus.dalaran.core.context.DalaranModelTypeContext;
 import io.terminus.dalaran.core.log.DalaranTraceLogger;
@@ -214,10 +216,18 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
             }
             List<FlowValidation> processorMessageList = validate(processorInfo, jsonObject);
             if (processor instanceof DalaranComponentValidator) {
-                List<FlowValidation> processorCustomMessageList;
+                List<FlowValidation> processorCustomMessageList = null;
                 if (processorModel.getConfig() instanceof String) {
-                    DalaranMapperConfig config = jsonObject.toJavaObject(DalaranMapperConfig.class);
-                    processorCustomMessageList = ((DalaranComponentValidator) processor).validate(config);
+                    if (processorModel.getType().equals("mapper-convert")) {
+                        DalaranMapperConfig config = jsonObject.toJavaObject(DalaranMapperConfig.class);
+                        processorCustomMessageList = ((DalaranComponentValidator) processor).validate(config);
+                    }else if(processorModel.getType().equals("service")) {
+                        ServiceOperationConfig config = jsonObject.toJavaObject(ServiceOperationConfig.class);
+                        processorCustomMessageList = ((DalaranComponentValidator) processor).validate(config);
+                    }else if(processorModel.getType().equals("error-catch")) {
+                        ErrorCatchConfig config = jsonObject.toJavaObject(ErrorCatchConfig.class);
+                        processorCustomMessageList = ((DalaranComponentValidator) processor).validate(config);
+                    }
                 }else {
                     processorCustomMessageList = ((DalaranComponentValidator) processor).validate(processorModel.getConfig());
                 }

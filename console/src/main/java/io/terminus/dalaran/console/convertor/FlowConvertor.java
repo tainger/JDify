@@ -6,6 +6,7 @@ import io.terminus.dalaran.core.resource.entity.TriggerFlowAbstractEntity;
 import io.terminus.dalaran.core.resource.entity.common.ProcessorEntity;
 import io.terminus.dalaran.core.resource.entity.released.TriggerFlowReleasedEntity;
 import io.terminus.dalaran.model.dto.ProcessorDTO;
+import io.terminus.dalaran.model.dto.flow.ReleaseFlowDTO;
 import io.terminus.dalaran.model.dto.flow.SubFlowDTO;
 import io.terminus.dalaran.model.dto.flow.TriggerFlowDTO;
 
@@ -74,6 +75,31 @@ public class FlowConvertor {
         }
 
         TriggerFlowDTO flowModel = new TriggerFlowDTO();
+        flowModel.setId(entity.getOriginId());
+        flowModel.setModuleId(entity.getModuleId());
+        flowModel.setName(entity.getName());
+        flowModel.setDescription(entity.getDescription());
+        flowModel.setInModelId(entity.getInModel());
+        flowModel.setOutModelId(entity.getOutModel());
+        flowModel.setPipeline(pipeline);
+        flowModel.setTracing(entity.isTracing());
+        flowModel.setTriggerType(entity.getTriggerType());
+        flowModel.setTriggerConfig(JSON.parseObject(entity.getTriggerConfig(), Map.class));
+        return flowModel;
+    }
+
+    public ReleaseFlowDTO releaseToDTOAndModuleName(TriggerFlowReleasedEntity entity) {
+        List<ProcessorDTO> pipeline = new ArrayList<>();
+        for (ProcessorEntity processorEntity : entity.getPipeline()) {
+            ProcessorDTO processor = new ProcessorDTO();
+            processor.setId(processorEntity.getId());
+            processor.setType(processorEntity.getType());
+            processor.setName(processorEntity.getName());
+            processor.setConfig(JSON.parseObject(processorEntity.getConfig(), Map.class));
+            pipeline.add(processor);
+        }
+
+        ReleaseFlowDTO flowModel = new ReleaseFlowDTO();
         flowModel.setId(entity.getOriginId());
         flowModel.setModuleId(entity.getModuleId());
         flowModel.setName(entity.getName());

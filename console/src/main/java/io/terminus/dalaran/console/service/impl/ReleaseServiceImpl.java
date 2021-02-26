@@ -10,17 +10,17 @@ import io.terminus.dalaran.core.resource.entity.released.*;
 import io.terminus.dalaran.core.resource.repository.*;
 import io.terminus.dalaran.model.dto.ReleaseRecordDTO;
 import io.terminus.dalaran.model.dto.ReleaseRequestDTO;
+import io.terminus.dalaran.model.dto.flow.ReleaseFlowDTO;
 import io.terminus.dalaran.model.dto.flow.TriggerFlowDTO;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.common.protocol.types.Field;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -152,8 +152,13 @@ public class ReleaseServiceImpl implements ReleaseService {
     }
 
     @Override
-    public List<TriggerFlowDTO> listReleasedTriggerFlowDTO(String version) {
-        return triggerFlowReleasedRepository.findByVersion(version).stream().map(flowConvertor::releaseToDTO).collect(Collectors.toList());
+    public List<ReleaseFlowDTO> listReleasedTriggerFlowDTO(String version) {
+        List<ModuleEntity> moduleEntities = moduleRepository.findByIsExistTrue();
+        Map<Long, String> map = new HashMap<>();
+        moduleEntities.forEach(moduleEntity -> map.put(moduleEntity.getId(), moduleEntity.getName()));
+        List<ReleaseFlowDTO> triggerFlowDTOS = triggerFlowReleasedRepository.findByVersion(version).stream().map(flowConvertor::releaseToDTOAndModuleName).collect(Collectors.toList());
+        triggerFlowDTOS.forEach(triggerFlowDTO -> triggerFlowDTO.setModuleName(map.get(triggerFlowDTO.getModuleId())));
+        return triggerFlowDTOS;
     }
 
     @Override

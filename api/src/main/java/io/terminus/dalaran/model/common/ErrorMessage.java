@@ -11,6 +11,8 @@ public class ErrorMessage {
     private String code;
     private String localMessage;
 
+    private String cause;
+
     private Map<String, Object> messageData;
 
     public String getExceptionType() {
@@ -43,5 +45,13 @@ public class ErrorMessage {
 
     public void setLocalMessage(String localMessage) {
         this.localMessage = localMessage;
+    }
+
+    public String getCause() {
+        return cause;
+    }
+
+    public void setCause(String cause) {
+        this.cause = cause;
     }
 }

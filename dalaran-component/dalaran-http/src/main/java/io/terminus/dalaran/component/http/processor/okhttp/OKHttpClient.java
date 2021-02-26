@@ -3,14 +3,11 @@ package io.terminus.dalaran.component.http.processor.okhttp;
 import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSClientBuilder;
 import com.aliyun.oss.model.GetObjectRequest;
-import com.google.common.base.Joiner;
-import com.google.common.base.Predicate;
-import com.google.common.collect.Maps;
-import io.terminus.dalaran.component.http.processor.HttpClientConfig;
 import io.terminus.dalaran.core.component.DalaranProcessor;
 import io.terminus.dalaran.core.component.annotation.Processor;
 import io.terminus.dalaran.core.oss.OSSAccount;
 import lombok.extern.slf4j.Slf4j;
+import okhttp3.ConnectionSpec;
 import okhttp3.OkHttpClient;
 import org.apache.camel.model.ProcessorDefinition;
 import org.apache.commons.lang3.StringUtils;
@@ -23,48 +20,62 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
+import java.security.SecureRandom;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateFactory;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
+
+import static io.terminus.dalaran.DalaranConstants.UNKNOWN_MODEL_TYPE;
 
 @Processor(
         value = "BrotliHttpClient",
-        order = 10,
-        configType = HttpClientConfig.class,
-        bodyType = "JSON"
+        order = 8,
+        configType = OKHttpClientConfig.class,
+        bodyType = UNKNOWN_MODEL_TYPE
 )
 @Slf4j
-public class OKHttpClient implements DalaranProcessor<HttpClientConfig> {
+public class OKHttpClient implements DalaranProcessor<OKHttpClientConfig> {
 
     @Autowired
     private OSSAccount ossAccount;
 
     @Override
-    public void configure(ProcessorDefinition route, HttpClientConfig config) {
-        if(config.getConnector().getProtocol().name().equals("HTTPS") && StringUtils.isNotBlank(config.getSslCertificate())) {
-            log.info("ossAccount: " + ossAccount.getBucketName());
-            File dir = new File("/var/tmp");
-            try {
-                X509TrustManager trustManager;
-                SSLSocketFactory sslSocketFactory;
-                trustManager = trustManagerForCertificates(trustedCertificatesInputStream(config.getSslCertificate(), ossAccount, dir));
-                SSLContext sslContext = SSLContext.getInstance("TLS");
-                sslContext.init(null, new TrustManager[] { trustManager }, null);
-                sslSocketFactory = sslContext.getSocketFactory();
+    public void configure(ProcessorDefinition route, OKHttpClientConfig config) {
+        if (config.getConnector().getProtocol().name().equals("HTTPS")) {
+            if (config.getCheckCertificate() && StringUtils.isNotBlank(config.getSslCertificate())) {
+                log.info("ossAccount: " + ossAccount.getBucketName());
+                File dir = new File("/var/tmp");
+                try {
+                    X509TrustManager trustManager;
+                    SSLSocketFactory sslSocketFactory;
+                    trustManager = trustManagerForCertificates(trustedCertificatesInputStream(config.getSslCertificate(), ossAccount, dir));
+                    SSLContext sslContext = SSLContext.getInstance("TLS");
+                    sslContext.init(null, new TrustManager[]{trustManager}, null);
+                    sslSocketFactory = sslContext.getSocketFactory();
 
+                    OkHttpClient client = new OkHttpClient().newBuilder()
+                            .connectTimeout(config.getConnector().getTimeout(), TimeUnit.MILLISECONDS)
+                            .readTimeout(config.getConnector().getTimeout(), TimeUnit.MILLISECONDS)
+                            .sslSocketFactory(sslSocketFactory, trustManager)
+                            .connectionSpecs(Arrays.asList(ConnectionSpec.COMPATIBLE_TLS))
+                            .build();
+                    route.process(new OKHttpProcessor(config, client));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            } else {
                 OkHttpClient client = new OkHttpClient().newBuilder()
                         .connectTimeout(config.getConnector().getTimeout(), TimeUnit.MILLISECONDS)
                         .readTimeout(config.getConnector().getTimeout(), TimeUnit.MILLISECONDS)
-                        .sslSocketFactory(sslSocketFactory, trustManager)
+                        .sslSocketFactory(createSSLSocketFactory(),new TrustAllCertificates())
+                        .connectionSpecs(Arrays.asList(ConnectionSpec.COMPATIBLE_TLS))
+                        .hostnameVerifier((s, sslSession) -> true)
                         .build();
                 route.process(new OKHttpProcessor(config, client));
-            } catch (Exception e) {
-                e.printStackTrace();
             }
-        }else {
+        } else {
             OkHttpClient client = new OkHttpClient().newBuilder()
                     .connectTimeout(config.getConnector().getTimeout(), TimeUnit.MILLISECONDS)
                     .readTimeout(config.getConnector().getTimeout(), TimeUnit.MILLISECONDS)
@@ -73,12 +84,16 @@ public class OKHttpClient implements DalaranProcessor<HttpClientConfig> {
         }
     }
 
-    public String buildQueryString(Object obj) {
-        if (obj instanceof Map) {
-            Map queryKV = Maps.filterEntries((Map) obj, (Predicate<Map.Entry>) entry -> entry.getValue() != null && entry.getKey() != null);
-            return Joiner.on("&").withKeyValueSeparator("=").join(queryKV);
+    private static SSLSocketFactory createSSLSocketFactory() {
+        SSLSocketFactory ssfFactory = null;
+        try {
+            SSLContext sc = SSLContext.getInstance("SSL");
+            sc.init(null, new TrustManager[]{new TrustAllCertificates()}, new SecureRandom());
+            ssfFactory = sc.getSocketFactory();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        return null;
+        return ssfFactory;
     }
 
     private InputStream trustedCertificatesInputStream(String object, OSSAccount ossAccount, File dir) throws Exception{

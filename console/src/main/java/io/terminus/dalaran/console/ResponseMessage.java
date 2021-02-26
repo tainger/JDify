@@ -112,6 +112,15 @@ public class ResponseMessage {
     
     public static final String CLIENT_QUERY_ERROR = "Client.Query.Exception";
 
+    // 组件处理异常
+    public static final String COMPONENT_CREATE_ERROR = "组件创建异常";
+
+    public static final String COMPONENT_UPDATE_ERROR = "组件更新异常";
+
+    public static final String COMPONENT_DELETE_ERROR = "组件删除异常";
+
+    public static final String COMPONENT_QUERY_ERROR = "组件查询异常";
+
     // .Property处理异常
     public static final String PROPERTY_CREATE_ERROR = "Property.Create.Exception";
 

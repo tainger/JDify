@@ -11,13 +11,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.rocketmq.acl.common.AclClientRPCHook;
 import org.apache.rocketmq.acl.common.SessionCredentials;
 import org.apache.rocketmq.client.AccessChannel;
-import org.apache.rocketmq.client.consumer.DefaultMQPullConsumer;
-import org.apache.rocketmq.client.consumer.MQPullConsumer;
-import org.apache.rocketmq.client.consumer.MQPullConsumerScheduleService;
-import org.apache.rocketmq.client.consumer.PullResult;
+import org.apache.rocketmq.client.consumer.*;
+import org.apache.rocketmq.client.consumer.listener.ConsumeConcurrentlyStatus;
+import org.apache.rocketmq.client.consumer.listener.MessageListenerConcurrently;
 import org.apache.rocketmq.common.message.MessageExt;
 import org.apache.rocketmq.remoting.RPCHook;
 
+import java.net.InetAddress;
 import java.util.List;
 import java.util.Properties;
 
@@ -35,6 +35,8 @@ public class RocketMQConsumer extends DefaultConsumer {
     private MQPullConsumerScheduleService service;
 
     private Consumer consumer;
+
+    private DefaultMQPushConsumer pushConsumer;
 
     private final String ROCKET_MQ_MANUAL_COMMIT = "ROCKET_MQ_MANUAL_COMMIT";
 
@@ -85,64 +87,87 @@ public class RocketMQConsumer extends DefaultConsumer {
             });
             consumer.start();
         } else {
-            RPCHook rpcHook = null;
-            if (StringUtils.isNotBlank(endpoint.getAccessKey()) && StringUtils.isNotBlank(endpoint.getSecretKey())) {
-                rpcHook = new AclClientRPCHook(new SessionCredentials(endpoint.getAccessKey(), endpoint.getSecretKey()));
-            }
-
-            service = new MQPullConsumerScheduleService(endpoint.getGroupId(), rpcHook);
-            DefaultMQPullConsumer defaultMQPullConsumer = service.getDefaultMQPullConsumer();
-            defaultMQPullConsumer.setNamesrvAddr(endpoint.getNameServer());
-            defaultMQPullConsumer.setAccessChannel(AccessChannel.LOCAL);
-
-//            if (endpoint.getUseAliCloudOns()) {
-//                defaultMQPullConsumer.setAccessChannel(AccessChannel.CLOUD);
-//            } else {
-//            }
-            service.registerPullTaskCallback(endpoint.getTopic(), (messageQueue, pullTaskContext) -> {
-                MQPullConsumer consumer = pullTaskContext.getPullConsumer();
-                try {
-                    long offset = consumer.fetchConsumeOffset(messageQueue, false);
-                    if (offset < 0) {
-                        offset = 0;
-                    }
-                    PullResult result;
-                    // todo consumer目前配置写死，一次只拿一条消息，方便消费确认
-                    if (StringUtils.isNotBlank(endpoint.getTags())) {
-                        result = consumer.pull(messageQueue, endpoint.getTags(), offset, 1);
-                    } else {
-                        result = consumer.pull(messageQueue, "*", offset, 1);
+            switch (endpoint.getConsumerType()) {
+                case "PULL":
+                    RPCHook rpcHook = null;
+                    if (StringUtils.isNotBlank(endpoint.getAccessKey()) && StringUtils.isNotBlank(endpoint.getSecretKey())) {
+                        rpcHook = new AclClientRPCHook(new SessionCredentials(endpoint.getAccessKey(), endpoint.getSecretKey()));
                     }
 
-                    switch (result.getPullStatus()) {
-                        case FOUND:
-                            List<MessageExt> messages = result.getMsgFoundList();
-                            if (messages == null || messages.size() == 0) {
-                                return;
+                    service = new MQPullConsumerScheduleService(endpoint.getGroupId(), rpcHook);
+                    DefaultMQPullConsumer defaultMQPullConsumer = service.getDefaultMQPullConsumer();
+                    defaultMQPullConsumer.setNamesrvAddr(endpoint.getNameServer());
+                    defaultMQPullConsumer.setAccessChannel(AccessChannel.LOCAL);
+
+                    service.registerPullTaskCallback(endpoint.getTopic(), (messageQueue, pullTaskContext) -> {
+                        MQPullConsumer consumer = pullTaskContext.getPullConsumer();
+                        try {
+                            long offset = consumer.fetchConsumeOffset(messageQueue, false);
+                            if (offset < 0) {
+                                offset = 0;
                             }
-                            for (MessageExt message : messages) {
-                                Exchange exchange = endpoint.createRocketMQExchange(message.getBody());
-                                if (!endpoint.getAutocommit()) {
-                                    RocketMQManualCommit commit = new RocketMQManualCommit(consumer, endpoint.getTopic(), messageQueue, result.getNextBeginOffset());
-                                    exchange.getIn().setHeader(ROCKET_MQ_MANUAL_COMMIT, commit);
-                                } else {
+                            PullResult result;
+                            // todo consumer目前配置写死，一次只拿一条消息，方便消费确认
+                            if (StringUtils.isNotBlank(endpoint.getTags())) {
+                                result = consumer.pull(messageQueue, endpoint.getTags(), offset, 1);
+                            } else {
+                                result = consumer.pull(messageQueue, "*", offset, 1);
+                            }
+
+                            switch (result.getPullStatus()) {
+                                case FOUND:
+                                    List<MessageExt> messages = result.getMsgFoundList();
+                                    if (messages == null || messages.size() == 0) {
+                                        return;
+                                    }
+                                    for (MessageExt message : messages) {
+                                        Exchange exchange = endpoint.createRocketMQExchange(message.getBody());
+                                        if (!endpoint.getAutocommit()) {
+                                            RocketMQManualCommit commit = new RocketMQManualCommit(consumer, endpoint.getTopic(), messageQueue, result.getNextBeginOffset());
+                                            exchange.getIn().setHeader(ROCKET_MQ_MANUAL_COMMIT, commit);
+                                        } else {
+                                            consumer.updateConsumeOffset(messageQueue, result.getNextBeginOffset());
+                                        }
+                                        processor.process(exchange);
+                                    }
+                                    break;
+                                case NO_MATCHED_MSG:
+                                case NO_NEW_MSG:
+                                case OFFSET_ILLEGAL:
+                                default:
                                     consumer.updateConsumeOffset(messageQueue, result.getNextBeginOffset());
-                                }
-                                processor.process(exchange);
+                                    break;
                             }
-                            break;
-                        case NO_MATCHED_MSG:
-                        case NO_NEW_MSG:
-                        case OFFSET_ILLEGAL:
-                        default:
-                            consumer.updateConsumeOffset(messageQueue, result.getNextBeginOffset());
-                            break;
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    });
+                    service.start();
+                    break;
+                case "PUSH":
+                default:
+                    pushConsumer = new DefaultMQPushConsumer(endpoint.getGroupId());
+                    String tag = "*";
+                    if (StringUtils.isNotBlank(endpoint.getTags())) {
+                        tag = endpoint.getTags();
                     }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            });
-            service.start();
+                    pushConsumer.subscribe(endpoint.getTopic(), tag);
+                    pushConsumer.setNamesrvAddr(endpoint.getNameServer());
+                    pushConsumer.setVipChannelEnabled(false);
+                    pushConsumer.setClientIP(InetAddress.getLocalHost().getHostAddress());
+                    pushConsumer.setMessageListener((MessageListenerConcurrently) (msgs, context) -> {
+                        msgs.forEach(messageExt -> {
+                            try {
+                                Exchange exchange = endpoint.createRocketMQExchange(messageExt.getBody());
+                                processor.process(exchange);
+                            } catch (Exception e) {
+                                throw new RuntimeException(e.getMessage());
+                            }
+                        });
+                        return ConsumeConcurrentlyStatus.CONSUME_SUCCESS;
+                    });
+                    pushConsumer.start();
+            }
         }
     }
 }

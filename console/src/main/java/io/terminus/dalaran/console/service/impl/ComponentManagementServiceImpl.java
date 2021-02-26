@@ -65,7 +65,7 @@ public class ComponentManagementServiceImpl implements ComponentManagementServic
             }
         } catch (Exception e) {
             e.printStackTrace();
-            throw new RuntimeException("create component error! ", e.getCause());
+            throw new RuntimeException("create " + componentDTO.getType().name() + " error! ", e.getCause());
         }
         return null;
     }
@@ -96,7 +96,7 @@ public class ComponentManagementServiceImpl implements ComponentManagementServic
             }
         } catch (Exception e) {
             e.printStackTrace();
-            throw new RuntimeException("update component error! ", e.getCause());
+            throw new RuntimeException("update " + componentDTO.getType().name() + " error! ", e.getCause());
         }
         return null;
     }
@@ -135,7 +135,7 @@ public class ComponentManagementServiceImpl implements ComponentManagementServic
             }
         } catch (Exception e) {
             e.printStackTrace();
-            throw new RuntimeException("delete component error! ", e.getCause());
+            throw new RuntimeException("delete " + componentType.name() + " error! ", e.getCause());
         }
     }
 

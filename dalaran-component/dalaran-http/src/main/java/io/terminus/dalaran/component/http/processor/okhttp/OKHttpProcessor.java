@@ -7,6 +7,7 @@ import com.google.common.collect.Maps;
 import io.terminus.dalaran.component.common.HttpMethod;
 import io.terminus.dalaran.component.http.processor.HttpClientConfig;
 import lombok.extern.slf4j.Slf4j;
+import lombok.var;
 import okhttp3.*;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
@@ -20,22 +21,23 @@ import java.util.Objects;
 @Slf4j
 public class OKHttpProcessor implements Processor {
 
-    private HttpClientConfig config;
+    private OKHttpClientConfig config;
 
     private OkHttpClient client;
 
-    public OKHttpProcessor(HttpClientConfig config, OkHttpClient client) {
+    public OKHttpProcessor(OKHttpClientConfig config, OkHttpClient client) {
         this.config = config;
         this.client = client;
     }
 
     @Override
     public void process(Exchange exchange) throws Exception {
+        String path = buildPath(config.getPath(), exchange);
         String url = "";
         if (config.getConnector().getProtocol().name().equals("HTTPS")){
-            url = config.getConnector().getProtocol().name().toLowerCase() + "://" + config.getConnector().getHost() + config.getPath();
-        }else {
-            url = config.getConnector().getProtocol().name().toLowerCase() + "://" + config.getConnector().getHost() + ":" + config.getConnector().getPort() + config.getPath();
+            url = config.getConnector().getProtocol().name().toLowerCase() + "://" + config.getConnector().getHost() + path;
+        } else {
+            url = config.getConnector().getProtocol().name().toLowerCase() + "://" + config.getConnector().getHost() + ":" + config.getConnector().getPort() + path;
         }
         log.info("url: " + url);
         Request request;
@@ -49,13 +51,16 @@ public class OKHttpProcessor implements Processor {
         if (config.getMethod() == HttpMethod.GET) {
             Map<String, Object> params = buildQueryString(exchange.getIn().getBody());
             //params.forEach(httpBuilder::addQueryParameter);
-            for(String string:params.keySet()) {
-                httpBuilder.addQueryParameter(string,params.get(string).toString());
+            for(String string: params.keySet()) {
+                httpBuilder.addQueryParameter(string, params.get(string).toString());
             }
             request = new Request.Builder().url(httpBuilder.build()).headers(headers).build();
         } else {
             if (StringUtils.isNotBlank(config.getQueryParams())) {
-                url += url + Joiner.on("&").withKeyValueSeparator("=").join(buildValues(exchange, config.getQueryParams()));
+                if (!StringUtils.endsWith(url, "?")) {
+                    url += "?";
+                }
+                url += Joiner.on("&").withKeyValueSeparator("=").join(buildValues(exchange, config.getQueryParams()));
             }
             switch (config.getContentType()) {
                 case APPLICATION_FORM_URLENCODED:
@@ -63,13 +68,21 @@ public class OKHttpProcessor implements Processor {
                     FormBody.Builder form = new FormBody.Builder();
                     formBody.forEach((k, v) -> form.add(k, v));
                     FormBody requestBody = form.build();
-                    request = new Request.Builder().url(url).headers(headers).post(requestBody).build();
+                    request = makeRequest(url, headers, config.getMethod(), requestBody);
+                    break;
+                case MULTIPART_FORM_DATA:
+                    Map<String, String> formData = buildValues(exchange, config.getFormData());
+                    var multipartBuilder = new MultipartBody.Builder();
+                    formData.forEach((k, v) -> multipartBuilder.addFormDataPart(k, v));
+                    MultipartBody multipartBody =  multipartBuilder.setType(MultipartBody.FORM).build();
+                    request = makeRequest(url, headers, config.getMethod(), multipartBody);
                     break;
                 default:
                     RequestBody body = RequestBody.create(MediaType.parse("application/json"), buildRequestBody(exchange.getIn().getBody()));
-                    request = new Request.Builder().url(url).headers(headers).post(body).build();
+                    request = makeRequest(url, headers, config.getMethod(), body);
             }
         }
+        log.info("url: " + url);
         Response response = client.newCall(request).execute();
         if (response.code() != 200) {
             throw new RuntimeException("Http Request Error! " + Objects.requireNonNull(response.body()).string());
@@ -77,6 +90,18 @@ public class OKHttpProcessor implements Processor {
         String responseBody = Objects.requireNonNull(response.body()).string();
         log.info("response: " + responseBody);
         exchange.getOut().setBody(responseBody);
+    }
+
+    public Request makeRequest(String url, Headers headers, HttpMethod method, RequestBody requestBody) {
+        Request request;
+        if (method == HttpMethod.PUT) {
+            request = new Request.Builder().url(url).headers(headers).put(requestBody).build();
+        } else if (method == HttpMethod.DELETE) {
+            request = new Request.Builder().url(url).headers(headers).delete(requestBody).build();
+        } else {
+            request = new Request.Builder().url(url).headers(headers).post(requestBody).build();
+        }
+        return request;
     }
 
     private Map<String, Object> buildQueryString(Object obj) throws Exception {
@@ -135,5 +160,27 @@ public class OKHttpProcessor implements Processor {
         } else {
             return JSON.parseObject(JSON.toJSONString(body), Map.class);
         }
+    }
+
+    private String buildPath(String path, Exchange exchange) {
+        if (!StringUtils.contains(path, "{") || !StringUtils.contains(path, "}")) {
+            return path;
+        }
+        String contextKey = "DalaranContextExchange" + exchange.getExchangeId();
+        Map<String, Object> contextValues = (Map)exchange.getProperties().get(contextKey);
+        StringBuilder pathBuilder = new StringBuilder(path);
+        String[] params = StringUtils.split(path, "/");
+        for (String param: params) {
+            if (!StringUtils.contains(param, "{") || !StringUtils.contains(param, "}")) {
+                continue;
+            }
+            String paramKey = StringUtils.substring(param, 1, param.length() - 1);
+            if (contextValues.containsKey(paramKey)) {
+                String pathValue = contextValues.get(paramKey).toString();
+                pathBuilder = new StringBuilder(StringUtils.replace(pathBuilder.toString(), param, pathValue));
+
+            }
+        }
+        return pathBuilder.toString();
     }
 }

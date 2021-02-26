@@ -1,6 +1,6 @@
 package io.terminus.dalaran.core.spring;
 
-import io.terminus.dalaran.core.cache.*;
+import io.terminus.dalaran.core.cache.CacheManager;
 import io.terminus.dalaran.core.component.config.CustomCamelContext;
 import io.terminus.dalaran.core.context.*;
 import io.terminus.dalaran.core.context.support.*;

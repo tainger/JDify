@@ -6,6 +6,7 @@ import io.terminus.dalaran.core.resource.entity.released.SubFlowReleasedEntity;
 import io.terminus.dalaran.core.resource.entity.released.TriggerFlowReleasedEntity;
 import io.terminus.dalaran.model.dto.ReleaseRecordDTO;
 import io.terminus.dalaran.model.dto.ReleaseRequestDTO;
+import io.terminus.dalaran.model.dto.flow.ReleaseFlowDTO;
 import io.terminus.dalaran.model.dto.flow.TriggerFlowDTO;
 
 import java.util.List;
@@ -16,7 +17,7 @@ public interface ReleaseService {
 
     ReleaseRecordDTO rollback(String version);
 
-    List<TriggerFlowDTO> listReleasedTriggerFlowDTO(String version);
+    List<ReleaseFlowDTO> listReleasedTriggerFlowDTO(String version);
 
     List<TriggerFlowReleasedEntity> listReleasedTriggerFlow(String version);
 
