@@ -12,6 +12,8 @@ public class ReleasedResourceLoader implements DalaranResourceLoader {
 
     private String version;
 
+    private String lastVersion;
+
     @Autowired
     private TriggerFlowReleasedRepository releasedTriggerFlowRepository;
 
@@ -51,12 +53,22 @@ public class ReleasedResourceLoader implements DalaranResourceLoader {
 
     @Override
     public List<TriggerFlowReleasedEntity> loadAvailableTriggerFlow() {
-        return releasedTriggerFlowRepository.findByVersionAndStatusNot(version, FlowStatus.Error);
+        return releasedTriggerFlowRepository.findByVersionAndStatusNotAndIsOnlineTrue(version, FlowStatus.Error);
+    }
+
+    @Override
+    public List<TriggerFlowReleasedEntity> loadLastVersionAvailableTriggerFlow() {
+        return releasedTriggerFlowRepository.findByVersionAndStatusNotAndIsOnlineTrue(lastVersion, FlowStatus.Error);
     }
 
     @Override
     public List<SubFlowReleasedEntity> loadAvailableSubFlow() {
-        return releasedSubFlowRepository.findByVersionAndStatusNot(version, FlowStatus.Error);
+        return releasedSubFlowRepository.findByVersionAndStatusNotAndIsOnlineTrue(version, FlowStatus.Error);
+    }
+
+    @Override
+    public List<SubFlowReleasedEntity> loadLastVersionAvailableSubFlow() {
+        return releasedSubFlowRepository.findByVersionAndStatusNotAndIsOnlineTrue(lastVersion, FlowStatus.Error);
     }
 
     @Override
@@ -115,5 +127,13 @@ public class ReleasedResourceLoader implements DalaranResourceLoader {
 
     public void setVersion(String version) {
         this.version = version;
+    }
+
+    public String getLastVersion() {
+        return lastVersion;
+    }
+
+    public void setLastVersion(String version) {
+        this.lastVersion = lastVersion;
     }
 }

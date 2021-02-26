@@ -55,6 +55,7 @@ public class SubFlowManagementServiceImpl implements SubFlowManagementService {
         SubFlowEntity subFlowEntity = buildEntity(flowModel);
         setFlowStatus(subFlowEntity);
         setCreatedBy(subFlowEntity);
+        subFlowEntity.setOnline(true);
         subFlowRepository.save(subFlowEntity);
         if (subFlowEntity.getStatus() != FlowStatus.Error) {
             testFlowInitializer.reloadTestSubFlow(subFlowEntity.getId());

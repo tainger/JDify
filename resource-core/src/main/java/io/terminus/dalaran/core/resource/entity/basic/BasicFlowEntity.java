@@ -28,6 +28,8 @@ public class BasicFlowEntity extends BasicEntity {
     @Enumerated(EnumType.STRING)
     private FlowStatus status;
 
+    private boolean isOnline;
+
     /**
      * all processor list
      */

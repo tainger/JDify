@@ -17,6 +17,7 @@ import io.terminus.dalaran.model.dto.flow.TriggerFlowDTO;
 import io.terminus.dalaran.model.dto.log.MainLogDTO;
 import io.terminus.dalaran.model.flow.FlowValidation;
 import io.terminus.dalaran.model.query.FlowQuery;
+import io.terminus.dalaran.response.ResponseResult;
 import io.terminus.dalaran.rest.read.FlowReadAPI;
 import io.terminus.dalaran.rest.write.FlowWriteAPI;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -80,6 +81,16 @@ public class FlowManagementRest implements FlowReadAPI, FlowWriteAPI {
     }
 
     @Override
+    public ResponseResult offline(TriggerFlowDTO flowDTO) {
+        return flowManagementService.offline(flowDTO);
+    }
+
+    @Override
+    public ResponseResult online(TriggerFlowDTO flowDTO) {
+        return flowManagementService.online(flowDTO);
+    }
+
+    @Override
     @OnException(code = ResponseMessage.FLOW_DELETE_ERROR)
     public void deleteById(@RequestParam Long id) {
         flowManagementService.deleteFlow(id);
@@ -99,8 +110,8 @@ public class FlowManagementRest implements FlowReadAPI, FlowWriteAPI {
 
     @Override
     @OnException(code = ResponseMessage.FLOW_QUERY_ERROR)
-    public TriggerFlowDTO getByIdVersion(Long id,String version) {
-        return flowManagementService.getByIdVersion(id,version);
+    public TriggerFlowDTO getByIdVersion(Long id,String version) throws FlowNotExistException{
+        return flowManagementService.getByIdVersion(id, version);
     }
 
     @Override

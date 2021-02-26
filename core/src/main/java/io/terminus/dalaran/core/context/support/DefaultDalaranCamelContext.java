@@ -11,6 +11,7 @@ import io.terminus.dalaran.model.flow.TriggerFlow;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.camel.CamelContext;
 import org.apache.camel.impl.DefaultProducerTemplate;
+import org.apache.camel.model.RouteDefinition;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -63,7 +64,6 @@ public class DefaultDalaranCamelContext implements DalaranContext<DalaranRoute> 
     @Override
     public void addTriggerFlow(TriggerFlow flow) {
         try {
-            camelContext.removeRoute(FLOW_PREFIX + flow.getId());
             DalaranRoute route = flowBuilder.buildTriggerFlow(flow, camelContext);
             log.info("load trigger flow [{}], steps: {}", route.getId(), route.getSteps());
             camelContext.addRouteDefinition(route);
@@ -75,6 +75,17 @@ public class DefaultDalaranCamelContext implements DalaranContext<DalaranRoute> 
     @Override
     public void addTriggerFlows(List<TriggerFlow> flows) {
         flows.forEach(this::addTriggerFlow);
+    }
+
+    @Override
+    public void removeTriggerFlow(TriggerFlow flow) {
+        try {
+            RouteDefinition route = camelContext.getRouteDefinition(flow.getRouteId());
+            camelContext.removeRouteDefinition(route);
+            log.info("remove trigger flow ,flow [{}]:", flow.getRouteId());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -114,10 +125,20 @@ public class DefaultDalaranCamelContext implements DalaranContext<DalaranRoute> 
     @Override
     public void addSubFlow(SubFlow flow) {
         try {
-            camelContext.removeRoute(flow.getRouteId());
             DalaranRoute route = flowBuilder.buildSubFLow(flow);
             log.info("load sub flow [{}], steps: {}", route.getId(), route.getSteps());
             camelContext.addRouteDefinition(route);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void removeSubFlow(SubFlow flow) {
+        try {
+            RouteDefinition route = camelContext.getRouteDefinition(flow.getRouteId());
+            camelContext.removeRouteDefinition(route);
+            log.info("remove sub flow ,flow [{}]", flow.getRouteId());
         } catch (Exception e) {
             e.printStackTrace();
         }

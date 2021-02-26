@@ -11,6 +11,7 @@ import io.terminus.dalaran.model.dto.flow.ImportFlowDTO;
 import io.terminus.dalaran.model.dto.flow.TriggerFlowDTO;
 import io.terminus.dalaran.model.flow.FlowValidation;
 import io.terminus.dalaran.model.query.FlowQuery;
+import io.terminus.dalaran.response.ResponseResult;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -41,11 +42,15 @@ public interface FlowManagementService {
     TriggerFlowDTO getById(Long flowId);
 
     @Nullable
-    TriggerFlowDTO getByIdVersion(Long flowId,String version);
+    TriggerFlowDTO getByIdVersion(Long flowId,String version) throws FlowNotExistException;
 
     Long copyFlow(CopyFlow copyFlow) throws FlowNotExistException;
 
     List<FlowValidation> validateFlow(TriggerFlowDTO model);
 
     List<String> listTriggerOperations();
+
+    ResponseResult offline(TriggerFlowDTO flowDTO);
+
+    ResponseResult online(TriggerFlowDTO flowDTO);
 }

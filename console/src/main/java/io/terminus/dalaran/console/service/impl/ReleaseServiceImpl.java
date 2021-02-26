@@ -87,14 +87,16 @@ public class ReleaseServiceImpl implements ReleaseService {
     @Override
     public ReleaseRecordDTO release(ReleaseRequestDTO requestDTO) {
         ReleaseRecordEntity enabledReleaseEntity = releaseRecordRepository.findByEnabledTrue();
+        String lastVersion = "";
         if (enabledReleaseEntity != null) {
             enabledReleaseEntity.setEnabled(false);
             releaseRecordRepository.save(enabledReleaseEntity);
+            lastVersion = enabledReleaseEntity.getVersion();
         }
-
         ReleaseRecordEntity recordEntity = new ReleaseRecordEntity();
         recordEntity.setEnabled(true);
         recordEntity.setVersion(requestDTO.getVersion());
+        recordEntity.setLastVersion(lastVersion);
         recordEntity.setReleaseLog(requestDTO.getReleaseLog());
         recordEntity.setReleaseTime(new Date());
         // TODO 需要校验是否有误, 暂时没做
@@ -134,13 +136,16 @@ public class ReleaseServiceImpl implements ReleaseService {
     @Override
     public ReleaseRecordDTO rollback(String version) {
         ReleaseRecordEntity enabledReleaseEntity = releaseRecordRepository.findByEnabledTrue();
+        String lastVersion = "";
         if (enabledReleaseEntity != null) {
             enabledReleaseEntity.setEnabled(false);
             releaseRecordRepository.save(enabledReleaseEntity);
+            lastVersion = enabledReleaseEntity.getVersion();
         }
         ReleaseRecordEntity nextReleaseRecord = releaseRecordRepository.findByVersion(version);
         if (nextReleaseRecord != null) {
             nextReleaseRecord.setEnabled(true);
+            nextReleaseRecord.setLastVersion(lastVersion);
             releaseRecordRepository.save(nextReleaseRecord);
         }
         return toDTO(nextReleaseRecord);

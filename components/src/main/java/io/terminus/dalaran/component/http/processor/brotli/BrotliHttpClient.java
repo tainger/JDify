@@ -45,7 +45,6 @@ public class BrotliHttpClient implements DalaranProcessor<HttpClientConfig> {
     @Override
     public void configure(ProcessorDefinition route, HttpClientConfig config) {
         if(config.getConnector().getProtocol().name().equals("HTTPS")) {
-            log.info("ossAccount: " + ossAccount.getBucketName());
             File dir = new File("/var/tmp");
             try {
                 File file = getSslCertificate(config.getSslCertificate(),ossAccount,dir);

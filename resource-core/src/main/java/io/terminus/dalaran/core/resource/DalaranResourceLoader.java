@@ -12,7 +12,11 @@ public interface DalaranResourceLoader {
 
     List<? extends TriggerFlowAbstractEntity> loadAvailableTriggerFlow();
 
+    List<? extends TriggerFlowAbstractEntity> loadLastVersionAvailableTriggerFlow();
+
     List<? extends SubFlowAbstractEntity> loadAvailableSubFlow();
+
+    List<? extends SubFlowAbstractEntity> loadLastVersionAvailableSubFlow();
 
     List<? extends TriggerFlowAbstractEntity> loadAvailableTriggerFlowByTriggerType(String triggerType);
 

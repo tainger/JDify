@@ -31,6 +31,8 @@ import io.terminus.dalaran.model.flow.FlowValidation;
 import io.terminus.dalaran.model.flow.TriggerFlow;
 import io.terminus.dalaran.model.flow.ValidateMessageLevel;
 import io.terminus.dalaran.model.query.FlowQuery;
+import io.terminus.dalaran.response.ResponseErrorMsg;
+import io.terminus.dalaran.response.ResponseResult;
 import io.terminus.draco.web.autoconfig.context.UserContext;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -113,6 +115,7 @@ public class FlowManagementServiceImpl implements FlowManagementService {
         buildEntity(flowModel, flowEntity);
         setFlowStatus(flowEntity);
         setCreatedBy(flowEntity);
+        flowEntity.setOnline(true);
         Long id = flowRepository.save(flowEntity).getId();
         // TODO 这里依赖 loader 有点怪 而且可以异步
         if (flowEntity.getStatus() != FlowStatus.Error) {
@@ -334,8 +337,11 @@ public class FlowManagementServiceImpl implements FlowManagementService {
 
     @Nullable
     @Override
-    public TriggerFlowDTO getByIdVersion(Long flowId,String version) {
+    public TriggerFlowDTO getByIdVersion(Long flowId,String version) throws FlowNotExistException{
         TriggerFlowReleasedEntity triggerFlowReleasedEntity = triggerFlowReleasedRepository.findByVersionAndOriginId(version,flowId);
+        if (triggerFlowReleasedEntity == null) {
+            throw new FlowNotExistException();
+        }
         return flowConvertor.releaseToDTO(triggerFlowReleasedEntity);
     }
 
@@ -364,6 +370,41 @@ public class FlowManagementServiceImpl implements FlowManagementService {
     @Override
     public List<String> listTriggerOperations() {
         return getSoapOperations();
+    }
+
+    @Override
+    public ResponseResult offline(TriggerFlowDTO flowDTO) {
+        try {
+            return isOnline(flowDTO, false);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return fail(ResponseErrorMsg.OFFLINE_FLOW_ERROR);
+        }
+    }
+
+    @Override
+    public ResponseResult online(TriggerFlowDTO flowDTO) {
+        try {
+            return isOnline(flowDTO, true);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return fail(ResponseErrorMsg.ONLINE_FLOW_ERROR);
+        }
+    }
+
+    public ResponseResult isOnline(TriggerFlowDTO flowDTO, boolean isOnline) {
+        Long flowId = flowDTO.getId();
+        if (flowId == null) {
+            return fail(ResponseErrorMsg.FLOW_ID_NULL);
+        }
+        Optional<TriggerFlowEntity> triggerFlowEntityOptional = flowRepository.findById(flowId);
+        if (!triggerFlowEntityOptional.isPresent()) {
+            return fail(ResponseErrorMsg.FLOW_IS_NULL);
+        }
+        TriggerFlowEntity triggerFlowEntity = triggerFlowEntityOptional.get();
+        triggerFlowEntity.setOnline(isOnline);
+        flowRepository.save(triggerFlowEntity);
+        return success();
     }
 
     private void setFlowStatus(TriggerFlowEntity flowEntity) {
@@ -446,6 +487,19 @@ public class FlowManagementServiceImpl implements FlowManagementService {
         if(UserContext.getUserInfo() != null && UserContext.getUserInfo().getUsername() != null){
             triggerFlowEntity.setUpdatedBy(UserContext.getUserInfo().getUsername());
         }
+    }
+
+    private ResponseResult fail(String errorMsg) {
+        ResponseResult result = new ResponseResult();
+        result.setSuccess(false);
+        result.setErrorMsg(errorMsg);
+        return result;
+    }
+
+    private ResponseResult success() {
+        ResponseResult result = new ResponseResult();
+        result.setSuccess(true);
+        return result;
     }
 
 }

@@ -19,6 +19,8 @@ public class BasicFlowInfo {
 
     private boolean isExist;
 
+    private boolean online;
+
     public BasicFlowInfo() {
     }
 

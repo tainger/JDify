@@ -21,6 +21,8 @@ public interface DalaranContext<T> {
 
     void addTriggerFlows(List<TriggerFlow> flows);
 
+    void removeTriggerFlow(TriggerFlow flow);
+
     void addTestFlow(BasicFlow flow);
 
     void addTestFlows(List<BasicFlow> flows);
@@ -32,6 +34,8 @@ public interface DalaranContext<T> {
     void addSubFlow(SubFlow flow);
 
     void addSubFlows(List<SubFlow> flows);
+
+    void removeSubFlow(SubFlow flow);
 
     void addFragmentFlow(FlowFragment flow);
 

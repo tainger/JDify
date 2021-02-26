@@ -1,6 +1,7 @@
 package io.terminus.dalaran.rest.read;
 
 import io.swagger.annotations.ApiOperation;
+import io.terminus.dalaran.exception.flow.FlowNotExistException;
 import io.terminus.dalaran.exception.flow.FlowTestException;
 import io.terminus.dalaran.model.dto.TestRequestDTO;
 import io.terminus.dalaran.model.dto.flow.TriggerFlowDTO;
@@ -20,7 +21,7 @@ public interface FlowReadAPI {
 
     @ApiOperation(value = "根据 ID、版本 获取集成流")
     @GetMapping(value = "/byIdVersion")
-    TriggerFlowDTO getByIdVersion(Long id,String version);
+    TriggerFlowDTO getByIdVersion(Long id,String version) throws FlowNotExistException;
 
     @ApiOperation(value = "条件查询集成流")
     @GetMapping(value = "/query")
