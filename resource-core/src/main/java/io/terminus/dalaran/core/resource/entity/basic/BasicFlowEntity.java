@@ -30,6 +30,10 @@ public class BasicFlowEntity extends BasicEntity {
 
     private boolean isOnline;
 
+    private boolean isMonitor;
+
+    private Long alarmId;
+
     /**
      * all processor list
      */

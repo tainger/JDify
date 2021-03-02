@@ -152,4 +152,15 @@ public class ResponseMessage {
     public static final String GET_ELAPSED_TIME_ERROR = "Get.ElapsedTime.Exception";
 
     public static final String GET_USER_INFO_ERROR = "Get.UserInfo.Exception" ;
+
+    //报警规则异常
+    public static final String ALARM_RULE_CREATE_ERROR = "AlarmRule.Create.Exception";
+
+    public static final String ALARM_RULE_UPDATE_ERROR = "AlarmRule.Update.Exception";
+
+    public static final String ALARM_RULE_DELETE_ERROR = "AlarmRule.Delete.Exception";
+
+    public static final String ALARM_RULE_QUERY_ERROR = "Property.Query.Exception";
+
+
 }

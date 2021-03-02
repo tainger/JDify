@@ -11,4 +11,6 @@ import java.util.List;
  */
 public interface ModuleRepository extends JpaRepository<ModuleEntity, Long>, JpaSpecificationExecutor<ModuleEntity> {
     List<ModuleEntity> findByIsExistTrue();
+
+    ModuleEntity findByIdAndIsExistTrue(Long id);
 }
