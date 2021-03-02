@@ -90,6 +90,8 @@ public class TracingLogServiceImpl implements TracingLogService {
         return entityManager.createQuery(criteriaQuery).getSingleResult();
     }
 
+
+
     @Override
     public MainLogDTO getRecordDetail(String recordId) {
         TracingLogEntity testMainLog = tracingLogRepository.findByRecordIdAndMainTrue(recordId);

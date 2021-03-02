@@ -4,6 +4,9 @@ import io.terminus.dalaran.console.entity.*;
 import io.terminus.dalaran.console.repository.*;
 import io.terminus.dalaran.core.context.DalaranContext;
 import io.terminus.dalaran.core.resource.DalaranResourceLoader;
+import io.terminus.dalaran.core.resource.entity.AlarmRuleAbstractEntity;
+import io.terminus.dalaran.core.resource.entity.released.AlarmRuleReleasedEntity;
+import io.terminus.dalaran.core.resource.repository.AlarmRuleReleasedRepository;
 import io.terminus.dalaran.model.flow.FlowStatus;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +43,9 @@ public class TestResourceLoader implements DalaranResourceLoader {
 
     @Autowired
     private ClientRepository clientRepository;
+
+    @Autowired
+    private AlarmRuleRepository alarmRuleRepository;
 
     @Autowired
     private DalaranContext dalaranContext;
@@ -126,5 +132,15 @@ public class TestResourceLoader implements DalaranResourceLoader {
     @Override
     public ServiceEntity loadService(Long serviceId) {
         return serviceRepository.findById(serviceId).get();
+    }
+
+    @Override
+    public AlarmRuleAbstractEntity loadAlarmRule(Long alarmRuleId) {
+        return alarmRuleRepository.findById(alarmRuleId).get();
+    }
+
+    @Override
+    public List<AlarmRuleReleasedEntity> loadAllMonitoredAlarmRule() {
+        return null;
     }
 }

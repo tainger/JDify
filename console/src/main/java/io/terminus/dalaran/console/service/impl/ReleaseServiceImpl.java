@@ -1,6 +1,7 @@
 package io.terminus.dalaran.console.service.impl;
 
 import io.terminus.dalaran.console.convertor.FlowConvertor;
+import io.terminus.dalaran.console.entity.LimiterEntity;
 import io.terminus.dalaran.console.repository.*;
 import io.terminus.dalaran.console.service.ReleaseService;
 import io.terminus.dalaran.core.resource.entity.basic.BasicEntity;
@@ -80,7 +81,19 @@ public class ReleaseServiceImpl implements ReleaseService {
     private ServiceReleasedRepository serviceReleasedRepository;
 
     @Autowired
+    private LimiterReleasedRepository limiterReleasedRepository;
+
+    @Autowired
+    private LimiterRepository limiterRepository;
+
+    @Autowired
     private  ModuleRepository moduleRepository;
+
+    @Autowired
+    private AlarmRuleReleasedRepository alarmRuleReleasedRepository;
+
+    @Autowired
+    private AlarmRuleRepository alarmRuleRepository;
 
     private final FlowConvertor flowConvertor = new FlowConvertor();
 
@@ -129,6 +142,12 @@ public class ReleaseServiceImpl implements ReleaseService {
 
         List<ServiceReleasedEntity> releasedServiceEntities = toReleasedData(serviceRepository.findByIsExistTrue(), ServiceReleasedEntity.class, requestDTO.getVersion());
         serviceReleasedRepository.saveAll(releasedServiceEntities);
+
+        List<LimiterReleasedEntity> limiterReleasedEntities = toReleasedData(limiterRepository.findByIsExistTrue(), LimiterReleasedEntity.class, requestDTO.getVersion());
+        limiterReleasedRepository.saveAll(limiterReleasedEntities);
+
+        List<AlarmRuleReleasedEntity> alarmRuleReleasedEntities = toReleasedData(alarmRuleRepository.findByIsExistTrue(), AlarmRuleReleasedEntity.class, requestDTO.getVersion());
+        alarmRuleReleasedRepository.saveAll(alarmRuleReleasedEntities);
 
         return toDTO(recordEntity);
     }

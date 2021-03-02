@@ -1,30 +1,34 @@
 package io.terminus.dalaran.runtime;
 
+import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.models.Swagger;
 import io.terminus.dalaran.component.http.trigger.model.ApiInfo;
 import io.terminus.dalaran.component.http.trigger.utils.SwaggerUtils;
+import io.terminus.dalaran.core.component.config.AlarmRuleConfig;
 import io.terminus.dalaran.core.context.DalaranContext;
 import io.terminus.dalaran.core.resource.DalaranResourceBuilder;
 import io.terminus.dalaran.core.resource.DalaranStarter;
+import io.terminus.dalaran.core.resource.entity.NoticeMessage;
 import io.terminus.dalaran.core.resource.entity.common.ModuleEntity;
 import io.terminus.dalaran.core.resource.entity.common.ReleaseRecordEntity;
 import io.terminus.dalaran.core.resource.entity.released.*;
 import io.terminus.dalaran.core.resource.repository.ModuleRepository;
 import io.terminus.dalaran.core.resource.repository.ReleaseRecordRepository;
+import io.terminus.dalaran.core.resource.repository.TriggerFlowReleasedRepository;
 import io.terminus.dalaran.model.flow.SubFlow;
 import io.terminus.dalaran.model.flow.TriggerFlow;
+import io.terminus.dalaran.runtime.service.DalaranNoticeService;
+import io.terminus.dalaran.runtime.service.TracingLogService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.camel.CamelContext;
 import org.apache.camel.model.RouteDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.PostConstruct;
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -48,9 +52,22 @@ public class ReleasedFlowInitializer implements DalaranStarter {
     @Autowired
     private CamelContext camelContext;
 
+    @Autowired
+    private DalaranNoticeService dalaranNoticeService;
+
+    @Autowired
+    private TracingLogService tracingLogService;
+
+    @Autowired
+    private TriggerFlowReleasedRepository triggerFlowReleasedRepository;
+
     private Swagger swagger;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
+
+    private Map<Long, Long> alarmConfig;
+
+    private Long current = System.currentTimeMillis();
 
     @PostConstruct
     private void init() throws Exception {
@@ -77,6 +94,7 @@ public class ReleasedFlowInitializer implements DalaranStarter {
             public void run() {
                 try {
                     loadResources();
+                    monitor();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -93,7 +111,8 @@ public class ReleasedFlowInitializer implements DalaranStarter {
             }
             resourceLoader.setVersion(recordEntity.getVersion());
             resourceLoader.setLastVersion(recordEntity.getLastVersion());
-
+            //
+            initAlarmConfig(recordEntity.getVersion());
             // load client info
             List<ClientReleasedEntity> clients = resourceLoader.loadAllClient();
             for (ClientReleasedEntity client : clients) {
@@ -180,4 +199,77 @@ public class ReleasedFlowInitializer implements DalaranStarter {
         return objectMapper.writeValueAsString(swagger);
     }
 
+
+    private void monitor() {
+        Date oneMinBeforeCurrent = new Date(current - 60 * 1000L);
+        Date now = new Date(current);
+        for (Map.Entry<Long, Long> entry : alarmConfig.entrySet()) {
+            Long flowId = entry.getKey();
+            Long alarmRuleId = entry.getValue();
+            AlarmRuleConfig alarmRuleConfig = (AlarmRuleConfig) resourceBuilder.buildAlarmRuleConfig(alarmRuleId, AlarmRuleConfig.class);
+            Map<AlarmRuleConfig.ChannelType, String[]> alarmChannel = alarmRuleConfig.getAlarmChannel();
+            if (alarmChannel.isEmpty()) {
+                continue;
+            }
+            NoticeMessage noticeMessage = alarmRuleValidate(alarmRuleConfig, oneMinBeforeCurrent, now, flowId);
+            noticeMessage.setCreateDate(now);
+            sendNotice(noticeMessage, alarmChannel);
+        }
+        current = current + 60 * 1000L;
+    }
+
+    private void sendNotice(NoticeMessage noticeMessage, Map<AlarmRuleConfig.ChannelType, String[]> alarmChannel) {
+        for (Map.Entry<AlarmRuleConfig.ChannelType, String[]> entry : alarmChannel.entrySet()) {
+            AlarmRuleConfig.ChannelType channelType = entry.getKey();
+            String[] contactWays = entry.getValue();
+            noticeMessage.setContactWays(contactWays);
+            switch (channelType) {
+                case mail:
+                    dalaranNoticeService.sendEmail(noticeMessage);
+                    return;
+                case shortMessage:
+                    dalaranNoticeService.sendShortMessage(noticeMessage);
+                    return;
+            }
+        }
+    }
+
+
+    private NoticeMessage alarmRuleValidate(AlarmRuleConfig alarmRuleConfig, Date oneMinBeforeCurrent, Date now, Long flowId) {
+        NoticeMessage noticeMessage = new NoticeMessage();
+        AlarmRuleConfig.FailureAlarm failureAlarm = alarmRuleConfig.getFailureAlarm();
+        if (null != failureAlarm && failureAlarm.getIsOpen()) {
+            Long failureFrequency = failureAlarm.getFailureFrequency();
+            long failureCount = tracingLogService.countFailureLog(oneMinBeforeCurrent, now, flowId);
+            if (failureCount >= failureFrequency) {
+                noticeMessage.setFailureCount(failureCount);
+                noticeMessage.setIsTouchFailureAlarm(true);
+                noticeMessage.setFailureFrequency(failureFrequency);
+            }
+        }
+        AlarmRuleConfig.TimeOutAlarm timeOutAlarm = alarmRuleConfig.getTimeOutAlarm();
+        if (null != timeOutAlarm && timeOutAlarm.getIsOpen()) {
+            Long elapse = timeOutAlarm.getElapse();
+            Long overTimeFrequency = timeOutAlarm.getElapsedFrequency();
+            long elapseCount = tracingLogService.countElapseLog(oneMinBeforeCurrent, now, flowId, elapse);
+            if (overTimeFrequency >= elapseCount) {
+                noticeMessage.setFailureCount(elapseCount);
+                noticeMessage.setIsTouchFailureAlarm(true);
+                noticeMessage.setFailureFrequency(elapseCount);
+            }
+        }
+        TriggerFlowReleasedEntity triggerFlowReleasedEntity = triggerFlowReleasedRepository.findByVersionAndOriginId(resourceLoader.getVersion(), flowId);
+        noticeMessage.setFlowName(triggerFlowReleasedEntity.getName());
+        return noticeMessage;
+    }
+
+    private void initAlarmConfig(String version) {
+        alarmConfig = new HashMap<> ();
+        List<TriggerFlowReleasedEntity> triggerFlowEntities = triggerFlowReleasedRepository.findByVersionAndIsMonitorTrue(version);
+        for (TriggerFlowReleasedEntity triggerFlowReleasedEntity : triggerFlowEntities) {
+            Long id = triggerFlowReleasedEntity.getOriginId();
+            Long alarmRuleId = triggerFlowReleasedEntity.getAlarmId();
+            alarmConfig.put(id, alarmRuleId);
+        }
+    }
 }

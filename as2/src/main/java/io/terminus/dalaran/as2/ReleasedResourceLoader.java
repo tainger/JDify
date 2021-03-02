@@ -1,6 +1,7 @@
 package io.terminus.dalaran.as2;
 
 import io.terminus.dalaran.core.resource.DalaranResourceLoader;
+import io.terminus.dalaran.core.resource.entity.AlarmRuleAbstractEntity;
 import io.terminus.dalaran.core.resource.entity.released.*;
 import io.terminus.dalaran.core.resource.repository.*;
 import io.terminus.dalaran.model.flow.FlowStatus;
@@ -40,6 +41,9 @@ public class ReleasedResourceLoader implements DalaranResourceLoader {
 
     @Autowired
     private ClientReleasedRepository clientRepository;
+
+    @Autowired
+    private AlarmRuleReleasedRepository alarmRuleReleasedRepository;
 
     @Override
     public List<TriggerFlowReleasedEntity> loadAllTriggerFlow() {
@@ -119,6 +123,16 @@ public class ReleasedResourceLoader implements DalaranResourceLoader {
     @Override
     public ServiceReleasedEntity loadService(Long serviceId) {
         return serviceRepository.findByVersionAndOriginId(version, serviceId);
+    }
+
+    @Override
+    public AlarmRuleAbstractEntity loadAlarmRule(Long alarmRuleId) {
+        return alarmRuleReleasedRepository.findByVersionAndOriginId(version, alarmRuleId);
+    }
+
+    @Override
+    public List<AlarmRuleReleasedEntity> loadAllMonitoredAlarmRule() {
+        return null;
     }
 
     public String getVersion() {

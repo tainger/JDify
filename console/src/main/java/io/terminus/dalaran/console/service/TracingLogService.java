@@ -5,6 +5,7 @@ import io.terminus.dalaran.model.dto.log.TimeLogDTO;
 import io.terminus.dalaran.model.query.TracingLogQuery;
 import org.springframework.data.domain.Page;
 
+import java.util.Date;
 import java.util.List;
 
 public interface TracingLogService {
@@ -16,4 +17,6 @@ public interface TracingLogService {
     MainLogDTO getRecordDetail(String recordId);
 
     TimeLogDTO getElapsedTime(TracingLogQuery query);
+
+
 }

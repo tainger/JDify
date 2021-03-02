@@ -171,6 +171,12 @@ public class DefaultDalaranResourceBuilder implements DalaranResourceBuilder {
         return buildConfig(serviceEntity.getServiceConfig(), serviceInfo.getServiceConfigType());
     }
 
+    @Override
+    public Object buildAlarmRuleConfig(Long alarmRuleId, Class alarmRuleType) {
+        AlarmRuleAbstractEntity entity = resourceLoader.loadAlarmRule(alarmRuleId);
+        return buildConfig(entity.getConfig(), alarmRuleType);
+    }
+
     private void buildFlow(BasicFlow flow, BasicFlowEntity flowEntity) {
         if (flowEntity instanceof ReleasedEntity) {
             flow.setId(String.valueOf(((ReleasedEntity) flowEntity).getOriginId()));
