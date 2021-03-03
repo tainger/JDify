@@ -20,6 +20,7 @@ import io.terminus.dalaran.model.query.FlowQuery;
 import io.terminus.dalaran.response.ResponseResult;
 import io.terminus.dalaran.rest.read.FlowReadAPI;
 import io.terminus.dalaran.rest.write.FlowWriteAPI;
+import org.apache.camel.CamelContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -45,6 +46,7 @@ public class FlowManagementRest implements FlowReadAPI, FlowWriteAPI {
 
     @Autowired
     private DalaranContext dalaranContext;
+
 
     @Override
     @OnException(code = ResponseMessage.FLOW_CREATE_ERROR)
@@ -81,13 +83,19 @@ public class FlowManagementRest implements FlowReadAPI, FlowWriteAPI {
     }
 
     @Override
-    public ResponseResult offline(TriggerFlowDTO flowDTO) {
+    public ResponseResult offline(@RequestBody TriggerFlowDTO flowDTO) {
         return flowManagementService.offline(flowDTO);
     }
 
     @Override
-    public ResponseResult online(TriggerFlowDTO flowDTO) {
+    public ResponseResult online(@RequestBody TriggerFlowDTO flowDTO) {
         return flowManagementService.online(flowDTO);
+    }
+
+    @Override
+    @OnException(code = ResponseMessage.FLOW_TRIGGER_ERROR)
+    public void trigger(@RequestBody TriggerFlowDTO flowDTO) {
+        dalaranContext.trigger(flowDTO.getId());
     }
 
     @Override

@@ -11,14 +11,15 @@ import io.terminus.dalaran.core.resource.repository.*;
 import io.terminus.dalaran.model.dto.ReleaseRecordDTO;
 import io.terminus.dalaran.model.dto.ReleaseRequestDTO;
 import io.terminus.dalaran.model.dto.flow.ReleaseFlowDTO;
-import io.terminus.dalaran.model.dto.flow.TriggerFlowDTO;
+import io.terminus.dalaran.model.flow.FlowStatus;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.kafka.common.protocol.types.Field;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.criteria.Predicate;
 import javax.transaction.Transactional;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -185,6 +186,34 @@ public class ReleaseServiceImpl implements ReleaseService {
     public List<ReleaseRecordDTO> listReleaseRecordDTO() {
         return releaseRecordRepository.findAll(new Sort(Sort.Direction.DESC, "releaseTime"))
                 .stream().map(this::toDTO).collect(Collectors.toList());
+    }
+
+    @Override
+    public Page<ReleaseFlowDTO> triggerFlowListByPage(Integer pageNumber, Integer pageSize) {
+        ReleaseRecordEntity releaseRecordEntity = releaseRecordRepository.findByEnabledTrue();
+        if (releaseRecordEntity == null) {
+            return null;
+        }
+        String version = releaseRecordEntity.getVersion();
+        Sort order = new Sort(Sort.Direction.DESC, "createdAt");
+        Pageable pageable = PageRequest.of(pageNumber - 1, pageSize, order);
+        Page<TriggerFlowReleasedEntity> page = triggerFlowReleasedRepository.findAll(buildSpecification(version, FlowStatus.Error), pageable);
+        return new PageImpl<>(page.stream().map(this::buildflowDTO).collect(Collectors.toList()), pageable, page.getTotalElements());
+    }
+
+    private ReleaseFlowDTO buildflowDTO(TriggerFlowReleasedEntity entity) {
+        ReleaseFlowDTO releaseFlowDTO = new ReleaseFlowDTO();
+        BeanUtils.copyProperties(entity, releaseFlowDTO);
+        return releaseFlowDTO;
+    }
+
+    private Specification<TriggerFlowReleasedEntity> buildSpecification(String version, FlowStatus status) {
+        return (root, query1, builder) -> {
+            List<Predicate> predicates = new ArrayList<>();
+            predicates.add(builder.equal(root.get("version"), version));
+            predicates.add(builder.notEqual(root.get("status"), status));
+            return builder.and(predicates.toArray(new Predicate[0]));
+        };
     }
 
     private <T extends ReleasedEntity, E extends BasicEntity> List<T> toReleasedData(List<E> data, Class<T> releasedType, String version) {

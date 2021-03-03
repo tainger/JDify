@@ -201,6 +201,20 @@ public class DefaultDalaranCamelContext implements DalaranContext<DalaranRoute> 
     }
 
     @Override
+    public void trigger(Long flowId) {
+        String recordId = nextRecordId();
+        if (camelContext.getRoute(TEST_FLOW_PREFIX + FLOW_PREFIX + flowId) == null) {
+            throw new RuntimeException("Trigger error! This flow can't be loaded into test service, please check it.");
+        }
+        try {
+            DefaultProducerTemplate template = (DefaultProducerTemplate) camelContext.createProducerTemplate();
+            template.sendBodyAndProperty(TEST_FLOW_DIRECT_PREFIX + FLOW_PREFIX + flowId, "", DalaranConstants.TEST_FLOW_RECORD_ID_HEADER, recordId);
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
     public DalaranComponentContext getDalaranComponentContext() {
         return componentContext;
     }

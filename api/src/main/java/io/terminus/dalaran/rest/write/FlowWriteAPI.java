@@ -40,11 +40,15 @@ public interface FlowWriteAPI {
     @PostMapping(value = "/importProcessor")
     ImportProcessorResult importProcessor(@RequestBody ImportProcessorDTO model);
 
-    @ApiOperation(value = "下线该流程")
+    @ApiOperation(value = "流程下线")
     @PostMapping(value = "/offline")
     ResponseResult offline(@RequestBody TriggerFlowDTO flowDTO);
 
-    @ApiOperation(value = "上线该流程")
+    @ApiOperation(value = "流程上线")
     @PostMapping(value = "/online")
     ResponseResult online(@RequestBody TriggerFlowDTO flowDTO);
+
+    @ApiOperation(value = "流程触发")
+    @PostMapping(value = "/trigger")
+    void trigger(@RequestBody TriggerFlowDTO flowDTO);
 }

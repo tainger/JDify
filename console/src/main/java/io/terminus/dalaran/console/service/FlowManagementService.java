@@ -53,4 +53,5 @@ public interface FlowManagementService {
     ResponseResult offline(TriggerFlowDTO flowDTO);
 
     ResponseResult online(TriggerFlowDTO flowDTO);
+
 }
