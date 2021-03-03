@@ -15,7 +15,7 @@ public interface LimiterReadAPI {
 
     @GetMapping("/{id}")
     @ApiOperation("获取熔断器详情")
-    LimiterDTO detail(@PathVariable Long id);
+    LimiterDTO detail(@PathVariable String id);
 
     @GetMapping("/option")
     @ApiOperation("获取熔断器可选项")

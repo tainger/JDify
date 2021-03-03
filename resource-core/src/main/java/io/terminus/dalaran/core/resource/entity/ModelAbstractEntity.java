@@ -17,10 +17,7 @@ import javax.persistence.MappedSuperclass;
 public abstract class ModelAbstractEntity extends BasicEntity {
 
     @Column
-    private Long moduleId;
-
-    @Column
-    private String modelKey;
+    private String moduleId;
 
     @Column(nullable = false, length = 64)
     private String name;

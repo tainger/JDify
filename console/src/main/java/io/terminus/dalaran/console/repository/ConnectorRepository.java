@@ -10,6 +10,7 @@ public interface ConnectorRepository extends JpaRepository<ConnectorEntity, Long
 
     List<ConnectorEntity> findByIsExistTrue();
 
-    List<ConnectorEntity> findByModuleIdAndIsExistTrue(Long moduleId);
+    List<ConnectorEntity> findByModuleIdAndIsExistTrue(String moduleId);
 
+    ConnectorEntity findByResourceKey(String resourceKey);
 }

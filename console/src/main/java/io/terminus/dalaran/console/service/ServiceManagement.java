@@ -8,17 +8,17 @@ import java.util.List;
 
 public interface ServiceManagement {
 
-    Long create(ServiceDTO serviceDTO);
+    String create(ServiceDTO serviceDTO);
 
     ServiceDTO update(ServiceDTO serviceDTO);
 
-    void delete(Long serviceId);
+    void delete(String serviceId);
 
-    ServiceDTO detail(Long serviceId);
+    ServiceDTO detail(String serviceId);
 
     List<ServiceDTO> list();
 
-    List<ServiceOperation> listOperation(Long serviceId);
+    List<ServiceOperation> listOperation(String serviceId);
 
-    List<BasicServiceInfo> listBasicInfoByModuleId(Long moduleId);
+    List<BasicServiceInfo> listBasicInfoByModuleId(String moduleId);
 }

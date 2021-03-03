@@ -7,11 +7,8 @@ import io.terminus.dalaran.console.repository.ElasticJobLogRepository;
 import io.terminus.dalaran.console.repository.TriggerFlowRepository;
 import io.terminus.dalaran.console.service.ElasticJobService;
 import io.terminus.dalaran.console.service.JobAPIService;
-import io.terminus.dalaran.core.resource.entity.common.ReleaseRecordEntity;
-import io.terminus.dalaran.core.resource.entity.released.TriggerFlowReleasedEntity;
 import io.terminus.dalaran.core.resource.repository.ReleaseRecordRepository;
 import io.terminus.dalaran.core.resource.repository.TriggerFlowReleasedRepository;
-import io.terminus.dalaran.model.dto.ElasticJobConfigInfo;
 import io.terminus.dalaran.model.dto.ElasticJobInfo;
 import io.terminus.dalaran.model.dto.log.ElasticJobLogDTO;
 import io.terminus.dalaran.model.flow.FlowStatus;
@@ -28,7 +25,6 @@ import org.springframework.stereotype.Service;
 import javax.persistence.criteria.Predicate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -78,15 +74,11 @@ public class ElasticJobServiceImpl implements ElasticJobService {
     }
 
     public ResponseResult updateStatus(ElasticJobInfo elasticJobInfo, boolean isOnline) {
-        Long flowId = elasticJobInfo.getFlowId();
+        String flowId = elasticJobInfo.getFlowId();
         if (flowId == null) {
             return fail(ResponseErrorMsg.FLOW_ID_NULL);
         }
-        Optional<TriggerFlowEntity> triggerFlowEntityOptional = triggerFlowRepository.findById(flowId);
-        if (!triggerFlowEntityOptional.isPresent()) {
-            return fail(ResponseErrorMsg.FLOW_IS_NULL);
-        }
-        TriggerFlowEntity triggerFlowEntity = triggerFlowEntityOptional.get();
+        TriggerFlowEntity triggerFlowEntity = triggerFlowRepository.findByResourceKey(flowId);
         triggerFlowEntity.setOnline(isOnline);
         triggerFlowRepository.save(triggerFlowEntity);
         return success();
@@ -108,7 +100,7 @@ public class ElasticJobServiceImpl implements ElasticJobService {
     private ElasticJobInfo buildJobInfo(TriggerFlowEntity entity) {
         ElasticJobInfo elasticJobInfo;
         elasticJobInfo = JSONObject.parseObject(entity.getTriggerConfig(), ElasticJobInfo.class);
-        elasticJobInfo.setFlowId(entity.getId());
+        elasticJobInfo.setFlowId(entity.getResourceKey());
         elasticJobInfo.setOnline(entity.isOnline());
         return elasticJobInfo;
     }

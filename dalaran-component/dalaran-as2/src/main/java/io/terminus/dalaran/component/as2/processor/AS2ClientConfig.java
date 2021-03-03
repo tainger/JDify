@@ -18,7 +18,7 @@ public class AS2ClientConfig extends OutModelConfig implements ConnectorConfig<A
     private AS2Connector connector;
 
     @ConfigFieldInfo(label = "AS2 连接器", inputType = FieldInputType.Connector, connectorType = AS2Connector.class)
-    private Long connectorId;
+    private String connectorId;
 
     @ConfigFieldInfo(label = "路径", inputType = FieldInputType.String, defaultValue = "/")
     private String requestUri;

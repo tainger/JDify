@@ -1,7 +1,6 @@
 package io.terminus.dalaran.console.service.impl;
 
 import io.terminus.dalaran.TracingType;
-import io.terminus.dalaran.console.entity.SubFlowEntity;
 import io.terminus.dalaran.console.entity.TriggerFlowEntity;
 import io.terminus.dalaran.console.repository.SubFlowRepository;
 import io.terminus.dalaran.console.repository.TriggerFlowRepository;
@@ -22,10 +21,16 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
-import javax.persistence.criteria.*;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 import javax.transaction.Transactional;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.TimeZone;
 import java.util.stream.Collectors;
 
 @Service
@@ -74,19 +79,19 @@ public class TracingLogServiceImpl implements TracingLogService {
         Root<TracingLogEntity> root = criteriaQuery.from(TracingLogEntity.class);
         List<Predicate> predicates = new ArrayList<>();
         if(query.getFlowId()!=null){
-            predicates.add(builder.equal(root.get("flowId"),query.getFlowId()));
+            predicates.add(builder.equal(root.get("flowId"), query.getFlowId()));
         }
         if(query.getSuccessful()!=null){
-            predicates.add(builder.equal(root.get("successful"),query.getSuccessful()));
+            predicates.add(builder.equal(root.get("successful"), query.getSuccessful()));
         }
         if(query.getStartTime()!=null){
-            predicates.add(builder.ge(root.get("timestamp"),query.getStartTime().getTime()));
+            predicates.add(builder.ge(root.get("timestamp"), query.getStartTime().getTime()));
         }
         if(query.getEndTime()!=null){
-            predicates.add(builder.le(root.get("timestamp"),query.getEndTime().getTime()));
+            predicates.add(builder.le(root.get("timestamp"), query.getEndTime().getTime()));
         }
-        criteriaQuery.multiselect(builder.max(root.get("elapsed")),builder.min(root.get("elapsed")),
-                builder.avg(root.get("elapsed")),builder.count(root.get("elapsed"))).where(predicates.toArray(new Predicate[0]));
+        criteriaQuery.multiselect(builder.max(root.get("elapsed")), builder.min(root.get("elapsed")),
+                builder.avg(root.get("elapsed")), builder.count(root.get("elapsed"))).where(predicates.toArray(new Predicate[0]));
         return entityManager.createQuery(criteriaQuery).getSingleResult();
     }
 
@@ -164,17 +169,11 @@ public class TracingLogServiceImpl implements TracingLogService {
             switch (log.getTracingType()) {
                 case Flow:
                 case TestFlow:
-                    Optional<TriggerFlowEntity> triggerFlowEntity = flowRepository.findById(log.getFlowId());
-                    if (triggerFlowEntity.isPresent()) {
-                        flowEntity = triggerFlowEntity.get();
-                    }
+                    flowEntity = flowRepository.findByResourceKey(log.getFlowId());
                     break;
                 case SubFlow:
                 case TestSubFlow:
-                    Optional<SubFlowEntity> subFlowEntity = subFlowRepository.findById(log.getFlowId());
-                    if (subFlowEntity.isPresent()) {
-                        flowEntity = subFlowEntity.get();
-                    }
+                    flowEntity = subFlowRepository.findByResourceKey(log.getFlowId());
                     break;
             }
             if (flowEntity != null) {
@@ -204,11 +203,7 @@ public class TracingLogServiceImpl implements TracingLogService {
 
         tracingLog.setProcessorId(log.getProcessorId());
         tracingLog.setFlowId(log.getFlowId());
-        Optional<TriggerFlowEntity> optional = flowRepository.findById(log.getFlowId());
-        TriggerFlowEntity flowEntity = null;
-        if (optional.isPresent()) {
-            flowEntity = optional.get();
-        }
+        TriggerFlowEntity flowEntity = flowRepository.findByResourceKey(log.getFlowId());
         if (flowEntity != null) {
             tracingLog.setFlowName(flowEntity.getName());
         }

@@ -7,15 +7,15 @@ import java.util.List;
 
 public interface ConnectorService {
 
-    Long create(ConnectorDTO connectorDTO);
+    String create(ConnectorDTO connectorDTO);
 
     ConnectorDTO update(ConnectorDTO connectorDTO);
 
-    void delete(Long connectorId);
+    void delete(String connectorId);
 
-    ConnectorDTO detail(Long connectorId);
+    ConnectorDTO detail(String connectorId);
 
-    List<BasicConnectorInfo> listBasicInfoByModuleId(Long moduleId);
+    List<BasicConnectorInfo> listBasicInfoByModuleId(String moduleId);
 
     List<BasicConnectorInfo> listBasicInfoByComponent(String connectorType);
 }

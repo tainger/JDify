@@ -18,7 +18,7 @@ public class ServiceDetail {
 
     private DalaranService dalaranService;
 
-    private Long moduleId;
+    private String moduleId;
 
-    private Long serviceId;
+    private String serviceId;
 }

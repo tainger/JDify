@@ -2,14 +2,13 @@ package io.terminus.dalaran.model.dto.basic;
 
 import io.terminus.dalaran.model.flow.FlowStatus;
 import lombok.Data;
-import org.jetbrains.annotations.Nullable;
 
 @Data
 public class BasicFlowInfo {
-    @Nullable
-    private Long id;
 
-    private Long moduleId;
+    private String id;
+
+    private String moduleId;
 
     private String name;
 
@@ -24,14 +23,17 @@ public class BasicFlowInfo {
     public BasicFlowInfo() {
     }
 
-    public BasicFlowInfo(@Nullable Long id, Long moduleId, String name, FlowStatus status) {
+    public BasicFlowInfo(String id, String moduleId, String name, FlowStatus status, String triggerType, boolean isExist, boolean online) {
         this.id = id;
         this.moduleId = moduleId;
         this.name = name;
         this.status = status;
+        this.triggerType = triggerType;
+        this.isExist = isExist;
+        this.online = online;
     }
 
-    public BasicFlowInfo(@Nullable Long id, Long moduleId, String name, FlowStatus status, String triggerType) {
+    public BasicFlowInfo(String id, String moduleId, String name, FlowStatus status, String triggerType) {
         this.id = id;
         this.moduleId = moduleId;
         this.name = name;

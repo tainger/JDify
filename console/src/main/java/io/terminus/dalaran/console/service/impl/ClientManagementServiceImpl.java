@@ -3,9 +3,12 @@ package io.terminus.dalaran.console.service.impl;
 import io.terminus.dalaran.console.entity.ClientEntity;
 import io.terminus.dalaran.console.repository.ClientRepository;
 import io.terminus.dalaran.console.service.ClientManagementService;
+import io.terminus.dalaran.console.service.jpa.model.QueryClientInfo;
+import io.terminus.dalaran.console.util.ResourceKeyUtils;
 import io.terminus.dalaran.model.dto.ClientDTO;
 import io.terminus.dalaran.model.dto.basic.BasicClientInfo;
 import io.terminus.draco.web.autoconfig.context.UserContext;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,6 +17,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -26,11 +30,11 @@ public class ClientManagementServiceImpl implements ClientManagementService {
     private EntityManager entityManager;
 
     @Override
-    public Long create(ClientDTO clientDTO) {
+    public String create(ClientDTO clientDTO) {
         ClientEntity entity = toEntity(clientDTO);
         setCreatedBy(entity);
         repository.save(entity);
-        return entity.getId();
+        return entity.getResourceKey();
     }
 
     @Override
@@ -41,15 +45,15 @@ public class ClientManagementServiceImpl implements ClientManagementService {
     }
 
     @Override
-    public void delete(Long appKey) {
-        ClientEntity entity = repository.findById(appKey).get();
+    public void delete(String appKey) {
+        ClientEntity entity = repository.findByAppKey(appKey);
         entity.setExist(false);
         repository.save(entity);
     }
 
     @Override
-    public ClientDTO detail(Long appKey) {
-        ClientEntity entity = repository.findById(appKey).get();
+    public ClientDTO detail(String appKey) {
+        ClientEntity entity = repository.findByAppKey(appKey);
         if (entity != null) {
             return toDTO(entity);
         }
@@ -57,24 +61,42 @@ public class ClientManagementServiceImpl implements ClientManagementService {
     }
 
     @Override
-    public List<BasicClientInfo> listBasicInfoByModuleId(Long moduleId) {
+    public List<BasicClientInfo> listBasicInfoByModuleId(String moduleId) {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<BasicClientInfo> criteriaQuery = builder.createQuery(BasicClientInfo.class);
+        CriteriaQuery<QueryClientInfo> criteriaQuery = builder.createQuery(QueryClientInfo.class);
         Root<ClientEntity> root = criteriaQuery.from(ClientEntity.class);
-        criteriaQuery.multiselect(root.get("id"), root.get("moduleId"), root.get("name"))
+        criteriaQuery.multiselect(root.get("resourceKey"), root.get("moduleId"), root.get("name"))
                 .where(builder.equal(root.get("moduleId"), moduleId) , builder.equal(root.get("isExist"), true));
-        return entityManager.createQuery(criteriaQuery).getResultList();
+        List<QueryClientInfo> models = entityManager.createQuery(criteriaQuery).getResultList();
+        List<BasicClientInfo> basicClients = new ArrayList<>();
+        models.forEach(client -> {
+            BasicClientInfo basicClient = new BasicClientInfo();
+            try {
+                BeanUtils.copyProperties(basicClient, client);
+                basicClient.setId(client.getResourceKey());
+                basicClients.add(basicClient);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+        return basicClients;
     }
 
     private ClientDTO toDTO(ClientEntity entity) {
         ClientDTO dto = new ClientDTO();
         BeanUtils.copyProperties(entity, dto);
+        dto.setId(entity.getResourceKey());
         return dto;
     }
 
     private ClientEntity toEntity(ClientDTO dto) {
         ClientEntity entity = new ClientEntity();
         BeanUtils.copyProperties(dto, entity);
+        String resourceKey = dto.getId();
+        if (StringUtils.isBlank(resourceKey)) {
+            resourceKey = ResourceKeyUtils.generateKey();
+        }
+        entity.setResourceKey(resourceKey);
         entity.setExist(true);
         return entity;
     }
@@ -86,7 +108,7 @@ public class ClientManagementServiceImpl implements ClientManagementService {
     }
 
     private ClientEntity buildEntity(ClientDTO clientDTO){
-        ClientEntity clientEntity = repository.findById(clientDTO.getId()).get();
+        ClientEntity clientEntity = repository.findByResourceKey(clientDTO.getId());
         clientEntity.setName(clientDTO.getName());
         clientEntity.setAppKey(clientDTO.getAppKey());
         clientEntity.setSecret(clientDTO.getSecret());

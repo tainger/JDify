@@ -15,10 +15,10 @@ public class TracingLogEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long moduleId;
+    private String moduleId;
 
     @Column(nullable = false)
-    private Long flowId;
+    private String flowId;
 
     @Column(length = 64)
     private String processorId;

@@ -3,6 +3,7 @@ package io.terminus.dalaran.console.rest;
 import io.terminus.dalaran.console.ResponseMessage;
 import io.terminus.dalaran.console.exception.OnException;
 import io.terminus.dalaran.console.service.FunctionService;
+import io.terminus.dalaran.model.CreateResponse;
 import io.terminus.dalaran.model.dto.FunctionDTO;
 import io.terminus.dalaran.rest.read.FunctionReadAPI;
 import io.terminus.dalaran.rest.write.FunctionWriteAPI;
@@ -19,8 +20,8 @@ public class FunctionRest implements FunctionReadAPI, FunctionWriteAPI {
 
     @Override
     @OnException(code = ResponseMessage.FUNCTION_CREATE_ERROR)
-    public Long create(@RequestBody FunctionDTO dto) {
-        return service.create(dto);
+    public CreateResponse create(@RequestBody FunctionDTO dto) {
+        return new CreateResponse(service.create(dto));
     }
 
     @Override
@@ -31,13 +32,13 @@ public class FunctionRest implements FunctionReadAPI, FunctionWriteAPI {
 
     @Override
     @OnException(code = ResponseMessage.FUNCTION_DELETE_ERROR)
-    public void deleteById(@PathVariable Long id) {
+    public void deleteById(@PathVariable String id) {
         service.delete(id);
     }
 
     @Override
     @OnException(code = ResponseMessage.FUNCTION_QUERY_ERROR)
-    public FunctionDTO detail(@PathVariable Long id) {
+    public FunctionDTO detail(@PathVariable String id) {
         return service.detail(id);
     }
 }

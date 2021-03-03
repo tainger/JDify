@@ -14,8 +14,6 @@ public class ModelDTO extends BasicModelInfo {
 
     private Map<String, Object> modelSchema;
 
-    private String modelKey;
-
     private String targetId;
 
     private ModelTargetType targetType = ModelTargetType.Normal;

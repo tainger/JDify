@@ -9,8 +9,8 @@ import java.util.Date;
 @Data
 public class TracingLogQuery {
 
-    private Long moduleId;
-    private Long flowId;
+    private String moduleId;
+    private String flowId;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date startTime;

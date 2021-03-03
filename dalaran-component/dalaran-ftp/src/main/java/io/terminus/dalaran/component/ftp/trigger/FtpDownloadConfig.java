@@ -14,7 +14,7 @@ public class FtpDownloadConfig extends InModelConfig implements ConnectorConfig<
     private FtpConnector connector;
 
     @ConfigFieldInfo(label = "Ftp 连接器", inputType = FieldInputType.Connector, connectorType = FtpConnector.class)
-    private Long connectorId;
+    private String connectorId;
 
     @ConfigFieldInfo(label = "执行成功后是否删除文件", inputType = FieldInputType.Switch, defaultValue = "false")
     private Boolean delete;

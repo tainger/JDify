@@ -4,9 +4,10 @@ import lombok.Data;
 
 @Data
 public class BasicConnectorInfo {
-    private Long id;
 
-    private Long moduleId;
+    private String id;
+
+    private String moduleId;
 
     private String name;
 
@@ -15,7 +16,7 @@ public class BasicConnectorInfo {
     public BasicConnectorInfo() {
     }
 
-    public BasicConnectorInfo(Long id, Long moduleId, String name, String connectorType) {
+    public BasicConnectorInfo(String id, String moduleId, String name, String connectorType) {
         this.id = id;
         this.moduleId = moduleId;
         this.name = name;

@@ -23,5 +23,5 @@ public interface ModuleReadAPI {
 
     @ApiOperation(value = "获取模块的详情, 包括所有组件的基本信息")
     @GetMapping(value = "/{id}")
-    ModuleDetailDTO moduleDetail(@PathVariable Long id);
+    ModuleDetailDTO moduleDetail(@PathVariable String id);
 }

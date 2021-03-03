@@ -12,9 +12,9 @@ import java.util.List;
 public interface SubFlowManagementService {
 
 
-    Long createFlow(SubFlowDTO flowModel);
+    String createFlow(SubFlowDTO flowModel);
 
-    void deleteFlow(Long flowId);
+    void deleteFlow(String flowId);
 
     SubFlowDTO updateFlow(SubFlowDTO flowModel);
 
@@ -23,11 +23,11 @@ public interface SubFlowManagementService {
     List<SubFlowDTO> list();
 
     @Nullable
-    SubFlowDTO getById(Long flowId);
+    SubFlowDTO getById(String flowId);
 
-    Long copyFlow(CopyFlow copyForm);
+    String copyFlow(CopyFlow copyForm);
 
     List<FlowValidation> validateFlow(SubFlowDTO model);
 
-    List<BasicFlowInfo> listBasicSubFlowInfoByModuleId(Long moduleId);
+    List<BasicFlowInfo> listBasicSubFlowInfoByModuleId(String moduleId);
 }

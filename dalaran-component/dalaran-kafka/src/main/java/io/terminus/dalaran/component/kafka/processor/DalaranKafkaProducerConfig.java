@@ -21,7 +21,7 @@ public class DalaranKafkaProducerConfig extends OutModelConfig implements Connec
     private KafkaConnector connector;
 
     @ConfigFieldInfo(label = "kafka 连接器", inputType = FieldInputType.Connector, connectorType = KafkaConnector.class)
-    private Long connectorId;
+    private String connectorId;
 
     @ConfigFieldInfo(label = "主题", inputType = FieldInputType.String)
     private String topic;

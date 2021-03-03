@@ -10,9 +10,9 @@ import java.util.List;
 @Data
 public class FlowQuery {
 
-    private List<Long> flowIds;
+    private List<String> flowIds;
 
-    private Long moduleId;
+    private String moduleId;
 
     private String type;
 

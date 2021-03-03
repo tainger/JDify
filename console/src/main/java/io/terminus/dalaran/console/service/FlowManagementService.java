@@ -18,15 +18,15 @@ import java.util.List;
 
 public interface FlowManagementService {
 
-    Long saveFlow(TriggerFlowEntity flowEntity);
+    String saveFlow(TriggerFlowEntity flowEntity);
 
-    Long createFlow(TriggerFlowDTO flowModel);
+    String createFlow(TriggerFlowDTO flowModel);
 
     ImportFlowResult importFlow(ImportFlowDTO flowModel);
 
     ImportProcessorResult importProcessor(ImportProcessorDTO model);
 
-    void deleteFlow(Long flowId);
+    void deleteFlow(String flowId);
 
     TriggerFlowDTO updateFlow(TriggerFlowDTO flowModel) throws FlowNotExistException;
 
@@ -34,17 +34,17 @@ public interface FlowManagementService {
 
     List<TriggerFlowDTO> list();
 
-    List<TriggerFlowDTO> queryByProcessorIds(List<Long> processorIds);
+    List<TriggerFlowDTO> queryByProcessorIds(List<String> processorIds);
 
-    List<BasicFlowInfo> listBasicFlowInfoByModuleId(Long moduleId);
-
-    @Nullable
-    TriggerFlowDTO getById(Long flowId);
+    List<BasicFlowInfo> listBasicFlowInfoByModuleId(String moduleId);
 
     @Nullable
-    TriggerFlowDTO getByIdVersion(Long flowId,String version) throws FlowNotExistException;
+    TriggerFlowDTO getById(String flowId);
 
-    Long copyFlow(CopyFlow copyFlow) throws FlowNotExistException;
+    @Nullable
+    TriggerFlowDTO getByIdVersion(String flowId, String version) throws FlowNotExistException;
+
+    String copyFlow(CopyFlow copyFlow) throws FlowNotExistException;
 
     List<FlowValidation> validateFlow(TriggerFlowDTO model);
 

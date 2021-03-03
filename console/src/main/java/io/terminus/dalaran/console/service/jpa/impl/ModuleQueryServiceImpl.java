@@ -28,7 +28,7 @@ public class ModuleQueryServiceImpl implements ModuleQueryService {
         Specification<ModuleEntity> specification = (root, criteriaQuery, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
             if (CollectionUtils.isNotEmpty(query.getModuleIds())) {
-                Predicate processorIds = criteriaBuilder.and(root.get("id").in(query.getModuleIds()));
+                Predicate processorIds = criteriaBuilder.and(root.get("resourceKey").in(query.getModuleIds()));
                 predicates.add(processorIds);
             }
 

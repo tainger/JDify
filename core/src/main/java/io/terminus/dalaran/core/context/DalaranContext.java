@@ -39,9 +39,9 @@ public interface DalaranContext<T> {
 
     void addFragmentFlow(FlowFragment flow);
 
-    String testFlow(Long flowId, String body);
+    String testFlow(String flowId, String body);
 
-    String testSubFlow(Long subFlowId, String body);
+    String testSubFlow(String subFlowId, String body);
 
     void addRoute(T route);
 

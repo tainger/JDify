@@ -4,6 +4,7 @@ import io.terminus.dalaran.console.entity.*;
 import io.terminus.dalaran.console.repository.*;
 import io.terminus.dalaran.console.service.*;
 import io.terminus.dalaran.console.service.jpa.ModuleQueryService;
+import io.terminus.dalaran.console.util.ResourceKeyUtils;
 import io.terminus.dalaran.core.resource.entity.common.ModuleEntity;
 import io.terminus.dalaran.core.resource.repository.ModuleRepository;
 import io.terminus.dalaran.model.dto.ModuleDTO;
@@ -18,7 +19,6 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Created by jingdi on 2019/4/1
@@ -79,15 +79,15 @@ public class ModuleManagementServiceImpl implements ModuleManagementService {
     private FunctionRepository functionRepository;
 
     @Override
-    public Long createModule(ModuleDTO moduleModel) {
+    public String createModule(ModuleDTO moduleModel) {
         ModuleEntity moduleEntity = buildEntity(moduleModel);
         setCreatedBy(moduleEntity);
-        return moduleRepository.save(moduleEntity).getId();
+        return moduleRepository.save(moduleEntity).getResourceKey();
     }
 
     @Override
-    public void deleteModule(Long moduleId) {
-        ModuleEntity moduleEntity = moduleRepository.findById(moduleId).get();
+    public void deleteModule(String moduleId) {
+        ModuleEntity moduleEntity = moduleRepository.findByResourceKey(moduleId);
         moduleEntity.setExist(false);
         moduleRepository.save(moduleEntity);
 
@@ -167,14 +167,10 @@ public class ModuleManagementServiceImpl implements ModuleManagementService {
     }
 
     @Override
-    public ModuleDetailDTO getModuleDetail(Long moduleId) {
-        Optional<ModuleEntity> moduleEntityOptional = moduleRepository.findById(moduleId);
-        if (!moduleEntityOptional.isPresent()) {
-            return null;
-        }
-        ModuleEntity moduleEntity = moduleEntityOptional.get();
+    public ModuleDetailDTO getModuleDetail(String moduleId) {
+        ModuleEntity moduleEntity = moduleRepository.findByResourceKey(moduleId);
         ModuleDetailDTO moduleDetail = new ModuleDetailDTO();
-        moduleDetail.setId(moduleEntity.getId());
+        moduleDetail.setId(moduleEntity.getResourceKey());
         moduleDetail.setName(moduleEntity.getName());
         moduleDetail.setDescription(moduleEntity.getDescription());
         // TODO to DTO
@@ -191,41 +187,39 @@ public class ModuleManagementServiceImpl implements ModuleManagementService {
     }
 
     @Override
-    public String getModuleName(@NotNull Long moduleId) {
-        Optional<ModuleEntity> optional = moduleRepository.findById(moduleId);
-        ModuleEntity entity = new ModuleEntity();
-        if(optional!=null && optional.isPresent()) {
-            entity = optional.get();
-        }
-        if (entity == null) {
+    public String getModuleName(@NotNull String moduleId) {
+        ModuleEntity moduleEntity = moduleRepository.findByResourceKey(moduleId);
+        if (moduleEntity == null) {
             return null;
         }
-        return entity.getName();
+        return moduleEntity.getName();
     }
 
-    private ModuleEntity buildEntity(ModuleDTO model) {
+    private ModuleEntity buildEntity(ModuleDTO module) {
         ModuleEntity moduleEntity;
-        Long id = model.getId();
-        if (id == null) {
+        String resourceKey = module.getId();
+        if (StringUtils.isBlank(resourceKey)) {
             moduleEntity = new ModuleEntity();
+            resourceKey = ResourceKeyUtils.generateKey();
         } else {
-            moduleEntity = moduleRepository.findById(id).get();
+            moduleEntity = moduleRepository.findByResourceKey(resourceKey);
         }
-        String name = model.getName();
+        String name = module.getName();
         if (StringUtils.isNoneBlank(name)) {
             moduleEntity.setName(name);
         } else {
             moduleEntity.setName("Dalaran Module");
         }
-        moduleEntity.setDependencies(model.getDependencies());
-        moduleEntity.setDescription(model.getDescription());
+        moduleEntity.setResourceKey(resourceKey);
+        moduleEntity.setDependencies(module.getDependencies());
+        moduleEntity.setDescription(module.getDescription());
         moduleEntity.setExist(true);
         return moduleEntity;
     }
 
     private ModuleDTO buildModel(ModuleEntity entity) {
         ModuleDTO moduleModel = new ModuleDTO();
-        moduleModel.setId(entity.getId());
+        moduleModel.setId(entity.getResourceKey());
         moduleModel.setName(entity.getName());
         moduleModel.setDependencies(entity.getDependencies());
         moduleModel.setDescription(entity.getDescription());

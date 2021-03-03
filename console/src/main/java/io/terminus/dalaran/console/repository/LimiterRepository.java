@@ -5,4 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 public interface LimiterRepository extends JpaRepository<LimiterEntity, Long>, JpaSpecificationExecutor<LimiterEntity> {
+
+    LimiterEntity findByResourceKey(String resourceKey);
 }

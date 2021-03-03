@@ -1,6 +1,7 @@
 package io.terminus.dalaran.rest.write;
 
 import io.swagger.annotations.ApiOperation;
+import io.terminus.dalaran.model.CreateResponse;
 import io.terminus.dalaran.model.dto.ConnectorDTO;
 import org.springframework.web.bind.annotation.*;
 
@@ -9,7 +10,7 @@ public interface ConnectorWriteAPI {
 
     @PostMapping
     @ApiOperation("新增连接器")
-    Long create(@RequestBody ConnectorDTO connectorDTO);
+    CreateResponse create(@RequestBody ConnectorDTO connectorDTO);
 
     @PutMapping
     @ApiOperation("更新连接器")
@@ -17,5 +18,5 @@ public interface ConnectorWriteAPI {
 
     @DeleteMapping("/{id}")
     @ApiOperation("删除连接器")
-    void deleteById(@PathVariable Long id);
+    void deleteById(@PathVariable String id);
 }

@@ -3,6 +3,7 @@ package io.terminus.dalaran.console.rest;
 import io.terminus.dalaran.console.ResponseMessage;
 import io.terminus.dalaran.console.exception.OnException;
 import io.terminus.dalaran.console.service.LimiterService;
+import io.terminus.dalaran.model.CreateResponse;
 import io.terminus.dalaran.model.dto.LimiterDTO;
 import io.terminus.dalaran.model.dto.basic.BasicLimiterInfo;
 import io.terminus.dalaran.rest.read.LimiterReadAPI;
@@ -22,7 +23,7 @@ public class LimiterRest implements LimiterReadAPI, LimiterWriteAPI {
 
     @Override
     @OnException(code = ResponseMessage.LIMITER_QUERY_ERROR)
-    public LimiterDTO detail(@PathVariable Long id) {
+    public LimiterDTO detail(@PathVariable String id) {
         return limiterService.detail(id);
     }
 
@@ -34,8 +35,8 @@ public class LimiterRest implements LimiterReadAPI, LimiterWriteAPI {
 
     @Override
     @OnException(code = ResponseMessage.LIMITER_CREATE_ERROR)
-    public Long create(@RequestBody LimiterDTO limiterDTO) {
-        return limiterService.create(limiterDTO);
+    public CreateResponse create(@RequestBody LimiterDTO limiterDTO) {
+        return new CreateResponse(limiterService.create(limiterDTO));
     }
 
     @Override
@@ -46,7 +47,7 @@ public class LimiterRest implements LimiterReadAPI, LimiterWriteAPI {
 
     @Override
     @OnException(code = ResponseMessage.LIMITER_DELETE_ERROR)
-    public void deleteById(@PathVariable Long id) {
+    public void deleteById(@PathVariable String id) {
         limiterService.delete(id);
     }
 }
