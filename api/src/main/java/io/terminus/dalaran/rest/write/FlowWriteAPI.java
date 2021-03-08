@@ -4,6 +4,7 @@ import io.swagger.annotations.ApiOperation;
 import io.terminus.dalaran.exception.flow.CreateFlowException;
 import io.terminus.dalaran.exception.flow.FlowNotExistException;
 import io.terminus.dalaran.exception.flow.UpdateFlowException;
+import io.terminus.dalaran.model.CreateResponse;
 import io.terminus.dalaran.model.dto.CopyFlow;
 import io.terminus.dalaran.model.dto.ImportFlowResult;
 import io.terminus.dalaran.model.dto.ImportProcessorDTO;
@@ -18,7 +19,7 @@ public interface FlowWriteAPI {
 
     @ApiOperation(value = "创建集成流")
     @PostMapping(value = "/create")
-    Long create(@RequestBody TriggerFlowDTO model) throws CreateFlowException;
+    CreateResponse create(@RequestBody TriggerFlowDTO model) throws CreateFlowException;
 
     @ApiOperation(value = "更新集成流")
     @PostMapping(value = "/update")
@@ -26,11 +27,11 @@ public interface FlowWriteAPI {
 
     @ApiOperation(value = "删除集成流")
     @DeleteMapping(value = "/delete")
-    void deleteById(@RequestParam Long id);
+    void deleteById(@RequestParam String id);
 
     @ApiOperation(value = "复制集成流")
     @PostMapping(value = "/copy")
-    Long copy(@RequestBody CopyFlow copyFlow) throws FlowNotExistException, CreateFlowException;
+    CreateResponse copy(@RequestBody CopyFlow copyFlow) throws FlowNotExistException, CreateFlowException;
 
     @ApiOperation(value = "快速创建集成流")
     @PostMapping(value = "/import")
@@ -40,11 +41,15 @@ public interface FlowWriteAPI {
     @PostMapping(value = "/importProcessor")
     ImportProcessorResult importProcessor(@RequestBody ImportProcessorDTO model);
 
-    @ApiOperation(value = "下线该流程")
+    @ApiOperation(value = "流程下线")
     @PostMapping(value = "/offline")
     ResponseResult offline(@RequestBody TriggerFlowDTO flowDTO);
 
-    @ApiOperation(value = "上线该流程")
+    @ApiOperation(value = "流程上线")
     @PostMapping(value = "/online")
     ResponseResult online(@RequestBody TriggerFlowDTO flowDTO);
+
+    @ApiOperation(value = "流程触发")
+    @PostMapping(value = "/trigger")
+    void trigger(@RequestBody TriggerFlowDTO flowDTO);
 }

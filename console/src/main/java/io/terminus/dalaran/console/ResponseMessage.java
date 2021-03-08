@@ -35,6 +35,8 @@ public class ResponseMessage {
     public static final String FLOW_CHECK_ERROR = "Flow.Validate.Exception";
 
     public static final String FLOW_TEST_ERROR = "Flow.Test.Exception";
+
+    public static final String FLOW_TRIGGER_ERROR = "Flow.Trigger.Exception";
     
     // SUB_FLOW处理异常
     public static final String SUB_FLOW_CREATE_ERROR = "SubFlow.Create.Exception";

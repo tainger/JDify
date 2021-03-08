@@ -23,17 +23,17 @@ public interface DalaranResourceBuilder {
 
     SubFlow buildSubFlow(SubFlowAbstractEntity subFlowEntity);
 
-    FlowFragment buildFlowFragment(List<ProcessorEntity> pipelineEntityList, MessageModel inModel, MessageModel outModel, Long flowId, String fragmentId, Boolean tracing);
+    FlowFragment buildFlowFragment(List<ProcessorEntity> pipelineEntityList, MessageModel inModel, MessageModel outModel, String flowId, String fragmentId, Boolean tracing);
 
-    MessageModel buildModel(Long modelId);
+    MessageModel buildModel(String modelId);
 
     MessageModel buildModel(ModelAbstractEntity modelEntity);
 
     ProcessorModel buildProcessorModel(ProcessorEntity processorEntity, MessageModel lastOutModel);
 
-    Object buildConnectorConfig(Long connectorId, Class connectorConfigType);
+    Object buildConnectorConfig(String connectorId, Class connectorConfigType);
 
-    Object buildLimiterConfig(Long limiterId, Class limiterConfigType);
+    Object buildLimiterConfig(String limiterId, Class limiterConfigType);
 
     Object buildServiceConfig(ServiceAbstractEntity serviceEntity);
 

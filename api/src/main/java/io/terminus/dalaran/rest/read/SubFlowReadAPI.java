@@ -15,7 +15,7 @@ public interface SubFlowReadAPI {
 
     @ApiOperation(value = "根据 ID 获取子流程")
     @GetMapping(value = "/{id}")
-    SubFlowDTO getById(@PathVariable Long id);
+    SubFlowDTO getById(@PathVariable String id);
 
     @ApiOperation(value = "条件查询子流程")
     @GetMapping(value = "/query")

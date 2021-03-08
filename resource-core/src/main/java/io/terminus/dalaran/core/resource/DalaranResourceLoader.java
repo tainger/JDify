@@ -27,17 +27,17 @@ public interface DalaranResourceLoader {
 
     List<? extends ClientAbstractEntity> loadAllClient();
 
-    TriggerFlowAbstractEntity loadTriggerFlow(Long triggerFlowId);
+    TriggerFlowAbstractEntity loadTriggerFlow(String triggerFlowId);
 
-    SubFlowAbstractEntity loadSubFlow(Long subFlowId);
+    SubFlowAbstractEntity loadSubFlow(String subFlowId);
 
-    ModelAbstractEntity loadModel(Long modelId);
+    ModelAbstractEntity loadModel(String modelId);
 
-    ConnectorAbstractEntity loadConnector(Long connectorId);
+    ConnectorAbstractEntity loadConnector(String connectorId);
 
-    LimiterAbstractEntity loadLimiter(Long limiterId);
+    LimiterAbstractEntity loadLimiter(String limiterId);
 
-    ServiceAbstractEntity loadService(Long serviceId);
+    ServiceAbstractEntity loadService(String serviceId);
 
     AlarmRuleAbstractEntity loadAlarmRule(Long alarmRuleId);
 

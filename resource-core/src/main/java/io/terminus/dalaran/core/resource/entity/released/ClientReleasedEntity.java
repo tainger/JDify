@@ -12,7 +12,7 @@ import javax.persistence.Table;
 @Table(name = "dalaran_released_client")
 public class ClientReleasedEntity extends ClientAbstractEntity implements ReleasedEntity {
     @Column(nullable = false)
-    private Long originId;
+    private String originId;
 
     @Column(nullable = false, length = 64)
     private String version;

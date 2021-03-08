@@ -38,7 +38,7 @@ public class MonitorServiceImpl implements MonitorService {
         }
         DalaranSchedulerConfig schedulerConfig = JSON.parseObject(flowEntity.getTriggerConfig(), DalaranSchedulerConfig.class);
         TracingLogQuery logQuery = new TracingLogQuery();
-        logQuery.setFlowId(flowEntity.getId());
+        logQuery.setFlowId(flowEntity.getResourceKey());
         logQuery.setTracingType(TracingType.Flow);
         logService.triggerLogs(logQuery).forEach(log -> {
             ScheduleTaskDetailDTO taskDetail = new ScheduleTaskDetailDTO();

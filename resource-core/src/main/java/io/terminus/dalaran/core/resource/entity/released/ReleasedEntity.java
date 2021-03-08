@@ -4,11 +4,15 @@ public interface ReleasedEntity {
 
     void setId(Long id);
 
-    void setOriginId(Long originId);
+    void setOriginId(String originId);
 
-    Long getOriginId();
+    String getOriginId();
 
     void setVersion(String version);
 
     String getVersion();
+
+    void setResourceKey(String resourceKey);
+
+    String getResourceKey();
 }

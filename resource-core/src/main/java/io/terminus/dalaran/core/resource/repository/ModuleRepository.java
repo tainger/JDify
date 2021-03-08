@@ -13,4 +13,7 @@ public interface ModuleRepository extends JpaRepository<ModuleEntity, Long>, Jpa
     List<ModuleEntity> findByIsExistTrue();
 
     ModuleEntity findByIdAndIsExistTrue(Long id);
+
+    ModuleEntity findByResourceKey(String resourceKey);
+
 }

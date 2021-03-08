@@ -13,11 +13,11 @@ import java.util.List;
 public class BasicFlowEntity extends BasicEntity {
 
     @Column(nullable = false)
-    private Long moduleId;
+    private String moduleId;
 
-    private Long inModel;
+    private String inModel;
 
-    private Long outModel;
+    private String outModel;
 
     @Column(nullable = false, length = 64)
     private String name;

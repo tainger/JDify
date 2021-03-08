@@ -12,7 +12,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 public class TestResourceLoader implements DalaranResourceLoader {
@@ -101,37 +100,33 @@ public class TestResourceLoader implements DalaranResourceLoader {
     }
 
     @Override
-    public TriggerFlowEntity loadTriggerFlow(Long triggerFlowId) {
-        return triggerFlowRepository.findById(triggerFlowId).get();
+    public TriggerFlowEntity loadTriggerFlow(String triggerFlowId) {
+        return triggerFlowRepository.findByResourceKey(triggerFlowId);
     }
 
     @Override
-    public SubFlowEntity loadSubFlow(Long subFlowId) {
-        return subFlowRepository.findById(subFlowId).get();
+    public SubFlowEntity loadSubFlow(String subFlowId) {
+        return subFlowRepository.findByResourceKey(subFlowId);
     }
 
     @Override
-    public ModelEntity loadModel(Long modelId) {
-        return modelRepository.findById(modelId).get();
+    public ModelEntity loadModel(String modelId) {
+        return modelRepository.findByResourceKey(modelId);
     }
 
     @Override
-    public ConnectorEntity loadConnector(Long connectorId) {
-        Optional<ConnectorEntity> optional = connectorRepository.findById(connectorId);
-        if(optional!=null && optional.isPresent()) {
-            return optional.get();
-        }
-        return null;
+    public ConnectorEntity loadConnector(String connectorId) {
+        return connectorRepository.findByResourceKey(connectorId);
     }
 
     @Override
-    public LimiterEntity loadLimiter(Long limiterId) {
-        return limiterRepository.findById(limiterId).get();
+    public LimiterEntity loadLimiter(String limiterId) {
+        return limiterRepository.findByResourceKey(limiterId);
     }
 
     @Override
-    public ServiceEntity loadService(Long serviceId) {
-        return serviceRepository.findById(serviceId).get();
+    public ServiceEntity loadService(String serviceId) {
+        return serviceRepository.findByResourceKey(serviceId);
     }
 
     @Override

@@ -7,7 +7,7 @@ import java.util.List;
 @Data
 public class MainLogDTO extends BasicLogDTO {
 
-    private Long moduleId;
+    private String moduleId;
 
     private String moduleName;
 

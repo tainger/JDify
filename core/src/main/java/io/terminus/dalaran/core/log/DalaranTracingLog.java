@@ -5,6 +5,7 @@ import lombok.Data;
 
 @Data
 public class DalaranTracingLog {
+
     private String flowId;
 
     private String processorId;

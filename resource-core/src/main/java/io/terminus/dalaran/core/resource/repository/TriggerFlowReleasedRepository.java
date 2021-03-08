@@ -10,7 +10,7 @@ import java.util.List;
 public interface TriggerFlowReleasedRepository extends JpaRepository<TriggerFlowReleasedEntity, Long>, JpaSpecificationExecutor<TriggerFlowReleasedEntity> {
     List<TriggerFlowReleasedEntity> findByVersion(String version);
 
-    TriggerFlowReleasedEntity findByVersionAndOriginId(String version, Long triggerFlowId);
+    TriggerFlowReleasedEntity findByVersionAndOriginId(String version, String triggerFlowId);
 
     List<TriggerFlowReleasedEntity> findByVersionAndStatusNot(String version, FlowStatus status);
 
