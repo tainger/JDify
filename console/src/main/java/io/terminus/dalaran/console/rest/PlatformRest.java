@@ -8,12 +8,13 @@ import io.terminus.dalaran.console.ExportData;
 import io.terminus.dalaran.console.ResponseMessage;
 import io.terminus.dalaran.console.exception.OnException;
 import io.terminus.dalaran.console.service.*;
+import io.terminus.dalaran.core.component.DalaranProcessor;
 import io.terminus.dalaran.core.context.DalaranContext;
 import io.terminus.dalaran.model.DalaranAccount;
+import io.terminus.dalaran.model.dto.ImportJarRequest;
 import io.terminus.dalaran.model.dto.ReleaseRecordDTO;
 import io.terminus.dalaran.model.dto.ReleaseRequestDTO;
 import io.terminus.dalaran.model.dto.flow.ReleaseFlowDTO;
-import io.terminus.dalaran.model.dto.flow.TriggerFlowDTO;
 import io.terminus.dalaran.model.function.MappingFunctionInfo;
 import io.terminus.dalaran.rest.read.PlatformExportAPI;
 import io.terminus.dalaran.rest.read.PlatformInfoAPI;
@@ -22,6 +23,7 @@ import io.terminus.dalaran.rest.write.LoginAPI;
 import io.terminus.dalaran.rest.write.PlatformImportAPI;
 import io.terminus.dalaran.rest.write.ReleaseWriteAPI;
 import io.terminus.draco.api.response.UserInfo;
+import lombok.var;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
@@ -36,6 +38,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.jar.JarFile;
 
 @RestController
 public class PlatformRest implements PlatformInfoAPI, PlatformImportAPI, PlatformExportAPI, ReleaseReadAPI, ReleaseWriteAPI, LoginAPI {
@@ -57,6 +60,10 @@ public class PlatformRest implements PlatformInfoAPI, PlatformImportAPI, Platfor
 
     @Autowired
     private FlowManagementService flowManagementService;
+
+    private final String libPath = "lib/";
+    private final String classSuffix = ".class";
+
 
     @Override
     @OnException(code = ResponseMessage.VERSION_QUERY_ERROR)
@@ -222,5 +229,40 @@ public class PlatformRest implements PlatformInfoAPI, PlatformImportAPI, Platfor
     @OnException(code = ResponseMessage.GET_USER_INFO_ERROR)
     public UserInfo getUserInfo() {
         return authorizeService.getUserInfo();
+    }
+
+    @Override
+    public void importJarFile(ImportJarRequest request) {
+        try {
+            File localFile = new File(request.getFilePath());
+            JarFile jarFile = new JarFile(localFile);
+            var entries = jarFile.entries();
+
+            while (entries.hasMoreElements()) {
+                 var jarEntity = entries.nextElement();
+                 String name = jarEntity.getName();
+                 if (jarEntity.isDirectory() || !name.endsWith(classSuffix)) {
+                     continue;
+                 }
+                String className = name.replace('/', '.');
+                className = className.substring(0, className.length() - classSuffix.length());
+                Class clazz = null;
+                try {
+                    clazz = Class.forName(className);
+                    Object bean = clazz.newInstance()
+                    if (bean instanceof DalaranProcessor) {
+                        //
+                    }
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
+                }
+
+            }
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 }
