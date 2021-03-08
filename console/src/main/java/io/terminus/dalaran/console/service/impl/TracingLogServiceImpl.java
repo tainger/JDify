@@ -16,10 +16,7 @@ import io.terminus.dalaran.core.resource.repository.ModuleRepository;
 import io.terminus.dalaran.core.resource.repository.ReleaseRecordRepository;
 import io.terminus.dalaran.core.resource.repository.TracingLogRepository;
 import io.terminus.dalaran.core.resource.repository.TriggerFlowReleasedRepository;
-import io.terminus.dalaran.model.dto.log.DetailLogDTO;
-import io.terminus.dalaran.model.dto.log.MainLogDTO;
-import io.terminus.dalaran.model.dto.log.TimeLogDTO;
-import io.terminus.dalaran.model.dto.log.TracingLogDTO;
+import io.terminus.dalaran.model.dto.log.*;
 import io.terminus.dalaran.model.query.TracingLogQuery;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -95,16 +92,44 @@ public class TracingLogServiceImpl implements TracingLogService {
 
     @Override
     public DetailLogDTO logDetailById(Long flowId) {
+        DetailLogDTO detailLogDTO = new DetailLogDTO();
         ReleaseRecordEntity releaseRecordEntity = releaseRecordRepository.findByEnabledTrue();
         if (releaseRecordEntity == null) {
-            return null;
+            return detailLogDTO;
         }
         String version = releaseRecordEntity.getVersion();
         TriggerFlowReleasedEntity entity = triggerFlowReleasedRepository.findByVersionAndOriginId(version, flowId);
-        DetailLogDTO detailLogDTO = buildDetailLog(entity);
+        if(entity == null) {
+            return detailLogDTO;
+        }
+        List<TracingLogEntity> tracingLogEntity = tracingLogRepository.findByFlowIdAndVersion(flowId, version);
+        if (tracingLogEntity.size() == 0) {
+            return detailLogDTO;
+        }
+        detailLogDTO = buildDetailLog(entity);
         TimeLogDTO timeLogDTO= getElapsedTime(flowId, version);
+        List<TracingLogEntity> tracingLogFailEntity = tracingLogRepository.findByFlowIdAndVersionAndSuccessful(flowId, version, false);
+        Long lastExceptionDate = null;
+        if (tracingLogFailEntity.size() != 0) {
+            lastExceptionDate = getLastExceptionDate(flowId, version);
+        }
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        if (StringUtils.isNotBlank(timeZone)) {
+            format.setTimeZone(TimeZone.getTimeZone(timeZone));
+        } else {
+            format.setTimeZone(TimeZone.getTimeZone("Asia/Shanghai"));
+        }
         detailLogDTO.setAvgTime(timeLogDTO.getAvgTime());
         detailLogDTO.setMaxTime(timeLogDTO.getMaxTime());
+        //可能会存在有多个相同的最大时间的情况，取时间最早的那个
+        detailLogDTO.setMaxTimeRecordId(getMaxTimeRecordId(flowId, version, timeLogDTO.getMaxTime()).get(0).toString());
+        if (lastExceptionDate == null) {
+            detailLogDTO.setLastExceptionDate(null);
+            detailLogDTO.setLastExceptionDateRecordId(null);
+        } else {
+            detailLogDTO.setLastExceptionDate(format.format(lastExceptionDate));
+            detailLogDTO.setLastExceptionDateRecordId(getLastExceptionRecordId(flowId, version, lastExceptionDate));
+        }
         return detailLogDTO;
     }
 
@@ -230,10 +255,11 @@ public class TracingLogServiceImpl implements TracingLogService {
         detailLogDTO.setModule(map.get(entity.getModuleId()));
         detailLogDTO.setOnline(entity.isOnline());
         detailLogDTO.setDescription(entity.getDescription());
+        //TODO 是否告警设值
         return detailLogDTO;
     }
 
-    public TimeLogDTO getElapsedTime(Long flowId, String version){
+    public TimeLogDTO getElapsedTime(Long flowId, String version) {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<TimeLogDTO> criteriaQuery = builder.createQuery(TimeLogDTO.class);
         Root<TracingLogEntity> root = criteriaQuery.from(TracingLogEntity.class);
@@ -248,4 +274,57 @@ public class TracingLogServiceImpl implements TracingLogService {
         criteriaQuery.multiselect(builder.max(root.get("elapsed")), builder.avg(root.get("elapsed"))).where(predicates.toArray(new Predicate[0]));
         return entityManager.createQuery(criteriaQuery).getSingleResult();
     }
+
+    public List getMaxTimeRecordId(Long flowId, String version, Long maxTime) {
+        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<String> criteriaQuery = builder.createQuery(String.class);
+        Root<TracingLogEntity> root = criteriaQuery.from(TracingLogEntity.class);
+        List<Predicate> predicates = new ArrayList<>();
+        if (flowId != null) {
+            predicates.add(builder.equal(root.get("flowId"), flowId));
+        }
+        if (version != null) {
+            predicates.add(builder.equal(root.get("version"), version));
+        }
+        predicates.add(builder.equal(root.get("tracingType"), TracingType.Flow));
+        predicates.add(builder.equal(root.get("elapsed"), maxTime));
+        criteriaQuery.multiselect(root.get("recordId")).where(predicates.toArray(new Predicate[0]));
+        return entityManager.createQuery(criteriaQuery).getResultList();
+    }
+
+    public Long getLastExceptionDate(Long flowId, String version) {
+        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Long> criteriaQuery = builder.createQuery(Long.class);
+        Root<TracingLogEntity> root = criteriaQuery.from(TracingLogEntity.class);
+        List<Predicate> predicates = new ArrayList<>();
+        if (flowId != null) {
+            predicates.add(builder.equal(root.get("flowId"), flowId));
+        }
+        if (version != null) {
+            predicates.add(builder.equal(root.get("version"), version));
+        }
+        predicates.add(builder.equal(root.get("tracingType"), TracingType.Flow));
+        predicates.add(builder.equal(root.get("successful"), false));
+        criteriaQuery.multiselect(builder.max(root.get("timestamp"))).where(predicates.toArray(new Predicate[0]));
+        return entityManager.createQuery(criteriaQuery).getSingleResult();
+    }
+
+    public String getLastExceptionRecordId(Long flowId, String version, Long timeStamp) {
+        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<String> criteriaQuery = builder.createQuery(String.class);
+        Root<TracingLogEntity> root = criteriaQuery.from(TracingLogEntity.class);
+        List<Predicate> predicates = new ArrayList<>();
+        if (flowId != null) {
+            predicates.add(builder.equal(root.get("flowId"), flowId));
+        }
+        if (version != null) {
+            predicates.add(builder.equal(root.get("version"), version));
+        }
+        predicates.add(builder.equal(root.get("successful"), false));
+        predicates.add(builder.equal(root.get("timestamp"), timeStamp));
+        criteriaQuery.multiselect(root.get("recordId")).where(predicates.toArray(new Predicate[0]));
+        return entityManager.createQuery(criteriaQuery).getSingleResult();
+    }
+
+
 }

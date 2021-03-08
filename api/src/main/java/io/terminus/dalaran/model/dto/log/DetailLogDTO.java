@@ -15,14 +15,18 @@ public class DetailLogDTO {
 
     private boolean online;
 
-    private String description;
+    private boolean isMonitor;
 
-    private boolean alert;
+    private String description;
 
     private Double avgTime;
 
     private Long maxTime;
 
+    private String maxTimeRecordId;
+
     private String lastExceptionDate;
+
+    private String lastExceptionDateRecordId;
 
 }

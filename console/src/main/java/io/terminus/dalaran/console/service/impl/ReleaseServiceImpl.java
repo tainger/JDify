@@ -2,6 +2,7 @@ package io.terminus.dalaran.console.service.impl;
 
 import io.terminus.dalaran.console.convertor.FlowConvertor;
 import io.terminus.dalaran.console.repository.*;
+import io.terminus.dalaran.console.service.ModuleManagementService;
 import io.terminus.dalaran.console.service.ReleaseService;
 import io.terminus.dalaran.core.resource.entity.basic.BasicEntity;
 import io.terminus.dalaran.core.resource.entity.common.ModuleEntity;
@@ -82,6 +83,9 @@ public class ReleaseServiceImpl implements ReleaseService {
 
     @Autowired
     private  ModuleRepository moduleRepository;
+
+    @Autowired
+    private ModuleManagementService moduleService;
 
     private final FlowConvertor flowConvertor = new FlowConvertor();
 
@@ -204,6 +208,9 @@ public class ReleaseServiceImpl implements ReleaseService {
     private ReleaseFlowDTO buildflowDTO(TriggerFlowReleasedEntity entity) {
         ReleaseFlowDTO releaseFlowDTO = new ReleaseFlowDTO();
         BeanUtils.copyProperties(entity, releaseFlowDTO);
+        String moduleName = moduleService.getModuleName(entity.getModuleId());
+        releaseFlowDTO.setModuleName(moduleName);
+        releaseFlowDTO.setId(entity.getOriginId());
         return releaseFlowDTO;
     }
 

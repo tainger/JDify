@@ -1,5 +1,6 @@
 package io.terminus.dalaran.rest.read;
 
+import io.swagger.annotations.ApiOperation;
 import io.terminus.dalaran.model.dto.log.DetailLogDTO;
 import io.terminus.dalaran.model.dto.log.MainLogDTO;
 import io.terminus.dalaran.model.query.TracingLogQuery;
@@ -23,6 +24,7 @@ public interface TracingReadAPI {
     @GetMapping("/{recordId}")
     MainLogDTO logDetail(@PathVariable String recordId);
 
+    @ApiOperation(value = "流程统计分页")
     @GetMapping("/detail/{id}")
     DetailLogDTO logDetailById(@PathVariable Long id);
 

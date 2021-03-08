@@ -10,11 +10,11 @@ public class TimeLogDTO {
 
     private Double avgTime;
 
-    public TimeLogDTO(){
+    public TimeLogDTO() {
 
     }
 
-    public TimeLogDTO(Long maxTime, Double avgTime){
+    public TimeLogDTO(Long maxTime, Double avgTime) {
         this.maxTime = maxTime;
         this.avgTime = avgTime;
     }
