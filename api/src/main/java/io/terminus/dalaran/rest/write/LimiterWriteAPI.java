@@ -2,6 +2,7 @@ package io.terminus.dalaran.rest.write;
 
 
 import io.swagger.annotations.ApiOperation;
+import io.terminus.dalaran.model.CreateResponse;
 import io.terminus.dalaran.model.dto.LimiterDTO;
 import org.springframework.web.bind.annotation.*;
 
@@ -10,7 +11,7 @@ public interface LimiterWriteAPI {
 
     @PostMapping
     @ApiOperation("新增熔断器")
-    Long create(@RequestBody LimiterDTO limiterDTO);
+    CreateResponse create(@RequestBody LimiterDTO limiterDTO);
 
     @PutMapping
     @ApiOperation("更新熔断器")
@@ -18,5 +19,5 @@ public interface LimiterWriteAPI {
 
     @DeleteMapping("/{id}")
     @ApiOperation("删除熔断器")
-    void deleteById(@PathVariable Long id);
+    void deleteById(@PathVariable String id);
 }

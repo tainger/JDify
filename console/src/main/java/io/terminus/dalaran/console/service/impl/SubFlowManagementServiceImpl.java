@@ -7,6 +7,7 @@ import io.terminus.dalaran.console.entity.SubFlowEntity;
 import io.terminus.dalaran.console.repository.SubFlowRepository;
 import io.terminus.dalaran.console.service.SubFlowManagementService;
 import io.terminus.dalaran.console.service.jpa.SubFlowQueryService;
+import io.terminus.dalaran.console.util.ResourceKeyUtils;
 import io.terminus.dalaran.core.flow.DalaranFlowBuilder;
 import io.terminus.dalaran.core.resource.DalaranResourceBuilder;
 import io.terminus.dalaran.core.resource.entity.common.ProcessorEntity;
@@ -27,7 +28,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -51,24 +51,23 @@ public class SubFlowManagementServiceImpl implements SubFlowManagementService {
     private final FlowConvertor flowConvertor = new FlowConvertor();
 
     @Override
-    public Long createFlow(SubFlowDTO flowModel) {
+    public String createFlow(SubFlowDTO flowModel) {
         SubFlowEntity subFlowEntity = buildEntity(flowModel);
         setFlowStatus(subFlowEntity);
         setCreatedBy(subFlowEntity);
         subFlowEntity.setOnline(true);
         subFlowRepository.save(subFlowEntity);
         if (subFlowEntity.getStatus() != FlowStatus.Error) {
-            testFlowInitializer.reloadTestSubFlow(subFlowEntity.getId());
+            testFlowInitializer.reloadTestSubFlow(subFlowEntity.getResourceKey());
         }
-        return subFlowEntity.getId();
+        return subFlowEntity.getResourceKey();
     }
 
     @Override
-    public void deleteFlow(Long flowId) {
-        Optional<SubFlowEntity> optional = subFlowRepository.findById(flowId);
-        SubFlowEntity subFlowEntity = optional.get();
-        subFlowEntity.setExist(false);
-        subFlowRepository.save(subFlowEntity);
+    public void deleteFlow(String flowId) {
+        SubFlowEntity entity = subFlowRepository.findByResourceKey(flowId);
+        entity.setExist(false);
+        subFlowRepository.save(entity);
     }
 
     @Override
@@ -78,7 +77,7 @@ public class SubFlowManagementServiceImpl implements SubFlowManagementService {
         setUpdatedBy(subFlowEntity);
         subFlowRepository.save(subFlowEntity);
         if (subFlowEntity.getStatus() != FlowStatus.Error) {
-            testFlowInitializer.reloadTestSubFlow(subFlowEntity.getId());
+            testFlowInitializer.reloadTestSubFlow(subFlowEntity.getResourceKey());
         }
         return flowConvertor.toDTO(subFlowEntity);
     }
@@ -101,8 +100,8 @@ public class SubFlowManagementServiceImpl implements SubFlowManagementService {
 
     @Nullable
     @Override
-    public SubFlowDTO getById(Long flowId) {
-        SubFlowEntity flowEntity = subFlowRepository.findById(flowId).get();
+    public SubFlowDTO getById(String flowId) {
+        SubFlowEntity flowEntity = subFlowRepository.findByResourceKey(flowId);
         if (flowEntity == null) {
             return null;
         }
@@ -110,8 +109,8 @@ public class SubFlowManagementServiceImpl implements SubFlowManagementService {
     }
 
     @Override
-    public Long copyFlow(CopyFlow copyFlow) {
-        SubFlowEntity flowEntity = subFlowRepository.findById(copyFlow.getId()).get();
+    public String copyFlow(CopyFlow copyFlow) {
+        SubFlowEntity flowEntity = subFlowRepository.findByResourceKey(copyFlow.getId());
         if (flowEntity == null) {
             return null;
         }
@@ -121,7 +120,7 @@ public class SubFlowManagementServiceImpl implements SubFlowManagementService {
         newFlowEntity.setId(null);
         newFlowEntity.setName(copyFlow.getName());
         subFlowRepository.save(newFlowEntity);
-        return newFlowEntity.getId();
+        return newFlowEntity.getResourceKey();
     }
 
     @Override
@@ -131,7 +130,7 @@ public class SubFlowManagementServiceImpl implements SubFlowManagementService {
     }
 
     @Override
-    public List<BasicFlowInfo> listBasicSubFlowInfoByModuleId(Long moduleId) {
+    public List<BasicFlowInfo> listBasicSubFlowInfoByModuleId(String moduleId) {
         return subFlowQueryService.listBasicInfoByModuleId(moduleId);
     }
 
@@ -156,13 +155,13 @@ public class SubFlowManagementServiceImpl implements SubFlowManagementService {
 
     private SubFlowEntity buildEntity(SubFlowDTO model) {
         SubFlowEntity flowEntity;
-        Long id = model.getId();
-        if (id != null) {
-            flowEntity = subFlowRepository.findById(id).get();
+        String resourceKey = model.getId();
+        if (StringUtils.isBlank(resourceKey)) {
+            flowEntity = subFlowRepository.findByResourceKey(resourceKey);
         } else {
             flowEntity = new SubFlowEntity();
+            resourceKey = ResourceKeyUtils.generateKey();
         }
-
         List<ProcessorEntity> pipeline = model.getPipeline().stream().map(processor -> {
             ProcessorEntity processorEntity = new ProcessorEntity();
             processorEntity.setId(processor.getId());
@@ -178,6 +177,7 @@ public class SubFlowManagementServiceImpl implements SubFlowManagementService {
         } else {
             flowEntity.setName("Dalaran Flow");
         }
+        flowEntity.setResourceKey(resourceKey);
         flowEntity.setModuleId(model.getModuleId());
         flowEntity.setInModel(model.getInModelId());
         flowEntity.setOutModel(model.getOutModelId());

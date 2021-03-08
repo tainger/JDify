@@ -21,7 +21,7 @@ public class RocketMQConsumerConfig extends AllModelConfig implements ConnectorC
     private RocketMQConnector connector;
 
     @ConfigFieldInfo(label = "RocketMQ 连接器", inputType = FieldInputType.Connector, connectorType = RocketMQConnector.class)
-    private Long connectorId;
+    private String connectorId;
 
     @ConfigFieldInfo(label = "消费者类型", inputType = FieldInputType.Select, defaultValue = "PUSH")
     private ConsumerType consumerType = ConsumerType.PUSH;

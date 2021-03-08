@@ -13,7 +13,7 @@ public interface FlowQueryService {
 
     List<TriggerFlowEntity> query(FlowQuery query);
 
-    List<TriggerFlowEntity> queryByProcessorIds(List<Long> processorIds);
+    List<TriggerFlowEntity> queryByProcessorIds(List<String> processorIds);
 
-    List<BasicFlowInfo> listBasicInfoByModuleId(Long moduleId);
+    List<BasicFlowInfo> listBasicInfoByModuleId(String moduleId);
 }

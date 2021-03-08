@@ -13,7 +13,7 @@ public class BasicLogDTO {
 
     private boolean successful;
 
-    private Long flowId;
+    private String flowId;
 
     private String flowName;
 

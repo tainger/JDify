@@ -1,6 +1,7 @@
 package io.terminus.dalaran.rest.write;
 
 import io.swagger.annotations.ApiOperation;
+import io.terminus.dalaran.model.CreateResponse;
 import io.terminus.dalaran.model.dto.ServiceDTO;
 import org.springframework.web.bind.annotation.*;
 
@@ -9,7 +10,7 @@ public interface ServiceWriteAPI {
 
     @PostMapping
     @ApiOperation("新增服务")
-    Long create(@RequestBody ServiceDTO serviceDTO);
+    CreateResponse create(@RequestBody ServiceDTO serviceDTO);
 
     @PutMapping
     @ApiOperation("更新服务")
@@ -17,5 +18,5 @@ public interface ServiceWriteAPI {
 
     @DeleteMapping("/{id}")
     @ApiOperation("删除服务")
-    void deleteById(@PathVariable Long id);
+    void deleteById(@PathVariable String id);
 }

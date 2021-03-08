@@ -101,32 +101,32 @@ public class ReleasedResourceLoader implements DalaranResourceLoader {
     }
 
     @Override
-    public TriggerFlowReleasedEntity loadTriggerFlow(Long triggerFlowId) {
+    public TriggerFlowReleasedEntity loadTriggerFlow(String triggerFlowId) {
         return releasedTriggerFlowRepository.findByVersionAndOriginId(version, triggerFlowId);
     }
 
     @Override
-    public SubFlowReleasedEntity loadSubFlow(Long subFlowId) {
+    public SubFlowReleasedEntity loadSubFlow(String subFlowId) {
         return releasedSubFlowRepository.findByVersionAndOriginId(version, subFlowId);
     }
 
     @Override
-    public ModelReleasedEntity loadModel(Long modelId) {
+    public ModelReleasedEntity loadModel(String modelId) {
         return modelRepository.findByVersionAndOriginId(version, modelId);
     }
 
     @Override
-    public ConnectorReleasedEntity loadConnector(Long connectorId) {
+    public ConnectorReleasedEntity loadConnector(String connectorId) {
         return connectorRepository.findByVersionAndOriginId(version, connectorId);
     }
 
     @Override
-    public LimiterReleasedEntity loadLimiter(Long limiterId) {
+    public LimiterReleasedEntity loadLimiter(String limiterId) {
         return limiterRepository.findByVersionAndOriginId(version, limiterId);
     }
 
     @Override
-    public ServiceReleasedEntity loadService(Long serviceId) {
+    public ServiceReleasedEntity loadService(String serviceId) {
         return serviceRepository.findByVersionAndOriginId(version, serviceId);
     }
 

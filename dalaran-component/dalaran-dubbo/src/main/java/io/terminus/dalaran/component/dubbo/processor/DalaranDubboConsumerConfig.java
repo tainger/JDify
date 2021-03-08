@@ -13,7 +13,7 @@ import lombok.Data;
 public class DalaranDubboConsumerConfig extends OutModelConfig implements ConnectorConfig<DubboRegistryConnector> {
 
     @ConfigFieldInfo(label = "注册中心", inputType = FieldInputType.Connector, connectorType = DubboRegistryConnector.class)
-    private Long connectorId;
+    private String connectorId;
 
     @ConfigFieldInfo(inputType = FieldInputType.Hidden)
     @JSONField(serialize = false)

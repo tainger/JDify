@@ -3,6 +3,7 @@ package io.terminus.dalaran.console.rest;
 import io.terminus.dalaran.console.ResponseMessage;
 import io.terminus.dalaran.console.exception.OnException;
 import io.terminus.dalaran.console.service.ServiceManagement;
+import io.terminus.dalaran.model.CreateResponse;
 import io.terminus.dalaran.model.component.ServiceOperation;
 import io.terminus.dalaran.model.dto.ServiceDTO;
 import io.terminus.dalaran.rest.read.ServiceReadAPI;
@@ -22,8 +23,8 @@ public class ServiceRest implements ServiceReadAPI, ServiceWriteAPI {
 
     @Override
     @OnException(code = ResponseMessage.SERVICE_CREATE_ERROR)
-    public Long create(@RequestBody ServiceDTO serviceDTO) {
-        return serviceManagement.create(serviceDTO);
+    public CreateResponse create(@RequestBody ServiceDTO serviceDTO) {
+        return new CreateResponse(serviceManagement.create(serviceDTO));
     }
 
     @Override
@@ -34,13 +35,13 @@ public class ServiceRest implements ServiceReadAPI, ServiceWriteAPI {
 
     @Override
     @OnException(code = ResponseMessage.SERVICE_DELETE_ERROR)
-    public void deleteById(@PathVariable Long id) {
+    public void deleteById(@PathVariable String id) {
         serviceManagement.delete(id);
     }
 
     @Override
     @OnException(code = ResponseMessage.SERVICE_QUERY_ERROR)
-    public ServiceDTO detail(@PathVariable Long id) {
+    public ServiceDTO detail(@PathVariable String id) {
         return serviceManagement.detail(id);
     }
 
@@ -52,7 +53,7 @@ public class ServiceRest implements ServiceReadAPI, ServiceWriteAPI {
 
     @Override
     @OnException(code = ResponseMessage.SERVICE_QUERY_ERROR)
-    public List<ServiceOperation> operations(@PathVariable Long id) {
+    public List<ServiceOperation> operations(@PathVariable String id) {
         return serviceManagement.listOperation(id);
     }
 }

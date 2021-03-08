@@ -5,9 +5,9 @@ import lombok.Data;
 @Data
 public class BasicLimiterInfo {
 
-    private Long id;
+    private String id;
 
-    private Long moduleId;
+    private String moduleId;
 
     private String name;
 
@@ -16,7 +16,7 @@ public class BasicLimiterInfo {
     public BasicLimiterInfo() {
     }
 
-    public BasicLimiterInfo(Long id, Long moduleId, String name, String limiterType) {
+    public BasicLimiterInfo(String id, String moduleId, String name, String limiterType) {
         this.id = id;
         this.moduleId = moduleId;
         this.name = name;

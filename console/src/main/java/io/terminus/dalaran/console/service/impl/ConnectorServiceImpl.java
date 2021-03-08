@@ -4,9 +4,13 @@ import com.alibaba.fastjson.JSON;
 import io.terminus.dalaran.console.entity.ConnectorEntity;
 import io.terminus.dalaran.console.repository.ConnectorRepository;
 import io.terminus.dalaran.console.service.ConnectorService;
+import io.terminus.dalaran.console.service.jpa.model.QueryConnectorInfo;
+import io.terminus.dalaran.console.util.ResourceKeyUtils;
 import io.terminus.dalaran.model.dto.ConnectorDTO;
 import io.terminus.dalaran.model.dto.basic.BasicConnectorInfo;
 import io.terminus.draco.web.autoconfig.context.UserContext;
+import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,9 +19,9 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @Service
 public class ConnectorServiceImpl implements ConnectorService {
@@ -29,11 +33,11 @@ public class ConnectorServiceImpl implements ConnectorService {
     private EntityManager entityManager;
 
     @Override
-    public Long create(ConnectorDTO connectorDTO) {
+    public String create(ConnectorDTO connectorDTO) {
         ConnectorEntity entity = toEntity(connectorDTO);
         setCreatedBy(entity);
         connectorRepository.save(entity);
-        return entity.getId();
+        return entity.getResourceKey();
     }
 
     @Override
@@ -44,42 +48,68 @@ public class ConnectorServiceImpl implements ConnectorService {
     }
 
     @Override
-    public void delete(Long connectorId) {
-        ConnectorEntity entity = connectorRepository.findById(connectorId).get();
+    public void delete(String connectorId) {
+        ConnectorEntity entity = connectorRepository.findByResourceKey(connectorId);
         entity.setExist(false);
         connectorRepository.save(entity);
     }
 
     @Override
-    public ConnectorDTO detail(Long connectorId) {
-        Optional<ConnectorEntity> entityOptional = connectorRepository.findById(connectorId);
-        return entityOptional.map(this::toDTO).orElse(null);
+    public ConnectorDTO detail(String connectorId) {
+        ConnectorEntity entity = connectorRepository.findByResourceKey(connectorId);
+        return toDTO(entity);
     }
 
     @Override
-    public List<BasicConnectorInfo> listBasicInfoByModuleId(Long moduleId) {
+    public List<BasicConnectorInfo> listBasicInfoByModuleId(String moduleId) {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<BasicConnectorInfo> criteriaQuery = builder.createQuery(BasicConnectorInfo.class);
+        CriteriaQuery<QueryConnectorInfo> criteriaQuery = builder.createQuery(QueryConnectorInfo.class);
         Root<ConnectorEntity> root = criteriaQuery.from(ConnectorEntity.class);
-        criteriaQuery.multiselect(root.get("id"), root.get("moduleId"), root.get("name"), root.get("connectorType"))
+        criteriaQuery.multiselect(root.get("resourceKey"), root.get("moduleId"), root.get("name"), root.get("connectorType"))
                 .where(builder.equal(root.get("moduleId"), moduleId), builder.equal(root.get("isExist"),true));
-        return entityManager.createQuery(criteriaQuery).getResultList();
+        List<QueryConnectorInfo> connectors = entityManager.createQuery(criteriaQuery).getResultList();
+        List<BasicConnectorInfo> basicConnectors = new ArrayList<>();
+        connectors.forEach(connector -> {
+            BasicConnectorInfo basicConnector = new BasicConnectorInfo();
+            try {
+                BeanUtils.copyProperties(basicConnector, connector);
+                basicConnector.setId(connector.getResourceKey());
+                basicConnectors.add(basicConnector);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+        return basicConnectors;
     }
 
     @Override
     public List<BasicConnectorInfo> listBasicInfoByComponent(String connectorType) {
-
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<BasicConnectorInfo> criteriaQuery = builder.createQuery(BasicConnectorInfo.class);
+        CriteriaQuery<QueryConnectorInfo> criteriaQuery = builder.createQuery(QueryConnectorInfo.class);
         Root<ConnectorEntity> root = criteriaQuery.from(ConnectorEntity.class);
         Predicate where = builder.and(builder.equal(root.get("connectorType"), connectorType), builder.equal(root.get("isExist"),true));
-        criteriaQuery.multiselect(root.get("id"), root.get("moduleId"), root.get("name"), root.get("connectorType")).where(where);
-        return entityManager.createQuery(criteriaQuery).getResultList();
+        criteriaQuery.multiselect(root.get("resourceKey"), root.get("moduleId"), root.get("name"), root.get("connectorType")).where(where);
+        List<QueryConnectorInfo> connectors = entityManager.createQuery(criteriaQuery).getResultList();
+        List<BasicConnectorInfo> basicConnectors = new ArrayList<>();
+        connectors.forEach(connector -> {
+            BasicConnectorInfo basicConnector = new BasicConnectorInfo();
+            try {
+                BeanUtils.copyProperties(basicConnector, connector);
+                basicConnector.setId(connector.getResourceKey());
+                basicConnectors.add(basicConnector);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+        return basicConnectors;
     }
 
     private ConnectorDTO toDTO(ConnectorEntity entity) {
         ConnectorDTO dto = new ConnectorDTO();
-        dto.setId(entity.getId());
+        if (entity == null) {
+            return dto;
+        }
+        dto.setId(entity.getResourceKey());
         dto.setName(entity.getName());
         dto.setConnectorType(entity.getConnectorType());
         dto.setDescription(entity.getDescription());
@@ -91,8 +121,12 @@ public class ConnectorServiceImpl implements ConnectorService {
 
     private ConnectorEntity toEntity(ConnectorDTO dto) {
         ConnectorEntity entity = new ConnectorEntity();
-        entity.setId(dto.getId());
         entity.setName(dto.getName());
+        String resourceKey = dto.getId();
+        if (StringUtils.isBlank(resourceKey)) {
+            resourceKey = ResourceKeyUtils.generateKey();
+        }
+        entity.setResourceKey(resourceKey);
         entity.setConnectorType(dto.getConnectorType());
         entity.setDescription(dto.getDescription());
         entity.setModuleId(dto.getModuleId());
@@ -108,7 +142,7 @@ public class ConnectorServiceImpl implements ConnectorService {
     }
 
     private ConnectorEntity buildEntity(ConnectorDTO connectorDTO){
-        ConnectorEntity connectorEntity = connectorRepository.findById(connectorDTO.getId()).get();
+        ConnectorEntity connectorEntity = connectorRepository.findByResourceKey(connectorDTO.getId());
         connectorEntity.setModuleId(connectorDTO.getModuleId());
         connectorEntity.setName(connectorDTO.getName());
         connectorEntity.setConnectorType(connectorDTO.getConnectorType());
@@ -119,5 +153,4 @@ public class ConnectorServiceImpl implements ConnectorService {
         }
         return connectorEntity;
     }
-
 }

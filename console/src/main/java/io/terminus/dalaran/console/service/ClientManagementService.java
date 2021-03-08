@@ -7,13 +7,13 @@ import java.util.List;
 
 public interface ClientManagementService {
 
-    Long create(ClientDTO clientDTO);
+    String create(ClientDTO clientDTO);
 
     ClientDTO update(ClientDTO clientDTO);
 
-    void delete(Long appKey);
+    void delete(String appKey);
 
-    ClientDTO detail(Long appKey);
+    ClientDTO detail(String appKey);
 
-    List<BasicClientInfo> listBasicInfoByModuleId(Long moduleId);
+    List<BasicClientInfo> listBasicInfoByModuleId(String moduleId);
 }

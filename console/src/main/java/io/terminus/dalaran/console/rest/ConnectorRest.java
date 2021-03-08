@@ -3,6 +3,7 @@ package io.terminus.dalaran.console.rest;
 import io.terminus.dalaran.console.ResponseMessage;
 import io.terminus.dalaran.console.exception.OnException;
 import io.terminus.dalaran.console.service.ConnectorService;
+import io.terminus.dalaran.model.CreateResponse;
 import io.terminus.dalaran.model.dto.ConnectorDTO;
 import io.terminus.dalaran.model.dto.basic.BasicConnectorInfo;
 import io.terminus.dalaran.rest.read.ConnectorReadAPI;
@@ -23,8 +24,8 @@ public class ConnectorRest implements ConnectorReadAPI, ConnectorWriteAPI {
 
     @Override
     @OnException(code = ResponseMessage.CONNECTOR_CREATE_ERROR)
-    public Long create(@RequestBody ConnectorDTO connectorDTO) {
-        return connectorService.create(connectorDTO);
+    public CreateResponse create(@RequestBody ConnectorDTO connectorDTO) {
+        return new CreateResponse(connectorService.create(connectorDTO));
     }
 
     @Override
@@ -35,13 +36,13 @@ public class ConnectorRest implements ConnectorReadAPI, ConnectorWriteAPI {
 
     @Override
     @OnException(code = ResponseMessage.CONNECTOR_DELETE_ERROR)
-    public void deleteById(@PathVariable Long id) {
+    public void deleteById(@PathVariable String id) {
         connectorService.delete(id);
     }
 
     @Override
     @OnException(code = ResponseMessage.CONNECTOR_QUERY_ERROR)
-    public ConnectorDTO detail(@PathVariable Long id) {
+    public ConnectorDTO detail(@PathVariable String id) {
         return connectorService.detail(id);
     }
 

@@ -2,7 +2,6 @@ package io.terminus.dalaran.model.dto.basic;
 
 
 import lombok.Data;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * Created by jingdi on 2019/3/28
@@ -10,10 +9,9 @@ import org.jetbrains.annotations.Nullable;
 @Data
 public class BasicModelInfo {
 
-    @Nullable
-    private Long id;
+    private String id;
 
-    private Long moduleId;
+    private String moduleId;
 
     private String name;
 
@@ -22,7 +20,7 @@ public class BasicModelInfo {
     public BasicModelInfo() {
     }
 
-    public BasicModelInfo(@Nullable Long id, Long moduleId, String name, String modelType) {
+    public BasicModelInfo(String id, String moduleId, String name, String modelType) {
         this.id = id;
         this.moduleId = moduleId;
         this.name = name;

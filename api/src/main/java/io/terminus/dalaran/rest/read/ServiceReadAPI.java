@@ -14,7 +14,7 @@ public interface ServiceReadAPI {
 
     @GetMapping("/{id}")
     @ApiOperation("获取服务详情")
-    ServiceDTO detail(@PathVariable Long id);
+    ServiceDTO detail(@PathVariable String id);
 
     @GetMapping
     @ApiOperation("获取所有服务")
@@ -22,5 +22,5 @@ public interface ServiceReadAPI {
 
     @GetMapping("/{id}/operation")
     @ApiOperation("获取服务可选项")
-    List<ServiceOperation> operations(@PathVariable Long id);
+    List<ServiceOperation> operations(@PathVariable String id);
 }

@@ -296,9 +296,9 @@ public class DalaranMessageMapper implements DalaranProcessor<DalaranMapperConfi
                         .message(MODEL_NOT_NULL).build());
                 return validations;
             }
-            ModelAbstractEntity inModelEntity = resourceLoader.loadModel(Long.parseLong(inModelId));
+            ModelAbstractEntity inModelEntity = resourceLoader.loadModel(inModelId);
             inModel = buildModel(inModelEntity);
-            ModelAbstractEntity outModelEntity = resourceLoader.loadModel(Long.parseLong(outModelId));
+            ModelAbstractEntity outModelEntity = resourceLoader.loadModel(outModelId);
             outModel = buildModel(outModelEntity);
             if(inModel == null || outModel == null) {
                 validations.add(FlowValidationBuilder.newBuilder()

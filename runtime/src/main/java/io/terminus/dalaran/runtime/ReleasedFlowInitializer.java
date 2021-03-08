@@ -189,7 +189,7 @@ public class ReleasedFlowInitializer implements DalaranStarter {
     private List<ApiInfo> getExportApiInfoList() {
         List<TriggerFlowReleasedEntity> restFlowList = resourceLoader.loadAvailableTriggerFlowByTriggerType("http-rest-listener");
         return restFlowList.stream().map(flowEntity -> {
-            ModuleEntity module = moduleRepository.findById(flowEntity.getModuleId()).get();
+            ModuleEntity module = moduleRepository.findByResourceKey(flowEntity.getModuleId());
             TriggerFlow triggerFlow = resourceBuilder.buildTriggerFlow(flowEntity);
             return new ApiInfo(module.getName(), triggerFlow);
         }).collect(Collectors.toList());

@@ -11,8 +11,9 @@ public interface SubFlowRepository extends JpaRepository<SubFlowEntity, Long>, J
 
     List<SubFlowEntity> findByIsExistTrue();
 
-    List<SubFlowEntity> findByModuleIdAndIsExistTrue(Long moduleId);
+    List<SubFlowEntity> findByModuleIdAndIsExistTrue(String moduleId);
 
     List<SubFlowEntity> findByStatusNotAndIsExistTrue(FlowStatus error);
 
+    SubFlowEntity findByResourceKey(String resourceKey);
 }

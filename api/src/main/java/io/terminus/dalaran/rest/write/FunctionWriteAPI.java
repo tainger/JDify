@@ -1,6 +1,7 @@
 package io.terminus.dalaran.rest.write;
 
 import io.swagger.annotations.ApiOperation;
+import io.terminus.dalaran.model.CreateResponse;
 import io.terminus.dalaran.model.dto.FunctionDTO;
 import org.springframework.web.bind.annotation.*;
 
@@ -9,7 +10,7 @@ public interface FunctionWriteAPI {
 
     @PostMapping
     @ApiOperation("新增函数")
-    Long create(@RequestBody FunctionDTO dto);
+    CreateResponse create(@RequestBody FunctionDTO dto);
 
     @PutMapping
     @ApiOperation("更新函数")
@@ -17,5 +18,5 @@ public interface FunctionWriteAPI {
 
     @DeleteMapping("/{id}")
     @ApiOperation("删除函数")
-    void deleteById(@PathVariable Long id);
+    void deleteById(@PathVariable String id);
 }

@@ -1,0 +1,10 @@
+package io.terminus.dalaran.console.util;
+
+import org.apache.commons.lang3.RandomStringUtils;
+
+public class ResourceKeyUtils {
+
+    public static String generateKey() {
+        return RandomStringUtils.random(8, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMN") + "-" + System.currentTimeMillis();
+    }
+}

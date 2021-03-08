@@ -10,6 +10,10 @@ public interface ClientRepository extends JpaRepository<ClientEntity, Long>, Jpa
 
     List<ClientEntity> findByIsExistTrue();
 
-    List<ClientEntity> findByModuleIdAndIsExistTrue(Long moduleId);
+    List<ClientEntity> findByModuleIdAndIsExistTrue(String moduleId);
+
+    ClientEntity findByResourceKey(String resourceKey);
+
+    ClientEntity findByAppKey(String appKey);
 
 }

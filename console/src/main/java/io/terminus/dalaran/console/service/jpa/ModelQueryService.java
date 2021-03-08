@@ -13,5 +13,5 @@ public interface ModelQueryService {
 
     List<ModelEntity> query(ModelQuery query);
 
-    List<BasicModelInfo> listBasicInfoByModuleId(Long moduleId);
+    List<BasicModelInfo> listBasicInfoByModuleId(String moduleId);
 }

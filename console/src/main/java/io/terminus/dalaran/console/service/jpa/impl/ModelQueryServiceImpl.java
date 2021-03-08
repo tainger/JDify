@@ -3,9 +3,11 @@ package io.terminus.dalaran.console.service.jpa.impl;
 import io.terminus.dalaran.console.entity.ModelEntity;
 import io.terminus.dalaran.console.repository.ModelRepository;
 import io.terminus.dalaran.console.service.jpa.ModelQueryService;
+import io.terminus.dalaran.console.service.jpa.model.QueryModelInfo;
 import io.terminus.dalaran.model.ModelTargetType;
 import io.terminus.dalaran.model.dto.basic.BasicModelInfo;
 import io.terminus.dalaran.model.query.ModelQuery;
+import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,7 +47,7 @@ public class ModelQueryServiceImpl implements ModelQueryService {
             }
 
             if (CollectionUtils.isNotEmpty(query.getModelIds())) {
-                Predicate modelIds = criteriaBuilder.and(root.get("id").in(query.getModelIds()));
+                Predicate modelIds = criteriaBuilder.and(root.get("resourceKey").in(query.getModelIds()));
                 predicates.add(modelIds);
             }
 
@@ -63,13 +65,25 @@ public class ModelQueryServiceImpl implements ModelQueryService {
     }
 
     @Override
-    public List<BasicModelInfo> listBasicInfoByModuleId(Long moduleId) {
+    public List<BasicModelInfo> listBasicInfoByModuleId(String moduleId) {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<BasicModelInfo> criteriaQuery = builder.createQuery(BasicModelInfo.class);
+        CriteriaQuery<QueryModelInfo> criteriaQuery = builder.createQuery(QueryModelInfo.class);
         Root<ModelEntity> root = criteriaQuery.from(ModelEntity.class);
-        criteriaQuery.multiselect(root.get("id"), root.get("moduleId"), root.get("name"), root.get("type"))
+        criteriaQuery.multiselect(root.get("resourceKey"), root.get("moduleId"), root.get("name"), root.get("type"))
                 .where(builder.equal(root.get("moduleId"), moduleId), builder.and(), root.get("targetType").in(ModelTargetType.editableTypes())
                 , builder.equal(root.get("isExist"), true));
-        return entityManager.createQuery(criteriaQuery).getResultList();
+        List<QueryModelInfo> models = entityManager.createQuery(criteriaQuery).getResultList();
+        List<BasicModelInfo> basicModels = new ArrayList<>();
+        models.forEach(model -> {
+            BasicModelInfo basicModel = new BasicModelInfo();
+            try {
+                BeanUtils.copyProperties(basicModel, model);
+                basicModel.setId(model.getResourceKey());
+                basicModels.add(basicModel);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+        return basicModels;
     }
 }
