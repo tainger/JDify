@@ -15,4 +15,8 @@ public class ReleaseFlowDTO extends BasicFlowDTO {
 
     private String moduleName;
 
+    private String createdAt;
+
+    private String updatedAt;
+
 }

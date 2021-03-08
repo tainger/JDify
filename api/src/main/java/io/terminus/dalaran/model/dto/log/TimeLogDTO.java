@@ -8,21 +8,15 @@ public class TimeLogDTO {
 
     private Long maxTime;
 
-    private Long minTime;
-
     private Double avgTime;
 
-    private Long count;
-
-    public TimeLogDTO(){
+    public TimeLogDTO() {
 
     }
 
-    public TimeLogDTO(Long maxTime,Long minTime,Double avgTime,Long count){
+    public TimeLogDTO(Long maxTime, Double avgTime) {
         this.maxTime = maxTime;
-        this.minTime = minTime;
         this.avgTime = avgTime;
-        this.count = count;
     }
 
 }

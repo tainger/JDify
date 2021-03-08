@@ -25,6 +25,7 @@ import io.terminus.draco.api.response.UserInfo;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
+import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -68,6 +69,12 @@ public class PlatformRest implements PlatformInfoAPI, PlatformImportAPI, Platfor
     @OnException(code = ResponseMessage.VERSION_QUERY_ERROR)
     public List<ReleaseFlowDTO> triggerFlowList(@PathVariable String version) {
         return releaseService.listReleasedTriggerFlowDTO(version);
+    }
+
+    @Override
+    @OnException(code = ResponseMessage.VERSION_QUERY_ERROR)
+    public Page<ReleaseFlowDTO> triggerFlowListByPage(@RequestParam Integer pageNumber, @RequestParam Integer pageSize) {
+        return releaseService.triggerFlowListByPage(pageNumber, pageSize);
     }
 
     @Override
@@ -223,4 +230,6 @@ public class PlatformRest implements PlatformInfoAPI, PlatformImportAPI, Platfor
     public UserInfo getUserInfo() {
         return authorizeService.getUserInfo();
     }
+
+
 }

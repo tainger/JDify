@@ -47,6 +47,7 @@ public class FlowManagementRest implements FlowReadAPI, FlowWriteAPI {
     @Autowired
     private DalaranContext dalaranContext;
 
+
     @Override
     @OnException(code = ResponseMessage.FLOW_CREATE_ERROR)
     public CreateResponse create(@RequestBody TriggerFlowDTO model) throws CreateFlowException {
@@ -82,13 +83,19 @@ public class FlowManagementRest implements FlowReadAPI, FlowWriteAPI {
     }
 
     @Override
-    public ResponseResult offline(TriggerFlowDTO flowDTO) {
+    public ResponseResult offline(@RequestBody TriggerFlowDTO flowDTO) {
         return flowManagementService.offline(flowDTO);
     }
 
     @Override
-    public ResponseResult online(TriggerFlowDTO flowDTO) {
+    public ResponseResult online(@RequestBody TriggerFlowDTO flowDTO) {
         return flowManagementService.online(flowDTO);
+    }
+
+    @Override
+    @OnException(code = ResponseMessage.FLOW_TRIGGER_ERROR)
+    public void trigger(@RequestBody TriggerFlowDTO flowDTO) {
+        dalaranContext.trigger(flowDTO.getId());
     }
 
     @Override
