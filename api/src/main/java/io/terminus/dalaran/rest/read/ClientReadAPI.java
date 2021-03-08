@@ -11,5 +11,5 @@ public interface ClientReadAPI {
 
     @GetMapping("/{id}")
     @ApiOperation("获取客户端详情")
-    ClientDTO detail(@PathVariable Long id);
+    ClientDTO detail(@PathVariable String id);
 }

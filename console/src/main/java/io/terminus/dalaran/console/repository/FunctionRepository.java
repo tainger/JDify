@@ -10,6 +10,7 @@ public interface FunctionRepository extends JpaRepository<FunctionEntity, Long>,
 
     List<FunctionEntity> findByIsExistTrue();
 
-    List<FunctionEntity> findByModuleIdAndIsExistTrue(Long moduleId);
+    List<FunctionEntity> findByModuleIdAndIsExistTrue(String moduleId);
 
+    FunctionEntity findByResourceKey(String resourceKey);
 }

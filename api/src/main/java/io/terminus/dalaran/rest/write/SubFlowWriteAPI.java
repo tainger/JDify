@@ -1,6 +1,7 @@
 package io.terminus.dalaran.rest.write;
 
 import io.swagger.annotations.ApiOperation;
+import io.terminus.dalaran.model.CreateResponse;
 import io.terminus.dalaran.model.dto.CopyFlow;
 import io.terminus.dalaran.model.dto.flow.SubFlowDTO;
 import io.terminus.dalaran.model.dto.flow.TriggerFlowDTO;
@@ -12,7 +13,7 @@ public interface SubFlowWriteAPI {
 
     @ApiOperation(value = "创建子流程")
     @PostMapping(value = "/create")
-    Long create(@RequestBody SubFlowDTO model);
+    CreateResponse create(@RequestBody SubFlowDTO model);
 
     @ApiOperation(value = "更新子流程")
     @PostMapping(value = "/update")
@@ -20,10 +21,9 @@ public interface SubFlowWriteAPI {
 
     @ApiOperation(value = "删除子流程")
     @DeleteMapping(value = "/delete")
-    void deleteById(@RequestParam Long id);
+    void deleteById(@RequestParam String id);
 
     @ApiOperation(value = "复制子流程")
     @PostMapping(value = "/copy")
-    Long copy(@RequestBody CopyFlow copyFlow);
-
+    CreateResponse copy(@RequestBody CopyFlow copyFlow);
 }

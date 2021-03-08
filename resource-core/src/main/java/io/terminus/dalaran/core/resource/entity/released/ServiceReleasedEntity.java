@@ -14,7 +14,7 @@ import javax.persistence.Table;
 public class ServiceReleasedEntity extends ServiceAbstractEntity implements ReleasedEntity {
 
     @Column(nullable = false)
-    private Long originId;
+    private String originId;
 
     @Column(nullable = false, length = 64)
     private String version;

@@ -6,5 +6,5 @@ import java.util.List;
 
 public interface SubFlowQueryService {
 
-    List<BasicFlowInfo> listBasicInfoByModuleId(Long moduleId);
+    List<BasicFlowInfo> listBasicInfoByModuleId(String moduleId);
 }

@@ -10,7 +10,7 @@ import java.util.List;
 @Data
 public class PropertyQuery {
 
-    private List<Long> propertyIds;
+    private List<String> propertyIds;
 
     private String name;
 }

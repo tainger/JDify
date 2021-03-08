@@ -1,15 +1,13 @@
 package io.terminus.dalaran.model.dto.basic;
 
 import lombok.Data;
-import org.jetbrains.annotations.Nullable;
 
 @Data
 public class BasicServiceInfo {
 
-    @Nullable
-    private Long id;
+    private String id;
 
-    private Long moduleId;
+    private String moduleId;
 
     private String type;
 
@@ -18,7 +16,7 @@ public class BasicServiceInfo {
     public BasicServiceInfo() {
     }
 
-    public BasicServiceInfo(@Nullable Long id, Long moduleId, String type, String name) {
+    public BasicServiceInfo(String id, String moduleId, String type, String name) {
         this.id = id;
         this.moduleId = moduleId;
         this.type = type;

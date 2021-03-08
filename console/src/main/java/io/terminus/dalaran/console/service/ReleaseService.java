@@ -23,7 +23,7 @@ public interface ReleaseService {
 
     List<SubFlowReleasedEntity> listReleasedSubFlow(String version);
 
-    ModelReleasedEntity getReleasedModel(String version, Long modelId);
+    ModelReleasedEntity getReleasedModel(String version, String modelId);
 
     List<PropertyReleasedEntity> getReleasedProperty(String version);
 

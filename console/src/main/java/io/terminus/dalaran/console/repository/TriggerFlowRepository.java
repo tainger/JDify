@@ -13,10 +13,11 @@ public interface TriggerFlowRepository extends JpaRepository<TriggerFlowEntity, 
 
     TriggerFlowEntity findByName(String name);
 
-    List<TriggerFlowEntity> findByModuleIdAndIsExistTrue(Long moduleId);
+    List<TriggerFlowEntity> findByModuleIdAndIsExistTrue(String moduleId);
 
     List<TriggerFlowEntity> findByIsExistTrue();
 
     List<TriggerFlowEntity> findByStatusNotAndTriggerTypeAndIsExistTrue(FlowStatus status, String triggerType);
 
+    TriggerFlowEntity findByResourceKey(String resourceKey);
 }

@@ -27,7 +27,7 @@ public interface ModelReadAPI {
 
     @ApiOperation(value = "全量查询某模块内的数据模型")
     @GetMapping(value = "/list/{moduleId}")
-    List<ModelDTO> listByModuleId(@PathVariable Long moduleId);
+    List<ModelDTO> listByModuleId(@PathVariable String moduleId);
 
     @ApiOperation(value = "查询全部可编辑的数据模型")
     @GetMapping(value = "/list/public")
@@ -35,15 +35,15 @@ public interface ModelReadAPI {
 
     @ApiOperation(value = "查询某模块内可编辑的数据模型")
     @GetMapping(value = "/list/{moduleId}/public")
-    List<ModelDTO> listEditableByModuleId(@PathVariable Long moduleId);
+    List<ModelDTO> listEditableByModuleId(@PathVariable String moduleId);
 
     @ApiOperation(value = "全量查询某模块内的分类数据模型")
     @GetMapping(value = "/list/classification/{moduleId}/")
-    Map<String, ClassificationModel> listClassificationByModuleId(@PathVariable Long moduleId);
+    Map<String, ClassificationModel> listClassificationByModuleId(@PathVariable String moduleId);
 
     @ApiOperation(value = "根据模型匹配自动生成建议的映射")
     @GetMapping(value = "/suggestMapping")
-    Map<String, String> suggestMapping(@RequestParam Long sourceId, @RequestParam Long targetId);
+    Map<String, String> suggestMapping(@RequestParam String sourceId, @RequestParam String targetId);
 
     @ApiOperation(value = "下载数据模型Excel模板样例")
     @GetMapping(value = "/download/excel-template")

@@ -3,10 +3,13 @@ package io.terminus.dalaran.console.service.impl;
 import io.terminus.dalaran.console.entity.FunctionEntity;
 import io.terminus.dalaran.console.repository.FunctionRepository;
 import io.terminus.dalaran.console.service.FunctionService;
+import io.terminus.dalaran.console.service.jpa.model.QueryFunctionInfo;
+import io.terminus.dalaran.console.util.ResourceKeyUtils;
 import io.terminus.dalaran.core.context.DalaranFunctionContext;
 import io.terminus.dalaran.model.dto.FunctionDTO;
 import io.terminus.dalaran.model.dto.basic.BasicFunctionInfo;
 import io.terminus.draco.web.autoconfig.context.UserContext;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,6 +18,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -30,49 +34,62 @@ public class FunctionServiceImpl implements FunctionService {
     private DalaranFunctionContext functionContext;
 
     @Override
-    public Long create(FunctionDTO functionDTO) {
+    public String create(FunctionDTO functionDTO) {
         FunctionEntity entity = toEntity(functionDTO);
         setCreatedBy(entity);
         repository.save(entity);
-        functionContext.addCustomFunction(String.valueOf(entity.getId()), entity.getType(), entity.getScript(), entity.getParams());
-        return entity.getId();
+        functionContext.addCustomFunction(String.valueOf(entity.getResourceKey()), entity.getType(), entity.getScript(), entity.getParams());
+        return entity.getResourceKey();
     }
 
     @Override
     public FunctionDTO update(FunctionDTO functionDTO) {
         FunctionEntity functionEntity = buildEntity(functionDTO);
         repository.save(functionEntity);
-        functionContext.addCustomFunction(String.valueOf(functionEntity.getId()), functionEntity.getType(), functionEntity.getScript(), functionEntity.getParams());
+        functionContext.addCustomFunction(String.valueOf(functionEntity.getResourceKey()), functionEntity.getType(), functionEntity.getScript(), functionEntity.getParams());
         return functionDTO;
     }
 
     @Override
-    public void delete(Long functionId) {
-        FunctionEntity functionEntity = repository.findById(functionId).get();
+    public void delete(String functionId) {
+        FunctionEntity functionEntity = repository.findByResourceKey(functionId);
         functionEntity.setExist(false);
         repository.save(functionEntity);
     }
 
     @Override
-    public FunctionDTO detail(Long functionId) {
-        FunctionEntity entity = repository.findById(functionId).get();
+    public FunctionDTO detail(String functionId) {
+        FunctionEntity entity = repository.findByResourceKey(functionId);
         return toDTO(entity);
     }
 
     @Override
-    public List<BasicFunctionInfo> listBasicInfoByModuleId(Long moduleId) {
+    public List<BasicFunctionInfo> listBasicInfoByModuleId(String moduleId) {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<BasicFunctionInfo> criteriaQuery = builder.createQuery(BasicFunctionInfo.class);
+        CriteriaQuery<QueryFunctionInfo> criteriaQuery = builder.createQuery(QueryFunctionInfo.class);
         Root<FunctionEntity> root = criteriaQuery.from(FunctionEntity.class);
-        criteriaQuery.multiselect(root.get("id"), root.get("moduleId"), root.get("name"), root.get("description"),
+        criteriaQuery.multiselect(root.get("resourceKey"), root.get("moduleId"), root.get("name"), root.get("description"),
                 root.get("type"), root.get("params")).where(builder.equal(root.get("moduleId"), moduleId),
                 builder.equal(root.get("isExist"),true));
-        return entityManager.createQuery(criteriaQuery).getResultList();
+        List<QueryFunctionInfo> functions = entityManager.createQuery(criteriaQuery).getResultList();
+        List<BasicFunctionInfo> basicFunctions = new ArrayList<>();
+        functions.forEach(function -> {
+            BasicFunctionInfo basicFunction = new BasicFunctionInfo();
+            try {
+                BeanUtils.copyProperties(basicFunction, function);
+                basicFunction.setId(function.getResourceKey());
+                basicFunctions.add(basicFunction);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+        return basicFunctions;
     }
 
     private FunctionDTO toDTO(FunctionEntity entity) {
         FunctionDTO dto = new FunctionDTO();
         BeanUtils.copyProperties(entity, dto);
+        dto.setId(entity.getResourceKey());
         dto.setExist(true);
         return dto;
     }
@@ -81,6 +98,11 @@ public class FunctionServiceImpl implements FunctionService {
         FunctionEntity entity = new FunctionEntity();
         BeanUtils.copyProperties(dto, entity);
         entity.setExist(true);
+        String resourceKey = dto.getId();
+        if (StringUtils.isBlank(resourceKey)) {
+            resourceKey = ResourceKeyUtils.generateKey();
+        }
+        entity.setResourceKey(resourceKey);
         return entity;
     }
 
@@ -91,7 +113,7 @@ public class FunctionServiceImpl implements FunctionService {
     }
 
     private FunctionEntity buildEntity(FunctionDTO functionDTO){
-        FunctionEntity functionEntity = repository.findById(functionDTO.getId()).get();
+        FunctionEntity functionEntity = repository.findByResourceKey(functionDTO.getId());
         functionEntity.setModuleId(functionDTO.getModuleId());
         functionEntity.setName(functionDTO.getName());
         functionEntity.setType(functionDTO.getType());

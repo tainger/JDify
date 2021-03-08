@@ -15,7 +15,7 @@ public interface ModelImportAPI {
 
     @ApiOperation(value = "导入 Excel 更新模型结构")
     @PostMapping(value = "/{id}/import/excel")
-    JsonSchema importExcel(@RequestParam MultipartFile file, @PathVariable long id);
+    JsonSchema importExcel(@RequestParam MultipartFile file, @PathVariable String id);
 
     @ApiOperation(value = "导入 Excel 更新模型结构，不需要id")
     @PostMapping(value = "/import/excel")
@@ -23,7 +23,7 @@ public interface ModelImportAPI {
 
     @ApiOperation(value = "导入数据模板更新模型结构")
     @PostMapping(value = "/{id}/import/data-template")
-    DalaranModelSchema importDataTemplate(@RequestBody DataTemplate dataTemplate, @PathVariable long id);
+    DalaranModelSchema importDataTemplate(@RequestBody DataTemplate dataTemplate, @PathVariable String id);
 
     @ApiOperation(value = "导入数据模版通过类型")
     @PostMapping(value = "/{type}/import/data-template-type")
@@ -31,16 +31,16 @@ public interface ModelImportAPI {
 
     @ApiOperation(value = "导入数据模板更新模型结构")
     @PostMapping(value = "/{id}/import/dalaran-schema")
-    DalaranModelSchema importDalaranSchema(@RequestBody DalaranModelSchema schema, @PathVariable long id);
+    DalaranModelSchema importDalaranSchema(@RequestBody DalaranModelSchema schema, @PathVariable String id);
 
     // TODO 待开发
     @ApiOperation(value = "导入模型类信息更新模型结构")
     @PostMapping(value = "/{id}/import/code-template")
-    Map<String, ModelField> importCodeTemplate(@RequestBody String codeTemplate, @PathVariable long id);
+    Map<String, ModelField> importCodeTemplate(@RequestBody String codeTemplate, @PathVariable String id);
 
     // TODO 其实意义不大
     @ApiOperation(value = "批量导入 Excel 创建模型结构")
     @PostMapping(value = "/multi-import/excel")
-    Map<Long, Map<String, JsonSchema>> multiImportExcel(@RequestParam MultipartFile file, @RequestParam String modelType);
+    Map<String, Map<String, JsonSchema>> multiImportExcel(@RequestParam MultipartFile file, @RequestParam String modelType);
 
 }

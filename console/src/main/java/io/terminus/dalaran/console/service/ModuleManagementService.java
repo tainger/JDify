@@ -12,9 +12,9 @@ import java.util.List;
  */
 public interface ModuleManagementService {
 
-    Long createModule(ModuleDTO moduleModel);
+    String createModule(ModuleDTO moduleModel);
 
-    void deleteModule(Long moduleId);
+    void deleteModule(String moduleId);
 
     ModuleDTO updateModule(ModuleDTO moduleModel);
 
@@ -22,7 +22,7 @@ public interface ModuleManagementService {
 
     List<ModuleDTO> queryModules(ModuleQuery query);
 
-    ModuleDetailDTO getModuleDetail(Long moduleId);
+    ModuleDetailDTO getModuleDetail(String moduleId);
 
-    String getModuleName(@NotNull Long moduleId);
+    String getModuleName(@NotNull String moduleId);
 }

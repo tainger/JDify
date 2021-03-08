@@ -11,5 +11,5 @@ public interface FunctionReadAPI {
 
     @GetMapping("/{id}")
     @ApiOperation("获取函数详情")
-    FunctionDTO detail(@PathVariable Long id);
+    FunctionDTO detail(@PathVariable String id);
 }

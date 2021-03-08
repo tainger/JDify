@@ -21,7 +21,7 @@ public class RocketMQProducerConfig extends OutModelConfig implements ConnectorC
     private RocketMQConnector connector;
 
     @ConfigFieldInfo(label = "RocketMQ 连接器", inputType = FieldInputType.Connector, connectorType = RocketMQConnector.class)
-    private Long connectorId;
+    private String connectorId;
 
     @ConfigFieldInfo(label = "主题", inputType = FieldInputType.String)
     private String topic;

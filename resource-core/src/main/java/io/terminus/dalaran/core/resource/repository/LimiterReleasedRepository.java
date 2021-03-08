@@ -6,5 +6,5 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 public interface LimiterReleasedRepository extends JpaRepository<LimiterReleasedEntity, Long>, JpaSpecificationExecutor<LimiterReleasedEntity> {
 
-    LimiterReleasedEntity findByVersionAndOriginId(String version, Long originId);
+    LimiterReleasedEntity findByVersionAndOriginId(String version, String originId);
 }

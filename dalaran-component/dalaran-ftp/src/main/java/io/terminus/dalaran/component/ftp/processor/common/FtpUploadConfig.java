@@ -15,7 +15,7 @@ public class FtpUploadConfig implements ConnectorConfig<FtpConnector> {
     private FtpConnector connector;
 
     @ConfigFieldInfo(label = "Ftp 连接器", inputType = FieldInputType.Connector, connectorType = FtpConnector.class)
-    private Long connectorId;
+    private String connectorId;
 
     @ConfigFieldInfo(label = "如果文件已存在", inputType = FieldInputType.Select, defaultValue = "Override")
     private FileExist fileExist;

@@ -21,9 +21,9 @@ import java.util.Map;
  */
 public interface ModelManagementService {
 
-    Long createModel(ModelDTO modelModel);
+    String createModel(ModelDTO modelModel);
 
-    void deleteModel(Long modelId);
+    void deleteModel(String modelId);
 
     ModelDTO updateModel(ModelDTO modelModel);
 
@@ -31,37 +31,37 @@ public interface ModelManagementService {
 
     List<ModelDTO> list();
 
-    List<ModelDTO> listByModuleId(Long moduleId);
+    List<ModelDTO> listByModuleId(String moduleId);
 
     List<ModelDTO> listEditableModel();
 
-    List<ModelDTO> listEditableModelByModuleId(Long moduleId);
+    List<ModelDTO> listEditableModelByModuleId(String moduleId);
 
-    List<BasicModelInfo> listBasicInfoByModuleId(Long moduleId);
+    List<BasicModelInfo> listBasicInfoByModuleId(String moduleId);
 
-    Map<String, ClassificationModel> listClassificationModels(Long moduleId);
+    Map<String, ClassificationModel> listClassificationModels(String moduleId);
 
-    ModelEntity getById(Long modelId);
+    ModelEntity getById(String modelId);
 
     ModelEntity getByNameAndServiceId(String name, String serviceId);
 
-    JsonSchema importExcel(MultipartFile file, Long id);
+    JsonSchema importExcel(MultipartFile file, String id);
 
     JsonSchema importExcelNoneId(MultipartFile file);
 
-    Map<Long, Map<String, JsonSchema>> multiImportExcel(MultipartFile file, String modelType);
+    Map<String, Map<String, JsonSchema>> multiImportExcel(MultipartFile file, String modelType);
 
-    DalaranModelSchema importDataTemplate(DataTemplate dataTemplate, Long id);
+    DalaranModelSchema importDataTemplate(DataTemplate dataTemplate, String id);
 
-    DalaranModelSchema importDalaranSchema(DalaranModelSchema schema, Long id);
+    DalaranModelSchema importDalaranSchema(DalaranModelSchema schema, String id);
 
-    DalaranModelTemplate buildDataTemplate(DalaranModelSchema schema, Long id);
+    DalaranModelTemplate buildDataTemplate(DalaranModelSchema schema, String id);
 
-    Map<String, String> suggestMapping(Long sourceId, Long targetId);
+    Map<String, String> suggestMapping(String sourceId, String targetId);
 
     ResponseEntity<Resource> downloadExcelTemplate();
 
-    DalaranModelSchema importModelTemplate(DataTemplate dataTemplate, Long id);
+    DalaranModelSchema importModelTemplate(DataTemplate dataTemplate, String id);
 
     DalaranModelSchema importDataTemplateByType(DataTemplate dataTemplate, String type);
 

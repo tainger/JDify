@@ -7,14 +7,14 @@ import java.util.List;
 
 public interface FunctionService {
 
-    Long create(FunctionDTO functionDTO);
+    String create(FunctionDTO functionDTO);
 
     FunctionDTO update(FunctionDTO functionDTO);
 
-    void delete(Long functionId);
+    void delete(String functionId);
 
-    FunctionDTO detail(Long functionId);
+    FunctionDTO detail(String functionId);
 
-    List<BasicFunctionInfo> listBasicInfoByModuleId(Long moduleId);
+    List<BasicFunctionInfo> listBasicInfoByModuleId(String moduleId);
 
 }

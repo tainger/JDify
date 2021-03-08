@@ -40,7 +40,7 @@ public class ComponentManagementServiceImpl implements ComponentManagementServic
     private ServiceManagement serviceManagement;
 
     @Override
-    public Long create(ComponentDTO componentDTO) {
+    public String create(ComponentDTO componentDTO) {
         String componentConfig = componentDTO.getConfig();
         try {
             switch (componentDTO.getType()){
@@ -102,7 +102,7 @@ public class ComponentManagementServiceImpl implements ComponentManagementServic
     }
 
     @Override
-    public void delete(BasicComponentType componentType, Long componentId) {
+    public void delete(BasicComponentType componentType, String componentId) {
         try {
             switch (componentType){
                 case Flow:
@@ -140,7 +140,7 @@ public class ComponentManagementServiceImpl implements ComponentManagementServic
     }
 
     @Override
-    public Object detail(BasicComponentType componentType, Long componentId) {
+    public Object detail(BasicComponentType componentType, String componentId) {
         return null;
     }
 }

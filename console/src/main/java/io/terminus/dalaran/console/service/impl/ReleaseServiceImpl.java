@@ -110,7 +110,7 @@ public class ReleaseServiceImpl implements ReleaseService {
 
         List<ModuleEntity> moduleEntities = moduleRepository.findByIsExistTrue();
         List<TriggerFlowReleasedEntity> releasedTriggerFlowEntities = new ArrayList<>();
-        moduleEntities.stream().forEach(moduleEntity -> releasedTriggerFlowEntities.addAll(toReleasedData(triggerFlowRepository.findByModuleIdAndIsExistTrue(moduleEntity.getId()),TriggerFlowReleasedEntity.class, requestDTO.getVersion())));
+        moduleEntities.stream().forEach(moduleEntity -> releasedTriggerFlowEntities.addAll(toReleasedData(triggerFlowRepository.findByModuleIdAndIsExistTrue(moduleEntity.getResourceKey()),TriggerFlowReleasedEntity.class, requestDTO.getVersion())));
        // List<TriggerFlowReleasedEntity> releasedTriggerFlowEntities = toReleasedData(triggerFlowRepository.findAll(), TriggerFlowReleasedEntity.class, requestDTO.getVersion());
         triggerFlowReleasedRepository.saveAll(releasedTriggerFlowEntities);
 
@@ -159,8 +159,8 @@ public class ReleaseServiceImpl implements ReleaseService {
     @Override
     public List<ReleaseFlowDTO> listReleasedTriggerFlowDTO(String version) {
         List<ModuleEntity> moduleEntities = moduleRepository.findByIsExistTrue();
-        Map<Long, String> map = new HashMap<>();
-        moduleEntities.forEach(moduleEntity -> map.put(moduleEntity.getId(), moduleEntity.getName()));
+        Map<String, String> map = new HashMap<>();
+        moduleEntities.forEach(moduleEntity -> map.put(moduleEntity.getResourceKey(), moduleEntity.getName()));
         List<ReleaseFlowDTO> triggerFlowDTOS = triggerFlowReleasedRepository.findByVersion(version).stream().map(flowConvertor::releaseToDTOAndModuleName).collect(Collectors.toList());
         triggerFlowDTOS.forEach(triggerFlowDTO -> triggerFlowDTO.setModuleName(map.get(triggerFlowDTO.getModuleId())));
         return triggerFlowDTOS;
@@ -177,7 +177,7 @@ public class ReleaseServiceImpl implements ReleaseService {
     }
 
     @Override
-    public ModelReleasedEntity getReleasedModel(String version, Long modelId) {
+    public ModelReleasedEntity getReleasedModel(String version, String modelId) {
         return modelReleasedRepository.findByVersionAndOriginId(version, modelId);
     }
 
@@ -229,8 +229,9 @@ public class ReleaseServiceImpl implements ReleaseService {
                 T releasedEntity = releasedType.newInstance();
                 BeanUtils.copyProperties(entity, releasedEntity);
                 releasedEntity.setId(null);
-                releasedEntity.setOriginId(entity.getId());
+                releasedEntity.setOriginId(entity.getResourceKey());
                 releasedEntity.setVersion(version);
+                releasedEntity.setResourceKey(entity.getResourceKey() + version);
                 return releasedEntity;
             } catch (InstantiationException | IllegalAccessException e) {
                 e.printStackTrace();

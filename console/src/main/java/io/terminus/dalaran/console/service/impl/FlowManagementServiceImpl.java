@@ -7,15 +7,14 @@ import io.terminus.dalaran.console.TestFlowInitializer;
 import io.terminus.dalaran.console.convertor.FlowConvertor;
 import io.terminus.dalaran.console.entity.ModelEntity;
 import io.terminus.dalaran.console.entity.TriggerFlowEntity;
-import io.terminus.dalaran.console.exception.DalaranExceptionBuilder;
 import io.terminus.dalaran.console.repository.ModelRepository;
 import io.terminus.dalaran.console.repository.PropertyRepository;
 import io.terminus.dalaran.console.repository.TriggerFlowRepository;
 import io.terminus.dalaran.console.service.FlowManagementService;
 import io.terminus.dalaran.console.service.ModelManagementService;
 import io.terminus.dalaran.console.service.jpa.FlowQueryService;
+import io.terminus.dalaran.console.util.ResourceKeyUtils;
 import io.terminus.dalaran.core.context.DalaranContext;
-import io.terminus.dalaran.core.context.support.DefaultDalaranCamelContext;
 import io.terminus.dalaran.core.flow.DalaranFlowBuilder;
 import io.terminus.dalaran.core.resource.DalaranResourceBuilder;
 import io.terminus.dalaran.core.resource.entity.common.ProcessorEntity;
@@ -104,27 +103,27 @@ public class FlowManagementServiceImpl implements FlowManagementService {
     }
 
     @Override
-    public Long saveFlow(TriggerFlowEntity flowEntity) {
+    public String saveFlow(TriggerFlowEntity flowEntity) {
         setFlowStatus(flowEntity);
-        Long id = flowRepository.save(flowEntity).getId();
+        String id = flowRepository.save(flowEntity).getResourceKey();
         // TODO 这里依赖 loader 有点怪 而且可以异步
         if (flowEntity.getStatus() != FlowStatus.Error) {
-            testFlowInitializer.reloadTestTriggerFlow(flowEntity.getId());
+            testFlowInitializer.reloadTestTriggerFlow(id);
         }
         return id;
     }
 
     @Override
-    public Long createFlow(TriggerFlowDTO flowModel) {
+    public String createFlow(TriggerFlowDTO flowModel) {
         TriggerFlowEntity flowEntity = new TriggerFlowEntity();
         buildEntity(flowModel, flowEntity);
         setFlowStatus(flowEntity);
         setCreatedBy(flowEntity);
         flowEntity.setOnline(true);
-        Long id = flowRepository.save(flowEntity).getId();
+        String id = flowRepository.save(flowEntity).getResourceKey();
         // TODO 这里依赖 loader 有点怪 而且可以异步
         if (flowEntity.getStatus() != FlowStatus.Error) {
-            testFlowInitializer.reloadTestTriggerFlow(flowEntity.getId());
+            testFlowInitializer.reloadTestTriggerFlow(id);
         }
         return id;
     }
@@ -137,7 +136,7 @@ public class FlowManagementServiceImpl implements FlowManagementService {
         List<String> existModels = checkExistModels(importInfo);
         if (!existModels.isEmpty()) {
             result.setExistModels(existModels);
-            result.setFlowId(-1L);
+            result.setFlowId("");
             return result;
         }
         TriggerFlowDTO triggerFlowDTO = new TriggerFlowDTO();
@@ -145,14 +144,14 @@ public class FlowManagementServiceImpl implements FlowManagementService {
         ModelDTO inModel = importInfo.getInModel();
         if (inModel != null) {
             inModel.setModuleId(importInfo.getModuleId());
-            Long modelId = importModel(inModel, importInfo.getImportMode());
+            String modelId = importModel(inModel, importInfo.getImportMode());
             config.put("inModelId", modelId);
             triggerFlowDTO.setInModelId(modelId);
         }
         ModelDTO outModel = importInfo.getOutModel();
         if (outModel != null) {
             outModel.setModuleId(importInfo.getModuleId());
-            Long modelId = importModel(outModel, importInfo.getImportMode());
+            String modelId = importModel(outModel, importInfo.getImportMode());
             config.put("outModelId", modelId);
             triggerFlowDTO.setOutModelId(modelId);
         }
@@ -162,6 +161,7 @@ public class FlowManagementServiceImpl implements FlowManagementService {
         triggerFlowDTO.setModuleId(importInfo.getModuleId());
         triggerFlowDTO.setName(importInfo.getName());
         triggerFlowDTO.setDescription(importInfo.getDescription());
+
         List<ProcessorDTO> pipeline = new ArrayList<>();
         if (StringUtils.isNotBlank(importInfo.getProcessorType())) {
             ProcessorDTO processor = new ProcessorDTO();
@@ -171,7 +171,7 @@ public class FlowManagementServiceImpl implements FlowManagementService {
             ModelDTO processorInModel = importInfo.getProcessorInModel();
             if (processorInModel != null) {
                 processorInModel.setModuleId(importInfo.getModuleId());
-                Long modelId = importModel(processorInModel, importInfo.getImportMode());
+                String modelId = importModel(processorInModel, importInfo.getImportMode());
                 processor.getConfig().put("inModelId", modelId);
                 if (inModel != null) {
                     ProcessorDTO inMapper = new ProcessorDTO();
@@ -188,7 +188,7 @@ public class FlowManagementServiceImpl implements FlowManagementService {
             ModelDTO processorOutModel = importInfo.getProcessorOutModel();
             if (processorOutModel != null) {
                 processorOutModel.setModuleId(importInfo.getModuleId());
-                Long modelId = importModel(processorOutModel, importInfo.getImportMode());
+                String modelId = importModel(processorOutModel, importInfo.getImportMode());
                 processor.getConfig().put("outModelId", modelId);
                 if (outModel != null) {
                     ProcessorDTO outMapper = new ProcessorDTO();
@@ -203,7 +203,7 @@ public class FlowManagementServiceImpl implements FlowManagementService {
             }
         }
         triggerFlowDTO.setPipeline(pipeline);
-        Long flowId = createFlow(triggerFlowDTO);
+        String flowId = createFlow(triggerFlowDTO);
         result.setFlowId(flowId);
         return result;
     }
@@ -220,13 +220,13 @@ public class FlowManagementServiceImpl implements FlowManagementService {
         ModelDTO inModel = importInfo.getInModel();
         if (inModel != null) {
             inModel.setModuleId(importInfo.getModuleId());
-            Long modelId = importModel(inModel, importInfo.getImportMode());
+            String modelId = importModel(inModel, importInfo.getImportMode());
             config.put("inModelId", modelId);
         }
         ModelDTO outModel = importInfo.getOutModel();
         if (outModel != null) {
             outModel.setModuleId(importInfo.getModuleId());
-            Long modelId = importModel(outModel, importInfo.getImportMode());
+            String modelId = importModel(outModel, importInfo.getImportMode());
             config.put("outModelId", modelId);
         }
         ProcessorDTO processor = new ProcessorDTO();
@@ -244,43 +244,42 @@ public class FlowManagementServiceImpl implements FlowManagementService {
         ModelDTO inModel = importInfo.getInModel();
         if (inModel != null) {
             inModel.setModuleId(importInfo.getModuleId());
-            ModelEntity inModelEntity = modelRepository.findByModuleIdAndModelKey(importInfo.getModuleId(), inModel.getModelKey());
+            ModelEntity inModelEntity = modelRepository.findByModuleIdAndResourceKey(importInfo.getModuleId(), inModel.getId());
             if (inModelEntity != null) {
-                existModels.add(inModelEntity.getModelKey());
+                existModels.add(inModelEntity.getResourceKey());
             }
         }
         ModelDTO outModel = importInfo.getOutModel();
         if (outModel != null) {
             outModel.setModuleId(importInfo.getModuleId());
-            ModelEntity outModelEntity = modelRepository.findByModuleIdAndModelKey(importInfo.getModuleId(), outModel.getModelKey());
+            ModelEntity outModelEntity = modelRepository.findByModuleIdAndResourceKey(importInfo.getModuleId(), outModel.getId());
             if (outModelEntity != null) {
-                existModels.add(outModelEntity.getModelKey());
+                existModels.add(outModelEntity.getResourceKey());
             }
         }
         return existModels;
     }
 
-    private Long importModel(ModelDTO model, ModelImportMode importMode) {
-        ModelEntity outModelEntity = modelRepository.findByModuleIdAndModelKey(model.getModuleId(), model.getModelKey());
+    private String importModel(ModelDTO model, ModelImportMode importMode) {
+        ModelEntity outModelEntity = modelRepository.findByModuleIdAndResourceKey(model.getModuleId(), model.getId());
         if (outModelEntity == null) {
             return modelService.createModel(model);
         } else if (importMode == ModelImportMode.Overwrite) {
-            model.setId(outModelEntity.getId());
+            model.setId(outModelEntity.getResourceKey());
             modelService.updateModel(model);
             return model.getId();
         } else if (importMode == ModelImportMode.Rename) {
             String randomId = RandomStringUtils.randomAlphanumeric(6);
+            model.setId(randomId);
             model.setName(model.getName() + "-" + randomId);
-            model.setModelKey(model.getModelKey() + "-" + randomId);
             return modelService.createModel(model);
         }
         return null;
     }
 
     @Override
-    public void deleteFlow(Long flowId) {
-        Optional<TriggerFlowEntity> flowEntityOptional = flowRepository.findById(flowId);
-        TriggerFlowEntity flowEntity = flowEntityOptional.get();
+    public void deleteFlow(String flowId) {
+        TriggerFlowEntity flowEntity = flowRepository.findByResourceKey(flowId);
         flowEntity.setExist(false);
         flowRepository.save(flowEntity);
 //        dalaranContext.removeFlow(FLOW_PREFIX + flowId);
@@ -292,17 +291,13 @@ public class FlowManagementServiceImpl implements FlowManagementService {
         if (flowModel.getId() == null) {
             throw new FlowNotExistException();
         }
-        Optional<TriggerFlowEntity> flowEntityOptional = flowRepository.findById(flowModel.getId());
-        if (!flowEntityOptional.isPresent()) {
-            throw new FlowNotExistException();
-        }
-        TriggerFlowEntity flowEntity = flowEntityOptional.get();
+        TriggerFlowEntity flowEntity = flowRepository.findByResourceKey(flowModel.getId());
         buildEntity(flowModel, flowEntity);
         setFlowStatus(flowEntity);
         setUpdatedBy(flowEntity);
         flowRepository.save(flowEntity);
         // TODO 这里依赖 loader 有点怪 而且可以异步
-        testFlowInitializer.reloadTestTriggerFlow(flowEntity.getId());
+        testFlowInitializer.reloadTestTriggerFlow(flowEntity.getResourceKey());
         return flowModel;
     }
 
@@ -318,7 +313,7 @@ public class FlowManagementServiceImpl implements FlowManagementService {
     }
 
     @Override
-    public List<TriggerFlowDTO> queryByProcessorIds(List<Long> processorIds) {
+    public List<TriggerFlowDTO> queryByProcessorIds(List<String> processorIds) {
         List<TriggerFlowEntity> entities = flowQueryService.queryByProcessorIds(processorIds);
         List<TriggerFlowDTO> models = new LinkedList<>();
         for (TriggerFlowEntity entity : entities) {
@@ -329,21 +324,21 @@ public class FlowManagementServiceImpl implements FlowManagementService {
     }
 
     @Override
-    public List<BasicFlowInfo> listBasicFlowInfoByModuleId(Long moduleId) {
+    public List<BasicFlowInfo> listBasicFlowInfoByModuleId(String moduleId) {
         return flowQueryService.listBasicInfoByModuleId(moduleId);
     }
 
     @Nullable
     @Override
-    public TriggerFlowDTO getById(Long flowId) {
-        Optional<TriggerFlowEntity> flowEntityOptional = flowRepository.findById(flowId);
-        return flowEntityOptional.map(flowConvertor::toDTO).orElse(null);
+    public TriggerFlowDTO getById(String flowId) {
+        TriggerFlowEntity flowEntity = flowRepository.findByResourceKey(flowId);
+        return flowConvertor.toDTO(flowEntity);
     }
 
     @Nullable
     @Override
-    public TriggerFlowDTO getByIdVersion(Long flowId,String version) throws FlowNotExistException{
-        TriggerFlowReleasedEntity triggerFlowReleasedEntity = triggerFlowReleasedRepository.findByVersionAndOriginId(version,flowId);
+    public TriggerFlowDTO getByIdVersion(String flowId, String version) throws FlowNotExistException{
+        TriggerFlowReleasedEntity triggerFlowReleasedEntity = triggerFlowReleasedRepository.findByVersionAndOriginId(version, flowId);
         if (triggerFlowReleasedEntity == null) {
             throw new FlowNotExistException();
         }
@@ -351,17 +346,16 @@ public class FlowManagementServiceImpl implements FlowManagementService {
     }
 
     @Override
-    public Long copyFlow(CopyFlow copyFlow) throws FlowNotExistException {
-        Optional<TriggerFlowEntity> flowEntityOptional = flowRepository.findById(copyFlow.getId());
-        if (!flowEntityOptional.isPresent()) {
-            throw DalaranExceptionBuilder.build(FlowNotExistException.class, "TriggerFlow[" + copyFlow.getId() + "] not exist.");
-        }
+    public String copyFlow(CopyFlow copyFlow) throws FlowNotExistException {
+        TriggerFlowEntity flowEntity = flowRepository.findByResourceKey(copyFlow.getId());
+
         TriggerFlowEntity newFlowEntity = new TriggerFlowEntity();
-        BeanUtils.copyProperties(flowEntityOptional.get(), newFlowEntity);
+        BeanUtils.copyProperties(flowEntity, newFlowEntity);
         newFlowEntity.setId(null);
         newFlowEntity.setName(copyFlow.getName());
+        newFlowEntity.setResourceKey("copy_" + copyFlow.getId() + "_" + RandomStringUtils.random(4, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMN"));
         flowRepository.save(newFlowEntity);
-        return newFlowEntity.getId();
+        return newFlowEntity.getResourceKey();
     }
 
     @Override
@@ -398,15 +392,11 @@ public class FlowManagementServiceImpl implements FlowManagementService {
     }
 
     public ResponseResult isOnline(TriggerFlowDTO flowDTO, boolean isOnline) {
-        Long flowId = flowDTO.getId();
+        String flowId = flowDTO.getId();
         if (flowId == null) {
             return fail(ResponseErrorMsg.FLOW_ID_NULL);
         }
-        Optional<TriggerFlowEntity> triggerFlowEntityOptional = flowRepository.findById(flowId);
-        if (!triggerFlowEntityOptional.isPresent()) {
-            return fail(ResponseErrorMsg.FLOW_IS_NULL);
-        }
-        TriggerFlowEntity triggerFlowEntity = triggerFlowEntityOptional.get();
+        TriggerFlowEntity triggerFlowEntity = flowRepository.findByResourceKey(flowId);
         triggerFlowEntity.setOnline(isOnline);
         flowRepository.save(triggerFlowEntity);
         return success();
@@ -454,19 +444,24 @@ public class FlowManagementServiceImpl implements FlowManagementService {
         flowEntity.setTriggerConfig(JSON.toJSONString(triggerFlow.getTriggerConfig()));
         flowEntity.setModuleId(triggerFlow.getModuleId());
         if (triggerFlow.getTriggerConfig().get("inModelId") != null) {
-            flowEntity.setInModel(Long.valueOf(JSON.toJSONString(triggerFlow.getTriggerConfig().get("inModelId"))));
+            flowEntity.setInModel((JSON.toJSONString(triggerFlow.getTriggerConfig().get("inModelId"))));
         }
         if (triggerFlow.getTriggerConfig().get("outModelId") != null) {
-            flowEntity.setOutModel(Long.valueOf(JSON.toJSONString(triggerFlow.getTriggerConfig().get("outModelId"))));
+            flowEntity.setOutModel((JSON.toJSONString(triggerFlow.getTriggerConfig().get("outModelId"))));
         }
         flowEntity.setPipeline(pipeline);
         flowEntity.setTracing(triggerFlow.isTracing());
         flowEntity.setDescription(triggerFlow.getDescription());
+        String resourceKey = triggerFlow.getId();
+        if (StringUtils.isBlank(resourceKey)) {
+            resourceKey = ResourceKeyUtils.generateKey();
+        }
+        flowEntity.setResourceKey(resourceKey);
     }
 
     private ModelDTO buildModelEntity(ModelEntity entity) {
         ModelDTO model = new ModelDTO();
-        model.setId(entity.getId());
+        model.setId(entity.getResourceKey());
         model.setModelType(entity.getType());
         model.setModelSchema(JSON.parseObject(entity.getModelSchema(), Map.class));
         model.setName(entity.getName());

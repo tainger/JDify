@@ -3,6 +3,7 @@ package io.terminus.dalaran.console.rest;
 import io.terminus.dalaran.console.ResponseMessage;
 import io.terminus.dalaran.console.exception.OnException;
 import io.terminus.dalaran.console.service.ModuleManagementService;
+import io.terminus.dalaran.model.CreateResponse;
 import io.terminus.dalaran.model.dto.ModuleDTO;
 import io.terminus.dalaran.model.dto.ModuleDetailDTO;
 import io.terminus.dalaran.model.query.ModuleQuery;
@@ -31,8 +32,8 @@ public class ModuleManagementRest implements ModuleReadAPI, ModuleWriteAPI {
 
     @Override
     @OnException(code = ResponseMessage.MODULE_CREATE_ERROR)
-    public Long create(@RequestBody ModuleDTO model) {
-        return moduleManagementService.createModule(model);
+    public CreateResponse create(@RequestBody ModuleDTO model) {
+        return new CreateResponse(moduleManagementService.createModule(model));
     }
 
     @Override
@@ -43,7 +44,7 @@ public class ModuleManagementRest implements ModuleReadAPI, ModuleWriteAPI {
 
     @Override
     @OnException(code = ResponseMessage.MODULE_DELETE_ERROR)
-    public void deleteById(@RequestParam Long id) {
+    public void deleteById(@RequestParam String id) {
         moduleManagementService.deleteModule(id);
     }
 
@@ -55,7 +56,7 @@ public class ModuleManagementRest implements ModuleReadAPI, ModuleWriteAPI {
 
     @Override
     @OnException(code = ResponseMessage.MODULE_QUERY_ERROR)
-    public ModuleDetailDTO moduleDetail(@PathVariable Long id) {
+    public ModuleDetailDTO moduleDetail(@PathVariable String id) {
         return moduleManagementService.getModuleDetail(id);
     }
 }

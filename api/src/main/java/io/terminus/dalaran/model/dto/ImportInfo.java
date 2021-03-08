@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 public class ImportInfo {
-    private Long moduleId;
+    private String moduleId;
     private ModelImportMode importMode;
     private ModelDTO inModel;
     private ModelDTO outModel;

@@ -208,10 +208,10 @@ public class ExportServiceImpl implements ExportService {
         List<TriggerFlowEntity> restFlowList = triggerFlowRepository.findByStatusNotAndTriggerTypeAndIsExistTrue(FlowStatus.Error, triggerType);
         Map<String, List<TriggerFlow>> moduleTriggerFlowList = new HashMap<>();
         for (TriggerFlowEntity flowEntity : restFlowList) {
-            Optional<ModuleEntity> moduleOptional = moduleRepository.findById(flowEntity.getModuleId());
+            ModuleEntity moduleEntity = moduleRepository.findByResourceKey(flowEntity.getModuleId());
             String moduleName;
-            if (moduleOptional.isPresent()) {
-                moduleName = moduleOptional.get().getName();
+            if (moduleEntity != null) {
+                moduleName = moduleEntity.getName();
             } else {
                 moduleName = "unknown";
             }
@@ -225,7 +225,7 @@ public class ExportServiceImpl implements ExportService {
     private List<ApiInfo> getExportApiInfoList() {
         List<TriggerFlowEntity> restFlowList = triggerFlowRepository.findByStatusNotAndTriggerTypeAndIsExistTrue(FlowStatus.Error, "http-rest-listener");
         return restFlowList.stream().map(flowEntity -> {
-            ModuleEntity module = moduleRepository.findById(flowEntity.getModuleId()).get();
+            ModuleEntity module = moduleRepository.findByResourceKey(flowEntity.getModuleId());
             TriggerFlow triggerFlow = resourceBuilder.buildTriggerFlow(flowEntity);
             return new ApiInfo(module.getName(), triggerFlow);
         }).collect(Collectors.toList());
@@ -235,14 +235,10 @@ public class ExportServiceImpl implements ExportService {
         List<TriggerFlowEntity> restFlowList = triggerFlowRepository.findByStatusNotAndTriggerTypeAndIsExistTrue(FlowStatus.Error, "http-rest-listener");
         List<ApiInfo> apiInfo = new ArrayList<>();
         restFlowList.stream().forEach(flowEntity -> {
-            Optional<ModuleEntity> optional = moduleRepository.findById(flowEntity.getModuleId());
-            ModuleEntity module = new ModuleEntity();
-            if(optional!=null && optional.isPresent()) {
-                module = optional.get();
-            }
+            ModuleEntity moduleEntity = moduleRepository.findByResourceKey(flowEntity.getModuleId());
             TriggerFlow triggerFlow = resourceBuilder.buildTriggerFlow(flowEntity);
             if(triggerFlow.getInModel()!=null && triggerFlow.getOutModel()!=null) {
-                apiInfo.add(new ApiInfo(module.getName(), triggerFlow));
+                apiInfo.add(new ApiInfo(moduleEntity.getName(), triggerFlow));
             }
         });
         return apiInfo;

@@ -16,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -55,15 +54,11 @@ public class ElasticJobServiceImpl implements ElasticJobService {
     }
 
     public ResponseResult updateStatus(ElasticJobInfo elasticJobInfo, boolean isOnline) {
-        Long flowId = elasticJobInfo.getFlowId();
+        String flowId = elasticJobInfo.getFlowId();
         if (flowId == null) {
             return fail(ResponseErrorMsg.FLOW_ID_NULL);
         }
-        Optional<TriggerFlowEntity> triggerFlowEntityOptional = triggerFlowRepository.findById(flowId);
-        if (!triggerFlowEntityOptional.isPresent()) {
-            return fail(ResponseErrorMsg.FLOW_IS_NULL);
-        }
-        TriggerFlowEntity triggerFlowEntity = triggerFlowEntityOptional.get();
+        TriggerFlowEntity triggerFlowEntity = triggerFlowRepository.findByResourceKey(flowId);
         triggerFlowEntity.setOnline(isOnline);
         triggerFlowRepository.save(triggerFlowEntity);
         return success();
@@ -85,7 +80,7 @@ public class ElasticJobServiceImpl implements ElasticJobService {
     private ElasticJobInfo buildJobInfo(TriggerFlowEntity entity) {
         ElasticJobInfo elasticJobInfo;
         elasticJobInfo = JSONObject.parseObject(entity.getTriggerConfig(), ElasticJobInfo.class);
-        elasticJobInfo.setFlowId(entity.getId());
+        elasticJobInfo.setFlowId(entity.getResourceKey());
         elasticJobInfo.setOnline(entity.isOnline());
         return elasticJobInfo;
     }

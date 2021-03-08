@@ -5,6 +5,7 @@ import io.terminus.dalaran.console.exception.OnException;
 import io.terminus.dalaran.console.service.SubFlowManagementService;
 import io.terminus.dalaran.console.service.TracingLogService;
 import io.terminus.dalaran.core.context.DalaranContext;
+import io.terminus.dalaran.model.CreateResponse;
 import io.terminus.dalaran.model.dto.CopyFlow;
 import io.terminus.dalaran.model.dto.TestRequestDTO;
 import io.terminus.dalaran.model.dto.flow.SubFlowDTO;
@@ -37,8 +38,8 @@ public class SubFlowManagementRest implements SubFlowReadAPI, SubFlowWriteAPI {
 
     @Override
     @OnException(code = ResponseMessage.SUB_FLOW_CREATE_ERROR)
-    public Long create(@RequestBody SubFlowDTO model) {
-        return service.createFlow(model);
+    public CreateResponse create(@RequestBody SubFlowDTO model) {
+        return new CreateResponse(service.createFlow(model));
     }
 
     @Override
@@ -49,19 +50,19 @@ public class SubFlowManagementRest implements SubFlowReadAPI, SubFlowWriteAPI {
 
     @Override
     @OnException(code = ResponseMessage.SUB_FLOW_DELETE_ERROR)
-    public void deleteById(@RequestParam Long id) {
+    public void deleteById(@RequestParam String id) {
         service.deleteFlow(id);
     }
 
     @Override
     @OnException(code = ResponseMessage.SUB_FLOW_COPY_ERROR)
-    public Long copy(@RequestBody CopyFlow copyFlow) {
-        return service.copyFlow(copyFlow);
+    public CreateResponse copy(@RequestBody CopyFlow copyFlow) {
+        return new CreateResponse(service.copyFlow(copyFlow));
     }
 
     @Override
     @OnException(code = ResponseMessage.SUB_FLOW_QUERY_ERROR)
-    public SubFlowDTO getById(@PathVariable Long id) {
+    public SubFlowDTO getById(@PathVariable String id) {
         return service.getById(id);
     }
 
