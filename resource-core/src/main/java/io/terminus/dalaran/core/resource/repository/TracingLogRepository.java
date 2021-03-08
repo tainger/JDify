@@ -20,7 +20,7 @@ public interface TracingLogRepository extends JpaRepository<TracingLogEntity, Lo
 
     void deleteByCreatedAtBefore(Date datetime);
 
-    List<TracingLogEntity> findByFlowIdAndVersion(Long flowId, String version);
+    List<TracingLogEntity> findByFlowIdAndVersion(String flowId, String version);
 
-    List<TracingLogEntity> findByFlowIdAndVersionAndSuccessful(Long flowId, String version, boolean successful);
+    List<TracingLogEntity> findByFlowIdAndVersionAndSuccessful(String flowId, String version, boolean successful);
 }

@@ -21,7 +21,6 @@ import io.terminus.dalaran.model.query.FlowQuery;
 import io.terminus.dalaran.response.ResponseResult;
 import io.terminus.dalaran.rest.read.FlowReadAPI;
 import io.terminus.dalaran.rest.write.FlowWriteAPI;
-import org.apache.camel.CamelContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;

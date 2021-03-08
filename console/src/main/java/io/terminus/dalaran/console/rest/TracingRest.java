@@ -37,7 +37,7 @@ public class TracingRest implements TracingReadAPI {
     }
 
     @OnException(code = ResponseMessage.TRACE_QUERY_ERROR)
-    public DetailLogDTO logDetailById(@PathVariable Long id) {
+    public DetailLogDTO logDetailById(@PathVariable String id) {
         return tracingLogService.logDetailById(id);
     }
 }

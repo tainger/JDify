@@ -201,7 +201,7 @@ public class DefaultDalaranCamelContext implements DalaranContext<DalaranRoute> 
     }
 
     @Override
-    public void trigger(Long flowId) {
+    public void trigger(String flowId) {
         String recordId = nextRecordId();
         if (camelContext.getRoute(TEST_FLOW_PREFIX + FLOW_PREFIX + flowId) == null) {
             throw new RuntimeException("Trigger error! This flow can't be loaded into test service, please check it.");

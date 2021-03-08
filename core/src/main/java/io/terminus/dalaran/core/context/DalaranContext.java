@@ -45,7 +45,7 @@ public interface DalaranContext<T> {
 
     void addRoute(T route);
 
-    void trigger(Long flowId);
+    void trigger(String flowId);
 
     DalaranComponentContext getDalaranComponentContext();
 

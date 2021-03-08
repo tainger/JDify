@@ -16,5 +16,5 @@ public interface TracingLogService {
 
     MainLogDTO getRecordDetail(String recordId);
 
-    DetailLogDTO logDetailById(Long id);
+    DetailLogDTO logDetailById(String id);
 }

@@ -30,10 +30,7 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.transaction.Transactional;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.TimeZone;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -96,7 +93,7 @@ public class TracingLogServiceImpl implements TracingLogService {
     }
 
     @Override
-    public DetailLogDTO logDetailById(Long flowId) {
+    public DetailLogDTO logDetailById(String flowId) {
         DetailLogDTO detailLogDTO = new DetailLogDTO();
         ReleaseRecordEntity releaseRecordEntity = releaseRecordRepository.findByEnabledTrue();
         if (releaseRecordEntity == null) {
@@ -254,7 +251,7 @@ public class TracingLogServiceImpl implements TracingLogService {
         return detailLogDTO;
     }
 
-    public TimeLogDTO getElapsedTime(Long flowId, String version) {
+    public TimeLogDTO getElapsedTime(String flowId, String version) {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<TimeLogDTO> criteriaQuery = builder.createQuery(TimeLogDTO.class);
         Root<TracingLogEntity> root = criteriaQuery.from(TracingLogEntity.class);
@@ -270,7 +267,7 @@ public class TracingLogServiceImpl implements TracingLogService {
         return entityManager.createQuery(criteriaQuery).getSingleResult();
     }
 
-    public List getMaxTimeRecordId(Long flowId, String version, Long maxTime) {
+    public List getMaxTimeRecordId(String flowId, String version, Long maxTime) {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<String> criteriaQuery = builder.createQuery(String.class);
         Root<TracingLogEntity> root = criteriaQuery.from(TracingLogEntity.class);
@@ -287,7 +284,7 @@ public class TracingLogServiceImpl implements TracingLogService {
         return entityManager.createQuery(criteriaQuery).getResultList();
     }
 
-    public Long getLastExceptionDate(Long flowId, String version) {
+    public Long getLastExceptionDate(String flowId, String version) {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<Long> criteriaQuery = builder.createQuery(Long.class);
         Root<TracingLogEntity> root = criteriaQuery.from(TracingLogEntity.class);
@@ -304,7 +301,7 @@ public class TracingLogServiceImpl implements TracingLogService {
         return entityManager.createQuery(criteriaQuery).getSingleResult();
     }
 
-    public String getLastExceptionRecordId(Long flowId, String version, Long timeStamp) {
+    public String getLastExceptionRecordId(String flowId, String version, Long timeStamp) {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<String> criteriaQuery = builder.createQuery(String.class);
         Root<TracingLogEntity> root = criteriaQuery.from(TracingLogEntity.class);
