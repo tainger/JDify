@@ -258,7 +258,7 @@ public class ReleasedFlowInitializer implements DalaranStarter {
                 noticeMessage.setFailureFrequency(elapseCount);
             }
         }
-        TriggerFlowReleasedEntity triggerFlowReleasedEntity = triggerFlowReleasedRepository.findByVersionAndOriginId(resourceLoader.getVersion(), flowId);
+        TriggerFlowReleasedEntity triggerFlowReleasedEntity = triggerFlowReleasedRepository.findByVersionAndOriginId(resourceLoader.getVersion(), String.valueOf(flowId));
         noticeMessage.setFlowName(triggerFlowReleasedEntity.getName());
         return noticeMessage;
     }
@@ -267,7 +267,7 @@ public class ReleasedFlowInitializer implements DalaranStarter {
         alarmConfig = new HashMap<> ();
         List<TriggerFlowReleasedEntity> triggerFlowEntities = triggerFlowReleasedRepository.findByVersionAndIsMonitorTrue(version);
         for (TriggerFlowReleasedEntity triggerFlowReleasedEntity : triggerFlowEntities) {
-            Long id = triggerFlowReleasedEntity.getOriginId();
+            Long id = Long.valueOf(triggerFlowReleasedEntity.getOriginId());
             Long alarmRuleId = triggerFlowReleasedEntity.getAlarmId();
             alarmConfig.put(id, alarmRuleId);
         }
