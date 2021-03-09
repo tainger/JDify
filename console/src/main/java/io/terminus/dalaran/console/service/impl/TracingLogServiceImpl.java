@@ -263,13 +263,13 @@ public class TracingLogServiceImpl implements TracingLogService {
 
     private DetailLogDTO buildDetailLog(TriggerFlowReleasedEntity entity) {
         List<ModuleEntity> moduleEntities = moduleRepository.findByIsExistTrue();
-        Map<Long, String> map = new HashMap<>();
-        moduleEntities.forEach(moduleEntity -> map.put(moduleEntity.getId(), moduleEntity.getName()));
+        Map<String, String> map = new HashMap<>();
+        moduleEntities.forEach(moduleEntity -> map.put(moduleEntity.getResourceKey(), moduleEntity.getName()));
         DetailLogDTO detailLogDTO = new DetailLogDTO();
         detailLogDTO.setName(entity.getName());
         detailLogDTO.setTriggerType(entity.getTriggerType());
         detailLogDTO.setVersion(entity.getVersion());
-        detailLogDTO.setModule(map.get(entity.getModuleId()));
+        detailLogDTO.setModuleName(map.get(entity.getModuleId()));
         detailLogDTO.setOnline(entity.isOnline());
         detailLogDTO.setDescription(entity.getDescription());
         detailLogDTO.setMonitor(entity.isMonitor());

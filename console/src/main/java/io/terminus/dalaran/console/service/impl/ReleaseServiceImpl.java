@@ -1,7 +1,6 @@
 package io.terminus.dalaran.console.service.impl;
 
 import io.terminus.dalaran.console.convertor.FlowConvertor;
-import io.terminus.dalaran.console.entity.LimiterEntity;
 import io.terminus.dalaran.console.repository.*;
 import io.terminus.dalaran.console.service.ModuleManagementService;
 import io.terminus.dalaran.console.service.ReleaseService;
@@ -119,6 +118,7 @@ public class ReleaseServiceImpl implements ReleaseService {
         recordEntity.setReleaseTime(new Date());
         // TODO 需要校验是否有误, 暂时没做
         recordEntity.setSuccessful(true);
+        recordEntity.setResourceKey("key");
         releaseRecordRepository.save(recordEntity);
 
         List<ModuleEntity> moduleEntities = moduleRepository.findByIsExistTrue();

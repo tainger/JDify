@@ -11,7 +11,7 @@ public class DetailLogDTO {
 
     private String version;
 
-    private String module;
+    private String moduleName;
 
     private boolean online;
 

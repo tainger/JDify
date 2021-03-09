@@ -21,4 +21,5 @@ public interface TriggerFlowReleasedRepository extends JpaRepository<TriggerFlow
     List<TriggerFlowReleasedEntity> findByVersionAndTriggerType(String version, String triggerType);
 
     List<TriggerFlowReleasedEntity> findByVersionAndIsMonitorTrue(String version);
+
 }
