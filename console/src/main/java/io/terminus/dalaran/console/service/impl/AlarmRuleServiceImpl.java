@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import io.terminus.dalaran.console.entity.AlarmRuleEntity;
 import io.terminus.dalaran.console.repository.AlarmRuleRepository;
 import io.terminus.dalaran.console.service.AlarmRuleService;
+import io.terminus.dalaran.console.util.ResourceKeyUtils;
 import io.terminus.dalaran.core.resource.repository.ModuleRepository;
 import io.terminus.dalaran.model.dto.AlarmRuleDTO;
 import io.terminus.dalaran.model.query.AlarmRuleQuery;
@@ -91,6 +92,7 @@ public class AlarmRuleServiceImpl implements AlarmRuleService {
         alarmRuleEntity.setCreatedAt(new Date());
         alarmRuleEntity.setUpdatedAt(new Date());
         alarmRuleEntity.setConfig(JSONObject.toJSONString(alarmRuleDTO.getConfig()));
+        alarmRuleEntity.setResourceKey(ResourceKeyUtils.generateKey());
         return alarmRuleEntity;
     }
 }
