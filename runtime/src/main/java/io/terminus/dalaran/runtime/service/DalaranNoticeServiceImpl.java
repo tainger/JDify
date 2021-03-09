@@ -2,6 +2,7 @@ package io.terminus.dalaran.runtime.service;
 
 import io.terminus.common.model.Response;
 import io.terminus.dalaran.core.resource.entity.NoticeMessage;
+import io.terminus.dalaran.runtime.NoticeMessage;
 import io.terminus.notice.api.dto.EmailSendDTO;
 import io.terminus.notice.sender.email.service.EmailSenderService;
 import io.terminus.notice.sender.sms.service.SmsSenderService;
@@ -32,6 +33,7 @@ public class DalaranNoticeServiceImpl implements DalaranNoticeService{
         EmailSendDTO emailSendDTO = new EmailSendDTO();
     // 发送邮箱，选填，不填写会取默认发送邮箱，填写会覆盖默认发送邮箱
         emailSendDTO.setSenderEmail("13017135085@163.com");
+        emailSendDTO.setSenderEmail("13037135085@163.com");
     // 邮件主题，选填，部分渠道要求必填，建议填写,500字符串以内
         emailSendDTO.setSubject("mule流程报警");
 //    // 抄送列表，选填，最多1000

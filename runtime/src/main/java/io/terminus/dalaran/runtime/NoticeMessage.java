@@ -1,4 +1,4 @@
-package io.terminus.dalaran.core.resource.entity;
+package io.terminus.dalaran.runtime;
 
 import java.util.Arrays;
 import java.util.Date;

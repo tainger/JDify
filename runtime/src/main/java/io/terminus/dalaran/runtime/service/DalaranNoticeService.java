@@ -2,6 +2,8 @@ package io.terminus.dalaran.runtime.service;
 
 import io.terminus.dalaran.core.resource.entity.NoticeMessage;
 
+import io.terminus.dalaran.runtime.NoticeMessage;
+
 public interface DalaranNoticeService {
 
     void sendEmail(NoticeMessage noticeMessage);

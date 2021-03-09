@@ -1,6 +1,5 @@
 package io.terminus.dalaran.console.flow;
 
-import io.terminus.dalaran.console.service.TracingLogService;
 import io.terminus.dalaran.core.resource.repository.TracingLogRepository;
 import io.terminus.dalaran.model.dto.log.MainLogDTO;
 import io.terminus.dalaran.model.query.TracingLogQuery;

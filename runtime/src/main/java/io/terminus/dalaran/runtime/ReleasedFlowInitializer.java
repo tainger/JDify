@@ -212,8 +212,12 @@ public class ReleasedFlowInitializer implements DalaranStarter {
                 continue;
             }
             NoticeMessage noticeMessage = alarmRuleValidate(alarmRuleConfig, oneMinBeforeCurrent, now, flowId);
-            noticeMessage.setCreateDate(now);
-            sendNotice(noticeMessage, alarmChannel);
+            if (noticeMessage.getIsTouchFailureAlarm() || noticeMessage.getIsTouchTimeOutAlarm()) {
+                TriggerFlowReleasedEntity triggerFlowReleasedEntity = triggerFlowReleasedRepository.findByVersionAndOriginId(resourceLoader.getVersion(), String.valueOf(flowId));
+                noticeMessage.setFlowName(triggerFlowReleasedEntity.getName());
+                noticeMessage.setCreateDate(now);
+                sendNotice(noticeMessage, alarmChannel);
+            }
         }
         current = current + 60 * 1000L;
     }
@@ -242,10 +246,10 @@ public class ReleasedFlowInitializer implements DalaranStarter {
             Long failureFrequency = failureAlarm.getFailureFrequency();
             long failureCount = tracingLogService.countFailureLog(oneMinBeforeCurrent, now, flowId);
             if (failureCount >= failureFrequency) {
-                noticeMessage.setFailureCount(failureCount);
                 noticeMessage.setIsTouchFailureAlarm(true);
-                noticeMessage.setFailureFrequency(failureFrequency);
             }
+            noticeMessage.setFailureCount(failureCount);
+            noticeMessage.setFailureFrequency(failureFrequency);
         }
         AlarmRuleConfig.TimeOutAlarm timeOutAlarm = alarmRuleConfig.getTimeOutAlarm();
         if (null != timeOutAlarm && timeOutAlarm.getIsOpen()) {
@@ -253,18 +257,16 @@ public class ReleasedFlowInitializer implements DalaranStarter {
             Long overTimeFrequency = timeOutAlarm.getElapsedFrequency();
             long elapseCount = tracingLogService.countElapseLog(oneMinBeforeCurrent, now, flowId, elapse);
             if (overTimeFrequency >= elapseCount) {
-                noticeMessage.setFailureCount(elapseCount);
-                noticeMessage.setIsTouchFailureAlarm(true);
-                noticeMessage.setFailureFrequency(elapseCount);
+                noticeMessage.setIsTouchTimeOutAlarm(true);
             }
+            noticeMessage.setTimeOutCount(elapseCount);
+            noticeMessage.setTimeOutFrequency(overTimeFrequency);
         }
-        TriggerFlowReleasedEntity triggerFlowReleasedEntity = triggerFlowReleasedRepository.findByVersionAndOriginId(resourceLoader.getVersion(), String.valueOf(flowId));
-        noticeMessage.setFlowName(triggerFlowReleasedEntity.getName());
         return noticeMessage;
     }
 
     private void initAlarmConfig(String version) {
-        alarmConfig = new HashMap<> ();
+        alarmConfig = new HashMap<>();
         List<TriggerFlowReleasedEntity> triggerFlowEntities = triggerFlowReleasedRepository.findByVersionAndIsMonitorTrue(version);
         for (TriggerFlowReleasedEntity triggerFlowReleasedEntity : triggerFlowEntities) {
             Long id = Long.valueOf(triggerFlowReleasedEntity.getOriginId());

@@ -96,7 +96,7 @@ public class ReleaseServiceImpl implements ReleaseService {
 
     @Autowired
     private AlarmRuleRepository alarmRuleRepository;
-    
+
     @Autowired
     private ModuleManagementService moduleService;
 
