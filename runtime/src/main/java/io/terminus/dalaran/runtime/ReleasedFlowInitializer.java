@@ -92,7 +92,7 @@ public class ReleasedFlowInitializer implements DalaranStarter {
             public void run() {
                 try {
                     loadResources();
-                    monitor();
+                    //monitor();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
