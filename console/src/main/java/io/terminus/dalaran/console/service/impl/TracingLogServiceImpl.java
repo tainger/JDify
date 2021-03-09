@@ -272,7 +272,7 @@ public class TracingLogServiceImpl implements TracingLogService {
         detailLogDTO.setModule(map.get(entity.getModuleId()));
         detailLogDTO.setOnline(entity.isOnline());
         detailLogDTO.setDescription(entity.getDescription());
-        //TODO 是否告警设值
+        detailLogDTO.setMonitor(entity.isMonitor());
         return detailLogDTO;
     }
 
