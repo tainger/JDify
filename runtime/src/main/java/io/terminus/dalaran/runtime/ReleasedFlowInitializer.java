@@ -211,7 +211,7 @@ public class ReleasedFlowInitializer implements DalaranStarter {
             }
             NoticeMessage noticeMessage = alarmRuleValidate(alarmRuleConfig, oneMinBeforeCurrent, now, flowId);
             if (noticeMessage.getIsTouchFailureAlarm() || noticeMessage.getIsTouchTimeOutAlarm()) {
-                TriggerFlowReleasedEntity triggerFlowReleasedEntity = triggerFlowReleasedRepository.findByVersionAndOriginId(resourceLoader.getVersion(), flowId);
+                TriggerFlowReleasedEntity triggerFlowReleasedEntity = triggerFlowReleasedRepository.findByVersionAndOriginId(resourceLoader.getVersion(), String.valueOf(flowId));
                 noticeMessage.setFlowName(triggerFlowReleasedEntity.getName());
                 noticeMessage.setCreateDate(now);
                 sendNotice(noticeMessage, alarmChannel);
@@ -267,7 +267,7 @@ public class ReleasedFlowInitializer implements DalaranStarter {
         alarmConfig = new HashMap<>();
         List<TriggerFlowReleasedEntity> triggerFlowEntities = triggerFlowReleasedRepository.findByVersionAndIsMonitorTrue(version);
         for (TriggerFlowReleasedEntity triggerFlowReleasedEntity : triggerFlowEntities) {
-            Long id = triggerFlowReleasedEntity.getOriginId();
+            Long id = Long.valueOf(triggerFlowReleasedEntity.getOriginId());
             Long alarmRuleId = triggerFlowReleasedEntity.getAlarmId();
             alarmConfig.put(id, alarmRuleId);
         }

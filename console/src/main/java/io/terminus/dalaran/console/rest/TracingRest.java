@@ -5,7 +5,6 @@ import io.terminus.dalaran.console.exception.OnException;
 import io.terminus.dalaran.console.service.TracingLogService;
 import io.terminus.dalaran.model.dto.log.DetailLogDTO;
 import io.terminus.dalaran.model.dto.log.MainLogDTO;
-import io.terminus.dalaran.model.dto.log.TimeLogDTO;
 import io.terminus.dalaran.model.query.TracingLogQuery;
 import io.terminus.dalaran.rest.read.TracingReadAPI;
 import org.springframework.beans.factory.annotation.Autowired;

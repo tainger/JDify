@@ -1,7 +1,6 @@
 package io.terminus.dalaran.console.service.impl;
 
 import com.alibaba.fastjson.JSON;
-import io.terminus.dalaran.DalaranConstants;
 import io.terminus.dalaran.ModelImportMode;
 import io.terminus.dalaran.console.TestFlowInitializer;
 import io.terminus.dalaran.console.convertor.FlowConvertor;
@@ -35,7 +34,6 @@ import io.terminus.dalaran.response.ResponseErrorMsg;
 import io.terminus.dalaran.response.ResponseResult;
 import io.terminus.draco.web.autoconfig.context.UserContext;
 import org.apache.camel.CamelContext;
-import org.apache.camel.impl.DefaultProducerTemplate;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
@@ -46,8 +44,6 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.util.*;
 import java.util.stream.Collectors;
-
-import static io.terminus.dalaran.DalaranConstants.*;
 
 @Service
 @Transactional
