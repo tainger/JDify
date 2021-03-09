@@ -10,6 +10,7 @@ public interface ServiceRepository extends JpaRepository<ServiceEntity, Long>, J
 
     List<ServiceEntity> findByIsExistTrue();
 
-    List<ServiceEntity> findByModuleIdAndIsExistTrue(Long moduleId);
+    List<ServiceEntity> findByModuleIdAndIsExistTrue(String moduleId);
 
+    ServiceEntity findByResourceKey(String resourceKey);
 }

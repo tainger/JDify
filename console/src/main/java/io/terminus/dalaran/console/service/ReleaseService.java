@@ -7,7 +7,7 @@ import io.terminus.dalaran.core.resource.entity.released.TriggerFlowReleasedEnti
 import io.terminus.dalaran.model.dto.ReleaseRecordDTO;
 import io.terminus.dalaran.model.dto.ReleaseRequestDTO;
 import io.terminus.dalaran.model.dto.flow.ReleaseFlowDTO;
-import io.terminus.dalaran.model.dto.flow.TriggerFlowDTO;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 
@@ -23,10 +23,12 @@ public interface ReleaseService {
 
     List<SubFlowReleasedEntity> listReleasedSubFlow(String version);
 
-    ModelReleasedEntity getReleasedModel(String version, Long modelId);
+    ModelReleasedEntity getReleasedModel(String version, String modelId);
 
     List<PropertyReleasedEntity> getReleasedProperty(String version);
 
     List<ReleaseRecordDTO> listReleaseRecordDTO();
+
+    Page<ReleaseFlowDTO> triggerFlowListByPage(Integer pageNumber, Integer pageSize);
 
 }

@@ -11,7 +11,7 @@ public interface ConnectorConfig<T> {
 
     void setConnector(T connector);
 
-    Long getConnectorId();
+    String getConnectorId();
 
-    void setConnectorId(Long connectorId);
+    void setConnectorId(String connectorId);
 }

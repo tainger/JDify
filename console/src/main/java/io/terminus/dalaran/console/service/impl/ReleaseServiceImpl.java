@@ -3,6 +3,7 @@ package io.terminus.dalaran.console.service.impl;
 import io.terminus.dalaran.console.convertor.FlowConvertor;
 import io.terminus.dalaran.console.entity.LimiterEntity;
 import io.terminus.dalaran.console.repository.*;
+import io.terminus.dalaran.console.service.ModuleManagementService;
 import io.terminus.dalaran.console.service.ReleaseService;
 import io.terminus.dalaran.core.resource.entity.basic.BasicEntity;
 import io.terminus.dalaran.core.resource.entity.common.ModuleEntity;
@@ -12,14 +13,15 @@ import io.terminus.dalaran.core.resource.repository.*;
 import io.terminus.dalaran.model.dto.ReleaseRecordDTO;
 import io.terminus.dalaran.model.dto.ReleaseRequestDTO;
 import io.terminus.dalaran.model.dto.flow.ReleaseFlowDTO;
-import io.terminus.dalaran.model.dto.flow.TriggerFlowDTO;
+import io.terminus.dalaran.model.flow.FlowStatus;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.kafka.common.protocol.types.Field;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.criteria.Predicate;
 import javax.transaction.Transactional;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -95,6 +97,9 @@ public class ReleaseServiceImpl implements ReleaseService {
     @Autowired
     private AlarmRuleRepository alarmRuleRepository;
 
+    @Autowired
+    private ModuleManagementService moduleService;
+
     private final FlowConvertor flowConvertor = new FlowConvertor();
 
     @Override
@@ -118,7 +123,7 @@ public class ReleaseServiceImpl implements ReleaseService {
 
         List<ModuleEntity> moduleEntities = moduleRepository.findByIsExistTrue();
         List<TriggerFlowReleasedEntity> releasedTriggerFlowEntities = new ArrayList<>();
-        moduleEntities.stream().forEach(moduleEntity -> releasedTriggerFlowEntities.addAll(toReleasedData(triggerFlowRepository.findByModuleIdAndIsExistTrue(moduleEntity.getId()),TriggerFlowReleasedEntity.class, requestDTO.getVersion())));
+        moduleEntities.stream().forEach(moduleEntity -> releasedTriggerFlowEntities.addAll(toReleasedData(triggerFlowRepository.findByModuleIdAndIsExistTrue(moduleEntity.getResourceKey()),TriggerFlowReleasedEntity.class, requestDTO.getVersion())));
        // List<TriggerFlowReleasedEntity> releasedTriggerFlowEntities = toReleasedData(triggerFlowRepository.findAll(), TriggerFlowReleasedEntity.class, requestDTO.getVersion());
         triggerFlowReleasedRepository.saveAll(releasedTriggerFlowEntities);
 
@@ -173,8 +178,8 @@ public class ReleaseServiceImpl implements ReleaseService {
     @Override
     public List<ReleaseFlowDTO> listReleasedTriggerFlowDTO(String version) {
         List<ModuleEntity> moduleEntities = moduleRepository.findByIsExistTrue();
-        Map<Long, String> map = new HashMap<>();
-        moduleEntities.forEach(moduleEntity -> map.put(moduleEntity.getId(), moduleEntity.getName()));
+        Map<String, String> map = new HashMap<>();
+        moduleEntities.forEach(moduleEntity -> map.put(moduleEntity.getResourceKey(), moduleEntity.getName()));
         List<ReleaseFlowDTO> triggerFlowDTOS = triggerFlowReleasedRepository.findByVersion(version).stream().map(flowConvertor::releaseToDTOAndModuleName).collect(Collectors.toList());
         triggerFlowDTOS.forEach(triggerFlowDTO -> triggerFlowDTO.setModuleName(map.get(triggerFlowDTO.getModuleId())));
         return triggerFlowDTOS;
@@ -191,7 +196,7 @@ public class ReleaseServiceImpl implements ReleaseService {
     }
 
     @Override
-    public ModelReleasedEntity getReleasedModel(String version, Long modelId) {
+    public ModelReleasedEntity getReleasedModel(String version, String modelId) {
         return modelReleasedRepository.findByVersionAndOriginId(version, modelId);
     }
 
@@ -206,14 +211,46 @@ public class ReleaseServiceImpl implements ReleaseService {
                 .stream().map(this::toDTO).collect(Collectors.toList());
     }
 
+    @Override
+    public Page<ReleaseFlowDTO> triggerFlowListByPage(Integer pageNumber, Integer pageSize) {
+        ReleaseRecordEntity releaseRecordEntity = releaseRecordRepository.findByEnabledTrue();
+        if (releaseRecordEntity == null) {
+            return null;
+        }
+        String version = releaseRecordEntity.getVersion();
+        Sort order = new Sort(Sort.Direction.DESC, "createdAt");
+        Pageable pageable = PageRequest.of(pageNumber - 1, pageSize, order);
+        Page<TriggerFlowReleasedEntity> page = triggerFlowReleasedRepository.findAll(buildSpecification(version, FlowStatus.Error), pageable);
+        return new PageImpl<>(page.stream().map(this::buildflowDTO).collect(Collectors.toList()), pageable, page.getTotalElements());
+    }
+
+    private ReleaseFlowDTO buildflowDTO(TriggerFlowReleasedEntity entity) {
+        ReleaseFlowDTO releaseFlowDTO = new ReleaseFlowDTO();
+        BeanUtils.copyProperties(entity, releaseFlowDTO);
+        String moduleName = moduleService.getModuleName(entity.getModuleId());
+        releaseFlowDTO.setModuleName(moduleName);
+        releaseFlowDTO.setId(entity.getOriginId());
+        return releaseFlowDTO;
+    }
+
+    private Specification<TriggerFlowReleasedEntity> buildSpecification(String version, FlowStatus status) {
+        return (root, query1, builder) -> {
+            List<Predicate> predicates = new ArrayList<>();
+            predicates.add(builder.equal(root.get("version"), version));
+            predicates.add(builder.notEqual(root.get("status"), status));
+            return builder.and(predicates.toArray(new Predicate[0]));
+        };
+    }
+
     private <T extends ReleasedEntity, E extends BasicEntity> List<T> toReleasedData(List<E> data, Class<T> releasedType, String version) {
         return data.stream().map(entity -> {
             try {
                 T releasedEntity = releasedType.newInstance();
                 BeanUtils.copyProperties(entity, releasedEntity);
                 releasedEntity.setId(null);
-                releasedEntity.setOriginId(entity.getId());
+                releasedEntity.setOriginId(entity.getResourceKey());
                 releasedEntity.setVersion(version);
+                releasedEntity.setResourceKey(entity.getResourceKey() + version);
                 return releasedEntity;
             } catch (InstantiationException | IllegalAccessException e) {
                 e.printStackTrace();

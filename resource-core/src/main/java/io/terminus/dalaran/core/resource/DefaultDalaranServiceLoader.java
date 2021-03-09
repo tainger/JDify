@@ -18,13 +18,13 @@ public class DefaultDalaranServiceLoader implements DalaranServiceLoader {
         if (StringUtils.isBlank(serviceId)) {
             return null;
         }
-        ServiceAbstractEntity entity = resourceLoader.loadService(Long.valueOf(serviceId));
+        ServiceAbstractEntity entity = resourceLoader.loadService(serviceId);
         return toDTO(entity);
     }
 
     private ServiceInfo toDTO(ServiceAbstractEntity entity) {
         ServiceInfo serviceInfo = new ServiceInfo();
-        serviceInfo.setModuleId(String.valueOf(entity.getModuleId()));
+        serviceInfo.setModuleId(entity.getModuleId());
         serviceInfo.setName(entity.getName());
         serviceInfo.setImportConfig(entity.getImportConfig());
         serviceInfo.setServiceConfig(entity.getServiceConfig());

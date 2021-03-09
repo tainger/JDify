@@ -18,8 +18,4 @@ public interface ElasticJobReadAPI {
     @GetMapping(value = "/list")
     List<ElasticJobInfo> list();
 
-
-    @ApiOperation(value = "查询作业执行历史")
-    @GetMapping(value = "/log")
-    Page<ElasticJobLogDTO> jobLog(ElasticJobLogQuery query, @RequestParam Integer pageNumber, @RequestParam Integer pageSize);
 }

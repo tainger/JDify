@@ -17,6 +17,10 @@ import java.util.Map;
 public class FlowConvertor {
 
     public TriggerFlowDTO toDTO(TriggerFlowAbstractEntity entity) {
+        TriggerFlowDTO flowModel = new TriggerFlowDTO();
+        if (entity == null) {
+            return flowModel;
+        }
         List<ProcessorDTO> pipeline = new ArrayList<>();
         for (ProcessorEntity processorEntity : entity.getPipeline()) {
             ProcessorDTO processor = new ProcessorDTO();
@@ -27,8 +31,7 @@ public class FlowConvertor {
             pipeline.add(processor);
         }
 
-        TriggerFlowDTO flowModel = new TriggerFlowDTO();
-        flowModel.setId(entity.getId());
+        flowModel.setId(entity.getResourceKey());
         flowModel.setModuleId(entity.getModuleId());
         flowModel.setName(entity.getName());
         flowModel.setDescription(entity.getDescription());
@@ -53,7 +56,7 @@ public class FlowConvertor {
         }
 
         SubFlowDTO flowModel = new SubFlowDTO();
-        flowModel.setId(entity.getId());
+        flowModel.setId(entity.getResourceKey());
         flowModel.setModuleId(entity.getModuleId());
         flowModel.setName(entity.getName());
         flowModel.setDescription(entity.getDescription());

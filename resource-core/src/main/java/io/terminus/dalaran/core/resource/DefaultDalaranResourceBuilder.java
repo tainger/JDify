@@ -77,8 +77,8 @@ public class DefaultDalaranResourceBuilder implements DalaranResourceBuilder {
 
         if (config instanceof ConnectorConfig) {
             ConnectorConfig connectorConfig = (ConnectorConfig) config;
-            Long connectorId = connectorConfig.getConnectorId();
-            if (connectorId != null) {
+            String connectorId = connectorConfig.getConnectorId();
+            if (StringUtils.isNotBlank(connectorId)) {
                 Object connector = buildConnectorConfig(connectorId, triggerInfo.getConnectorInfo().getClassType());
                 connectorConfig.setConnector(connector);
             }
@@ -86,8 +86,8 @@ public class DefaultDalaranResourceBuilder implements DalaranResourceBuilder {
 
         if (config instanceof LimiterConfig) {
             LimiterConfig limiterConfig = (LimiterConfig) config;
-            Long limiterId = limiterConfig.getLimiterId();
-            if (limiterId != null) {
+            String limiterId = limiterConfig.getLimiterId();
+            if (StringUtils.isNotBlank(limiterId)) {
                 Object limiter = buildLimiterConfig(limiterId, triggerInfo.getLimiterInfo().getClassType());
                 limiterConfig.setLimiter(limiter);
             }
@@ -104,7 +104,7 @@ public class DefaultDalaranResourceBuilder implements DalaranResourceBuilder {
     }
 
     @Override
-    public FlowFragment buildFlowFragment(List<ProcessorEntity> pipelineEntityList, MessageModel inModel, MessageModel outModel, Long flowId, String fragmentId, Boolean tracing) {
+    public FlowFragment buildFlowFragment(List<ProcessorEntity> pipelineEntityList, MessageModel inModel, MessageModel outModel, String flowId, String fragmentId, Boolean tracing) {
         MessageModel fragmentLastOutModel = outModel;
         List<ProcessorModel> pipeline = new ArrayList<>();
         for (ProcessorEntity processorEntity : pipelineEntityList) {
@@ -124,7 +124,7 @@ public class DefaultDalaranResourceBuilder implements DalaranResourceBuilder {
     }
 
     @Override
-    public MessageModel buildModel(Long modelId) {
+    public MessageModel buildModel(String modelId) {
         if (modelId != null) {
             return buildModel(resourceLoader.loadModel(modelId));
         }
@@ -147,7 +147,7 @@ public class DefaultDalaranResourceBuilder implements DalaranResourceBuilder {
     }
 
     @Override
-    public Object buildConnectorConfig(Long connectorId, Class connectorConfigType) {
+    public Object buildConnectorConfig(String connectorId, Class connectorConfigType) {
         ConnectorAbstractEntity entity = resourceLoader.loadConnector(connectorId);
         if (entity == null) {
             // TODO throw ConnectorNotFound
@@ -157,7 +157,7 @@ public class DefaultDalaranResourceBuilder implements DalaranResourceBuilder {
     }
 
     @Override
-    public Object buildLimiterConfig(Long limiterId, Class limiterConfigType) {
+    public Object buildLimiterConfig(String limiterId, Class limiterConfigType) {
         LimiterAbstractEntity entity = resourceLoader.loadLimiter(limiterId);
         if (entity == null) {
             throw new RuntimeException("limiter [" + limiterId + "] not found");
@@ -181,7 +181,7 @@ public class DefaultDalaranResourceBuilder implements DalaranResourceBuilder {
         if (flowEntity instanceof ReleasedEntity) {
             flow.setId(String.valueOf(((ReleasedEntity) flowEntity).getOriginId()));
         } else {
-            flow.setId(String.valueOf(flowEntity.getId()));
+            flow.setId(String.valueOf(flowEntity.getResourceKey()));
         }
         flow.setInModel(buildModel(flowEntity.getInModel()));
         flow.setOutModel(buildModel(flowEntity.getOutModel()));
@@ -218,22 +218,22 @@ public class DefaultDalaranResourceBuilder implements DalaranResourceBuilder {
 
         if (config instanceof ConnectorConfig) {
             ConnectorConfig connectorConfig = (ConnectorConfig) config;
-            Long connectorId = connectorConfig.getConnectorId();
-            if (connectorId != null) {
+            String connectorId = connectorConfig.getConnectorId();
+            if (StringUtils.isNotBlank(connectorId)) {
                 Object connector = buildConnectorConfig(connectorId, processorInfo.getConnectorInfo().getClassType());
                 connectorConfig.setConnector(connector);
             }
         }
         if (config instanceof ServiceOperationConfig) {
             ServiceOperationConfig serviceOperationConfig = (ServiceOperationConfig) config;
-            Long serviceId = null;
+            String serviceId = null;
             if(StringUtils.isNotBlank(serviceOperationConfig.getServiceId())) {
-                serviceId =  Long.valueOf(serviceOperationConfig.getServiceId());
+                serviceId =  serviceOperationConfig.getServiceId();
             }
-            if (serviceId != null) {
+            if (StringUtils.isNotBlank(serviceId)) {
                 ServiceOperation service = buildService(serviceId, serviceOperationConfig.getOperation());
-                serviceOperationConfig.setInModel(buildModel(Long.valueOf(service.getInModelId())));
-                serviceOperationConfig.setOutModel(buildModel(Long.valueOf(service.getOutModelId())));
+                serviceOperationConfig.setInModel(buildModel(service.getInModelId()));
+                serviceOperationConfig.setOutModel(buildModel(service.getOutModelId()));
             }
         }
         MessageModel outModel = injectModel(config, lastOutModel);
@@ -247,7 +247,7 @@ public class DefaultDalaranResourceBuilder implements DalaranResourceBuilder {
             OutModelConfig outModelConfig = (OutModelConfig) config;
             outModelConfig.setInModel(lastOutModel);
             if (StringUtils.isNotBlank(outModelConfig.getOutModelId())) {
-                lastOutModel = buildModel(Long.valueOf(outModelConfig.getOutModelId()));
+                lastOutModel = buildModel(outModelConfig.getOutModelId());
                 outModelConfig.setOutModel(lastOutModel);
             }
         } else if (config instanceof ImmutableModelConfig) {
@@ -256,30 +256,30 @@ public class DefaultDalaranResourceBuilder implements DalaranResourceBuilder {
         if (config instanceof AllModelConfig) {
             AllModelConfig allModelConfig = (AllModelConfig) config;
             if(StringUtils.isNotBlank(allModelConfig.getInModelId())) {
-                allModelConfig.setInModel(buildModel(Long.valueOf(allModelConfig.getInModelId())));
+                allModelConfig.setInModel(buildModel(allModelConfig.getInModelId()));
             }
             if (StringUtils.isNotBlank(allModelConfig.getOutModelId())) {
-                lastOutModel = buildModel(Long.valueOf(allModelConfig.getOutModelId()));
+                lastOutModel = buildModel(allModelConfig.getOutModelId());
                 allModelConfig.setOutModel(lastOutModel);
             }
         }
         if (config instanceof AllImmutableModelConfig) {
             AllImmutableModelConfig allImmutableModelConfig = (AllImmutableModelConfig) config;
             if(StringUtils.isNotBlank(allImmutableModelConfig.getInModelId())) {
-                allImmutableModelConfig.setInModel(buildModel(Long.valueOf(allImmutableModelConfig.getInModelId())));
+                allImmutableModelConfig.setInModel(buildModel(allImmutableModelConfig.getInModelId()));
             }
             if (StringUtils.isNotBlank(allImmutableModelConfig.getOutModelId())) {
-                lastOutModel = buildModel(Long.valueOf(allImmutableModelConfig.getOutModelId()));
+                lastOutModel = buildModel(allImmutableModelConfig.getOutModelId());
                 allImmutableModelConfig.setOutModel(lastOutModel);
             }
         }
         if (config instanceof ImmutableInModelConfig) {
             ImmutableInModelConfig immutableInModelConfig = (ImmutableInModelConfig) config;
             if(StringUtils.isNotBlank(immutableInModelConfig.getInModelId())) {
-                immutableInModelConfig.setInModel(buildModel(Long.valueOf(immutableInModelConfig.getInModelId())));
+                immutableInModelConfig.setInModel(buildModel(immutableInModelConfig.getInModelId()));
             }
             if (StringUtils.isNotBlank(immutableInModelConfig.getOutModelId())) {
-                lastOutModel = buildModel(Long.valueOf(immutableInModelConfig.getOutModelId()));
+                lastOutModel = buildModel(immutableInModelConfig.getOutModelId());
                 immutableInModelConfig.setOutModel(lastOutModel);
             }
         }
@@ -296,7 +296,7 @@ public class DefaultDalaranResourceBuilder implements DalaranResourceBuilder {
         return stringSubstitutor.replace(configValue);
     }
 
-    private ServiceOperation buildService(Long serviceId, String operationKey) {
+    private ServiceOperation buildService(String serviceId, String operationKey) {
         ServiceAbstractEntity serviceAbstractEntity = resourceLoader.loadService(serviceId);
         if (serviceAbstractEntity == null) {
             throw new RuntimeException("service [" + serviceId + "] not found");

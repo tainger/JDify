@@ -9,4 +9,6 @@ import java.util.List;
 
 public interface LimiterRepository extends JpaRepository<LimiterEntity, Long>, JpaSpecificationExecutor<LimiterEntity> {
     List<LimiterEntity> findByIsExistTrue();
+
+    LimiterEntity findByResourceKey(String resourceKey);
 }

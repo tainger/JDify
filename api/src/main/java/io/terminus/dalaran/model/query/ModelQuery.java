@@ -10,9 +10,9 @@ import java.util.List;
 @Data
 public class ModelQuery {
 
-    private Long moduleId;
+    private String moduleId;
 
-    private List<Long> modelIds;
+    private List<String> modelIds;
 
     private String name;
 }

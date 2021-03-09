@@ -22,7 +22,7 @@ public class DefaultDalaranServiceBuilder implements DalaranServiceBuilder {
 
     @Override
     public MessageModel buildModel(String modelId) {
-        return resourceBuilder.buildModel(Long.valueOf(modelId));
+        return resourceBuilder.buildModel(modelId);
     }
 
     private ServiceAbstractEntity toEntity(ServiceInfo serviceInfo) {

@@ -10,7 +10,7 @@ import java.util.List;
 @Data
 public class ProcessorQuery {
 
-    private List<Long> processorIds;
+    private List<String> processorIds;
 
     private String type;
 

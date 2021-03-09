@@ -14,6 +14,7 @@ import io.terminus.dalaran.console.repository.ServiceRepository;
 import io.terminus.dalaran.console.service.ModelManagementService;
 import io.terminus.dalaran.console.service.jpa.ModelQueryService;
 import io.terminus.dalaran.console.util.ExcelUtils;
+import io.terminus.dalaran.console.util.ResourceKeyUtils;
 import io.terminus.dalaran.core.context.DalaranContext;
 import io.terminus.dalaran.core.resource.repository.ModuleRepository;
 import io.terminus.dalaran.model.*;
@@ -71,15 +72,15 @@ public class ModelManagementServiceImpl implements ModelManagementService {
     private JaroWinklerDistance jd = new JaroWinklerDistance();
 
     @Override
-    public Long createModel(ModelDTO modelModel) {
+    public String createModel(ModelDTO modelModel) {
         ModelEntity modelEntity = buildEntity(modelModel);
         setCreatedBy(modelEntity);
-        return modelRepository.save(modelEntity).getId();
+        return modelRepository.save(modelEntity).getResourceKey();
     }
 
     @Override
-    public void deleteModel(Long modelId) {
-        ModelEntity modelEntity = modelRepository.findById(modelId).get();
+    public void deleteModel(String modelId) {
+        ModelEntity modelEntity = modelRepository.findByResourceKey(modelId);
         modelEntity.setExist(false);
         modelRepository.save(modelEntity);
     }
@@ -105,7 +106,7 @@ public class ModelManagementServiceImpl implements ModelManagementService {
     }
 
     @Override
-    public List<ModelDTO> listByModuleId(Long moduleId) {
+    public List<ModelDTO> listByModuleId(String moduleId) {
         List<ModelEntity> entities = modelRepository.findByModuleIdAndIsExistTrue(moduleId);
         return entities.stream().map(this::buildModel).collect(Collectors.toList());
     }
@@ -117,26 +118,26 @@ public class ModelManagementServiceImpl implements ModelManagementService {
     }
 
     @Override
-    public List<ModelDTO> listEditableModelByModuleId(Long moduleId) {
+    public List<ModelDTO> listEditableModelByModuleId(String moduleId) {
         List<ModelEntity> entities = modelRepository.findByTargetTypeInAndModuleIdAndIsExistTrue(ModelTargetType.editableTypes(), moduleId);
         return entities.stream().map(this::buildModel).collect(Collectors.toList());
     }
 
     @Override
-    public List<BasicModelInfo> listBasicInfoByModuleId(Long moduleId) {
+    public List<BasicModelInfo> listBasicInfoByModuleId(String moduleId) {
         return modelQueryService.listBasicInfoByModuleId(moduleId);
     }
 
     @Override
-    public Map<String, ClassificationModel> listClassificationModels(Long moduleId) {
+    public Map<String, ClassificationModel> listClassificationModels(String moduleId) {
         List<ModelEntity> entities = modelRepository.findByModuleIdAndIsExistTrue(moduleId);
         List<ModelDTO> models = entities.stream().map(this::buildModel).collect(Collectors.toList());
         return buildClassificationModel(models);
     }
 
     @Override
-    public ModelEntity getById(Long modelId) {
-        return modelRepository.findById(modelId).get();
+    public ModelEntity getById(String modelId) {
+        return modelRepository.findByResourceKey(modelId);
     }
 
     @Override
@@ -145,12 +146,12 @@ public class ModelManagementServiceImpl implements ModelManagementService {
     }
 
     @Override
-    public JsonSchema importExcel(MultipartFile file, Long id) {
+    public JsonSchema importExcel(MultipartFile file, String id) {
         try {
             Map<String, ModelField> fields = ExcelUtils.parseFirstSheet(file.getInputStream());
             JsonSchema schema = new JsonSchema();
             schema.setFields(fields);
-            ModelEntity model = modelRepository.findById(id).get();
+            ModelEntity model = modelRepository.findByResourceKey(id);
             model.setModelSchema(JSON.toJSONString(schema));
             modelRepository.save(model);
             return schema;
@@ -174,9 +175,9 @@ public class ModelManagementServiceImpl implements ModelManagementService {
     }
 
     @Override
-    public Map<Long, Map<String, JsonSchema>> multiImportExcel(MultipartFile file, String modelType) {
+    public Map<String, Map<String, JsonSchema>> multiImportExcel(MultipartFile file, String modelType) {
         try {
-            Map<Long, Map<String, JsonSchema>> modelSchema = new HashMap<>();
+            Map<String, Map<String, JsonSchema>> modelSchema = new HashMap<>();
             Map<String, Map<String, ModelField>> schemas = ExcelUtils.parseAllSheet(file.getInputStream());
             for (Map.Entry<String, Map<String, ModelField>> entry : schemas.entrySet()) {
                 ModelEntity model = new ModelEntity();
@@ -189,7 +190,7 @@ public class ModelManagementServiceImpl implements ModelManagementService {
                 modelRepository.save(model);
                 Map<String, JsonSchema> singleSchema = new HashMap<>();
                 singleSchema.put(entry.getKey(), schema);
-                modelSchema.put(model.getId(), singleSchema);
+                modelSchema.put(model.getResourceKey(), singleSchema);
             }
             return modelSchema;
         } catch (Exception e) {
@@ -199,7 +200,7 @@ public class ModelManagementServiceImpl implements ModelManagementService {
     }
 
     @Override
-    public DalaranModelSchema importDataTemplate(DataTemplate dataTemplate, Long id) {
+    public DalaranModelSchema importDataTemplate(DataTemplate dataTemplate, String id) {
         SortedMap<String, ModelField> root = new TreeMap<>();
         ModelField modelField = new ModelField();
         root.put(MapperConstants.MODEL_ROOT, modelField);
@@ -209,7 +210,7 @@ public class ModelManagementServiceImpl implements ModelManagementService {
             buildModel(body, type, modelField);
         }
         DalaranModelSchema schema;
-        ModelEntity model = modelRepository.findById(id).get();
+        ModelEntity model = modelRepository.findByResourceKey(id);
         if (model.getType().equals("SOAP")) {
             schema = JSON.parseObject(model.getModelSchema(), SoapSchema.class);
             if (schema == null) {
@@ -233,8 +234,8 @@ public class ModelManagementServiceImpl implements ModelManagementService {
     }
 
     @Override
-    public DalaranModelSchema importModelTemplate(DataTemplate dataTemplate, Long id) {
-        ModelEntity model = modelRepository.findById(id).get();
+    public DalaranModelSchema importModelTemplate(DataTemplate dataTemplate, String id) {
+        ModelEntity model = modelRepository.findByResourceKey(id);
         DalaranModelSchema schema = dalaranContext.getDalaranModelTypeContext().getModelType(model.getType()).importTemplateData(dataTemplate, model.getModelSchema());
         model.setModelSchema(JSON.toJSONString(schema));
         modelRepository.save(model);
@@ -248,16 +249,16 @@ public class ModelManagementServiceImpl implements ModelManagementService {
     }
 
     @Override
-    public DalaranModelSchema importDalaranSchema(DalaranModelSchema schema, Long id) {
-        ModelEntity model = modelRepository.findById(id).get();
+    public DalaranModelSchema importDalaranSchema(DalaranModelSchema schema, String id) {
+        ModelEntity model = modelRepository.findByResourceKey(id);
         model.setModelSchema(JSON.toJSONString(schema));
         modelRepository.save(model);
         return schema;
     }
 
     @Override
-    public DalaranModelTemplate buildDataTemplate(DalaranModelSchema schema, Long id) {
-        ModelEntity model = modelRepository.findById(id).get();
+    public DalaranModelTemplate buildDataTemplate(DalaranModelSchema schema, String id) {
+        ModelEntity model = modelRepository.findByResourceKey(id);
        // Map fields = schema.getFields();
         DalaranModelTemplate dalaranModelTemplate = new DalaranModelTemplate();
         DalaranModelSchema modelSchema = JSONObject.parseObject(model.getModelSchema(),DalaranModelSchema.class);
@@ -283,12 +284,12 @@ public class ModelManagementServiceImpl implements ModelManagementService {
     }
 
     @Override
-    public Map<String, String> suggestMapping(Long sourceId, Long targetId) {
-        ModelEntity sourceEntity = modelRepository.findById(sourceId).get();
+    public Map<String, String> suggestMapping(String sourceId, String targetId) {
+        ModelEntity sourceEntity = modelRepository.findByResourceKey(sourceId);
         Class<? extends DalaranModelSchema> sourceSchemaType = dalaranContext.getDalaranModelTypeContext().getModelSchema(sourceEntity.getType());
         DalaranModelSchema sourceModelSchema = JSON.parseObject(sourceEntity.getModelSchema(), sourceSchemaType);
 
-        ModelEntity targetEntity = modelRepository.findById(targetId).get();
+        ModelEntity targetEntity = modelRepository.findByResourceKey(targetId);
         Class<? extends DalaranModelSchema> targetSchemaType = dalaranContext.getDalaranModelTypeContext().getModelSchema(targetEntity.getType());
         DalaranModelSchema targetModelSchema = JSON.parseObject(targetEntity.getModelSchema(), targetSchemaType);
         Map<String, String> mappings = new HashMap<>();
@@ -447,11 +448,12 @@ public class ModelManagementServiceImpl implements ModelManagementService {
 
     private ModelEntity buildEntity(ModelDTO model) {
         ModelEntity modelEntity;
-        Long id = model.getId();
-        if (id == null) {
+        String resourceKey = model.getId();
+        if (StringUtils.isBlank(resourceKey)) {
             modelEntity = new ModelEntity();
+            resourceKey = ResourceKeyUtils.generateKey();
         } else {
-            modelEntity = modelRepository.findById(id).get();
+            modelEntity = modelRepository.findByResourceKey(resourceKey);
         }
         String name = model.getName();
         if (StringUtils.isNoneBlank(name)) {
@@ -476,8 +478,8 @@ public class ModelManagementServiceImpl implements ModelManagementService {
                 modelEntity.setModelSchema(JSON.toJSONString(new HashMap<>()));
             }
         }
+        modelEntity.setResourceKey(resourceKey);
         modelEntity.setType(model.getModelType());
-        modelEntity.setModelKey(model.getModelKey());
         modelEntity.setDescription(model.getDescription());
         modelEntity.setModuleId(model.getModuleId());
         modelEntity.setTargetId(model.getTargetId());
@@ -500,10 +502,9 @@ public class ModelManagementServiceImpl implements ModelManagementService {
         }
 
         model.setModelType(entity.getType());
-        model.setModelKey(entity.getModelKey());
+        model.setId(entity.getResourceKey());
         model.setTargetId(entity.getTargetId());
         model.setTargetType(entity.getTargetType());
-        model.setId(entity.getId());
         return model;
     }
 

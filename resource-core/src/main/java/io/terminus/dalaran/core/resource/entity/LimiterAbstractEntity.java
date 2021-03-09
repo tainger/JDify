@@ -11,7 +11,7 @@ import javax.persistence.MappedSuperclass;
 public class LimiterAbstractEntity extends BasicEntity {
 
     @Column(nullable = false)
-    private Long moduleId;
+    private String moduleId;
 
     @Column(nullable = false)
     private String name;

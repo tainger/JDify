@@ -17,6 +17,9 @@ public class BasicEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false, length = 64)
+    private String resourceKey;
+
     @Column(nullable = false, columnDefinition="bit(1) default true")
     private boolean isExist = true;
 

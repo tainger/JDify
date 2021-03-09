@@ -31,13 +31,13 @@ public class TestFlowInitializer implements DalaranStarter {
     @Autowired
     private DalaranContext dalaranContext;
 
-    public void reloadTestTriggerFlow(Long triggerFlowId) {
+    public void reloadTestTriggerFlow(String triggerFlowId) {
         TriggerFlowAbstractEntity triggerFlowEntity = resourceLoader.loadTriggerFlow(triggerFlowId);
         BasicFlow testFlow = resourceBuilder.buildTestFlow(triggerFlowEntity);
         dalaranContext.addTestFlow(testFlow);
     }
 
-    public void reloadTestSubFlow(Long subFlowId) {
+    public void reloadTestSubFlow(String subFlowId) {
         SubFlowAbstractEntity subFlowEntity = resourceLoader.loadSubFlow(subFlowId);
         SubFlow subFlow = resourceBuilder.buildSubFlow(subFlowEntity);
         dalaranContext.addSubFlow(subFlow);
@@ -50,7 +50,7 @@ public class TestFlowInitializer implements DalaranStarter {
         List<FunctionEntity> functions = resourceLoader.loadAllFunctions();
         for (FunctionEntity function : functions) {
             try {
-                dalaranContext.getDalaranFunctionContext().addCustomFunction(String.valueOf(function.getId()), function.getType(),
+                dalaranContext.getDalaranFunctionContext().addCustomFunction(String.valueOf(function.getResourceKey()), function.getType(),
                         function.getScript(), function.getParams());
             } catch (Exception e) {
                 e.printStackTrace();
@@ -64,7 +64,7 @@ public class TestFlowInitializer implements DalaranStarter {
                 log.info("load test flow [{}]", testFlow.getId());
             } catch (Throwable e) {
                 e.printStackTrace();
-                log.error("load test flow [{}] error", triggerFlowEntity.getId());
+                log.error("load test flow [{}] error", triggerFlowEntity.getResourceKey());
             }
         }
         List<SubFlowEntity> subFlows = resourceLoader.loadAvailableSubFlow();
@@ -77,7 +77,7 @@ public class TestFlowInitializer implements DalaranStarter {
                 log.info("load sub-flow {}", testFlow.getId());
             } catch (Throwable e) {
                 e.printStackTrace();
-                log.error("load sub flow [{}] error", subFlowEntity.getId());
+                log.error("load sub flow [{}] error", subFlowEntity.getResourceKey());
             }
         }
         log.info("dalaran resource load started");

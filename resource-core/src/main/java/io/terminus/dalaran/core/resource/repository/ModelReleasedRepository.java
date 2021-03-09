@@ -8,5 +8,5 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
  * Created by jingdi on 2019/3/29
  */
 public interface ModelReleasedRepository extends JpaRepository<ModelReleasedEntity, Long>, JpaSpecificationExecutor<ModelReleasedEntity> {
-    ModelReleasedEntity findByVersionAndOriginId(String version, Long originId);
+    ModelReleasedEntity findByVersionAndOriginId(String version, String originId);
 }

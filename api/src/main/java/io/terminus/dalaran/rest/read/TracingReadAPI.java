@@ -1,7 +1,8 @@
 package io.terminus.dalaran.rest.read;
 
+import io.swagger.annotations.ApiOperation;
+import io.terminus.dalaran.model.dto.log.DetailLogDTO;
 import io.terminus.dalaran.model.dto.log.MainLogDTO;
-import io.terminus.dalaran.model.dto.log.TimeLogDTO;
 import io.terminus.dalaran.model.query.TracingLogQuery;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,6 +24,8 @@ public interface TracingReadAPI {
     @GetMapping("/{recordId}")
     MainLogDTO logDetail(@PathVariable String recordId);
 
-    @GetMapping("/getElapsedTime")
-    TimeLogDTO getElapsedTime(TracingLogQuery query);
+    @ApiOperation(value = "流程统计分页")
+    @GetMapping("/detail/{id}")
+    DetailLogDTO logDetailById(@PathVariable String id);
+
 }

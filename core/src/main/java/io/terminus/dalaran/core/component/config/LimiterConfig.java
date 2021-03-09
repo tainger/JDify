@@ -11,7 +11,7 @@ public interface LimiterConfig<T> {
 
     void setLimiter(T limiter);
 
-    Long getLimiterId();
+    String getLimiterId();
 
-    void setLimiterId(Long limiterId);
+    void setLimiterId(String limiterId);
 }

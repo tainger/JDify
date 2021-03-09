@@ -8,5 +8,5 @@ import java.util.List;
 
 public interface LimiterReleasedRepository extends JpaRepository<LimiterReleasedEntity, Long>, JpaSpecificationExecutor<LimiterReleasedEntity> {
 
-    LimiterReleasedEntity findByVersionAndOriginId(String version, Long originId);
+    LimiterReleasedEntity findByVersionAndOriginId(String version, String originId);
 }

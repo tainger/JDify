@@ -7,15 +7,15 @@ import java.util.List;
 
 public interface LimiterService {
 
-    Long create(LimiterDTO limiterDTO);
+    String create(LimiterDTO limiterDTO);
 
     LimiterDTO update(LimiterDTO limiterDTO);
 
-    void delete(Long limiterId);
+    void delete(String limiterId);
 
-    LimiterDTO detail(Long limiterId);
+    LimiterDTO detail(String limiterId);
 
-    List<BasicLimiterInfo> listBasicInfoByModuleId(Long moduleId);
+    List<BasicLimiterInfo> listBasicInfoByModuleId(String moduleId);
 
     List<BasicLimiterInfo> listBasicInfoByComponent(String limiterType);
 }

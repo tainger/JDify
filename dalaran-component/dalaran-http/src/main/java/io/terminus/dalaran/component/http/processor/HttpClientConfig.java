@@ -20,7 +20,7 @@ public class HttpClientConfig extends OutModelConfig implements ConnectorConfig<
     private RestClientConnector connector;
 
     @ConfigFieldInfo(label = "Http 连接器", inputType = FieldInputType.Connector, connectorType = RestClientConnector.class)
-    private Long connectorId;
+    private String connectorId;
 
     @ConfigFieldInfo(label = "Http Method", inputType = FieldInputType.Select, defaultValue = "GET")
     private HttpMethod method;

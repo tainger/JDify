@@ -13,7 +13,7 @@ import javax.persistence.Table;
 public class SubFlowReleasedEntity extends SubFlowAbstractEntity implements ReleasedEntity {
 
     @Column(nullable = false)
-    private Long originId;
+    private String originId;
 
     @Column(nullable = false, length = 64)
     private String version;

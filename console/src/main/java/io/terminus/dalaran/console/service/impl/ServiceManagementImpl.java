@@ -12,6 +12,8 @@ import io.terminus.dalaran.console.repository.ServiceRepository;
 import io.terminus.dalaran.console.repository.TriggerFlowRepository;
 import io.terminus.dalaran.console.service.ModelManagementService;
 import io.terminus.dalaran.console.service.ServiceManagement;
+import io.terminus.dalaran.console.service.jpa.model.QueryServiceInfo;
+import io.terminus.dalaran.console.util.ResourceKeyUtils;
 import io.terminus.dalaran.core.component.DalaranService;
 import io.terminus.dalaran.core.context.DalaranServiceContext;
 import io.terminus.dalaran.core.resource.DalaranResourceBuilder;
@@ -25,6 +27,8 @@ import io.terminus.dalaran.model.dto.basic.BasicServiceInfo;
 import io.terminus.dalaran.model.flow.FlowStatus;
 import io.terminus.dalaran.model.flow.TriggerFlow;
 import io.terminus.draco.web.autoconfig.context.UserContext;
+import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -33,6 +37,7 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import javax.transaction.Transactional;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -64,11 +69,11 @@ public class ServiceManagementImpl implements ServiceManagement {
 
     @Override
     @Transactional
-    public Long create(ServiceDTO serviceDTO) {
+    public String create(ServiceDTO serviceDTO) {
         ServiceDetail serviceDetail = toEntity(serviceDTO);
         ServiceEntity entity = serviceDetail.getEntity();
         setCreatedBy(entity);
-        Long serviceId = serviceRepository.save(entity).getId();
+        String serviceId = serviceRepository.save(entity).getResourceKey();
         serviceDetail.setServiceId(serviceId);
         createModels(serviceDetail);
         return serviceId;
@@ -86,15 +91,15 @@ public class ServiceManagementImpl implements ServiceManagement {
     }
 
     @Override
-    public void delete(Long serviceId) {
-        ServiceEntity entity = serviceRepository.findById(serviceId).get();
+    public void delete(String serviceId) {
+        ServiceEntity entity = serviceRepository.findByResourceKey(serviceId);
         entity.setExist(false);
         serviceRepository.save(entity);
     }
 
     @Override
-    public ServiceDTO detail(Long serviceId) {
-        return toDTO(serviceRepository.findById(serviceId).get());
+    public ServiceDTO detail(String serviceId) {
+        return toDTO(serviceRepository.findByResourceKey(serviceId));
     }
 
     @Override
@@ -103,26 +108,38 @@ public class ServiceManagementImpl implements ServiceManagement {
     }
 
     @Override
-    public List<ServiceOperation> listOperation(Long serviceId) {
-        ServiceEntity entity = serviceRepository.findById(serviceId).get();
+    public List<ServiceOperation> listOperation(String serviceId) {
+        ServiceEntity entity = serviceRepository.findByResourceKey(serviceId);
         ServiceInfo serviceInfo = serviceContext.getServiceInfo(entity.getType());
         Object serviceConfig = JSON.parseObject(entity.getServiceConfig(), serviceInfo.getServiceConfigType());
         return serviceContext.getService(entity.getType()).operations(serviceConfig);
     }
 
     @Override
-    public List<BasicServiceInfo> listBasicInfoByModuleId(Long moduleId) {
+    public List<BasicServiceInfo> listBasicInfoByModuleId(String moduleId) {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<BasicServiceInfo> criteriaQuery = builder.createQuery(BasicServiceInfo.class);
+        CriteriaQuery<QueryServiceInfo> criteriaQuery = builder.createQuery(QueryServiceInfo.class);
         Root<ServiceEntity> root = criteriaQuery.from(ServiceEntity.class);
-        criteriaQuery.multiselect(root.get("id"), root.get("moduleId"), root.get("type"), root.get("name"))
+        criteriaQuery.multiselect(root.get("resourceKey"), root.get("moduleId"), root.get("type"), root.get("name"))
                 .where(builder.equal(root.get("moduleId"), moduleId), builder.equal(root.get("isExist"),true));
-        return entityManager.createQuery(criteriaQuery).getResultList();
+        List<QueryServiceInfo> services = entityManager.createQuery(criteriaQuery).getResultList();
+        List<BasicServiceInfo> basicServices = new ArrayList<>();
+        services.forEach(service -> {
+            BasicServiceInfo basicService = new BasicServiceInfo();
+            try {
+                BeanUtils.copyProperties(basicService, service);
+                basicService.setId(service.getResourceKey());
+                basicServices.add(basicService);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+        return basicServices;
     }
 
     private ServiceDTO toDTO(ServiceEntity entity) {
         ServiceDTO dto = new ServiceDTO();
-        dto.setId(entity.getId());
+        dto.setId(entity.getResourceKey());
         dto.setModuleId(entity.getModuleId());
         dto.setName(entity.getName());
         dto.setType(entity.getType());
@@ -135,13 +152,17 @@ public class ServiceManagementImpl implements ServiceManagement {
     private ServiceDetail toEntity(ServiceDTO dto) {
         ServiceDetail serviceDetail = new ServiceDetail();
         String type = dto.getType();
-        Long moduleId = dto.getModuleId();
+        String moduleId = dto.getModuleId();
         serviceDetail.setModuleId(moduleId);
-        Long serviceId = dto.getId();
-        ServiceEntity entity = new ServiceEntity();
-        if (serviceId != null) {
-            entity.setId(serviceId);
+        ServiceEntity entity;
+        String resourceKey = dto.getId();
+        if (StringUtils.isBlank(resourceKey)) {
+            entity = new ServiceEntity();
+            resourceKey = ResourceKeyUtils.generateKey();
+        } else {
+            entity = serviceRepository.findByResourceKey(resourceKey);
         }
+        entity.setResourceKey(resourceKey);
         entity.setModuleId(moduleId);
         entity.setName(dto.getName());
         entity.setType(type);
@@ -163,18 +184,18 @@ public class ServiceManagementImpl implements ServiceManagement {
     }
 
     private void createModels(ServiceDetail serviceDetail) {
-        Map<String, Long> models = new HashMap<>();
+        Map<String, String> models = new HashMap<>();
         ServiceEntity entity = serviceDetail.getEntity();
         DalaranService dalaranService = serviceDetail.getDalaranService();
         Object serviceConfig = serviceDetail.getServiceConfig();
         Object importConfig = serviceDetail.getImportConfig();
-        Long moduleId = serviceDetail.getModuleId();
-        Long serviceId = serviceDetail.getServiceId();
+        String moduleId = serviceDetail.getModuleId();
+        String serviceId = serviceDetail.getServiceId();
         List<ServiceOperation> operations = dalaranService.operations(serviceConfig);
         operations.forEach(operation -> {
             ServiceOperationModel operationModel = dalaranService.buildOperationModel(importConfig, operation);
-            Long inModelId = buildModel(operationModel.getInModel(), operationModel.getInputName(), moduleId, serviceId, models);
-            Long outModelId = buildModel(operationModel.getOutModel(), operationModel.getOutputName(), moduleId, serviceId, models);
+            String inModelId = buildModel(operationModel.getInModel(), operationModel.getInputName(), moduleId, serviceId, models);
+            String outModelId = buildModel(operationModel.getOutModel(), operationModel.getOutputName(), moduleId, serviceId, models);
             operation.setInModelId(String.valueOf(inModelId));
             operation.setOutModelId(String.valueOf(outModelId));
         });
@@ -182,26 +203,25 @@ public class ServiceManagementImpl implements ServiceManagement {
         serviceRepository.save(entity);
     }
 
-    private Long buildModel(MessageModel messageModel, String modelName, Long moduleId, Long serviceId, Map<String, Long> models) {
+    private String buildModel(MessageModel messageModel, String modelName, String moduleId, String serviceId, Map<String, String> models) {
         if (models.containsKey(modelName)) {
             return models.get(modelName);
         }
         ModelDTO model = new ModelDTO();
-        String targetId = serviceId.toString();
         model.setName(modelName);
         model.setModuleId(moduleId);
-        model.setTargetId(targetId);
+        model.setTargetId(serviceId);
         model.setTargetType(ModelTargetType.Service);
         model.setModelType(messageModel.getModelType());
         model.setModelSchema(JSON.parseObject(JSON.toJSONString(messageModel.getModelSchema()), Map.class));
 
-        ModelEntity entity = modelManagementService.getByNameAndServiceId(modelName, targetId);
+        ModelEntity entity = modelManagementService.getByNameAndServiceId(modelName, serviceId);
         if (entity == null) {
-            Long id = modelManagementService.createModel(model);
+            String id = modelManagementService.createModel(model);
             models.put(modelName, id);
             return id;
         } else {
-            Long id = entity.getId();
+            String id = entity.getResourceKey();
             model.setId(id);
             modelManagementService.updateModel(model);
             return id;
@@ -227,5 +247,4 @@ public class ServiceManagementImpl implements ServiceManagement {
             serviceEntity.setUpdatedBy(UserContext.getUserInfo().getUsername());
         }
     }
-
 }

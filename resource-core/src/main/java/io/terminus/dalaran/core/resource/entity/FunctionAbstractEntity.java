@@ -13,7 +13,7 @@ import java.util.List;
 public abstract class FunctionAbstractEntity extends BasicEntity {
 
     @Column(nullable = false)
-    private Long moduleId;
+    private String moduleId;
 
     @Column(nullable = false, length = 64)
     private String name;

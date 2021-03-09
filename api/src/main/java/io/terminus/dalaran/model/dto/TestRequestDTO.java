@@ -8,7 +8,7 @@ import org.jetbrains.annotations.Nullable;
 public class TestRequestDTO {
 
     @NotNull
-    private Long flowId;
+    private String flowId;
 
     @Nullable
     private String body;

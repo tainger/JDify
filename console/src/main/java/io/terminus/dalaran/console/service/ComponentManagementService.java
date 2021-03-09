@@ -6,11 +6,11 @@ import io.terminus.dalaran.model.dto.ComponentDTO;
 
 public interface ComponentManagementService {
 
-    Long create(ComponentDTO componentDTO);
+    String create(ComponentDTO componentDTO);
 
     Object update(ComponentDTO componentDTO);
 
-    void delete(BasicComponentType componentType, Long componentId);
+    void delete(BasicComponentType componentType, String componentId);
 
-    Object detail(BasicComponentType componentType, Long componentId);
+    Object detail(BasicComponentType componentType, String componentId);
 }

@@ -1,5 +1,6 @@
 package io.terminus.dalaran.console.service;
 
+import io.terminus.dalaran.model.dto.log.DetailLogDTO;
 import io.terminus.dalaran.model.dto.log.MainLogDTO;
 import io.terminus.dalaran.model.dto.log.TimeLogDTO;
 import io.terminus.dalaran.model.query.TracingLogQuery;
@@ -19,4 +20,5 @@ public interface TracingLogService {
     TimeLogDTO getElapsedTime(TracingLogQuery query);
 
 
+    DetailLogDTO logDetailById(String id);
 }

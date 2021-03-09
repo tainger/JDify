@@ -15,7 +15,7 @@ public interface ConnectorReadAPI {
 
     @GetMapping("/{id}")
     @ApiOperation("获取连接器详情")
-    ConnectorDTO detail(@PathVariable Long id);
+    ConnectorDTO detail(@PathVariable String id);
 
     @GetMapping("/option")
     @ApiOperation("获取连接器可选项")
