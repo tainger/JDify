@@ -130,7 +130,7 @@ public class TestResourceLoader implements DalaranResourceLoader {
     }
 
     @Override
-    public AlarmRuleAbstractEntity loadAlarmRule(Long alarmRuleId) {
+    public AlarmRuleAbstractEntity loadAlarmRule(String alarmRuleId) {
         return alarmRuleRepository.findById(alarmRuleId).get();
     }
 

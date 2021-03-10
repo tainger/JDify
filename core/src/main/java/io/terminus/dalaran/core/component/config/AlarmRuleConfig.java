@@ -15,7 +15,7 @@ public class AlarmRuleConfig {
 
     private FailureAlarm failureAlarm;
 
-    private Map<ChannelType, String[]> alarmChannel = new HashMap();
+    private Map<ChannelType, String> alarmChannel = new HashMap();
 
     @Data
     public class TimeOutAlarm{

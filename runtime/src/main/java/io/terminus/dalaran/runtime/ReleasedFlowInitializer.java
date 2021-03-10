@@ -23,6 +23,9 @@ import io.terminus.dalaran.runtime.service.TracingLogService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.camel.CamelContext;
 import org.apache.camel.model.RouteDefinition;
+import org.apache.kafka.common.protocol.types.Field;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.PostConstruct;
@@ -31,6 +34,8 @@ import java.util.stream.Collectors;
 
 @Slf4j
 public class ReleasedFlowInitializer implements DalaranStarter {
+
+    private static final Logger logger = LoggerFactory.getLogger(ReleasedFlowInitializer.class);
 
     @Autowired
     private ModuleRepository moduleRepository;
@@ -63,7 +68,7 @@ public class ReleasedFlowInitializer implements DalaranStarter {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    private Map<Long, Long> alarmConfig;
+    private Map<String, String> alarmConfig;
 
     private Long current = System.currentTimeMillis();
 
@@ -91,8 +96,9 @@ public class ReleasedFlowInitializer implements DalaranStarter {
             @Override
             public void run() {
                 try {
+                    logger.info(">>>>>>>>>调度开始>>>>>>");
                     loadResources();
-                    //monitor();
+                    monitor();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -199,13 +205,14 @@ public class ReleasedFlowInitializer implements DalaranStarter {
 
 
     private void monitor() {
+        logger.info(">>>>>>>>>monitor>>>>>>");
         Date oneMinBeforeCurrent = new Date(current - 60 * 1000L);
         Date now = new Date(current);
-        for (Map.Entry<Long, Long> entry : alarmConfig.entrySet()) {
-            Long flowId = entry.getKey();
-            Long alarmRuleId = entry.getValue();
+        for (Map.Entry<String, String> entry : alarmConfig.entrySet()) {
+            String flowId = entry.getKey();
+            String alarmRuleId = entry.getValue();
             AlarmRuleConfig alarmRuleConfig = (AlarmRuleConfig) resourceBuilder.buildAlarmRuleConfig(alarmRuleId, AlarmRuleConfig.class);
-            Map<AlarmRuleConfig.ChannelType, String[]> alarmChannel = alarmRuleConfig.getAlarmChannel();
+            Map<AlarmRuleConfig.ChannelType, String> alarmChannel = alarmRuleConfig.getAlarmChannel();
             if (alarmChannel.isEmpty()) {
                 continue;
             }
@@ -220,11 +227,11 @@ public class ReleasedFlowInitializer implements DalaranStarter {
         current = current + 60 * 1000L;
     }
 
-    private void sendNotice(NoticeMessage noticeMessage, Map<AlarmRuleConfig.ChannelType, String[]> alarmChannel) {
-        for (Map.Entry<AlarmRuleConfig.ChannelType, String[]> entry : alarmChannel.entrySet()) {
+    private void sendNotice(NoticeMessage noticeMessage, Map<AlarmRuleConfig.ChannelType, String> alarmChannel) {
+        for (Map.Entry<AlarmRuleConfig.ChannelType, String> entry : alarmChannel.entrySet()) {
             AlarmRuleConfig.ChannelType channelType = entry.getKey();
-            String[] contactWays = entry.getValue();
-            noticeMessage.setContactWays(contactWays);
+            String contactWays = entry.getValue();
+            noticeMessage.setContactWays(contactWays.split(","));
             switch (channelType) {
                 case mail:
                     dalaranNoticeService.sendEmail(noticeMessage);
@@ -232,12 +239,14 @@ public class ReleasedFlowInitializer implements DalaranStarter {
                 case shortMessage:
                     dalaranNoticeService.sendShortMessage(noticeMessage);
                     return;
+                default:
+                    throw new RuntimeException();
             }
         }
     }
 
 
-    private NoticeMessage alarmRuleValidate(AlarmRuleConfig alarmRuleConfig, Date oneMinBeforeCurrent, Date now, Long flowId) {
+    private NoticeMessage alarmRuleValidate(AlarmRuleConfig alarmRuleConfig, Date oneMinBeforeCurrent, Date now, String flowId) {
         NoticeMessage noticeMessage = new NoticeMessage();
         AlarmRuleConfig.FailureAlarm failureAlarm = alarmRuleConfig.getFailureAlarm();
         if (null != failureAlarm && failureAlarm.getIsOpen()) {
@@ -267,8 +276,8 @@ public class ReleasedFlowInitializer implements DalaranStarter {
         alarmConfig = new HashMap<>();
         List<TriggerFlowReleasedEntity> triggerFlowEntities = triggerFlowReleasedRepository.findByVersionAndIsMonitorTrue(version);
         for (TriggerFlowReleasedEntity triggerFlowReleasedEntity : triggerFlowEntities) {
-            Long id = Long.valueOf(triggerFlowReleasedEntity.getOriginId());
-            Long alarmRuleId = triggerFlowReleasedEntity.getAlarmId();
+            String id = triggerFlowReleasedEntity.getOriginId();
+            String alarmRuleId = triggerFlowReleasedEntity.getAlarmResourceKey();
             alarmConfig.put(id, alarmRuleId);
         }
     }

@@ -26,4 +26,6 @@ public class ModuleDetailDTO extends ModuleDTO {
     private List<BasicFunctionInfo> functions;
 
     private List<BasicClientInfo> clients;
+
+    private List<BasicAlarmInfo> alarmRules;
 }

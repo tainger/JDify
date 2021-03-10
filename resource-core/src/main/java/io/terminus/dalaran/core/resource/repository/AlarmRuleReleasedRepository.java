@@ -7,8 +7,8 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import java.util.List;
 
 public interface AlarmRuleReleasedRepository extends JpaRepository<AlarmRuleReleasedEntity, Long>, JpaSpecificationExecutor<AlarmRuleReleasedEntity> {
-    AlarmRuleReleasedEntity findByVersionAndOriginId(String version, Long alarmRuleId);
 
+    AlarmRuleReleasedEntity findByVersionAndOriginId(String version, String alarmRuleId);
 
     List<AlarmRuleReleasedEntity> findByVersion(String version);
 }
