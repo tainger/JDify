@@ -23,7 +23,6 @@ import io.terminus.dalaran.runtime.service.TracingLogService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.camel.CamelContext;
 import org.apache.camel.model.RouteDefinition;
-import org.apache.kafka.common.protocol.types.Field;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -96,8 +95,8 @@ public class ReleasedFlowInitializer implements DalaranStarter {
             @Override
             public void run() {
                 try {
-                    logger.info(">>>>>>>>>调度开始>>>>>>");
                     loadResources();
+                    logger.info(">>>>>>>>>调度开始>>>>>>");
                     monitor();
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -205,6 +204,9 @@ public class ReleasedFlowInitializer implements DalaranStarter {
 
 
     private void monitor() {
+        if(null == alarmConfig) {
+            return;
+        }
         logger.info(">>>>>>>>>monitor>>>>>>");
         Date oneMinBeforeCurrent = new Date(current - 60 * 1000L);
         Date now = new Date(current);
@@ -218,6 +220,7 @@ public class ReleasedFlowInitializer implements DalaranStarter {
             }
             NoticeMessage noticeMessage = alarmRuleValidate(alarmRuleConfig, oneMinBeforeCurrent, now, flowId);
             if (noticeMessage.getIsTouchFailureAlarm() || noticeMessage.getIsTouchTimeOutAlarm()) {
+                logger.info(">>>>>>>>>产生报警，准备发送通知>>>>>>");
                 TriggerFlowReleasedEntity triggerFlowReleasedEntity = triggerFlowReleasedRepository.findByVersionAndOriginId(resourceLoader.getVersion(), String.valueOf(flowId));
                 noticeMessage.setFlowName(triggerFlowReleasedEntity.getName());
                 noticeMessage.setCreateDate(now);
@@ -232,13 +235,14 @@ public class ReleasedFlowInitializer implements DalaranStarter {
             AlarmRuleConfig.ChannelType channelType = entry.getKey();
             String contactWays = entry.getValue();
             noticeMessage.setContactWays(contactWays.split(","));
+            logger.info(">>>>>>>>>联系人的方式为 {} >>>>>>", contactWays);
             switch (channelType) {
                 case mail:
                     dalaranNoticeService.sendEmail(noticeMessage);
-                    return;
+                    break;
                 case shortMessage:
                     dalaranNoticeService.sendShortMessage(noticeMessage);
-                    return;
+                    break;
                 default:
                     throw new RuntimeException();
             }

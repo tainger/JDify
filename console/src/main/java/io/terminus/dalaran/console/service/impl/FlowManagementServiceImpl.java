@@ -390,13 +390,17 @@ public class FlowManagementServiceImpl implements FlowManagementService {
 
     @Override
     public ResponseResult bindAlarm(BindAlarmRuleDto bindAlarmRuleDto) {
-        String alarmRuleId = bindAlarmRuleDto.getAlarmRuleId();
         String flowId = bindAlarmRuleDto.getFlowId();
-        if (alarmRuleId == null || flowId == null) {
+        if (flowId == null) {
             return fail(ResponseErrorMsg.FLOW_ID_NULL);
         }
         TriggerFlowEntity triggerFlowEntity = flowRepository.findByResourceKey(flowId);
+        String alarmRuleId = bindAlarmRuleDto.getAlarmRuleId();
+        if (alarmRuleId == null) {
+            return fail(ResponseErrorMsg.ALARM_ID_NULL);
+        }
         triggerFlowEntity.setAlarmResourceKey(alarmRuleId);
+        triggerFlowEntity.setMonitor(bindAlarmRuleDto.getIsMonitor());
         flowRepository.save(triggerFlowEntity);
         return success();
     }
