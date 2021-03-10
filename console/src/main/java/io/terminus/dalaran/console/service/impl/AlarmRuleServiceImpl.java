@@ -110,7 +110,7 @@ public class AlarmRuleServiceImpl implements AlarmRuleService {
     private Specification<AlarmRuleEntity> buildSpecification(AlarmRuleQuery query) {
         return (root, criteriaQuery, builder) -> {
             List<Predicate> predicates = new ArrayList<>();
-            predicates.add(builder.equal(root.get("isExit"), Boolean.TRUE));
+            predicates.add(builder.equal(root.get("isExist"), Boolean.TRUE));
             if (null != query.getName()) {
                 predicates.add(builder.like(root.get("name"), "%" + query.getName() + "%"));
             }

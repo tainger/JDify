@@ -22,5 +22,5 @@ public abstract class TriggerFlowAbstractEntity extends BasicFlowEntity {
     @Column(nullable = false)
     private boolean isMonitor;
 
-    private Long alarmId;
+    private String alarmResourceKey;;
 }
