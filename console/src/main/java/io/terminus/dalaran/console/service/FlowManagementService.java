@@ -7,6 +7,7 @@ import io.terminus.dalaran.model.dto.ImportFlowResult;
 import io.terminus.dalaran.model.dto.ImportProcessorDTO;
 import io.terminus.dalaran.model.dto.ImportProcessorResult;
 import io.terminus.dalaran.model.dto.basic.BasicFlowInfo;
+import io.terminus.dalaran.model.dto.flow.BindAlarmRuleDto;
 import io.terminus.dalaran.model.dto.flow.ImportFlowDTO;
 import io.terminus.dalaran.model.dto.flow.TriggerFlowDTO;
 import io.terminus.dalaran.model.flow.FlowValidation;
@@ -54,4 +55,5 @@ public interface FlowManagementService {
 
     ResponseResult online(TriggerFlowDTO flowDTO);
 
+    ResponseResult bindAlarm(BindAlarmRuleDto bindAlarmRuleDto);
 }

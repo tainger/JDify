@@ -172,7 +172,7 @@ public class DefaultDalaranResourceBuilder implements DalaranResourceBuilder {
     }
 
     @Override
-    public Object buildAlarmRuleConfig(Long alarmRuleId, Class alarmRuleType) {
+    public Object buildAlarmRuleConfig(String alarmRuleId, Class alarmRuleType) {
         AlarmRuleAbstractEntity entity = resourceLoader.loadAlarmRule(alarmRuleId);
         return buildConfig(entity.getConfig(), alarmRuleType);
     }

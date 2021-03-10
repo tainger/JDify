@@ -23,6 +23,7 @@ import io.terminus.dalaran.core.resource.repository.TriggerFlowReleasedRepositor
 import io.terminus.dalaran.exception.flow.FlowNotExistException;
 import io.terminus.dalaran.model.dto.*;
 import io.terminus.dalaran.model.dto.basic.BasicFlowInfo;
+import io.terminus.dalaran.model.dto.flow.BindAlarmRuleDto;
 import io.terminus.dalaran.model.dto.flow.ImportFlowDTO;
 import io.terminus.dalaran.model.dto.flow.TriggerFlowDTO;
 import io.terminus.dalaran.model.flow.FlowStatus;
@@ -385,6 +386,19 @@ public class FlowManagementServiceImpl implements FlowManagementService {
             e.printStackTrace();
             return fail(ResponseErrorMsg.ONLINE_FLOW_ERROR);
         }
+    }
+
+    @Override
+    public ResponseResult bindAlarm(BindAlarmRuleDto bindAlarmRuleDto) {
+        String alarmRuleId = bindAlarmRuleDto.getAlarmRuleId();
+        String flowId = bindAlarmRuleDto.getFlowId();
+        if (alarmRuleId == null || flowId == null) {
+            return fail(ResponseErrorMsg.FLOW_ID_NULL);
+        }
+        TriggerFlowEntity triggerFlowEntity = flowRepository.findByResourceKey(flowId);
+        triggerFlowEntity.setAlarmResourceKey(alarmRuleId);
+        flowRepository.save(triggerFlowEntity);
+        return success();
     }
 
     public ResponseResult isOnline(TriggerFlowDTO flowDTO, boolean isOnline) {

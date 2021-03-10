@@ -18,4 +18,9 @@ public abstract class TriggerFlowAbstractEntity extends BasicFlowEntity {
 
     @Column(nullable = false)
     private boolean tracing;
+
+    @Column(nullable = false)
+    private boolean isMonitor;
+
+    private String alarmResourceKey;;
 }

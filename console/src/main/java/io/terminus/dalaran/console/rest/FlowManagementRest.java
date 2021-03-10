@@ -13,6 +13,7 @@ import io.terminus.dalaran.exception.flow.FlowNotExistException;
 import io.terminus.dalaran.exception.flow.UpdateFlowException;
 import io.terminus.dalaran.model.CreateResponse;
 import io.terminus.dalaran.model.dto.*;
+import io.terminus.dalaran.model.dto.flow.BindAlarmRuleDto;
 import io.terminus.dalaran.model.dto.flow.ImportFlowDTO;
 import io.terminus.dalaran.model.dto.flow.TriggerFlowDTO;
 import io.terminus.dalaran.model.dto.log.MainLogDTO;
@@ -96,6 +97,11 @@ public class FlowManagementRest implements FlowReadAPI, FlowWriteAPI {
     @OnException(code = ResponseMessage.FLOW_TRIGGER_ERROR)
     public void trigger(@RequestBody TriggerFlowDTO flowDTO) {
         dalaranContext.trigger(flowDTO.getId());
+    }
+
+    @Override
+    public ResponseResult bindAlarm(BindAlarmRuleDto bindAlarmRuleDto) {
+        return flowManagementService.bindAlarm(bindAlarmRuleDto);
     }
 
     @Override

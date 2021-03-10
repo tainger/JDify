@@ -78,6 +78,9 @@ public class ModuleManagementServiceImpl implements ModuleManagementService {
     @Autowired
     private FunctionRepository functionRepository;
 
+    @Autowired
+    private AlarmRuleService alarmRuleService;
+
     @Override
     public String createModule(ModuleDTO moduleModel) {
         ModuleEntity moduleEntity = buildEntity(moduleModel);

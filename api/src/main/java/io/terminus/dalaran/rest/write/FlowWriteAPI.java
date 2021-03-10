@@ -9,6 +9,7 @@ import io.terminus.dalaran.model.dto.CopyFlow;
 import io.terminus.dalaran.model.dto.ImportFlowResult;
 import io.terminus.dalaran.model.dto.ImportProcessorDTO;
 import io.terminus.dalaran.model.dto.ImportProcessorResult;
+import io.terminus.dalaran.model.dto.flow.BindAlarmRuleDto;
 import io.terminus.dalaran.model.dto.flow.ImportFlowDTO;
 import io.terminus.dalaran.model.dto.flow.TriggerFlowDTO;
 import io.terminus.dalaran.response.ResponseResult;
@@ -52,4 +53,8 @@ public interface FlowWriteAPI {
     @ApiOperation(value = "流程触发")
     @PostMapping(value = "/trigger")
     void trigger(@RequestBody TriggerFlowDTO flowDTO);
+
+    @ApiOperation(value = "流程绑定报警")
+    @PostMapping(value = "/trigger/bind")
+    ResponseResult bindAlarm(@RequestBody BindAlarmRuleDto bindAlarmRuleDto);
 }

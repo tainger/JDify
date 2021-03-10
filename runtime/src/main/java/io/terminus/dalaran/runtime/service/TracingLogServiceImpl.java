@@ -15,7 +15,7 @@ public class TracingLogServiceImpl implements TracingLogService{
     private TracingLogRepository tracingLogRepository;
 
     @Override
-    public Long countElapseLog(Date oneMinBeforeCurrent, Date now, Long flowId, Long elapse) {
+    public Long countElapseLog(Date oneMinBeforeCurrent, Date now, String flowId, Long elapse) {
         return tracingLogRepository.count((root, query1, builder) -> {
             List<Predicate> predicates = new ArrayList<>();
             predicates.add(builder.between(root.get("createdAt"), oneMinBeforeCurrent, now));
@@ -26,7 +26,7 @@ public class TracingLogServiceImpl implements TracingLogService{
     }
 
     @Override
-    public Long countFailureLog(Date oneMinBeforeCurrent, Date now, Long flowId) {
+    public Long countFailureLog(Date oneMinBeforeCurrent, Date now, String flowId) {
         return tracingLogRepository.count((root, query1, builder) -> {
             List<Predicate> predicates = new ArrayList<>();
             predicates.add(builder.between(root.get("createdAt"), oneMinBeforeCurrent, now));

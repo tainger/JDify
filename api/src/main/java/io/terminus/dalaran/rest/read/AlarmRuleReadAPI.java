@@ -15,7 +15,7 @@ public interface AlarmRuleReadAPI {
 
     @GetMapping("/{id}")
     @ApiOperation("获取报警策略详情")
-    AlarmRuleDTO detail(@PathVariable Long id);
+    AlarmRuleDTO detail(@PathVariable String id);
 
     @GetMapping("/pageable")
     @ApiOperation("模糊分页查询报警策略")

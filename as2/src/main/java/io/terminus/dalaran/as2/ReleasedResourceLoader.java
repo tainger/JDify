@@ -126,7 +126,7 @@ public class ReleasedResourceLoader implements DalaranResourceLoader {
     }
 
     @Override
-    public AlarmRuleAbstractEntity loadAlarmRule(Long alarmRuleId) {
+    public AlarmRuleAbstractEntity loadAlarmRule(String alarmRuleId) {
         return alarmRuleReleasedRepository.findByVersionAndOriginId(version, alarmRuleId);
     }
 

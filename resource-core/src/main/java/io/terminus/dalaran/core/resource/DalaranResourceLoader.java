@@ -39,7 +39,7 @@ public interface DalaranResourceLoader {
 
     ServiceAbstractEntity loadService(String serviceId);
 
-    AlarmRuleAbstractEntity loadAlarmRule(Long alarmRuleId);
+    AlarmRuleAbstractEntity loadAlarmRule(String alarmRuleId);
 
     List<AlarmRuleReleasedEntity> loadAllMonitoredAlarmRule();
 }
