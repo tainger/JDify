@@ -9,7 +9,7 @@ public interface AlarmRuleWriteAPI {
 
     @PostMapping
     @ApiOperation("新增报警策略")
-    Long create(@RequestBody AlarmRuleDTO AlarmDTO);
+    String create(@RequestBody AlarmRuleDTO AlarmDTO);
 
     @PutMapping
     @ApiOperation("更新报警策略")
@@ -17,6 +17,6 @@ public interface AlarmRuleWriteAPI {
 
     @DeleteMapping("/{id}")
     @ApiOperation("删除报警策略")
-    void deleteById(@PathVariable Long id);
+    void deleteById(@PathVariable String id);
 
 }

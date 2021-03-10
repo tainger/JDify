@@ -11,9 +11,6 @@ import javax.persistence.*;
 public abstract class AlarmRuleAbstractEntity extends BasicEntity {
 
     @Column(nullable = false)
-    private Long moduleId;
-
-    @Column(nullable = false)
     private String name;
 
     @Column(nullable = false, columnDefinition = "TEXT")

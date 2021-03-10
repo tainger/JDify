@@ -7,11 +7,7 @@ import java.util.Date;
 @Data
 public class BasicAlarmInfo {
 
-    private Long id;
-
-    private Long moduleId;
-
-    private String moduleName;
+    private String id;
 
     private String name;
 

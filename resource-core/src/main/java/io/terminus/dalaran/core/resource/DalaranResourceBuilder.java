@@ -37,5 +37,5 @@ public interface DalaranResourceBuilder {
 
     Object buildServiceConfig(ServiceAbstractEntity serviceEntity);
 
-    Object buildAlarmRuleConfig(Long alarmRuleId, Class alarmRuleType);
+    Object buildAlarmRuleConfig(String alarmRuleId, Class alarmRuleType);
 }

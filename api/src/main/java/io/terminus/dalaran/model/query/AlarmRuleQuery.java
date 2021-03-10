@@ -7,4 +7,6 @@ public class AlarmRuleQuery {
 
     private String name;
 
+    private String moduleId;
+
 }
