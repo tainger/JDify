@@ -24,7 +24,7 @@ public interface TracingReadAPI {
     @GetMapping("/{recordId}")
     MainLogDTO logDetail(@PathVariable String recordId);
 
-    @ApiOperation(value = "流程统计分页")
+    @ApiOperation(value = "统计详情")
     @GetMapping("/detail/{id}")
     DetailLogDTO logDetailById(@PathVariable String id);
 

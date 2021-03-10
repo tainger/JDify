@@ -17,6 +17,8 @@ public class DetailLogDTO {
 
     private boolean isMonitor;
 
+    private String monitorName;
+
     private String description;
 
     private Double avgTime;

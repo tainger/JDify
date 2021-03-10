@@ -11,4 +11,6 @@ public interface AlarmRuleReleasedRepository extends JpaRepository<AlarmRuleRele
     AlarmRuleReleasedEntity findByVersionAndOriginId(String version, String alarmRuleId);
 
     List<AlarmRuleReleasedEntity> findByVersion(String version);
+
+    AlarmRuleReleasedEntity findByResourceKeyAndVersion(String resourceKey, String version);
 }

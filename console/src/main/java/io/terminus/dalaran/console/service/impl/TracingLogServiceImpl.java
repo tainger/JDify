@@ -10,11 +10,9 @@ import io.terminus.dalaran.core.resource.entity.basic.BasicFlowEntity;
 import io.terminus.dalaran.core.resource.entity.common.ModuleEntity;
 import io.terminus.dalaran.core.resource.entity.common.ReleaseRecordEntity;
 import io.terminus.dalaran.core.resource.entity.common.TracingLogEntity;
+import io.terminus.dalaran.core.resource.entity.released.AlarmRuleReleasedEntity;
 import io.terminus.dalaran.core.resource.entity.released.TriggerFlowReleasedEntity;
-import io.terminus.dalaran.core.resource.repository.ModuleRepository;
-import io.terminus.dalaran.core.resource.repository.ReleaseRecordRepository;
-import io.terminus.dalaran.core.resource.repository.TracingLogRepository;
-import io.terminus.dalaran.core.resource.repository.TriggerFlowReleasedRepository;
+import io.terminus.dalaran.core.resource.repository.*;
 import io.terminus.dalaran.model.dto.log.*;
 import io.terminus.dalaran.model.query.TracingLogQuery;
 import org.apache.commons.lang3.StringUtils;
@@ -60,6 +58,11 @@ public class TracingLogServiceImpl implements TracingLogService {
 
     @Autowired
     private TriggerFlowReleasedRepository triggerFlowReleasedRepository;
+
+    @Autowired
+    private AlarmRuleReleasedRepository alarmRuleReleasedRepository;
+
+
 
     private String timeZone = System.getenv("TZ");
 
@@ -133,7 +136,7 @@ public class TracingLogServiceImpl implements TracingLogService {
         if (tracingLogEntity.size() == 0) {
             return detailLogDTO;
         }
-        detailLogDTO = buildDetailLog(entity);
+        detailLogDTO = buildDetailLog(entity, version);
         TimeLogDTO timeLogDTO= getElapsedTime(flowId, version);
         List<TracingLogEntity> tracingLogFailEntity = tracingLogRepository.findByFlowIdAndVersionAndSuccessful(flowId, version, false);
         Long lastExceptionDate = null;
@@ -261,7 +264,7 @@ public class TracingLogServiceImpl implements TracingLogService {
         return tracingLog;
     }
 
-    private DetailLogDTO buildDetailLog(TriggerFlowReleasedEntity entity) {
+    private DetailLogDTO buildDetailLog(TriggerFlowReleasedEntity entity, String version) {
         List<ModuleEntity> moduleEntities = moduleRepository.findByIsExistTrue();
         Map<String, String> map = new HashMap<>();
         moduleEntities.forEach(moduleEntity -> map.put(moduleEntity.getResourceKey(), moduleEntity.getName()));
@@ -273,6 +276,7 @@ public class TracingLogServiceImpl implements TracingLogService {
         detailLogDTO.setOnline(entity.isOnline());
         detailLogDTO.setDescription(entity.getDescription());
         detailLogDTO.setMonitor(entity.isMonitor());
+        AlarmRuleReleasedEntity alarmRuleReleasedEntity = alarmRuleReleasedRepository.findByResourceKeyAndVersion(entity.getAlarmResourceKey(), version);
         return detailLogDTO;
     }
 
