@@ -156,7 +156,7 @@ public class SubFlowManagementServiceImpl implements SubFlowManagementService {
     private SubFlowEntity buildEntity(SubFlowDTO model) {
         SubFlowEntity flowEntity;
         String resourceKey = model.getId();
-        if (StringUtils.isBlank(resourceKey)) {
+        if (StringUtils.isNotBlank(resourceKey)) {
             flowEntity = subFlowRepository.findByResourceKey(resourceKey);
         } else {
             flowEntity = new SubFlowEntity();
