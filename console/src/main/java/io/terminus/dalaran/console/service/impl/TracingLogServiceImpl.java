@@ -277,6 +277,8 @@ public class TracingLogServiceImpl implements TracingLogService {
         detailLogDTO.setDescription(entity.getDescription());
         detailLogDTO.setMonitor(entity.isMonitor());
         AlarmRuleReleasedEntity alarmRuleReleasedEntity = alarmRuleReleasedRepository.findByResourceKeyAndVersion(entity.getAlarmResourceKey(), version);
+        detailLogDTO.setMonitorId(entity.getAlarmResourceKey());
+        detailLogDTO.setMonitorName(alarmRuleReleasedEntity.getName());
         return detailLogDTO;
     }
 

@@ -17,6 +17,8 @@ public class DetailLogDTO {
 
     private boolean isMonitor;
 
+    private String monitorId;
+
     private String monitorName;
 
     private String description;
