@@ -9,5 +9,5 @@ import lombok.Data;
 public class DalaranSubFlowConfig extends ComponentModelConfig {
 
     @ConfigFieldInfo(label = "选择子流程", inputType = FieldInputType.SubFlow)
-    private Long subFlowId;
+    private String subFlowId;
 }
