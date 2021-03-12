@@ -13,13 +13,16 @@ public class BasicConnectorInfo {
 
     private String connectorType;
 
+    private boolean isExist;
+
     public BasicConnectorInfo() {
     }
 
-    public BasicConnectorInfo(String id, String moduleId, String name, String connectorType) {
+    public BasicConnectorInfo(String id, String moduleId, String name, String connectorType, boolean isExist) {
         this.id = id;
         this.moduleId = moduleId;
         this.name = name;
         this.connectorType = connectorType;
+        this.isExist = isExist;
     }
 }

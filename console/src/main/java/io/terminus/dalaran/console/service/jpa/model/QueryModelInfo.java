@@ -13,13 +13,16 @@ public class QueryModelInfo {
 
     private String modelType;
 
+    private boolean isExist;
+
     public QueryModelInfo() {
     }
 
-    public QueryModelInfo(String resourceKey, String moduleId, String name, String modelType) {
+    public QueryModelInfo(String resourceKey, String moduleId, String name, String modelType, boolean isExist) {
         this.resourceKey = resourceKey;
         this.moduleId = moduleId;
         this.name = name;
         this.modelType = modelType;
+        this.isExist = isExist;
     }
 }

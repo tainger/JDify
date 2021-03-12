@@ -18,19 +18,19 @@ public class BasicFlowInfo {
 
     private boolean isExist;
 
-    private boolean online;
+    private boolean isOnline;
 
     public BasicFlowInfo() {
     }
 
-    public BasicFlowInfo(String id, String moduleId, String name, FlowStatus status, String triggerType, boolean isExist, boolean online) {
+    public BasicFlowInfo(String id, String moduleId, String name, FlowStatus status, String triggerType, boolean isExist, boolean isOnline) {
         this.id = id;
         this.moduleId = moduleId;
         this.name = name;
         this.status = status;
         this.triggerType = triggerType;
         this.isExist = isExist;
-        this.online = online;
+        this.isOnline = isOnline;
     }
 
     public BasicFlowInfo(String id, String moduleId, String name, FlowStatus status, String triggerType) {

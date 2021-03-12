@@ -65,7 +65,7 @@ public class ClientManagementServiceImpl implements ClientManagementService {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<QueryClientInfo> criteriaQuery = builder.createQuery(QueryClientInfo.class);
         Root<ClientEntity> root = criteriaQuery.from(ClientEntity.class);
-        criteriaQuery.multiselect(root.get("resourceKey"), root.get("moduleId"), root.get("name"))
+        criteriaQuery.multiselect(root.get("resourceKey"), root.get("moduleId"), root.get("name"), root.get("isExist"))
                 .where(builder.equal(root.get("moduleId"), moduleId) , builder.equal(root.get("isExist"), true));
         List<QueryClientInfo> models = entityManager.createQuery(criteriaQuery).getResultList();
         List<BasicClientInfo> basicClients = new ArrayList<>();

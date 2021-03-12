@@ -11,12 +11,15 @@ public class QueryClientInfo {
 
     private String name;
 
+    private boolean isExist;
+
     public QueryClientInfo() {
     }
 
-    public QueryClientInfo(String resourceKey, String moduleId, String name) {
+    public QueryClientInfo(String resourceKey, String moduleId, String name, boolean isExist) {
         this.resourceKey = resourceKey;
         this.moduleId = moduleId;
         this.name = name;
+        this.isExist = isExist;
     }
 }

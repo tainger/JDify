@@ -13,13 +13,16 @@ public class QueryLimiterInfo {
 
     private String limiterType;
 
+    private boolean isExist;
+
     public QueryLimiterInfo() {
     }
 
-    public QueryLimiterInfo(String resourceKey, String moduleId, String name, String limiterType) {
+    public QueryLimiterInfo(String resourceKey, String moduleId, String name, String limiterType, boolean isExist) {
         this.resourceKey = resourceKey;
         this.moduleId = moduleId;
         this.name = name;
         this.limiterType = limiterType;
+        this.isExist = isExist;
     }
 }

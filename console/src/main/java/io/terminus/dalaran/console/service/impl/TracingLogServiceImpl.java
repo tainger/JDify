@@ -132,11 +132,11 @@ public class TracingLogServiceImpl implements TracingLogService {
         if(entity == null) {
             return detailLogDTO;
         }
+        detailLogDTO = buildDetailLog(entity, version, flowId);
         List<TracingLogEntity> tracingLogEntity = tracingLogRepository.findByFlowIdAndVersion(flowId, version);
         if (tracingLogEntity.size() == 0) {
             return detailLogDTO;
         }
-        detailLogDTO = buildDetailLog(entity, version);
         TimeLogDTO timeLogDTO= getElapsedTime(flowId, version);
         List<TracingLogEntity> tracingLogFailEntity = tracingLogRepository.findByFlowIdAndVersionAndSuccessful(flowId, version, false);
         Long lastExceptionDate = null;
@@ -264,7 +264,7 @@ public class TracingLogServiceImpl implements TracingLogService {
         return tracingLog;
     }
 
-    private DetailLogDTO buildDetailLog(TriggerFlowReleasedEntity entity, String version) {
+    private DetailLogDTO buildDetailLog(TriggerFlowReleasedEntity entity, String version, String flowId) {
         List<ModuleEntity> moduleEntities = moduleRepository.findByIsExistTrue();
         Map<String, String> map = new HashMap<>();
         moduleEntities.forEach(moduleEntity -> map.put(moduleEntity.getResourceKey(), moduleEntity.getName()));
@@ -276,8 +276,9 @@ public class TracingLogServiceImpl implements TracingLogService {
         detailLogDTO.setOnline(entity.isOnline());
         detailLogDTO.setDescription(entity.getDescription());
         detailLogDTO.setMonitor(entity.isMonitor());
-        AlarmRuleEntity alarmRuleEntity = alarmRuleRepository.findByResourceKey(entity.getAlarmResourceKey());
-        detailLogDTO.setMonitorId(entity.getAlarmResourceKey());
+        TriggerFlowEntity triggerFlowEntity = flowRepository.findByResourceKey(flowId);
+        AlarmRuleEntity alarmRuleEntity = alarmRuleRepository.findByResourceKey(triggerFlowEntity.getAlarmResourceKey());
+        detailLogDTO.setMonitorId(alarmRuleEntity.getResourceKey());
         detailLogDTO.setMonitorName(alarmRuleEntity.getName());
         return detailLogDTO;
     }
