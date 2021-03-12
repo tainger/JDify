@@ -47,4 +47,8 @@ public class RedisService {
             return redisTemplate.hasKey(key);
         }
     }
+
+    public Boolean deleteKey(String key) {
+        return redisTemplate.delete(key);
+    }
 }

@@ -90,8 +90,6 @@ public class ReleaseServiceImpl implements ReleaseService {
     @Autowired
     private  ModuleRepository moduleRepository;
 
-    @Autowired
-    private AlarmRuleReleasedRepository alarmRuleReleasedRepository;
 
     @Autowired
     private AlarmRuleRepository alarmRuleRepository;
@@ -151,8 +149,6 @@ public class ReleaseServiceImpl implements ReleaseService {
         List<LimiterReleasedEntity> limiterReleasedEntities = toReleasedData(limiterRepository.findByIsExistTrue(), LimiterReleasedEntity.class, requestDTO.getVersion());
         limiterReleasedRepository.saveAll(limiterReleasedEntities);
 
-        List<AlarmRuleReleasedEntity> alarmRuleReleasedEntities = toReleasedData(alarmRuleRepository.findByIsExistTrue(), AlarmRuleReleasedEntity.class, requestDTO.getVersion());
-        alarmRuleReleasedRepository.saveAll(alarmRuleReleasedEntities);
 
         return toDTO(recordEntity);
     }

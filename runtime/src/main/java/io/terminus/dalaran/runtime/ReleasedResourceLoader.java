@@ -1,13 +1,10 @@
 package io.terminus.dalaran.runtime;
 
 import io.terminus.dalaran.core.resource.DalaranResourceLoader;
-import io.terminus.dalaran.core.resource.entity.AlarmRuleAbstractEntity;
-import io.terminus.dalaran.core.resource.entity.LimiterAbstractEntity;
 import io.terminus.dalaran.core.resource.entity.released.*;
 import io.terminus.dalaran.core.resource.repository.*;
 import io.terminus.dalaran.model.flow.FlowStatus;
 import org.springframework.beans.factory.annotation.Autowired;
-
 import java.util.List;
 
 public class ReleasedResourceLoader implements DalaranResourceLoader {
@@ -43,8 +40,6 @@ public class ReleasedResourceLoader implements DalaranResourceLoader {
     @Autowired
     private LimiterReleasedRepository limiterRepository;
 
-    @Autowired
-    private AlarmRuleReleasedRepository alarmRuleReleasedRepository;
 
     public List<TriggerFlowReleasedEntity> LoadAllMonitoredTriggerFlow() {
         return releasedTriggerFlowRepository.findByVersionAndIsMonitorTrue(version);
@@ -130,15 +125,6 @@ public class ReleasedResourceLoader implements DalaranResourceLoader {
         return serviceRepository.findByVersionAndOriginId(version, serviceId);
     }
 
-    @Override
-    public AlarmRuleAbstractEntity loadAlarmRule(String alarmRuleId) {
-        return alarmRuleReleasedRepository.findByVersionAndOriginId(version, alarmRuleId);
-    }
-
-    @Override
-    public List<AlarmRuleReleasedEntity> loadAllMonitoredAlarmRule() {
-        return alarmRuleReleasedRepository.findByVersion(version);
-    }
 
     public String getVersion() {
         return version;

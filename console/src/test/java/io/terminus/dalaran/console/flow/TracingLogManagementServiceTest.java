@@ -31,8 +31,8 @@ public class TracingLogManagementServiceTest {
     @Test
     public void triggerLogs() {
         TracingLogQuery query = new TracingLogQuery();
-        query.setModuleId(1L);
-        query.setFlowId(4L);
+        query.setModuleId("1L");
+        query.setFlowId("4L");
         List<MainLogDTO> logs = tracingLogService.triggerLogs(query);
         logs.forEach(log -> {
             Assert.assertSame(log.getFlowId(), 4L);

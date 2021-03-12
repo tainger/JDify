@@ -2,6 +2,7 @@ package io.terminus.dalaran.console.repository;
 
 import io.terminus.dalaran.console.entity.TriggerFlowEntity;
 import io.terminus.dalaran.model.flow.FlowStatus;
+import io.terminus.dalaran.model.flow.TriggerFlow;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
@@ -22,4 +23,6 @@ public interface TriggerFlowRepository extends JpaRepository<TriggerFlowEntity, 
     List<TriggerFlowEntity> findByIsMonitorTrue();
 
     TriggerFlowEntity findByResourceKey(String resourceKey);
+
+    List<TriggerFlowEntity> findByAlarmResourceKey(String resourceKey);
 }
