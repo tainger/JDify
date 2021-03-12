@@ -15,7 +15,6 @@ public interface PlatformImportAPI {
     @PostMapping(value = "/import")
     void importAll(@RequestParam MultipartFile importFile);
 
-
     @ApiOperation(value = "导入jar文件（测试）")
     @PostMapping(value = "/import/jar")
     void importJarFile(@RequestBody ImportJarRequest request);
