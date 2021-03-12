@@ -30,7 +30,7 @@ public class SubFlowQueryServiceImpl implements SubFlowQueryService {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<QueryFlowInfo> criteriaQuery = builder.createQuery(QueryFlowInfo.class);
         Root<SubFlowEntity> root = criteriaQuery.from(SubFlowEntity.class);
-        criteriaQuery.multiselect(root.get("resourceKey"), root.get("moduleId"), root.get("name"), root.get("status")).where(builder.equal(root.get("moduleId"), moduleId));
+        criteriaQuery.multiselect(root.get("resourceKey"), root.get("moduleId"), root.get("name"), root.get("status"), root.get("isExist")).where(builder.equal(root.get("moduleId"), moduleId), builder.equal(root.get("isExist"),true));
         List<QueryFlowInfo> subFlows = entityManager.createQuery(criteriaQuery).getResultList();
         List<BasicFlowInfo> basicSubFlows = new ArrayList<>();
         subFlows.forEach(subFlow -> {

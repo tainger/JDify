@@ -61,8 +61,8 @@ public class LimiterServiceImpl implements LimiterService {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<QueryLimiterInfo> criteriaQuery = builder.createQuery(QueryLimiterInfo.class);
         Root<LimiterEntity> root = criteriaQuery.from(LimiterEntity.class);
-        criteriaQuery.multiselect(root.get("resourceKey"), root.get("moduleId"), root.get("name"), root.get("limiterType"))
-                .where(builder.equal(root.get("moduleId"), moduleId));
+        criteriaQuery.multiselect(root.get("resourceKey"), root.get("moduleId"), root.get("name"), root.get("limiterType"), root.get("isExist"))
+                .where(builder.equal(root.get("moduleId"), moduleId), builder.equal(root.get("isExist"),true));
         List<QueryLimiterInfo> limiters = entityManager.createQuery(criteriaQuery).getResultList();
         List<BasicLimiterInfo> basicLimiters = new ArrayList<>();
         limiters.forEach(limiter -> {

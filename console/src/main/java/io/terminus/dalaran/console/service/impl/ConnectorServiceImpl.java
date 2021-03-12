@@ -65,7 +65,7 @@ public class ConnectorServiceImpl implements ConnectorService {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<QueryConnectorInfo> criteriaQuery = builder.createQuery(QueryConnectorInfo.class);
         Root<ConnectorEntity> root = criteriaQuery.from(ConnectorEntity.class);
-        criteriaQuery.multiselect(root.get("resourceKey"), root.get("moduleId"), root.get("name"), root.get("connectorType"))
+        criteriaQuery.multiselect(root.get("resourceKey"), root.get("moduleId"), root.get("name"), root.get("connectorType"), root.get("isExist"))
                 .where(builder.equal(root.get("moduleId"), moduleId), builder.equal(root.get("isExist"),true));
         List<QueryConnectorInfo> connectors = entityManager.createQuery(criteriaQuery).getResultList();
         List<BasicConnectorInfo> basicConnectors = new ArrayList<>();

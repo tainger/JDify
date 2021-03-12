@@ -69,7 +69,7 @@ public class FunctionServiceImpl implements FunctionService {
         CriteriaQuery<QueryFunctionInfo> criteriaQuery = builder.createQuery(QueryFunctionInfo.class);
         Root<FunctionEntity> root = criteriaQuery.from(FunctionEntity.class);
         criteriaQuery.multiselect(root.get("resourceKey"), root.get("moduleId"), root.get("name"), root.get("description"),
-                root.get("type"), root.get("params")).where(builder.equal(root.get("moduleId"), moduleId),
+                root.get("type"), root.get("params"), root.get("isExist")).where(builder.equal(root.get("moduleId"), moduleId),
                 builder.equal(root.get("isExist"),true));
         List<QueryFunctionInfo> functions = entityManager.createQuery(criteriaQuery).getResultList();
         List<BasicFunctionInfo> basicFunctions = new ArrayList<>();

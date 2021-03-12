@@ -1,7 +1,9 @@
 package io.terminus.dalaran.console.service.impl;
 
 import io.terminus.dalaran.TracingType;
+import io.terminus.dalaran.console.entity.AlarmRuleEntity;
 import io.terminus.dalaran.console.entity.TriggerFlowEntity;
+import io.terminus.dalaran.console.repository.AlarmRuleRepository;
 import io.terminus.dalaran.console.repository.SubFlowRepository;
 import io.terminus.dalaran.console.repository.TriggerFlowRepository;
 import io.terminus.dalaran.console.service.ModuleManagementService;
@@ -10,7 +12,6 @@ import io.terminus.dalaran.core.resource.entity.basic.BasicFlowEntity;
 import io.terminus.dalaran.core.resource.entity.common.ModuleEntity;
 import io.terminus.dalaran.core.resource.entity.common.ReleaseRecordEntity;
 import io.terminus.dalaran.core.resource.entity.common.TracingLogEntity;
-import io.terminus.dalaran.core.resource.entity.released.AlarmRuleReleasedEntity;
 import io.terminus.dalaran.core.resource.entity.released.TriggerFlowReleasedEntity;
 import io.terminus.dalaran.core.resource.repository.*;
 import io.terminus.dalaran.model.dto.log.*;
@@ -60,7 +61,7 @@ public class TracingLogServiceImpl implements TracingLogService {
     private TriggerFlowReleasedRepository triggerFlowReleasedRepository;
 
     @Autowired
-    private AlarmRuleReleasedRepository alarmRuleReleasedRepository;
+    private AlarmRuleRepository alarmRuleRepository;
 
 
 
@@ -132,11 +133,11 @@ public class TracingLogServiceImpl implements TracingLogService {
         if(entity == null) {
             return detailLogDTO;
         }
+        detailLogDTO = buildDetailLog(entity, version, flowId);
         List<TracingLogEntity> tracingLogEntity = tracingLogRepository.findByFlowIdAndVersion(flowId, version);
         if (tracingLogEntity.size() == 0) {
             return detailLogDTO;
         }
-        detailLogDTO = buildDetailLog(entity, version);
         TimeLogDTO timeLogDTO= getElapsedTime(flowId, version);
         List<TracingLogEntity> tracingLogFailEntity = tracingLogRepository.findByFlowIdAndVersionAndSuccessful(flowId, version, false);
         Long lastExceptionDate = null;
@@ -264,7 +265,7 @@ public class TracingLogServiceImpl implements TracingLogService {
         return tracingLog;
     }
 
-    private DetailLogDTO buildDetailLog(TriggerFlowReleasedEntity entity, String version) {
+    private DetailLogDTO buildDetailLog(TriggerFlowReleasedEntity entity, String version, String flowId) {
         List<ModuleEntity> moduleEntities = moduleRepository.findByIsExistTrue();
         Map<String, String> map = new HashMap<>();
         moduleEntities.forEach(moduleEntity -> map.put(moduleEntity.getResourceKey(), moduleEntity.getName()));
@@ -276,9 +277,11 @@ public class TracingLogServiceImpl implements TracingLogService {
         detailLogDTO.setOnline(entity.isOnline());
         detailLogDTO.setDescription(entity.getDescription());
         detailLogDTO.setMonitor(entity.isMonitor());
-        AlarmRuleReleasedEntity alarmRuleReleasedEntity = alarmRuleReleasedRepository.findByResourceKeyAndVersion(entity.getAlarmResourceKey(), version);
-        detailLogDTO.setMonitorId(entity.getAlarmResourceKey());
-        detailLogDTO.setMonitorName(alarmRuleReleasedEntity.getName());
+        //用普通表的ResourceKey查对应的告警信息
+        TriggerFlowEntity triggerFlowEntity = flowRepository.findByResourceKey(flowId);
+        AlarmRuleEntity alarmRuleEntity = alarmRuleRepository.findByResourceKey(triggerFlowEntity.getAlarmResourceKey());
+        detailLogDTO.setMonitorId(alarmRuleEntity.getResourceKey());
+        detailLogDTO.setMonitorName(alarmRuleEntity.getName());
         return detailLogDTO;
     }
 
