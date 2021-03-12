@@ -11,12 +11,15 @@ public class BasicClientInfo {
 
     private String name;
 
+    private boolean isExist;
+
     public BasicClientInfo() {
     }
 
-    public BasicClientInfo(String id, String moduleId, String name) {
+    public BasicClientInfo(String id, String moduleId, String name, boolean isExist) {
         this.id = id;
         this.moduleId = moduleId;
         this.name = name;
+        this.isExist = isExist;
     }
 }

@@ -17,14 +17,17 @@ public class BasicModelInfo {
 
     private String modelType;
 
+    private boolean isExist;
+
     public BasicModelInfo() {
     }
 
-    public BasicModelInfo(String id, String moduleId, String name, String modelType) {
+    public BasicModelInfo(String id, String moduleId, String name, String modelType, boolean isExist) {
         this.id = id;
         this.moduleId = moduleId;
         this.name = name;
         this.modelType = modelType;
+        this.isExist = isExist;
     }
 }
 

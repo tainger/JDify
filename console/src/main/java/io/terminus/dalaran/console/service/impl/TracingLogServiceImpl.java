@@ -277,7 +277,6 @@ public class TracingLogServiceImpl implements TracingLogService {
         detailLogDTO.setOnline(entity.isOnline());
         detailLogDTO.setDescription(entity.getDescription());
         detailLogDTO.setMonitor(entity.isMonitor());
-        //用普通表的ResourceKey查对应的告警信息
         TriggerFlowEntity triggerFlowEntity = flowRepository.findByResourceKey(flowId);
         AlarmRuleEntity alarmRuleEntity = alarmRuleRepository.findByResourceKey(triggerFlowEntity.getAlarmResourceKey());
         detailLogDTO.setMonitorId(alarmRuleEntity.getResourceKey());

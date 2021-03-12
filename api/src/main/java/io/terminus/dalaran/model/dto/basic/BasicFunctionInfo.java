@@ -25,12 +25,13 @@ public class BasicFunctionInfo {
     public BasicFunctionInfo() {
     }
 
-    public BasicFunctionInfo(String id, String moduleId, String name, String description, MappingFunctionType type, List<String> params) {
+    public BasicFunctionInfo(String id, String moduleId, String name, String description, MappingFunctionType type, List<String> params, boolean isExist) {
         this.id = id;
         this.moduleId = moduleId;
         this.name = name;
         this.description = description;
         this.type = type;
         this.params = params;
+        this.isExist = isExist;
     }
 }

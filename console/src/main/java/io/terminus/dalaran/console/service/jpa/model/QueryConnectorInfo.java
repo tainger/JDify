@@ -13,13 +13,16 @@ public class QueryConnectorInfo {
 
     private String connectorType;
 
+    private boolean isExist;
+
     public QueryConnectorInfo() {
     }
 
-    public QueryConnectorInfo(String resourceKey, String moduleId, String name, String connectorType) {
+    public QueryConnectorInfo(String resourceKey, String moduleId, String name, String connectorType, boolean isExist) {
         this.resourceKey = resourceKey;
         this.moduleId = moduleId;
         this.name = name;
         this.connectorType = connectorType;
+        this.isExist = isExist;
     }
 }

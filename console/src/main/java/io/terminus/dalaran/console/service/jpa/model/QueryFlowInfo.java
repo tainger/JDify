@@ -18,23 +18,26 @@ public class QueryFlowInfo {
 
     private boolean isExist;
 
-    private boolean online;
+    private boolean isOnline;
 
     public QueryFlowInfo() {
     }
 
-    public QueryFlowInfo(String resourceKey, String moduleId, String name, FlowStatus status) {
+    public QueryFlowInfo(String resourceKey, String moduleId, String name, FlowStatus status, boolean isExist) {
         this.resourceKey = resourceKey;
         this.moduleId = moduleId;
         this.name = name;
         this.status = status;
+        this.isExist = isExist;
     }
 
-    public QueryFlowInfo(String resourceKey, String moduleId, String name, FlowStatus status, String triggerType) {
+    public QueryFlowInfo(String resourceKey, String moduleId, String name, FlowStatus status, String triggerType, boolean isExist, boolean isOnline) {
         this.resourceKey = resourceKey;
         this.moduleId = moduleId;
         this.name = name;
         this.status = status;
         this.triggerType = triggerType;
+        this.isExist = isExist;
+        this.isOnline = isOnline;
     }
 }

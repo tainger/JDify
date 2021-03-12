@@ -13,13 +13,16 @@ public class BasicLimiterInfo {
 
     private String limiterType;
 
+    private boolean isExist;
+
     public BasicLimiterInfo() {
     }
 
-    public BasicLimiterInfo(String id, String moduleId, String name, String limiterType) {
+    public BasicLimiterInfo(String id, String moduleId, String name, String limiterType, boolean isExist) {
         this.id = id;
         this.moduleId = moduleId;
         this.name = name;
         this.limiterType = limiterType;
+        this.isExist = isExist;
     }
 }

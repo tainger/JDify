@@ -25,12 +25,13 @@ public class QueryFunctionInfo {
     public QueryFunctionInfo() {
     }
 
-    public QueryFunctionInfo(String resourceKey, String moduleId, String name, String description, MappingFunctionType type, List<String> params) {
+    public QueryFunctionInfo(String resourceKey, String moduleId, String name, String description, MappingFunctionType type, List<String> params, boolean isExist) {
         this.resourceKey = resourceKey;
         this.moduleId = moduleId;
         this.name = name;
         this.description = description;
         this.type = type;
         this.params = params;
+        this.isExist = isExist;
     }
 }

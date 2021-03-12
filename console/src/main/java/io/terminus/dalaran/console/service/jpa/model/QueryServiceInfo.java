@@ -13,13 +13,16 @@ public class QueryServiceInfo {
 
     private String name;
 
+    private boolean isExist;
+
     public QueryServiceInfo() {
     }
 
-    public QueryServiceInfo(String resourceKey, String moduleId, String type, String name) {
+    public QueryServiceInfo(String resourceKey, String moduleId, String type, String name, boolean isExist) {
         this.resourceKey = resourceKey;
         this.moduleId = moduleId;
         this.type = type;
         this.name = name;
+        this.isExist = isExist;
     }
 }
