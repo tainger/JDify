@@ -3,12 +3,12 @@ package io.terminus.dalaran.runtime;
 import com.alibaba.fastjson.JSONObject;
 import io.terminus.dalaran.core.component.config.AlarmRuleConfig;
 import io.terminus.dalaran.core.resource.DalaranStarter;
-import io.terminus.dalaran.core.resource.entity.NoticeMessage;
 import io.terminus.dalaran.core.resource.entity.released.TriggerFlowReleasedEntity;
 import io.terminus.dalaran.core.resource.redis.RedisService;
 import io.terminus.dalaran.core.resource.redis.RedisUtil;
 import io.terminus.dalaran.core.resource.repository.ReleaseRecordRepository;
 import io.terminus.dalaran.core.resource.repository.TriggerFlowReleasedRepository;
+import io.terminus.dalaran.model.alarm.NoticeMessage;
 import io.terminus.dalaran.runtime.service.DalaranNoticeService;
 import io.terminus.dalaran.runtime.service.TracingLogService;
 import lombok.extern.slf4j.Slf4j;
@@ -62,25 +62,25 @@ public class AlarmManagerInitializer implements DalaranStarter {
                     e.printStackTrace();
                 }
             }
-        }, 0, 3 * 60 * 1000L);
+        }, 0, 60 * 1000L);
     }
 
     private void monitor() {
-        String alarmConfigCache = redisService.getValue(RedisUtil.getAlarmConfigKey());
-        Map<String, String> alarmConfig = JSONObject.parseObject(alarmConfigCache, Map.class);
-        if (alarmConfig.isEmpty()) {
+        String flowIds = redisService.getValue(RedisUtil.getReleasedFlowIdsKey());
+        String[] ids = flowIds.split(",");
+//        Map<String, String> alarmConfig = JSONObject.parseObject(alarmConfigCache, Map.class);
+        if (ids.length==0) {
             return;
         }
         Date oneMinBeforeCurrent = new Date(current - 60 * 1000L);
         Date now = new Date(current);
-        logger.error("-------------报警配置:{}-----", alarmConfig);
-        for (Map.Entry<String, String> entry : alarmConfig.entrySet()) {
-            String flowId = entry.getKey();
-            String alarmRuleId = entry.getValue();
-            String value = redisService.getValue(alarmRuleId);
+        List<String> strList = Arrays.asList(ids);
+        logger.error("-------------报警配置的id:{}-----", strList);
+        for (String flowId : strList) {
+            String alarmRuleId = redisService.getValue(RedisUtil.getAlarmConfigKey(flowId));
             logger.error("-------------报警审核：{}----{}----", flowId, alarmRuleId);
-            logger.error("-------------报警规则String：----{}----", value);
-            AlarmRuleConfig alarmRuleConfig = JSONObject.parseObject(value, AlarmRuleConfig.class);
+            String alarmConfig = redisService.getValue(RedisUtil.getAlarmRuleKey(alarmRuleId));
+            AlarmRuleConfig alarmRuleConfig = JSONObject.parseObject(alarmConfig, AlarmRuleConfig.class);
             logger.error("-------------报警规则：----{}----", alarmRuleConfig);
             Map<AlarmRuleConfig.ChannelType, String> alarmChannel = alarmRuleConfig.getAlarmChannel();
             if (alarmChannel.isEmpty()) {

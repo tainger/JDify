@@ -116,17 +116,22 @@ public class ReleasedFlowInitializer implements DalaranStarter {
             }
             resourceLoader.setVersion(recordEntity.getVersion());
             resourceLoader.setLastVersion(recordEntity.getLastVersion());
-            Map<String, String> alarmConfig = new HashMap<>();
 
+
+
+            List<String> flowIds = new ArrayList<>();
             List<TriggerFlowReleasedEntity> triggerFlowReleasedEntities = resourceLoader.loadAllTriggerFlow();
             for (TriggerFlowReleasedEntity triggerFlowReleasedEntity : triggerFlowReleasedEntities) {
                 if(triggerFlowReleasedEntity.isExist()&&triggerFlowReleasedEntity.isMonitor()&&triggerFlowReleasedEntity.isOnline()){
                     String originId = triggerFlowReleasedEntity.getOriginId();
-                    String alarmResourceKey = triggerFlowReleasedEntity.getAlarmResourceKey();
-                    alarmConfig.put(originId, alarmResourceKey);
+                    flowIds.add(originId);
                 }
             }
-            redisService.persistKey(RedisUtil.getAlarmConfigKey(), JSONObject.toJSONString(alarmConfig));
+            String join = String.join(",", flowIds);
+            redisService.persistKey(RedisUtil.getReleasedFlowIdsKey(), join);
+
+
+
             // load client info
             List<ClientReleasedEntity> clients = resourceLoader.loadAllClient();
             for (ClientReleasedEntity client : clients) {

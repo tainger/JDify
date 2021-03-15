@@ -1,7 +1,7 @@
 package io.terminus.dalaran.runtime.service.Impl;
 
 import io.terminus.common.model.Response;
-import io.terminus.dalaran.core.resource.entity.NoticeMessage;
+import io.terminus.dalaran.model.alarm.NoticeMessage;
 import io.terminus.dalaran.runtime.service.DalaranNoticeService;
 import io.terminus.notice.api.dto.EmailSendDTO;
 import io.terminus.notice.sender.email.service.EmailSenderService;
