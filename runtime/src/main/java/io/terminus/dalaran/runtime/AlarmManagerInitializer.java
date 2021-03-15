@@ -2,22 +2,20 @@ package io.terminus.dalaran.runtime;
 
 import com.alibaba.fastjson.JSONObject;
 import io.terminus.dalaran.core.component.config.AlarmRuleConfig;
-import io.terminus.dalaran.core.resource.DalaranResourceBuilder;
 import io.terminus.dalaran.core.resource.DalaranStarter;
 import io.terminus.dalaran.core.resource.entity.NoticeMessage;
-import io.terminus.dalaran.core.resource.entity.common.ReleaseRecordEntity;
 import io.terminus.dalaran.core.resource.entity.released.TriggerFlowReleasedEntity;
 import io.terminus.dalaran.core.resource.redis.RedisService;
+import io.terminus.dalaran.core.resource.redis.RedisUtil;
 import io.terminus.dalaran.core.resource.repository.ReleaseRecordRepository;
 import io.terminus.dalaran.core.resource.repository.TriggerFlowReleasedRepository;
 import io.terminus.dalaran.runtime.service.DalaranNoticeService;
 import io.terminus.dalaran.runtime.service.TracingLogService;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Slf4j
@@ -46,6 +44,9 @@ public class AlarmManagerInitializer implements DalaranStarter {
 
     private Long current = System.currentTimeMillis();
 
+
+    private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
     @Override
     public void start() {
         logger.error("------------start------------");
@@ -64,7 +65,7 @@ public class AlarmManagerInitializer implements DalaranStarter {
     }
 
     private void monitor() {
-        String alarmConfigCache = redisService.getValue("alarmConfig");
+        String alarmConfigCache = redisService.getValue(RedisUtil.getAlarmConfigKey());
         Map<String, String> alarmConfig = JSONObject.parseObject(alarmConfigCache, Map.class);
         if (alarmConfig.isEmpty()) {
             return;
@@ -76,7 +77,10 @@ public class AlarmManagerInitializer implements DalaranStarter {
             String flowId = entry.getKey();
             String alarmRuleId = entry.getValue();
             String value = redisService.getValue(alarmRuleId);
+            logger.error("-------------报警审核：{}----{}----", flowId, alarmRuleId);
+            logger.error("-------------报警规则String：----{}----", value);
             AlarmRuleConfig alarmRuleConfig = JSONObject.parseObject(value, AlarmRuleConfig.class);
+            logger.error("-------------报警规则：----{}----", alarmRuleConfig);
             Map<AlarmRuleConfig.ChannelType, String> alarmChannel = alarmRuleConfig.getAlarmChannel();
             if (alarmChannel.isEmpty()) {
                 continue;
@@ -86,7 +90,7 @@ public class AlarmManagerInitializer implements DalaranStarter {
                 logger.error("------------产生报警消息{}，准备发送通知------------", noticeMessage);
                 TriggerFlowReleasedEntity triggerFlowReleasedEntity = triggerFlowReleasedRepository.findByVersionAndOriginId(resourceLoader.getVersion(), String.valueOf(flowId));
                 noticeMessage.setFlowName(triggerFlowReleasedEntity.getName());
-                noticeMessage.setCreateDate(now);
+                noticeMessage.setCreateDate(dateFormat.format(now));
                 sendNotice(noticeMessage, alarmChannel);
             }
         }
@@ -131,12 +135,13 @@ public class AlarmManagerInitializer implements DalaranStarter {
             Long overTimeFrequency = timeOutAlarm.getElapsedFrequency();
             long elapseCount = tracingLogService.countElapseLog(oneMinBeforeCurrent, now, flowId, elapse);
             //todo refactor
-            if (overTimeFrequency >= elapseCount) {
+            if (elapseCount >= overTimeFrequency) {
                 noticeMessage.setIsTouchTimeOutAlarm(true);
             }
             noticeMessage.setTimeOutCount(elapseCount);
             noticeMessage.setTimeOutFrequency(overTimeFrequency);
         }
+        logger.error("-------------消息通知：----{}----", noticeMessage);
         return noticeMessage;
     }
 }

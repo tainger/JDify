@@ -9,6 +9,7 @@ import io.terminus.dalaran.console.service.AlarmRuleService;
 import io.terminus.dalaran.console.service.jpa.model.QueryAlarmRuleInfo;
 import io.terminus.dalaran.console.util.ResourceKeyUtils;
 import io.terminus.dalaran.core.resource.redis.RedisService;
+import io.terminus.dalaran.core.resource.redis.RedisUtil;
 import io.terminus.dalaran.model.dto.AlarmRuleDTO;
 import io.terminus.dalaran.model.dto.basic.BasicAlarmInfo;
 import io.terminus.dalaran.model.query.AlarmRuleQuery;
@@ -55,7 +56,7 @@ public class AlarmRuleServiceImpl implements AlarmRuleService , InitializingBean
         alarmRuleEntities.forEach((alarmRule)->{
             String id = alarmRule.getResourceKey();
             String config = alarmRule.getConfig();
-            redisService.persistKey(id, config);
+            redisService.persistKey(RedisUtil.getAlarmRuleKey(id), config);
         });
     }
 
@@ -63,21 +64,16 @@ public class AlarmRuleServiceImpl implements AlarmRuleService , InitializingBean
     public String create(AlarmRuleDTO alarmRuleDTO) {
         AlarmRuleEntity alarmRule = alarmRuleRepository.save(toEntity(alarmRuleDTO));
         String resourceKey = alarmRule.getResourceKey();
-        redisService.persistKey(resourceKey, JSONObject.toJSONString(alarmRule));
+        redisService.persistKey(RedisUtil.getAlarmRuleKey(resourceKey), JSONObject.toJSONString(alarmRule.getConfig()));
         return resourceKey;
     }
 
     @Override
     public AlarmRuleDTO update(AlarmRuleDTO alarmRuleDTO) {
-        //延时双删
-        redisService.deleteKey(alarmRuleDTO.getId());
+        //延时双删 不适用
+        redisService.deleteKey(RedisUtil.getAlarmRuleKey(alarmRuleDTO.getId()));
         alarmRuleRepository.save(toEntity(alarmRuleDTO));
-        try {
-            Thread.sleep(200);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        redisService.deleteKey(alarmRuleDTO.getId());
+        redisService.persistKey(RedisUtil.getAlarmRuleKey(alarmRuleDTO.getId()), JSONObject.toJSONString(alarmRuleDTO.getConfig()));
         return alarmRuleDTO;
     }
 
@@ -87,7 +83,7 @@ public class AlarmRuleServiceImpl implements AlarmRuleService , InitializingBean
         AlarmRuleEntity entity = alarmRuleRepository.findByResourceKey(id);
         entity.setExist(false);
         alarmRuleRepository.save(entity);
-        redisService.deleteKey(id);
+        redisService.deleteKey(RedisUtil.getAlarmRuleKey(id));
     }
 
     @Override

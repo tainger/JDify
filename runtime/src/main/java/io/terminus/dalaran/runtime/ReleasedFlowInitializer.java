@@ -14,6 +14,7 @@ import io.terminus.dalaran.core.resource.entity.common.ModuleEntity;
 import io.terminus.dalaran.core.resource.entity.common.ReleaseRecordEntity;
 import io.terminus.dalaran.core.resource.entity.released.*;
 import io.terminus.dalaran.core.resource.redis.RedisService;
+import io.terminus.dalaran.core.resource.redis.RedisUtil;
 import io.terminus.dalaran.core.resource.repository.ModuleRepository;
 import io.terminus.dalaran.core.resource.repository.ReleaseRecordRepository;
 import io.terminus.dalaran.core.resource.repository.TriggerFlowReleasedRepository;
@@ -119,11 +120,13 @@ public class ReleasedFlowInitializer implements DalaranStarter {
 
             List<TriggerFlowReleasedEntity> triggerFlowReleasedEntities = resourceLoader.loadAllTriggerFlow();
             for (TriggerFlowReleasedEntity triggerFlowReleasedEntity : triggerFlowReleasedEntities) {
-                String originId = triggerFlowReleasedEntity.getOriginId();
-                String alarmResourceKey = triggerFlowReleasedEntity.getAlarmResourceKey();
-                alarmConfig.put(originId, alarmResourceKey);
+                if(triggerFlowReleasedEntity.isExist()&&triggerFlowReleasedEntity.isMonitor()&&triggerFlowReleasedEntity.isOnline()){
+                    String originId = triggerFlowReleasedEntity.getOriginId();
+                    String alarmResourceKey = triggerFlowReleasedEntity.getAlarmResourceKey();
+                    alarmConfig.put(originId, alarmResourceKey);
+                }
             }
-            redisService.persistKey("alarmConfig", JSONObject.toJSONString(alarmConfig));
+            redisService.persistKey(RedisUtil.getAlarmConfigKey(), JSONObject.toJSONString(alarmConfig));
             // load client info
             List<ClientReleasedEntity> clients = resourceLoader.loadAllClient();
             for (ClientReleasedEntity client : clients) {
