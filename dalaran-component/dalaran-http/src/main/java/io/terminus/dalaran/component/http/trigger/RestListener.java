@@ -2,7 +2,6 @@ package io.terminus.dalaran.component.http.trigger;
 
 import io.swagger.models.Swagger;
 import io.terminus.dalaran.component.authenticator.DalaranAuthenticator;
-import io.terminus.dalaran.component.basic.BasicAuthenticator;
 import io.terminus.dalaran.component.common.HttpMethod;
 import io.terminus.dalaran.component.common.LimitOperation;
 import io.terminus.dalaran.component.http.trigger.model.ApiInfo;
