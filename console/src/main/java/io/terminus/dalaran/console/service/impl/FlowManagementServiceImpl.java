@@ -5,9 +5,11 @@ import io.terminus.dalaran.ModelImportMode;
 import io.terminus.dalaran.console.TestFlowInitializer;
 import io.terminus.dalaran.console.convertor.FlowConvertor;
 import io.terminus.dalaran.console.entity.ModelEntity;
+import io.terminus.dalaran.console.entity.TriggerFlowAlarmRuleEntity;
 import io.terminus.dalaran.console.entity.TriggerFlowEntity;
 import io.terminus.dalaran.console.repository.ModelRepository;
 import io.terminus.dalaran.console.repository.PropertyRepository;
+import io.terminus.dalaran.console.repository.TriggerFlowAlarmRuleRepository;
 import io.terminus.dalaran.console.repository.TriggerFlowRepository;
 import io.terminus.dalaran.console.service.FlowManagementService;
 import io.terminus.dalaran.console.service.ModelManagementService;
@@ -18,6 +20,8 @@ import io.terminus.dalaran.core.flow.DalaranFlowBuilder;
 import io.terminus.dalaran.core.resource.DalaranResourceBuilder;
 import io.terminus.dalaran.core.resource.entity.common.ProcessorEntity;
 import io.terminus.dalaran.core.resource.entity.released.TriggerFlowReleasedEntity;
+import io.terminus.dalaran.core.resource.redis.RedisService;
+import io.terminus.dalaran.core.resource.redis.RedisUtil;
 import io.terminus.dalaran.core.resource.repository.ModuleRepository;
 import io.terminus.dalaran.core.resource.repository.TriggerFlowReleasedRepository;
 import io.terminus.dalaran.exception.flow.FlowNotExistException;
@@ -85,6 +89,13 @@ public class FlowManagementServiceImpl implements FlowManagementService {
 
     @Autowired
     private CamelContext camelContext;
+
+    @Autowired
+    private RedisService redisService;
+
+
+    @Autowired
+    private TriggerFlowAlarmRuleRepository triggerFlowAlarmRuleRepository;
 
 
     private final FlowConvertor flowConvertor = new FlowConvertor();
@@ -334,7 +345,7 @@ public class FlowManagementServiceImpl implements FlowManagementService {
 
     @Nullable
     @Override
-    public TriggerFlowDTO getByIdVersion(String flowId, String version) throws FlowNotExistException{
+    public TriggerFlowDTO getByIdVersion(String flowId, String version) throws FlowNotExistException {
         TriggerFlowReleasedEntity triggerFlowReleasedEntity = triggerFlowReleasedRepository.findByVersionAndOriginId(version, flowId);
         if (triggerFlowReleasedEntity == null) {
             throw new FlowNotExistException();
@@ -388,20 +399,31 @@ public class FlowManagementServiceImpl implements FlowManagementService {
         }
     }
 
+    //todo 事务
     @Override
     public ResponseResult bindAlarm(BindAlarmRuleDto bindAlarmRuleDto) {
-        String flowId = bindAlarmRuleDto.getFlowId();
-        if (flowId == null) {
-            return fail(ResponseErrorMsg.FLOW_ID_NULL);
+        if (bindAlarmRuleDto.getFlowId() == null || bindAlarmRuleDto.getAlarmRuleId() == null) {
+            return fail(ResponseErrorMsg.PARAM_IS_NULL);
         }
-        TriggerFlowEntity triggerFlowEntity = flowRepository.findByResourceKey(flowId);
-        String alarmRuleId = bindAlarmRuleDto.getAlarmRuleId();
-        if (alarmRuleId == null) {
-            return fail(ResponseErrorMsg.ALARM_ID_NULL);
+        try {
+            TriggerFlowEntity triggerFlowEntity = flowRepository.findByResourceKey(bindAlarmRuleDto.getFlowId());
+            triggerFlowEntity.setMonitor(bindAlarmRuleDto.getIsMonitor());
+            flowRepository.save(triggerFlowEntity);
+            //关联表
+            TriggerFlowAlarmRuleEntity triggerFlowAlarmRuleEntity = triggerFlowAlarmRuleRepository.findByTriggerFlowIdAndIsExistTrue(bindAlarmRuleDto.getFlowId());
+            if(triggerFlowAlarmRuleEntity == null) {
+                triggerFlowAlarmRuleEntity = new TriggerFlowAlarmRuleEntity();
+                triggerFlowAlarmRuleEntity.setAlarmRuleId(bindAlarmRuleDto.getAlarmRuleId());
+                triggerFlowAlarmRuleEntity.setTriggerFlowId(bindAlarmRuleDto.getFlowId());
+            }else {
+                triggerFlowAlarmRuleEntity.setAlarmRuleId(bindAlarmRuleDto.getAlarmRuleId());
+            }
+            triggerFlowAlarmRuleRepository.save(triggerFlowAlarmRuleEntity);
+            //更新缓存
+            redisService.persistKey(RedisUtil.getAlarmConfigKey(bindAlarmRuleDto.getFlowId()),bindAlarmRuleDto.getAlarmRuleId());
+        } catch (Exception e) {
+            return fail(e.getMessage());
         }
-        triggerFlowEntity.setAlarmResourceKey(alarmRuleId);
-        triggerFlowEntity.setMonitor(bindAlarmRuleDto.getIsMonitor());
-        flowRepository.save(triggerFlowEntity);
         return success();
     }
 
@@ -491,14 +513,14 @@ public class FlowManagementServiceImpl implements FlowManagementService {
         }).collect(Collectors.toList());
     }
 
-    private void setCreatedBy(TriggerFlowEntity triggerFlowEntity){
-        if(UserContext.getUserInfo() != null && UserContext.getUserInfo().getUsername() != null){
+    private void setCreatedBy(TriggerFlowEntity triggerFlowEntity) {
+        if (UserContext.getUserInfo() != null && UserContext.getUserInfo().getUsername() != null) {
             triggerFlowEntity.setCreatedBy(UserContext.getUserInfo().getUsername());
         }
     }
 
-    private void setUpdatedBy(TriggerFlowEntity triggerFlowEntity){
-        if(UserContext.getUserInfo() != null && UserContext.getUserInfo().getUsername() != null){
+    private void setUpdatedBy(TriggerFlowEntity triggerFlowEntity) {
+        if (UserContext.getUserInfo() != null && UserContext.getUserInfo().getUsername() != null) {
             triggerFlowEntity.setUpdatedBy(UserContext.getUserInfo().getUsername());
         }
     }

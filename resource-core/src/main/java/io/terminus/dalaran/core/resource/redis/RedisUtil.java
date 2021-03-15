@@ -6,7 +6,9 @@ public class RedisUtil {
 
     private static final String ALARM_ID = "alarm:id";
 
-    private static final String  Alarm_Config = "alarm_id:trigger_id:config";
+    private static final String  ALARM_CONFIG = "alarm_config:trigger_id:";
+
+    private static final String  RELEASED_FLOW_IDS = "released_ids";
 
 
     public static String getAlarmRuleKey(String alarmRuleId) {
@@ -14,8 +16,13 @@ public class RedisUtil {
     }
 
 
-    public static String getAlarmConfigKey() {
-        return  Alarm_Config;
+    public static String getAlarmConfigKey(String triggerId) {
+        return  ALARM_CONFIG + triggerId;
     }
+
+    public static String getReleasedFlowIdsKey() {
+        return  RELEASED_FLOW_IDS;
+    }
+
 
 }
