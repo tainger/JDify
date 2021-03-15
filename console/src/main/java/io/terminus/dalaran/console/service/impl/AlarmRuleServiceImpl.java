@@ -9,6 +9,7 @@ import io.terminus.dalaran.console.service.AlarmRuleService;
 import io.terminus.dalaran.console.service.jpa.model.QueryAlarmRuleInfo;
 import io.terminus.dalaran.console.util.ResourceKeyUtils;
 import io.terminus.dalaran.core.resource.redis.RedisService;
+import io.terminus.dalaran.core.resource.redis.RedisUtil;
 import io.terminus.dalaran.model.dto.AlarmRuleDTO;
 import io.terminus.dalaran.model.dto.basic.BasicAlarmInfo;
 import io.terminus.dalaran.model.query.AlarmRuleQuery;
@@ -16,6 +17,8 @@ import io.terminus.dalaran.response.ResponseResult;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
@@ -29,9 +32,11 @@ import javax.persistence.criteria.Root;
 import java.util.*;
 import java.util.stream.Collectors;
 
+
 @Service
 public class AlarmRuleServiceImpl implements AlarmRuleService , InitializingBean {
 
+    private static  final Logger logger = LoggerFactory.getLogger(AlarmRuleServiceImpl.class);
     @Autowired
     private EntityManager entityManager;
 
@@ -47,10 +52,11 @@ public class AlarmRuleServiceImpl implements AlarmRuleService , InitializingBean
     @Override
     public void afterPropertiesSet() {
         List<AlarmRuleEntity> alarmRuleEntities = alarmRuleRepository.findByIsExistTrue();
+        logger.error("-----报警规则:{}-----", alarmRuleEntities);
         alarmRuleEntities.forEach((alarmRule)->{
             String id = alarmRule.getResourceKey();
             String config = alarmRule.getConfig();
-            redisService.setValue(id, config);
+            redisService.persistKey(RedisUtil.getAlarmRuleKey(id), config);
         });
     }
 
@@ -58,16 +64,16 @@ public class AlarmRuleServiceImpl implements AlarmRuleService , InitializingBean
     public String create(AlarmRuleDTO alarmRuleDTO) {
         AlarmRuleEntity alarmRule = alarmRuleRepository.save(toEntity(alarmRuleDTO));
         String resourceKey = alarmRule.getResourceKey();
-        redisService.setValue(resourceKey, JSONObject.toJSONString(alarmRule));
+        redisService.persistKey(RedisUtil.getAlarmRuleKey(resourceKey), JSONObject.toJSONString(alarmRule.getConfig()));
         return resourceKey;
     }
 
     @Override
     public AlarmRuleDTO update(AlarmRuleDTO alarmRuleDTO) {
-        //双删
-        redisService.deleteKey(alarmRuleDTO.getId());
-        AlarmRuleEntity alarmRuleEntity = alarmRuleRepository.save(toEntity(alarmRuleDTO));
-        redisService.setValue(alarmRuleEntity.getResourceKey(), JSONObject.toJSONString(alarmRuleEntity.getConfig()));
+        //延时双删 不适用
+        redisService.deleteKey(RedisUtil.getAlarmRuleKey(alarmRuleDTO.getId()));
+        alarmRuleRepository.save(toEntity(alarmRuleDTO));
+        redisService.persistKey(RedisUtil.getAlarmRuleKey(alarmRuleDTO.getId()), JSONObject.toJSONString(alarmRuleDTO.getConfig()));
         return alarmRuleDTO;
     }
 
@@ -77,7 +83,7 @@ public class AlarmRuleServiceImpl implements AlarmRuleService , InitializingBean
         AlarmRuleEntity entity = alarmRuleRepository.findByResourceKey(id);
         entity.setExist(false);
         alarmRuleRepository.save(entity);
-        redisService.deleteKey(id);
+        redisService.deleteKey(RedisUtil.getAlarmRuleKey(id));
     }
 
     @Override
@@ -164,6 +170,4 @@ public class AlarmRuleServiceImpl implements AlarmRuleService , InitializingBean
         entity.setConfig(JSONObject.toJSONString(alarmRuleDTO.getConfig()));
         return entity;
     }
-
-
 }

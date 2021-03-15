@@ -1,4 +1,4 @@
-package io.terminus.dalaran.core.resource.entity;
+package io.terminus.dalaran.model.alarm;
 
 import java.util.Arrays;
 import java.util.Date;
@@ -19,7 +19,7 @@ public class NoticeMessage {
 
     private Long timeOutCount;
 
-    private String createDate;
+    private Date createDate;
 
     private String []contactWays;
 
@@ -84,11 +84,11 @@ public class NoticeMessage {
         this.timeOutCount = timeOutCount;
     }
 
-    public String getCreateDate() {
+    public Date getCreateDate() {
         return createDate;
     }
 
-    public void setCreateDate(String createDate) {
+    public void setCreateDate(Date createDate) {
         this.createDate = createDate;
     }
 

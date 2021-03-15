@@ -1,5 +1,6 @@
 package io.terminus.dalaran.console.service.impl;
 
+import com.alibaba.fastjson.JSONObject;
 import io.terminus.dalaran.console.convertor.FlowConvertor;
 import io.terminus.dalaran.console.repository.*;
 import io.terminus.dalaran.console.service.ModuleManagementService;
@@ -8,6 +9,7 @@ import io.terminus.dalaran.core.resource.entity.basic.BasicEntity;
 import io.terminus.dalaran.core.resource.entity.common.ModuleEntity;
 import io.terminus.dalaran.core.resource.entity.common.ReleaseRecordEntity;
 import io.terminus.dalaran.core.resource.entity.released.*;
+import io.terminus.dalaran.core.resource.redis.RedisService;
 import io.terminus.dalaran.core.resource.repository.*;
 import io.terminus.dalaran.model.dto.ReleaseRecordDTO;
 import io.terminus.dalaran.model.dto.ReleaseRequestDTO;
@@ -19,7 +21,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-
 import javax.persistence.criteria.Predicate;
 import javax.transaction.Transactional;
 import java.util.*;
@@ -88,7 +89,7 @@ public class ReleaseServiceImpl implements ReleaseService {
     private LimiterRepository limiterRepository;
 
     @Autowired
-    private  ModuleRepository moduleRepository;
+    private ModuleRepository moduleRepository;
 
 
     @Autowired
@@ -96,6 +97,10 @@ public class ReleaseServiceImpl implements ReleaseService {
 
     @Autowired
     private ModuleManagementService moduleService;
+
+    @Autowired
+    private RedisService redisService;
+
 
     private final FlowConvertor flowConvertor = new FlowConvertor();
 

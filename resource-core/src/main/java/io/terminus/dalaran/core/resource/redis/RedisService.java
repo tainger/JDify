@@ -4,13 +4,25 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
+import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 
 @Component
 public class RedisService {
 
+    private final String split = ":";
+
+    private final String ALARM_ID = "alarm_id";
+
+
     @Autowired
     private RedisTemplate<String, String> redisTemplate;
+
+    public Boolean persistKey(String key, String value) {
+        redisTemplate.opsForValue().set(key, value);
+        return redisTemplate.persist(key);
+    }
+
 
     public Boolean setValue(String key, String value) {
         try {

@@ -1,18 +1,20 @@
 package io.terminus.dalaran.runtime;
 
+import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.models.Swagger;
 import io.terminus.dalaran.component.http.trigger.model.ApiInfo;
 import io.terminus.dalaran.component.http.trigger.utils.SwaggerUtils;
-import io.terminus.dalaran.core.component.config.AlarmRuleConfig;
 import io.terminus.dalaran.core.context.DalaranContext;
 import io.terminus.dalaran.core.resource.DalaranResourceBuilder;
 import io.terminus.dalaran.core.resource.DalaranStarter;
 import io.terminus.dalaran.core.resource.entity.common.ModuleEntity;
 import io.terminus.dalaran.core.resource.entity.common.ReleaseRecordEntity;
 import io.terminus.dalaran.core.resource.entity.released.*;
+import io.terminus.dalaran.core.resource.redis.RedisService;
+import io.terminus.dalaran.core.resource.redis.RedisUtil;
 import io.terminus.dalaran.core.resource.repository.ModuleRepository;
 import io.terminus.dalaran.core.resource.repository.ReleaseRecordRepository;
 import io.terminus.dalaran.core.resource.repository.TriggerFlowReleasedRepository;
@@ -62,6 +64,9 @@ public class ReleasedFlowInitializer implements DalaranStarter {
     @Autowired
     private TriggerFlowReleasedRepository triggerFlowReleasedRepository;
 
+    @Autowired
+    private RedisService redisService;
+
     private Swagger swagger;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -95,8 +100,6 @@ public class ReleasedFlowInitializer implements DalaranStarter {
             public void run() {
                 try {
                     loadResources();
-                    logger.info(">>>>>>>>>调度开始>>>>>>");
-//                    monitor();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -113,8 +116,17 @@ public class ReleasedFlowInitializer implements DalaranStarter {
             }
             resourceLoader.setVersion(recordEntity.getVersion());
             resourceLoader.setLastVersion(recordEntity.getLastVersion());
-            //
-//            initAlarmConfig(recordEntity.getVersion());
+            Map<String, String> alarmConfig = new HashMap<>();
+
+            List<TriggerFlowReleasedEntity> triggerFlowReleasedEntities = resourceLoader.loadAllTriggerFlow();
+            for (TriggerFlowReleasedEntity triggerFlowReleasedEntity : triggerFlowReleasedEntities) {
+                if(triggerFlowReleasedEntity.isExist()&&triggerFlowReleasedEntity.isMonitor()&&triggerFlowReleasedEntity.isOnline()){
+                    String originId = triggerFlowReleasedEntity.getOriginId();
+                    String alarmResourceKey = triggerFlowReleasedEntity.getAlarmResourceKey();
+                    alarmConfig.put(originId, alarmResourceKey);
+                }
+            }
+            redisService.persistKey(RedisUtil.getAlarmConfigKey(), JSONObject.toJSONString(alarmConfig));
             // load client info
             List<ClientReleasedEntity> clients = resourceLoader.loadAllClient();
             for (ClientReleasedEntity client : clients) {
