@@ -137,7 +137,7 @@ public class TracingLogServiceImpl implements TracingLogService {
         if (tracingLogEntity.size() == 0) {
             return detailLogDTO;
         }
-        TimeLogDTO timeLogDTO= getElapsedTime(flowId, version);
+        TimeLogDTO timeLogDTO = getElapsedTime(flowId, version);
         List<TracingLogEntity> tracingLogFailEntity = tracingLogRepository.findByFlowIdAndVersionAndSuccessful(flowId, version, false);
         Long lastExceptionDate = null;
         if (tracingLogFailEntity.size() != 0) {
@@ -158,7 +158,7 @@ public class TracingLogServiceImpl implements TracingLogService {
             detailLogDTO.setLastExceptionDateRecordId(null);
         } else {
             detailLogDTO.setLastExceptionDate(format.format(lastExceptionDate));
-            detailLogDTO.setLastExceptionDateRecordId(getLastExceptionRecordId(flowId, version, lastExceptionDate));
+            detailLogDTO.setLastExceptionDateRecordId(getLastExceptionRecordId(flowId, version, lastExceptionDate).get(0));
         }
         return detailLogDTO;
     }
@@ -281,6 +281,9 @@ public class TracingLogServiceImpl implements TracingLogService {
         if (alarmRuleEntity != null) {
             detailLogDTO.setMonitorId(alarmRuleEntity.getResourceKey());
             detailLogDTO.setMonitorName(alarmRuleEntity.getName());
+        } else {
+            detailLogDTO.setMonitorId(null);
+            detailLogDTO.setMonitorName(null);
         }
         return detailLogDTO;
     }
@@ -335,7 +338,7 @@ public class TracingLogServiceImpl implements TracingLogService {
         return entityManager.createQuery(criteriaQuery).getSingleResult();
     }
 
-    public String getLastExceptionRecordId(String flowId, String version, Long timeStamp) {
+    public List<String> getLastExceptionRecordId(String flowId, String version, Long timeStamp) {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<String> criteriaQuery = builder.createQuery(String.class);
         Root<TracingLogEntity> root = criteriaQuery.from(TracingLogEntity.class);
@@ -349,7 +352,7 @@ public class TracingLogServiceImpl implements TracingLogService {
         predicates.add(builder.equal(root.get("successful"), false));
         predicates.add(builder.equal(root.get("timestamp"), timeStamp));
         criteriaQuery.multiselect(root.get("recordId")).where(predicates.toArray(new Predicate[0]));
-        return entityManager.createQuery(criteriaQuery).getSingleResult();
+        return entityManager.createQuery(criteriaQuery).getResultList();
     }
 
 
