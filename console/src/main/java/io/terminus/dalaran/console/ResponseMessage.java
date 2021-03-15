@@ -114,6 +114,15 @@ public class ResponseMessage {
     
     public static final String CLIENT_QUERY_ERROR = "Client.Query.Exception";
 
+    // Authenticator处理异常
+    public static final String AUTHENTICATOR_CREATE_ERROR = "Authenticator.Create.Exception";
+
+    public static final String AUTHENTICATOR_UPDATE_ERROR = "Authenticator.Update.Exception";
+
+    public static final String AUTHENTICATOR_DELETE_ERROR = "Authenticator.Delete.Exception";
+
+    public static final String AUTHENTICATORT_QUERY_ERROR = "Authenticator.Query.Exception";
+
     // 组件处理异常
     public static final String COMPONENT_CREATE_ERROR = "组件创建异常";
 

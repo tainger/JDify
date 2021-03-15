@@ -26,4 +26,6 @@ public @interface ConfigFieldInfo {
     Class connectorType() default Void.class;
 
     Class limiterType() default Void.class;
+
+    Class authenticatorType() default Void.class;
 }

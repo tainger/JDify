@@ -23,6 +23,8 @@ public interface DalaranComponentContext {
 
     Collection<LimiterInfo> getAllLimiterInfo();
 
+    Collection<AuthenticatorInfo> getAllAuthenticatorInfo();
+
     Collection<ProcessorInfo> getAllProcessorInfo();
 
     void addProcessor(DalaranProcessor bean);
