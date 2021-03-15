@@ -118,6 +118,11 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext {
     }
 
     @Override
+    public Collection<AuthenticatorInfo> getAllAuthenticatorInfo() {
+        return null;
+    }
+
+    @Override
     public Collection<ProcessorInfo> getAllProcessorInfo() {
         return processorInfoMapping.values().stream().map(processorInfo -> {
             ProcessorInfo newProcessorInfo = new ProcessorInfo();

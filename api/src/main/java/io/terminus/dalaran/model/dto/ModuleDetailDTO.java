@@ -28,4 +28,6 @@ public class ModuleDetailDTO extends ModuleDTO {
     private List<BasicClientInfo> clients;
 
     private List<BasicAlarmInfo> alarmRules;
+
+    private List<BasicAuthenticatorInfo> authenticators;
 }

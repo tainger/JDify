@@ -81,6 +81,9 @@ public class ModuleManagementServiceImpl implements ModuleManagementService {
     @Autowired
     private AlarmRuleService alarmRuleService;
 
+    @Autowired
+    private AuthenticatorService authenticatorService;
+
     @Override
     public String createModule(ModuleDTO moduleModel) {
         ModuleEntity moduleEntity = buildEntity(moduleModel);
@@ -186,6 +189,7 @@ public class ModuleManagementServiceImpl implements ModuleManagementService {
         moduleDetail.setFunctions(functionService.listBasicInfoByModuleId(moduleId));
         moduleDetail.setClients(clientService.listBasicInfoByModuleId(moduleId));
         moduleDetail.setLimiters(limiterService.listBasicInfoByModuleId(moduleId));
+        moduleDetail.setAuthenticators(authenticatorService.listBasicInfoByModuleId(moduleId));
         return moduleDetail;
     }
 

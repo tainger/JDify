@@ -3,6 +3,8 @@ package io.terminus.dalaran.component.http.trigger;
 import com.alibaba.fastjson.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.terminus.dalaran.FieldInputType;
+import io.terminus.dalaran.component.authenticator.DalaranAuthenticator;
+import io.terminus.dalaran.component.basic.BasicAuthenticator;
 import io.terminus.dalaran.component.common.HttpMethod;
 import io.terminus.dalaran.component.limiter.DalaranLimiter;
 import io.terminus.dalaran.core.component.annotation.ConfigFieldInfo;
@@ -32,11 +34,19 @@ public class RestConfig extends AllModelConfig implements LimiterConfig<DalaranL
     @ConfigFieldInfo(label = "端口", inputType = FieldInputType.Hidden)
     private Integer port = 8080;
 
-    @ConfigFieldInfo(label = "开启鉴权", inputType = FieldInputType.Switch, defaultValue = "false")
-    private boolean enableSign = false;
+    @ConfigFieldInfo(inputType = FieldInputType.Hidden, required = false)
+    @JSONField(serialize = false)
+    @JsonIgnore
+    private DalaranAuthenticator authenticator;
 
-    @ConfigFieldInfo(label = "计算签名", inputType = FieldInputType.Switch, defaultValue = "false")
-    private boolean checkSign = false;
+    @ConfigFieldInfo(label = "鉴权器", inputType = FieldInputType.Authenticator, required = false, authenticatorType = DalaranAuthenticator.class)
+    private String authenticatorId;
+
+//    @ConfigFieldInfo(label = "开启鉴权", inputType = FieldInputType.Switch, defaultValue = "false")
+//    private boolean enableSign = false;
+
+//    @ConfigFieldInfo(label = "计算签名", inputType = FieldInputType.Switch, defaultValue = "false")
+//    private boolean checkSign = false;
 
 //    @ConfigFieldInfo(label = "密钥", inputType = FieldInputType.Password, required = false)
     private String secret;
