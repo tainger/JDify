@@ -34,6 +34,10 @@ public interface PlatformInfoAPI {
     @GetMapping(value = "/limiter")
     Collection<LimiterInfo> listLimiterInfo();
 
+    @ApiOperation(value = "获取鉴权器配置结构")
+    @GetMapping(value = "/authenticator")
+    Collection<AuthenticatorInfo> listAuthenticatorInfo();
+
     @ApiOperation(value = "获取新增或更新组件所需的基本结构")
     @GetMapping(value = "/basicComponent")
     Collection<BasicComponentInfo> listBasicComponentInfo();
