@@ -25,6 +25,6 @@ public interface AlarmRuleWriteAPI {
 
     @GetMapping("/validate/{id}")
     @ApiOperation("校验报警策略是不是被使用")
-    ResponseResult validateIsUsed(@PathVariable String id);
+    ResponseResult  validateIsUsed(@PathVariable String id);
 
 }

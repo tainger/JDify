@@ -5,26 +5,29 @@ import io.terminus.dalaran.core.component.config.AlarmRuleConfig;
 import io.terminus.dalaran.core.resource.DalaranResourceBuilder;
 import io.terminus.dalaran.core.resource.DalaranStarter;
 import io.terminus.dalaran.core.resource.entity.NoticeMessage;
+import io.terminus.dalaran.core.resource.entity.common.ReleaseRecordEntity;
 import io.terminus.dalaran.core.resource.entity.released.TriggerFlowReleasedEntity;
 import io.terminus.dalaran.core.resource.redis.RedisService;
+import io.terminus.dalaran.core.resource.repository.ReleaseRecordRepository;
 import io.terminus.dalaran.core.resource.repository.TriggerFlowReleasedRepository;
 import io.terminus.dalaran.runtime.service.DalaranNoticeService;
 import io.terminus.dalaran.runtime.service.TracingLogService;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+
 import java.util.*;
 
+@Slf4j
 public class AlarmManagerInitializer implements DalaranStarter {
 
-    private static  final Logger logger = LoggerFactory.getLogger(AlarmManagerInitializer.class);
+    private static final Logger logger = LoggerFactory.getLogger(AlarmManagerInitializer.class);
 
 
     @Autowired
     private ReleasedResourceLoader resourceLoader;
-
-    @Autowired
-    private DalaranResourceBuilder resourceBuilder;
 
     @Autowired
     private TracingLogService tracingLogService;
@@ -35,19 +38,23 @@ public class AlarmManagerInitializer implements DalaranStarter {
     @Autowired
     private TriggerFlowReleasedRepository triggerFlowReleasedRepository;
 
+    @Autowired
     private RedisService redisService;
 
-    private Map<String, String> alarmConfig = new HashMap(16);
+    @Autowired
+    private ReleaseRecordRepository releaseRecordRepository;
 
     private Long current = System.currentTimeMillis();
 
     @Override
     public void start() {
+        logger.error("------------start------------");
         Timer timer = new Timer();
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
                 try {
+                    logger.error("------------monitor2------------");
                     monitor();
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -57,16 +64,19 @@ public class AlarmManagerInitializer implements DalaranStarter {
     }
 
     private void monitor() {
-        String monitor_key_value = redisService.getValue("monitor_key_value");
-        Map<String, String> map = JSONObject.parseObject(monitor_key_value, Map.class);
-        logger.error("------------monitor------------");
+        String alarmConfigCache = redisService.getValue("alarmConfig");
+        Map<String, String> alarmConfig = JSONObject.parseObject(alarmConfigCache, Map.class);
+        if (alarmConfig.isEmpty()) {
+            return;
+        }
         Date oneMinBeforeCurrent = new Date(current - 60 * 1000L);
         Date now = new Date(current);
         logger.error("-------------报警配置:{}-----", alarmConfig);
         for (Map.Entry<String, String> entry : alarmConfig.entrySet()) {
             String flowId = entry.getKey();
             String alarmRuleId = entry.getValue();
-           AlarmRuleConfig alarmRuleConfig =  new AlarmRuleConfig();// (AlarmRuleConfig) resourceBuilder.buildAlarmRuleConfig(alarmRuleId, AlarmRuleConfig.class);
+            String value = redisService.getValue(alarmRuleId);
+            AlarmRuleConfig alarmRuleConfig = JSONObject.parseObject(value, AlarmRuleConfig.class);
             Map<AlarmRuleConfig.ChannelType, String> alarmChannel = alarmRuleConfig.getAlarmChannel();
             if (alarmChannel.isEmpty()) {
                 continue;
@@ -120,6 +130,7 @@ public class AlarmManagerInitializer implements DalaranStarter {
             Long elapse = timeOutAlarm.getElapse();
             Long overTimeFrequency = timeOutAlarm.getElapsedFrequency();
             long elapseCount = tracingLogService.countElapseLog(oneMinBeforeCurrent, now, flowId, elapse);
+            //todo refactor
             if (overTimeFrequency >= elapseCount) {
                 noticeMessage.setIsTouchTimeOutAlarm(true);
             }

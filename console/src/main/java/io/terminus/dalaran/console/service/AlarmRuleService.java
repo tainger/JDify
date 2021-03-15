@@ -2,8 +2,10 @@ package io.terminus.dalaran.console.service;
 
 
 import io.terminus.dalaran.console.entity.TriggerFlowEntity;
+import io.terminus.dalaran.core.resource.entity.TriggerFlowAbstractEntity;
 import io.terminus.dalaran.model.dto.AlarmRuleDTO;
 import io.terminus.dalaran.model.dto.basic.BasicAlarmInfo;
+import io.terminus.dalaran.model.dto.flow.TriggerFlowDTO;
 import io.terminus.dalaran.model.flow.TriggerFlow;
 import io.terminus.dalaran.model.query.AlarmRuleQuery;
 import io.terminus.dalaran.response.ResponseResult;
@@ -25,5 +27,6 @@ public interface AlarmRuleService {
 
     List<BasicAlarmInfo> listAlarmRuleByModuleId(String moduleId);
 
-    ResponseResult<TriggerFlowEntity> validateIsUsed(String id);
+    ResponseResult <TriggerFlowEntity> validateIsUsed(String id);
+
 }
