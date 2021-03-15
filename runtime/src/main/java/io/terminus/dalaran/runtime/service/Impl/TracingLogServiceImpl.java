@@ -1,6 +1,7 @@
-package io.terminus.dalaran.runtime.service;
+package io.terminus.dalaran.runtime.service.Impl;
 
 import io.terminus.dalaran.core.resource.repository.TracingLogRepository;
+import io.terminus.dalaran.runtime.service.TracingLogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -10,7 +11,7 @@ import java.util.Date;
 import java.util.List;
 
 @Service
-public class TracingLogServiceImpl implements TracingLogService{
+public class TracingLogServiceImpl implements TracingLogService {
     @Autowired
     private TracingLogRepository tracingLogRepository;
 

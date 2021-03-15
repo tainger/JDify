@@ -64,7 +64,7 @@ public class AlarmRuleServiceImpl implements AlarmRuleService , InitializingBean
     public String create(AlarmRuleDTO alarmRuleDTO) {
         AlarmRuleEntity alarmRule = alarmRuleRepository.save(toEntity(alarmRuleDTO));
         String resourceKey = alarmRule.getResourceKey();
-        redisService.persistKey(RedisUtil.getAlarmRuleKey(resourceKey), JSONObject.toJSONString(alarmRule.getConfig()));
+        redisService.persistKey(RedisUtil.getAlarmRuleKey(resourceKey), alarmRule.getConfig());
         return resourceKey;
     }
 
@@ -72,8 +72,9 @@ public class AlarmRuleServiceImpl implements AlarmRuleService , InitializingBean
     public AlarmRuleDTO update(AlarmRuleDTO alarmRuleDTO) {
         //延时双删 不适用
         redisService.deleteKey(RedisUtil.getAlarmRuleKey(alarmRuleDTO.getId()));
-        alarmRuleRepository.save(toEntity(alarmRuleDTO));
-        redisService.persistKey(RedisUtil.getAlarmRuleKey(alarmRuleDTO.getId()), JSONObject.toJSONString(alarmRuleDTO.getConfig()));
+        AlarmRuleEntity alarmRuleEntity = toEntity(alarmRuleDTO);
+        alarmRuleRepository.save(alarmRuleEntity);
+        redisService.persistKey(RedisUtil.getAlarmRuleKey(alarmRuleDTO.getId()), alarmRuleEntity.getConfig());
         return alarmRuleDTO;
     }
 
