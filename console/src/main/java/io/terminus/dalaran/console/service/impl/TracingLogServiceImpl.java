@@ -278,7 +278,9 @@ public class TracingLogServiceImpl implements TracingLogService {
         detailLogDTO.setMonitor(entity.isMonitor());
         TriggerFlowEntity triggerFlowEntity = flowRepository.findByResourceKey(flowId);
         AlarmRuleEntity alarmRuleEntity = alarmRuleRepository.findByResourceKey(triggerFlowEntity.getAlarmResourceKey());
-        detailLogDTO.setMonitorId(alarmRuleEntity.getResourceKey());
+        if (alarmRuleEntity != null) {
+            detailLogDTO.setMonitorId(alarmRuleEntity.getResourceKey());
+        }
         detailLogDTO.setMonitorName(alarmRuleEntity.getName());
         return detailLogDTO;
     }
