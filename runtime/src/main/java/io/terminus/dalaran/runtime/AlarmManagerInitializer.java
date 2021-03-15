@@ -7,6 +7,7 @@ import io.terminus.dalaran.core.resource.entity.NoticeMessage;
 import io.terminus.dalaran.core.resource.entity.released.TriggerFlowReleasedEntity;
 import io.terminus.dalaran.core.resource.redis.RedisService;
 import io.terminus.dalaran.core.resource.redis.RedisUtil;
+import io.terminus.dalaran.core.resource.repository.ReleaseRecordRepository;
 import io.terminus.dalaran.core.resource.repository.TriggerFlowReleasedRepository;
 import io.terminus.dalaran.runtime.service.DalaranNoticeService;
 import io.terminus.dalaran.runtime.service.TracingLogService;
@@ -37,6 +38,9 @@ public class AlarmManagerInitializer implements DalaranStarter {
 
     @Autowired
     private RedisService redisService;
+
+    @Autowired
+    private ReleaseRecordRepository releaseRecordRepository;
 
     private Long current = System.currentTimeMillis();
 
