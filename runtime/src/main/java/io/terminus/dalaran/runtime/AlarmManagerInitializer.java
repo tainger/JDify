@@ -15,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -61,7 +62,7 @@ public class AlarmManagerInitializer implements DalaranStarter {
                     e.printStackTrace();
                 }
             }
-        }, 0, 60 * 1000L);
+        }, 0, 3 * 60 * 1000L);
     }
 
     private void monitor() {
