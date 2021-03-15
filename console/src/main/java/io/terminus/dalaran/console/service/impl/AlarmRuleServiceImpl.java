@@ -1,27 +1,28 @@
 package io.terminus.dalaran.console.service.impl;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import io.terminus.dalaran.console.entity.AlarmRuleEntity;
-import io.terminus.dalaran.console.entity.LimiterEntity;
+import io.terminus.dalaran.console.entity.TriggerFlowEntity;
 import io.terminus.dalaran.console.repository.AlarmRuleRepository;
+import io.terminus.dalaran.console.repository.TriggerFlowRepository;
 import io.terminus.dalaran.console.service.AlarmRuleService;
 import io.terminus.dalaran.console.service.jpa.model.QueryAlarmRuleInfo;
-import io.terminus.dalaran.console.service.jpa.model.QueryLimiterInfo;
 import io.terminus.dalaran.console.util.ResourceKeyUtils;
-import io.terminus.dalaran.core.resource.repository.ModuleRepository;
+import io.terminus.dalaran.core.resource.redis.RedisService;
 import io.terminus.dalaran.model.dto.AlarmRuleDTO;
 import io.terminus.dalaran.model.dto.basic.BasicAlarmInfo;
-import io.terminus.dalaran.model.dto.basic.BasicLimiterInfo;
 import io.terminus.dalaran.model.query.AlarmRuleQuery;
+import io.terminus.dalaran.response.ResponseResult;
 import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.kafka.common.protocol.types.Field;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-
 import javax.persistence.EntityManager;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -30,9 +31,11 @@ import javax.persistence.criteria.Root;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Service
-public class AlarmRuleServiceImpl implements AlarmRuleService {
 
+@Service
+public class AlarmRuleServiceImpl implements AlarmRuleService , InitializingBean {
+
+    private static  final Logger logger = LoggerFactory.getLogger(AlarmRuleServiceImpl.class);
     @Autowired
     private EntityManager entityManager;
 
@@ -40,24 +43,51 @@ public class AlarmRuleServiceImpl implements AlarmRuleService {
     private AlarmRuleRepository alarmRuleRepository;
 
     @Autowired
-    private ModuleRepository moduleRepository;
+    private TriggerFlowRepository triggerFlowRepository;
+
+    @Autowired
+    private RedisService redisService;
+
+    @Override
+    public void afterPropertiesSet() {
+        List<AlarmRuleEntity> alarmRuleEntities = alarmRuleRepository.findByIsExistTrue();
+        logger.error("-----报警规则:{}-----", alarmRuleEntities);
+        alarmRuleEntities.forEach((alarmRule)->{
+            String id = alarmRule.getResourceKey();
+            String config = alarmRule.getConfig();
+            redisService.persistKey(id, config);
+        });
+    }
 
     @Override
     public String create(AlarmRuleDTO alarmRuleDTO) {
-        return alarmRuleRepository.save(toEntity(alarmRuleDTO)).getResourceKey();
+        AlarmRuleEntity alarmRule = alarmRuleRepository.save(toEntity(alarmRuleDTO));
+        String resourceKey = alarmRule.getResourceKey();
+        redisService.persistKey(resourceKey, JSONObject.toJSONString(alarmRule));
+        return resourceKey;
     }
 
     @Override
     public AlarmRuleDTO update(AlarmRuleDTO alarmRuleDTO) {
+        //延时双删
+        redisService.deleteKey(alarmRuleDTO.getId());
         alarmRuleRepository.save(toEntity(alarmRuleDTO));
+        try {
+            Thread.sleep(200);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        redisService.deleteKey(alarmRuleDTO.getId());
         return alarmRuleDTO;
     }
 
     @Override
     public void delete(String id) {
+        //缓存同步
         AlarmRuleEntity entity = alarmRuleRepository.findByResourceKey(id);
         entity.setExist(false);
         alarmRuleRepository.save(entity);
+        redisService.deleteKey(id);
     }
 
     @Override
@@ -95,6 +125,17 @@ public class AlarmRuleServiceImpl implements AlarmRuleService {
             }
         });
         return alarmRuleInfo;
+    }
+
+    @Override
+    public ResponseResult <TriggerFlowEntity>validateIsUsed(String id) {
+        ResponseResult<TriggerFlowEntity> responseResult = new ResponseResult<>();
+        List<TriggerFlowEntity> triggerFlowEntities = triggerFlowRepository.findByAlarmResourceKey(id);
+        if(!CollectionUtils.isEmpty(triggerFlowEntities)) {
+           responseResult.setDelete(false);
+        }
+        responseResult.setData(triggerFlowEntities);
+        return responseResult;
     }
 
     private AlarmRuleDTO toDTO(AlarmRuleEntity alarmRuleEntity) {

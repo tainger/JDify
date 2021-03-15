@@ -12,6 +12,12 @@ public class RedisService {
     @Autowired
     private RedisTemplate<String, String> redisTemplate;
 
+    public Boolean persistKey(String key, String value) {
+        setValue(key,value);
+        return redisTemplate.persist(key);
+    }
+
+
     public Boolean setValue(String key, String value) {
         try {
             return redisTemplate.opsForValue().setIfAbsent(key, value, 30, TimeUnit.MINUTES);
@@ -47,4 +53,10 @@ public class RedisService {
             return redisTemplate.hasKey(key);
         }
     }
+
+    public Boolean deleteKey(String key) {
+        return redisTemplate.delete(key);
+    }
+
+
 }

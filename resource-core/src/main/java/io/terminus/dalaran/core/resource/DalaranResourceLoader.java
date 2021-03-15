@@ -1,7 +1,6 @@
 package io.terminus.dalaran.core.resource;
 
 import io.terminus.dalaran.core.resource.entity.*;
-import io.terminus.dalaran.core.resource.entity.released.AlarmRuleReleasedEntity;
 
 import java.util.List;
 
@@ -39,7 +38,4 @@ public interface DalaranResourceLoader {
 
     ServiceAbstractEntity loadService(String serviceId);
 
-    AlarmRuleAbstractEntity loadAlarmRule(String alarmRuleId);
-
-    List<AlarmRuleReleasedEntity> loadAllMonitoredAlarmRule();
 }
