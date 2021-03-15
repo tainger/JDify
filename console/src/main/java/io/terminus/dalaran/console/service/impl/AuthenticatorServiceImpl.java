@@ -84,11 +84,13 @@ public class AuthenticatorServiceImpl implements AuthenticatorService {
 
     private AuthenticatorEntity toEntity(AuthenticatorDTO dto) {
         AuthenticatorEntity entity = new AuthenticatorEntity();
-        try {
-            BeanUtils.copyProperties(dto, entity);
-        }catch (Exception e) {
-            e.printStackTrace();
-        }
+        entity.setName(dto.getName());
+        entity.setStatic(dto.isStatic());
+        entity.setAuthenticatorKey(dto.getAuthenticatorKey());
+        entity.setAuthenticatorValue(dto.getAuthenticatorValue());
+        entity.setKeyLocation(dto.getKeyLocation());
+        entity.setExpireTime(dto.getExpireTime());
+        entity.setModuleId(dto.getModuleId());
         String resourceKey = dto.getId();
         if (StringUtils.isBlank(resourceKey)) {
             resourceKey = ResourceKeyUtils.generateKey();
@@ -125,6 +127,14 @@ public class AuthenticatorServiceImpl implements AuthenticatorService {
         }catch (Exception e) {
             e.printStackTrace();
         }
+        dto.setName(entity.getName());
+        dto.setKeyLocation(entity.getKeyLocation());
+        dto.setStatic(entity.isStatic());
+        dto.setAuthenticatorKey(entity.getAuthenticatorKey());
+        dto.setAuthenticatorValue(entity.getAuthenticatorValue());
+        dto.setExpireTime(entity.getExpireTime());
+        dto.setModuleId(entity.getModuleId());
+        dto.setExist(entity.isExist());
         dto.setId(entity.getResourceKey());
         return dto;
     }
