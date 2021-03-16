@@ -42,6 +42,7 @@
         <!--camel property-->
         <javax.servlet-api-version>3.1.0</javax.servlet-api-version>
         <terminus.notice.sender>1.0.11.2-RELEASE</terminus.notice.sender>
+        <market.version>0.0.1-SNAPSHOT</market.version>
     </properties>
 
     <dependencyManagement>

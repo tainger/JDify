@@ -157,4 +157,9 @@ public class FlowManagementRest implements FlowReadAPI, FlowWriteAPI {
         String recordId = dalaranContext.testFlow(request.getFlowId(), request.getBody());
         return tracingLogService.getRecordDetail(recordId);
     }
+
+    @Override
+    public CreateResponse saveAsTemplate(TriggerFlowDTO model) throws CreateFlowException {
+        return null;
+    }
 }
