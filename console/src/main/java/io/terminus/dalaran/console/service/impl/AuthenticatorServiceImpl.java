@@ -1,10 +1,13 @@
 package io.terminus.dalaran.console.service.impl;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import io.terminus.dalaran.console.entity.AuthenticatorEntity;
 import io.terminus.dalaran.console.repository.AuthenticatorRepository;
 import io.terminus.dalaran.console.service.AuthenticatorService;
 import io.terminus.dalaran.console.service.jpa.model.QueryAuthenticatorInfo;
 import io.terminus.dalaran.console.util.ResourceKeyUtils;
+import io.terminus.dalaran.model.dto.AuthenticatorConfigDTO;
 import io.terminus.dalaran.model.dto.AuthenticatorDTO;
 import io.terminus.dalaran.model.dto.basic.BasicAuthenticatorInfo;
 import io.terminus.draco.web.autoconfig.context.UserContext;
@@ -85,11 +88,7 @@ public class AuthenticatorServiceImpl implements AuthenticatorService {
     private AuthenticatorEntity toEntity(AuthenticatorDTO dto) {
         AuthenticatorEntity entity = new AuthenticatorEntity();
         entity.setName(dto.getName());
-        entity.setStatic(dto.isStatic());
-        entity.setAuthenticatorKey(dto.getAuthenticatorKey());
-        entity.setAuthenticatorValue(dto.getAuthenticatorValue());
-        entity.setKeyLocation(dto.getKeyLocation());
-        entity.setExpireTime(dto.getExpireTime());
+        entity.setConfig(JSON.toJSONString(dto.getAuthenticator()));
         entity.setModuleId(dto.getModuleId());
         String resourceKey = dto.getId();
         if (StringUtils.isBlank(resourceKey)) {
@@ -110,9 +109,7 @@ public class AuthenticatorServiceImpl implements AuthenticatorService {
         AuthenticatorEntity entity = repository.findByResourceKey(dto.getId());
         entity.setName(dto.getName());
         entity.setExist(dto.isExist());
-        entity.setAuthenticatorKey(dto.getAuthenticatorKey());
-        entity.setAuthenticatorValue(dto.getAuthenticatorValue());
-        entity.setExpireTime(dto.getExpireTime());
+        entity.setConfig(JSON.toJSONString(dto.getAuthenticator()));
         if(UserContext.getUserInfo() != null && UserContext.getUserInfo().getUsername() != null) {
             entity.setUpdatedBy(UserContext.getUserInfo().getUsername());
         }
@@ -122,17 +119,8 @@ public class AuthenticatorServiceImpl implements AuthenticatorService {
 
     private AuthenticatorDTO toDTO(AuthenticatorEntity entity) {
         AuthenticatorDTO dto = new AuthenticatorDTO();
-        try {
-            BeanUtils.copyProperties(entity, dto);
-        }catch (Exception e) {
-            e.printStackTrace();
-        }
         dto.setName(entity.getName());
-        dto.setKeyLocation(entity.getKeyLocation());
-        dto.setStatic(entity.isStatic());
-        dto.setAuthenticatorKey(entity.getAuthenticatorKey());
-        dto.setAuthenticatorValue(entity.getAuthenticatorValue());
-        dto.setExpireTime(entity.getExpireTime());
+        dto.setAuthenticator(JSONObject.parseArray(entity.getConfig(), AuthenticatorConfigDTO.class));
         dto.setModuleId(entity.getModuleId());
         dto.setExist(entity.isExist());
         dto.setId(entity.getResourceKey());
