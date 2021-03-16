@@ -117,7 +117,9 @@ public class FlowConvertor {
         flowModel.setTriggerType(entity.getTriggerType());
         flowModel.setTriggerConfig(JSON.parseObject(entity.getTriggerConfig(), Map.class));
         flowModel.setCreatedAt(dateFormat.format(entity.getCreatedAt()));
-        flowModel.setUpdatedAt(dateFormat.format(entity.getUpdatedAt()));
+        if (entity.getUpdatedAt() != null) {
+            flowModel.setUpdatedAt(dateFormat.format(entity.getUpdatedAt()));
+        }
         return flowModel;
     }
 }

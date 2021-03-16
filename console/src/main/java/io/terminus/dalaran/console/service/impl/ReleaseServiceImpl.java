@@ -16,6 +16,7 @@ import io.terminus.dalaran.model.dto.ReleaseRequestDTO;
 import io.terminus.dalaran.model.dto.flow.ReleaseFlowDTO;
 import io.terminus.dalaran.model.flow.FlowStatus;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
@@ -23,6 +24,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import javax.persistence.criteria.Predicate;
 import javax.transaction.Transactional;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -103,6 +105,8 @@ public class ReleaseServiceImpl implements ReleaseService {
 
 
     private final FlowConvertor flowConvertor = new FlowConvertor();
+
+    private String timeZone = System.getenv("TZ");
 
     @Override
     public ReleaseRecordDTO release(ReleaseRequestDTO requestDTO) {
@@ -231,6 +235,14 @@ public class ReleaseServiceImpl implements ReleaseService {
         String moduleName = moduleService.getModuleName(entity.getModuleId());
         releaseFlowDTO.setModuleName(moduleName);
         releaseFlowDTO.setId(entity.getOriginId());
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        if (StringUtils.isNotBlank(timeZone)) {
+            format.setTimeZone(TimeZone.getTimeZone(timeZone));
+        } else {
+            format.setTimeZone(TimeZone.getTimeZone("Asia/Shanghai"));
+        }
+        releaseFlowDTO.setCreatedAt(format.format(entity.getCreatedAt()));
+        releaseFlowDTO.setUpdatedAt(format.format(entity.getUpdatedAt()));
         return releaseFlowDTO;
     }
 
