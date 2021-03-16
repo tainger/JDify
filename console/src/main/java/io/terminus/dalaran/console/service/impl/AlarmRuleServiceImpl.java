@@ -2,8 +2,10 @@ package io.terminus.dalaran.console.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import io.terminus.dalaran.console.entity.AlarmRuleEntity;
+import io.terminus.dalaran.console.entity.TriggerFlowAlarmRuleEntity;
 import io.terminus.dalaran.console.entity.TriggerFlowEntity;
 import io.terminus.dalaran.console.repository.AlarmRuleRepository;
+import io.terminus.dalaran.console.repository.TriggerFlowAlarmRuleRepository;
 import io.terminus.dalaran.console.repository.TriggerFlowRepository;
 import io.terminus.dalaran.console.service.AlarmRuleService;
 import io.terminus.dalaran.console.service.jpa.model.QueryAlarmRuleInfo;
@@ -45,6 +47,9 @@ public class AlarmRuleServiceImpl implements AlarmRuleService , InitializingBean
 
     @Autowired
     private TriggerFlowRepository triggerFlowRepository;
+
+    @Autowired
+    private TriggerFlowAlarmRuleRepository triggerFlowAlarmRuleRepository;
 
     @Autowired
     private RedisService redisService;
@@ -125,13 +130,13 @@ public class AlarmRuleServiceImpl implements AlarmRuleService , InitializingBean
     }
 
     @Override
-    public ResponseResult <TriggerFlowEntity>validateIsUsed(String id) {
-        ResponseResult<TriggerFlowEntity> responseResult = new ResponseResult<>();
-        List<TriggerFlowEntity> triggerFlowEntities = triggerFlowRepository.findByAlarmResourceKey(id);
-        if(!CollectionUtils.isEmpty(triggerFlowEntities)) {
+    public ResponseResult <TriggerFlowAlarmRuleEntity>validateIsUsed(String id) {
+        ResponseResult<TriggerFlowAlarmRuleEntity> responseResult = new ResponseResult<>();
+        List<TriggerFlowAlarmRuleEntity> triggerFlowAlarmRuleEntities = triggerFlowAlarmRuleRepository.findByAlarmRuleIdAndIsExistTrue(id);
+        if(!CollectionUtils.isEmpty(triggerFlowAlarmRuleEntities)) {
            responseResult.setDelete(false);
         }
-        responseResult.setData(triggerFlowEntities);
+        responseResult.setData(triggerFlowAlarmRuleEntities);
         return responseResult;
     }
 

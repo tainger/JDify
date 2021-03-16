@@ -19,7 +19,7 @@ public class NoticeMessage {
 
     private Long timeOutCount;
 
-    private Date createDate;
+    private String createDate;
 
     private String []contactWays;
 
@@ -84,11 +84,11 @@ public class NoticeMessage {
         this.timeOutCount = timeOutCount;
     }
 
-    public Date getCreateDate() {
+    public String getCreateDate() {
         return createDate;
     }
 
-    public void setCreateDate(Date createDate) {
+    public void setCreateDate(String createDate) {
         this.createDate = createDate;
     }
 

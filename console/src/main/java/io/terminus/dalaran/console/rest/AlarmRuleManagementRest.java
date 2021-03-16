@@ -2,6 +2,7 @@ package io.terminus.dalaran.console.rest;
 
 import io.terminus.dalaran.console.ResponseMessage;
 import io.terminus.dalaran.console.entity.AlarmRuleEntity;
+import io.terminus.dalaran.console.entity.TriggerFlowAlarmRuleEntity;
 import io.terminus.dalaran.console.entity.TriggerFlowEntity;
 import io.terminus.dalaran.console.exception.OnException;
 import io.terminus.dalaran.console.service.AlarmRuleService;
@@ -47,7 +48,7 @@ public class AlarmRuleManagementRest implements AlarmRuleReadAPI, AlarmRuleWrite
     }
 
     @Override
-    public ResponseResult <TriggerFlowEntity> validateIsUsed(String id) {
+    public ResponseResult <TriggerFlowAlarmRuleEntity> validateIsUsed(String id) {
        return alarmRuleService.validateIsUsed(id);
     }
 
