@@ -146,7 +146,7 @@ public class TracingLogServiceImpl implements TracingLogService {
         List<TracingLogEntity> tracingLogFailEntity = tracingLogRepository.findByFlowIdAndSuccessful(flowId, false);
         Long lastExceptionDate = null;
         if (tracingLogFailEntity.size() != 0) {
-            lastExceptionDate = getLastExceptionDate(flowId, version);
+            lastExceptionDate = getLastExceptionDate(flowId);
         }
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         if (StringUtils.isNotBlank(timeZone)) {
@@ -157,7 +157,11 @@ public class TracingLogServiceImpl implements TracingLogService {
         detailLogDTO.setAvgTime(timeLogDTO.getAvgTime());
         detailLogDTO.setMaxTime(timeLogDTO.getMaxTime());
         //可能会存在有多个相同的最大时间的情况，取时间最早的那个
-        detailLogDTO.setMaxTimeRecordId(getMaxTimeRecordId(flowId, timeLogDTO.getMaxTime()).get(0).toString());
+        if (timeLogDTO.getMaxTime() == null) {
+            detailLogDTO.setMaxTimeRecordId(null);
+        } else {
+            detailLogDTO.setMaxTimeRecordId(getMaxTimeRecordId(flowId, timeLogDTO.getMaxTime()).get(0).toString());
+        }
         if (lastExceptionDate == null) {
             detailLogDTO.setLastExceptionDate(null);
             detailLogDTO.setLastExceptionDateRecordId(null);
@@ -327,16 +331,13 @@ public class TracingLogServiceImpl implements TracingLogService {
         return entityManager.createQuery(criteriaQuery).getResultList();
     }
 
-    public Long getLastExceptionDate(String flowId, String version) {
+    public Long getLastExceptionDate(String flowId) {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<Long> criteriaQuery = builder.createQuery(Long.class);
         Root<TracingLogEntity> root = criteriaQuery.from(TracingLogEntity.class);
         List<Predicate> predicates = new ArrayList<>();
         if (flowId != null) {
             predicates.add(builder.equal(root.get("flowId"), flowId));
-        }
-        if (version != null) {
-            predicates.add(builder.equal(root.get("version"), version));
         }
         predicates.add(builder.equal(root.get("tracingType"), TracingType.Flow));
         predicates.add(builder.equal(root.get("successful"), false));
