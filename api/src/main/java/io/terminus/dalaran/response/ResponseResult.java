@@ -12,6 +12,7 @@ public class ResponseResult <T>{
 
     private boolean success = true;
 
+    //todo remove
     private boolean isDelete = true;
 
     private String errorMsg;

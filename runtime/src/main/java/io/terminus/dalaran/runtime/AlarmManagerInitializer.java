@@ -22,9 +22,6 @@ import java.util.*;
 @Slf4j
 public class AlarmManagerInitializer implements DalaranStarter {
 
-    private static final Logger logger = LoggerFactory.getLogger(AlarmManagerInitializer.class);
-
-
     @Autowired
     private ReleasedResourceLoader resourceLoader;
 
@@ -50,13 +47,13 @@ public class AlarmManagerInitializer implements DalaranStarter {
 
     @Override
     public void start() {
-        logger.error("------------start------------");
+        log.error("------------start------------");
         Timer timer = new Timer();
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
                 try {
-                    logger.error("------------monitor2------------");
+                    log.error("------------monitor2------------");
                     monitor();
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -74,21 +71,22 @@ public class AlarmManagerInitializer implements DalaranStarter {
         }
         Date oneMinBeforeCurrent = new Date(current - 60 * 1000L);
         Date now = new Date(current);
+        log.error("-------------统计时间:{}-----", now);
         List<String> strList = Arrays.asList(ids);
-        logger.error("-------------报警配置的id:{}-----", strList);
+        log.error("-------------报警配置的id:{}-----", strList);
         for (String flowId : strList) {
             String alarmRuleId = redisService.getValue(RedisUtil.getAlarmConfigKey(flowId));
-            logger.error("-------------报警审核：{}----{}----", flowId, alarmRuleId);
+            log.error("-------------报警审核：{}----{}----", flowId, alarmRuleId);
             String alarmConfig = redisService.getValue(RedisUtil.getAlarmRuleKey(alarmRuleId));
             AlarmRuleConfig alarmRuleConfig = JSONObject.parseObject(alarmConfig, AlarmRuleConfig.class);
-            logger.error("-------------报警规则：----{}----", alarmRuleConfig);
+            log.error("-------------报警规则：----{}----", alarmRuleConfig);
             Map<AlarmRuleConfig.ChannelType, String> alarmChannel = alarmRuleConfig.getAlarmChannel();
             if (alarmChannel.isEmpty()) {
                 continue;
             }
             NoticeMessage noticeMessage = alarmRuleValidate(alarmRuleConfig, oneMinBeforeCurrent, now, flowId);
             if (noticeMessage.getIsTouchFailureAlarm() || noticeMessage.getIsTouchTimeOutAlarm()) {
-                logger.error("------------产生报警消息{}，准备发送通知------------", noticeMessage);
+                log.error("------------产生报警消息{}，准备发送通知------------", noticeMessage);
                 TriggerFlowReleasedEntity triggerFlowReleasedEntity = triggerFlowReleasedRepository.findByVersionAndOriginId(resourceLoader.getVersion(), String.valueOf(flowId));
                 noticeMessage.setFlowName(triggerFlowReleasedEntity.getName());
                 noticeMessage.setCreateDate(dateFormat.format(now));
@@ -99,16 +97,17 @@ public class AlarmManagerInitializer implements DalaranStarter {
     }
 
     private void sendNotice(NoticeMessage noticeMessage, Map<AlarmRuleConfig.ChannelType, String> alarmChannel) {
+        log.error("---------通知渠道 {} -------------", alarmChannel);
         for (Map.Entry<AlarmRuleConfig.ChannelType, String> entry : alarmChannel.entrySet()) {
             AlarmRuleConfig.ChannelType channelType = entry.getKey();
             String contactWays = entry.getValue();
             noticeMessage.setContactWays(contactWays.split(","));
-            logger.error("---------联系人的方式为 {} -------------", contactWays);
+            log.error("---------联系人的方式为 {} -------------", contactWays);
             switch (channelType) {
                 case mail:
                     dalaranNoticeService.sendEmail(noticeMessage);
                     break;
-                case shortMessage:
+                case message:
                     dalaranNoticeService.sendShortMessage(noticeMessage);
                     break;
                 default:
@@ -142,7 +141,6 @@ public class AlarmManagerInitializer implements DalaranStarter {
             noticeMessage.setTimeOutCount(elapseCount);
             noticeMessage.setTimeOutFrequency(overTimeFrequency);
         }
-        logger.error("-------------消息通知：----{}----", noticeMessage);
         return noticeMessage;
     }
 }
