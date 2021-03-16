@@ -5,11 +5,9 @@ import lombok.Data;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.MappedSuperclass;
 import javax.persistence.Table;
 
 @Data
-@MappedSuperclass
 @Entity
 @Table(name = "dalaran_private_repository")
 public class PrivateRepositoryEntity extends BasicEntity {
