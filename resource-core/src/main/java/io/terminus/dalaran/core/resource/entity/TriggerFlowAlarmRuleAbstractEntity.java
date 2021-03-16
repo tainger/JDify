@@ -1,7 +1,6 @@
 package io.terminus.dalaran.core.resource.entity;
 
 
-import io.terminus.dalaran.core.resource.entity.basic.BasicEntity;
 import lombok.Data;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
@@ -41,4 +40,6 @@ public class TriggerFlowAlarmRuleAbstractEntity  {
 
     @Column(nullable = false, length = 64)
     private String alarmRuleId;
+
+    private Boolean monitor;
 }

@@ -13,7 +13,7 @@ import java.util.List;
 
 
 @Service
-public class TriggerFlowAlarmRuleServiceImpl implements TriggerFlowAlarmRuleService , InitializingBean {
+public class TriggerFlowAlarmRuleServiceImpl implements TriggerFlowAlarmRuleService, InitializingBean {
 
     @Autowired
     private TriggerFlowAlarmRuleRepository triggerFlowAlarmRuleRepository;
@@ -27,7 +27,10 @@ public class TriggerFlowAlarmRuleServiceImpl implements TriggerFlowAlarmRuleServ
         for (TriggerFlowAlarmRuleEntity triggerFlowAlarmRuleEntity : triggerFlowAlarmRuleEntities) {
             String triggerFlowId = triggerFlowAlarmRuleEntity.getTriggerFlowId();
             String alarmRuleId = triggerFlowAlarmRuleEntity.getAlarmRuleId();
-            redisService.persistKey(RedisUtil.getAlarmConfigKey(triggerFlowId), alarmRuleId);
+            Boolean monitor = triggerFlowAlarmRuleEntity.getMonitor();
+            if (monitor) {
+                redisService.persistKey(RedisUtil.getAlarmConfigKey(triggerFlowId), alarmRuleId);
+            }
         }
     }
 }
