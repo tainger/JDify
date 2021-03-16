@@ -30,7 +30,7 @@ public class PrivateRepositoryEntity extends BasicEntity {
     @Column
     private String logoUri;
 
-    @Column(nullable = false, columnDefinition = "TEXT")
+    @Column(nullable = false, columnDefinition = "LONGTEXT")
     private String data;
 
     @Column(columnDefinition = "TEXT")
