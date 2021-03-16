@@ -1,13 +1,11 @@
 package io.terminus.dalaran.component.http.trigger;
 
 import io.swagger.models.Swagger;
+import io.terminus.dalaran.component.authenticator.DalaranAuthenticator;
 import io.terminus.dalaran.component.common.HttpMethod;
 import io.terminus.dalaran.component.common.LimitOperation;
 import io.terminus.dalaran.component.http.trigger.model.ApiInfo;
-import io.terminus.dalaran.component.http.trigger.processor.MixMethodProcessor;
-import io.terminus.dalaran.component.http.trigger.processor.QueryStringConvertProcessor;
-import io.terminus.dalaran.component.http.trigger.processor.QueryStringSignProcessor;
-import io.terminus.dalaran.component.http.trigger.processor.SignProcessor;
+import io.terminus.dalaran.component.http.trigger.processor.*;
 import io.terminus.dalaran.component.http.trigger.utils.RestWordUtils;
 import io.terminus.dalaran.component.http.trigger.utils.SwaggerUtils;
 import io.terminus.dalaran.component.limiter.DalaranLimiter;
@@ -26,6 +24,7 @@ import org.apache.camel.CamelContext;
 import org.apache.camel.model.RouteDefinition;
 import org.apache.camel.model.ThrottleDefinition;
 import org.apache.camel.model.dataformat.JsonLibrary;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.File;
@@ -66,21 +65,38 @@ public class RestListener implements DalaranTrigger<RestConfig>, DalaranTriggerA
             route.convertBodyTo(String.class);
             return;
         }
+
+//        if (config.getMethod().isNoBody()) {
+//            if (config.isEnableSign()) {
+//                route.process(new QueryStringSignProcessor(clientContext.getAllClient(), config.isCheckSign()));
+//            } else {
+//                route.process(new QueryStringConvertProcessor());
+//            }
+//            // TODO 目前会多一次序列化, 如果下个节点要求的是非序列化对象, 会有额外的性能开销
+//            route.marshal().json(JsonLibrary.Fastjson);
+//        } else {
+//            if (config.isEnableSign()) {
+//                route.unmarshal().json(JsonLibrary.Fastjson);
+//                route.process(new SignProcessor(clientContext.getAllClient(), config.isCheckSign()));
+//            }
+//            route.convertBodyTo(String.class);
+//        }
+        DalaranAuthenticator authenticator = config.getAuthenticator();
         if (config.getMethod().isNoBody()) {
-            if (config.isEnableSign()) {
-                route.process(new QueryStringSignProcessor(clientContext.getAllClient(), config.isCheckSign()));
+            if (StringUtils.isNotBlank(config.getAuthenticatorId())) {
+                route.process(new QueryProcessor(authenticator));
             } else {
                 route.process(new QueryStringConvertProcessor());
             }
-            // TODO 目前会多一次序列化, 如果下个节点要求的是非序列化对象, 会有额外的性能开销
             route.marshal().json(JsonLibrary.Fastjson);
         } else {
-            if (config.isEnableSign()) {
+            if (StringUtils.isNotBlank(config.getAuthenticatorId())) {
                 route.unmarshal().json(JsonLibrary.Fastjson);
-                route.process(new SignProcessor(clientContext.getAllClient(), config.isCheckSign()));
+                route.process(new AuthenticatorProcessor(authenticator));
             }
             route.convertBodyTo(String.class);
         }
+
     }
 
     @Override

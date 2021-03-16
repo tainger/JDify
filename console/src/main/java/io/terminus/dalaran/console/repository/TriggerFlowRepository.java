@@ -20,9 +20,6 @@ public interface TriggerFlowRepository extends JpaRepository<TriggerFlowEntity, 
 
     List<TriggerFlowEntity> findByStatusNotAndTriggerTypeAndIsExistTrue(FlowStatus status, String triggerType);
 
-    List<TriggerFlowEntity> findByIsMonitorTrue();
-
     TriggerFlowEntity findByResourceKey(String resourceKey);
 
-    List<TriggerFlowEntity> findByAlarmResourceKey(String resourceKey);
 }

@@ -10,11 +10,14 @@ import io.terminus.dalaran.model.dto.flow.ReleaseFlowDTO;
 import io.terminus.dalaran.model.dto.flow.SubFlowDTO;
 import io.terminus.dalaran.model.dto.flow.TriggerFlowDTO;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 public class FlowConvertor {
+
+    private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     public TriggerFlowDTO toDTO(TriggerFlowAbstractEntity entity) {
         TriggerFlowDTO flowModel = new TriggerFlowDTO();
@@ -113,6 +116,8 @@ public class FlowConvertor {
         flowModel.setTracing(entity.isTracing());
         flowModel.setTriggerType(entity.getTriggerType());
         flowModel.setTriggerConfig(JSON.parseObject(entity.getTriggerConfig(), Map.class));
+        flowModel.setCreatedAt(dateFormat.format(entity.getCreatedAt()));
+        flowModel.setUpdatedAt(dateFormat.format(entity.getUpdatedAt()));
         return flowModel;
     }
 }

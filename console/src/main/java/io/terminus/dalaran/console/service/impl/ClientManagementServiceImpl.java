@@ -9,7 +9,7 @@ import io.terminus.dalaran.model.dto.ClientDTO;
 import io.terminus.dalaran.model.dto.basic.BasicClientInfo;
 import io.terminus.draco.web.autoconfig.context.UserContext;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.BeanUtils;
+import org.apache.commons.beanutils.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -84,14 +84,22 @@ public class ClientManagementServiceImpl implements ClientManagementService {
 
     private ClientDTO toDTO(ClientEntity entity) {
         ClientDTO dto = new ClientDTO();
-        BeanUtils.copyProperties(entity, dto);
+        try {
+            BeanUtils.copyProperties(entity, dto);
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
         dto.setId(entity.getResourceKey());
         return dto;
     }
 
     private ClientEntity toEntity(ClientDTO dto) {
         ClientEntity entity = new ClientEntity();
-        BeanUtils.copyProperties(dto, entity);
+        try {
+            BeanUtils.copyProperties(dto, entity);
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
         String resourceKey = dto.getId();
         if (StringUtils.isBlank(resourceKey)) {
             resourceKey = ResourceKeyUtils.generateKey();

@@ -12,5 +12,4 @@ public class ClientDTO extends BasicClientInfo {
 
     private String description;
 
-    private boolean isExist;
 }

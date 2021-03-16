@@ -14,6 +14,7 @@ import io.terminus.dalaran.core.resource.entity.common.ModuleEntity;
 import io.terminus.dalaran.core.resource.entity.common.ReleaseRecordEntity;
 import io.terminus.dalaran.core.resource.entity.released.*;
 import io.terminus.dalaran.core.resource.redis.RedisService;
+import io.terminus.dalaran.core.resource.redis.RedisUtil;
 import io.terminus.dalaran.core.resource.repository.ModuleRepository;
 import io.terminus.dalaran.core.resource.repository.ReleaseRecordRepository;
 import io.terminus.dalaran.core.resource.repository.TriggerFlowReleasedRepository;
@@ -115,15 +116,22 @@ public class ReleasedFlowInitializer implements DalaranStarter {
             }
             resourceLoader.setVersion(recordEntity.getVersion());
             resourceLoader.setLastVersion(recordEntity.getLastVersion());
-            Map<String, String> alarmConfig = new HashMap<>();
 
+
+
+            List<String> flowIds = new ArrayList<>();
             List<TriggerFlowReleasedEntity> triggerFlowReleasedEntities = resourceLoader.loadAllTriggerFlow();
             for (TriggerFlowReleasedEntity triggerFlowReleasedEntity : triggerFlowReleasedEntities) {
-                String originId = triggerFlowReleasedEntity.getOriginId();
-                String alarmResourceKey = triggerFlowReleasedEntity.getAlarmResourceKey();
-                alarmConfig.put(originId, alarmResourceKey);
+                if(triggerFlowReleasedEntity.isExist()&& triggerFlowReleasedEntity.isTracing() &&triggerFlowReleasedEntity.isOnline()){
+                    String originId = triggerFlowReleasedEntity.getOriginId();
+                    flowIds.add(originId);
+                }
             }
-            redisService.persistKey("alarmConfig", JSONObject.toJSONString(alarmConfig));
+            String join = String.join(",", flowIds);
+            redisService.persistKey(RedisUtil.getReleasedFlowIdsKey(), join);
+
+
+
             // load client info
             List<ClientReleasedEntity> clients = resourceLoader.loadAllClient();
             for (ClientReleasedEntity client : clients) {

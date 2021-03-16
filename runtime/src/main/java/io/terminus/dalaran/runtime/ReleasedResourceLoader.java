@@ -41,9 +41,6 @@ public class ReleasedResourceLoader implements DalaranResourceLoader {
     private LimiterReleasedRepository limiterRepository;
 
 
-    public List<TriggerFlowReleasedEntity> LoadAllMonitoredTriggerFlow() {
-        return releasedTriggerFlowRepository.findByVersionAndIsMonitorTrue(version);
-    }
 
     @Override
     public List<TriggerFlowReleasedEntity> loadAllTriggerFlow() {

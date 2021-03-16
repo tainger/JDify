@@ -23,6 +23,7 @@ public class FieldInputType {
     public static final String Service = "Service";
     public static final String ServiceOperation = "ServiceOperation";
     public static final String Limiter = "Limiter";
+    public static final String Authenticator= "Authenticator";
     public static final String Spi = "Spi";
     public static final String TriggerSelector = "TriggerSelector";
     public static final String ProcessorSelector = "ProcessorSelector";
