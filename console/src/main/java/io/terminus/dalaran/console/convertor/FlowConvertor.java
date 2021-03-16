@@ -44,6 +44,8 @@ public class FlowConvertor {
         flowModel.setTracing(entity.isTracing());
         flowModel.setTriggerType(entity.getTriggerType());
         flowModel.setTriggerConfig(JSON.parseObject(entity.getTriggerConfig(), Map.class));
+        flowModel.setExist(entity.isExist());
+        flowModel.setOnline(entity.isOnline());
         return flowModel;
     }
 
