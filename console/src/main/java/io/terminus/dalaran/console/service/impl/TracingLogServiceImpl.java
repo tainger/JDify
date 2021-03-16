@@ -137,13 +137,13 @@ public class TracingLogServiceImpl implements TracingLogService {
         if(entity == null) {
             return detailLogDTO;
         }
-        detailLogDTO = buildDetailLog(entity, version, flowId);
-        List<TracingLogEntity> tracingLogEntity = tracingLogRepository.findByFlowIdAndVersion(flowId, version);
+        detailLogDTO = buildDetailLog(entity, flowId);
+        List<TracingLogEntity> tracingLogEntity = tracingLogRepository.findByFlowId(flowId);
         if (tracingLogEntity.size() == 0) {
             return detailLogDTO;
         }
-        TimeLogDTO timeLogDTO = getElapsedTime(flowId, version);
-        List<TracingLogEntity> tracingLogFailEntity = tracingLogRepository.findByFlowIdAndVersionAndSuccessful(flowId, version, false);
+        TimeLogDTO timeLogDTO = getElapsedTime(flowId);
+        List<TracingLogEntity> tracingLogFailEntity = tracingLogRepository.findByFlowIdAndSuccessful(flowId, false);
         Long lastExceptionDate = null;
         if (tracingLogFailEntity.size() != 0) {
             lastExceptionDate = getLastExceptionDate(flowId, version);
@@ -157,13 +157,13 @@ public class TracingLogServiceImpl implements TracingLogService {
         detailLogDTO.setAvgTime(timeLogDTO.getAvgTime());
         detailLogDTO.setMaxTime(timeLogDTO.getMaxTime());
         //可能会存在有多个相同的最大时间的情况，取时间最早的那个
-        detailLogDTO.setMaxTimeRecordId(getMaxTimeRecordId(flowId, version, timeLogDTO.getMaxTime()).get(0).toString());
+        detailLogDTO.setMaxTimeRecordId(getMaxTimeRecordId(flowId, timeLogDTO.getMaxTime()).get(0).toString());
         if (lastExceptionDate == null) {
             detailLogDTO.setLastExceptionDate(null);
             detailLogDTO.setLastExceptionDateRecordId(null);
         } else {
             detailLogDTO.setLastExceptionDate(format.format(lastExceptionDate));
-            detailLogDTO.setLastExceptionDateRecordId(getLastExceptionRecordId(flowId, version, lastExceptionDate).get(0));
+            detailLogDTO.setLastExceptionDateRecordId(getLastExceptionRecordId(flowId, lastExceptionDate).get(0));
         }
         return detailLogDTO;
     }
@@ -269,7 +269,7 @@ public class TracingLogServiceImpl implements TracingLogService {
         return tracingLog;
     }
 
-    private DetailLogDTO buildDetailLog(TriggerFlowReleasedEntity entity, String version, String flowId) {
+    private DetailLogDTO buildDetailLog(TriggerFlowReleasedEntity entity, String flowId) {
         List<ModuleEntity> moduleEntities = moduleRepository.findByIsExistTrue();
         Map<String, String> map = new HashMap<>();
         moduleEntities.forEach(moduleEntity -> map.put(moduleEntity.getResourceKey(), moduleEntity.getName()));
@@ -280,20 +280,27 @@ public class TracingLogServiceImpl implements TracingLogService {
         detailLogDTO.setModuleName(map.get(entity.getModuleId()));
         detailLogDTO.setOnline(entity.isOnline());
         detailLogDTO.setDescription(entity.getDescription());
-//        detailLogDTO.setMonitor(entity.isMonitor());
         TriggerFlowAlarmRuleEntity triggerFlowAlarmRuleEntity = triggerFlowAlarmRuleRepository.findByTriggerFlowIdAndIsExistTrue(flowId);
         if (triggerFlowAlarmRuleEntity != null) {
-            AlarmRuleEntity alarmRuleEntity = alarmRuleRepository.findByResourceKey(triggerFlowAlarmRuleEntity.getAlarmRuleId());
-            detailLogDTO.setMonitorId(triggerFlowAlarmRuleEntity.getAlarmRuleId());
-            detailLogDTO.setMonitorName(alarmRuleEntity.getName());
+            if (triggerFlowAlarmRuleEntity.getMonitor()) {
+                AlarmRuleEntity alarmRuleEntity = alarmRuleRepository.findByResourceKey(triggerFlowAlarmRuleEntity.getAlarmRuleId());
+                detailLogDTO.setMonitor(triggerFlowAlarmRuleEntity.getMonitor());
+                detailLogDTO.setMonitorId(triggerFlowAlarmRuleEntity.getAlarmRuleId());
+                detailLogDTO.setMonitorName(alarmRuleEntity.getName());
+            } else {
+                detailLogDTO.setMonitor(false);
+                detailLogDTO.setMonitorId(null);
+                detailLogDTO.setMonitorName(null);
+            }
         } else {
+            detailLogDTO.setMonitor(false);
             detailLogDTO.setMonitorId(null);
             detailLogDTO.setMonitorName(null);
         }
         return detailLogDTO;
     }
 
-    public TimeLogDTO getElapsedTime(String flowId, String version) {
+    public TimeLogDTO getElapsedTime(String flowId) {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<TimeLogDTO> criteriaQuery = builder.createQuery(TimeLogDTO.class);
         Root<TracingLogEntity> root = criteriaQuery.from(TracingLogEntity.class);
@@ -301,24 +308,18 @@ public class TracingLogServiceImpl implements TracingLogService {
         if (flowId != null) {
             predicates.add(builder.equal(root.get("flowId"), flowId));
         }
-        if (version != null) {
-            predicates.add(builder.equal(root.get("version"), version));
-        }
         predicates.add(builder.equal(root.get("tracingType"), TracingType.Flow));
         criteriaQuery.multiselect(builder.max(root.get("elapsed")), builder.avg(root.get("elapsed"))).where(predicates.toArray(new Predicate[0]));
         return entityManager.createQuery(criteriaQuery).getSingleResult();
     }
 
-    public List getMaxTimeRecordId(String flowId, String version, Long maxTime) {
+    public List getMaxTimeRecordId(String flowId, Long maxTime) {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<String> criteriaQuery = builder.createQuery(String.class);
         Root<TracingLogEntity> root = criteriaQuery.from(TracingLogEntity.class);
         List<Predicate> predicates = new ArrayList<>();
         if (flowId != null) {
             predicates.add(builder.equal(root.get("flowId"), flowId));
-        }
-        if (version != null) {
-            predicates.add(builder.equal(root.get("version"), version));
         }
         predicates.add(builder.equal(root.get("tracingType"), TracingType.Flow));
         predicates.add(builder.equal(root.get("elapsed"), maxTime));
@@ -343,16 +344,13 @@ public class TracingLogServiceImpl implements TracingLogService {
         return entityManager.createQuery(criteriaQuery).getSingleResult();
     }
 
-    public List<String> getLastExceptionRecordId(String flowId, String version, Long timeStamp) {
+    public List<String> getLastExceptionRecordId(String flowId, Long timeStamp) {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<String> criteriaQuery = builder.createQuery(String.class);
         Root<TracingLogEntity> root = criteriaQuery.from(TracingLogEntity.class);
         List<Predicate> predicates = new ArrayList<>();
         if (flowId != null) {
             predicates.add(builder.equal(root.get("flowId"), flowId));
-        }
-        if (version != null) {
-            predicates.add(builder.equal(root.get("version"), version));
         }
         predicates.add(builder.equal(root.get("successful"), false));
         predicates.add(builder.equal(root.get("timestamp"), timeStamp));
