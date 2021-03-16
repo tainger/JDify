@@ -2,9 +2,11 @@ package io.terminus.dalaran.console.service.impl;
 
 import io.terminus.dalaran.TracingType;
 import io.terminus.dalaran.console.entity.AlarmRuleEntity;
+import io.terminus.dalaran.console.entity.TriggerFlowAlarmRuleEntity;
 import io.terminus.dalaran.console.entity.TriggerFlowEntity;
 import io.terminus.dalaran.console.repository.AlarmRuleRepository;
 import io.terminus.dalaran.console.repository.SubFlowRepository;
+import io.terminus.dalaran.console.repository.TriggerFlowAlarmRuleRepository;
 import io.terminus.dalaran.console.repository.TriggerFlowRepository;
 import io.terminus.dalaran.console.service.ModuleManagementService;
 import io.terminus.dalaran.console.service.TracingLogService;
@@ -59,6 +61,9 @@ public class TracingLogServiceImpl implements TracingLogService {
 
     @Autowired
     private TriggerFlowReleasedRepository triggerFlowReleasedRepository;
+
+    @Autowired
+    private TriggerFlowAlarmRuleRepository triggerFlowAlarmRuleRepository;
 
     @Autowired
     private AlarmRuleRepository alarmRuleRepository;
@@ -276,10 +281,10 @@ public class TracingLogServiceImpl implements TracingLogService {
         detailLogDTO.setOnline(entity.isOnline());
         detailLogDTO.setDescription(entity.getDescription());
         detailLogDTO.setMonitor(entity.isMonitor());
-        TriggerFlowEntity triggerFlowEntity = flowRepository.findByResourceKey(flowId);
-        AlarmRuleEntity alarmRuleEntity = alarmRuleRepository.findByResourceKey(triggerFlowEntity.getAlarmResourceKey());
-        if (alarmRuleEntity != null) {
-            detailLogDTO.setMonitorId(alarmRuleEntity.getResourceKey());
+        TriggerFlowAlarmRuleEntity triggerFlowAlarmRuleEntity = triggerFlowAlarmRuleRepository.findByTriggerFlowIdAndIsExistTrue(flowId);
+        if (triggerFlowAlarmRuleEntity != null) {
+            AlarmRuleEntity alarmRuleEntity = alarmRuleRepository.findByResourceKey(triggerFlowAlarmRuleEntity.getAlarmRuleId());
+            detailLogDTO.setMonitorId(triggerFlowAlarmRuleEntity.getAlarmRuleId());
             detailLogDTO.setMonitorName(alarmRuleEntity.getName());
         } else {
             detailLogDTO.setMonitorId(null);
