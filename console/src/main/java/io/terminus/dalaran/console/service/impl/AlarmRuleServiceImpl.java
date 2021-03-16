@@ -3,6 +3,7 @@ package io.terminus.dalaran.console.service.impl;
 import com.alibaba.fastjson.JSONObject;
 import io.terminus.dalaran.console.entity.AlarmRuleEntity;
 import io.terminus.dalaran.console.entity.TriggerFlowAlarmRuleEntity;
+import io.terminus.dalaran.console.entity.TriggerFlowEntity;
 import io.terminus.dalaran.console.repository.AlarmRuleRepository;
 import io.terminus.dalaran.console.repository.TriggerFlowAlarmRuleRepository;
 import io.terminus.dalaran.console.repository.TriggerFlowRepository;
@@ -12,6 +13,7 @@ import io.terminus.dalaran.console.util.ResourceKeyUtils;
 import io.terminus.dalaran.core.resource.redis.RedisService;
 import io.terminus.dalaran.core.resource.redis.RedisUtil;
 import io.terminus.dalaran.model.dto.AlarmRuleDTO;
+import io.terminus.dalaran.model.dto.TriggerAlarmRuleDTO;
 import io.terminus.dalaran.model.dto.basic.BasicAlarmInfo;
 import io.terminus.dalaran.model.query.AlarmRuleQuery;
 import io.terminus.dalaran.response.ResponseResult;
@@ -89,6 +91,12 @@ public class AlarmRuleServiceImpl implements AlarmRuleService , InitializingBean
         entity.setExist(false);
         alarmRuleRepository.save(entity);
         redisService.deleteKey(RedisUtil.getAlarmRuleKey(id));
+        //删除关联表
+        List<TriggerFlowAlarmRuleEntity> triggerFlowAlarmRuleEntities = triggerFlowAlarmRuleRepository.findByAlarmRuleIdAndIsExistTrue(id);
+        triggerFlowAlarmRuleEntities.forEach((triggerFlowAlarmRuleEntity)->{
+            triggerFlowAlarmRuleEntity.setExist(false);
+            triggerFlowAlarmRuleRepository.save(triggerFlowAlarmRuleEntity);
+        });
     }
 
     @Override
@@ -129,14 +137,17 @@ public class AlarmRuleServiceImpl implements AlarmRuleService , InitializingBean
     }
 
     @Override
-    public ResponseResult <TriggerFlowAlarmRuleEntity>validateIsUsed(String id) {
-        ResponseResult<TriggerFlowAlarmRuleEntity> responseResult = new ResponseResult<>();
+    public  List<TriggerAlarmRuleDTO> validateIsUsed(String id) {
+        List<TriggerAlarmRuleDTO> triggerAlarmRuleDTOS = new ArrayList<>();
         List<TriggerFlowAlarmRuleEntity> triggerFlowAlarmRuleEntities = triggerFlowAlarmRuleRepository.findByAlarmRuleIdAndIsExistTrue(id);
-        if(!CollectionUtils.isEmpty(triggerFlowAlarmRuleEntities)) {
-           responseResult.setDelete(false);
-        }
-        responseResult.setData(triggerFlowAlarmRuleEntities);
-        return responseResult;
+        triggerFlowAlarmRuleEntities.forEach((item) ->{
+            TriggerAlarmRuleDTO triggerAlarmRuleDTO = new TriggerAlarmRuleDTO();
+            String triggerFlowId = item.getTriggerFlowId();
+            TriggerFlowEntity triggerFlowEntity = triggerFlowRepository.findByResourceKey(triggerFlowId);
+            triggerAlarmRuleDTO.setFlowName(triggerFlowEntity.getName());
+            triggerAlarmRuleDTOS.add(triggerAlarmRuleDTO);
+        });
+        return triggerAlarmRuleDTOS;
     }
 
     private AlarmRuleDTO toDTO(AlarmRuleEntity alarmRuleEntity) {
@@ -169,7 +180,9 @@ public class AlarmRuleServiceImpl implements AlarmRuleService , InitializingBean
         } else {
             entity = new AlarmRuleEntity();
             resourceKey = ResourceKeyUtils.generateKey();
+            entity.setCreatedAt(new Date());
         }
+        entity.setUpdatedAt(new Date());
         entity.setResourceKey(resourceKey);
         entity.setName(alarmRuleDTO.getName());
         entity.setConfig(JSONObject.toJSONString(alarmRuleDTO.getConfig()));

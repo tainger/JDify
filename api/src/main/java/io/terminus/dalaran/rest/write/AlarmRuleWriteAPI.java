@@ -2,6 +2,7 @@ package io.terminus.dalaran.rest.write;
 
 import io.swagger.annotations.ApiOperation;
 import io.terminus.dalaran.model.dto.AlarmRuleDTO;
+import io.terminus.dalaran.model.dto.TriggerAlarmRuleDTO;
 import io.terminus.dalaran.model.flow.TriggerFlow;
 import io.terminus.dalaran.response.ResponseResult;
 import org.springframework.web.bind.annotation.*;
@@ -25,6 +26,6 @@ public interface AlarmRuleWriteAPI {
 
     @GetMapping("/validate/{id}")
     @ApiOperation("校验报警策略是不是被使用")
-    ResponseResult  validateIsUsed(@PathVariable String id);
+    List<TriggerAlarmRuleDTO>  validateIsUsed(@PathVariable String id);
 
 }

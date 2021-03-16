@@ -8,6 +8,7 @@ import io.terminus.dalaran.console.exception.OnException;
 import io.terminus.dalaran.console.service.AlarmRuleService;
 import io.terminus.dalaran.model.TestRequestDTO;
 import io.terminus.dalaran.model.dto.AlarmRuleDTO;
+import io.terminus.dalaran.model.dto.TriggerAlarmRuleDTO;
 import io.terminus.dalaran.model.dto.log.MainLogDTO;
 import io.terminus.dalaran.model.flow.TriggerFlow;
 import io.terminus.dalaran.model.query.AlarmRuleQuery;
@@ -48,7 +49,7 @@ public class AlarmRuleManagementRest implements AlarmRuleReadAPI, AlarmRuleWrite
     }
 
     @Override
-    public ResponseResult <TriggerFlowAlarmRuleEntity> validateIsUsed(String id) {
+    public  List<TriggerAlarmRuleDTO> validateIsUsed(String id) {
        return alarmRuleService.validateIsUsed(id);
     }
 
