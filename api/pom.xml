@@ -56,6 +56,11 @@
             <groupId>io.terminus.draco</groupId>
             <version>1.2.3.BUILD-SNAPSHOT</version>
         </dependency>
+        <dependency>
+            <groupId>io.terminus.dalaran</groupId>
+            <artifactId>market-model</artifactId>
+            <version>${market.version}</version>
+        </dependency>
     </dependencies>
 
 

@@ -26,6 +26,10 @@ public interface FlowWriteAPI {
     @PostMapping(value = "/update")
     TriggerFlowDTO update(@RequestBody TriggerFlowDTO model) throws FlowNotExistException, UpdateFlowException;
 
+    @ApiOperation(value = "保存集成流为模板")
+    @PostMapping(value = "/save/template")
+    CreateResponse saveAsTemplate(@RequestBody TriggerFlowDTO model) throws CreateFlowException;
+
     @ApiOperation(value = "删除集成流")
     @DeleteMapping(value = "/delete")
     void deleteById(@RequestParam String id);
