@@ -13,4 +13,6 @@ public interface TriggerFlowAlarmRuleRepository extends JpaRepository<TriggerFlo
 
     TriggerFlowAlarmRuleEntity findByTriggerFlowIdAndIsExistTrue(String triggerFlowId);
 
+    List<TriggerFlowAlarmRuleEntity> findByAlarmRuleIdAndIsExistTrue(String alarmRuleId);
+
 }

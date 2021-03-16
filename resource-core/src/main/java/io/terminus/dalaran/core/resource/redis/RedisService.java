@@ -10,10 +10,6 @@ import java.util.concurrent.TimeUnit;
 @Component
 public class RedisService {
 
-    private final String split = ":";
-
-    private final String ALARM_ID = "alarm_id";
-
 
     @Autowired
     private RedisTemplate<String, String> redisTemplate;
