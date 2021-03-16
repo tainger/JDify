@@ -2,6 +2,7 @@ package io.terminus.dalaran.core.resource.entity.common;
 
 import io.terminus.dalaran.core.resource.entity.basic.BasicEntity;
 import lombok.Data;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
@@ -11,22 +12,22 @@ import javax.persistence.Table;
 @Table(name = "dalaran_private_repository")
 public class PrivateRepositoryEntity extends BasicEntity {
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 64)
     private String name;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 64)
     private String version;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 64)
     private String type;
 
-    @Column(nullable = false)
-    private String group;
+    @Column(nullable = false, length = 64)
+    private String resourceGroup;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 64)
     private String tenantCode;
 
-    @Column(nullable = false)
+    @Column
     private String logoUri;
 
     @Column(nullable = false, columnDefinition = "TEXT")
