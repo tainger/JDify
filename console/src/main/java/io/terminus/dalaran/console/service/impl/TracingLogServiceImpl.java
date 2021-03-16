@@ -2,9 +2,11 @@ package io.terminus.dalaran.console.service.impl;
 
 import io.terminus.dalaran.TracingType;
 import io.terminus.dalaran.console.entity.AlarmRuleEntity;
+import io.terminus.dalaran.console.entity.TriggerFlowAlarmRuleEntity;
 import io.terminus.dalaran.console.entity.TriggerFlowEntity;
 import io.terminus.dalaran.console.repository.AlarmRuleRepository;
 import io.terminus.dalaran.console.repository.SubFlowRepository;
+import io.terminus.dalaran.console.repository.TriggerFlowAlarmRuleRepository;
 import io.terminus.dalaran.console.repository.TriggerFlowRepository;
 import io.terminus.dalaran.console.service.ModuleManagementService;
 import io.terminus.dalaran.console.service.TracingLogService;
@@ -59,6 +61,9 @@ public class TracingLogServiceImpl implements TracingLogService {
 
     @Autowired
     private TriggerFlowReleasedRepository triggerFlowReleasedRepository;
+
+    @Autowired
+    private TriggerFlowAlarmRuleRepository triggerFlowAlarmRuleRepository;
 
     @Autowired
     private AlarmRuleRepository alarmRuleRepository;
@@ -137,7 +142,7 @@ public class TracingLogServiceImpl implements TracingLogService {
         if (tracingLogEntity.size() == 0) {
             return detailLogDTO;
         }
-        TimeLogDTO timeLogDTO= getElapsedTime(flowId, version);
+        TimeLogDTO timeLogDTO = getElapsedTime(flowId, version);
         List<TracingLogEntity> tracingLogFailEntity = tracingLogRepository.findByFlowIdAndVersionAndSuccessful(flowId, version, false);
         Long lastExceptionDate = null;
         if (tracingLogFailEntity.size() != 0) {
@@ -158,7 +163,7 @@ public class TracingLogServiceImpl implements TracingLogService {
             detailLogDTO.setLastExceptionDateRecordId(null);
         } else {
             detailLogDTO.setLastExceptionDate(format.format(lastExceptionDate));
-            detailLogDTO.setLastExceptionDateRecordId(getLastExceptionRecordId(flowId, version, lastExceptionDate));
+            detailLogDTO.setLastExceptionDateRecordId(getLastExceptionRecordId(flowId, version, lastExceptionDate).get(0));
         }
         return detailLogDTO;
     }
@@ -276,12 +281,15 @@ public class TracingLogServiceImpl implements TracingLogService {
         detailLogDTO.setOnline(entity.isOnline());
         detailLogDTO.setDescription(entity.getDescription());
         detailLogDTO.setMonitor(entity.isMonitor());
-        TriggerFlowEntity triggerFlowEntity = flowRepository.findByResourceKey(flowId);
-        AlarmRuleEntity alarmRuleEntity = alarmRuleRepository.findByResourceKey(triggerFlowEntity.getAlarmResourceKey());
-        if (alarmRuleEntity != null) {
-            detailLogDTO.setMonitorId(alarmRuleEntity.getResourceKey());
+        TriggerFlowAlarmRuleEntity triggerFlowAlarmRuleEntity = triggerFlowAlarmRuleRepository.findByTriggerFlowIdAndIsExistTrue(flowId);
+        if (triggerFlowAlarmRuleEntity != null) {
+            AlarmRuleEntity alarmRuleEntity = alarmRuleRepository.findByResourceKey(triggerFlowAlarmRuleEntity.getAlarmRuleId());
+            detailLogDTO.setMonitorId(triggerFlowAlarmRuleEntity.getAlarmRuleId());
+            detailLogDTO.setMonitorName(alarmRuleEntity.getName());
+        } else {
+            detailLogDTO.setMonitorId(null);
+            detailLogDTO.setMonitorName(null);
         }
-        detailLogDTO.setMonitorName(alarmRuleEntity.getName());
         return detailLogDTO;
     }
 
@@ -335,7 +343,7 @@ public class TracingLogServiceImpl implements TracingLogService {
         return entityManager.createQuery(criteriaQuery).getSingleResult();
     }
 
-    public String getLastExceptionRecordId(String flowId, String version, Long timeStamp) {
+    public List<String> getLastExceptionRecordId(String flowId, String version, Long timeStamp) {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<String> criteriaQuery = builder.createQuery(String.class);
         Root<TracingLogEntity> root = criteriaQuery.from(TracingLogEntity.class);
@@ -349,7 +357,7 @@ public class TracingLogServiceImpl implements TracingLogService {
         predicates.add(builder.equal(root.get("successful"), false));
         predicates.add(builder.equal(root.get("timestamp"), timeStamp));
         criteriaQuery.multiselect(root.get("recordId")).where(predicates.toArray(new Predicate[0]));
-        return entityManager.createQuery(criteriaQuery).getSingleResult();
+        return entityManager.createQuery(criteriaQuery).getResultList();
     }
 
 
