@@ -122,7 +122,7 @@ public class ReleasedFlowInitializer implements DalaranStarter {
             List<String> flowIds = new ArrayList<>();
             List<TriggerFlowReleasedEntity> triggerFlowReleasedEntities = resourceLoader.loadAllTriggerFlow();
             for (TriggerFlowReleasedEntity triggerFlowReleasedEntity : triggerFlowReleasedEntities) {
-                if(triggerFlowReleasedEntity.isExist()&&triggerFlowReleasedEntity.isMonitor()&&triggerFlowReleasedEntity.isOnline()){
+                if(triggerFlowReleasedEntity.isExist()&& triggerFlowReleasedEntity.isTracing() &&triggerFlowReleasedEntity.isOnline()){
                     String originId = triggerFlowReleasedEntity.getOriginId();
                     flowIds.add(originId);
                 }

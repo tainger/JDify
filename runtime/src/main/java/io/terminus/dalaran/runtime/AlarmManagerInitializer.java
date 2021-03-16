@@ -76,6 +76,9 @@ public class AlarmManagerInitializer implements DalaranStarter {
         log.error("-------------报警配置的id:{}-----", strList);
         for (String flowId : strList) {
             String alarmRuleId = redisService.getValue(RedisUtil.getAlarmConfigKey(flowId));
+            if(alarmRuleId == null) {
+                continue;
+            }
             log.error("-------------报警审核：{}----{}----", flowId, alarmRuleId);
             String alarmConfig = redisService.getValue(RedisUtil.getAlarmRuleKey(alarmRuleId));
             AlarmRuleConfig alarmRuleConfig = JSONObject.parseObject(alarmConfig, AlarmRuleConfig.class);

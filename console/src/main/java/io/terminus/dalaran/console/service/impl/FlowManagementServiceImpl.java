@@ -407,8 +407,10 @@ public class FlowManagementServiceImpl implements FlowManagementService {
         }
         try {
             TriggerFlowEntity triggerFlowEntity = flowRepository.findByResourceKey(bindAlarmRuleDto.getFlowId());
-            triggerFlowEntity.setMonitor(bindAlarmRuleDto.getIsMonitor());
-            flowRepository.save(triggerFlowEntity);
+            if(triggerFlowEntity == null) {
+                return fail(ResponseErrorMsg.FLOW_IS_NOT_EXIT);
+            }
+
             //关联表
             TriggerFlowAlarmRuleEntity triggerFlowAlarmRuleEntity = triggerFlowAlarmRuleRepository.findByTriggerFlowIdAndIsExistTrue(bindAlarmRuleDto.getFlowId());
             if(triggerFlowAlarmRuleEntity == null) {
@@ -418,9 +420,14 @@ public class FlowManagementServiceImpl implements FlowManagementService {
             }else {
                 triggerFlowAlarmRuleEntity.setAlarmRuleId(bindAlarmRuleDto.getAlarmRuleId());
             }
+            triggerFlowAlarmRuleEntity.setMonitor(bindAlarmRuleDto.getIsMonitor());
             triggerFlowAlarmRuleRepository.save(triggerFlowAlarmRuleEntity);
-            //更新缓存
-            redisService.persistKey(RedisUtil.getAlarmConfigKey(bindAlarmRuleDto.getFlowId()),bindAlarmRuleDto.getAlarmRuleId());
+
+            //被监管就加入缓存
+            if(bindAlarmRuleDto.getIsMonitor()) {
+                redisService.persistKey(RedisUtil.getAlarmConfigKey(bindAlarmRuleDto.getFlowId()),bindAlarmRuleDto.getAlarmRuleId());
+            }
+
         } catch (Exception e) {
             return fail(e.getMessage());
         }
