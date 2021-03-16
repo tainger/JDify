@@ -3,7 +3,6 @@ package io.terminus.dalaran.console.service.impl;
 import com.alibaba.fastjson.JSONObject;
 import io.terminus.dalaran.console.entity.AlarmRuleEntity;
 import io.terminus.dalaran.console.entity.TriggerFlowAlarmRuleEntity;
-import io.terminus.dalaran.console.entity.TriggerFlowEntity;
 import io.terminus.dalaran.console.repository.AlarmRuleRepository;
 import io.terminus.dalaran.console.repository.TriggerFlowAlarmRuleRepository;
 import io.terminus.dalaran.console.repository.TriggerFlowRepository;
