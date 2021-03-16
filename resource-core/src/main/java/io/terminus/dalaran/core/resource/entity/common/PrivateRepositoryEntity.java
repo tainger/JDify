@@ -2,11 +2,14 @@ package io.terminus.dalaran.core.resource.entity.common;
 
 import io.terminus.dalaran.core.resource.entity.basic.BasicEntity;
 import lombok.Data;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.MappedSuperclass;
 import javax.persistence.Table;
 
 @Data
+@MappedSuperclass
 @Entity
 @Table(name = "dalaran_private_repository")
 public class PrivateRepositoryEntity extends BasicEntity {
@@ -26,7 +29,7 @@ public class PrivateRepositoryEntity extends BasicEntity {
     @Column(nullable = false)
     private String tenantCode;
 
-    @Column(nullable = false)
+    @Column
     private String logoUri;
 
     @Column(nullable = false, columnDefinition = "TEXT")
