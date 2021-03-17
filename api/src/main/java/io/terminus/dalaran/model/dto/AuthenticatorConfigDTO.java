@@ -14,5 +14,5 @@ public class AuthenticatorConfigDTO {
 
     private String authenticatorValue;
 
-    private String expireTime;
+    private long expireTime;
 }

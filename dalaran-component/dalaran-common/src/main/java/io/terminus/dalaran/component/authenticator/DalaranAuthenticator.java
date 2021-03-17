@@ -24,5 +24,5 @@ public class DalaranAuthenticator {
     private String authenticatorValue;
 
     @ConfigFieldInfo(label = "过期时间", inputType = FieldInputType.String)
-    private String expireTime;
+    private long expireTime;
 }

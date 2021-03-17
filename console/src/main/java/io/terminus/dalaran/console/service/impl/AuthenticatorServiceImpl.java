@@ -2,11 +2,13 @@ package io.terminus.dalaran.console.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import io.terminus.dalaran.DalaranConsoleConstants;
 import io.terminus.dalaran.console.entity.AuthenticatorEntity;
 import io.terminus.dalaran.console.repository.AuthenticatorRepository;
 import io.terminus.dalaran.console.service.AuthenticatorService;
 import io.terminus.dalaran.console.service.jpa.model.QueryAuthenticatorInfo;
 import io.terminus.dalaran.console.util.ResourceKeyUtils;
+import io.terminus.dalaran.core.resource.redis.RedisService;
 import io.terminus.dalaran.model.dto.AuthenticatorConfigDTO;
 import io.terminus.dalaran.model.dto.AuthenticatorDTO;
 import io.terminus.dalaran.model.dto.basic.BasicAuthenticatorInfo;
@@ -22,7 +24,6 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 @Service
 public class AuthenticatorServiceImpl implements AuthenticatorService {
@@ -33,11 +34,15 @@ public class AuthenticatorServiceImpl implements AuthenticatorService {
     @Autowired
     private EntityManager entityManager;
 
+    @Autowired
+    private RedisService redisService;
+
     @Override
     public String create(AuthenticatorDTO authenticatorDTO) {
         AuthenticatorEntity entity = toEntity(authenticatorDTO);
         setCreatedBy(entity);
         repository.save(entity);
+        saveToRedis(authenticatorDTO.getAuthenticator());
         return entity.getResourceKey();
     }
 
@@ -45,6 +50,7 @@ public class AuthenticatorServiceImpl implements AuthenticatorService {
     public AuthenticatorDTO update(AuthenticatorDTO authenticatorDTO) {
         AuthenticatorEntity entity = buildEntity(authenticatorDTO);
         repository.save(entity);
+        saveToRedis(authenticatorDTO.getAuthenticator());
         return authenticatorDTO;
     }
 
@@ -53,6 +59,8 @@ public class AuthenticatorServiceImpl implements AuthenticatorService {
         AuthenticatorEntity entity = repository.findByResourceKey(authenticatorId);
         entity.setExist(false);
         repository.save(entity);
+        List<AuthenticatorConfigDTO> authenticatorConfigDTOS = JSONObject.parseArray(entity.getConfig(), AuthenticatorConfigDTO.class);
+        deleteFromRedis(authenticatorConfigDTOS);
     }
 
     @Override
@@ -137,5 +145,21 @@ public class AuthenticatorServiceImpl implements AuthenticatorService {
         dto.setId(entity.getResourceKey());
         return dto;
     }
+
+    private void saveToRedis(List<AuthenticatorConfigDTO> dtos) {
+        dtos.forEach(dto -> {
+            if (dto.isStatic()) {
+                redisService.persistKey(DalaranConsoleConstants.REDIS_AUTHENTICATOR_KEY + dto.getAuthenticatorKey(), dto.getAuthenticatorValue());
+            } else {
+                redisService.setValueMinutes(DalaranConsoleConstants.REDIS_AUTHENTICATOR_KEY + dto.getAuthenticatorKey(), dto.getAuthenticatorValue(), dto.getExpireTime());
+            }
+        });
+    }
+
+    private void deleteFromRedis(List<AuthenticatorConfigDTO> dtos) {
+        dtos.forEach(dto -> redisService.deleteKey(DalaranConsoleConstants.REDIS_AUTHENTICATOR_KEY + dto.getAuthenticatorKey()));
+    }
+
+
 
 }
