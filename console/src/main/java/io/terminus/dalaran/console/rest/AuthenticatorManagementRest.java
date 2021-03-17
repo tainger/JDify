@@ -41,4 +41,14 @@ public class AuthenticatorManagementRest implements AuthenticatorReadAPI, Authen
     public AuthenticatorDTO detail(@PathVariable String id) {
         return service.detail(id);
     }
+
+    @Override
+    public String getKey() {
+        return service.getKey();
+    }
+
+    @Override
+    public String getValue() {
+        return service.getValue();
+    }
 }

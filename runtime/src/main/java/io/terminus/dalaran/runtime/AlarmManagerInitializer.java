@@ -12,8 +12,6 @@ import io.terminus.dalaran.model.alarm.NoticeMessage;
 import io.terminus.dalaran.runtime.service.DalaranNoticeService;
 import io.terminus.dalaran.runtime.service.TracingLogService;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.text.SimpleDateFormat;
@@ -47,13 +45,12 @@ public class AlarmManagerInitializer implements DalaranStarter {
 
     @Override
     public void start() {
-        log.error("------------start------------");
         Timer timer = new Timer();
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
                 try {
-                    log.error("------------monitor2------------");
+                    log.error("------------monitor------------");
                     monitor();
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -65,8 +62,7 @@ public class AlarmManagerInitializer implements DalaranStarter {
     private void monitor() {
         String flowIds = redisService.getValue(RedisUtil.getReleasedFlowIdsKey());
         String[] ids = flowIds.split(",");
-//        Map<String, String> alarmConfig = JSONObject.parseObject(alarmConfigCache, Map.class);
-        if (ids.length==0) {
+        if (ids.length == 0) {
             return;
         }
         Date oneMinBeforeCurrent = new Date(current - 60 * 1000L);
@@ -75,13 +71,17 @@ public class AlarmManagerInitializer implements DalaranStarter {
         List<String> strList = Arrays.asList(ids);
         log.error("-------------报警配置的id:{}-----", strList);
         for (String flowId : strList) {
-            String alarmRuleId = redisService.getValue(RedisUtil.getAlarmConfigKey(flowId));
-            if(alarmRuleId == null) {
-                continue;
-            }
-            log.error("-------------报警审核：{}----{}----", flowId, alarmRuleId);
-            String alarmConfig = redisService.getValue(RedisUtil.getAlarmRuleKey(alarmRuleId));
-            if (alarmConfig == null) {
+//            String alarmRuleId = redisService.getValue(RedisUtil.getAlarmConfigKey(flowId));
+//            if (alarmRuleId == null) {
+//                continue;
+//            }
+//            log.error("-------------报警审核：{}----{}----", flowId, alarmRuleId);
+//            String alarmConfig = redisService.getValue(RedisUtil.getAlarmRuleKey(alarmRuleId));
+//            if (alarmConfig == null) {
+//                continue;
+//            }
+            String alarmConfig = getAlarmConfigIfAlarmConfigKey(flowId);
+            if (null == alarmConfig) {
                 continue;
             }
             AlarmRuleConfig alarmRuleConfig = JSONObject.parseObject(alarmConfig, AlarmRuleConfig.class);
@@ -117,7 +117,7 @@ public class AlarmManagerInitializer implements DalaranStarter {
                     dalaranNoticeService.sendShortMessage(noticeMessage);
                     break;
                 default:
-                    throw new RuntimeException();
+                    break;
             }
         }
     }
@@ -148,5 +148,19 @@ public class AlarmManagerInitializer implements DalaranStarter {
             noticeMessage.setTimeOutFrequency(overTimeFrequency);
         }
         return noticeMessage;
+    }
+
+
+    private String getAlarmConfigIfAlarmConfigKey(String flowId) {
+        String alarmRuleId = redisService.getValue(RedisUtil.getAlarmConfigKey(flowId));
+        if (alarmRuleId == null) {
+            return null;
+        }
+        String alarmConfig = redisService.getValue(RedisUtil.getAlarmRuleKey(alarmRuleId));
+        if (alarmConfig == null) {
+            redisService.deleteKey(RedisUtil.getAlarmConfigKey(flowId));
+            return null;
+        }
+        return alarmConfig;
     }
 }

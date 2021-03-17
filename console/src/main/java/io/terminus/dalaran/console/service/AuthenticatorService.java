@@ -16,4 +16,8 @@ public interface AuthenticatorService {
     AuthenticatorDTO detail(String authenticatorId);
 
     List<BasicAuthenticatorInfo> listBasicInfoByModuleId(String moduleId);
+
+    String getKey();
+
+    String getValue();
 }
