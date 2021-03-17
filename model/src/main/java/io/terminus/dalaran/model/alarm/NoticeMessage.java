@@ -25,7 +25,11 @@ public class NoticeMessage {
 
     public NoticeMessage() {
         this.isTouchFailureAlarm = false;
+        this.failureCount = 0L;
+        this.failureFrequency = 0L;
         this.isTouchTimeOutAlarm = false;
+        this.timeOutFrequency = 0L;
+        this.timeOutCount = 0L;
     }
 
     public String getFlowName() {
