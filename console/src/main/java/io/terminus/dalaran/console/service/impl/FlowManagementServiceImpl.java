@@ -500,6 +500,7 @@ public class FlowManagementServiceImpl implements FlowManagementService {
             resourceKey = ResourceKeyUtils.generateKey();
         }
         flowEntity.setResourceKey(resourceKey);
+        flowEntity.setUpdatedAt(new Date());
     }
 
     private ModelDTO buildModelEntity(ModelEntity entity) {
