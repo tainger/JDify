@@ -12,4 +12,13 @@ public interface AuthenticatorReadAPI {
     @GetMapping("/{id}")
     @ApiOperation("获取鉴权器详情")
     AuthenticatorDTO detail(@PathVariable String id);
+
+    @GetMapping("/key")
+    @ApiOperation("获取动态key")
+    String getKey();
+
+    @GetMapping("/value")
+    @ApiOperation("获取动态value")
+    String getValue();
+
 }

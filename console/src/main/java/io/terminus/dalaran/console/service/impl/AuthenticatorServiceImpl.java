@@ -22,6 +22,7 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class AuthenticatorServiceImpl implements AuthenticatorService {
@@ -83,6 +84,16 @@ public class AuthenticatorServiceImpl implements AuthenticatorService {
             }
         });
         return basicAuthenticatorInfos;
+    }
+
+    @Override
+    public String getKey() {
+        return ResourceKeyUtils.authenticatorKey();
+    }
+
+    @Override
+    public String getValue() {
+        return ResourceKeyUtils.authenticatorValue();
     }
 
     private AuthenticatorEntity toEntity(AuthenticatorDTO dto) {

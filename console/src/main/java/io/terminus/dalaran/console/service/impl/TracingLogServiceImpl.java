@@ -143,7 +143,7 @@ public class TracingLogServiceImpl implements TracingLogService {
             return detailLogDTO;
         }
         TimeLogDTO timeLogDTO = getElapsedTime(flowId);
-        List<TracingLogEntity> tracingLogFailEntity = tracingLogRepository.findByFlowIdAndSuccessful(flowId, false);
+        List<TracingLogEntity> tracingLogFailEntity = tracingLogRepository.findByFlowIdAndTracingTypeAndSuccessful(flowId, TracingType.Flow, false);
         Long lastExceptionDate = null;
         if (tracingLogFailEntity.size() != 0) {
             lastExceptionDate = getLastExceptionDate(flowId);

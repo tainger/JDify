@@ -24,7 +24,7 @@ public interface TracingLogRepository extends JpaRepository<TracingLogEntity, Lo
 
     List<TracingLogEntity> findByFlowIdAndVersion(String flowId, String version);
 
-    List<TracingLogEntity> findByFlowIdAndSuccessful(String flowId, boolean successful);
+    List<TracingLogEntity> findByFlowIdAndTracingTypeAndSuccessful(String flowId, TracingType tracingType ,boolean successful);
 
 
     List<TracingLogEntity> findByFlowIdAndVersionAndSuccessful(String flowId, String version, boolean successful);
