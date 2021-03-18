@@ -3,6 +3,8 @@ package io.terminus.dalaran.console.rest;
 import io.terminus.dalaran.console.ResponseMessage;
 import io.terminus.dalaran.console.exception.OnException;
 import io.terminus.dalaran.console.service.AuthenticatorService;
+import io.terminus.dalaran.model.AuthenticatorKeyResponse;
+import io.terminus.dalaran.model.AuthenticatorValueResponse;
 import io.terminus.dalaran.model.CreateResponse;
 import io.terminus.dalaran.model.dto.AuthenticatorDTO;
 import io.terminus.dalaran.rest.read.AuthenticatorReadAPI;
@@ -43,12 +45,12 @@ public class AuthenticatorManagementRest implements AuthenticatorReadAPI, Authen
     }
 
     @Override
-    public String getKey() {
+    public AuthenticatorKeyResponse getKey() {
         return service.getKey();
     }
 
     @Override
-    public String getValue() {
+    public AuthenticatorValueResponse getValue() {
         return service.getValue();
     }
 }

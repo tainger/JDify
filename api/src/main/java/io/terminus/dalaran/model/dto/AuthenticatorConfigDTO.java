@@ -8,7 +8,7 @@ public class AuthenticatorConfigDTO {
 
     private AuthenticatorKeyLocation keyLocation;
 
-    private boolean isStatic;
+    private Boolean isStatic;
 
     private String authenticatorKey;
 

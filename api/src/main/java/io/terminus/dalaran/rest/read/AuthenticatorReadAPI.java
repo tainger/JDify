@@ -1,6 +1,8 @@
 package io.terminus.dalaran.rest.read;
 
 import io.swagger.annotations.ApiOperation;
+import io.terminus.dalaran.model.AuthenticatorKeyResponse;
+import io.terminus.dalaran.model.AuthenticatorValueResponse;
 import io.terminus.dalaran.model.dto.AuthenticatorDTO;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,10 +17,10 @@ public interface AuthenticatorReadAPI {
 
     @GetMapping("/key")
     @ApiOperation("获取动态key")
-    String getKey();
+    AuthenticatorKeyResponse getKey();
 
     @GetMapping("/value")
     @ApiOperation("获取动态value")
-    String getValue();
+    AuthenticatorValueResponse getValue();
 
 }

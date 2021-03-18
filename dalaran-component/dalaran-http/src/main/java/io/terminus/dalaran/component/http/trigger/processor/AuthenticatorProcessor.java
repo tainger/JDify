@@ -36,7 +36,7 @@ public class AuthenticatorProcessor implements Processor {
         log.info("checkSign() - keyLocation: " + authenticator.getKeyLocation());
         log.info("checkSign() - key: " + authenticator.getAuthenticatorKey());
         log.info("checkSign() - value: " + authenticator.getAuthenticatorValue());
-        if (!authenticator.isStatic()) {
+        if (!authenticator.getIsStatic()) {
             String redisValue = redisService.getValue("Authenticator-" + authenticator.getAuthenticatorKey());
             if (StringUtils.isBlank(redisValue)) {
                 stopExchangeOnInvalidAppKey(exchange);
