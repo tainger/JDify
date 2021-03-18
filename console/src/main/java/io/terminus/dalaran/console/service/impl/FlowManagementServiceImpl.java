@@ -585,7 +585,7 @@ public class FlowManagementServiceImpl implements FlowManagementService {
         for (ProcessorEntity processorEntity : origin.getPipeline()) {
             ProcessorInfo processorInfo = dalaranContext.getDalaranComponentContext().getProcessorInfo(processorEntity.getType());
             Object processorConfig = resourceBuilder.buildConfig(processorEntity.getConfig(), processorInfo.getConfigType());
-
+            parseProcessorModel(processorConfig, models);
             if (processorConfig instanceof ConnectorConfig) {
                 ConnectorConfig connectorConfig = (ConnectorConfig) processorConfig;
                 String connectorId = connectorConfig.getConnectorId();
@@ -605,8 +605,6 @@ public class FlowManagementServiceImpl implements FlowManagementService {
                 List<ModelEntity> serviceModels = modelRepository.findByTargetTypeAndTargetId(ModelTargetType.Service, serviceId);
                 serviceModels.forEach(modelEntity -> models.put(modelEntity.getResourceKey(), modelEntity));
             }
-
-
         }
     }
 
@@ -623,8 +621,24 @@ public class FlowManagementServiceImpl implements FlowManagementService {
         if (config instanceof AllModelConfig) {
             AllModelConfig allModelConfig = (AllModelConfig) config;
             String inModelId = allModelConfig.getInModelId();
-
+            if (StringUtils.isNotBlank(inModelId)) {
+                models.put(inModelId, resourceLoader.loadModel(inModelId));
+            }
             String outModelId = allModelConfig.getOutModelId();
+            if (StringUtils.isNotBlank(outModelId)) {
+                models.put(outModelId, resourceLoader.loadModel(outModelId));
+            }
+        }
+        if (config instanceof ImmutableInModelConfig) {
+            ImmutableInModelConfig immutableInModelConfig = (ImmutableInModelConfig) config;
+            String inModelId = immutableInModelConfig.getInModelId();
+            if (StringUtils.isNotBlank(inModelId)) {
+                models.put(inModelId, resourceLoader.loadModel(inModelId));
+            }
+            String outModelId = immutableInModelConfig.getOutModelId();
+            if (StringUtils.isNotBlank(outModelId)) {
+                models.put(outModelId, resourceLoader.loadModel(outModelId));
+            }
         }
     }
 
