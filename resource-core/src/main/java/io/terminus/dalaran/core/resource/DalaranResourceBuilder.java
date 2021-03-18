@@ -37,4 +37,6 @@ public interface DalaranResourceBuilder {
 
     Object buildServiceConfig(ServiceAbstractEntity serviceEntity);
 
+    <T> T buildConfig(String configValue, Class<T> configType);
+
 }

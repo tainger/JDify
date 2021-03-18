@@ -237,6 +237,12 @@ public class DefaultDalaranResourceBuilder implements DalaranResourceBuilder {
         return processor;
     }
 
+    @Override
+    public  <T> T buildConfig(String configValue, Class<T> configType) {
+        String replacedConfig = replaceProperties(configValue, getProperties());
+        return JSON.parseObject(replacedConfig, configType);
+    }
+
     private MessageModel injectModel(Object config, MessageModel lastOutModel) {
         if (config instanceof OutModelConfig) {
             OutModelConfig outModelConfig = (OutModelConfig) config;
@@ -281,10 +287,7 @@ public class DefaultDalaranResourceBuilder implements DalaranResourceBuilder {
         return lastOutModel;
     }
 
-    private <T> T buildConfig(String configValue, Class<T> configType) {
-        String replacedConfig = replaceProperties(configValue, getProperties());
-        return JSON.parseObject(replacedConfig, configType);
-    }
+
 
     private String replaceProperties(String configValue, Map<String, String> properties) {
         StringSubstitutor stringSubstitutor = new StringSubstitutor(properties, DalaranConstants.ENV_REPLACE_PREFIX, DalaranConstants.ENV_REPLACE_SUFFIX);

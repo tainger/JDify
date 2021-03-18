@@ -2,11 +2,15 @@ package io.terminus.dalaran.console.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import io.terminus.dalaran.ModelImportMode;
+import io.terminus.dalaran.config.ProcessorInfo;
+import io.terminus.dalaran.config.TriggerInfo;
 import io.terminus.dalaran.console.TestFlowInitializer;
 import io.terminus.dalaran.console.convertor.FlowConvertor;
 import io.terminus.dalaran.console.entity.ModelEntity;
 import io.terminus.dalaran.console.entity.TriggerFlowAlarmRuleEntity;
 import io.terminus.dalaran.console.entity.TriggerFlowEntity;
+import io.terminus.dalaran.console.model.FlowTemplate;
+import io.terminus.dalaran.console.model.TemplateData;
 import io.terminus.dalaran.console.repository.ModelRepository;
 import io.terminus.dalaran.console.repository.PropertyRepository;
 import io.terminus.dalaran.console.repository.TriggerFlowAlarmRuleRepository;
@@ -15,9 +19,11 @@ import io.terminus.dalaran.console.service.FlowManagementService;
 import io.terminus.dalaran.console.service.ModelManagementService;
 import io.terminus.dalaran.console.service.jpa.FlowQueryService;
 import io.terminus.dalaran.console.util.ResourceKeyUtils;
+import io.terminus.dalaran.core.component.config.*;
 import io.terminus.dalaran.core.context.DalaranContext;
 import io.terminus.dalaran.core.flow.DalaranFlowBuilder;
 import io.terminus.dalaran.core.resource.DalaranResourceBuilder;
+import io.terminus.dalaran.core.resource.DalaranResourceLoader;
 import io.terminus.dalaran.core.resource.entity.common.ProcessorEntity;
 import io.terminus.dalaran.core.resource.entity.released.TriggerFlowReleasedEntity;
 import io.terminus.dalaran.core.resource.redis.RedisService;
@@ -25,6 +31,8 @@ import io.terminus.dalaran.core.resource.redis.RedisUtil;
 import io.terminus.dalaran.core.resource.repository.ModuleRepository;
 import io.terminus.dalaran.core.resource.repository.TriggerFlowReleasedRepository;
 import io.terminus.dalaran.exception.flow.FlowNotExistException;
+import io.terminus.dalaran.model.BasicResponse;
+import io.terminus.dalaran.model.ModelTargetType;
 import io.terminus.dalaran.model.dto.*;
 import io.terminus.dalaran.model.dto.basic.BasicFlowInfo;
 import io.terminus.dalaran.model.dto.flow.BindAlarmRuleDto;
@@ -39,10 +47,10 @@ import io.terminus.dalaran.response.ResponseErrorMsg;
 import io.terminus.dalaran.response.ResponseResult;
 import io.terminus.draco.web.autoconfig.context.UserContext;
 import org.apache.camel.CamelContext;
+import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -80,6 +88,9 @@ public class FlowManagementServiceImpl implements FlowManagementService {
 
     @Autowired
     private DalaranResourceBuilder resourceBuilder;
+
+    @Autowired
+    private DalaranResourceLoader resourceLoader;
 
     @Autowired
     private ModelManagementService modelService;
@@ -134,6 +145,15 @@ public class FlowManagementServiceImpl implements FlowManagementService {
             testFlowInitializer.reloadTestTriggerFlow(id);
         }
         return id;
+    }
+
+    @Override
+    public BasicResponse saveAsTemplate(TemplatePrecipitationDTO flow) {
+        FlowTemplate flowTemplate = new FlowTemplate();
+        TemplateData templateData = new TemplateData();
+        flowTemplate.setVersion(flow.getVersion());
+        flowTemplate.setId(flow.getId());
+        return null;
     }
 
     // TODO 很多重复内容 逻辑也比较尴尬, 各种 magic, 先测试一波, 有时间改改
@@ -358,7 +378,11 @@ public class FlowManagementServiceImpl implements FlowManagementService {
         TriggerFlowEntity flowEntity = flowRepository.findByResourceKey(copyFlow.getId());
 
         TriggerFlowEntity newFlowEntity = new TriggerFlowEntity();
-        BeanUtils.copyProperties(flowEntity, newFlowEntity);
+        try {
+            BeanUtils.copyProperties(flowEntity, newFlowEntity);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         newFlowEntity.setId(null);
         newFlowEntity.setName(copyFlow.getName());
         newFlowEntity.setResourceKey("copy_" + copyFlow.getId() + "_" + RandomStringUtils.random(4, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMN"));
@@ -515,10 +539,96 @@ public class FlowManagementServiceImpl implements FlowManagementService {
 
     private List<String> getSoapOperations() {
         List<TriggerFlowEntity> soapFlowList = flowRepository.findByStatusNotAndTriggerTypeAndIsExistTrue(FlowStatus.Error, "soap-listener");
-        return soapFlowList.stream().map(flowEntity -> {
-            return flowEntity.getName().trim();
-        }).collect(Collectors.toList());
+        return soapFlowList.stream().map(flowEntity -> flowEntity.getName().trim()).collect(Collectors.toList());
     }
+
+
+    public TemplateData buildFlowTemplate(TriggerFlowEntity origin) {
+        TemplateData templateData = new TemplateData();
+//        Map<String, ModelEntity> relationModel = new HashMap<>();
+//        Map<String, ConnectorEntity> relationConnector = new HashMap<>();
+//        Map<String, ServiceEntity> relationService = new HashMap<>();
+//        Map<String, FunctionEntity> relationFunction = new HashMap<>();
+//        Map<String, SubFlowEntity> relationSubFlow = new HashMap<>();
+        try {
+            BeanUtils.copyProperties(templateData, origin);
+
+        } catch (Exception e) {
+
+        }
+        return templateData;
+    }
+
+    private void buildTemplateRelationResource(TemplateData templateData, TriggerFlowEntity origin) {
+        Map models = templateData.getRelationModel();
+        Map connectors = templateData.getRelationConnector();
+        Map services = templateData.getRelationService();
+        String inModelId = origin.getInModel();
+        String outModelId = origin.getOutModel();
+        if (StringUtils.isNotBlank(inModelId)) {
+            models.put(inModelId, resourceLoader.loadModel(inModelId));
+        }
+        if (StringUtils.isNotBlank(outModelId)) {
+            models.put(outModelId, resourceLoader.loadModel(outModelId));
+        }
+
+        TriggerInfo triggerInfo = dalaranContext.getDalaranComponentContext().getTriggerInfo(origin.getTriggerType());
+        Object config = resourceBuilder.buildConfig(origin.getTriggerConfig(), triggerInfo.getConfigType());
+        if (config instanceof ConnectorConfig) {
+            ConnectorConfig connectorConfig = (ConnectorConfig) config;
+            String connectorId = connectorConfig.getConnectorId();
+            if (StringUtils.isNotBlank(connectorId)) {
+                connectors.put(connectorId, resourceLoader.loadConnector(connectorId));
+            }
+        }
+
+        for (ProcessorEntity processorEntity : origin.getPipeline()) {
+            ProcessorInfo processorInfo = dalaranContext.getDalaranComponentContext().getProcessorInfo(processorEntity.getType());
+            Object processorConfig = resourceBuilder.buildConfig(processorEntity.getConfig(), processorInfo.getConfigType());
+
+            if (processorConfig instanceof ConnectorConfig) {
+                ConnectorConfig connectorConfig = (ConnectorConfig) processorConfig;
+                String connectorId = connectorConfig.getConnectorId();
+                if (StringUtils.isNotBlank(connectorId)) {
+                    connectors.put(connectorId, resourceLoader.loadConnector(connectorId));
+                }
+            }
+            if (processorConfig instanceof ServiceOperationConfig) {
+                ServiceOperationConfig serviceOperationConfig = (ServiceOperationConfig) processorConfig;
+                String serviceId = null;
+                if(StringUtils.isNotBlank(serviceOperationConfig.getServiceId())) {
+                    serviceId =  serviceOperationConfig.getServiceId();
+                }
+                if (StringUtils.isNotBlank(serviceId)) {
+                    services.put(serviceId, resourceLoader.loadService(serviceId));
+                }
+                List<ModelEntity> serviceModels = modelRepository.findByTargetTypeAndTargetId(ModelTargetType.Service, serviceId);
+                serviceModels.forEach(modelEntity -> models.put(modelEntity.getResourceKey(), modelEntity));
+            }
+
+
+        }
+    }
+
+
+    private void parseProcessorModel(Object config, Map models) {
+        if (config instanceof OutModelConfig) {
+            OutModelConfig outModelConfig = (OutModelConfig) config;
+            String outModelId = outModelConfig.getOutModelId();
+            if (StringUtils.isBlank(outModelId)) {
+                return;
+            }
+            models.put(outModelId, resourceLoader.loadModel(outModelId));
+        }
+        if (config instanceof AllModelConfig) {
+            AllModelConfig allModelConfig = (AllModelConfig) config;
+            String inModelId = allModelConfig.getInModelId();
+
+            String outModelId = allModelConfig.getOutModelId();
+        }
+    }
+
+
 
     private void setCreatedBy(TriggerFlowEntity triggerFlowEntity) {
         if (UserContext.getUserInfo() != null && UserContext.getUserInfo().getUsername() != null) {

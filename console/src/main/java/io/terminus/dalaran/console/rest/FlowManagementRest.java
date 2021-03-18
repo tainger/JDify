@@ -11,6 +11,7 @@ import io.terminus.dalaran.core.context.DalaranContext;
 import io.terminus.dalaran.exception.flow.CreateFlowException;
 import io.terminus.dalaran.exception.flow.FlowNotExistException;
 import io.terminus.dalaran.exception.flow.UpdateFlowException;
+import io.terminus.dalaran.model.BasicResponse;
 import io.terminus.dalaran.model.CreateResponse;
 import io.terminus.dalaran.model.dto.*;
 import io.terminus.dalaran.model.dto.flow.BindAlarmRuleDto;
@@ -159,7 +160,7 @@ public class FlowManagementRest implements FlowReadAPI, FlowWriteAPI {
     }
 
     @Override
-    public CreateResponse saveAsTemplate(TriggerFlowDTO model) throws CreateFlowException {
-        return null;
+    public BasicResponse saveAsTemplate(TemplatePrecipitationDTO flow) {
+        return flowManagementService.saveAsTemplate(flow);
     }
 }
