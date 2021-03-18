@@ -15,7 +15,7 @@ public class DalaranAuthenticator {
     private AuthenticatorKeyLocation keyLocation;
 
     @ConfigFieldInfo(label = "是否静态", inputType = FieldInputType.Switch, defaultValue = "true")
-    private boolean isStatic = true;
+    private Boolean isStatic = true;
 
     @ConfigFieldInfo(label = "字段名称", inputType = FieldInputType.String)
     private String authenticatorKey;

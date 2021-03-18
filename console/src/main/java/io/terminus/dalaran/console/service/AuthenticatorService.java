@@ -1,5 +1,7 @@
 package io.terminus.dalaran.console.service;
 
+import io.terminus.dalaran.model.AuthenticatorKeyResponse;
+import io.terminus.dalaran.model.AuthenticatorValueResponse;
 import io.terminus.dalaran.model.dto.AuthenticatorDTO;
 import io.terminus.dalaran.model.dto.basic.BasicAuthenticatorInfo;
 
@@ -17,7 +19,7 @@ public interface AuthenticatorService {
 
     List<BasicAuthenticatorInfo> listBasicInfoByModuleId(String moduleId);
 
-    String getKey();
+    AuthenticatorKeyResponse getKey();
 
-    String getValue();
+    AuthenticatorValueResponse getValue();
 }

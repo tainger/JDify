@@ -9,6 +9,8 @@ import io.terminus.dalaran.console.service.AuthenticatorService;
 import io.terminus.dalaran.console.service.jpa.model.QueryAuthenticatorInfo;
 import io.terminus.dalaran.console.util.ResourceKeyUtils;
 import io.terminus.dalaran.core.resource.redis.RedisService;
+import io.terminus.dalaran.model.AuthenticatorKeyResponse;
+import io.terminus.dalaran.model.AuthenticatorValueResponse;
 import io.terminus.dalaran.model.dto.AuthenticatorConfigDTO;
 import io.terminus.dalaran.model.dto.AuthenticatorDTO;
 import io.terminus.dalaran.model.dto.basic.BasicAuthenticatorInfo;
@@ -95,13 +97,13 @@ public class AuthenticatorServiceImpl implements AuthenticatorService {
     }
 
     @Override
-    public String getKey() {
-        return ResourceKeyUtils.authenticatorKey();
+    public AuthenticatorKeyResponse getKey() {
+        return new AuthenticatorKeyResponse(ResourceKeyUtils.authenticatorKey());
     }
 
     @Override
-    public String getValue() {
-        return ResourceKeyUtils.authenticatorValue();
+    public AuthenticatorValueResponse getValue() {
+        return new AuthenticatorValueResponse(ResourceKeyUtils.authenticatorValue());
     }
 
     private AuthenticatorEntity toEntity(AuthenticatorDTO dto) {
@@ -148,7 +150,7 @@ public class AuthenticatorServiceImpl implements AuthenticatorService {
 
     private void saveToRedis(List<AuthenticatorConfigDTO> dtos) {
         dtos.forEach(dto -> {
-            if (dto.isStatic()) {
+            if (dto.getIsStatic()) {
                 redisService.persistKey(DalaranConsoleConstants.REDIS_AUTHENTICATOR_KEY + dto.getAuthenticatorKey(), dto.getAuthenticatorValue());
             } else {
                 redisService.setValueMinutes(DalaranConsoleConstants.REDIS_AUTHENTICATOR_KEY + dto.getAuthenticatorKey(), dto.getAuthenticatorValue(), dto.getExpireTime());
