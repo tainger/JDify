@@ -81,7 +81,9 @@ public class DefaultDalaranCamelContext implements DalaranContext<DalaranRoute> 
     public void removeTriggerFlow(TriggerFlow flow) {
         try {
             RouteDefinition route = camelContext.getRouteDefinition(flow.getRouteId());
-            camelContext.removeRouteDefinition(route);
+            if (route != null) {
+                camelContext.removeRouteDefinition(route);
+            }
             log.info("remove trigger flow ,flow [{}]:", flow.getRouteId());
         } catch (Exception e) {
             e.printStackTrace();
@@ -137,7 +139,9 @@ public class DefaultDalaranCamelContext implements DalaranContext<DalaranRoute> 
     public void removeSubFlow(SubFlow flow) {
         try {
             RouteDefinition route = camelContext.getRouteDefinition(flow.getRouteId());
-            camelContext.removeRouteDefinition(route);
+            if (route != null) {
+                camelContext.removeRouteDefinition(route);
+            }
             log.info("remove sub flow ,flow [{}]", flow.getRouteId());
         } catch (Exception e) {
             e.printStackTrace();
