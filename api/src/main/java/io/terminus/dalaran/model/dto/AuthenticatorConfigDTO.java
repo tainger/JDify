@@ -8,11 +8,11 @@ public class AuthenticatorConfigDTO {
 
     private AuthenticatorKeyLocation keyLocation;
 
-    private boolean isStatic;
+    private Boolean isStatic;
 
     private String authenticatorKey;
 
     private String authenticatorValue;
 
-    private String expireTime;
+    private long expireTime;
 }

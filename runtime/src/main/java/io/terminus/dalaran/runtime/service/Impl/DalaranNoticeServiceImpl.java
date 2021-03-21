@@ -9,11 +9,16 @@ import io.terminus.notice.sender.sms.service.SmsSenderService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import java.util.*;
 
 @Service
 public class DalaranNoticeServiceImpl implements DalaranNoticeService {
+
+
+//    @Value("${}")
+    private  String noticeCode;
 
     private static final Logger logger = LoggerFactory.getLogger(DalaranNoticeServiceImpl.class);
 
@@ -42,7 +47,7 @@ public class DalaranNoticeServiceImpl implements DalaranNoticeService {
     @Override
     public void sendShortMessage(NoticeMessage noticeMessage) {
         logger.error(noticeMessage.toString());
-        String noticeCode = "SMS_213090744";
+        String noticeCode = "SMS_213077210";
         List<String> keys = new ArrayList<>();
         keys.add("flowName");
         keys.add("createDate");

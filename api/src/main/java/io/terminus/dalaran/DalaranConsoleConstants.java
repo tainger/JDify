@@ -34,4 +34,6 @@ public class DalaranConsoleConstants {
     public static final String SWAGGER_CONNECTOR = "swagger-connector";
 
     public static final String MODEL_EXCEL_TEMPLATE = "excel-model-template.xlsx";
+
+    public static final String REDIS_AUTHENTICATOR_KEY = "Authenticator-";
 }

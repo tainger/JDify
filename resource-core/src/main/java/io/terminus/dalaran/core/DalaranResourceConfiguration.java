@@ -4,7 +4,6 @@ package io.terminus.dalaran.core;
 import io.terminus.dalaran.core.context.DalaranComponentContext;
 import io.terminus.dalaran.core.context.DalaranModelTypeContext;
 import io.terminus.dalaran.core.context.DalaranServiceContext;
-import io.terminus.dalaran.core.elasticjob.ElasticJobDataSource;
 import io.terminus.dalaran.core.flow.DalaranFragmentBuilder;
 import io.terminus.dalaran.core.flow.DalaranServiceBuilder;
 import io.terminus.dalaran.core.flow.DalaranServiceLoader;
@@ -45,10 +44,5 @@ public class DalaranResourceConfiguration {
     @Bean
     public OSSAccount ossAccount(@Value("${oss.endpoint}") String endpoint, @Value("${oss.accessId}") String accessId, @Value("${oss.accessSecret}") String accessSecret, @Value("${oss.bucketName}") String bucketName, @Value("${oss.rootDir}") String rootDir) {
         return new OSSAccount(endpoint, accessId, accessSecret, bucketName, rootDir);
-    }
-
-    @Bean
-    public ElasticJobDataSource elasticJobDataSource(@Value("${elasticjob.url}") String url, @Value("${elasticjob.username}") String username, @Value("${elasticjob.password}") String password) {
-        return new ElasticJobDataSource(url, username, password);
     }
 }

@@ -26,7 +26,7 @@ public class RedisService {
         }
     }
 
-    public Boolean setValue(String key, String value, long timeout) {
+    public Boolean setValueMinutes(String key, String value, long timeout) {
         try {
             return redisTemplate.opsForValue().setIfAbsent(key, value, timeout, TimeUnit.MINUTES);
         } catch (Exception e) {
@@ -42,7 +42,7 @@ public class RedisService {
         }
     }
 
-    public Boolean setValue(String key, String value, Long timeout) {
+    public Boolean setValueSeconds(String key, String value, long timeout) {
         return redisTemplate.opsForValue().setIfAbsent(key, value, timeout, TimeUnit.SECONDS);
     }
 
