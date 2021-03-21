@@ -25,6 +25,9 @@ public abstract class AbstractComponentInfo implements ComponentInfo {
     @NotNull
     private String modelType;
 
+    @NotNull
+    private String origin;
+
     @JSONField(serialize = false)
     @JsonIgnore
     private ConnectorInfo connectorInfo;

@@ -15,7 +15,7 @@ public interface PrivateRepositoryWriteAPI {
     @PostMapping(value = "/publish")
     BasicResponse publish(@RequestBody BasicResourceDTO basicResource);
 
-    @ApiOperation(value = "发布模板到市场")
+    @ApiOperation(value = "下载到私有仓库")
     @PostMapping(value = "/install")
     BasicResponse install(@RequestBody PrivateRepositoryDTO privateRepository);
 }

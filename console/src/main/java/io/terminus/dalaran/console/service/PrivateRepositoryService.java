@@ -1,5 +1,6 @@
 package io.terminus.dalaran.console.service;
 
+import io.terminus.dalaran.console.model.FlowTemplate;
 import io.terminus.dalaran.market.model.BasicResourceDTO;
 import io.terminus.dalaran.market.model.MarketResourceVersionDTO;
 import io.terminus.dalaran.model.BasicResponse;
@@ -17,4 +18,7 @@ public interface PrivateRepositoryService {
     BasicResponse publish(BasicResourceDTO basicResource);
 
     BasicResponse install(PrivateRepositoryDTO privateRepository);
+
+    BasicResponse saveTemplate(FlowTemplate flowTemplate);
+
 }

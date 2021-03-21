@@ -5,7 +5,7 @@ import io.terminus.dalaran.console.entity.ConnectorEntity;
 import io.terminus.dalaran.console.repository.ConnectorRepository;
 import io.terminus.dalaran.console.service.ConnectorService;
 import io.terminus.dalaran.console.service.jpa.model.QueryConnectorInfo;
-import io.terminus.dalaran.console.util.ResourceKeyUtils;
+import io.terminus.dalaran.console.util.GenerateKeyUtils;
 import io.terminus.dalaran.model.dto.ConnectorDTO;
 import io.terminus.dalaran.model.dto.basic.BasicConnectorInfo;
 import io.terminus.draco.web.autoconfig.context.UserContext;
@@ -124,7 +124,7 @@ public class ConnectorServiceImpl implements ConnectorService {
         entity.setName(dto.getName());
         String resourceKey = dto.getId();
         if (StringUtils.isBlank(resourceKey)) {
-            resourceKey = ResourceKeyUtils.generateKey();
+            resourceKey = GenerateKeyUtils.resourceKey();
         }
         entity.setResourceKey(resourceKey);
         entity.setConnectorType(dto.getConnectorType());

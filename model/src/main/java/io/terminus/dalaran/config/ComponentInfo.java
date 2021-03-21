@@ -12,6 +12,8 @@ public interface ComponentInfo {
 
     String getModelType();
 
+    String getOrigin();
+
     ConnectorInfo getConnectorInfo();
 
     Class getConfigType();

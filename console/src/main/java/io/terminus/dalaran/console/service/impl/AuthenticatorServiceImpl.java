@@ -6,7 +6,7 @@ import io.terminus.dalaran.console.entity.AuthenticatorEntity;
 import io.terminus.dalaran.console.repository.AuthenticatorRepository;
 import io.terminus.dalaran.console.service.AuthenticatorService;
 import io.terminus.dalaran.console.service.jpa.model.QueryAuthenticatorInfo;
-import io.terminus.dalaran.console.util.ResourceKeyUtils;
+import io.terminus.dalaran.console.util.GenerateKeyUtils;
 import io.terminus.dalaran.model.dto.AuthenticatorConfigDTO;
 import io.terminus.dalaran.model.dto.AuthenticatorDTO;
 import io.terminus.dalaran.model.dto.basic.BasicAuthenticatorInfo;
@@ -22,7 +22,6 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 @Service
 public class AuthenticatorServiceImpl implements AuthenticatorService {
@@ -88,12 +87,12 @@ public class AuthenticatorServiceImpl implements AuthenticatorService {
 
     @Override
     public String getKey() {
-        return ResourceKeyUtils.authenticatorKey();
+        return GenerateKeyUtils.authenticatorKey();
     }
 
     @Override
     public String getValue() {
-        return ResourceKeyUtils.authenticatorValue();
+        return GenerateKeyUtils.authenticatorValue();
     }
 
     private AuthenticatorEntity toEntity(AuthenticatorDTO dto) {
@@ -103,7 +102,7 @@ public class AuthenticatorServiceImpl implements AuthenticatorService {
         entity.setModuleId(dto.getModuleId());
         String resourceKey = dto.getId();
         if (StringUtils.isBlank(resourceKey)) {
-            resourceKey = ResourceKeyUtils.generateKey();
+            resourceKey = GenerateKeyUtils.resourceKey();
         }
         entity.setResourceKey(resourceKey);
         entity.setExist(true);

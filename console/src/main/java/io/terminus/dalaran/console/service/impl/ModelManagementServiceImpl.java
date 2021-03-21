@@ -14,7 +14,7 @@ import io.terminus.dalaran.console.repository.ServiceRepository;
 import io.terminus.dalaran.console.service.ModelManagementService;
 import io.terminus.dalaran.console.service.jpa.ModelQueryService;
 import io.terminus.dalaran.console.util.ExcelUtils;
-import io.terminus.dalaran.console.util.ResourceKeyUtils;
+import io.terminus.dalaran.console.util.GenerateKeyUtils;
 import io.terminus.dalaran.core.context.DalaranContext;
 import io.terminus.dalaran.core.resource.repository.ModuleRepository;
 import io.terminus.dalaran.model.*;
@@ -451,7 +451,7 @@ public class ModelManagementServiceImpl implements ModelManagementService {
         String resourceKey = model.getId();
         if (StringUtils.isBlank(resourceKey)) {
             modelEntity = new ModelEntity();
-            resourceKey = ResourceKeyUtils.generateKey();
+            resourceKey = GenerateKeyUtils.resourceKey();
         } else {
             modelEntity = modelRepository.findByResourceKey(resourceKey);
         }
