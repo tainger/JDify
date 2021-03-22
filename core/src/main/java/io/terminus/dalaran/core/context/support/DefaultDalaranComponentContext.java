@@ -169,6 +169,7 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext {
             triggerInfo.setOutdated(i != 0);
             triggerInfo.setType(triggerType);
             triggerInfo.setName(triggerType);
+            triggerInfo.setOrigin(triggerAnnotation.origin());
             triggerInfo.setOrder(triggerAnnotation.order());
             triggerInfo.setConfigFields(configFields);
             triggerInfo.setConfigType(triggerAnnotation.configType());
@@ -219,6 +220,7 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext {
             processorInfo.setType(processorType);
 
             processorInfo.setName(processorType);
+            processorInfo.setOrigin(processorAnnotation.origin());
             processorInfo.setOrder(processorAnnotation.order());
             processorInfo.setConfigFields(configFields);
             processorInfo.setConfigType(processorAnnotation.configType());

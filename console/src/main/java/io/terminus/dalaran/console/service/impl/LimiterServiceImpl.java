@@ -5,7 +5,7 @@ import io.terminus.dalaran.console.entity.LimiterEntity;
 import io.terminus.dalaran.console.repository.LimiterRepository;
 import io.terminus.dalaran.console.service.LimiterService;
 import io.terminus.dalaran.console.service.jpa.model.QueryLimiterInfo;
-import io.terminus.dalaran.console.util.ResourceKeyUtils;
+import io.terminus.dalaran.console.util.GenerateKeyUtils;
 import io.terminus.dalaran.model.dto.LimiterDTO;
 import io.terminus.dalaran.model.dto.basic.BasicLimiterInfo;
 import org.apache.commons.beanutils.BeanUtils;
@@ -117,7 +117,7 @@ public class LimiterServiceImpl implements LimiterService {
             entity = limiterRepository.findByResourceKey(resourceKey);
         } else {
             entity = new LimiterEntity();
-            resourceKey = ResourceKeyUtils.generateKey();
+            resourceKey = GenerateKeyUtils.resourceKey();
         }
         entity.setResourceKey(resourceKey);
         entity.setName(dto.getName());

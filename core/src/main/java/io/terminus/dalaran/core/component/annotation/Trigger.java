@@ -26,5 +26,7 @@ public @interface Trigger {
 
     Class configType() default Void.class;
 
+    String origin() default DalaranConstants.DALARAN;
+
     String description() default DalaranConstants.DALARAN_COMPONENT_DEFAULT_DESC;
 }

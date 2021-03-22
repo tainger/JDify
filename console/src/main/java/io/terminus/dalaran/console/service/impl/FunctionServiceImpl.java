@@ -4,7 +4,7 @@ import io.terminus.dalaran.console.entity.FunctionEntity;
 import io.terminus.dalaran.console.repository.FunctionRepository;
 import io.terminus.dalaran.console.service.FunctionService;
 import io.terminus.dalaran.console.service.jpa.model.QueryFunctionInfo;
-import io.terminus.dalaran.console.util.ResourceKeyUtils;
+import io.terminus.dalaran.console.util.GenerateKeyUtils;
 import io.terminus.dalaran.core.context.DalaranFunctionContext;
 import io.terminus.dalaran.model.dto.FunctionDTO;
 import io.terminus.dalaran.model.dto.basic.BasicFunctionInfo;
@@ -100,7 +100,7 @@ public class FunctionServiceImpl implements FunctionService {
         entity.setExist(true);
         String resourceKey = dto.getId();
         if (StringUtils.isBlank(resourceKey)) {
-            resourceKey = ResourceKeyUtils.generateKey();
+            resourceKey = GenerateKeyUtils.resourceKey();
         }
         entity.setResourceKey(resourceKey);
         return entity;

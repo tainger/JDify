@@ -4,7 +4,7 @@ import io.terminus.dalaran.console.entity.*;
 import io.terminus.dalaran.console.repository.*;
 import io.terminus.dalaran.console.service.*;
 import io.terminus.dalaran.console.service.jpa.ModuleQueryService;
-import io.terminus.dalaran.console.util.ResourceKeyUtils;
+import io.terminus.dalaran.console.util.GenerateKeyUtils;
 import io.terminus.dalaran.core.resource.entity.common.ModuleEntity;
 import io.terminus.dalaran.core.resource.repository.ModuleRepository;
 import io.terminus.dalaran.model.dto.ModuleDTO;
@@ -207,7 +207,7 @@ public class ModuleManagementServiceImpl implements ModuleManagementService {
         String resourceKey = module.getId();
         if (StringUtils.isBlank(resourceKey)) {
             moduleEntity = new ModuleEntity();
-            resourceKey = ResourceKeyUtils.generateKey();
+            resourceKey = GenerateKeyUtils.resourceKey();
         } else {
             moduleEntity = moduleRepository.findByResourceKey(resourceKey);
         }

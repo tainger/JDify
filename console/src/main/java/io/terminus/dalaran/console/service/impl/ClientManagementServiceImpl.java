@@ -4,7 +4,7 @@ import io.terminus.dalaran.console.entity.ClientEntity;
 import io.terminus.dalaran.console.repository.ClientRepository;
 import io.terminus.dalaran.console.service.ClientManagementService;
 import io.terminus.dalaran.console.service.jpa.model.QueryClientInfo;
-import io.terminus.dalaran.console.util.ResourceKeyUtils;
+import io.terminus.dalaran.console.util.GenerateKeyUtils;
 import io.terminus.dalaran.model.dto.ClientDTO;
 import io.terminus.dalaran.model.dto.basic.BasicClientInfo;
 import io.terminus.draco.web.autoconfig.context.UserContext;
@@ -102,7 +102,7 @@ public class ClientManagementServiceImpl implements ClientManagementService {
         }
         String resourceKey = dto.getId();
         if (StringUtils.isBlank(resourceKey)) {
-            resourceKey = ResourceKeyUtils.generateKey();
+            resourceKey = GenerateKeyUtils.resourceKey();
         }
         entity.setResourceKey(resourceKey);
         entity.setExist(true);

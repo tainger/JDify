@@ -4,11 +4,9 @@ import io.swagger.annotations.ApiOperation;
 import io.terminus.dalaran.exception.flow.CreateFlowException;
 import io.terminus.dalaran.exception.flow.FlowNotExistException;
 import io.terminus.dalaran.exception.flow.UpdateFlowException;
+import io.terminus.dalaran.model.BasicResponse;
 import io.terminus.dalaran.model.CreateResponse;
-import io.terminus.dalaran.model.dto.CopyFlow;
-import io.terminus.dalaran.model.dto.ImportFlowResult;
-import io.terminus.dalaran.model.dto.ImportProcessorDTO;
-import io.terminus.dalaran.model.dto.ImportProcessorResult;
+import io.terminus.dalaran.model.dto.*;
 import io.terminus.dalaran.model.dto.flow.BindAlarmRuleDto;
 import io.terminus.dalaran.model.dto.flow.ImportFlowDTO;
 import io.terminus.dalaran.model.dto.flow.TriggerFlowDTO;
@@ -20,15 +18,15 @@ public interface FlowWriteAPI {
 
     @ApiOperation(value = "创建集成流")
     @PostMapping(value = "/create")
-    CreateResponse create(@RequestBody TriggerFlowDTO model) throws CreateFlowException;
+    CreateResponse create(@RequestBody TriggerFlowDTO flow) throws CreateFlowException;
 
     @ApiOperation(value = "更新集成流")
     @PostMapping(value = "/update")
-    TriggerFlowDTO update(@RequestBody TriggerFlowDTO model) throws FlowNotExistException, UpdateFlowException;
+    TriggerFlowDTO update(@RequestBody TriggerFlowDTO flow) throws FlowNotExistException, UpdateFlowException;
 
     @ApiOperation(value = "保存集成流为模板")
     @PostMapping(value = "/save/template")
-    CreateResponse saveAsTemplate(@RequestBody TriggerFlowDTO model) throws CreateFlowException;
+    BasicResponse saveAsTemplate(@RequestBody TemplatePrecipitationDTO flow) throws CreateFlowException;
 
     @ApiOperation(value = "删除集成流")
     @DeleteMapping(value = "/delete")
@@ -40,11 +38,11 @@ public interface FlowWriteAPI {
 
     @ApiOperation(value = "快速创建集成流")
     @PostMapping(value = "/import")
-    ImportFlowResult importTriggerFlow(@RequestBody ImportFlowDTO model);
+    ImportFlowResult importTriggerFlow(@RequestBody ImportFlowDTO flow);
 
     @ApiOperation(value = "快速创建处理器")
     @PostMapping(value = "/importProcessor")
-    ImportProcessorResult importProcessor(@RequestBody ImportProcessorDTO model);
+    ImportProcessorResult importProcessor(@RequestBody ImportProcessorDTO flow);
 
     @ApiOperation(value = "流程下线")
     @PostMapping(value = "/offline")
