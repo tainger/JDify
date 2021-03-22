@@ -2,7 +2,7 @@ package io.terminus.dalaran.console.model;
 
 import io.terminus.dalaran.console.entity.*;
 import io.terminus.dalaran.core.resource.entity.TriggerFlowAbstractEntity;
-import io.terminus.dalaran.model.market.ResourceFile;
+import io.terminus.dalaran.model.market.MarketProcessor;
 import lombok.Data;
 
 import java.util.HashMap;
@@ -21,5 +21,5 @@ public class TemplateData extends TriggerFlowAbstractEntity {
 
     private Map<String, SubFlowEntity> relationSubFlow = new HashMap<>();
 
-    private Map<String, ResourceFile> relationPackage = new HashMap<>();
+    private Map<String, MarketProcessor> relationPackage = new HashMap<>();
 }
