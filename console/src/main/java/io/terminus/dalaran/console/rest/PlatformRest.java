@@ -10,6 +10,7 @@ import io.terminus.dalaran.console.exception.OnException;
 import io.terminus.dalaran.console.service.*;
 import io.terminus.dalaran.core.context.DalaranContext;
 import io.terminus.dalaran.model.DalaranAccount;
+import io.terminus.dalaran.model.dto.ImportJarRequest;
 import io.terminus.dalaran.model.dto.ReleaseRecordDTO;
 import io.terminus.dalaran.model.dto.ReleaseRequestDTO;
 import io.terminus.dalaran.model.dto.flow.ReleaseFlowDTO;
@@ -56,7 +57,14 @@ public class PlatformRest implements PlatformInfoAPI, PlatformImportAPI, Platfor
     private ExportService exportService;
 
     @Autowired
+    private MarketManagementService marketManagementService;
+
+    @Autowired
     private FlowManagementService flowManagementService;
+
+    private final String libPath = "lib/";
+    private final String classSuffix = ".class";
+
 
     @Override
     @OnException(code = ResponseMessage.VERSION_QUERY_ERROR)
@@ -235,5 +243,8 @@ public class PlatformRest implements PlatformInfoAPI, PlatformImportAPI, Platfor
         return authorizeService.getUserInfo();
     }
 
-
+    @Override
+    public void importJarFile(ImportJarRequest request) {
+        marketManagementService.upload(request.getFilePath());
+    }
 }

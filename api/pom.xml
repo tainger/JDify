@@ -42,12 +42,6 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>io.terminus</groupId>
-            <artifactId>dalaran-model</artifactId>
-            <version>${project.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
             <groupId>org.springframework.data</groupId>
             <artifactId>spring-data-commons</artifactId>
         </dependency>
