@@ -23,7 +23,7 @@ public class PrivateRepositoryEntity extends BasicEntity {
     @Column(nullable = false, length = 64)
     private String type;
 
-    @Column(nullable = false, length = 64)
+    @Column(length = 64)
     private String resourceGroup;
 
     @Column(nullable = false, length = 64)

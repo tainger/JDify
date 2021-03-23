@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 public class PropertyService {
 
     @Value("${terminus.dalaran.tenant-code}")
-    private String tenantCode;
+    private String tenantCode = "terminus";
 
     @Value("${terminus.dalaran.market.host}")
     private String marketHost;
