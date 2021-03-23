@@ -159,7 +159,11 @@ public class AuthenticatorServiceImpl implements AuthenticatorService {
     }
 
     private void deleteFromRedis(List<AuthenticatorConfigDTO> dtos) {
-        dtos.forEach(dto -> redisService.deleteKey(DalaranConsoleConstants.REDIS_AUTHENTICATOR_KEY + dto.getAuthenticatorKey()));
+        dtos.forEach(dto -> {
+            if (dto.getIsStatic()) {
+                redisService.deleteKey(DalaranConsoleConstants.REDIS_AUTHENTICATOR_KEY + dto.getAuthenticatorKey());
+            }
+        });
     }
 
 

@@ -31,6 +31,12 @@
             <artifactId>mysql-connector-java</artifactId>
             <version>${mysql.connector.version}</version>
         </dependency>
+        <dependency>
+            <groupId>io.terminus</groupId>
+            <artifactId>dalaran-common</artifactId>
+            <version>2.4.8-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 
 </project>

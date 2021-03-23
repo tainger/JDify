@@ -21,6 +21,7 @@ public class I18nUtils {
     private static final String COMPONENT_FIELD_PREFIX = "component_field.";
     private static final String CONNECTOR_FIELD_PREFIX = "connector_field.";
     private static final String LIMITER_FIELD_PREFIX = "limiter_field.";
+    private static final String AUTHENTICATOR_FIELD_PREFIX = "authenticator_field.";
     private static final String MODEL_PREFIX = "model.";
     private static final String MODEL_FIELD_PREFIX = "model_field.";
     private static final String BASIC_COMPONENT_PREFIX = "basic_field.";
@@ -83,6 +84,11 @@ public class I18nUtils {
 
     public String getLimiterFieldLabel(String limiter, String field) {
         Optional<String> message = getMessageOptional(LIMITER_FIELD_PREFIX + limiter + "." + field);
+        return message.orElse(field);
+    }
+
+    public String getAuthenticatorFieldLabel(String authenticator, String field) {
+        Optional<String> message = getMessageOptional(AUTHENTICATOR_FIELD_PREFIX + authenticator + "." + field);
         return message.orElse(field);
     }
 

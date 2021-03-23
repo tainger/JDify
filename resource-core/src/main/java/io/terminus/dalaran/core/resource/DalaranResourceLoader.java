@@ -38,4 +38,6 @@ public interface DalaranResourceLoader {
 
     ServiceAbstractEntity loadService(String serviceId);
 
+    AuthenticatorAbstractEntity loadAuthenticator(String authenticatorId);
+
 }
