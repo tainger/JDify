@@ -40,6 +40,9 @@ public class ReleasedResourceLoader implements DalaranResourceLoader {
     @Autowired
     private ClientReleasedRepository clientRepository;
 
+    @Autowired
+    private AuthenticatorReleasedRepository authenticatorRepository;
+
 
     @Override
     public List<TriggerFlowReleasedEntity> loadAllTriggerFlow() {
@@ -119,6 +122,11 @@ public class ReleasedResourceLoader implements DalaranResourceLoader {
     @Override
     public ServiceReleasedEntity loadService(String serviceId) {
         return serviceRepository.findByVersionAndOriginId(version, serviceId);
+    }
+
+    @Override
+    public AuthenticatorReleasedEntity loadAuthenticator(String authenticatorId) {
+        return authenticatorRepository.findByVersionAndOriginId(version, authenticatorId);
     }
 
 

@@ -3,18 +3,21 @@ package io.terminus.dalaran.component.http.trigger;
 import com.alibaba.fastjson.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.terminus.dalaran.FieldInputType;
+import io.terminus.dalaran.component.authenticator.AuthenticatorRestConfig;
 import io.terminus.dalaran.component.authenticator.DalaranAuthenticator;
-import io.terminus.dalaran.component.basic.BasicAuthenticator;
 import io.terminus.dalaran.component.common.HttpMethod;
 import io.terminus.dalaran.component.limiter.DalaranLimiter;
 import io.terminus.dalaran.core.component.annotation.ConfigFieldInfo;
 import io.terminus.dalaran.core.component.config.AllModelConfig;
+import io.terminus.dalaran.core.component.config.AuthenticatorConfig;
 import io.terminus.dalaran.core.component.config.LimiterConfig;
 import io.terminus.dalaran.model.HttpProtocol;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
-public class RestConfig extends AllModelConfig implements LimiterConfig<DalaranLimiter> {
+public class RestConfig extends AllModelConfig implements  AuthenticatorConfig<DalaranAuthenticator>, LimiterConfig<DalaranLimiter> {
 
     @ConfigFieldInfo(inputType = FieldInputType.Hidden, required = false)
     @JSONField(serialize = false)
@@ -24,10 +27,10 @@ public class RestConfig extends AllModelConfig implements LimiterConfig<DalaranL
     @ConfigFieldInfo(label = "限流熔断器", inputType = FieldInputType.Limiter, required = false, limiterType = DalaranLimiter.class)
     private String limiterId;
 
-//    @ConfigFieldInfo(label = "开启限流", inputType = FieldInputType.Switch, defaultValue = "false")
+    @ConfigFieldInfo(label = "开启限流", inputType = FieldInputType.Switch, defaultValue = "false")
     private boolean enableLimit = false;
 
-//    @ConfigFieldInfo(label = "开启熔断", inputType = FieldInputType.Switch, defaultValue = "false")
+    @ConfigFieldInfo(label = "开启熔断", inputType = FieldInputType.Switch, defaultValue = "false")
     private boolean enableBreaker = false;
 
     // TODO load by application.yml
@@ -39,7 +42,7 @@ public class RestConfig extends AllModelConfig implements LimiterConfig<DalaranL
     @JsonIgnore
     private DalaranAuthenticator authenticator;
 
-    @ConfigFieldInfo(label = "鉴权器", inputType = FieldInputType.Authenticator, required = false, authenticatorType = DalaranAuthenticator.class)
+    @ConfigFieldInfo(label = "鉴权器", inputType = FieldInputType.Authenticator, required = false, authenticatorType = AuthenticatorRestConfig.class)
     private String authenticatorId;
 
 //    @ConfigFieldInfo(label = "开启鉴权", inputType = FieldInputType.Switch, defaultValue = "false")

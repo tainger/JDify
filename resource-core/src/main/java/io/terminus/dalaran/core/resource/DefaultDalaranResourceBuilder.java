@@ -2,6 +2,8 @@ package io.terminus.dalaran.core.resource;
 
 import com.alibaba.fastjson.JSON;
 import io.terminus.dalaran.DalaranConstants;
+import io.terminus.dalaran.component.authenticator.AuthenticatorRestConfig;
+import io.terminus.dalaran.component.authenticator.DalaranAuthenticator;
 import io.terminus.dalaran.config.ProcessorInfo;
 import io.terminus.dalaran.config.ServiceInfo;
 import io.terminus.dalaran.config.TriggerInfo;
@@ -93,6 +95,16 @@ public class DefaultDalaranResourceBuilder implements DalaranResourceBuilder {
             }
         }
 
+        if (config instanceof AuthenticatorConfig) {
+            AuthenticatorConfig authenticatorConfig = (AuthenticatorConfig) config;
+            String authenticatorId = authenticatorConfig.getAuthenticatorId();
+            if (StringUtils.isNotBlank(authenticatorId)) {
+                Object authenticator = buildAuthenticatorConfig(authenticatorId, triggerInfo.getAuthenticatorInfo().getClassType());
+                authenticatorConfig.setAuthenticator(authenticator);
+            }
+        }
+
+
         return flow;
     }
 
@@ -163,6 +175,15 @@ public class DefaultDalaranResourceBuilder implements DalaranResourceBuilder {
             throw new RuntimeException("limiter [" + limiterId + "] not found");
         }
         return buildConfig(entity.getConfig(), limiterConfigType);
+    }
+
+    @Override
+    public Object buildAuthenticatorConfig(String authenticatorId, Class authenticatorConfigType) {
+        AuthenticatorAbstractEntity entity = resourceLoader.loadAuthenticator(authenticatorId);
+        if (entity == null) {
+            throw new RuntimeException("authenticator [" + authenticatorId + "] not found");
+        }
+        return buildArrayConfig(entity.getConfig(), authenticatorConfigType);
     }
 
     @Override
@@ -241,6 +262,14 @@ public class DefaultDalaranResourceBuilder implements DalaranResourceBuilder {
     public  <T> T buildConfig(String configValue, Class<T> configType) {
         String replacedConfig = replaceProperties(configValue, getProperties());
         return JSON.parseObject(replacedConfig, configType);
+    }
+
+    public  <T> T buildArrayConfig(String configValue, Class<T> configType) {
+        String replacedConfig = replaceProperties(configValue, getProperties());
+        DalaranAuthenticator authenticator = new DalaranAuthenticator();
+        List<AuthenticatorRestConfig> configs = JSON.parseArray(replacedConfig, AuthenticatorRestConfig.class);
+        authenticator.setConfig(configs);
+        return JSON.parseObject(JSON.toJSONString(authenticator), configType);
     }
 
     private MessageModel injectModel(Object config, MessageModel lastOutModel) {
