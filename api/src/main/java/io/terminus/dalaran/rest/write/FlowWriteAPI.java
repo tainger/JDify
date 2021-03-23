@@ -20,6 +20,10 @@ public interface FlowWriteAPI {
     @PostMapping(value = "/create")
     CreateResponse create(@RequestBody TriggerFlowDTO flow) throws CreateFlowException;
 
+    @ApiOperation(value = "基于模板创建集成流")
+    @PostMapping(value = "/create/template")
+    BasicResponse create(@RequestBody TemplatePrecipitationDTO template) throws CreateFlowException;
+
     @ApiOperation(value = "更新集成流")
     @PostMapping(value = "/update")
     TriggerFlowDTO update(@RequestBody TriggerFlowDTO flow) throws FlowNotExistException, UpdateFlowException;

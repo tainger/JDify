@@ -234,7 +234,6 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext {
                     ConnectorInfo connectorInfo = buildConnectorInfo(ComponentType.Processor, connectorType, connector, processorType);
                     processorInfo.setConnectorInfo(connectorInfo);
                     processorInfo.setConnectorType(connector.value());
-
                 }
             }
 

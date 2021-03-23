@@ -21,6 +21,8 @@ public interface FlowManagementService {
 
     String createFlow(TriggerFlowDTO flowModel);
 
+    BasicResponse createFromTemplate(TemplatePrecipitationDTO template);
+
     BasicResponse saveAsTemplate(TemplatePrecipitationDTO flow);
 
     ImportFlowResult importFlow(ImportFlowDTO flowModel);

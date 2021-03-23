@@ -1,12 +1,18 @@
 package io.terminus.dalaran.console.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.aliyun.oss.model.OSSObject;
+import io.terminus.dalaran.DalaranConstants;
+import io.terminus.dalaran.component.utils.DalaranFileUtils;
+import io.terminus.dalaran.component.utils.OSSUtils;
 import io.terminus.dalaran.console.entity.*;
 import io.terminus.dalaran.console.model.FlowTemplate;
 import io.terminus.dalaran.console.model.TemplateData;
 import io.terminus.dalaran.console.repository.*;
 import io.terminus.dalaran.console.service.PrivateRepositoryService;
 import io.terminus.dalaran.console.util.GenerateKeyUtils;
+import io.terminus.dalaran.core.market.MarketResourceLoader;
+import io.terminus.dalaran.core.oss.OSSAccount;
 import io.terminus.dalaran.core.resource.entity.common.PrivateRepositoryEntity;
 import io.terminus.dalaran.core.resource.property.PropertyService;
 import io.terminus.dalaran.core.resource.repository.PrivateRepositoryRepository;
@@ -15,17 +21,18 @@ import io.terminus.dalaran.market.model.MarketResourceVersionDTO;
 import io.terminus.dalaran.model.BasicResponse;
 import io.terminus.dalaran.model.dto.PrivateRepositoryDTO;
 import io.terminus.dalaran.model.market.MarketProcessor;
-import io.terminus.dalaran.model.market.ResourceFile;
 import io.terminus.dalaran.model.query.PrivateRepositoryQuery;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.File;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -54,6 +61,15 @@ public class PrivateRepositoryServiceImpl implements PrivateRepositoryService {
     @Autowired
     private PrivateSubFlowRepository privateSubFlowRepository;
 
+    @Autowired
+    private OSSAccount ossAccount;
+
+    @Autowired
+    private MarketResourceLoader marketResourceLoader;
+
+    @Autowired
+    private PrivatePackageRepository privatePackageRepository;
+
     private final RestTemplate restTemplate = new RestTemplate();
 
     @Override
@@ -67,8 +83,14 @@ public class PrivateRepositoryServiceImpl implements PrivateRepositoryService {
         PrivateRepositoryDTO privateRepository = new PrivateRepositoryDTO();
         try {
             BeanUtils.copyProperties(privateRepository, entity);
-            FlowTemplate flowTemplate = JSON.parseObject(entity.getData(), FlowTemplate.class);
-            privateRepository.setData(flowTemplate);
+            switch (entity.getType()) {
+                case DalaranConstants.PROCESSOR:
+                    privateRepository.setData(JSON.parseObject(entity.getData(), MarketProcessor.class));
+                    break;
+                case DalaranConstants.FLOW_TEMPLATE:
+                case DalaranConstants.SUB_FLOW_TEMPLATE:
+                    privateRepository.setData(JSON.parseObject(entity.getData(), FlowTemplate.class));
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -135,7 +157,25 @@ public class PrivateRepositoryServiceImpl implements PrivateRepositoryService {
         switch (privateRepositoryDTO.getType()) {
             case PROCESSOR:
                 MarketProcessor marketProcessor = JSON.parseObject((String)privateRepositoryDTO.getData(), MarketProcessor.class);
-                // todo load processor
+                PrivatePackageEntity privatePackageEntity = privatePackageRepository.findByResourceKeyAndVersion(marketProcessor.getId(), marketProcessor.getVersion());
+                if (privatePackageEntity != null) {
+                    return;
+                }
+
+                PrivatePackageEntity entity = new PrivatePackageEntity();
+                BeanUtils.copyProperties(entity, marketProcessor);
+
+                String fileUrl = marketProcessor.getData().getFilePath();
+                OSSObject ossObject = OSSUtils.downloadByUrl(fileUrl, ossAccount);
+                entity.setFilePath(OSSUtils.upload(ossObject.getKey(), ossObject.getObjectContent(), ossAccount));
+                entity.setResourceKey(marketProcessor.getId());
+                entity.setId(null);
+                privatePackageRepository.save(entity);
+
+                OSSObject object = OSSUtils.downloadByUrl(fileUrl, ossAccount);
+                File file = DalaranFileUtils.createFile(object.getKey());
+                FileUtils.copyToFile(object.getObjectContent(), file);
+                marketResourceLoader.loadProcessor(file);
                 break;
             case FLOW_TEMPLATE:
             case SUB_FLOW_TEMPLATE:
@@ -206,8 +246,31 @@ public class PrivateRepositoryServiceImpl implements PrivateRepositoryService {
                 }
             }
         }
-        Map<String, ResourceFile> resourceFile = templateData.getRelationPackage();
+        Map<String, MarketProcessor> resourceFile = templateData.getRelationPackage();
         // todo load processor
+        if (MapUtils.isNotEmpty(resourceFile)) {
+            for (Map.Entry<String, MarketProcessor> entityEntry: resourceFile.entrySet()) {
+                PrivatePackageEntity privatePackageEntity = privatePackageRepository.findByResourceKeyAndVersion(entityEntry.getValue().getId(), entityEntry.getValue().getVersion());
+                if (privatePackageEntity == null) {
+                    PrivatePackageEntity entity = new PrivatePackageEntity();
+                    BeanUtils.copyProperties(entity, entityEntry.getValue());
+
+                    String fileUrl = entityEntry.getValue().getData().getFilePath();
+                    OSSObject ossObject = OSSUtils.downloadByUrl(fileUrl, ossAccount);
+                    entity.setFilePath(OSSUtils.upload(ossObject.getKey(), ossObject.getObjectContent(), ossAccount));
+
+                    entity.setId(null);
+                    privatePackageRepository.save(entity);
+                    loadProcessor(entityEntry.getValue().getData().getFilePath());
+                }
+            }
+        }
     }
 
+    private void loadProcessor(String fileUrl) throws Exception {
+        OSSObject ossObject = OSSUtils.downloadByUrl(fileUrl, ossAccount);
+        File file = DalaranFileUtils.createFile(ossObject.getKey());
+        FileUtils.copyToFile(ossObject.getObjectContent(), file);
+        marketResourceLoader.loadProcessor(file);
+    }
 }

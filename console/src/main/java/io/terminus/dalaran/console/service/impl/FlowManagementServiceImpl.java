@@ -7,15 +7,10 @@ import io.terminus.dalaran.config.ProcessorInfo;
 import io.terminus.dalaran.config.TriggerInfo;
 import io.terminus.dalaran.console.TestFlowInitializer;
 import io.terminus.dalaran.console.convertor.FlowConvertor;
-import io.terminus.dalaran.console.entity.ModelEntity;
-import io.terminus.dalaran.console.entity.TriggerFlowAlarmRuleEntity;
-import io.terminus.dalaran.console.entity.TriggerFlowEntity;
+import io.terminus.dalaran.console.entity.*;
 import io.terminus.dalaran.console.model.FlowTemplate;
 import io.terminus.dalaran.console.model.TemplateData;
-import io.terminus.dalaran.console.repository.ModelRepository;
-import io.terminus.dalaran.console.repository.PropertyRepository;
-import io.terminus.dalaran.console.repository.TriggerFlowAlarmRuleRepository;
-import io.terminus.dalaran.console.repository.TriggerFlowRepository;
+import io.terminus.dalaran.console.repository.*;
 import io.terminus.dalaran.console.service.FlowManagementService;
 import io.terminus.dalaran.console.service.ModelManagementService;
 import io.terminus.dalaran.console.service.PrivateRepositoryService;
@@ -26,6 +21,7 @@ import io.terminus.dalaran.core.context.DalaranContext;
 import io.terminus.dalaran.core.flow.DalaranFlowBuilder;
 import io.terminus.dalaran.core.resource.DalaranResourceBuilder;
 import io.terminus.dalaran.core.resource.DalaranResourceLoader;
+import io.terminus.dalaran.core.resource.entity.ModelAbstractEntity;
 import io.terminus.dalaran.core.resource.entity.TriggerFlowAbstractEntity;
 import io.terminus.dalaran.core.resource.entity.common.PrivateRepositoryEntity;
 import io.terminus.dalaran.core.resource.entity.common.ProcessorEntity;
@@ -54,12 +50,12 @@ import io.terminus.dalaran.response.ResponseResult;
 import io.terminus.draco.web.autoconfig.context.UserContext;
 import org.apache.camel.CamelContext;
 import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import javax.transaction.Transactional;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -85,6 +81,18 @@ public class FlowManagementServiceImpl implements FlowManagementService {
 
     @Autowired
     private ModelRepository modelRepository;
+
+    @Autowired
+    private ConnectorRepository connectorRepository;
+
+    @Autowired
+    private FunctionRepository functionRepository;
+
+    @Autowired
+    private ServiceRepository serviceRepository;
+
+    @Autowired
+    private SubFlowRepository subFlowRepository;
 
     @Autowired
     private TestFlowInitializer testFlowInitializer;
@@ -122,6 +130,23 @@ public class FlowManagementServiceImpl implements FlowManagementService {
     @Autowired
     private PropertyService propertyService;
 
+    @Autowired
+    private PrivateModelRepository privateModelRepository;
+
+    @Autowired
+    private PrivateConnectorRepository privateConnectorRepository;
+
+    @Autowired
+    private PrivateFunctionRepository privateFunctionRepository;
+
+    @Autowired
+    private PrivateServiceRepository privateServiceRepository;
+
+    @Autowired
+    private PrivateSubFlowRepository privateSubFlowRepository;
+
+    @Autowired
+    private PrivatePackageRepository privatePackageRepository;
 
     private final FlowConvertor flowConvertor = new FlowConvertor();
 
@@ -159,6 +184,100 @@ public class FlowManagementServiceImpl implements FlowManagementService {
             testFlowInitializer.reloadTestTriggerFlow(id);
         }
         return id;
+    }
+
+    @Override
+    public BasicResponse createFromTemplate(TemplatePrecipitationDTO template) {
+        PrivateRepositoryEntity entity = privateRepositoryRepository.findByResourceKeyAndVersion(template.getId(), template.getVersion());
+        TemplateData templateData = JSON.parseObject(entity.getData(), TemplateData.class);
+        Map<String, String> resourceKeyMap = new HashMap<>();
+        TriggerFlowEntity triggerFlowEntity = new TriggerFlowEntity();
+        try {
+            copyResourceFromPrivateRepo(templateData, resourceKeyMap);
+            BeanUtils.copyProperties(triggerFlowEntity, templateData);
+            String oldConfig = JSON.toJSONString(triggerFlowEntity);
+            String newConfig = StringUtils.replaceEach(oldConfig, ArrayUtils.toStringArray(resourceKeyMap.keySet().toArray()), ArrayUtils.toStringArray(resourceKeyMap.values().toArray()));
+            triggerFlowEntity = JSON.parseObject(newConfig, TriggerFlowEntity.class);
+            triggerFlowEntity.setResourceKey(GenerateKeyUtils.resourceKey(propertyService.getTenantCode()));
+            triggerFlowEntity.setId(null);
+            String id = flowRepository.save(triggerFlowEntity).getResourceKey();
+            return new BasicResponse(true, id);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new BasicResponse(false, e.getMessage());
+        }
+    }
+
+    private void copyResourceFromPrivateRepo(TemplateData templateData, Map<String, String> resourceKeyMap) throws Exception {
+        Map<String, ModelEntity> models = templateData.getRelationModel();
+        for (Map.Entry<String, ModelEntity> entityEntry: models.entrySet()) {
+            if (modelRepository.findByResourceKey(entityEntry.getKey()) != null) {
+                continue;
+            }
+            ModelEntity modelEntity = new ModelEntity();
+            BeanUtils.copyProperties(modelEntity, entityEntry.getValue());
+            String newResourceKey = GenerateKeyUtils.resourceKey(propertyService.getTenantCode());
+            modelEntity.setResourceKey(newResourceKey);
+            modelEntity.setId(null);
+            modelRepository.save(modelEntity);
+            resourceKeyMap.put(entityEntry.getKey(), newResourceKey);
+        }
+
+        Map<String, ConnectorEntity> connectors = templateData.getRelationConnector();
+        for (Map.Entry<String, ConnectorEntity> entityEntry: connectors.entrySet()) {
+            if (connectorRepository.findByResourceKey(entityEntry.getKey()) != null) {
+                continue;
+            }
+            ConnectorEntity connectorEntity = new ConnectorEntity();
+            BeanUtils.copyProperties(connectorEntity, entityEntry.getValue());
+            String newResourceKey = GenerateKeyUtils.resourceKey(propertyService.getTenantCode());
+            connectorEntity.setResourceKey(newResourceKey);
+            connectorEntity.setId(null);
+            connectorRepository.save(connectorEntity);
+            resourceKeyMap.put(entityEntry.getKey(), newResourceKey);
+        }
+
+        Map<String, FunctionEntity> functions = templateData.getRelationFunction();
+        for (Map.Entry<String, FunctionEntity> entityEntry: functions.entrySet()) {
+            if (functionRepository.findByResourceKey(entityEntry.getKey()) != null) {
+                continue;
+            }
+            FunctionEntity functionEntity = new FunctionEntity();
+            BeanUtils.copyProperties(functionEntity, entityEntry.getValue());
+            String newResourceKey = GenerateKeyUtils.resourceKey(propertyService.getTenantCode());
+            functionEntity.setResourceKey(newResourceKey);
+            functionEntity.setId(null);
+            functionRepository.save(functionEntity);
+            resourceKeyMap.put(entityEntry.getKey(), newResourceKey);
+        }
+
+        Map<String, ServiceEntity> services = templateData.getRelationService();
+        for (Map.Entry<String, ServiceEntity> entityEntry: services.entrySet()) {
+            if (serviceRepository.findByResourceKey(entityEntry.getKey()) != null) {
+                continue;
+            }
+            ServiceEntity serviceEntity = new ServiceEntity();
+            BeanUtils.copyProperties(serviceEntity, entityEntry.getValue());
+            String newResourceKey = GenerateKeyUtils.resourceKey(propertyService.getTenantCode());
+            serviceEntity.setResourceKey(newResourceKey);
+            serviceEntity.setId(null);
+            serviceRepository.save(serviceEntity);
+            resourceKeyMap.put(entityEntry.getKey(), newResourceKey);
+        }
+
+        Map<String, SubFlowEntity> subflows = templateData.getRelationSubFlow();
+        for (Map.Entry<String, SubFlowEntity> entityEntry: subflows.entrySet()) {
+            if (subFlowRepository.findByResourceKey(entityEntry.getKey()) != null) {
+                continue;
+            }
+            SubFlowEntity subflowEntity = new SubFlowEntity();
+            BeanUtils.copyProperties(subflowEntity, entityEntry.getValue());
+            String newResourceKey = GenerateKeyUtils.resourceKey(propertyService.getTenantCode());
+            subflowEntity.setResourceKey(newResourceKey);
+            subflowEntity.setId(null);
+            subFlowRepository.save(subflowEntity);
+            resourceKeyMap.put(entityEntry.getKey(), newResourceKey);
+        }
     }
 
     @Override
@@ -569,7 +688,7 @@ public class FlowManagementServiceImpl implements FlowManagementService {
         return templateData;
     }
 
-    private void buildTemplateRelationResource(TemplateData templateData, TriggerFlowAbstractEntity origin) {
+    private void buildTemplateRelationResource(TemplateData templateData, TriggerFlowAbstractEntity origin) throws Exception {
         Map models = templateData.getRelationModel();
         Map connectors = templateData.getRelationConnector();
         Map services = templateData.getRelationService();
@@ -577,10 +696,14 @@ public class FlowManagementServiceImpl implements FlowManagementService {
         String inModelId = origin.getInModel();
         String outModelId = origin.getOutModel();
         if (StringUtils.isNotBlank(inModelId)) {
-            models.put(inModelId, resourceLoader.loadModel(inModelId));
+            ModelAbstractEntity abstractEntity = resourceLoader.loadModel(inModelId);
+            models.put(inModelId, abstractEntity);
+            savePrivateResource(abstractEntity, DalaranConstants.MODEL);
         }
         if (StringUtils.isNotBlank(outModelId)) {
-            models.put(outModelId, resourceLoader.loadModel(outModelId));
+            ModelAbstractEntity abstractEntity = resourceLoader.loadModel(outModelId);
+            models.put(outModelId, abstractEntity);
+            savePrivateResource(abstractEntity, DalaranConstants.MODEL);
         }
 
         TriggerInfo triggerInfo = dalaranContext.getDalaranComponentContext().getTriggerInfo(origin.getTriggerType());
@@ -588,6 +711,7 @@ public class FlowManagementServiceImpl implements FlowManagementService {
             PrivateRepositoryEntity privateRepositoryEntity = privateRepositoryRepository.findByNameAndType(triggerInfo.getName(), DalaranConstants.TRIGGER);
             if (privateRepositoryEntity != null) {
                 packages.put(privateRepositoryEntity.getResourceKey(), privateRepositoryEntity);
+                savePrivateResource(privateRepositoryEntity, DalaranConstants.PACKAGE);
             }
         }
 
@@ -605,7 +729,7 @@ public class FlowManagementServiceImpl implements FlowManagementService {
             if (StringUtils.equalsIgnoreCase(processorInfo.getOrigin(), DalaranConstants.PARTNER)) {
                 PrivateRepositoryEntity privateRepositoryEntity = privateRepositoryRepository.findByNameAndType(processorInfo.getName(), DalaranConstants.PROCESSOR);
                 if (privateRepositoryEntity != null) {
-                    packages.put(privateRepositoryEntity.getResourceKey(), privateRepositoryEntity);
+                    packages.put(privateRepositoryEntity.getResourceKey() + "#" + privateRepositoryEntity.getVersion(), privateRepositoryEntity);
                 }
             }
 
@@ -663,6 +787,47 @@ public class FlowManagementServiceImpl implements FlowManagementService {
             if (StringUtils.isNotBlank(outModelId)) {
                 models.put(outModelId, resourceLoader.loadModel(outModelId));
             }
+        }
+    }
+
+    private void savePrivateResource(Object origin, String type) throws Exception {
+        switch (type) {
+            case "model":
+                PrivateModelEntity privateModelEntity = new PrivateModelEntity();
+                BeanUtils.copyProperties(privateModelEntity, origin);
+                privateModelEntity.setId(null);
+                privateModelRepository.save(privateModelEntity);
+                break;
+            case "connector":
+                PrivateConnectorEntity privateConnectorEntity = new PrivateConnectorEntity();
+                BeanUtils.copyProperties(privateConnectorEntity, origin);
+                privateConnectorEntity.setId(null);
+                privateConnectorRepository.save(privateConnectorEntity);
+                break;
+            case "service":
+                PrivateServiceEntity privateServiceEntity = new PrivateServiceEntity();
+                BeanUtils.copyProperties(privateServiceEntity, origin);
+                privateServiceEntity.setId(null);
+                privateServiceRepository.save(privateServiceEntity);
+                break;
+            case "function":
+                PrivateFunctionEntity privateFunctionEntity = new PrivateFunctionEntity();
+                BeanUtils.copyProperties(privateFunctionEntity, origin);
+                privateFunctionEntity.setId(null);
+                privateFunctionRepository.save(privateFunctionEntity);
+                break;
+            case "subflow":
+                PrivateSubFlowEntity privateSubFlowEntity = new PrivateSubFlowEntity();
+                BeanUtils.copyProperties(privateSubFlowEntity, origin);
+                privateSubFlowEntity.setId(null);
+                privateSubFlowRepository.save(privateSubFlowEntity);
+                break;
+            case "package":
+                PrivatePackageEntity privatePackageEntity = new PrivatePackageEntity();
+                BeanUtils.copyProperties(privatePackageEntity, origin);
+                privatePackageEntity.setId(null);
+                privatePackageRepository.save(privatePackageEntity);
+                break;
         }
     }
 
