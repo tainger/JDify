@@ -246,22 +246,22 @@ public class PrivateRepositoryServiceImpl implements PrivateRepositoryService {
                 }
             }
         }
-        Map<String, MarketProcessor> resourceFile = templateData.getRelationPackage();
+        Map<String, PrivatePackageEntity> resourceFile = templateData.getRelationPackage();
         // todo load processor
         if (MapUtils.isNotEmpty(resourceFile)) {
-            for (Map.Entry<String, MarketProcessor> entityEntry: resourceFile.entrySet()) {
-                PrivatePackageEntity privatePackageEntity = privatePackageRepository.findByResourceKeyAndVersion(entityEntry.getValue().getId(), entityEntry.getValue().getVersion());
+            for (Map.Entry<String, PrivatePackageEntity> entityEntry: resourceFile.entrySet()) {
+                PrivatePackageEntity privatePackageEntity = privatePackageRepository.findByResourceKeyAndVersion(entityEntry.getValue().getResourceKey(), entityEntry.getValue().getVersion());
                 if (privatePackageEntity == null) {
                     PrivatePackageEntity entity = new PrivatePackageEntity();
                     BeanUtils.copyProperties(entity, entityEntry.getValue());
 
-                    String fileUrl = entityEntry.getValue().getData().getFilePath();
+                    String fileUrl = entityEntry.getValue().getFilePath();
                     OSSObject ossObject = OSSUtils.downloadByUrl(fileUrl, ossAccount);
                     entity.setFilePath(OSSUtils.upload(ossObject.getKey(), ossObject.getObjectContent(), ossAccount));
 
                     entity.setId(null);
                     privatePackageRepository.save(entity);
-                    loadProcessor(entityEntry.getValue().getData().getFilePath());
+                    loadProcessor(entityEntry.getValue().getFilePath());
                 }
             }
         }

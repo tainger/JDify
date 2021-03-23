@@ -51,12 +51,14 @@ import io.terminus.dalaran.response.ResponseResult;
 import io.terminus.draco.web.autoconfig.context.UserContext;
 import org.apache.camel.CamelContext;
 import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import javax.transaction.Transactional;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -695,10 +697,55 @@ public class FlowManagementServiceImpl implements FlowManagementService {
         try {
             BeanUtils.copyProperties(templateData, origin);
             buildTemplateRelationResource(templateData, origin);
+            saveRelationResource(templateData);
         } catch (Exception e) {
             e.printStackTrace();
         }
         return templateData;
+    }
+
+    private void saveRelationResource(TemplateData templateData) throws Exception {
+        Map<String, ModelEntity> models = templateData.getRelationModel();
+        if (MapUtils.isNotEmpty(models)) {
+            for (ModelEntity entity: models.values()) {
+                savePrivateResource(entity, DalaranConstants.MODEL);
+            }
+        }
+
+        Map<String, ConnectorEntity> connectors = templateData.getRelationConnector();
+        if (MapUtils.isNotEmpty(connectors)) {
+            for (ConnectorEntity entity: connectors.values()) {
+                savePrivateResource(entity, DalaranConstants.CONNECTOR);
+            }
+        }
+
+        Map<String, ServiceEntity> services = templateData.getRelationService();
+        if (MapUtils.isNotEmpty(services)) {
+            for (ServiceEntity entity: services.values()) {
+                savePrivateResource(entity, DalaranConstants.SERVICE);
+            }
+        }
+
+        Map<String, PrivatePackageEntity> packages = templateData.getRelationPackage();
+        if (MapUtils.isNotEmpty(packages)) {
+            for (PrivatePackageEntity entity: packages.values()) {
+                savePrivateResource(entity, DalaranConstants.PACKAGE);
+            }
+        }
+
+        Map<String, FunctionEntity> functions = templateData.getRelationFunction();
+        if (MapUtils.isNotEmpty(functions)) {
+            for (FunctionEntity entity: functions.values()) {
+                savePrivateResource(entity, DalaranConstants.FUNCTION);
+            }
+        }
+
+        Map<String, SubFlowEntity> subflows = templateData.getRelationSubFlow();
+        if (MapUtils.isNotEmpty(subflows)) {
+            for (SubFlowEntity entity: subflows.values()) {
+                savePrivateResource(entity, DalaranConstants.SUB_FLOW);
+            }
+        }
     }
 
     private void buildTemplateRelationResource(TemplateData templateData, TriggerFlowAbstractEntity origin) throws Exception {
@@ -711,12 +758,10 @@ public class FlowManagementServiceImpl implements FlowManagementService {
         if (StringUtils.isNotBlank(inModelId)) {
             ModelAbstractEntity abstractEntity = resourceLoader.loadModel(inModelId);
             models.put(inModelId, abstractEntity);
-            savePrivateResource(abstractEntity, DalaranConstants.MODEL);
         }
         if (StringUtils.isNotBlank(outModelId)) {
             ModelAbstractEntity abstractEntity = resourceLoader.loadModel(outModelId);
             models.put(outModelId, abstractEntity);
-            savePrivateResource(abstractEntity, DalaranConstants.MODEL);
         }
 
         TriggerInfo triggerInfo = dalaranContext.getDalaranComponentContext().getTriggerInfo(origin.getTriggerType());
@@ -724,7 +769,6 @@ public class FlowManagementServiceImpl implements FlowManagementService {
             PrivateRepositoryEntity privateRepositoryEntity = privateRepositoryRepository.findByNameAndType(triggerInfo.getName(), DalaranConstants.TRIGGER);
             if (privateRepositoryEntity != null) {
                 packages.put(privateRepositoryEntity.getResourceKey(), privateRepositoryEntity);
-                savePrivateResource(privateRepositoryEntity, DalaranConstants.PACKAGE);
             }
         }
 
