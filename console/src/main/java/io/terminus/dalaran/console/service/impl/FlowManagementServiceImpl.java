@@ -196,12 +196,14 @@ public class FlowManagementServiceImpl implements FlowManagementService {
         Map<String, String> resourceKeyMap = new HashMap<>();
         TriggerFlowEntity triggerFlowEntity = new TriggerFlowEntity();
         try {
-            copyResourceFromPrivateRepo(templateData, resourceKeyMap);
+            copyResourceFromPrivateRepo(templateData, resourceKeyMap, template.getModuleId());
             BeanUtils.copyProperties(triggerFlowEntity, templateData);
             String oldConfig = JSON.toJSONString(triggerFlowEntity);
             String newConfig = StringUtils.replaceEach(oldConfig, ArrayUtils.toStringArray(resourceKeyMap.keySet().toArray()), ArrayUtils.toStringArray(resourceKeyMap.values().toArray()));
             triggerFlowEntity = JSON.parseObject(newConfig, TriggerFlowEntity.class);
             triggerFlowEntity.setResourceKey(GenerateKeyUtils.resourceKey(propertyService.getTenantCode()));
+            triggerFlowEntity.setCreatedFrom(entity.getResourceKey());
+            triggerFlowEntity.setModuleId(template.getModuleId());
             triggerFlowEntity.setId(null);
             String id = flowRepository.save(triggerFlowEntity).getResourceKey();
             return new BasicResponse(true, id);
@@ -211,7 +213,7 @@ public class FlowManagementServiceImpl implements FlowManagementService {
         }
     }
 
-    private void copyResourceFromPrivateRepo(TemplateData templateData, Map<String, String> resourceKeyMap) throws Exception {
+    private void copyResourceFromPrivateRepo(TemplateData templateData, Map<String, String> resourceKeyMap, String moduleId) throws Exception {
         Map<String, ModelEntity> models = templateData.getRelationModel();
         for (Map.Entry<String, ModelEntity> entityEntry: models.entrySet()) {
             if (modelRepository.findByResourceKey(entityEntry.getKey()) != null) {
@@ -221,6 +223,8 @@ public class FlowManagementServiceImpl implements FlowManagementService {
             BeanUtils.copyProperties(modelEntity, entityEntry.getValue());
             String newResourceKey = GenerateKeyUtils.resourceKey(propertyService.getTenantCode());
             modelEntity.setResourceKey(newResourceKey);
+            modelEntity.setCreatedFrom(entityEntry.getValue().getResourceKey());
+            modelEntity.setModuleId(moduleId);
             modelEntity.setId(null);
             modelRepository.save(modelEntity);
             resourceKeyMap.put(entityEntry.getKey(), newResourceKey);
@@ -235,6 +239,8 @@ public class FlowManagementServiceImpl implements FlowManagementService {
             BeanUtils.copyProperties(connectorEntity, entityEntry.getValue());
             String newResourceKey = GenerateKeyUtils.resourceKey(propertyService.getTenantCode());
             connectorEntity.setResourceKey(newResourceKey);
+            connectorEntity.setCreatedFrom(entityEntry.getValue().getResourceKey());
+            connectorEntity.setModuleId(moduleId);
             connectorEntity.setId(null);
             connectorRepository.save(connectorEntity);
             resourceKeyMap.put(entityEntry.getKey(), newResourceKey);
@@ -249,6 +255,8 @@ public class FlowManagementServiceImpl implements FlowManagementService {
             BeanUtils.copyProperties(functionEntity, entityEntry.getValue());
             String newResourceKey = GenerateKeyUtils.resourceKey(propertyService.getTenantCode());
             functionEntity.setResourceKey(newResourceKey);
+            functionEntity.setCreatedFrom(entityEntry.getValue().getResourceKey());
+            functionEntity.setModuleId(moduleId);
             functionEntity.setId(null);
             functionRepository.save(functionEntity);
             resourceKeyMap.put(entityEntry.getKey(), newResourceKey);
@@ -263,6 +271,8 @@ public class FlowManagementServiceImpl implements FlowManagementService {
             BeanUtils.copyProperties(serviceEntity, entityEntry.getValue());
             String newResourceKey = GenerateKeyUtils.resourceKey(propertyService.getTenantCode());
             serviceEntity.setResourceKey(newResourceKey);
+            serviceEntity.setCreatedFrom(entityEntry.getValue().getResourceKey());
+            serviceEntity.setModuleId(moduleId);
             serviceEntity.setId(null);
             serviceRepository.save(serviceEntity);
             resourceKeyMap.put(entityEntry.getKey(), newResourceKey);
@@ -277,6 +287,8 @@ public class FlowManagementServiceImpl implements FlowManagementService {
             BeanUtils.copyProperties(subflowEntity, entityEntry.getValue());
             String newResourceKey = GenerateKeyUtils.resourceKey(propertyService.getTenantCode());
             subflowEntity.setResourceKey(newResourceKey);
+            subflowEntity.setCreatedFrom(entityEntry.getValue().getResourceKey());
+            subflowEntity.setModuleId(moduleId);
             subflowEntity.setId(null);
             subFlowRepository.save(subflowEntity);
             resourceKeyMap.put(entityEntry.getKey(), newResourceKey);

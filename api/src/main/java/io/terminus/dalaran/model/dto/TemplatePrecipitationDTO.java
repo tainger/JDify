@@ -8,4 +8,6 @@ public class TemplatePrecipitationDTO {
     private String id;
 
     private String version;
+
+    private String moduleId;
 }
