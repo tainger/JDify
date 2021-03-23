@@ -49,7 +49,6 @@ public class FlowManagementRest implements FlowReadAPI, FlowWriteAPI {
     @Autowired
     private DalaranContext dalaranContext;
 
-
     @Override
     @OnException(code = ResponseMessage.FLOW_CREATE_ERROR)
     public CreateResponse create(@RequestBody TriggerFlowDTO model) throws CreateFlowException {
@@ -58,6 +57,11 @@ public class FlowManagementRest implements FlowReadAPI, FlowWriteAPI {
         } catch (Exception e) {
             throw DalaranExceptionBuilder.build(CreateFlowException.class, e.getMessage());
         }
+    }
+
+    @Override
+    public BasicResponse create(TemplatePrecipitationDTO template) throws CreateFlowException {
+        return flowManagementService.createFromTemplate(template);
     }
 
     @Override

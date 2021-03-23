@@ -50,12 +50,12 @@ import io.terminus.dalaran.response.ResponseResult;
 import io.terminus.draco.web.autoconfig.context.UserContext;
 import org.apache.camel.CamelContext;
 import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import javax.transaction.Transactional;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -81,6 +81,18 @@ public class FlowManagementServiceImpl implements FlowManagementService {
 
     @Autowired
     private ModelRepository modelRepository;
+
+    @Autowired
+    private ConnectorRepository connectorRepository;
+
+    @Autowired
+    private FunctionRepository functionRepository;
+
+    @Autowired
+    private ServiceRepository serviceRepository;
+
+    @Autowired
+    private SubFlowRepository subFlowRepository;
 
     @Autowired
     private TestFlowInitializer testFlowInitializer;
@@ -136,7 +148,6 @@ public class FlowManagementServiceImpl implements FlowManagementService {
     @Autowired
     private PrivatePackageRepository privatePackageRepository;
 
-
     private final FlowConvertor flowConvertor = new FlowConvertor();
 
     @Override
@@ -173,6 +184,100 @@ public class FlowManagementServiceImpl implements FlowManagementService {
             testFlowInitializer.reloadTestTriggerFlow(id);
         }
         return id;
+    }
+
+    @Override
+    public BasicResponse createFromTemplate(TemplatePrecipitationDTO template) {
+        PrivateRepositoryEntity entity = privateRepositoryRepository.findByResourceKeyAndVersion(template.getId(), template.getVersion());
+        TemplateData templateData = JSON.parseObject(entity.getData(), TemplateData.class);
+        Map<String, String> resourceKeyMap = new HashMap<>();
+        TriggerFlowEntity triggerFlowEntity = new TriggerFlowEntity();
+        try {
+            copyResourceFromPrivateRepo(templateData, resourceKeyMap);
+            BeanUtils.copyProperties(triggerFlowEntity, templateData);
+            String oldConfig = JSON.toJSONString(triggerFlowEntity);
+            String newConfig = StringUtils.replaceEach(oldConfig, ArrayUtils.toStringArray(resourceKeyMap.keySet().toArray()), ArrayUtils.toStringArray(resourceKeyMap.values().toArray()));
+            triggerFlowEntity = JSON.parseObject(newConfig, TriggerFlowEntity.class);
+            triggerFlowEntity.setResourceKey(GenerateKeyUtils.resourceKey(propertyService.getTenantCode()));
+            triggerFlowEntity.setId(null);
+            String id = flowRepository.save(triggerFlowEntity).getResourceKey();
+            return new BasicResponse(true, id);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new BasicResponse(false, e.getMessage());
+        }
+    }
+
+    private void copyResourceFromPrivateRepo(TemplateData templateData, Map<String, String> resourceKeyMap) throws Exception {
+        Map<String, ModelEntity> models = templateData.getRelationModel();
+        for (Map.Entry<String, ModelEntity> entityEntry: models.entrySet()) {
+            if (modelRepository.findByResourceKey(entityEntry.getKey()) != null) {
+                continue;
+            }
+            ModelEntity modelEntity = new ModelEntity();
+            BeanUtils.copyProperties(modelEntity, entityEntry.getValue());
+            String newResourceKey = GenerateKeyUtils.resourceKey(propertyService.getTenantCode());
+            modelEntity.setResourceKey(newResourceKey);
+            modelEntity.setId(null);
+            modelRepository.save(modelEntity);
+            resourceKeyMap.put(entityEntry.getKey(), newResourceKey);
+        }
+
+        Map<String, ConnectorEntity> connectors = templateData.getRelationConnector();
+        for (Map.Entry<String, ConnectorEntity> entityEntry: connectors.entrySet()) {
+            if (connectorRepository.findByResourceKey(entityEntry.getKey()) != null) {
+                continue;
+            }
+            ConnectorEntity connectorEntity = new ConnectorEntity();
+            BeanUtils.copyProperties(connectorEntity, entityEntry.getValue());
+            String newResourceKey = GenerateKeyUtils.resourceKey(propertyService.getTenantCode());
+            connectorEntity.setResourceKey(newResourceKey);
+            connectorEntity.setId(null);
+            connectorRepository.save(connectorEntity);
+            resourceKeyMap.put(entityEntry.getKey(), newResourceKey);
+        }
+
+        Map<String, FunctionEntity> functions = templateData.getRelationFunction();
+        for (Map.Entry<String, FunctionEntity> entityEntry: functions.entrySet()) {
+            if (functionRepository.findByResourceKey(entityEntry.getKey()) != null) {
+                continue;
+            }
+            FunctionEntity functionEntity = new FunctionEntity();
+            BeanUtils.copyProperties(functionEntity, entityEntry.getValue());
+            String newResourceKey = GenerateKeyUtils.resourceKey(propertyService.getTenantCode());
+            functionEntity.setResourceKey(newResourceKey);
+            functionEntity.setId(null);
+            functionRepository.save(functionEntity);
+            resourceKeyMap.put(entityEntry.getKey(), newResourceKey);
+        }
+
+        Map<String, ServiceEntity> services = templateData.getRelationService();
+        for (Map.Entry<String, ServiceEntity> entityEntry: services.entrySet()) {
+            if (serviceRepository.findByResourceKey(entityEntry.getKey()) != null) {
+                continue;
+            }
+            ServiceEntity serviceEntity = new ServiceEntity();
+            BeanUtils.copyProperties(serviceEntity, entityEntry.getValue());
+            String newResourceKey = GenerateKeyUtils.resourceKey(propertyService.getTenantCode());
+            serviceEntity.setResourceKey(newResourceKey);
+            serviceEntity.setId(null);
+            serviceRepository.save(serviceEntity);
+            resourceKeyMap.put(entityEntry.getKey(), newResourceKey);
+        }
+
+        Map<String, SubFlowEntity> subflows = templateData.getRelationSubFlow();
+        for (Map.Entry<String, SubFlowEntity> entityEntry: subflows.entrySet()) {
+            if (subFlowRepository.findByResourceKey(entityEntry.getKey()) != null) {
+                continue;
+            }
+            SubFlowEntity subflowEntity = new SubFlowEntity();
+            BeanUtils.copyProperties(subflowEntity, entityEntry.getValue());
+            String newResourceKey = GenerateKeyUtils.resourceKey(propertyService.getTenantCode());
+            subflowEntity.setResourceKey(newResourceKey);
+            subflowEntity.setId(null);
+            subFlowRepository.save(subflowEntity);
+            resourceKeyMap.put(entityEntry.getKey(), newResourceKey);
+        }
     }
 
     @Override
