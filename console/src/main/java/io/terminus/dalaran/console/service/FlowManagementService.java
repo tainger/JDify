@@ -25,6 +25,8 @@ public interface FlowManagementService {
 
     BasicResponse saveAsTemplate(TemplatePrecipitationDTO flow);
 
+    BasicResponse checkTemplateVersion(TemplatePrecipitationDTO flow);
+
     ImportFlowResult importFlow(ImportFlowDTO flowModel);
 
     ImportProcessorResult importProcessor(ImportProcessorDTO model);

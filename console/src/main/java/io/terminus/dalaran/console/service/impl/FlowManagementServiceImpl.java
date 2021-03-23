@@ -290,6 +290,14 @@ public class FlowManagementServiceImpl implements FlowManagementService {
         return privateRepositoryService.saveTemplate(flowTemplate);
     }
 
+    @Override
+    public BasicResponse checkTemplateVersion(TemplatePrecipitationDTO flow) {
+        if (privateRepositoryRepository.findByResourceKeyAndVersion(flow.getId(), flow.getVersion()) != null) {
+            return new BasicResponse(false, "version: " + flow.getVersion() + " is exist");
+        }
+        return new BasicResponse(true);
+    }
+
     // TODO 很多重复内容 逻辑也比较尴尬, 各种 magic, 先测试一波, 有时间改改
     @Override
     public ImportFlowResult importFlow(ImportFlowDTO importInfo) {

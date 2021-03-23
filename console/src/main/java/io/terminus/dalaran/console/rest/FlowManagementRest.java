@@ -89,6 +89,11 @@ public class FlowManagementRest implements FlowReadAPI, FlowWriteAPI {
     }
 
     @Override
+    public BasicResponse checkTemplateVersion(TemplatePrecipitationDTO flow) throws CreateFlowException {
+        return flowManagementService.checkTemplateVersion(flow);
+    }
+
+    @Override
     public ResponseResult offline(@RequestBody TriggerFlowDTO flowDTO) {
         return flowManagementService.offline(flowDTO);
     }

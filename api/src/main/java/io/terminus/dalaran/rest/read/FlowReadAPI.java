@@ -1,14 +1,16 @@
 package io.terminus.dalaran.rest.read;
 
 import io.swagger.annotations.ApiOperation;
+import io.terminus.dalaran.exception.flow.CreateFlowException;
 import io.terminus.dalaran.exception.flow.FlowNotExistException;
 import io.terminus.dalaran.exception.flow.FlowTestException;
+import io.terminus.dalaran.model.BasicResponse;
+import io.terminus.dalaran.model.dto.TemplatePrecipitationDTO;
 import io.terminus.dalaran.model.dto.TestRequestDTO;
 import io.terminus.dalaran.model.dto.flow.TriggerFlowDTO;
 import io.terminus.dalaran.model.dto.log.MainLogDTO;
 import io.terminus.dalaran.model.flow.FlowValidation;
 import io.terminus.dalaran.model.query.FlowQuery;
-import io.terminus.dalaran.response.ResponseResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -40,4 +42,7 @@ public interface FlowReadAPI {
     @PostMapping("/test")
     MainLogDTO doTest(@RequestBody TestRequestDTO request) throws FlowTestException;
 
+    @ApiOperation(value = "模板版本重复性校验")
+    @PostMapping(value = "/check/template/version")
+    BasicResponse checkTemplateVersion(@RequestBody TemplatePrecipitationDTO flow) throws CreateFlowException;
 }
