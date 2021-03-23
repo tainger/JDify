@@ -42,7 +42,7 @@ public class DalaranMailSenderProcessor implements Processor {
         Object in = exchange.getIn().getBody();
         if (config.isDynamicAddress()) {
             MailSenderInfo senderInfo = JSON.parseObject(JSON.toJSONString(in), MailSenderInfo.class);
-            File file = OSSUtils.getFileFromOss(senderInfo.getUploadUrl(), ossAccount);
+            File file = OSSUtils.downloadByPath(senderInfo.getUploadUrl(), ossAccount);
             byte[] fileContent = FileUtils.readFileToByteArray(file);
             sendSmtp(senderInfo.getFileName(), senderInfo.getEmailUrl(), fileContent, "application/excel");
         } else {
