@@ -46,8 +46,14 @@ public class AuthenticatorProcessor implements Processor {
             String value;
             if (authenticatorRestConfig.getKeyLocation() == AuthenticatorKeyLocation.Header) {
                 value = exchange.getIn().getHeader(authenticatorRestConfig.getAuthenticatorKey(), String.class);
+            } else if (authenticatorRestConfig.getKeyLocation() == AuthenticatorKeyLocation.QueryParam) {
+                value = exchange.getIn().getHeader(authenticatorRestConfig.getAuthenticatorKey(), String.class);
             } else {
-                value = body.get(authenticatorRestConfig.getAuthenticatorKey());
+                if (body != null) {
+                    value = body.get(authenticatorRestConfig.getAuthenticatorKey());
+                } else {
+                    value = "";
+                }
             }
             if (StringUtils.isBlank(value) || !value.equals(authenticatorRestConfig.getAuthenticatorValue())) {
                 stopExchangeOnInvalidAppKey(exchange);
@@ -73,7 +79,11 @@ public class AuthenticatorProcessor implements Processor {
                 Map<String, String> body = exchange.getIn().getBody(Map.class);
                 value = body.get(authenticatorRestConfig.getAuthenticatorKey());
             } else {
-                value = param.get(authenticatorRestConfig.getAuthenticatorKey());
+                if (param !=null ) {
+                    value = param.get(authenticatorRestConfig.getAuthenticatorKey());
+                } else {
+                    value = "";
+                }
             }
             if (StringUtils.isBlank(value) || !value.equals(authenticatorRestConfig.getAuthenticatorValue())) {
                 stopExchangeOnInvalidAppKey(exchange);
