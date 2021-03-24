@@ -8,4 +8,6 @@ import java.util.List;
 public interface PrivateResourceQueryService {
 
     List<PrivateRepositoryEntity> query(PrivateRepositoryQuery query);
+
+    List<String> listResourceVersion(String id);
 }

@@ -15,6 +15,7 @@ import io.terminus.dalaran.console.service.FlowManagementService;
 import io.terminus.dalaran.console.service.ModelManagementService;
 import io.terminus.dalaran.console.service.PrivateRepositoryService;
 import io.terminus.dalaran.console.service.jpa.FlowQueryService;
+import io.terminus.dalaran.console.service.jpa.PrivateResourceQueryService;
 import io.terminus.dalaran.console.util.GenerateKeyUtils;
 import io.terminus.dalaran.core.component.config.*;
 import io.terminus.dalaran.core.context.DalaranContext;
@@ -150,6 +151,9 @@ public class FlowManagementServiceImpl implements FlowManagementService {
 
     @Autowired
     private PrivatePackageRepository privatePackageRepository;
+
+    @Autowired
+    private PrivateResourceQueryService privateResourceQueryService;
 
     private final FlowConvertor flowConvertor = new FlowConvertor();
 
@@ -315,6 +319,11 @@ public class FlowManagementServiceImpl implements FlowManagementService {
             return new BasicResponse(false, "version: " + flow.getVersion() + " is exist");
         }
         return new BasicResponse(true);
+    }
+
+    @Override
+    public List<String> listResourceVersion(String id) {
+        return privateResourceQueryService.listResourceVersion(id);
     }
 
     // TODO 很多重复内容 逻辑也比较尴尬, 各种 magic, 先测试一波, 有时间改改
@@ -497,7 +506,6 @@ public class FlowManagementServiceImpl implements FlowManagementService {
         for (TriggerFlowEntity entity : entities) {
             models.add(flowConvertor.toDTO(entity));
         }
-
         return models;
     }
 
@@ -508,7 +516,6 @@ public class FlowManagementServiceImpl implements FlowManagementService {
         for (TriggerFlowEntity entity : entities) {
             models.add(flowConvertor.toDTO(entity));
         }
-
         return models;
     }
 

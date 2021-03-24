@@ -10,5 +10,4 @@ public interface PrivateRepositoryRepository extends JpaRepository<PrivateReposi
     PrivateRepositoryEntity findByResourceKeyAndVersion(String resourceKey, String version);
 
     PrivateRepositoryEntity findByNameAndType(String name, String type);
-
 }
