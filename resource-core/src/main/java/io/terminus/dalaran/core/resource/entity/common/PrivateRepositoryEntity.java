@@ -2,8 +2,8 @@ package io.terminus.dalaran.core.resource.entity.common;
 
 import io.terminus.dalaran.core.resource.converter.ListToJsonConverter;
 import io.terminus.dalaran.core.resource.entity.basic.BasicEntity;
-import io.terminus.dalaran.model.ResourceType;
 import lombok.Data;
+
 import javax.persistence.Column;
 import javax.persistence.Convert;
 import javax.persistence.Entity;
@@ -22,13 +22,16 @@ public class PrivateRepositoryEntity extends BasicEntity {
     private String version;
 
     @Column(nullable = false, length = 64)
-    private ResourceType type;
+    private String type;
 
     @Column(length = 64)
     private String resourceGroup;
 
     @Column(nullable = false, length = 64)
     private String tenantCode;
+
+    @Column(length = 64)
+    private String origin;
 
     @Column
     private String logoUri;

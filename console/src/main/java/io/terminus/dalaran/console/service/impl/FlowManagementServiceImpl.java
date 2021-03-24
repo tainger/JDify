@@ -34,7 +34,6 @@ import io.terminus.dalaran.core.resource.repository.ModuleRepository;
 import io.terminus.dalaran.core.resource.repository.PrivateRepositoryRepository;
 import io.terminus.dalaran.core.resource.repository.TriggerFlowReleasedRepository;
 import io.terminus.dalaran.exception.flow.FlowNotExistException;
-import io.terminus.dalaran.market.model.ResourceType;
 import io.terminus.dalaran.model.BasicResponse;
 import io.terminus.dalaran.model.ModelTargetType;
 import io.terminus.dalaran.model.dto.*;
@@ -63,6 +62,8 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static io.terminus.dalaran.DalaranConstants.FLOW_TEMPLATE;
 
 @Service
 @Transactional
@@ -302,6 +303,9 @@ public class FlowManagementServiceImpl implements FlowManagementService {
     @Override
     public BasicResponse saveAsTemplate(TemplatePrecipitationDTO flow) {
         FlowTemplate flowTemplate = new FlowTemplate();
+        if (privateRepositoryRepository.findByResourceKeyAndVersion(flow.getId(), flow.getVersion()) != null) {
+            return new BasicResponse(false, "Template is exist!");
+        }
         TriggerFlowAbstractEntity abstractEntity = resourceLoader.loadTriggerFlow(flow.getId());
         TemplateData templateData = buildFlowTemplate(abstractEntity);
         flowTemplate.setVersion(flow.getVersion());
@@ -309,7 +313,7 @@ public class FlowManagementServiceImpl implements FlowManagementService {
         flowTemplate.setData(templateData);
         flowTemplate.setName(abstractEntity.getName());
         flowTemplate.setTenantCode(propertyService.getTenantCode());
-        flowTemplate.setType(ResourceType.FLOW_TEMPLATE);
+        flowTemplate.setType(FLOW_TEMPLATE);
         return privateRepositoryService.saveTemplate(flowTemplate);
     }
 

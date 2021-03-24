@@ -2,7 +2,6 @@ package io.terminus.dalaran.console.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.aliyun.oss.model.OSSObject;
-import io.terminus.dalaran.DalaranConstants;
 import io.terminus.dalaran.component.utils.DalaranFileUtils;
 import io.terminus.dalaran.component.utils.OSSUtils;
 import io.terminus.dalaran.console.entity.*;
@@ -37,6 +36,8 @@ import org.springframework.web.client.RestTemplate;
 
 import java.io.File;
 import java.util.*;
+
+import static io.terminus.dalaran.DalaranConstants.*;
 
 @Service
 public class PrivateRepositoryServiceImpl implements PrivateRepositoryService {
@@ -121,32 +122,39 @@ public class PrivateRepositoryServiceImpl implements PrivateRepositoryService {
 
     @Override
     public PrivateRepositoryDTO getResourceDetail(String id, String version) {
-        PrivateRepositoryEntity entity = privateRepository.findByResourceKeyAndVersion(id, version);
-        PrivateRepositoryDTO privateRepository = new PrivateRepositoryDTO();
+        PrivateRepositoryDTO privateRepositoryDTO = new PrivateRepositoryDTO();
         try {
-            BeanUtils.copyProperties(privateRepository, entity);
-            privateRepository.setId(entity.getResourceKey());
-            switch (entity.getType().name()) {
-                case DalaranConstants.PROCESSOR:
-                    privateRepository.setData(JSON.parseObject(entity.getData(), MarketProcessor.class));
+            PrivateRepositoryEntity entity = privateRepository.findByResourceKeyAndVersion(id, version);
+            BeanUtils.copyProperties(privateRepositoryDTO, entity);
+            privateRepositoryDTO.setId(entity.getResourceKey());
+            switch (entity.getType()) {
+                case PROCESSOR:
+                    privateRepositoryDTO.setData(JSON.parseObject(entity.getData(), MarketProcessor.class));
                     break;
-                case DalaranConstants.FLOW_TEMPLATE:
-                case DalaranConstants.SUB_FLOW_TEMPLATE:
-                    privateRepository.setData(JSON.parseObject(entity.getData(), FlowTemplate.class));
+                case FLOW_TEMPLATE:
+                case SUB_FLOW_TEMPLATE:
+                    privateRepositoryDTO.setData(JSON.parseObject(entity.getData(), FlowTemplate.class));
             }
         } catch (Exception e) {
             e.printStackTrace();
+            throw new RuntimeException("Get Resource Detail Error! ");
         }
-        return privateRepository;
+        return privateRepositoryDTO;
     }
 
     @Override
     public BasicResponse publish(BasicResourceDTO basicResource) {
-        PrivateRepositoryDTO privateResource = getResourceDetail(basicResource.getId(), basicResource.getVersion());
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<PrivateRepositoryDTO> request = new HttpEntity<>(privateResource, headers);
-        return restTemplate.postForObject(propertyService.getMarketHost() + propertyService.getMarketUpload(), request, BasicResponse.class);
+        try {
+            PrivateRepositoryDTO privateResource = getResourceDetail(basicResource.getId(), basicResource.getVersion());
+            BeanUtils.copyProperties(privateResource, basicResource);
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            HttpEntity<PrivateRepositoryDTO> request = new HttpEntity<>(privateResource, headers);
+            return restTemplate.postForObject(propertyService.getMarketHost() + propertyService.getMarketUpload(), request, BasicResponse.class);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return new BasicResponse(false);
     }
 
     @Override
@@ -155,6 +163,7 @@ public class PrivateRepositoryServiceImpl implements PrivateRepositoryService {
             resourceInstall(privateRepositoryDTO);
             PrivateRepositoryEntity entity = toEntity(privateRepositoryDTO);
             entity.setResourceKey(privateRepositoryDTO.getId());
+            entity.setOrigin(MARKET);
             entity.setId(null);
             privateRepository.save(entity);
             return new BasicResponse(true, entity.getResourceKey());
@@ -169,6 +178,7 @@ public class PrivateRepositoryServiceImpl implements PrivateRepositoryService {
         try {
             PrivateRepositoryEntity entity = flowTemplateToEntity(flowTemplate);
             entity.setResourceKey(flowTemplate.getId());
+            entity.setOrigin(PRIVATE);
             entity.setId(null);
             privateRepository.save(entity);
             return new BasicResponse(true, entity.getResourceKey());
@@ -185,7 +195,7 @@ public class PrivateRepositoryServiceImpl implements PrivateRepositoryService {
         }
         PrivateRepositoryEntity entity = new PrivateRepositoryEntity();
         BeanUtils.copyProperties(entity, flowTemplate);
-        entity.setData(JSON.toJSONString(flowTemplate.getData()));
+        entity.setData(JSON.toJSONString(flowTemplate));
         entity.setResourceKey(resourceKey);
         return entity;
     }
@@ -224,8 +234,8 @@ public class PrivateRepositoryServiceImpl implements PrivateRepositoryService {
                 break;
             case FLOW_TEMPLATE:
             case SUB_FLOW_TEMPLATE:
-                FlowTemplate flowTemplate = JSON.parseObject((String) privateRepositoryDTO.getData(), FlowTemplate.class);
-                loadRelationResource(flowTemplate.getData());
+                FlowTemplate templateData = JSON.parseObject((String) privateRepositoryDTO.getData(), FlowTemplate.class);
+                loadRelationResource(templateData.getData());
                 break;
         }
     }

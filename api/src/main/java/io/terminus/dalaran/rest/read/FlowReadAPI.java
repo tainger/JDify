@@ -12,7 +12,6 @@ import io.terminus.dalaran.model.dto.log.MainLogDTO;
 import io.terminus.dalaran.model.flow.FlowValidation;
 import io.terminus.dalaran.model.query.FlowQuery;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @RequestMapping(value = "/api/flow", produces = {"application/json; charset=UTF-8"})

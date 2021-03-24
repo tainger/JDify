@@ -72,7 +72,6 @@ public final class DalaranConstants {
 
     public static final String DALARAN_COMPONENT_DEFAULT_DESC = "";
 
-
     public static final String MODEL = "model";
     public static final String CONNECTOR = "connector";
     public static final String FUNCTION = "function";
@@ -80,8 +79,6 @@ public final class DalaranConstants {
     public static final String SUB_FLOW = "subflow";
     public static final String PACKAGE = "package";
 
-
-
-
-
+    public static final String MARKET = "Market";
+    public static final String PRIVATE = "Private";
 }
