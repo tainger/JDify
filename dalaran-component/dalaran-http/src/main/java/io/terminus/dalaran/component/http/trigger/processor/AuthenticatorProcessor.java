@@ -8,7 +8,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 import java.util.Map;
@@ -44,7 +43,7 @@ public class AuthenticatorProcessor implements Processor {
                 }
             }
             String value;
-            if (authenticatorRestConfig.getKeyLocation() == AuthenticatorKeyLocation.Header) {
+            if (StringUtils.equals(authenticatorRestConfig.getKeyLocation().name(), AuthenticatorKeyLocation.Header.name())) {
                 value = exchange.getIn().getHeader(authenticatorRestConfig.getAuthenticatorKey(), String.class);
             } else if (authenticatorRestConfig.getKeyLocation() == AuthenticatorKeyLocation.QueryParam) {
                 value = exchange.getIn().getHeader(authenticatorRestConfig.getAuthenticatorKey(), String.class);

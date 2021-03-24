@@ -10,6 +10,7 @@ import io.terminus.dalaran.console.model.FlowTemplate;
 import io.terminus.dalaran.console.model.TemplateData;
 import io.terminus.dalaran.console.repository.*;
 import io.terminus.dalaran.console.service.PrivateRepositoryService;
+import io.terminus.dalaran.console.service.jpa.PrivateResourceQueryService;
 import io.terminus.dalaran.console.util.GenerateKeyUtils;
 import io.terminus.dalaran.core.market.MarketResourceLoader;
 import io.terminus.dalaran.core.oss.OSSAccount;
@@ -29,13 +30,13 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.File;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class PrivateRepositoryServiceImpl implements PrivateRepositoryService {
@@ -70,11 +71,52 @@ public class PrivateRepositoryServiceImpl implements PrivateRepositoryService {
     @Autowired
     private PrivatePackageRepository privatePackageRepository;
 
+    @Autowired
+    private PrivateResourceQueryService privateResourceQueryService;
+
     private final RestTemplate restTemplate = new RestTemplate();
 
     @Override
     public Collection<MarketResourceVersionDTO> listPrivateResource(PrivateRepositoryQuery query) {
-        return null;
+        List<PrivateRepositoryEntity> entities =  privateResourceQueryService.query(query);
+        Map<String, List<BasicResourceDTO>> resourceMap = new HashMap<>();
+        for (PrivateRepositoryEntity entity: entities) {
+            String resourceKey = entity.getResourceKey();
+            BasicResourceDTO basicResource = new BasicResourceDTO();
+            try {
+                BeanUtils.copyProperties(basicResource, entity);
+                basicResource.setId(resourceKey);
+
+                List<BasicResourceDTO> resourceList = resourceMap.get(resourceKey);
+                if (CollectionUtils.isEmpty(resourceList)) {
+                    resourceList = new ArrayList<>();
+                    resourceMap.put(resourceKey, resourceList);
+                }
+                resourceList.add(basicResource);
+            } catch (Exception e) {
+                e.printStackTrace();
+                return new ArrayList<>();
+            }
+        }
+
+        List<MarketResourceVersionDTO> versionResourceList = new ArrayList<>();
+        resourceMap.forEach((key, resources) -> {
+            MarketResourceVersionDTO versionResource = new MarketResourceVersionDTO();
+            if (CollectionUtils.isNotEmpty(resources)) {
+                Map<String, BasicResourceDTO> versions = new HashMap<>();
+                resources.forEach(resource -> versions.put(resource.getVersion(), resource));
+                versionResource.setVersions(versions);
+                BasicResourceDTO lastResource = resources.get(0);
+                try {
+                    BeanUtils.copyProperties(versionResource, lastResource);
+                    versionResource.setLastVersion(lastResource.getVersion());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                versionResourceList.add(versionResource);
+            }
+        });
+        return versionResourceList;
     }
 
     @Override
@@ -83,7 +125,8 @@ public class PrivateRepositoryServiceImpl implements PrivateRepositoryService {
         PrivateRepositoryDTO privateRepository = new PrivateRepositoryDTO();
         try {
             BeanUtils.copyProperties(privateRepository, entity);
-            switch (entity.getType()) {
+            privateRepository.setId(entity.getResourceKey());
+            switch (entity.getType().name()) {
                 case DalaranConstants.PROCESSOR:
                     privateRepository.setData(JSON.parseObject(entity.getData(), MarketProcessor.class));
                     break;
@@ -100,7 +143,9 @@ public class PrivateRepositoryServiceImpl implements PrivateRepositoryService {
     @Override
     public BasicResponse publish(BasicResourceDTO basicResource) {
         PrivateRepositoryDTO privateResource = getResourceDetail(basicResource.getId(), basicResource.getVersion());
-        HttpEntity<PrivateRepositoryDTO> request = new HttpEntity<>(privateResource);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<PrivateRepositoryDTO> request = new HttpEntity<>(privateResource, headers);
         return restTemplate.postForObject(propertyService.getMarketHost() + propertyService.getMarketUpload(), request, BasicResponse.class);
     }
 
