@@ -3,7 +3,6 @@ package io.terminus.dalaran.core.resource.entity.common;
 import io.terminus.dalaran.core.resource.converter.ListToJsonConverter;
 import io.terminus.dalaran.core.resource.entity.basic.BasicEntity;
 import lombok.Data;
-
 import javax.persistence.Column;
 import javax.persistence.Convert;
 import javax.persistence.Entity;

@@ -24,6 +24,7 @@ import io.terminus.dalaran.core.resource.DalaranResourceBuilder;
 import io.terminus.dalaran.core.resource.DalaranResourceLoader;
 import io.terminus.dalaran.core.resource.entity.ModelAbstractEntity;
 import io.terminus.dalaran.core.resource.entity.TriggerFlowAbstractEntity;
+import io.terminus.dalaran.core.resource.entity.basic.BasicFlowEntity;
 import io.terminus.dalaran.core.resource.entity.common.PrivateRepositoryEntity;
 import io.terminus.dalaran.core.resource.entity.common.ProcessorEntity;
 import io.terminus.dalaran.core.resource.entity.released.TriggerFlowReleasedEntity;
@@ -64,6 +65,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static io.terminus.dalaran.DalaranConstants.FLOW_TEMPLATE;
+import static io.terminus.dalaran.DalaranConstants.SUB_FLOW_TEMPLATE;
 
 @Service
 @Transactional
@@ -306,7 +308,16 @@ public class FlowManagementServiceImpl implements FlowManagementService {
         if (privateRepositoryRepository.findByResourceKeyAndVersion(flow.getId(), flow.getVersion()) != null) {
             return new BasicResponse(false, "Template is exist!");
         }
-        TriggerFlowAbstractEntity abstractEntity = resourceLoader.loadTriggerFlow(flow.getId());
+
+        BasicFlowEntity abstractEntity;
+        switch (flow.getType()) {
+            case FLOW_TEMPLATE:
+                abstractEntity = resourceLoader.loadTriggerFlow(flow.getId());
+                break;
+            case SUB_FLOW_TEMPLATE:
+            default:
+                abstractEntity = resourceLoader.loadSubFlow(flow.getId());
+        }
         TemplateData templateData = buildFlowTemplate(abstractEntity);
         flowTemplate.setVersion(flow.getVersion());
         flowTemplate.setId(flow.getId());
@@ -710,7 +721,7 @@ public class FlowManagementServiceImpl implements FlowManagementService {
         return soapFlowList.stream().map(flowEntity -> flowEntity.getName().trim()).collect(Collectors.toList());
     }
 
-    private TemplateData buildFlowTemplate(TriggerFlowAbstractEntity origin) {
+    private TemplateData buildFlowTemplate(BasicFlowEntity origin) {
         TemplateData templateData = new TemplateData();
         try {
             BeanUtils.copyProperties(templateData, origin);
@@ -766,7 +777,7 @@ public class FlowManagementServiceImpl implements FlowManagementService {
         }
     }
 
-    private void buildTemplateRelationResource(TemplateData templateData, TriggerFlowAbstractEntity origin) throws Exception {
+    private void buildTemplateRelationResource(TemplateData templateData, BasicFlowEntity origin) throws Exception {
         Map models = templateData.getRelationModel();
         Map connectors = templateData.getRelationConnector();
         Map services = templateData.getRelationService();
@@ -782,20 +793,22 @@ public class FlowManagementServiceImpl implements FlowManagementService {
             models.put(outModelId, abstractEntity);
         }
 
-        TriggerInfo triggerInfo = dalaranContext.getDalaranComponentContext().getTriggerInfo(origin.getTriggerType());
-        if (StringUtils.equalsIgnoreCase(triggerInfo.getOrigin(), DalaranConstants.PARTNER)) {
-            PrivateRepositoryEntity privateRepositoryEntity = privateRepositoryRepository.findByNameAndType(triggerInfo.getName(), DalaranConstants.TRIGGER);
-            if (privateRepositoryEntity != null) {
-                packages.put(privateRepositoryEntity.getResourceKey(), privateRepositoryEntity);
+        if (origin instanceof TriggerFlowAbstractEntity) {
+            TriggerInfo triggerInfo = dalaranContext.getDalaranComponentContext().getTriggerInfo(((TriggerFlowAbstractEntity)origin).getTriggerType());
+            if (StringUtils.equalsIgnoreCase(triggerInfo.getOrigin(), DalaranConstants.PARTNER)) {
+                PrivateRepositoryEntity privateRepositoryEntity = privateRepositoryRepository.findByNameAndType(triggerInfo.getName(), DalaranConstants.TRIGGER);
+                if (privateRepositoryEntity != null) {
+                    packages.put(privateRepositoryEntity.getResourceKey(), privateRepositoryEntity);
+                }
             }
-        }
 
-        Object config = resourceBuilder.buildConfig(origin.getTriggerConfig(), triggerInfo.getConfigType());
-        if (config instanceof ConnectorConfig) {
-            ConnectorConfig connectorConfig = (ConnectorConfig) config;
-            String connectorId = connectorConfig.getConnectorId();
-            if (StringUtils.isNotBlank(connectorId)) {
-                connectors.put(connectorId, resourceLoader.loadConnector(connectorId));
+            Object config = resourceBuilder.buildConfig(((TriggerFlowAbstractEntity)origin).getTriggerConfig(), triggerInfo.getConfigType());
+            if (config instanceof ConnectorConfig) {
+                ConnectorConfig connectorConfig = (ConnectorConfig) config;
+                String connectorId = connectorConfig.getConnectorId();
+                if (StringUtils.isNotBlank(connectorId)) {
+                    connectors.put(connectorId, resourceLoader.loadConnector(connectorId));
+                }
             }
         }
 
