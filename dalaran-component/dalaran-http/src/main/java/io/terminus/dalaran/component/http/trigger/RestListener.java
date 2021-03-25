@@ -71,23 +71,7 @@ public class RestListener implements DalaranTrigger<RestConfig>, DalaranTriggerA
             return;
         }
 
-//        if (config.getMethod().isNoBody()) {
-//            if (config.isEnableSign()) {
-//                route.process(new QueryStringSignProcessor(clientContext.getAllClient(), config.isCheckSign()));
-//            } else {
-//                route.process(new QueryStringConvertProcessor());
-//            }
-//            // TODO 目前会多一次序列化, 如果下个节点要求的是非序列化对象, 会有额外的性能开销
-//            route.marshal().json(JsonLibrary.Fastjson);
-//        } else {
-//            if (config.isEnableSign()) {
-//                route.unmarshal().json(JsonLibrary.Fastjson);
-//                route.process(new SignProcessor(clientContext.getAllClient(), config.isCheckSign()));
-//            }
-//            route.convertBodyTo(String.class);
-//        }
         DalaranAuthenticator authenticator = config.getAuthenticator();
-//        DalaranAuthenticator authenticator = config.getAuthenticator();
         if (config.getMethod().isNoBody()) {
             if (StringUtils.isNotBlank(config.getAuthenticatorId())) {
                 route.process(new QueryProcessor(authenticator, redisService));

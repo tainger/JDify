@@ -21,5 +21,5 @@ public interface AuthenticatorService {
 
     AuthenticatorKeyResponse getKey();
 
-    AuthenticatorValueResponse getValue();
+    AuthenticatorValueResponse getValue(String key);
 }

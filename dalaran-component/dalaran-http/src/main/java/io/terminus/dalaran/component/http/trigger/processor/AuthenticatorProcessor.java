@@ -35,26 +35,27 @@ public class AuthenticatorProcessor implements Processor {
     void checkValue(Exchange exchange, Map<String, String> body) {
         List<AuthenticatorRestConfig> authenticatorRestConfigs = authenticator.getConfig();
         authenticatorRestConfigs.forEach(authenticatorRestConfig -> {
+            String value = authenticatorRestConfig.getAuthenticatorValue();
+            String requestValue;
             if (!authenticatorRestConfig.getIsStatic()) {
-                String redisValue = redisService.getValue("Authenticator-" + authenticatorRestConfig.getAuthenticatorKey());
-                if (StringUtils.isBlank(redisValue)) {
+                value = redisService.getValue("Authenticator-" + authenticatorRestConfig.getAuthenticatorKey());
+                if (StringUtils.isBlank(value)) {
                     stopExchangeOnInvalidAppKey(exchange);
                     return;
                 }
             }
-            String value;
             if (StringUtils.equals(authenticatorRestConfig.getKeyLocation().name(), AuthenticatorKeyLocation.Header.name())) {
-                value = exchange.getIn().getHeader(authenticatorRestConfig.getAuthenticatorKey(), String.class);
+                requestValue = exchange.getIn().getHeader(authenticatorRestConfig.getAuthenticatorKey(), String.class);
             } else if (authenticatorRestConfig.getKeyLocation() == AuthenticatorKeyLocation.QueryParam) {
-                value = exchange.getIn().getHeader(authenticatorRestConfig.getAuthenticatorKey(), String.class);
+                requestValue = exchange.getIn().getHeader(authenticatorRestConfig.getAuthenticatorKey(), String.class);
             } else {
                 if (body != null) {
-                    value = body.get(authenticatorRestConfig.getAuthenticatorKey());
+                    requestValue = body.get(authenticatorRestConfig.getAuthenticatorKey());
                 } else {
-                    value = "";
+                    requestValue = "";
                 }
             }
-            if (StringUtils.isBlank(value) || !value.equals(authenticatorRestConfig.getAuthenticatorValue())) {
+            if (StringUtils.isBlank(requestValue) || !requestValue.equals(value)) {
                 stopExchangeOnInvalidAppKey(exchange);
             }
         });
@@ -64,27 +65,28 @@ public class AuthenticatorProcessor implements Processor {
     void checkGetValue(Exchange exchange, Map<String, String> param) {
         List<AuthenticatorRestConfig> authenticatorRestConfigs = authenticator.getConfig();
         authenticatorRestConfigs.forEach(authenticatorRestConfig -> {
+            String value = authenticatorRestConfig.getAuthenticatorValue();
+            String requestValue;
             if (!authenticatorRestConfig.getIsStatic()) {
-                String redisValue = redisService.getValue("Authenticator-" + authenticatorRestConfig.getAuthenticatorKey());
-                if (StringUtils.isBlank(redisValue)) {
+                value = redisService.getValue("Authenticator-" + authenticatorRestConfig.getAuthenticatorKey());
+                if (StringUtils.isBlank(value)) {
                     stopExchangeOnInvalidAppKey(exchange);
                     return;
                 }
             }
-            String value;
             if (authenticatorRestConfig.getKeyLocation() == AuthenticatorKeyLocation.Header) {
-                value = exchange.getIn().getHeader(authenticatorRestConfig.getAuthenticatorKey(), String.class);
+                requestValue = exchange.getIn().getHeader(authenticatorRestConfig.getAuthenticatorKey(), String.class);
             } else if (authenticatorRestConfig.getKeyLocation() == AuthenticatorKeyLocation.Body){
                 Map<String, String> body = exchange.getIn().getBody(Map.class);
-                value = body.get(authenticatorRestConfig.getAuthenticatorKey());
+                requestValue = body.get(authenticatorRestConfig.getAuthenticatorKey());
             } else {
                 if (param !=null ) {
-                    value = param.get(authenticatorRestConfig.getAuthenticatorKey());
+                    requestValue = param.get(authenticatorRestConfig.getAuthenticatorKey());
                 } else {
-                    value = "";
+                    requestValue = "";
                 }
             }
-            if (StringUtils.isBlank(value) || !value.equals(authenticatorRestConfig.getAuthenticatorValue())) {
+            if (StringUtils.isBlank(requestValue) || !requestValue.equals(value)) {
                 stopExchangeOnInvalidAppKey(exchange);
             }
         });

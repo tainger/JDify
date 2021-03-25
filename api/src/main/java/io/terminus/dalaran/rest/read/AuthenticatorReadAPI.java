@@ -7,6 +7,7 @@ import io.terminus.dalaran.model.dto.AuthenticatorDTO;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @RequestMapping(value = "/api/authenticator", produces = {"application/json; charset=UTF-8"})
 public interface AuthenticatorReadAPI {
@@ -21,6 +22,6 @@ public interface AuthenticatorReadAPI {
 
     @GetMapping("/value")
     @ApiOperation("获取动态value")
-    AuthenticatorValueResponse getValue();
+    AuthenticatorValueResponse getValue(@RequestParam String key);
 
 }
