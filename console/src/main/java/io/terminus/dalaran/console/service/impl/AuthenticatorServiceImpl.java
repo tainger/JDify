@@ -102,8 +102,14 @@ public class AuthenticatorServiceImpl implements AuthenticatorService {
     }
 
     @Override
-    public AuthenticatorValueResponse getValue() {
-        return new AuthenticatorValueResponse(GenerateKeyUtils.authenticatorValue());
+    public AuthenticatorValueResponse getValue(String key) {
+        String value = GenerateKeyUtils.authenticatorValue();
+        String expireTimeValue = redisService.getValue(DalaranConsoleConstants.REDIS_EXPIRETIME_KEY + key);
+        if (StringUtils.isBlank(expireTimeValue)) {
+            return new AuthenticatorValueResponse("invalid key");
+        }
+        redisService.setValueMinutes(DalaranConsoleConstants.REDIS_AUTHENTICATOR_KEY + key, value, Long.parseLong(expireTimeValue));
+        return new AuthenticatorValueResponse(value);
     }
 
     private AuthenticatorEntity toEntity(AuthenticatorDTO dto) {
@@ -153,7 +159,7 @@ public class AuthenticatorServiceImpl implements AuthenticatorService {
             if (dto.getIsStatic()) {
                 redisService.persistKey(DalaranConsoleConstants.REDIS_AUTHENTICATOR_KEY + dto.getAuthenticatorKey(), dto.getAuthenticatorValue());
             } else {
-                redisService.setValueMinutes(DalaranConsoleConstants.REDIS_AUTHENTICATOR_KEY + dto.getAuthenticatorKey(), dto.getAuthenticatorValue(), dto.getExpireTime());
+                redisService.persistKey(DalaranConsoleConstants.REDIS_EXPIRETIME_KEY + dto.getAuthenticatorKey(), String.valueOf(dto.getExpireTime()));
             }
         });
     }
@@ -162,6 +168,8 @@ public class AuthenticatorServiceImpl implements AuthenticatorService {
         dtos.forEach(dto -> {
             if (dto.getIsStatic()) {
                 redisService.deleteKey(DalaranConsoleConstants.REDIS_AUTHENTICATOR_KEY + dto.getAuthenticatorKey());
+            } else {
+                redisService.deleteKey(DalaranConsoleConstants.REDIS_EXPIRETIME_KEY + dto.getAuthenticatorKey());
             }
         });
     }
