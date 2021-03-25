@@ -11,7 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 public class OSSManagementServiceImpl implements OSSManagementService {
 
-    private static final String FILE_ROOT = "carso";
+    private static final String FILE_ROOT = "dalaran";
 
     @Autowired
     private OSSAccount ossAccount;

@@ -2,6 +2,7 @@ package io.terminus.dalaran.core.util;
 
 import io.terminus.dalaran.FieldInputType;
 import io.terminus.dalaran.config.DalaranConfigField;
+import io.terminus.dalaran.config.ValidateConfig;
 import io.terminus.dalaran.core.component.annotation.ConfigFieldInfo;
 import lombok.val;
 import org.apache.commons.lang3.StringUtils;
@@ -28,6 +29,16 @@ public class ConfigFieldUtils {
                 configField.setLabel(configFieldInfo.label());
                 configField.setRequired(configFieldInfo.required());
                 configField.setReadonly(configFieldInfo.readonly());
+
+                //TODO 暂时放在这里，后面统一处理
+                if (configFieldInfo.inputType().equals("String")) {
+                    ValidateConfig validateConfig = new ValidateConfig();
+                    if (field.getName().equals("expireTime")) {
+                        validateConfig.setOnlyNumber(true);
+                        validateConfig.setMinNumber(5);
+                    }
+                    configField.setValidateConfig(validateConfig);
+                }
 
                 if (field.getType().isEnum()) {
                     val enumValueMap = new HashMap<String, String>();

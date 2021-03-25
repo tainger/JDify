@@ -22,8 +22,13 @@ public abstract class AbstractComponentInfo implements ComponentInfo {
 
     private String limiterType;
 
+    private String authenticatorType;
+
     @NotNull
     private String modelType;
+
+    @NotNull
+    private String origin;
 
     @JSONField(serialize = false)
     @JsonIgnore
@@ -32,6 +37,10 @@ public abstract class AbstractComponentInfo implements ComponentInfo {
     @JSONField(serialize = false)
     @JsonIgnore
     private LimiterInfo limiterInfo;
+
+    @JSONField(serialize = false)
+    @JsonIgnore
+    private AuthenticatorInfo authenticatorInfo;
 
     @JSONField(serialize = false)
     @JsonIgnore

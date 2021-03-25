@@ -12,6 +12,7 @@ import io.terminus.dalaran.rest.write.AuthenticatorWriteAPI;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -50,7 +51,7 @@ public class AuthenticatorManagementRest implements AuthenticatorReadAPI, Authen
     }
 
     @Override
-    public AuthenticatorValueResponse getValue() {
-        return service.getValue();
+    public AuthenticatorValueResponse getValue(@RequestParam String key) {
+        return service.getValue(key);
     }
 }

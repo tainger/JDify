@@ -26,4 +26,10 @@ public class DalaranFileUtils {
             bufferedReader.close();
         }
     }
+
+    public static File createFile(String fileKey) throws Exception {
+        File dir = new File("/var/tmp");
+        String fileName = "dalaran-" + fileKey.hashCode();
+        return File.createTempFile(fileName, "", dir);
+    }
 }

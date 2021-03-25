@@ -2,7 +2,7 @@ package io.terminus.dalaran.component.mail.camel;
 
 import com.alibaba.fastjson.JSON;
 import io.terminus.dalaran.ComponentConstants;
-import io.terminus.dalaran.component.mail.utils.OSSUtils;
+import io.terminus.dalaran.component.utils.OSSUtils;
 import io.terminus.dalaran.core.oss.*;
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
@@ -28,7 +28,7 @@ public class CamelMailSenderProcessor implements Processor {
         Object in = exchange.getIn().getBody();
         if (config.isDynamicAddress()) {
             MailSenderInfo senderInfo = JSON.parseObject(JSON.toJSONString(in), MailSenderInfo.class);
-            File file = OSSUtils.getFileFromOss(senderInfo.getUploadUrl(), ossAccount);
+            File file = OSSUtils.downloadByPath(senderInfo.getUploadUrl(), ossAccount);
             byte[] fileContent = FileUtils.readFileToByteArray(file);
             Message out = exchange.getOut();
             out.addAttachment(senderInfo.getFileName(), new DataHandler(fileContent,"application/excel"));

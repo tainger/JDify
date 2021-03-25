@@ -93,7 +93,6 @@ public class ReleaseServiceImpl implements ReleaseService {
     @Autowired
     private ModuleRepository moduleRepository;
 
-
     @Autowired
     private AlarmRuleRepository alarmRuleRepository;
 
@@ -102,6 +101,12 @@ public class ReleaseServiceImpl implements ReleaseService {
 
     @Autowired
     private RedisService redisService;
+
+    @Autowired
+    private AuthenticatorRepository authenticatorRepository;
+
+    @Autowired
+    private AuthenticatorReleasedRepository authenticatorReleasedRepository;
 
 
     private final FlowConvertor flowConvertor = new FlowConvertor();
@@ -158,6 +163,8 @@ public class ReleaseServiceImpl implements ReleaseService {
         List<LimiterReleasedEntity> limiterReleasedEntities = toReleasedData(limiterRepository.findByIsExistTrue(), LimiterReleasedEntity.class, requestDTO.getVersion());
         limiterReleasedRepository.saveAll(limiterReleasedEntities);
 
+        List<AuthenticatorReleasedEntity> authenticatorReleasedEntities = toReleasedData(authenticatorRepository.findByIsExistTrue(), AuthenticatorReleasedEntity.class, requestDTO.getVersion());
+        authenticatorReleasedRepository.saveAll(authenticatorReleasedEntities);
 
         return toDTO(recordEntity);
     }

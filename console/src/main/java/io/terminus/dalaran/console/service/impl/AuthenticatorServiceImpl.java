@@ -7,7 +7,7 @@ import io.terminus.dalaran.console.entity.AuthenticatorEntity;
 import io.terminus.dalaran.console.repository.AuthenticatorRepository;
 import io.terminus.dalaran.console.service.AuthenticatorService;
 import io.terminus.dalaran.console.service.jpa.model.QueryAuthenticatorInfo;
-import io.terminus.dalaran.console.util.ResourceKeyUtils;
+import io.terminus.dalaran.console.util.GenerateKeyUtils;
 import io.terminus.dalaran.core.resource.redis.RedisService;
 import io.terminus.dalaran.model.AuthenticatorKeyResponse;
 import io.terminus.dalaran.model.AuthenticatorValueResponse;
@@ -98,12 +98,18 @@ public class AuthenticatorServiceImpl implements AuthenticatorService {
 
     @Override
     public AuthenticatorKeyResponse getKey() {
-        return new AuthenticatorKeyResponse(ResourceKeyUtils.authenticatorKey());
+        return new AuthenticatorKeyResponse(GenerateKeyUtils.authenticatorKey());
     }
 
     @Override
-    public AuthenticatorValueResponse getValue() {
-        return new AuthenticatorValueResponse(ResourceKeyUtils.authenticatorValue());
+    public AuthenticatorValueResponse getValue(String key) {
+        String value = GenerateKeyUtils.authenticatorValue();
+        String expireTimeValue = redisService.getValue(DalaranConsoleConstants.REDIS_EXPIRETIME_KEY + key);
+        if (StringUtils.isBlank(expireTimeValue)) {
+            return new AuthenticatorValueResponse("invalid key");
+        }
+        redisService.setValueMinutes(DalaranConsoleConstants.REDIS_AUTHENTICATOR_KEY + key, value, Long.parseLong(expireTimeValue));
+        return new AuthenticatorValueResponse(value);
     }
 
     private AuthenticatorEntity toEntity(AuthenticatorDTO dto) {
@@ -113,7 +119,7 @@ public class AuthenticatorServiceImpl implements AuthenticatorService {
         entity.setModuleId(dto.getModuleId());
         String resourceKey = dto.getId();
         if (StringUtils.isBlank(resourceKey)) {
-            resourceKey = ResourceKeyUtils.generateKey();
+            resourceKey = GenerateKeyUtils.resourceKey();
         }
         entity.setResourceKey(resourceKey);
         entity.setExist(true);
@@ -153,13 +159,19 @@ public class AuthenticatorServiceImpl implements AuthenticatorService {
             if (dto.getIsStatic()) {
                 redisService.persistKey(DalaranConsoleConstants.REDIS_AUTHENTICATOR_KEY + dto.getAuthenticatorKey(), dto.getAuthenticatorValue());
             } else {
-                redisService.setValueMinutes(DalaranConsoleConstants.REDIS_AUTHENTICATOR_KEY + dto.getAuthenticatorKey(), dto.getAuthenticatorValue(), dto.getExpireTime());
+                redisService.persistKey(DalaranConsoleConstants.REDIS_EXPIRETIME_KEY + dto.getAuthenticatorKey(), String.valueOf(dto.getExpireTime()));
             }
         });
     }
 
     private void deleteFromRedis(List<AuthenticatorConfigDTO> dtos) {
-        dtos.forEach(dto -> redisService.deleteKey(DalaranConsoleConstants.REDIS_AUTHENTICATOR_KEY + dto.getAuthenticatorKey()));
+        dtos.forEach(dto -> {
+            if (dto.getIsStatic()) {
+                redisService.deleteKey(DalaranConsoleConstants.REDIS_AUTHENTICATOR_KEY + dto.getAuthenticatorKey());
+            } else {
+                redisService.deleteKey(DalaranConsoleConstants.REDIS_EXPIRETIME_KEY + dto.getAuthenticatorKey());
+            }
+        });
     }
 
 

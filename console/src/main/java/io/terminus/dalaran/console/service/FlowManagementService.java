@@ -2,10 +2,8 @@ package io.terminus.dalaran.console.service;
 
 import io.terminus.dalaran.console.entity.TriggerFlowEntity;
 import io.terminus.dalaran.exception.flow.FlowNotExistException;
-import io.terminus.dalaran.model.dto.CopyFlow;
-import io.terminus.dalaran.model.dto.ImportFlowResult;
-import io.terminus.dalaran.model.dto.ImportProcessorDTO;
-import io.terminus.dalaran.model.dto.ImportProcessorResult;
+import io.terminus.dalaran.model.BasicResponse;
+import io.terminus.dalaran.model.dto.*;
 import io.terminus.dalaran.model.dto.basic.BasicFlowInfo;
 import io.terminus.dalaran.model.dto.flow.BindAlarmRuleDto;
 import io.terminus.dalaran.model.dto.flow.ImportFlowDTO;
@@ -22,6 +20,12 @@ public interface FlowManagementService {
     String saveFlow(TriggerFlowEntity flowEntity);
 
     String createFlow(TriggerFlowDTO flowModel);
+
+    BasicResponse createFromTemplate(TemplatePrecipitationDTO template);
+
+    BasicResponse saveAsTemplate(TemplatePrecipitationDTO flow);
+
+    BasicResponse checkTemplateVersion(TemplatePrecipitationDTO flow);
 
     ImportFlowResult importFlow(ImportFlowDTO flowModel);
 

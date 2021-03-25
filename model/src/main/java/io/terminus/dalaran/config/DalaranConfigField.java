@@ -24,4 +24,6 @@ public class DalaranConfigField {
     private boolean readonly;
 
     Map<String, String> enumValues;
+
+    private ValidateConfig validateConfig;
 }

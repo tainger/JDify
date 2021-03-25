@@ -4,7 +4,7 @@ import io.terminus.dalaran.console.entity.ClientEntity;
 import io.terminus.dalaran.console.repository.ClientRepository;
 import io.terminus.dalaran.console.service.ClientManagementService;
 import io.terminus.dalaran.console.service.jpa.model.QueryClientInfo;
-import io.terminus.dalaran.console.util.ResourceKeyUtils;
+import io.terminus.dalaran.console.util.GenerateKeyUtils;
 import io.terminus.dalaran.model.dto.ClientDTO;
 import io.terminus.dalaran.model.dto.basic.BasicClientInfo;
 import io.terminus.draco.web.autoconfig.context.UserContext;
@@ -45,15 +45,15 @@ public class ClientManagementServiceImpl implements ClientManagementService {
     }
 
     @Override
-    public void delete(String appKey) {
-        ClientEntity entity = repository.findByAppKey(appKey);
+    public void delete(String resourceKey) {
+        ClientEntity entity = repository.findByResourceKey(resourceKey);
         entity.setExist(false);
         repository.save(entity);
     }
 
     @Override
-    public ClientDTO detail(String appKey) {
-        ClientEntity entity = repository.findByAppKey(appKey);
+    public ClientDTO detail(String resourceKey) {
+        ClientEntity entity = repository.findByResourceKey(resourceKey);
         if (entity != null) {
             return toDTO(entity);
         }
@@ -85,7 +85,7 @@ public class ClientManagementServiceImpl implements ClientManagementService {
     private ClientDTO toDTO(ClientEntity entity) {
         ClientDTO dto = new ClientDTO();
         try {
-            BeanUtils.copyProperties(entity, dto);
+            BeanUtils.copyProperties(dto, entity);
         }catch (Exception e) {
             e.printStackTrace();
         }
@@ -96,13 +96,13 @@ public class ClientManagementServiceImpl implements ClientManagementService {
     private ClientEntity toEntity(ClientDTO dto) {
         ClientEntity entity = new ClientEntity();
         try {
-            BeanUtils.copyProperties(dto, entity);
+            BeanUtils.copyProperties(entity, dto);
         }catch (Exception e) {
             e.printStackTrace();
         }
         String resourceKey = dto.getId();
         if (StringUtils.isBlank(resourceKey)) {
-            resourceKey = ResourceKeyUtils.generateKey();
+            resourceKey = GenerateKeyUtils.resourceKey();
         }
         entity.setResourceKey(resourceKey);
         entity.setExist(true);

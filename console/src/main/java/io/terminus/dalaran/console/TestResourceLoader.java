@@ -45,6 +45,9 @@ public class TestResourceLoader implements DalaranResourceLoader {
     private AlarmRuleRepository alarmRuleRepository;
 
     @Autowired
+    private AuthenticatorRepository authenticatorRepository;
+
+    @Autowired
     private DalaranContext dalaranContext;
 
     @Override
@@ -125,6 +128,11 @@ public class TestResourceLoader implements DalaranResourceLoader {
     @Override
     public ServiceEntity loadService(String serviceId) {
         return serviceRepository.findByResourceKey(serviceId);
+    }
+
+    @Override
+    public AuthenticatorEntity loadAuthenticator(String authenticatorId) {
+        return authenticatorRepository.findByResourceKey(authenticatorId);
     }
 
 

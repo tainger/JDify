@@ -34,7 +34,6 @@ public class ModelQueryServiceImpl implements ModelQueryService {
     @Autowired
     private EntityManager entityManager;
 
-
     @Override
     public List<ModelEntity> query(ModelQuery query) {
 

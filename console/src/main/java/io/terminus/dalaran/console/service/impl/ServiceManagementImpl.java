@@ -13,7 +13,7 @@ import io.terminus.dalaran.console.repository.TriggerFlowRepository;
 import io.terminus.dalaran.console.service.ModelManagementService;
 import io.terminus.dalaran.console.service.ServiceManagement;
 import io.terminus.dalaran.console.service.jpa.model.QueryServiceInfo;
-import io.terminus.dalaran.console.util.ResourceKeyUtils;
+import io.terminus.dalaran.console.util.GenerateKeyUtils;
 import io.terminus.dalaran.core.component.DalaranService;
 import io.terminus.dalaran.core.context.DalaranServiceContext;
 import io.terminus.dalaran.core.resource.DalaranResourceBuilder;
@@ -158,7 +158,7 @@ public class ServiceManagementImpl implements ServiceManagement {
         String resourceKey = dto.getId();
         if (StringUtils.isBlank(resourceKey)) {
             entity = new ServiceEntity();
-            resourceKey = ResourceKeyUtils.generateKey();
+            resourceKey = GenerateKeyUtils.resourceKey();
         } else {
             entity = serviceRepository.findByResourceKey(resourceKey);
         }

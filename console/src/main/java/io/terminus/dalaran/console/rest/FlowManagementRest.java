@@ -11,6 +11,7 @@ import io.terminus.dalaran.core.context.DalaranContext;
 import io.terminus.dalaran.exception.flow.CreateFlowException;
 import io.terminus.dalaran.exception.flow.FlowNotExistException;
 import io.terminus.dalaran.exception.flow.UpdateFlowException;
+import io.terminus.dalaran.model.BasicResponse;
 import io.terminus.dalaran.model.CreateResponse;
 import io.terminus.dalaran.model.dto.*;
 import io.terminus.dalaran.model.dto.flow.BindAlarmRuleDto;
@@ -48,7 +49,6 @@ public class FlowManagementRest implements FlowReadAPI, FlowWriteAPI {
     @Autowired
     private DalaranContext dalaranContext;
 
-
     @Override
     @OnException(code = ResponseMessage.FLOW_CREATE_ERROR)
     public CreateResponse create(@RequestBody TriggerFlowDTO model) throws CreateFlowException {
@@ -57,6 +57,11 @@ public class FlowManagementRest implements FlowReadAPI, FlowWriteAPI {
         } catch (Exception e) {
             throw DalaranExceptionBuilder.build(CreateFlowException.class, e.getMessage());
         }
+    }
+
+    @Override
+    public BasicResponse create(TemplatePrecipitationDTO template) throws CreateFlowException {
+        return flowManagementService.createFromTemplate(template);
     }
 
     @Override
@@ -81,6 +86,11 @@ public class FlowManagementRest implements FlowReadAPI, FlowWriteAPI {
     @OnException(code = ResponseMessage.FLOW_CREATE_ERROR)
     public ImportProcessorResult importProcessor(@RequestBody ImportProcessorDTO model) {
         return flowManagementService.importProcessor(model);
+    }
+
+    @Override
+    public BasicResponse checkTemplateVersion(TemplatePrecipitationDTO flow) throws CreateFlowException {
+        return flowManagementService.checkTemplateVersion(flow);
     }
 
     @Override
@@ -159,7 +169,7 @@ public class FlowManagementRest implements FlowReadAPI, FlowWriteAPI {
     }
 
     @Override
-    public CreateResponse saveAsTemplate(TriggerFlowDTO model) throws CreateFlowException {
-        return null;
+    public BasicResponse saveAsTemplate(TemplatePrecipitationDTO flow) {
+        return flowManagementService.saveAsTemplate(flow);
     }
 }

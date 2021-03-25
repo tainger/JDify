@@ -4,6 +4,7 @@ import io.terminus.dalaran.ComponentType;
 import io.terminus.dalaran.config.*;
 import io.terminus.dalaran.core.component.*;
 import io.terminus.dalaran.core.component.annotation.*;
+import io.terminus.dalaran.core.component.config.AuthenticatorConfig;
 import io.terminus.dalaran.core.component.config.ConnectorConfig;
 import io.terminus.dalaran.core.component.config.LimiterConfig;
 import io.terminus.dalaran.core.context.DalaranComponentContext;
@@ -36,6 +37,8 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext {
     private final Map<String, BasicComponentInfo> basicComponentInfoMap = new ConcurrentHashMap<>();
 
     private final Map<String, LimiterInfo> limiterInfoMap = new ConcurrentHashMap<>();
+
+    private final Map<String, AuthenticatorInfo> authenticatorInfoMap = new ConcurrentHashMap<>();
 
     @Override
     public DalaranTrigger getTrigger(String triggerType) {
@@ -119,7 +122,20 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext {
 
     @Override
     public Collection<AuthenticatorInfo> getAllAuthenticatorInfo() {
-        return null;
+        return authenticatorInfoMap.values().stream().map(authenticatorInfo -> {
+            AuthenticatorInfo newAuthenticatorInfo = new AuthenticatorInfo();
+            BeanUtils.copyProperties(authenticatorInfo, newAuthenticatorInfo);
+            List<DalaranConfigField> fields = new ArrayList<>();
+            for (DalaranConfigField configField : newAuthenticatorInfo.getConfigFields()) {
+                DalaranConfigField i18nField = new DalaranConfigField();
+                fields.add(i18nField);
+                BeanUtils.copyProperties(configField, i18nField);
+                i18nField.setLabel(i18nUtils.getAuthenticatorFieldLabel(authenticatorInfo.getName(), configField.getName()));
+            }
+            newAuthenticatorInfo.setConfigFields(fields.toArray(new DalaranConfigField[0]));
+            return newAuthenticatorInfo;
+        }).sorted(Comparator.comparingInt(AuthenticatorInfo::getOrder))
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -169,6 +185,7 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext {
             triggerInfo.setOutdated(i != 0);
             triggerInfo.setType(triggerType);
             triggerInfo.setName(triggerType);
+            triggerInfo.setOrigin(triggerAnnotation.origin());
             triggerInfo.setOrder(triggerAnnotation.order());
             triggerInfo.setConfigFields(configFields);
             triggerInfo.setConfigType(triggerAnnotation.configType());
@@ -196,6 +213,17 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext {
                 }
             }
 
+            Class authenticatorType = getConfigType(triggerAnnotation.configType(), AuthenticatorConfig.class);
+            if (authenticatorType != null) {
+                Authenticator authenticator = (Authenticator) authenticatorType.getDeclaredAnnotation(Authenticator.class);
+                if (authenticator != null) {
+                    AuthenticatorInfo authenticatorInfo = buildAuthenticatorInfo(authenticatorType, authenticator, triggerType);
+                    triggerInfo.setAuthenticatorInfo(authenticatorInfo);
+                    triggerInfo.setAuthenticatorType(authenticator.value());
+                }
+            }
+
+
             if (trigger instanceof DalaranTriggerApiDocExport) {
                 triggerInfo.setApiDocs(true);
             }
@@ -219,6 +247,7 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext {
             processorInfo.setType(processorType);
 
             processorInfo.setName(processorType);
+            processorInfo.setOrigin(processorAnnotation.origin());
             processorInfo.setOrder(processorAnnotation.order());
             processorInfo.setConfigFields(configFields);
             processorInfo.setConfigType(processorAnnotation.configType());
@@ -232,7 +261,6 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext {
                     ConnectorInfo connectorInfo = buildConnectorInfo(ComponentType.Processor, connectorType, connector, processorType);
                     processorInfo.setConnectorInfo(connectorInfo);
                     processorInfo.setConnectorType(connector.value());
-
                 }
             }
 
@@ -284,6 +312,21 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext {
         return limiterInfo;
     }
 
+    private AuthenticatorInfo buildAuthenticatorInfo(Class authenticatorType, Authenticator authenticator, String componentName) {
+        AuthenticatorInfo authenticatorInfo = authenticatorInfoMap.computeIfAbsent(authenticator.value(), key -> {
+            DalaranConfigField[] authenticatorFields = ConfigFieldUtils.buildConfigFields(authenticatorType);
+            AuthenticatorInfo newAuthenticatorInfo = new AuthenticatorInfo();
+            newAuthenticatorInfo.setName(authenticator.value());
+            newAuthenticatorInfo.setOrder(authenticator.order());
+            newAuthenticatorInfo.setClassType(authenticatorType);
+            newAuthenticatorInfo.setType(authenticator.value());
+            newAuthenticatorInfo.setConfigFields(authenticatorFields);
+            return newAuthenticatorInfo;
+        });
+        authenticatorInfo.addComponent(componentName);
+        return authenticatorInfo;
+    }
+
     private Class getConfigType(Class type, Class configType) {
         for (Type genericInterface : type.getGenericInterfaces()) {
             if (!(genericInterface instanceof ParameterizedType)) {
@@ -291,7 +334,7 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext {
             }
             Class rawType = (Class) ((ParameterizedType) genericInterface).getRawType();
             if (rawType != configType) {
-                return null;
+                continue;
             }
             Type[] parameterizedType = ((ParameterizedType) genericInterface).getActualTypeArguments();
             if (parameterizedType.length == 1) {

@@ -9,16 +9,14 @@ import io.terminus.dalaran.console.repository.TriggerFlowAlarmRuleRepository;
 import io.terminus.dalaran.console.repository.TriggerFlowRepository;
 import io.terminus.dalaran.console.service.AlarmRuleService;
 import io.terminus.dalaran.console.service.jpa.model.QueryAlarmRuleInfo;
-import io.terminus.dalaran.console.util.ResourceKeyUtils;
+import io.terminus.dalaran.console.util.GenerateKeyUtils;
 import io.terminus.dalaran.core.resource.redis.RedisService;
 import io.terminus.dalaran.core.resource.redis.RedisUtil;
 import io.terminus.dalaran.model.dto.AlarmRuleDTO;
 import io.terminus.dalaran.model.dto.TriggerAlarmRuleDTO;
 import io.terminus.dalaran.model.dto.basic.BasicAlarmInfo;
 import io.terminus.dalaran.model.query.AlarmRuleQuery;
-import io.terminus.dalaran.response.ResponseResult;
 import org.apache.commons.beanutils.BeanUtils;
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -178,7 +176,7 @@ public class AlarmRuleServiceImpl implements AlarmRuleService , InitializingBean
             entity = alarmRuleRepository.findByResourceKey(resourceKey);
         } else {
             entity = new AlarmRuleEntity();
-            resourceKey = ResourceKeyUtils.generateKey();
+            resourceKey = GenerateKeyUtils.resourceKey();
             entity.setCreatedAt(new Date());
         }
         entity.setUpdatedAt(new Date());

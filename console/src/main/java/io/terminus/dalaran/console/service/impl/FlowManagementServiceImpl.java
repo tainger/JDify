@@ -1,30 +1,42 @@
 package io.terminus.dalaran.console.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import io.terminus.dalaran.DalaranConstants;
 import io.terminus.dalaran.ModelImportMode;
+import io.terminus.dalaran.config.ProcessorInfo;
+import io.terminus.dalaran.config.TriggerInfo;
 import io.terminus.dalaran.console.TestFlowInitializer;
 import io.terminus.dalaran.console.convertor.FlowConvertor;
-import io.terminus.dalaran.console.entity.ModelEntity;
-import io.terminus.dalaran.console.entity.TriggerFlowAlarmRuleEntity;
-import io.terminus.dalaran.console.entity.TriggerFlowEntity;
-import io.terminus.dalaran.console.repository.ModelRepository;
-import io.terminus.dalaran.console.repository.PropertyRepository;
-import io.terminus.dalaran.console.repository.TriggerFlowAlarmRuleRepository;
-import io.terminus.dalaran.console.repository.TriggerFlowRepository;
+import io.terminus.dalaran.console.entity.*;
+import io.terminus.dalaran.console.model.FlowTemplate;
+import io.terminus.dalaran.console.model.TemplateData;
+import io.terminus.dalaran.console.repository.*;
 import io.terminus.dalaran.console.service.FlowManagementService;
 import io.terminus.dalaran.console.service.ModelManagementService;
+import io.terminus.dalaran.console.service.PrivateRepositoryService;
 import io.terminus.dalaran.console.service.jpa.FlowQueryService;
-import io.terminus.dalaran.console.util.ResourceKeyUtils;
+import io.terminus.dalaran.console.service.jpa.PrivateResourceQueryService;
+import io.terminus.dalaran.console.util.GenerateKeyUtils;
+import io.terminus.dalaran.core.component.config.*;
 import io.terminus.dalaran.core.context.DalaranContext;
 import io.terminus.dalaran.core.flow.DalaranFlowBuilder;
 import io.terminus.dalaran.core.resource.DalaranResourceBuilder;
+import io.terminus.dalaran.core.resource.DalaranResourceLoader;
+import io.terminus.dalaran.core.resource.entity.ModelAbstractEntity;
+import io.terminus.dalaran.core.resource.entity.TriggerFlowAbstractEntity;
+import io.terminus.dalaran.core.resource.entity.basic.BasicFlowEntity;
+import io.terminus.dalaran.core.resource.entity.common.PrivateRepositoryEntity;
 import io.terminus.dalaran.core.resource.entity.common.ProcessorEntity;
 import io.terminus.dalaran.core.resource.entity.released.TriggerFlowReleasedEntity;
+import io.terminus.dalaran.core.resource.property.PropertyService;
 import io.terminus.dalaran.core.resource.redis.RedisService;
 import io.terminus.dalaran.core.resource.redis.RedisUtil;
 import io.terminus.dalaran.core.resource.repository.ModuleRepository;
+import io.terminus.dalaran.core.resource.repository.PrivateRepositoryRepository;
 import io.terminus.dalaran.core.resource.repository.TriggerFlowReleasedRepository;
 import io.terminus.dalaran.exception.flow.FlowNotExistException;
+import io.terminus.dalaran.model.BasicResponse;
+import io.terminus.dalaran.model.ModelTargetType;
 import io.terminus.dalaran.model.dto.*;
 import io.terminus.dalaran.model.dto.basic.BasicFlowInfo;
 import io.terminus.dalaran.model.dto.flow.BindAlarmRuleDto;
@@ -39,16 +51,21 @@ import io.terminus.dalaran.response.ResponseErrorMsg;
 import io.terminus.dalaran.response.ResponseResult;
 import io.terminus.draco.web.autoconfig.context.UserContext;
 import org.apache.camel.CamelContext;
+import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static io.terminus.dalaran.DalaranConstants.FLOW_TEMPLATE;
+import static io.terminus.dalaran.DalaranConstants.SUB_FLOW_TEMPLATE;
 
 @Service
 @Transactional
@@ -73,6 +90,18 @@ public class FlowManagementServiceImpl implements FlowManagementService {
     private ModelRepository modelRepository;
 
     @Autowired
+    private ConnectorRepository connectorRepository;
+
+    @Autowired
+    private FunctionRepository functionRepository;
+
+    @Autowired
+    private ServiceRepository serviceRepository;
+
+    @Autowired
+    private SubFlowRepository subFlowRepository;
+
+    @Autowired
     private TestFlowInitializer testFlowInitializer;
 
     @Autowired
@@ -80,6 +109,9 @@ public class FlowManagementServiceImpl implements FlowManagementService {
 
     @Autowired
     private DalaranResourceBuilder resourceBuilder;
+
+    @Autowired
+    private DalaranResourceLoader resourceLoader;
 
     @Autowired
     private ModelManagementService modelService;
@@ -93,10 +125,38 @@ public class FlowManagementServiceImpl implements FlowManagementService {
     @Autowired
     private RedisService redisService;
 
-
     @Autowired
     private TriggerFlowAlarmRuleRepository triggerFlowAlarmRuleRepository;
 
+    @Autowired
+    private PrivateRepositoryService privateRepositoryService;
+
+    @Autowired
+    private PrivateRepositoryRepository privateRepositoryRepository;
+
+    @Autowired
+    private PropertyService propertyService;
+
+    @Autowired
+    private PrivateModelRepository privateModelRepository;
+
+    @Autowired
+    private PrivateConnectorRepository privateConnectorRepository;
+
+    @Autowired
+    private PrivateFunctionRepository privateFunctionRepository;
+
+    @Autowired
+    private PrivateServiceRepository privateServiceRepository;
+
+    @Autowired
+    private PrivateSubFlowRepository privateSubFlowRepository;
+
+    @Autowired
+    private PrivatePackageRepository privatePackageRepository;
+
+    @Autowired
+    private PrivateResourceQueryService privateResourceQueryService;
 
     private final FlowConvertor flowConvertor = new FlowConvertor();
 
@@ -134,6 +194,146 @@ public class FlowManagementServiceImpl implements FlowManagementService {
             testFlowInitializer.reloadTestTriggerFlow(id);
         }
         return id;
+    }
+
+    @Override
+    public BasicResponse createFromTemplate(TemplatePrecipitationDTO template) {
+        PrivateRepositoryEntity entity = privateRepositoryRepository.findByResourceKeyAndVersion(template.getId(), template.getVersion());
+        TemplateData templateData = JSON.parseObject(entity.getData(), TemplateData.class);
+        Map<String, String> resourceKeyMap = new HashMap<>();
+        TriggerFlowEntity triggerFlowEntity = new TriggerFlowEntity();
+        try {
+            copyResourceFromPrivateRepo(templateData, resourceKeyMap, template.getModuleId());
+            BeanUtils.copyProperties(triggerFlowEntity, templateData);
+            String oldConfig = JSON.toJSONString(triggerFlowEntity);
+            String newConfig = StringUtils.replaceEach(oldConfig, ArrayUtils.toStringArray(resourceKeyMap.keySet().toArray()), ArrayUtils.toStringArray(resourceKeyMap.values().toArray()));
+            triggerFlowEntity = JSON.parseObject(newConfig, TriggerFlowEntity.class);
+            triggerFlowEntity.setResourceKey(GenerateKeyUtils.resourceKey(propertyService.getTenantCode()));
+            triggerFlowEntity.setCreatedFrom(entity.getResourceKey());
+            triggerFlowEntity.setModuleId(template.getModuleId());
+            triggerFlowEntity.setId(null);
+            String id = flowRepository.save(triggerFlowEntity).getResourceKey();
+            return new BasicResponse(true, id);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new BasicResponse(false, e.getMessage());
+        }
+    }
+
+    private void copyResourceFromPrivateRepo(TemplateData templateData, Map<String, String> resourceKeyMap, String moduleId) throws Exception {
+        Map<String, ModelEntity> models = templateData.getRelationModel();
+        for (Map.Entry<String, ModelEntity> entityEntry: models.entrySet()) {
+            if (modelRepository.findByResourceKey(entityEntry.getKey()) != null) {
+                continue;
+            }
+            ModelEntity modelEntity = new ModelEntity();
+            BeanUtils.copyProperties(modelEntity, entityEntry.getValue());
+            String newResourceKey = GenerateKeyUtils.resourceKey(propertyService.getTenantCode());
+            modelEntity.setResourceKey(newResourceKey);
+            modelEntity.setCreatedFrom(entityEntry.getValue().getResourceKey());
+            modelEntity.setModuleId(moduleId);
+            modelEntity.setId(null);
+            modelRepository.save(modelEntity);
+            resourceKeyMap.put(entityEntry.getKey(), newResourceKey);
+        }
+
+        Map<String, ConnectorEntity> connectors = templateData.getRelationConnector();
+        for (Map.Entry<String, ConnectorEntity> entityEntry: connectors.entrySet()) {
+            if (connectorRepository.findByResourceKey(entityEntry.getKey()) != null) {
+                continue;
+            }
+            ConnectorEntity connectorEntity = new ConnectorEntity();
+            BeanUtils.copyProperties(connectorEntity, entityEntry.getValue());
+            String newResourceKey = GenerateKeyUtils.resourceKey(propertyService.getTenantCode());
+            connectorEntity.setResourceKey(newResourceKey);
+            connectorEntity.setCreatedFrom(entityEntry.getValue().getResourceKey());
+            connectorEntity.setModuleId(moduleId);
+            connectorEntity.setId(null);
+            connectorRepository.save(connectorEntity);
+            resourceKeyMap.put(entityEntry.getKey(), newResourceKey);
+        }
+
+        Map<String, FunctionEntity> functions = templateData.getRelationFunction();
+        for (Map.Entry<String, FunctionEntity> entityEntry: functions.entrySet()) {
+            if (functionRepository.findByResourceKey(entityEntry.getKey()) != null) {
+                continue;
+            }
+            FunctionEntity functionEntity = new FunctionEntity();
+            BeanUtils.copyProperties(functionEntity, entityEntry.getValue());
+            String newResourceKey = GenerateKeyUtils.resourceKey(propertyService.getTenantCode());
+            functionEntity.setResourceKey(newResourceKey);
+            functionEntity.setCreatedFrom(entityEntry.getValue().getResourceKey());
+            functionEntity.setModuleId(moduleId);
+            functionEntity.setId(null);
+            functionRepository.save(functionEntity);
+            resourceKeyMap.put(entityEntry.getKey(), newResourceKey);
+        }
+
+        Map<String, ServiceEntity> services = templateData.getRelationService();
+        for (Map.Entry<String, ServiceEntity> entityEntry: services.entrySet()) {
+            if (serviceRepository.findByResourceKey(entityEntry.getKey()) != null) {
+                continue;
+            }
+            ServiceEntity serviceEntity = new ServiceEntity();
+            BeanUtils.copyProperties(serviceEntity, entityEntry.getValue());
+            String newResourceKey = GenerateKeyUtils.resourceKey(propertyService.getTenantCode());
+            serviceEntity.setResourceKey(newResourceKey);
+            serviceEntity.setCreatedFrom(entityEntry.getValue().getResourceKey());
+            serviceEntity.setModuleId(moduleId);
+            serviceEntity.setId(null);
+            serviceRepository.save(serviceEntity);
+            resourceKeyMap.put(entityEntry.getKey(), newResourceKey);
+        }
+
+        Map<String, SubFlowEntity> subflows = templateData.getRelationSubFlow();
+        for (Map.Entry<String, SubFlowEntity> entityEntry: subflows.entrySet()) {
+            if (subFlowRepository.findByResourceKey(entityEntry.getKey()) != null) {
+                continue;
+            }
+            SubFlowEntity subflowEntity = new SubFlowEntity();
+            BeanUtils.copyProperties(subflowEntity, entityEntry.getValue());
+            String newResourceKey = GenerateKeyUtils.resourceKey(propertyService.getTenantCode());
+            subflowEntity.setResourceKey(newResourceKey);
+            subflowEntity.setCreatedFrom(entityEntry.getValue().getResourceKey());
+            subflowEntity.setModuleId(moduleId);
+            subflowEntity.setId(null);
+            subFlowRepository.save(subflowEntity);
+            resourceKeyMap.put(entityEntry.getKey(), newResourceKey);
+        }
+    }
+
+    @Override
+    public BasicResponse saveAsTemplate(TemplatePrecipitationDTO flow) {
+        FlowTemplate flowTemplate = new FlowTemplate();
+        if (privateRepositoryRepository.findByResourceKeyAndVersion(flow.getId(), flow.getVersion()) != null) {
+            return new BasicResponse(false, "Template is exist!");
+        }
+
+        BasicFlowEntity abstractEntity;
+        switch (flow.getType()) {
+            case FLOW_TEMPLATE:
+                abstractEntity = resourceLoader.loadTriggerFlow(flow.getId());
+                break;
+            case SUB_FLOW_TEMPLATE:
+            default:
+                abstractEntity = resourceLoader.loadSubFlow(flow.getId());
+        }
+        TemplateData templateData = buildFlowTemplate(abstractEntity);
+        flowTemplate.setVersion(flow.getVersion());
+        flowTemplate.setId(flow.getId());
+        flowTemplate.setData(templateData);
+        flowTemplate.setName(abstractEntity.getName());
+        flowTemplate.setTenantCode(propertyService.getTenantCode());
+        flowTemplate.setType(FLOW_TEMPLATE);
+        return privateRepositoryService.saveTemplate(flowTemplate);
+    }
+
+    @Override
+    public BasicResponse checkTemplateVersion(TemplatePrecipitationDTO flow) {
+        if (privateRepositoryRepository.findByResourceKeyAndVersion(flow.getId(), flow.getVersion()) != null) {
+            return new BasicResponse(false, "version: " + flow.getVersion() + " is exist");
+        }
+        return new BasicResponse(true);
     }
 
     // TODO 很多重复内容 逻辑也比较尴尬, 各种 magic, 先测试一波, 有时间改改
@@ -316,7 +516,6 @@ public class FlowManagementServiceImpl implements FlowManagementService {
         for (TriggerFlowEntity entity : entities) {
             models.add(flowConvertor.toDTO(entity));
         }
-
         return models;
     }
 
@@ -327,7 +526,6 @@ public class FlowManagementServiceImpl implements FlowManagementService {
         for (TriggerFlowEntity entity : entities) {
             models.add(flowConvertor.toDTO(entity));
         }
-
         return models;
     }
 
@@ -358,7 +556,11 @@ public class FlowManagementServiceImpl implements FlowManagementService {
         TriggerFlowEntity flowEntity = flowRepository.findByResourceKey(copyFlow.getId());
 
         TriggerFlowEntity newFlowEntity = new TriggerFlowEntity();
-        BeanUtils.copyProperties(flowEntity, newFlowEntity);
+        try {
+            BeanUtils.copyProperties(flowEntity, newFlowEntity);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         newFlowEntity.setId(null);
         newFlowEntity.setName(copyFlow.getName());
         newFlowEntity.setResourceKey("copy_" + copyFlow.getId() + "_" + RandomStringUtils.random(4, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMN"));
@@ -487,17 +689,17 @@ public class FlowManagementServiceImpl implements FlowManagementService {
         flowEntity.setTriggerConfig(JSON.toJSONString(triggerFlow.getTriggerConfig()));
         flowEntity.setModuleId(triggerFlow.getModuleId());
         if (triggerFlow.getTriggerConfig().get("inModelId") != null) {
-            flowEntity.setInModel((JSON.toJSONString(triggerFlow.getTriggerConfig().get("inModelId"))));
+            flowEntity.setInModel((String) triggerFlow.getTriggerConfig().get("inModelId"));
         }
         if (triggerFlow.getTriggerConfig().get("outModelId") != null) {
-            flowEntity.setOutModel((JSON.toJSONString(triggerFlow.getTriggerConfig().get("outModelId"))));
+            flowEntity.setOutModel((String)triggerFlow.getTriggerConfig().get("outModelId"));
         }
         flowEntity.setPipeline(pipeline);
         flowEntity.setTracing(triggerFlow.isTracing());
         flowEntity.setDescription(triggerFlow.getDescription());
         String resourceKey = triggerFlow.getId();
         if (StringUtils.isBlank(resourceKey)) {
-            resourceKey = ResourceKeyUtils.generateKey();
+            resourceKey = GenerateKeyUtils.resourceKey();
         }
         flowEntity.setResourceKey(resourceKey);
         flowEntity.setUpdatedAt(new Date());
@@ -516,9 +718,205 @@ public class FlowManagementServiceImpl implements FlowManagementService {
 
     private List<String> getSoapOperations() {
         List<TriggerFlowEntity> soapFlowList = flowRepository.findByStatusNotAndTriggerTypeAndIsExistTrue(FlowStatus.Error, "soap-listener");
-        return soapFlowList.stream().map(flowEntity -> {
-            return flowEntity.getName().trim();
-        }).collect(Collectors.toList());
+        return soapFlowList.stream().map(flowEntity -> flowEntity.getName().trim()).collect(Collectors.toList());
+    }
+
+    private TemplateData buildFlowTemplate(BasicFlowEntity origin) {
+        TemplateData templateData = new TemplateData();
+        try {
+            BeanUtils.copyProperties(templateData, origin);
+            buildTemplateRelationResource(templateData, origin);
+            saveRelationResource(templateData);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return templateData;
+    }
+
+    private void saveRelationResource(TemplateData templateData) throws Exception {
+        Map<String, ModelEntity> models = templateData.getRelationModel();
+        if (MapUtils.isNotEmpty(models)) {
+            for (ModelEntity entity: models.values()) {
+                savePrivateResource(entity, DalaranConstants.MODEL);
+            }
+        }
+
+        Map<String, ConnectorEntity> connectors = templateData.getRelationConnector();
+        if (MapUtils.isNotEmpty(connectors)) {
+            for (ConnectorEntity entity: connectors.values()) {
+                savePrivateResource(entity, DalaranConstants.CONNECTOR);
+            }
+        }
+
+        Map<String, ServiceEntity> services = templateData.getRelationService();
+        if (MapUtils.isNotEmpty(services)) {
+            for (ServiceEntity entity: services.values()) {
+                savePrivateResource(entity, DalaranConstants.SERVICE);
+            }
+        }
+
+        Map<String, PrivatePackageEntity> packages = templateData.getRelationPackage();
+        if (MapUtils.isNotEmpty(packages)) {
+            for (PrivatePackageEntity entity: packages.values()) {
+                savePrivateResource(entity, DalaranConstants.PACKAGE);
+            }
+        }
+
+        Map<String, FunctionEntity> functions = templateData.getRelationFunction();
+        if (MapUtils.isNotEmpty(functions)) {
+            for (FunctionEntity entity: functions.values()) {
+                savePrivateResource(entity, DalaranConstants.FUNCTION);
+            }
+        }
+
+        Map<String, SubFlowEntity> subflows = templateData.getRelationSubFlow();
+        if (MapUtils.isNotEmpty(subflows)) {
+            for (SubFlowEntity entity: subflows.values()) {
+                savePrivateResource(entity, DalaranConstants.SUB_FLOW);
+            }
+        }
+    }
+
+    private void buildTemplateRelationResource(TemplateData templateData, BasicFlowEntity origin) throws Exception {
+        Map models = templateData.getRelationModel();
+        Map connectors = templateData.getRelationConnector();
+        Map services = templateData.getRelationService();
+        Map packages = templateData.getRelationPackage();
+        String inModelId = origin.getInModel();
+        String outModelId = origin.getOutModel();
+        if (StringUtils.isNotBlank(inModelId)) {
+            ModelAbstractEntity abstractEntity = resourceLoader.loadModel(inModelId);
+            models.put(inModelId, abstractEntity);
+        }
+        if (StringUtils.isNotBlank(outModelId)) {
+            ModelAbstractEntity abstractEntity = resourceLoader.loadModel(outModelId);
+            models.put(outModelId, abstractEntity);
+        }
+
+        if (origin instanceof TriggerFlowAbstractEntity) {
+            TriggerInfo triggerInfo = dalaranContext.getDalaranComponentContext().getTriggerInfo(((TriggerFlowAbstractEntity)origin).getTriggerType());
+            if (StringUtils.equalsIgnoreCase(triggerInfo.getOrigin(), DalaranConstants.PARTNER)) {
+                PrivateRepositoryEntity privateRepositoryEntity = privateRepositoryRepository.findByNameAndType(triggerInfo.getName(), DalaranConstants.TRIGGER);
+                if (privateRepositoryEntity != null) {
+                    packages.put(privateRepositoryEntity.getResourceKey(), privateRepositoryEntity);
+                }
+            }
+
+            Object config = resourceBuilder.buildConfig(((TriggerFlowAbstractEntity)origin).getTriggerConfig(), triggerInfo.getConfigType());
+            if (config instanceof ConnectorConfig) {
+                ConnectorConfig connectorConfig = (ConnectorConfig) config;
+                String connectorId = connectorConfig.getConnectorId();
+                if (StringUtils.isNotBlank(connectorId)) {
+                    connectors.put(connectorId, resourceLoader.loadConnector(connectorId));
+                }
+            }
+        }
+
+        for (ProcessorEntity processorEntity : origin.getPipeline()) {
+            ProcessorInfo processorInfo = dalaranContext.getDalaranComponentContext().getProcessorInfo(processorEntity.getType());
+            if (StringUtils.equalsIgnoreCase(processorInfo.getOrigin(), DalaranConstants.PARTNER)) {
+                PrivateRepositoryEntity privateRepositoryEntity = privateRepositoryRepository.findByNameAndType(processorInfo.getName(), DalaranConstants.PROCESSOR);
+                if (privateRepositoryEntity != null) {
+                    packages.put(privateRepositoryEntity.getResourceKey() + "#" + privateRepositoryEntity.getVersion(), privateRepositoryEntity);
+                }
+            }
+
+            Object processorConfig = resourceBuilder.buildConfig(processorEntity.getConfig(), processorInfo.getConfigType());
+            parseProcessorModel(processorConfig, models);
+            if (processorConfig instanceof ConnectorConfig) {
+                ConnectorConfig connectorConfig = (ConnectorConfig) processorConfig;
+                String connectorId = connectorConfig.getConnectorId();
+                if (StringUtils.isNotBlank(connectorId)) {
+                    connectors.put(connectorId, resourceLoader.loadConnector(connectorId));
+                }
+            }
+            if (processorConfig instanceof ServiceOperationConfig) {
+                ServiceOperationConfig serviceOperationConfig = (ServiceOperationConfig) processorConfig;
+                String serviceId = null;
+                if(StringUtils.isNotBlank(serviceOperationConfig.getServiceId())) {
+                    serviceId =  serviceOperationConfig.getServiceId();
+                }
+                if (StringUtils.isNotBlank(serviceId)) {
+                    services.put(serviceId, resourceLoader.loadService(serviceId));
+                }
+                List<ModelEntity> serviceModels = modelRepository.findByTargetTypeAndTargetId(ModelTargetType.Service, serviceId);
+                serviceModels.forEach(modelEntity -> models.put(modelEntity.getResourceKey(), modelEntity));
+            }
+        }
+    }
+
+    private void parseProcessorModel(Object config, Map models) {
+        if (config instanceof OutModelConfig) {
+            OutModelConfig outModelConfig = (OutModelConfig) config;
+            String outModelId = outModelConfig.getOutModelId();
+            if (StringUtils.isBlank(outModelId)) {
+                return;
+            }
+            models.put(outModelId, resourceLoader.loadModel(outModelId));
+        }
+        if (config instanceof AllModelConfig) {
+            AllModelConfig allModelConfig = (AllModelConfig) config;
+            String inModelId = allModelConfig.getInModelId();
+            if (StringUtils.isNotBlank(inModelId)) {
+                models.put(inModelId, resourceLoader.loadModel(inModelId));
+            }
+            String outModelId = allModelConfig.getOutModelId();
+            if (StringUtils.isNotBlank(outModelId)) {
+                models.put(outModelId, resourceLoader.loadModel(outModelId));
+            }
+        }
+        if (config instanceof ImmutableInModelConfig) {
+            ImmutableInModelConfig immutableInModelConfig = (ImmutableInModelConfig) config;
+            String inModelId = immutableInModelConfig.getInModelId();
+            if (StringUtils.isNotBlank(inModelId)) {
+                models.put(inModelId, resourceLoader.loadModel(inModelId));
+            }
+            String outModelId = immutableInModelConfig.getOutModelId();
+            if (StringUtils.isNotBlank(outModelId)) {
+                models.put(outModelId, resourceLoader.loadModel(outModelId));
+            }
+        }
+    }
+
+    private void savePrivateResource(Object origin, String type) throws Exception {
+        switch (type) {
+            case "model":
+                PrivateModelEntity privateModelEntity = new PrivateModelEntity();
+                BeanUtils.copyProperties(privateModelEntity, origin);
+                privateModelEntity.setId(null);
+                privateModelRepository.save(privateModelEntity);
+                break;
+            case "connector":
+                PrivateConnectorEntity privateConnectorEntity = new PrivateConnectorEntity();
+                BeanUtils.copyProperties(privateConnectorEntity, origin);
+                privateConnectorEntity.setId(null);
+                privateConnectorRepository.save(privateConnectorEntity);
+                break;
+            case "service":
+                PrivateServiceEntity privateServiceEntity = new PrivateServiceEntity();
+                BeanUtils.copyProperties(privateServiceEntity, origin);
+                privateServiceEntity.setId(null);
+                privateServiceRepository.save(privateServiceEntity);
+                break;
+            case "function":
+                PrivateFunctionEntity privateFunctionEntity = new PrivateFunctionEntity();
+                BeanUtils.copyProperties(privateFunctionEntity, origin);
+                privateFunctionEntity.setId(null);
+                privateFunctionRepository.save(privateFunctionEntity);
+                break;
+            case "subflow":
+                PrivateSubFlowEntity privateSubFlowEntity = new PrivateSubFlowEntity();
+                BeanUtils.copyProperties(privateSubFlowEntity, origin);
+                privateSubFlowEntity.setId(null);
+                privateSubFlowRepository.save(privateSubFlowEntity);
+                break;
+            case "package":
+                PrivatePackageEntity privatePackageEntity = new PrivatePackageEntity();
+                BeanUtils.copyProperties(privatePackageEntity, origin);
+                privatePackageEntity.setId(null);
+                privatePackageRepository.save(privatePackageEntity);
+                break;
+        }
     }
 
     private void setCreatedBy(TriggerFlowEntity triggerFlowEntity) {

@@ -1,6 +1,7 @@
 package io.terminus.dalaran.component.http.trigger;
 
 import io.swagger.models.Swagger;
+import io.terminus.dalaran.component.authenticator.AuthenticatorRestConfig;
 import io.terminus.dalaran.component.authenticator.DalaranAuthenticator;
 import io.terminus.dalaran.component.common.HttpMethod;
 import io.terminus.dalaran.component.common.LimitOperation;
@@ -17,6 +18,7 @@ import io.terminus.dalaran.core.component.annotation.Trigger;
 import io.terminus.dalaran.core.context.DalaranClientContext;
 import io.terminus.dalaran.core.flow.DalaranRoute;
 import io.terminus.dalaran.core.log.TracingErrorHandlerFactory;
+import io.terminus.dalaran.core.resource.redis.RedisService;
 import io.terminus.dalaran.model.HttpProtocol;
 import io.terminus.dalaran.model.flow.TriggerFlow;
 import lombok.val;
@@ -45,6 +47,9 @@ public class RestListener implements DalaranTrigger<RestConfig>, DalaranTriggerA
     @Autowired
     private DalaranClientContext clientContext;
 
+    @Autowired
+    private RedisService redisService;
+
     @Override
     public void buildFromRoute(RouteDefinition route, RestConfig config) {
         String protocol = config.getProtocol().name();
@@ -66,25 +71,10 @@ public class RestListener implements DalaranTrigger<RestConfig>, DalaranTriggerA
             return;
         }
 
-//        if (config.getMethod().isNoBody()) {
-//            if (config.isEnableSign()) {
-//                route.process(new QueryStringSignProcessor(clientContext.getAllClient(), config.isCheckSign()));
-//            } else {
-//                route.process(new QueryStringConvertProcessor());
-//            }
-//            // TODO 目前会多一次序列化, 如果下个节点要求的是非序列化对象, 会有额外的性能开销
-//            route.marshal().json(JsonLibrary.Fastjson);
-//        } else {
-//            if (config.isEnableSign()) {
-//                route.unmarshal().json(JsonLibrary.Fastjson);
-//                route.process(new SignProcessor(clientContext.getAllClient(), config.isCheckSign()));
-//            }
-//            route.convertBodyTo(String.class);
-//        }
         DalaranAuthenticator authenticator = config.getAuthenticator();
         if (config.getMethod().isNoBody()) {
             if (StringUtils.isNotBlank(config.getAuthenticatorId())) {
-                route.process(new QueryProcessor(authenticator));
+                route.process(new QueryProcessor(authenticator, redisService));
             } else {
                 route.process(new QueryStringConvertProcessor());
             }
@@ -92,7 +82,7 @@ public class RestListener implements DalaranTrigger<RestConfig>, DalaranTriggerA
         } else {
             if (StringUtils.isNotBlank(config.getAuthenticatorId())) {
                 route.unmarshal().json(JsonLibrary.Fastjson);
-                route.process(new AuthenticatorProcessor(authenticator));
+                route.process(new AuthenticatorProcessor(authenticator, redisService));
             }
             route.convertBodyTo(String.class);
         }

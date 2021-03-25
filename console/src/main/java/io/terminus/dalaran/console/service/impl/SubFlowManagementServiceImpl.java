@@ -7,7 +7,7 @@ import io.terminus.dalaran.console.entity.SubFlowEntity;
 import io.terminus.dalaran.console.repository.SubFlowRepository;
 import io.terminus.dalaran.console.service.SubFlowManagementService;
 import io.terminus.dalaran.console.service.jpa.SubFlowQueryService;
-import io.terminus.dalaran.console.util.ResourceKeyUtils;
+import io.terminus.dalaran.console.util.GenerateKeyUtils;
 import io.terminus.dalaran.core.flow.DalaranFlowBuilder;
 import io.terminus.dalaran.core.resource.DalaranResourceBuilder;
 import io.terminus.dalaran.core.resource.entity.common.ProcessorEntity;
@@ -160,7 +160,7 @@ public class SubFlowManagementServiceImpl implements SubFlowManagementService {
             flowEntity = subFlowRepository.findByResourceKey(resourceKey);
         } else {
             flowEntity = new SubFlowEntity();
-            resourceKey = ResourceKeyUtils.generateKey();
+            resourceKey = GenerateKeyUtils.resourceKey();
         }
         List<ProcessorEntity> pipeline = model.getPipeline().stream().map(processor -> {
             ProcessorEntity processorEntity = new ProcessorEntity();

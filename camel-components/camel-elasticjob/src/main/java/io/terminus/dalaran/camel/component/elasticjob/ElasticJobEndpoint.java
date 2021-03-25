@@ -36,18 +36,6 @@ public class ElasticJobEndpoint extends ProcessorEndpoint {
     @Metadata(required = "true")
     private Integer shardingTotalCount;
 
-    @UriParam(description = "数据库url", javaType = "java.lang.String")
-    @Metadata(required = "true")
-    private String url;
-
-    @UriParam(description = "数据库用户名", javaType = "java.lang.String")
-    @Metadata(required = "true")
-    private String username;
-
-    @UriParam(description = "数据库密码", javaType = "java.lang.String")
-    @Metadata(required = "true")
-    private String password;
-
     public String getServerLists() {
         return serverLists;
     }
@@ -88,37 +76,13 @@ public class ElasticJobEndpoint extends ProcessorEndpoint {
         this.shardingTotalCount = shardingTotalCount;
     }
 
-    public String getUrl() {
-        return url;
-    }
-
-    public void setUrl(String url) {
-        this.url = url;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
 
     public ElasticJobEndpoint() {
     }
 
     @Override
     protected String createEndpointUri() {
-        return "elasticjob://" + serverLists + "." + namespace + "." + jobName + "." + cron + "." + shardingTotalCount
-                + "." + url + "." + username + "." + password;
+        return "elasticjob://" + serverLists + "." + namespace + "." + jobName + "." + cron + "." + shardingTotalCount;
     }
 
     @Override

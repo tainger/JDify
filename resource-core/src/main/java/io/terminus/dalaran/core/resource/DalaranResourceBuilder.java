@@ -35,6 +35,10 @@ public interface DalaranResourceBuilder {
 
     Object buildLimiterConfig(String limiterId, Class limiterConfigType);
 
+    Object buildAuthenticatorConfig(String authenticatorId, Class authenticatorConfigType);
+
     Object buildServiceConfig(ServiceAbstractEntity serviceEntity);
+
+    <T> T buildConfig(String configValue, Class<T> configType);
 
 }

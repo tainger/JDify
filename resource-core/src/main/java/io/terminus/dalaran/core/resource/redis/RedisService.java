@@ -4,12 +4,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
-import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 
 @Component
 public class RedisService {
-
 
     @Autowired
     private RedisTemplate<String, String> redisTemplate;
@@ -59,6 +57,5 @@ public class RedisService {
     public Boolean deleteKey(String key) {
         return redisTemplate.delete(key);
     }
-
 
 }

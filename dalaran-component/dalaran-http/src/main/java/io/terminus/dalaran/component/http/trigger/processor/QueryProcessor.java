@@ -3,29 +3,29 @@ package io.terminus.dalaran.component.http.trigger.processor;
 
 import com.google.common.base.Splitter;
 import io.terminus.dalaran.component.authenticator.DalaranAuthenticator;
-import io.terminus.dalaran.component.basic.BasicAuthenticator;
+import io.terminus.dalaran.core.resource.redis.RedisService;
 import org.apache.camel.Exchange;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Map;
 
-import static io.terminus.dalaran.component.http.trigger.utils.SignUtils.stopExchangeOnMissingAppKey;
 
 public class QueryProcessor extends AuthenticatorProcessor {
 
-    public QueryProcessor(DalaranAuthenticator authenticator) {
-        super(authenticator);
+    public QueryProcessor(DalaranAuthenticator authenticator, RedisService redisService) {
+        super(authenticator, redisService);
     }
 
     @Override
     public void process(Exchange exchange) {
         String queryString = exchange.getIn().getHeader(Exchange.HTTP_QUERY, String.class);
+        Map<String, String> body;
         if (StringUtils.isEmpty(queryString)) {
-            stopExchangeOnMissingAppKey(exchange);
-            return;
+            body = null;
+        } else {
+            body = Splitter.on("&").withKeyValueSeparator("=").split(queryString);
         }
-        Map<String, String> body = Splitter.on("&").withKeyValueSeparator("=").split(queryString);
-        super.checkValue(exchange, body);
+        super.checkGetValue(exchange, body);
     }
 
 }
