@@ -20,7 +20,7 @@ public interface PrivateRepositoryWriteAPI {
     @PostMapping(value = "/install")
     BasicResponse install(@RequestBody PrivateRepositoryDTO privateRepository);
 
-    @ApiOperation(value = "发布模板到市场")
+    @ApiOperation(value = "本地开发资源上报")
     @PostMapping(value = "/local/upload")
     BasicResponse localUpload(MultipartFile file, @RequestBody BasicResourceDTO basicResource);
 }
