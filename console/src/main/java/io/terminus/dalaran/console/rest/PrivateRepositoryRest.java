@@ -5,6 +5,7 @@ import io.terminus.dalaran.market.model.BasicResourceDTO;
 import io.terminus.dalaran.market.model.MarketResourceVersionDTO;
 import io.terminus.dalaran.model.BasicResponse;
 import io.terminus.dalaran.model.dto.PrivateRepositoryDTO;
+import io.terminus.dalaran.model.dto.ResourceGroupDTO;
 import io.terminus.dalaran.model.query.PrivateRepositoryQuery;
 import io.terminus.dalaran.rest.read.PrivateRepositoryReadAPI;
 import io.terminus.dalaran.rest.write.PrivateRepositoryWriteAPI;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Collection;
+import java.util.List;
 
 @RestController
 public class PrivateRepositoryRest implements PrivateRepositoryReadAPI, PrivateRepositoryWriteAPI {
@@ -43,5 +45,10 @@ public class PrivateRepositoryRest implements PrivateRepositoryReadAPI, PrivateR
     @Override
     public BasicResponse localUpload(MultipartFile file, BasicResourceDTO basicResource) {
         return privateRepositoryService.localResourceUpload(file, basicResource);
+    }
+
+    @Override
+    public List<ResourceGroupDTO> listResourceGroup() {
+        return privateRepositoryService.listResourceGroup();
     }
 }

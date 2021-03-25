@@ -15,7 +15,11 @@ public class PropertyService {
     @Value("${terminus.dalaran.market.upload}")
     private String marketUpload;
 
+    @Value("${terminus.dalaran.market.group}")
+    private String resourceGroup;
+
     private static String DALARAN_TENANT_CODE = "dalaran_tenant_code";
+
 
     public String getTenantCode() {
         return tenantCode;
@@ -27,5 +31,9 @@ public class PropertyService {
 
     public String getMarketUpload() {
         return marketUpload;
+    }
+
+    public String getResourceGroup() {
+        return resourceGroup;
     }
 }

@@ -20,6 +20,7 @@ import io.terminus.dalaran.market.model.BasicResourceDTO;
 import io.terminus.dalaran.market.model.MarketResourceVersionDTO;
 import io.terminus.dalaran.model.BasicResponse;
 import io.terminus.dalaran.model.dto.PrivateRepositoryDTO;
+import io.terminus.dalaran.model.dto.ResourceGroupDTO;
 import io.terminus.dalaran.model.market.MarketProcessor;
 import io.terminus.dalaran.model.market.ResourceFile;
 import io.terminus.dalaran.model.query.PrivateRepositoryQuery;
@@ -29,9 +30,8 @@ import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
@@ -120,6 +120,16 @@ public class PrivateRepositoryServiceImpl implements PrivateRepositoryService {
             }
         });
         return versionResourceList;
+    }
+
+    @Override
+    public List<ResourceGroupDTO> listResourceGroup() {
+        ResponseEntity<List<ResourceGroupDTO>> responseEntity = restTemplate.exchange(
+                propertyService.getMarketHost() + propertyService.getResourceGroup(),
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<List<ResourceGroupDTO>>() {});
+        return responseEntity.getBody();
     }
 
     @Override

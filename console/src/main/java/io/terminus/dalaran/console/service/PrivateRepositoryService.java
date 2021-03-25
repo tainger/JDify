@@ -5,10 +5,12 @@ import io.terminus.dalaran.market.model.BasicResourceDTO;
 import io.terminus.dalaran.market.model.MarketResourceVersionDTO;
 import io.terminus.dalaran.model.BasicResponse;
 import io.terminus.dalaran.model.dto.PrivateRepositoryDTO;
+import io.terminus.dalaran.model.dto.ResourceGroupDTO;
 import io.terminus.dalaran.model.query.PrivateRepositoryQuery;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Collection;
+import java.util.List;
 
 public interface PrivateRepositoryService {
 
@@ -23,4 +25,7 @@ public interface PrivateRepositoryService {
     BasicResponse saveTemplate(FlowTemplate flowTemplate);
 
     BasicResponse localResourceUpload(MultipartFile file, BasicResourceDTO basicResource);
+
+    List<ResourceGroupDTO> listResourceGroup();
+
 }
