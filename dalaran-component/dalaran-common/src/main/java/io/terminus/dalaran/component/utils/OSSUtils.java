@@ -32,6 +32,14 @@ public class OSSUtils {
         return key;
     }
 
+    public static String upload(File file, OSSAccount ossAccount) {
+        OSS client = new OSSClientBuilder().build(ossAccount.getEndpoint(), ossAccount.getAccessId(), ossAccount.getAccessSecret());
+        String key = ossAccount.getRootDir() + "/" + file.getName() + "_" + System.currentTimeMillis();
+        client.putObject(ossAccount.getBucketName(), key, file);
+        client.shutdown();
+        return key;
+    }
+
     public static OSSObject downloadByUrl(String url, OSSAccount ossAccount) throws Exception {
         OSS ossClient = new OSSClientBuilder().build(ossAccount.getEndpoint(), ossAccount.getAccessId(), ossAccount.getAccessSecret());
         Map<String, String> customHeaders = new HashMap<>();

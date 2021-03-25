@@ -10,6 +10,8 @@ import io.terminus.dalaran.rest.read.PrivateRepositoryReadAPI;
 import io.terminus.dalaran.rest.write.PrivateRepositoryWriteAPI;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+
 import java.util.Collection;
 
 @RestController
@@ -36,5 +38,10 @@ public class PrivateRepositoryRest implements PrivateRepositoryReadAPI, PrivateR
     @Override
     public BasicResponse install(PrivateRepositoryDTO privateRepository) {
         return privateRepositoryService.install(privateRepository);
+    }
+
+    @Override
+    public BasicResponse localUpload(MultipartFile file, BasicResourceDTO basicResource) {
+        return privateRepositoryService.localResourceUpload(file, basicResource);
     }
 }

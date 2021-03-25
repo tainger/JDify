@@ -6,6 +6,7 @@ import io.terminus.dalaran.market.model.MarketResourceVersionDTO;
 import io.terminus.dalaran.model.BasicResponse;
 import io.terminus.dalaran.model.dto.PrivateRepositoryDTO;
 import io.terminus.dalaran.model.query.PrivateRepositoryQuery;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Collection;
 
@@ -21,4 +22,5 @@ public interface PrivateRepositoryService {
 
     BasicResponse saveTemplate(FlowTemplate flowTemplate);
 
+    BasicResponse localResourceUpload(MultipartFile file, BasicResourceDTO basicResource);
 }

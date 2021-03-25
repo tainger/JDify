@@ -21,6 +21,7 @@ import io.terminus.dalaran.market.model.MarketResourceVersionDTO;
 import io.terminus.dalaran.model.BasicResponse;
 import io.terminus.dalaran.model.dto.PrivateRepositoryDTO;
 import io.terminus.dalaran.model.market.MarketProcessor;
+import io.terminus.dalaran.model.market.ResourceFile;
 import io.terminus.dalaran.model.query.PrivateRepositoryQuery;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.collections4.CollectionUtils;
@@ -33,6 +34,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.util.*;
@@ -182,6 +184,30 @@ public class PrivateRepositoryServiceImpl implements PrivateRepositoryService {
             entity.setId(null);
             privateRepository.save(entity);
             return new BasicResponse(true, entity.getResourceKey());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return new BasicResponse(false);
+    }
+
+    @Override
+    public BasicResponse localResourceUpload(MultipartFile file, BasicResourceDTO basicResource) {
+        try {
+            File local = io.terminus.dalaran.console.util.FileUtils.transfer(file);
+            String filePath = OSSUtils.upload(local, ossAccount);
+            ResourceFile resourceFile = new ResourceFile(filePath);
+            marketResourceLoader.loadProcessor(local);
+            PrivateRepositoryEntity entity = new PrivateRepositoryEntity();
+            BeanUtils.copyProperties(entity, basicResource);
+            String resourceKey = basicResource.getId();
+            if (StringUtils.isBlank(resourceKey)) {
+                resourceKey = GenerateKeyUtils.resourceKey(propertyService.getTenantCode());
+            }
+            entity.setResourceKey(resourceKey);
+            entity.setData(JSON.toJSONString(resourceFile));
+            entity.setId(null);
+            privateRepository.save(entity);
+            return new BasicResponse(true, resourceKey);
         } catch (Exception e) {
             e.printStackTrace();
         }
