@@ -17,8 +17,11 @@ import java.util.*;
 public class DalaranNoticeServiceImpl implements DalaranNoticeService {
 
 
-//    @Value("${}")
-    private  String noticeCode;
+    @Value("${noticeMessage.mailNoticeCode}")
+    private String mailNoticeCode;
+
+    @Value("${noticeMessage.SMSNoticeCode}")
+    private String SMSNoticeCode;
 
     private static final Logger logger = LoggerFactory.getLogger(DalaranNoticeServiceImpl.class);
 
@@ -30,14 +33,12 @@ public class DalaranNoticeServiceImpl implements DalaranNoticeService {
 
     @Override
     public void sendEmail(NoticeMessage noticeMessage) {
-        logger.error(noticeMessage.toString());
         EmailSendDTO emailSendDTO = new EmailSendDTO();
         emailSendDTO.setSubject("mule流程报警");
         emailSendDTO.setSenderEmail("no-reply@terminus.io");
         List<String> contents = buildNoticeMessage(noticeMessage);
         String[] contactWays = noticeMessage.getContactWays();
-        boolean isHtml = false;
-        Response<String> result = emailSenderService.send("1234", Arrays.asList(contactWays), emailSendDTO, contents);
+        Response<String> result = emailSenderService.send(mailNoticeCode, Arrays.asList(contactWays), emailSendDTO, contents);
         if (result.isSuccess())
             logger.error("发送成功");
         else
@@ -46,8 +47,7 @@ public class DalaranNoticeServiceImpl implements DalaranNoticeService {
 
     @Override
     public void sendShortMessage(NoticeMessage noticeMessage) {
-        logger.error(noticeMessage.toString());
-        String noticeCode = "SMS_213077210";
+//        String noticeCode = "SMS_213077210";
         List<String> keys = new ArrayList<>();
         keys.add("flowName");
         keys.add("createDate");
@@ -59,7 +59,7 @@ public class DalaranNoticeServiceImpl implements DalaranNoticeService {
         keys.add("timeOutCount");
         List<String> contents = buildNoticeMessage(noticeMessage);
         List<String> phoneNumbers = Arrays.asList(noticeMessage.getContactWays());
-        Response<String> sendResult = smsSenderService.templateSend(phoneNumbers, keys, contents, noticeCode);
+        Response<String> sendResult = smsSenderService.templateSend(phoneNumbers, keys, contents, SMSNoticeCode);
         if (sendResult.isSuccess())
             logger.error("发送成功");
         else

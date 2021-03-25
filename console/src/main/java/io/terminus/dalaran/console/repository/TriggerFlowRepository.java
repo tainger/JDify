@@ -2,7 +2,6 @@ package io.terminus.dalaran.console.repository;
 
 import io.terminus.dalaran.console.entity.TriggerFlowEntity;
 import io.terminus.dalaran.model.flow.FlowStatus;
-import io.terminus.dalaran.model.flow.TriggerFlow;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
