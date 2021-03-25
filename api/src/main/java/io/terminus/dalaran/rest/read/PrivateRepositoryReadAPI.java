@@ -26,4 +26,8 @@ public interface PrivateRepositoryReadAPI {
     @ApiOperation(value = "根据资源分组列表")
     @GetMapping(value = "/resource/group")
     List<ResourceGroupDTO> listResourceGroup();
+
+    @ApiOperation(value = "根据资源ID获取模板版本列表")
+    @GetMapping(value = "/version/{id}")
+    List<String> listResourceVersion(@PathVariable String id);
 }

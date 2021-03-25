@@ -27,8 +27,6 @@ public interface FlowManagementService {
 
     BasicResponse checkTemplateVersion(TemplatePrecipitationDTO flow);
 
-    List<String> listResourceVersion(String id);
-
     ImportFlowResult importFlow(ImportFlowDTO flowModel);
 
     ImportProcessorResult importProcessor(ImportProcessorDTO model);

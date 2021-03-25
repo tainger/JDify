@@ -1,6 +1,7 @@
 package io.terminus.dalaran.console.rest;
 
 import io.terminus.dalaran.console.service.PrivateRepositoryService;
+import io.terminus.dalaran.console.service.jpa.PrivateResourceQueryService;
 import io.terminus.dalaran.market.model.BasicResourceDTO;
 import io.terminus.dalaran.market.model.MarketResourceVersionDTO;
 import io.terminus.dalaran.model.BasicResponse;
@@ -21,6 +22,9 @@ public class PrivateRepositoryRest implements PrivateRepositoryReadAPI, PrivateR
 
     @Autowired
     private PrivateRepositoryService privateRepositoryService;
+
+    @Autowired
+    private PrivateResourceQueryService privateResourceQueryService;
 
     @Override
     public Collection<MarketResourceVersionDTO> listPrivateResource(PrivateRepositoryQuery query) {
@@ -50,5 +54,10 @@ public class PrivateRepositoryRest implements PrivateRepositoryReadAPI, PrivateR
     @Override
     public List<ResourceGroupDTO> listResourceGroup() {
         return privateRepositoryService.listResourceGroup();
+    }
+
+    @Override
+    public List<String> listResourceVersion(String id) {
+        return privateResourceQueryService.listResourceVersion(id);
     }
 }

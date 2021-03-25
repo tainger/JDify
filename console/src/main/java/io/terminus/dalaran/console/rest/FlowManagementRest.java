@@ -94,11 +94,6 @@ public class FlowManagementRest implements FlowReadAPI, FlowWriteAPI {
     }
 
     @Override
-    public List<String> listResourceVersion(String id) {
-        return flowManagementService.listResourceVersion(id);
-    }
-
-    @Override
     public ResponseResult offline(@RequestBody TriggerFlowDTO flowDTO) {
         return flowManagementService.offline(flowDTO);
     }

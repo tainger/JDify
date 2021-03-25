@@ -44,8 +44,4 @@ public interface FlowReadAPI {
     @ApiOperation(value = "模板版本重复性校验")
     @PostMapping(value = "/check/template/version")
     BasicResponse checkTemplateVersion(@RequestBody TemplatePrecipitationDTO flow) throws CreateFlowException;
-
-    @ApiOperation(value = "根据资源ID获取模板版本列表")
-    @GetMapping(value = "/template/version/{id}")
-    List<String> listResourceVersion(@PathVariable String id);
 }

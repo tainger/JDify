@@ -325,11 +325,6 @@ public class FlowManagementServiceImpl implements FlowManagementService {
         return new BasicResponse(true);
     }
 
-    @Override
-    public List<String> listResourceVersion(String id) {
-        return privateResourceQueryService.listResourceVersion(id);
-    }
-
     // TODO 很多重复内容 逻辑也比较尴尬, 各种 magic, 先测试一波, 有时间改改
     @Override
     public ImportFlowResult importFlow(ImportFlowDTO importInfo) {
