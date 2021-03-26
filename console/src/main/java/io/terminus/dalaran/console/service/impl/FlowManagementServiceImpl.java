@@ -201,23 +201,41 @@ public class FlowManagementServiceImpl implements FlowManagementService {
         PrivateRepositoryEntity entity = privateRepositoryRepository.findByResourceKeyAndVersion(template.getId(), template.getVersion());
         TemplateData templateData = JSON.parseObject(entity.getData(), TemplateData.class);
         Map<String, String> resourceKeyMap = new HashMap<>();
-        TriggerFlowEntity triggerFlowEntity = new TriggerFlowEntity();
+        String id;
         try {
             copyResourceFromPrivateRepo(templateData, resourceKeyMap, template.getModuleId());
-            BeanUtils.copyProperties(triggerFlowEntity, templateData);
-            String oldConfig = JSON.toJSONString(triggerFlowEntity);
-            String newConfig = StringUtils.replaceEach(oldConfig, ArrayUtils.toStringArray(resourceKeyMap.keySet().toArray()), ArrayUtils.toStringArray(resourceKeyMap.values().toArray()));
-            triggerFlowEntity = JSON.parseObject(newConfig, TriggerFlowEntity.class);
-            triggerFlowEntity.setResourceKey(GenerateKeyUtils.resourceKey(propertyService.getTenantCode()));
-            triggerFlowEntity.setCreatedFrom(entity.getResourceKey());
-            triggerFlowEntity.setModuleId(template.getModuleId());
-            triggerFlowEntity.setId(null);
-            String id = flowRepository.save(triggerFlowEntity).getResourceKey();
+            switch (template.getType()) {
+                case FLOW_TEMPLATE:
+                    TriggerFlowEntity triggerFlowEntity = new TriggerFlowEntity();
+                    buildFlowEntity(triggerFlowEntity, templateData, resourceKeyMap);
+                    triggerFlowEntity.setCreatedFrom(entity.getResourceKey());
+                    triggerFlowEntity.setModuleId(template.getModuleId());
+                    id = flowRepository.save(triggerFlowEntity).getResourceKey();
+                    break;
+                case SUB_FLOW_TEMPLATE:
+                default:
+                    SubFlowEntity subFlowEntity = new SubFlowEntity();
+                    buildFlowEntity(subFlowEntity, templateData, resourceKeyMap);
+                    subFlowEntity.setCreatedFrom(entity.getResourceKey());
+                    subFlowEntity.setModuleId(template.getModuleId());
+                    subFlowEntity.setId(null);
+                    id = subFlowRepository.save(subFlowEntity).getResourceKey();
+            }
             return new BasicResponse(true, id);
         } catch (Exception e) {
             e.printStackTrace();
             return new BasicResponse(false, e.getMessage());
         }
+    }
+
+    private Object buildFlowEntity(BasicFlowEntity flowEntity, TemplateData templateData, Map<String, String> resourceKeyMap) throws Exception {
+        BeanUtils.copyProperties(flowEntity, templateData);
+        String oldConfig = JSON.toJSONString(flowEntity);
+        String newConfig = StringUtils.replaceEach(oldConfig, ArrayUtils.toStringArray(resourceKeyMap.keySet().toArray()), ArrayUtils.toStringArray(resourceKeyMap.values().toArray()));
+        flowEntity = JSON.parseObject(newConfig, TriggerFlowEntity.class);
+        flowEntity.setResourceKey(GenerateKeyUtils.resourceKey(propertyService.getTenantCode()));
+        flowEntity.setId(null);
+        return flowEntity;
     }
 
     private void copyResourceFromPrivateRepo(TemplateData templateData, Map<String, String> resourceKeyMap, String moduleId) throws Exception {
@@ -313,10 +331,12 @@ public class FlowManagementServiceImpl implements FlowManagementService {
         switch (flow.getType()) {
             case FLOW_TEMPLATE:
                 abstractEntity = resourceLoader.loadTriggerFlow(flow.getId());
+                flowTemplate.setType(FLOW_TEMPLATE);
                 break;
             case SUB_FLOW_TEMPLATE:
             default:
                 abstractEntity = resourceLoader.loadSubFlow(flow.getId());
+                flowTemplate.setType(SUB_FLOW_TEMPLATE);
         }
         TemplateData templateData = buildFlowTemplate(abstractEntity);
         flowTemplate.setVersion(flow.getVersion());
@@ -324,7 +344,6 @@ public class FlowManagementServiceImpl implements FlowManagementService {
         flowTemplate.setData(templateData);
         flowTemplate.setName(abstractEntity.getName());
         flowTemplate.setTenantCode(propertyService.getTenantCode());
-        flowTemplate.setType(FLOW_TEMPLATE);
         return privateRepositoryService.saveTemplate(flowTemplate);
     }
 

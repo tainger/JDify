@@ -257,19 +257,19 @@ public class PrivateRepositoryServiceImpl implements PrivateRepositoryService {
     private void resourceInstall(PrivateRepositoryDTO privateRepositoryDTO) throws Exception {
         switch (privateRepositoryDTO.getType()) {
             case PROCESSOR:
-                MarketProcessor marketProcessor = JSON.parseObject((String)privateRepositoryDTO.getData(), MarketProcessor.class);
-                PrivatePackageEntity privatePackageEntity = privatePackageRepository.findByResourceKeyAndVersion(marketProcessor.getId(), marketProcessor.getVersion());
+                ResourceFile resourceFile = JSON.parseObject((String)privateRepositoryDTO.getData(), ResourceFile.class);
+                PrivatePackageEntity privatePackageEntity = privatePackageRepository.findByResourceKeyAndVersion(privateRepositoryDTO.getId(), privateRepositoryDTO.getVersion());
                 if (privatePackageEntity != null) {
                     return;
                 }
 
                 PrivatePackageEntity entity = new PrivatePackageEntity();
-                BeanUtils.copyProperties(entity, marketProcessor);
+                BeanUtils.copyProperties(entity, privateRepositoryDTO);
 
-                String fileUrl = marketProcessor.getData().getFilePath();
+                String fileUrl = resourceFile.getFilePath();
                 OSSObject ossObject = OSSUtils.downloadByUrl(fileUrl, ossAccount);
                 entity.setFilePath(OSSUtils.upload(ossObject.getKey(), ossObject.getObjectContent(), ossAccount));
-                entity.setResourceKey(marketProcessor.getId());
+                entity.setResourceKey(privateRepositoryDTO.getId());
                 entity.setId(null);
                 privatePackageRepository.save(entity);
 
