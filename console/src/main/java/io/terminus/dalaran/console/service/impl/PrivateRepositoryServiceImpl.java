@@ -212,18 +212,17 @@ public class PrivateRepositoryServiceImpl implements PrivateRepositoryService {
     }
 
     @Override
-    public BasicResponse localResourceUpload(MultipartFile file, BasicResourceDTO basicResource) {
+    public BasicResponse localResourceUpload(MultipartFile file, String name, String version, String resourceGroup) {
         try {
             File local = io.terminus.dalaran.console.util.FileUtils.transfer(file);
             String filePath = OSSUtils.upload(local, ossAccount);
             ResourceFile resourceFile = new ResourceFile(filePath);
             marketResourceLoader.loadProcessor(local);
             PrivateRepositoryEntity entity = new PrivateRepositoryEntity();
-            BeanUtils.copyProperties(entity, basicResource);
-            String resourceKey = basicResource.getId();
-            if (StringUtils.isBlank(resourceKey)) {
-                resourceKey = GenerateKeyUtils.resourceKey(propertyService.getTenantCode());
-            }
+            String resourceKey = GenerateKeyUtils.resourceKey(propertyService.getTenantCode());
+            entity.setName(name);
+            entity.setVersion(version);
+            entity.setResourceGroup(resourceGroup);
             entity.setResourceKey(resourceKey);
             entity.setData(JSON.toJSONString(resourceFile));
             entity.setId(null);
