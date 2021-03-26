@@ -105,7 +105,6 @@ public class AlarmRuleServiceImpl implements AlarmRuleService , InitializingBean
 
     @Override
     public Page<AlarmRuleDTO> queryPageable(AlarmRuleQuery query, Integer pageNumber, Integer pageSize) {
-        //todo关联查询
         Sort order = new Sort(new Sort.Order(Sort.Direction.DESC, "createdAt"));
         Pageable pageable = PageRequest.of(pageNumber - 1, pageSize, order);
         Page<AlarmRuleEntity> alarmRuleEntities = alarmRuleRepository.findAll(buildSpecification(query), pageable);
