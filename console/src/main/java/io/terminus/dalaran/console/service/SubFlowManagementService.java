@@ -11,11 +11,7 @@ import java.util.List;
 
 public interface SubFlowManagementService {
 
-
     String createFlow(SubFlowDTO flowModel);
-
-    String createFromTemplate(SubFlowDTO flowModel);
-
 
     void deleteFlow(String flowId);
 
@@ -33,6 +29,4 @@ public interface SubFlowManagementService {
     List<FlowValidation> validateFlow(SubFlowDTO model);
 
     List<BasicFlowInfo> listBasicSubFlowInfoByModuleId(String moduleId);
-
-
 }
