@@ -24,7 +24,7 @@ public interface PrivateRepositoryService {
 
     BasicResponse saveTemplate(FlowTemplate flowTemplate);
 
-    BasicResponse localResourceUpload(MultipartFile file, BasicResourceDTO basicResource);
+    BasicResponse localResourceUpload(MultipartFile file, String name, String version, String resourceGroup);
 
     List<ResourceGroupDTO> listResourceGroup();
 

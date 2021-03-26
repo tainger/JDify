@@ -47,8 +47,8 @@ public class PrivateRepositoryRest implements PrivateRepositoryReadAPI, PrivateR
     }
 
     @Override
-    public BasicResponse localUpload(MultipartFile file, BasicResourceDTO basicResource) {
-        return privateRepositoryService.localResourceUpload(file, basicResource);
+    public BasicResponse localUpload(MultipartFile file, String name,  String version, String resourceGroup) {
+        return privateRepositoryService.localResourceUpload(file, name, version, resourceGroup);
     }
 
     @Override
