@@ -199,7 +199,7 @@ public class FlowManagementServiceImpl implements FlowManagementService {
     @Override
     public BasicResponse createFromTemplate(TemplatePrecipitationDTO template) {
         PrivateRepositoryEntity entity = privateRepositoryRepository.findByResourceKeyAndVersion(template.getId(), template.getVersion());
-        TemplateData templateData = JSON.parseObject(entity.getData(), FlowTemplate.class).getData();
+        TemplateData templateData = JSON.parseObject(entity.getData(), TemplateData.class);
         Map<String, String> resourceKeyMap = new HashMap<>();
         TriggerFlowEntity triggerFlowEntity = new TriggerFlowEntity();
         try {

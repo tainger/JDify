@@ -148,8 +148,8 @@ public class PrivateRepositoryServiceImpl implements PrivateRepositoryService {
                     break;
                 case FLOW_TEMPLATE:
                 case SUB_FLOW_TEMPLATE:
-                    FlowTemplate flowTemplate = JSON.parseObject(entity.getData(), FlowTemplate.class);
-                    Map<String, PrivatePackageEntity> packages = flowTemplate.getData().getRelationPackage();
+                    TemplateData templateData = JSON.parseObject(entity.getData(), TemplateData.class);
+                    Map<String, PrivatePackageEntity> packages = templateData.getRelationPackage();
                     if (MapUtils.isNotEmpty(packages)) {
                         packages.values().forEach(value -> {
                             String url = OSSUtils.getFileUrl(value.getFilePath(), ossAccount);
@@ -242,7 +242,7 @@ public class PrivateRepositoryServiceImpl implements PrivateRepositoryService {
         }
         PrivateRepositoryEntity entity = new PrivateRepositoryEntity();
         BeanUtils.copyProperties(entity, flowTemplate);
-        entity.setData(JSON.toJSONString(flowTemplate));
+        entity.setData(JSON.toJSONString(flowTemplate.getData()));
         entity.setResourceKey(resourceKey);
         return entity;
     }
@@ -281,8 +281,8 @@ public class PrivateRepositoryServiceImpl implements PrivateRepositoryService {
                 break;
             case FLOW_TEMPLATE:
             case SUB_FLOW_TEMPLATE:
-                FlowTemplate templateData = JSON.parseObject((String) privateRepositoryDTO.getData(), FlowTemplate.class);
-                loadRelationResource(templateData.getData());
+                TemplateData templateData = JSON.parseObject((String) privateRepositoryDTO.getData(), TemplateData.class);
+                loadRelationResource(templateData);
                 break;
         }
     }
