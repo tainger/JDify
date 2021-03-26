@@ -141,11 +141,22 @@ public class PrivateRepositoryServiceImpl implements PrivateRepositoryService {
             privateRepositoryDTO.setId(entity.getResourceKey());
             switch (entity.getType()) {
                 case PROCESSOR:
-                    privateRepositoryDTO.setData(JSON.parseObject(entity.getData(), MarketProcessor.class));
+                    MarketProcessor marketProcessor = JSON.parseObject(entity.getData(), MarketProcessor.class);
+                    String openUrl = OSSUtils.getFileUrl(marketProcessor.getData().getFilePath(), ossAccount);
+                    marketProcessor.getData().setFilePath(openUrl);
+                    privateRepositoryDTO.setData(marketProcessor);
                     break;
                 case FLOW_TEMPLATE:
                 case SUB_FLOW_TEMPLATE:
-                    privateRepositoryDTO.setData(JSON.parseObject(entity.getData(), FlowTemplate.class));
+                    FlowTemplate flowTemplate = JSON.parseObject(entity.getData(), FlowTemplate.class);
+                    Map<String, PrivatePackageEntity> packages = flowTemplate.getData().getRelationPackage();
+                    if (MapUtils.isNotEmpty(packages)) {
+                        packages.values().forEach(value -> {
+                            String url = OSSUtils.getFileUrl(value.getFilePath(), ossAccount);
+                            value.setFilePath(url);
+                        });
+                    }
+                    privateRepositoryDTO.setData(packages);
             }
         } catch (Exception e) {
             e.printStackTrace();
