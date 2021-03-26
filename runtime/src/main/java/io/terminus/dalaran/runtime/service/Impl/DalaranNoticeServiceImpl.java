@@ -17,10 +17,10 @@ import java.util.*;
 public class DalaranNoticeServiceImpl implements DalaranNoticeService {
 
 
-    @Value("${noticeMessage.mailNoticeCode}")
+    @Value("${notice-center.notice.mailNoticeCode}")
     private String mailNoticeCode;
 
-    @Value("${noticeMessage.SMSNoticeCode}")
+    @Value("${notice-center.notice.SMSNoticeCode}")
     private String SMSNoticeCode;
 
     private static final Logger logger = LoggerFactory.getLogger(DalaranNoticeServiceImpl.class);
