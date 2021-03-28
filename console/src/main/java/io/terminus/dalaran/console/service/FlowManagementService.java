@@ -21,11 +21,11 @@ public interface FlowManagementService {
 
     String createFlow(TriggerFlowDTO flowModel);
 
-    BasicResponse createFromTemplate(TemplatePrecipitationDTO template);
+    BasicResponse createFromTemplate(BasicResourceRequest template);
 
-    BasicResponse saveAsTemplate(TemplatePrecipitationDTO flow);
+    BasicResponse saveAsTemplate(BasicResourceRequest flow);
 
-    BasicResponse checkTemplateVersion(TemplatePrecipitationDTO flow);
+    BasicResponse checkTemplateVersion(BasicResourceRequest flow);
 
     ImportFlowResult importFlow(ImportFlowDTO flowModel);
 

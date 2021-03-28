@@ -25,7 +25,7 @@ public class DefaultMarketResourceLoader implements MarketResourceLoader {
     private DalaranComponentContext componentContext;
 
     @Override
-    public void loadProcessor(File file) {
+    public void loadProcessor(File file, String type, String version) {
         try {
             ClassLoader classLoader = loadJars(file);
             JarFile jarFile = new JarFile(file);
@@ -41,7 +41,7 @@ public class DefaultMarketResourceLoader implements MarketResourceLoader {
                 Class clazz = Class.forName(className, true, classLoader);
                 Annotation annotation = clazz.getAnnotation(Processor.class);
                 if (annotation != null) {
-                    componentContext.addProcessor((DalaranProcessor)clazz.newInstance());
+                    componentContext.addProcessor((DalaranProcessor)clazz.newInstance(), type, version);
                 }
             }
         } catch (Exception e) {

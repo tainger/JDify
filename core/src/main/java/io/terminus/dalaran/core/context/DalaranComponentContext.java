@@ -6,6 +6,7 @@ import io.terminus.dalaran.core.component.DalaranProcessor;
 import io.terminus.dalaran.core.component.DalaranTrigger;
 
 import java.util.Collection;
+import java.util.Map;
 
 public interface DalaranComponentContext {
 
@@ -27,11 +28,13 @@ public interface DalaranComponentContext {
 
     Collection<ProcessorInfo> getAllProcessorInfo();
 
-    void addProcessor(DalaranProcessor bean);
+    void addProcessor(DalaranProcessor bean, String type, String version);
 
     void addTrigger(DalaranTrigger bean);
 
     void addBasicComponent(DalaranBasicComponent bean);
 
     Collection<BasicComponentInfo> getAllBasicComponentInfo();
+
+    Map<String, Map<String, Map<String, ProcessorInfo>>> listAllGroupProcessor();
 }

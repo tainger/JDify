@@ -3,7 +3,7 @@ package io.terminus.dalaran.model.dto;
 import lombok.Data;
 
 @Data
-public class TemplatePrecipitationDTO {
+public class BasicResourceRequest {
 
     private String id;
 

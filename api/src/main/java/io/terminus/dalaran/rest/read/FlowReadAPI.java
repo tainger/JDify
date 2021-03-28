@@ -5,7 +5,7 @@ import io.terminus.dalaran.exception.flow.CreateFlowException;
 import io.terminus.dalaran.exception.flow.FlowNotExistException;
 import io.terminus.dalaran.exception.flow.FlowTestException;
 import io.terminus.dalaran.model.BasicResponse;
-import io.terminus.dalaran.model.dto.TemplatePrecipitationDTO;
+import io.terminus.dalaran.model.dto.BasicResourceRequest;
 import io.terminus.dalaran.model.dto.TestRequestDTO;
 import io.terminus.dalaran.model.dto.flow.TriggerFlowDTO;
 import io.terminus.dalaran.model.dto.log.MainLogDTO;
@@ -43,5 +43,5 @@ public interface FlowReadAPI {
 
     @ApiOperation(value = "模板版本重复性校验")
     @PostMapping(value = "/check/template/version")
-    BasicResponse checkTemplateVersion(@RequestBody TemplatePrecipitationDTO flow) throws CreateFlowException;
+    BasicResponse checkTemplateVersion(@RequestBody BasicResourceRequest flow) throws CreateFlowException;
 }

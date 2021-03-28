@@ -34,7 +34,7 @@ public class DalaranComponentLoader implements BeanPostProcessor {
     @Override
     public Object postProcessAfterInitialization(Object bean, String name) throws BeansException {
         if (bean instanceof DalaranProcessor) {
-            componentContext.addProcessor((DalaranProcessor) bean);
+            componentContext.addProcessor((DalaranProcessor) bean, "Basic", "1.0.0");
         }
         if (bean instanceof DalaranTrigger) {
             componentContext.addTrigger((DalaranTrigger) bean);

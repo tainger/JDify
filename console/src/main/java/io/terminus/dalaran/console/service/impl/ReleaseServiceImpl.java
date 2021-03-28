@@ -1,6 +1,5 @@
 package io.terminus.dalaran.console.service.impl;
 
-import com.alibaba.fastjson.JSONObject;
 import io.terminus.dalaran.console.convertor.FlowConvertor;
 import io.terminus.dalaran.console.repository.*;
 import io.terminus.dalaran.console.service.ModuleManagementService;
@@ -22,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+
 import javax.persistence.criteria.Predicate;
 import javax.transaction.Transactional;
 import java.text.SimpleDateFormat;
@@ -225,13 +225,13 @@ public class ReleaseServiceImpl implements ReleaseService {
 
     @Override
     public Page<ReleaseFlowDTO> triggerFlowListByPage(Integer pageNumber, Integer pageSize) {
-        ReleaseRecordEntity releaseRecordEntity = releaseRecordRepository.findByEnabledTrue();
-        if (releaseRecordEntity == null) {
-            return null;
-        }
-        String version = releaseRecordEntity.getVersion();
         Sort order = new Sort(Sort.Direction.DESC, "createdAt");
         Pageable pageable = PageRequest.of(pageNumber - 1, pageSize, order);
+        ReleaseRecordEntity releaseRecordEntity = releaseRecordRepository.findByEnabledTrue();
+        if (releaseRecordEntity == null) {
+            return new PageImpl<>(new ArrayList<>(), pageable, 0);
+        }
+        String version = releaseRecordEntity.getVersion();
         Page<TriggerFlowReleasedEntity> page = triggerFlowReleasedRepository.findAll(buildSpecification(version, FlowStatus.Error), pageable);
         return new PageImpl<>(page.stream().map(this::buildflowDTO).collect(Collectors.toList()), pageable, page.getTotalElements());
     }

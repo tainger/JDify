@@ -11,6 +11,7 @@ import io.terminus.dalaran.core.context.DalaranComponentContext;
 import io.terminus.dalaran.core.util.ConfigFieldUtils;
 import io.terminus.dalaran.core.util.I18nUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.MapUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -39,6 +40,8 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext {
     private final Map<String, LimiterInfo> limiterInfoMap = new ConcurrentHashMap<>();
 
     private final Map<String, AuthenticatorInfo> authenticatorInfoMap = new ConcurrentHashMap<>();
+
+    private final Map<String, Map<String, Map<String, ProcessorInfo>>> groupProcessorInfo = new ConcurrentHashMap<>();
 
     @Override
     public DalaranTrigger getTrigger(String triggerType) {
@@ -237,7 +240,7 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext {
     }
 
     // TODO 很多重复性的代码
-    public void addProcessor(DalaranProcessor processor) {
+    public void addProcessor(DalaranProcessor processor, String type, String version) {
         Processor processorAnnotation = processor.getClass().getDeclaredAnnotation(Processor.class);
         DalaranConfigField[] configFields = ConfigFieldUtils.buildConfigFields(processorAnnotation.configType());
         for (int i = 0; i < processorAnnotation.value().length; i++) {
@@ -266,6 +269,19 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext {
 
             processorInfoMapping.put(processorType, processorInfo);
             processorMapping.put(processorType, processor);
+
+            Map<String, Map<String, ProcessorInfo>> processors = groupProcessorInfo.get(type);
+            if (MapUtils.isEmpty(processors)) {
+                processors = new ConcurrentHashMap<>();
+                groupProcessorInfo.put(type, processors);
+            }
+            Map<String, ProcessorInfo> versionedProcessor = processors.get(processorType);
+            if (MapUtils.isEmpty(versionedProcessor)) {
+                versionedProcessor = new ConcurrentHashMap<>();
+            }
+            ProcessorInfo newProcessor = processorTransfer(processorInfo);
+            versionedProcessor.put(version, newProcessor);
+            processors.put(processorType, versionedProcessor);
         }
         log.info("load processor {}", processorAnnotation);
     }
@@ -279,6 +295,11 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext {
         componentInfo.setName(componentAnnotation.value());
         componentInfo.setType(componentAnnotation.value());
         basicComponentInfoMap.put(componentAnnotation.value(), componentInfo);
+    }
+
+    @Override
+    public Map<String, Map<String, Map<String, ProcessorInfo>>> listAllGroupProcessor() {
+        return groupProcessorInfo;
     }
 
     private ConnectorInfo buildConnectorInfo(ComponentType component, Class classType, Connector connector, String componentName) {
@@ -325,6 +346,21 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext {
         });
         authenticatorInfo.addComponent(componentName);
         return authenticatorInfo;
+    }
+
+    private ProcessorInfo processorTransfer(ProcessorInfo processorInfo) {
+        ProcessorInfo newProcessorInfo = new ProcessorInfo();
+        BeanUtils.copyProperties(processorInfo, newProcessorInfo);
+        newProcessorInfo.setName(i18nUtils.getComponentName(processorInfo.getType()));
+        List<DalaranConfigField> fields = new ArrayList<>();
+        for (DalaranConfigField configField : newProcessorInfo.getConfigFields()) {
+            DalaranConfigField i18nField = new DalaranConfigField();
+            fields.add(i18nField);
+            BeanUtils.copyProperties(configField, i18nField);
+            i18nField.setLabel(i18nUtils.getComponentFieldLabel(newProcessorInfo.getType(), configField.getName()));
+        }
+        newProcessorInfo.setConfigFields(fields.toArray(new DalaranConfigField[0]));
+        return newProcessorInfo;
     }
 
     private Class getConfigType(Class type, Class configType) {

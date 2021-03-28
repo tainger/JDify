@@ -60,7 +60,7 @@ public class FlowManagementRest implements FlowReadAPI, FlowWriteAPI {
     }
 
     @Override
-    public BasicResponse create(TemplatePrecipitationDTO template) throws CreateFlowException {
+    public BasicResponse create(BasicResourceRequest template) throws CreateFlowException {
         return flowManagementService.createFromTemplate(template);
     }
 
@@ -89,7 +89,7 @@ public class FlowManagementRest implements FlowReadAPI, FlowWriteAPI {
     }
 
     @Override
-    public BasicResponse checkTemplateVersion(TemplatePrecipitationDTO flow) throws CreateFlowException {
+    public BasicResponse checkTemplateVersion(BasicResourceRequest flow) throws CreateFlowException {
         return flowManagementService.checkTemplateVersion(flow);
     }
 
@@ -169,7 +169,7 @@ public class FlowManagementRest implements FlowReadAPI, FlowWriteAPI {
     }
 
     @Override
-    public BasicResponse saveAsTemplate(TemplatePrecipitationDTO flow) {
+    public BasicResponse saveAsTemplate(BasicResourceRequest flow) {
         return flowManagementService.saveAsTemplate(flow);
     }
 }

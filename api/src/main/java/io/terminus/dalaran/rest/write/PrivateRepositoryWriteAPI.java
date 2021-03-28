@@ -4,6 +4,7 @@ import io.swagger.annotations.ApiOperation;
 import io.terminus.dalaran.market.model.BasicResourceDTO;
 import io.terminus.dalaran.model.BasicResponse;
 import io.terminus.dalaran.model.dto.PrivateRepositoryDTO;
+import io.terminus.dalaran.model.dto.BasicResourceRequest;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -21,4 +22,8 @@ public interface PrivateRepositoryWriteAPI {
     @ApiOperation(value = "本地开发资源上报")
     @PostMapping(value = "/local/upload")
     BasicResponse localUpload(@RequestPart MultipartFile file, @RequestParam String name, @RequestParam String version, @RequestParam String resourceGroup);
+
+    @ApiOperation(value = "删除资源")
+    @PostMapping("/delete")
+    BasicResponse delete(@RequestBody BasicResourceRequest request);
 }

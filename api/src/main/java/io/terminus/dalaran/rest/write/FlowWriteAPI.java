@@ -22,7 +22,7 @@ public interface FlowWriteAPI {
 
     @ApiOperation(value = "基于模板创建集成流")
     @PostMapping(value = "/create/template")
-    BasicResponse create(@RequestBody TemplatePrecipitationDTO template) throws CreateFlowException;
+    BasicResponse create(@RequestBody BasicResourceRequest template) throws CreateFlowException;
 
     @ApiOperation(value = "更新集成流")
     @PostMapping(value = "/update")
@@ -30,7 +30,7 @@ public interface FlowWriteAPI {
 
     @ApiOperation(value = "保存集成流为模板")
     @PostMapping(value = "/save/template")
-    BasicResponse saveAsTemplate(@RequestBody TemplatePrecipitationDTO flow) throws CreateFlowException;
+    BasicResponse saveAsTemplate(@RequestBody BasicResourceRequest flow) throws CreateFlowException;
 
     @ApiOperation(value = "删除集成流")
     @DeleteMapping(value = "/delete")

@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 @RequestMapping(value = "/api/platform", produces = {"application/json; charset=UTF-8"})
 public interface PlatformInfoAPI {
@@ -17,6 +18,10 @@ public interface PlatformInfoAPI {
     @ApiOperation(value = "获取处理器配置结构")
     @GetMapping(value = "/processor")
     Collection<ProcessorInfo> listProcessorInfo();
+
+    @ApiOperation(value = "获取处理器配置结构(分组)")
+    @GetMapping(value = "/processor/group")
+    Map<String, Map<String, Map<String, ProcessorInfo>>> listGroupProcessorInfo();
 
     @ApiOperation(value = "获取触发器配置结构")
     @GetMapping(value = "/trigger")

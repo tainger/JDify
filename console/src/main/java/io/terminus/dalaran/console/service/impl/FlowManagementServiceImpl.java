@@ -197,7 +197,7 @@ public class FlowManagementServiceImpl implements FlowManagementService {
     }
 
     @Override
-    public BasicResponse createFromTemplate(TemplatePrecipitationDTO template) {
+    public BasicResponse createFromTemplate(BasicResourceRequest template) {
         PrivateRepositoryEntity entity = privateRepositoryRepository.findByResourceKeyAndVersion(template.getId(), template.getVersion());
         TemplateData templateData = JSON.parseObject(entity.getData(), TemplateData.class);
         Map<String, String> resourceKeyMap = new HashMap<>();
@@ -321,7 +321,7 @@ public class FlowManagementServiceImpl implements FlowManagementService {
     }
 
     @Override
-    public BasicResponse saveAsTemplate(TemplatePrecipitationDTO flow) {
+    public BasicResponse saveAsTemplate(BasicResourceRequest flow) {
         FlowTemplate flowTemplate = new FlowTemplate();
         if (privateRepositoryRepository.findByResourceKeyAndVersion(flow.getId(), flow.getVersion()) != null) {
             return new BasicResponse(false, "Template is exist!");
@@ -348,7 +348,7 @@ public class FlowManagementServiceImpl implements FlowManagementService {
     }
 
     @Override
-    public BasicResponse checkTemplateVersion(TemplatePrecipitationDTO flow) {
+    public BasicResponse checkTemplateVersion(BasicResourceRequest flow) {
         if (privateRepositoryRepository.findByResourceKeyAndVersion(flow.getId(), flow.getVersion()) != null) {
             return new BasicResponse(false, "version: " + flow.getVersion() + " is exist");
         }

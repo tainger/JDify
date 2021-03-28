@@ -4,5 +4,5 @@ import java.io.File;
 
 public interface MarketResourceLoader {
 
-    void loadProcessor(File file);
+    void loadProcessor(File file, String type, String version);
 }

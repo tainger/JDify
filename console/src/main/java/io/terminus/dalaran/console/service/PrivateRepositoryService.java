@@ -4,6 +4,7 @@ import io.terminus.dalaran.console.model.FlowTemplate;
 import io.terminus.dalaran.market.model.BasicResourceDTO;
 import io.terminus.dalaran.market.model.MarketResourceVersionDTO;
 import io.terminus.dalaran.model.BasicResponse;
+import io.terminus.dalaran.model.dto.BasicResourceRequest;
 import io.terminus.dalaran.model.dto.PrivateRepositoryDTO;
 import io.terminus.dalaran.model.dto.ResourceGroupDTO;
 import io.terminus.dalaran.model.query.PrivateRepositoryQuery;
@@ -28,4 +29,5 @@ public interface PrivateRepositoryService {
 
     List<ResourceGroupDTO> listResourceGroup();
 
+    BasicResponse delete(BasicResourceRequest request);
 }

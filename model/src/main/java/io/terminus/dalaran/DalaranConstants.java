@@ -60,6 +60,9 @@ public final class DalaranConstants {
     public static final String DALARAN = "Dalaran";
     public static final String PARTNER = "Partner";
 
+    public static final String BASIC = "Basic";
+    public static final String CUSTOM = "Custom";
+
     public static final String TRIGGER = "Trigger";
     public static final String PROCESSOR = "Processor";
     public static final String FLOW_TEMPLATE = "FlowTemplate";

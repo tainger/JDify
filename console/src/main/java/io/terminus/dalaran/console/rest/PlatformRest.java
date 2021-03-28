@@ -9,6 +9,8 @@ import io.terminus.dalaran.console.ResponseMessage;
 import io.terminus.dalaran.console.exception.OnException;
 import io.terminus.dalaran.console.service.*;
 import io.terminus.dalaran.core.context.DalaranContext;
+import io.terminus.dalaran.core.resource.property.PropertyService;
+import io.terminus.dalaran.model.BasicResponse;
 import io.terminus.dalaran.model.DalaranAccount;
 import io.terminus.dalaran.model.dto.ImportJarRequest;
 import io.terminus.dalaran.model.dto.ReleaseRecordDTO;
@@ -37,6 +39,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 public class PlatformRest implements PlatformInfoAPI, PlatformImportAPI, PlatformExportAPI, ReleaseReadAPI, ReleaseWriteAPI, LoginAPI {
@@ -61,6 +64,9 @@ public class PlatformRest implements PlatformInfoAPI, PlatformImportAPI, Platfor
 
     @Autowired
     private FlowManagementService flowManagementService;
+
+    @Autowired
+    private PropertyService propertyService;
 
     private final String libPath = "lib/";
     private final String classSuffix = ".class";
@@ -100,6 +106,11 @@ public class PlatformRest implements PlatformInfoAPI, PlatformImportAPI, Platfor
     @OnException(code = ResponseMessage.PROCESSOR_QUERY_ERROR)
     public Collection<ProcessorInfo> listProcessorInfo() {
         return dalaranContext.getDalaranComponentContext().getAllProcessorInfo();
+    }
+
+    @Override
+    public Map<String, Map<String, Map<String, ProcessorInfo>>> listGroupProcessorInfo() {
+        return dalaranContext.getDalaranComponentContext().listAllGroupProcessor();
     }
 
     @Override
@@ -227,8 +238,8 @@ public class PlatformRest implements PlatformInfoAPI, PlatformImportAPI, Platfor
 
     @Override
     @OnException(code = ResponseMessage.LOGIN_ERROR)
-    public boolean loginAuth(@RequestBody DalaranAccount account) {
-        return authorizeService.authAccount(account);
+    public BasicResponse loginAuth(@RequestBody DalaranAccount account) {
+        return new BasicResponse(authorizeService.authAccount(account), propertyService.getTenantCode());
     }
 
     @Override
