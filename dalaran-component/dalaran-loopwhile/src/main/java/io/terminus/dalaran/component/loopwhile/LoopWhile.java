@@ -42,7 +42,7 @@ public class LoopWhile implements DalaranProcessor<LoopWhileFragmentInfo>, Dalar
         dalaranContext.addFragmentFlow(fragment);
         if (!fragment.getPipeline().isEmpty()) {
             ProcessorModel lastProcessor = fragment.getPipeline().get(fragment.getPipeline().size() - 1);
-            ProcessorInfo lastProcessorInfo = dalaranContext.getDalaranComponentContext().getProcessorInfo(lastProcessor.getType());
+            ProcessorInfo lastProcessorInfo = dalaranContext.getDalaranComponentContext().getProcessorInfo(lastProcessor.getGroup(), lastProcessor.getType(), lastProcessor.getVersion());
             DalaranRoute route = dalaranContext.getDalaranFlowBuilder().buildFlowFragment(fragment);
             if (!DalaranConstants.OBJECT_MODEL_TYPE.equalsIgnoreCase(lastProcessorInfo.getModelType()) && lastProcessor.getOutModel() != null) {
                 dalaranContext.getDalaranModelTypeContext().toObject(route, lastProcessor.getOutModel(), lastProcessorInfo.getModelType());

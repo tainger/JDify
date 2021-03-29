@@ -12,6 +12,10 @@ public class ImportProcessorDTO extends ImportInfo {
     @NotNull
     private String processorType;
 
+    private String processorGroup;
+
+    private String processorVersion;
+
     @Nullable
     private Map<String, Object> processorConfig;
 }

@@ -42,6 +42,8 @@ public class DefaultDalaranFragmentBuilder implements DalaranFragmentBuilder {
     private ProcessorEntity toEntity(ProcessorRouteInfo routeInfo) {
         ProcessorEntity entity = new ProcessorEntity();
         entity.setId(routeInfo.getId());
+        entity.setGroup(routeInfo.getGroup());
+        entity.setVersion(routeInfo.getVersion());
         entity.setName(routeInfo.getName());
         entity.setType(routeInfo.getType());
         entity.setConfig(routeInfo.getConfig());

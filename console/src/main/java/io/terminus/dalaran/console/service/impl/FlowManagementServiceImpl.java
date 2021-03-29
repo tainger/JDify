@@ -393,7 +393,10 @@ public class FlowManagementServiceImpl implements FlowManagementService {
         if (StringUtils.isNotBlank(importInfo.getProcessorType())) {
             ProcessorDTO processor = new ProcessorDTO();
             processor.setId(RandomStringUtils.randomAlphanumeric(6));
+
             processor.setType(importInfo.getProcessorType());
+            processor.setGroup(importInfo.getProcessorGroup());
+            processor.setVersion(importInfo.getProcessorVersion());
             processor.setConfig(importInfo.getProcessorConfig());
             ModelDTO processorInModel = importInfo.getProcessorInModel();
             if (processorInModel != null) {
@@ -459,6 +462,8 @@ public class FlowManagementServiceImpl implements FlowManagementService {
         ProcessorDTO processor = new ProcessorDTO();
         processor.setConfig(config);
         processor.setType(importInfo.getProcessorType());
+        processor.setGroup(importInfo.getProcessorGroup());
+        processor.setVersion(importInfo.getProcessorVersion());
         result.setProcessor(processor);
         return result;
     }
@@ -692,6 +697,8 @@ public class FlowManagementServiceImpl implements FlowManagementService {
         List<ProcessorEntity> pipeline = triggerFlow.getPipeline().stream().map(processor -> {
             ProcessorEntity processorEntity = new ProcessorEntity();
             processorEntity.setId(processor.getId());
+            processorEntity.setGroup(processor.getGroup());
+            processorEntity.setVersion(processor.getVersion());
             processorEntity.setType(processor.getType());
             processorEntity.setName(processor.getName());
             processorEntity.setConfig(JSON.toJSONString(processor.getConfig()));
@@ -832,7 +839,7 @@ public class FlowManagementServiceImpl implements FlowManagementService {
         }
 
         for (ProcessorEntity processorEntity : origin.getPipeline()) {
-            ProcessorInfo processorInfo = dalaranContext.getDalaranComponentContext().getProcessorInfo(processorEntity.getType());
+            ProcessorInfo processorInfo = dalaranContext.getDalaranComponentContext().getProcessorInfo(processorEntity.getGroup(), processorEntity.getType(), processorEntity.getVersion());
             if (StringUtils.equalsIgnoreCase(processorInfo.getOrigin(), DalaranConstants.PARTNER)) {
                 PrivateRepositoryEntity privateRepositoryEntity = privateRepositoryRepository.findByNameAndType(processorInfo.getName(), DalaranConstants.PROCESSOR);
                 if (privateRepositoryEntity != null) {

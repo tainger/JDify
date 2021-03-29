@@ -36,10 +36,8 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.io.File;
 import java.util.*;
-
 import static io.terminus.dalaran.DalaranConstants.*;
 
 @Service
@@ -380,10 +378,10 @@ public class PrivateRepositoryServiceImpl implements PrivateRepositoryService {
         }
     }
 
-    private void loadProcessor(String fileUrl, String type, String version) throws Exception {
+    private void loadProcessor(String fileUrl, String group, String version) throws Exception {
         OSSObject ossObject = OSSUtils.downloadByUrl(fileUrl, ossAccount);
         File file = DalaranFileUtils.createFile(ossObject.getKey());
         FileUtils.copyToFile(ossObject.getObjectContent(), file);
-        marketResourceLoader.loadProcessor(file, type, version);
+        marketResourceLoader.loadProcessor(file, group, version);
     }
 }

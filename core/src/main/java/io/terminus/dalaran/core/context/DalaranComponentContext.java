@@ -12,11 +12,11 @@ public interface DalaranComponentContext {
 
     DalaranTrigger getTrigger(String triggerType);
 
-    DalaranProcessor getProcessor(String processorType);
+    DalaranProcessor getProcessor(String group, String processorType, String version);
 
     TriggerInfo getTriggerInfo(String triggerType);
 
-    ProcessorInfo getProcessorInfo(String processorType);
+    ProcessorInfo getProcessorInfo(String group, String processorType, String version);
 
     Collection<TriggerInfo> getAllTriggerInfo();
 

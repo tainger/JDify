@@ -1,6 +1,7 @@
 package io.terminus.dalaran.console.service.impl;
 
 import io.terminus.dalaran.console.service.AuthorizeService;
+import io.terminus.dalaran.core.resource.property.PropertyService;
 import io.terminus.dalaran.model.DalaranAccount;
 import io.terminus.draco.api.response.UserInfo;
 import io.terminus.draco.web.autoconfig.context.UserContext;
@@ -22,6 +23,9 @@ public class AuthorizeServiceImpl implements AuthorizeService {
     @Autowired
     private AuthenticationManager authenticationManager;
 
+    @Autowired
+    private PropertyService propertyService;
+
     @Override
     public boolean authAccount(DalaranAccount account) {
         UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(account.getUsername(), account.getPassword(), AuthorityUtils.commaSeparatedStringToAuthorityList(""));
@@ -32,7 +36,11 @@ public class AuthorizeServiceImpl implements AuthorizeService {
 
     @Override
     public UserInfo getUserInfo(){
-        return UserContext.getUserInfo();
+        UserInfo userInfo = UserContext.getUserInfo();
+        if (userInfo == null) {
+            userInfo = new UserInfo();
+            userInfo.setUsername(propertyService.getTenantCode());
+        }
+        return userInfo;
     }
-
 }

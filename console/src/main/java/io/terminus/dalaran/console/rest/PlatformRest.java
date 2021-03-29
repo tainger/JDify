@@ -66,6 +66,9 @@ public class PlatformRest implements PlatformInfoAPI, PlatformImportAPI, Platfor
     private FlowManagementService flowManagementService;
 
     @Autowired
+    private PrivateRepositoryService privateRepositoryService;
+
+    @Autowired
     private PropertyService propertyService;
 
     private final String libPath = "lib/";
@@ -257,5 +260,10 @@ public class PlatformRest implements PlatformInfoAPI, PlatformImportAPI, Platfor
     @Override
     public void importJarFile(ImportJarRequest request) {
         marketManagementService.upload(request.getFilePath());
+    }
+
+    @Override
+    public BasicResponse localUpload(MultipartFile file, String name, String version, String resourceGroup) {
+        return privateRepositoryService.localResourceUpload(file, name, version, resourceGroup);
     }
 }

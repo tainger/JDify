@@ -12,6 +12,7 @@ import io.terminus.dalaran.core.util.ConfigFieldUtils;
 import io.terminus.dalaran.core.util.I18nUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.MapUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -43,6 +44,8 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext {
 
     private final Map<String, Map<String, Map<String, ProcessorInfo>>> groupProcessorInfo = new ConcurrentHashMap<>();
 
+    private final Map<String, Map<String, Map<String, DalaranProcessor>>> groupProcessor = new ConcurrentHashMap<>();
+
     @Override
     public DalaranTrigger getTrigger(String triggerType) {
         // TODO check null
@@ -50,10 +53,13 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext {
     }
 
     @Override
-    public DalaranProcessor getProcessor(String processorType) {
-
+    public DalaranProcessor getProcessor(String group, String processorType, String version) {
         // TODO check null
-        return processorMapping.get(processorType);
+        if (StringUtils.isNotBlank(group) && StringUtils.isNotBlank(version)) {
+            return groupProcessor.get(group).get(processorType).get(version);
+        } else {
+            return processorMapping.get(processorType);
+        }
     }
 
     @Override
@@ -63,9 +69,13 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext {
     }
 
     @Override
-    public ProcessorInfo getProcessorInfo(String processorType) {
+    public ProcessorInfo getProcessorInfo(String group, String processorType, String version) {
         // TODO check null
-        return processorInfoMapping.get(processorType);
+        if (StringUtils.isNotBlank(group) && StringUtils.isNotBlank(version)) {
+            return groupProcessorInfo.get(group).get(processorType).get(version);
+        } else {
+            return processorInfoMapping.get(processorType);
+        }
     }
 
     @Override
@@ -240,7 +250,7 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext {
     }
 
     // TODO 很多重复性的代码
-    public void addProcessor(DalaranProcessor processor, String type, String version) {
+    public void addProcessor(DalaranProcessor processor, String group, String version) {
         Processor processorAnnotation = processor.getClass().getDeclaredAnnotation(Processor.class);
         DalaranConfigField[] configFields = ConfigFieldUtils.buildConfigFields(processorAnnotation.configType());
         for (int i = 0; i < processorAnnotation.value().length; i++) {
@@ -270,21 +280,35 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext {
             processorInfoMapping.put(processorType, processorInfo);
             processorMapping.put(processorType, processor);
 
-            Map<String, Map<String, ProcessorInfo>> processors = groupProcessorInfo.get(type);
+            Map<String, Map<String, ProcessorInfo>> processorInfos = groupProcessorInfo.get(group);
+            if (MapUtils.isEmpty(processorInfos)) {
+                processorInfos = new ConcurrentHashMap<>();
+                groupProcessorInfo.put(group, processorInfos);
+            }
+            Map<String, ProcessorInfo> versionedProcessorInfo = processorInfos.get(processorType);
+            if (MapUtils.isEmpty(versionedProcessorInfo)) {
+                versionedProcessorInfo = new ConcurrentHashMap<>();
+            }
+            ProcessorInfo newProcessorInfo = processorTransfer(processorInfo);
+            versionedProcessorInfo.put(version, newProcessorInfo);
+            processorInfos.put(processorType, versionedProcessorInfo);
+
+            Map<String, Map<String, DalaranProcessor>> processors = groupProcessor.get(group);
             if (MapUtils.isEmpty(processors)) {
                 processors = new ConcurrentHashMap<>();
-                groupProcessorInfo.put(type, processors);
+                groupProcessor.put(group, processors);
             }
-            Map<String, ProcessorInfo> versionedProcessor = processors.get(processorType);
+            Map<String, DalaranProcessor> versionedProcessor = processors.get(processorType);
             if (MapUtils.isEmpty(versionedProcessor)) {
                 versionedProcessor = new ConcurrentHashMap<>();
             }
-            ProcessorInfo newProcessor = processorTransfer(processorInfo);
-            versionedProcessor.put(version, newProcessor);
+            versionedProcessor.put(version, processor);
             processors.put(processorType, versionedProcessor);
         }
         log.info("load processor {}", processorAnnotation);
     }
+
+
 
     @Override
     public void addBasicComponent(DalaranBasicComponent component) {

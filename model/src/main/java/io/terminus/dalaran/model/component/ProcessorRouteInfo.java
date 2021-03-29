@@ -15,6 +15,10 @@ public class ProcessorRouteInfo {
     @NotNull
     private String type;
 
+    private String group;
+
+    private String version;
+
     @Nullable
     private String config;
 }

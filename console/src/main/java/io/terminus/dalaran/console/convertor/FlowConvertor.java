@@ -27,6 +27,8 @@ public class FlowConvertor {
         List<ProcessorDTO> pipeline = new ArrayList<>();
         for (ProcessorEntity processorEntity : entity.getPipeline()) {
             ProcessorDTO processor = new ProcessorDTO();
+            processor.setGroup(processorEntity.getGroup());
+            processor.setVersion(processorEntity.getVersion());
             processor.setId(processorEntity.getId());
             processor.setType(processorEntity.getType());
             processor.setName(processorEntity.getName());
@@ -53,6 +55,8 @@ public class FlowConvertor {
         List<ProcessorDTO> pipeline = new ArrayList<>();
         for (ProcessorEntity processorEntity : entity.getPipeline()) {
             ProcessorDTO processor = new ProcessorDTO();
+            processor.setGroup(processorEntity.getGroup());
+            processor.setVersion(processorEntity.getVersion());
             processor.setId(processorEntity.getId());
             processor.setType(processorEntity.getType());
             processor.setName(processorEntity.getName());
@@ -75,6 +79,8 @@ public class FlowConvertor {
         List<ProcessorDTO> pipeline = new ArrayList<>();
         for (ProcessorEntity processorEntity : entity.getPipeline()) {
             ProcessorDTO processor = new ProcessorDTO();
+            processor.setGroup(processorEntity.getGroup());
+            processor.setVersion(processorEntity.getVersion());
             processor.setId(processorEntity.getId());
             processor.setType(processorEntity.getType());
             processor.setName(processorEntity.getName());
@@ -100,6 +106,8 @@ public class FlowConvertor {
         List<ProcessorDTO> pipeline = new ArrayList<>();
         for (ProcessorEntity processorEntity : entity.getPipeline()) {
             ProcessorDTO processor = new ProcessorDTO();
+            processor.setGroup(processorEntity.getGroup());
+            processor.setVersion(processorEntity.getVersion());
             processor.setId(processorEntity.getId());
             processor.setType(processorEntity.getType());
             processor.setName(processorEntity.getName());

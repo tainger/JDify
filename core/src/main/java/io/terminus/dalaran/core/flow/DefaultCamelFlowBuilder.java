@@ -187,8 +187,8 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
 
     public FlowValidationModel validatePipeline(List<ProcessorModel> pipeline, List<FlowValidation> validateMessages, MessageModel lastModel, FlowValidationModel flowValidationModel){
         for(ProcessorModel processorModel : pipeline){
-            DalaranProcessor processor = componentContext.getProcessor(processorModel.getType());
-            ProcessorInfo processorInfo = componentContext.getProcessorInfo(processorModel.getType());
+            DalaranProcessor processor = componentContext.getProcessor(processorModel.getGroup(), processorModel.getType(), processorModel.getVersion());
+            ProcessorInfo processorInfo = componentContext.getProcessorInfo(processorModel.getGroup(), processorModel.getType(), processorModel.getVersion());
             String json = JSONObject.toJSONString(processorModel.getConfig());
             JSONObject jsonObject;
             if (json.startsWith("\"")) {
@@ -339,8 +339,8 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
             if (flow.isTracing()) {
                 spanTracer = DalaranTracer.buildFlowSpanTracer(traceLogger, processor.getId());
             }
-            DalaranProcessor processorComponent = componentContext.getProcessor(processor.getType());
-            currentProcessorInfo = componentContext.getProcessorInfo(processor.getType());
+            DalaranProcessor processorComponent = componentContext.getProcessor(processor.getGroup(), processor.getType(), processor.getVersion());
+            currentProcessorInfo = componentContext.getProcessorInfo(processor.getGroup(), processor.getType(), processor.getVersion());
 
             if (spanTracer != null) {
                 spanTracer.before(route, currentBodyType);

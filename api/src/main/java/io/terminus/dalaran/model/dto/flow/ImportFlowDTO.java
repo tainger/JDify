@@ -13,6 +13,8 @@ public class ImportFlowDTO extends ImportInfo {
     private String triggerType;
     private Map<String, Object> triggerConfig;
     private String processorType;
+    private String processorGroup;
+    private String processorVersion;
     private Map<String, Object> processorConfig;
     private ModelDTO processorInModel;
     private ModelDTO processorOutModel;

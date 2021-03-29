@@ -20,9 +20,9 @@ import io.terminus.dalaran.model.flow.SubFlow;
 import io.terminus.dalaran.model.flow.ValidateMessageLevel;
 import io.terminus.dalaran.model.query.FlowQuery;
 import io.terminus.draco.web.autoconfig.context.UserContext;
+import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -115,8 +115,11 @@ public class SubFlowManagementServiceImpl implements SubFlowManagementService {
             return null;
         }
         SubFlowEntity newFlowEntity = new SubFlowEntity();
-
-        BeanUtils.copyProperties(flowEntity, newFlowEntity);
+        try {
+            BeanUtils.copyProperties(flowEntity, newFlowEntity);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         newFlowEntity.setId(null);
         newFlowEntity.setName(copyFlow.getName());
         subFlowRepository.save(newFlowEntity);
@@ -164,9 +167,11 @@ public class SubFlowManagementServiceImpl implements SubFlowManagementService {
         }
         List<ProcessorEntity> pipeline = model.getPipeline().stream().map(processor -> {
             ProcessorEntity processorEntity = new ProcessorEntity();
-            processorEntity.setId(processor.getId());
-            processorEntity.setType(processor.getType());
-            processorEntity.setName(processor.getName());
+            try {
+                BeanUtils.copyProperties(processorEntity, processor);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             processorEntity.setConfig(JSON.toJSONString(processor.getConfig()));
             return processorEntity;
         }).collect(Collectors.toList());
