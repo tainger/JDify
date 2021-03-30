@@ -1,19 +1,26 @@
 package io.terminus.dalaran.console;
 
+import com.alibaba.fastjson.JSON;
+import io.terminus.dalaran.component.utils.OSSUtils;
 import io.terminus.dalaran.console.entity.FunctionEntity;
 import io.terminus.dalaran.console.entity.SubFlowEntity;
 import io.terminus.dalaran.console.entity.TriggerFlowEntity;
 import io.terminus.dalaran.core.context.DalaranContext;
+import io.terminus.dalaran.core.market.MarketResourceLoader;
+import io.terminus.dalaran.core.oss.OSSAccount;
 import io.terminus.dalaran.core.resource.DalaranResourceBuilder;
 import io.terminus.dalaran.core.resource.DalaranStarter;
 import io.terminus.dalaran.core.resource.entity.SubFlowAbstractEntity;
 import io.terminus.dalaran.core.resource.entity.TriggerFlowAbstractEntity;
+import io.terminus.dalaran.core.resource.entity.common.PrivateRepositoryEntity;
 import io.terminus.dalaran.core.resource.repository.ReleaseRecordRepository;
 import io.terminus.dalaran.model.flow.BasicFlow;
 import io.terminus.dalaran.model.flow.SubFlow;
+import io.terminus.dalaran.model.market.ResourceFile;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.io.File;
 import java.util.List;
 
 @Slf4j
@@ -27,6 +34,12 @@ public class TestFlowInitializer implements DalaranStarter {
 
     @Autowired
     private DalaranResourceBuilder resourceBuilder;
+
+    @Autowired
+    private MarketResourceLoader marketResourceLoader;
+
+    @Autowired
+    private OSSAccount ossAccount;
 
     @Autowired
     private DalaranContext dalaranContext;
@@ -80,6 +93,18 @@ public class TestFlowInitializer implements DalaranStarter {
                 log.error("load sub flow [{}] error", subFlowEntity.getResourceKey());
             }
         }
+
+        List<PrivateRepositoryEntity> privateRepositoryEntityList = resourceLoader.loadPackage();
+        for (PrivateRepositoryEntity entity : privateRepositoryEntityList) {
+            try {
+                ResourceFile resourceFile = JSON.parseObject(entity.getData(), ResourceFile.class);
+                File file = OSSUtils.downloadByPath(resourceFile.getFilePath(), ossAccount);
+                marketResourceLoader.install(file, entity.getType(), entity.getVersion());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
         log.info("dalaran resource load started");
     }
 }

@@ -2,9 +2,11 @@ package io.terminus.dalaran.console;
 
 import io.terminus.dalaran.console.entity.*;
 import io.terminus.dalaran.console.repository.*;
+import io.terminus.dalaran.console.service.jpa.PrivateResourceQueryService;
 import io.terminus.dalaran.core.context.DalaranContext;
 import io.terminus.dalaran.core.resource.DalaranResourceLoader;
-import io.terminus.dalaran.core.resource.entity.AlarmRuleAbstractEntity;
+import io.terminus.dalaran.core.resource.entity.common.PrivateRepositoryEntity;
+import io.terminus.dalaran.core.resource.repository.PrivateRepositoryRepository;
 import io.terminus.dalaran.model.flow.FlowStatus;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,6 +48,12 @@ public class TestResourceLoader implements DalaranResourceLoader {
 
     @Autowired
     private AuthenticatorRepository authenticatorRepository;
+
+    @Autowired
+    private PrivateRepositoryRepository privateRepository;
+
+    @Autowired
+    private PrivateResourceQueryService privateResourceQueryService;
 
     @Autowired
     private DalaranContext dalaranContext;
@@ -98,6 +106,11 @@ public class TestResourceLoader implements DalaranResourceLoader {
     @Override
     public List<ClientEntity> loadAllClient() {
         return clientRepository.findByIsExistTrue();
+    }
+
+    @Override
+    public List<PrivateRepositoryEntity> loadPackage() {
+        return privateResourceQueryService.listPackageResource();
     }
 
     @Override

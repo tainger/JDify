@@ -1,5 +1,6 @@
 package io.terminus.dalaran.console.service.jpa.impl;
 
+import io.terminus.dalaran.DalaranConstants;
 import io.terminus.dalaran.console.service.jpa.PrivateResourceQueryService;
 import io.terminus.dalaran.core.resource.entity.common.PrivateRepositoryEntity;
 import io.terminus.dalaran.core.resource.repository.PrivateRepositoryRepository;
@@ -75,6 +76,28 @@ public class PrivateResourceQueryServiceImpl implements PrivateResourceQueryServ
                 Predicate id = criteriaBuilder.equal(root.get("version"), version);
                 predicates.add(id);
             }
+
+            Predicate isExist = criteriaBuilder.equal(root.get("isExist"),true);
+            predicates.add(isExist);
+
+            return criteriaBuilder.and(predicates.toArray(new Predicate[predicates.size()]));
+        };
+        return privateRepository.findAll(specification);
+    }
+
+    @Override
+    public List<PrivateRepositoryEntity> listPackageResource() {
+        Specification<PrivateRepositoryEntity> specification = (root, criteriaQuery, criteriaBuilder) -> {
+            List<Predicate> predicates = new ArrayList<>();
+
+
+            Predicate processor = criteriaBuilder.equal(root.get("type"), DalaranConstants.PROCESSOR);
+
+            Predicate trigger = criteriaBuilder.equal(root.get("type"), DalaranConstants.TRIGGER);
+
+            Predicate predicate
+                    = criteriaBuilder.or(processor, trigger);
+            predicates.add(predicate);
 
             Predicate isExist = criteriaBuilder.equal(root.get("isExist"),true);
             predicates.add(isExist);

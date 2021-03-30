@@ -18,7 +18,6 @@ import io.terminus.dalaran.core.resource.property.PropertyService;
 import io.terminus.dalaran.core.resource.repository.PrivateRepositoryRepository;
 import io.terminus.dalaran.market.model.BasicResourceDTO;
 import io.terminus.dalaran.market.model.MarketResourceVersionDTO;
-import io.terminus.dalaran.market.model.ResourceType;
 import io.terminus.dalaran.model.BasicResponse;
 import io.terminus.dalaran.model.dto.BasicResourceRequest;
 import io.terminus.dalaran.model.dto.PrivateRepositoryDTO;
@@ -37,8 +36,10 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
+
 import java.io.File;
 import java.util.*;
+
 import static io.terminus.dalaran.DalaranConstants.*;
 
 @Service
@@ -247,7 +248,9 @@ public class PrivateRepositoryServiceImpl implements PrivateRepositoryService {
             PrivateRepositoryEntity entity = entities.get(0);
             entity.setExist(false);
             privateRepository.save(entity);
-            marketResourceLoader.uninstall(entity.getResourceGroup(), entity.getName(), entity.getVersion());
+            if (StringUtils.equalsIgnoreCase(entity.getType(), PROCESSOR) || StringUtils.equalsIgnoreCase(entity.getType(), TRIGGER)) {
+                marketResourceLoader.uninstall(entity.getResourceGroup(), entity.getName(), entity.getVersion());
+            }
             return new BasicResponse(true, "删除成功");
         } catch (Exception e) {
             e.printStackTrace();

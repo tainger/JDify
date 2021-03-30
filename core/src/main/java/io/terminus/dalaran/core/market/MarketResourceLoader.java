@@ -4,7 +4,7 @@ import java.io.File;
 
 public interface MarketResourceLoader {
 
-    void install(File file, String type, String version);
+    void install(File file, String group, String version);
 
     void uninstall(String group, String type, String version);
 }

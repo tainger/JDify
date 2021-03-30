@@ -13,4 +13,5 @@ public interface PrivateResourceQueryService {
 
     List<PrivateRepositoryEntity> findByResourceKeyAndVersion(String resourceKey, String version);
 
+    List<PrivateRepositoryEntity> listPackageResource();
 }

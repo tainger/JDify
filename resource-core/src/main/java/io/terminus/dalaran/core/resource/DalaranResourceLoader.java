@@ -1,6 +1,7 @@
 package io.terminus.dalaran.core.resource;
 
 import io.terminus.dalaran.core.resource.entity.*;
+import io.terminus.dalaran.core.resource.entity.common.PrivateRepositoryEntity;
 
 import java.util.List;
 
@@ -25,6 +26,8 @@ public interface DalaranResourceLoader {
     List<? extends FunctionAbstractEntity> loadAllFunctions();
 
     List<? extends ClientAbstractEntity> loadAllClient();
+
+    List<PrivateRepositoryEntity> loadPackage();
 
     TriggerFlowAbstractEntity loadTriggerFlow(String triggerFlowId);
 
