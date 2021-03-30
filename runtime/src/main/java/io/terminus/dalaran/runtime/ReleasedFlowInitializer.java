@@ -1,18 +1,25 @@
 package io.terminus.dalaran.runtime;
 
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.JSON;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.models.Swagger;
 import io.terminus.dalaran.component.http.trigger.model.ApiInfo;
 import io.terminus.dalaran.component.http.trigger.utils.SwaggerUtils;
+import io.terminus.dalaran.component.utils.OSSUtils;
 import io.terminus.dalaran.core.context.DalaranContext;
+import io.terminus.dalaran.core.market.MarketResourceLoader;
+import io.terminus.dalaran.core.oss.OSSAccount;
 import io.terminus.dalaran.core.resource.DalaranResourceBuilder;
 import io.terminus.dalaran.core.resource.DalaranStarter;
 import io.terminus.dalaran.core.resource.entity.common.ModuleEntity;
+import io.terminus.dalaran.core.resource.entity.common.PrivateRepositoryEntity;
 import io.terminus.dalaran.core.resource.entity.common.ReleaseRecordEntity;
-import io.terminus.dalaran.core.resource.entity.released.*;
+import io.terminus.dalaran.core.resource.entity.released.ClientReleasedEntity;
+import io.terminus.dalaran.core.resource.entity.released.FunctionReleasedEntity;
+import io.terminus.dalaran.core.resource.entity.released.SubFlowReleasedEntity;
+import io.terminus.dalaran.core.resource.entity.released.TriggerFlowReleasedEntity;
 import io.terminus.dalaran.core.resource.redis.RedisService;
 import io.terminus.dalaran.core.resource.redis.RedisUtil;
 import io.terminus.dalaran.core.resource.repository.ModuleRepository;
@@ -20,6 +27,7 @@ import io.terminus.dalaran.core.resource.repository.ReleaseRecordRepository;
 import io.terminus.dalaran.core.resource.repository.TriggerFlowReleasedRepository;
 import io.terminus.dalaran.model.flow.SubFlow;
 import io.terminus.dalaran.model.flow.TriggerFlow;
+import io.terminus.dalaran.model.market.ResourceFile;
 import io.terminus.dalaran.runtime.service.DalaranNoticeService;
 import io.terminus.dalaran.runtime.service.TracingLogService;
 import lombok.extern.slf4j.Slf4j;
@@ -28,7 +36,9 @@ import org.apache.camel.model.RouteDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+
 import javax.annotation.PostConstruct;
+import java.io.File;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -63,6 +73,12 @@ public class ReleasedFlowInitializer implements DalaranStarter {
 
     @Autowired
     private TriggerFlowReleasedRepository triggerFlowReleasedRepository;
+
+    @Autowired
+    private MarketResourceLoader marketResourceLoader;
+
+    @Autowired
+    private OSSAccount ossAccount;
 
     @Autowired
     private RedisService redisService;
@@ -148,6 +164,17 @@ public class ReleasedFlowInitializer implements DalaranStarter {
                 try {
                     dalaranContext.getDalaranFunctionContext().addCustomFunction(String.valueOf(function.getOriginId()), function.getType(),
                             function.getScript(), function.getParams());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            List<PrivateRepositoryEntity> privateRepositoryEntityList = resourceLoader.loadPackage();
+            for (PrivateRepositoryEntity entity : privateRepositoryEntityList) {
+                try {
+                    ResourceFile resourceFile = JSON.parseObject(entity.getData(), ResourceFile.class);
+                    File file = OSSUtils.downloadByPath(resourceFile.getFilePath(), ossAccount);
+                    marketResourceLoader.install(file, entity.getType(), entity.getVersion());
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

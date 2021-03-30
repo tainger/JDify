@@ -1,6 +1,7 @@
 package io.terminus.dalaran.as2;
 
 import io.terminus.dalaran.core.resource.DalaranResourceLoader;
+import io.terminus.dalaran.core.resource.entity.common.PrivateRepositoryEntity;
 import io.terminus.dalaran.core.resource.entity.released.*;
 import io.terminus.dalaran.core.resource.repository.*;
 import io.terminus.dalaran.model.flow.FlowStatus;
@@ -77,6 +78,11 @@ public class ReleasedResourceLoader implements DalaranResourceLoader {
     @Override
     public List<TriggerFlowReleasedEntity> loadAvailableTriggerFlowByTriggerType(String triggerType) {
         return releasedTriggerFlowRepository.findByVersionAndStatusNotAndTriggerType(version, FlowStatus.Error, triggerType);
+    }
+
+    @Override
+    public List<PrivateRepositoryEntity> loadPackage() {
+        return null;
     }
 
     @Override

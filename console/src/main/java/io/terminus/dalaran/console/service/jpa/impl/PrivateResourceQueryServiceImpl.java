@@ -35,13 +35,13 @@ public class PrivateResourceQueryServiceImpl implements PrivateResourceQueryServ
             List<Predicate> predicates = new ArrayList<>();
 
             if (StringUtils.isNoneBlank(query.getOrigin())) {
-                Predicate type = criteriaBuilder.equal(root.get("origin"), query.getOrigin());
-                predicates.add(type);
+                Predicate origin = criteriaBuilder.equal(root.get("origin"), query.getOrigin());
+                predicates.add(origin);
             }
 
             if (StringUtils.isNoneBlank(query.getTenantCode())) {
-                Predicate type = criteriaBuilder.equal(root.get("tenantCode"), query.getTenantCode());
-                predicates.add(type);
+                Predicate tenantCode = criteriaBuilder.equal(root.get("tenantCode"), query.getTenantCode());
+                predicates.add(tenantCode);
             }
 
             if (StringUtils.isNoneBlank(query.getType())) {

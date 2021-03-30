@@ -67,6 +67,12 @@ public class PrivateRepositoryServiceImpl implements PrivateRepositoryService {
     private PrivateSubFlowRepository privateSubFlowRepository;
 
     @Autowired
+    private TriggerFlowRepository triggerFlowRepository;
+
+    @Autowired
+    private SubFlowRepository subFlowRepository;
+
+    @Autowired
     private OSSAccount ossAccount;
 
     @Autowired
@@ -185,10 +191,16 @@ public class PrivateRepositoryServiceImpl implements PrivateRepositoryService {
     public BasicResponse install(PrivateRepositoryDTO privateRepositoryDTO) {
         try {
             resourceInstall(privateRepositoryDTO);
-            PrivateRepositoryEntity entity = toEntity(privateRepositoryDTO);
+            PrivateRepositoryEntity entity;
+            List<PrivateRepositoryEntity> entities = privateResourceQueryService.findByResourceKeyAndVersion(privateRepositoryDTO.getId(), privateRepositoryDTO.getVersion());
+            if (CollectionUtils.isNotEmpty(entities)) {
+                entity = entities.get(0);
+            } else {
+                entity = toEntity(privateRepositoryDTO);
+                entity.setId(null);
+            }
             entity.setResourceKey(privateRepositoryDTO.getId());
             entity.setOrigin(MARKET);
-            entity.setId(null);
             privateRepository.save(entity);
             return new BasicResponse(true, entity.getResourceKey());
         } catch (Exception e) {
@@ -203,6 +215,7 @@ public class PrivateRepositoryServiceImpl implements PrivateRepositoryService {
             PrivateRepositoryEntity entity = flowTemplateToEntity(flowTemplate);
             entity.setResourceKey(flowTemplate.getId());
             entity.setOrigin(PRIVATE);
+            entity.setTenantCode(propertyService.getTenantCode());
             entity.setId(null);
             privateRepository.save(entity);
             return new BasicResponse(true, entity.getResourceKey());
@@ -251,11 +264,36 @@ public class PrivateRepositoryServiceImpl implements PrivateRepositoryService {
             if (StringUtils.equalsIgnoreCase(entity.getType(), PROCESSOR) || StringUtils.equalsIgnoreCase(entity.getType(), TRIGGER)) {
                 marketResourceLoader.uninstall(entity.getResourceGroup(), entity.getName(), entity.getVersion());
             }
+
+            String flowName = checkResourceDependency(entity);
+            if (StringUtils.isNotBlank(flowName)) {
+                return new BasicResponse(false, "该资源已经被其他流程依赖，删除失败. 流程名：" + flowName);
+            }
+
             return new BasicResponse(true, "删除成功");
         } catch (Exception e) {
             e.printStackTrace();
         }
         return new BasicResponse(false, "删除失败");
+    }
+
+    private String checkResourceDependency(PrivateRepositoryEntity entity) {
+        String resourceType = entity.getName();
+        List<TriggerFlowEntity> triggerFlowEntityList = triggerFlowRepository.findByIsExistTrue();
+        for (TriggerFlowEntity flowEntity : triggerFlowEntityList) {
+            if (StringUtils.contains(flowEntity.getTriggerConfig(), resourceType) || StringUtils.contains(JSON.toJSONString(flowEntity.getPipeline()), resourceType)) {
+                return flowEntity.getName();
+            }
+        }
+
+        List<SubFlowEntity> subFlowEntityList = subFlowRepository.findByIsExistTrue();
+        for (SubFlowEntity subFlowEntity : subFlowEntityList) {
+            if (StringUtils.contains(JSON.toJSONString(subFlowEntity.getPipeline()), resourceType)) {
+                return subFlowEntity.getName();
+            }
+        }
+
+        return null;
     }
 
     private PrivateRepositoryEntity flowTemplateToEntity(FlowTemplate flowTemplate) throws Exception {
