@@ -16,6 +16,6 @@ public class MarketManagementServiceImpl implements MarketManagementService {
     @Override
     public void upload(String url) {
         File localFile = new File("/Users/jingdi/work/terminus-work/Trantor/dice/current/dalaran-starter/custom-components/target/custom-components-2.4.8-SNAPSHOT.jar");
-        marketResourceLoader.loadProcessor(localFile, "", "");
+        marketResourceLoader.install(localFile, "", "");
     }
 }

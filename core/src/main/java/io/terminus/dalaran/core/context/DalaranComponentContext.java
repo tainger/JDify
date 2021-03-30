@@ -18,6 +18,8 @@ public interface DalaranComponentContext {
 
     ProcessorInfo getProcessorInfo(String group, String processorType, String version);
 
+    boolean removeProcessorInfo(String group, String processorType, String version);
+
     Collection<TriggerInfo> getAllTriggerInfo();
 
     Collection<ConnectorInfo> getAllConnectorInfo();

@@ -135,7 +135,7 @@ public class PrivateRepositoryServiceImpl implements PrivateRepositoryService {
     public PrivateRepositoryDTO getResourceDetail(String id, String version) {
         PrivateRepositoryDTO privateRepositoryDTO = new PrivateRepositoryDTO();
         try {
-            PrivateRepositoryEntity entity = privateRepository.findByResourceKeyAndVersion(id, version);
+            PrivateRepositoryEntity entity = privateResourceQueryService.findByResourceKeyAndVersion(id, version).get(0);
             BeanUtils.copyProperties(privateRepositoryDTO, entity);
             privateRepositoryDTO.setId(entity.getResourceKey());
             switch (entity.getType()) {
@@ -216,7 +216,7 @@ public class PrivateRepositoryServiceImpl implements PrivateRepositoryService {
             File local = io.terminus.dalaran.console.util.FileUtils.transfer(file);
             String filePath = OSSUtils.upload(local, ossAccount);
             ResourceFile resourceFile = new ResourceFile(filePath);
-            marketResourceLoader.loadProcessor(local, CUSTOM, version);
+            marketResourceLoader.install(local, CUSTOM, version);
             PrivateRepositoryEntity entity = new PrivateRepositoryEntity();
             String resourceKey = GenerateKeyUtils.resourceKey(propertyService.getTenantCode());
             entity.setName(name);
@@ -236,12 +236,19 @@ public class PrivateRepositoryServiceImpl implements PrivateRepositoryService {
     @Override
     public BasicResponse delete(BasicResourceRequest request) {
         try {
-            privateRepository.findByResourceKeyAndVersion(request.getId(), request.getVersion());
-            return new BasicResponse(true);
+            List<PrivateRepositoryEntity> entities = privateResourceQueryService.findByResourceKeyAndVersion(request.getId(), request.getVersion());
+            if (CollectionUtils.isEmpty(entities)) {
+                return new BasicResponse(true);
+            }
+            PrivateRepositoryEntity entity = entities.get(0);
+            entity.setExist(false);
+            privateRepository.save(entity);
+            marketResourceLoader.uninstall(entity.getResourceGroup(), entity.getName(), entity.getVersion());
+            return new BasicResponse(true, "删除成功");
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return new BasicResponse(false);
+        return new BasicResponse(false, "删除失败");
     }
 
     private PrivateRepositoryEntity flowTemplateToEntity(FlowTemplate flowTemplate) throws Exception {
@@ -286,7 +293,7 @@ public class PrivateRepositoryServiceImpl implements PrivateRepositoryService {
                 OSSObject object = OSSUtils.downloadByUrl(fileUrl, ossAccount);
                 File file = DalaranFileUtils.createFile(object.getKey());
                 FileUtils.copyToFile(object.getObjectContent(), file);
-                marketResourceLoader.loadProcessor(file, MARKET, entity.getVersion());
+                marketResourceLoader.install(file, MARKET, entity.getVersion());
                 break;
             case FLOW_TEMPLATE:
             case SUB_FLOW_TEMPLATE:
@@ -382,6 +389,6 @@ public class PrivateRepositoryServiceImpl implements PrivateRepositoryService {
         OSSObject ossObject = OSSUtils.downloadByUrl(fileUrl, ossAccount);
         File file = DalaranFileUtils.createFile(ossObject.getKey());
         FileUtils.copyToFile(ossObject.getObjectContent(), file);
-        marketResourceLoader.loadProcessor(file, group, version);
+        marketResourceLoader.install(file, group, version);
     }
 }

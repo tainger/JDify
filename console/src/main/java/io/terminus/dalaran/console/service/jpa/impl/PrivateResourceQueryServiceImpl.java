@@ -62,6 +62,29 @@ public class PrivateResourceQueryServiceImpl implements PrivateResourceQueryServ
     }
 
     @Override
+    public List<PrivateRepositoryEntity> findByResourceKeyAndVersion(String resourceKey, String version) {
+        Specification<PrivateRepositoryEntity> specification = (root, criteriaQuery, criteriaBuilder) -> {
+            List<Predicate> predicates = new ArrayList<>();
+
+            if (StringUtils.isNoneBlank(resourceKey)) {
+                Predicate id = criteriaBuilder.equal(root.get("resourceKey"), resourceKey);
+                predicates.add(id);
+            }
+
+            if (StringUtils.isNoneBlank(version)) {
+                Predicate id = criteriaBuilder.equal(root.get("version"), version);
+                predicates.add(id);
+            }
+
+            Predicate isExist = criteriaBuilder.equal(root.get("isExist"),true);
+            predicates.add(isExist);
+
+            return criteriaBuilder.and(predicates.toArray(new Predicate[predicates.size()]));
+        };
+        return privateRepository.findAll(specification);
+    }
+
+    @Override
     public List<String> listResourceVersion(String id) {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<String> criteriaQuery = builder.createQuery(String.class);

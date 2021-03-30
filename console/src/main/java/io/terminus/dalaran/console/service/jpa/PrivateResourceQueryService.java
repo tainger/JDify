@@ -10,4 +10,7 @@ public interface PrivateResourceQueryService {
     List<PrivateRepositoryEntity> query(PrivateRepositoryQuery query);
 
     List<String> listResourceVersion(String id);
+
+    List<PrivateRepositoryEntity> findByResourceKeyAndVersion(String resourceKey, String version);
+
 }

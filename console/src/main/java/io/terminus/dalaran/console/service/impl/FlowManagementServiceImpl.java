@@ -47,11 +47,14 @@ import io.terminus.dalaran.model.flow.FlowValidation;
 import io.terminus.dalaran.model.flow.TriggerFlow;
 import io.terminus.dalaran.model.flow.ValidateMessageLevel;
 import io.terminus.dalaran.model.query.FlowQuery;
+import io.terminus.dalaran.model.query.PrivateRepositoryQuery;
 import io.terminus.dalaran.response.ResponseErrorMsg;
 import io.terminus.dalaran.response.ResponseResult;
 import io.terminus.draco.web.autoconfig.context.UserContext;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.camel.CamelContext;
 import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -66,7 +69,7 @@ import java.util.stream.Collectors;
 
 import static io.terminus.dalaran.DalaranConstants.FLOW_TEMPLATE;
 import static io.terminus.dalaran.DalaranConstants.SUB_FLOW_TEMPLATE;
-
+@Slf4j
 @Service
 @Transactional
 public class FlowManagementServiceImpl implements FlowManagementService {
@@ -198,8 +201,9 @@ public class FlowManagementServiceImpl implements FlowManagementService {
 
     @Override
     public BasicResponse createFromTemplate(BasicResourceRequest template) {
-        PrivateRepositoryEntity entity = privateRepositoryRepository.findByResourceKeyAndVersion(template.getId(), template.getVersion());
+        PrivateRepositoryEntity entity = privateResourceQueryService.findByResourceKeyAndVersion(template.getId(), template.getVersion()).get(0);
         TemplateData templateData = JSON.parseObject(entity.getData(), TemplateData.class);
+        log.info("templateData: " + JSON.toJSONString(templateData));
         Map<String, String> resourceKeyMap = new HashMap<>();
         String id;
         try {
@@ -207,17 +211,23 @@ public class FlowManagementServiceImpl implements FlowManagementService {
             switch (template.getType()) {
                 case FLOW_TEMPLATE:
                     TriggerFlowEntity triggerFlowEntity = new TriggerFlowEntity();
-                    buildFlowEntity(triggerFlowEntity, templateData, resourceKeyMap);
+                    triggerFlowEntity = (TriggerFlowEntity) buildFlowEntity(triggerFlowEntity, templateData, resourceKeyMap);
                     triggerFlowEntity.setCreatedFrom(entity.getResourceKey());
                     triggerFlowEntity.setModuleId(template.getModuleId());
+                    triggerFlowEntity.setName(entity.getName());
+                    triggerFlowEntity.setResourceKey(GenerateKeyUtils.resourceKey(propertyService.getTenantCode()));
+                    triggerFlowEntity.setId(null);
+                    log.info("now triggerFlowEntity: " + JSON.toJSONString(triggerFlowEntity));
                     id = flowRepository.save(triggerFlowEntity).getResourceKey();
                     break;
                 case SUB_FLOW_TEMPLATE:
                 default:
                     SubFlowEntity subFlowEntity = new SubFlowEntity();
-                    buildFlowEntity(subFlowEntity, templateData, resourceKeyMap);
+                    subFlowEntity = (SubFlowEntity) buildFlowEntity(subFlowEntity, templateData, resourceKeyMap);
                     subFlowEntity.setCreatedFrom(entity.getResourceKey());
                     subFlowEntity.setModuleId(template.getModuleId());
+                    subFlowEntity.setName(entity.getName());
+                    subFlowEntity.setResourceKey(GenerateKeyUtils.resourceKey(propertyService.getTenantCode()));
                     subFlowEntity.setId(null);
                     id = subFlowRepository.save(subFlowEntity).getResourceKey();
             }
@@ -232,9 +242,11 @@ public class FlowManagementServiceImpl implements FlowManagementService {
         BeanUtils.copyProperties(flowEntity, templateData);
         String oldConfig = JSON.toJSONString(flowEntity);
         String newConfig = StringUtils.replaceEach(oldConfig, ArrayUtils.toStringArray(resourceKeyMap.keySet().toArray()), ArrayUtils.toStringArray(resourceKeyMap.values().toArray()));
+        log.info("new config: " + newConfig);
         flowEntity = JSON.parseObject(newConfig, TriggerFlowEntity.class);
         flowEntity.setResourceKey(GenerateKeyUtils.resourceKey(propertyService.getTenantCode()));
         flowEntity.setId(null);
+        log.info("new flowEntity: " + JSON.toJSONString(flowEntity));
         return flowEntity;
     }
 
@@ -323,7 +335,7 @@ public class FlowManagementServiceImpl implements FlowManagementService {
     @Override
     public BasicResponse saveAsTemplate(BasicResourceRequest flow) {
         FlowTemplate flowTemplate = new FlowTemplate();
-        if (privateRepositoryRepository.findByResourceKeyAndVersion(flow.getId(), flow.getVersion()) != null) {
+        if (CollectionUtils.isNotEmpty(privateResourceQueryService.findByResourceKeyAndVersion(flow.getId(), flow.getVersion()))) {
             return new BasicResponse(false, "Template is exist!");
         }
 
@@ -349,7 +361,7 @@ public class FlowManagementServiceImpl implements FlowManagementService {
 
     @Override
     public BasicResponse checkTemplateVersion(BasicResourceRequest flow) {
-        if (privateRepositoryRepository.findByResourceKeyAndVersion(flow.getId(), flow.getVersion()) != null) {
+        if (CollectionUtils.isNotEmpty(privateResourceQueryService.findByResourceKeyAndVersion(flow.getId(), flow.getVersion()))) {
             return new BasicResponse(false, "version: " + flow.getVersion() + " is exist");
         }
         return new BasicResponse(true);
@@ -822,9 +834,9 @@ public class FlowManagementServiceImpl implements FlowManagementService {
         if (origin instanceof TriggerFlowAbstractEntity) {
             TriggerInfo triggerInfo = dalaranContext.getDalaranComponentContext().getTriggerInfo(((TriggerFlowAbstractEntity)origin).getTriggerType());
             if (StringUtils.equalsIgnoreCase(triggerInfo.getOrigin(), DalaranConstants.PARTNER)) {
-                PrivateRepositoryEntity privateRepositoryEntity = privateRepositoryRepository.findByNameAndType(triggerInfo.getName(), DalaranConstants.TRIGGER);
-                if (privateRepositoryEntity != null) {
-                    packages.put(privateRepositoryEntity.getResourceKey(), privateRepositoryEntity);
+                List<PrivateRepositoryEntity> privateRepositoryEntity = privateResourceQueryService.query(new PrivateRepositoryQuery(triggerInfo.getName(), DalaranConstants.TRIGGER));
+                if (CollectionUtils.isNotEmpty(privateRepositoryEntity)) {
+                    packages.put(privateRepositoryEntity.get(0).getResourceKey(), privateRepositoryEntity.get(0));
                 }
             }
 
@@ -841,9 +853,9 @@ public class FlowManagementServiceImpl implements FlowManagementService {
         for (ProcessorEntity processorEntity : origin.getPipeline()) {
             ProcessorInfo processorInfo = dalaranContext.getDalaranComponentContext().getProcessorInfo(processorEntity.getGroup(), processorEntity.getType(), processorEntity.getVersion());
             if (StringUtils.equalsIgnoreCase(processorInfo.getOrigin(), DalaranConstants.PARTNER)) {
-                PrivateRepositoryEntity privateRepositoryEntity = privateRepositoryRepository.findByNameAndType(processorInfo.getName(), DalaranConstants.PROCESSOR);
-                if (privateRepositoryEntity != null) {
-                    packages.put(privateRepositoryEntity.getResourceKey() + "#" + privateRepositoryEntity.getVersion(), privateRepositoryEntity);
+                List<PrivateRepositoryEntity> privateRepositoryEntity = privateResourceQueryService.query(new PrivateRepositoryQuery(processorInfo.getName(), DalaranConstants.PROCESSOR));
+                if (CollectionUtils.isNotEmpty(privateRepositoryEntity)) {
+                    packages.put(privateRepositoryEntity.get(0).getResourceKey() + "#" + privateRepositoryEntity.get(0).getVersion(), privateRepositoryEntity.get(0));
                 }
             }
 

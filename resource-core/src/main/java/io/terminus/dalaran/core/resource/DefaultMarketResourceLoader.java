@@ -1,7 +1,9 @@
 package io.terminus.dalaran.core.resource;
 
 import io.terminus.dalaran.core.component.DalaranProcessor;
+import io.terminus.dalaran.core.component.DalaranTrigger;
 import io.terminus.dalaran.core.component.annotation.Processor;
+import io.terminus.dalaran.core.component.annotation.Trigger;
 import io.terminus.dalaran.core.context.DalaranComponentContext;
 import io.terminus.dalaran.core.market.MarketResourceLoader;
 import org.apache.commons.io.FileUtils;
@@ -25,7 +27,7 @@ public class DefaultMarketResourceLoader implements MarketResourceLoader {
     private DalaranComponentContext componentContext;
 
     @Override
-    public void loadProcessor(File file, String group, String version) {
+    public void install(File file, String group, String version) {
         try {
             ClassLoader classLoader = loadJars(file);
             JarFile jarFile = new JarFile(file);
@@ -39,14 +41,24 @@ public class DefaultMarketResourceLoader implements MarketResourceLoader {
                 String className = name.replace('/', '.');
                 className = className.substring(0, className.length() - 6);
                 Class clazz = Class.forName(className, true, classLoader);
-                Annotation annotation = clazz.getAnnotation(Processor.class);
-                if (annotation != null) {
+                Annotation processorAnnotation = clazz.getAnnotation(Processor.class);
+                if (processorAnnotation != null) {
                     componentContext.addProcessor((DalaranProcessor)clazz.newInstance(), group, version);
+                }
+
+                Annotation triggerAnnotation = clazz.getAnnotation(Trigger.class);
+                if (triggerAnnotation != null) {
+                    componentContext.addTrigger((DalaranTrigger) clazz.newInstance());
                 }
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void uninstall(String group, String type, String version) {
+        componentContext.removeProcessorInfo(group, type, version);
     }
 
     private ClassLoader loadJars(File file) throws Exception {

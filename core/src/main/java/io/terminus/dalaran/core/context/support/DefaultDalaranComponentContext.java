@@ -79,6 +79,17 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext {
     }
 
     @Override
+    public boolean removeProcessorInfo(String group, String processorType, String version) {
+        try {
+            groupProcessorInfo.get(group).get(processorType).remove(version);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    @Override
     public Collection<TriggerInfo> getAllTriggerInfo() {
         return triggerInfoMapping.values().stream().map(triggerInfo -> {
             TriggerInfo newTriggerInfo = new TriggerInfo();
