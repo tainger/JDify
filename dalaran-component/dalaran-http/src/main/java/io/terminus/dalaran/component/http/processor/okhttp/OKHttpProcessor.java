@@ -5,7 +5,6 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Maps;
 import io.terminus.dalaran.component.common.HttpMethod;
-import io.terminus.dalaran.component.http.processor.HttpClientConfig;
 import lombok.extern.slf4j.Slf4j;
 import lombok.var;
 import okhttp3.*;

@@ -225,6 +225,8 @@ public class PrivateRepositoryServiceImpl implements PrivateRepositoryService {
             entity.setResourceKey(resourceKey);
             entity.setData(JSON.toJSONString(resourceFile));
             entity.setId(null);
+            entity.setTenantCode("terminus");
+            entity.setType("Processor");
             privateRepository.save(entity);
             return new BasicResponse(true, resourceKey);
         } catch (Exception e) {
