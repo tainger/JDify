@@ -18,6 +18,7 @@ import io.terminus.dalaran.core.resource.property.PropertyService;
 import io.terminus.dalaran.core.resource.repository.PrivateRepositoryRepository;
 import io.terminus.dalaran.market.model.BasicResourceDTO;
 import io.terminus.dalaran.market.model.MarketResourceVersionDTO;
+import io.terminus.dalaran.market.model.ResourceType;
 import io.terminus.dalaran.model.BasicResponse;
 import io.terminus.dalaran.model.dto.BasicResourceRequest;
 import io.terminus.dalaran.model.dto.PrivateRepositoryDTO;
@@ -225,6 +226,9 @@ public class PrivateRepositoryServiceImpl implements PrivateRepositoryService {
             entity.setResourceKey(resourceKey);
             entity.setData(JSON.toJSONString(resourceFile));
             entity.setId(null);
+            entity.setTenantCode("terminus");
+            entity.setType("Processor");
+            entity.setOrigin("Private");
             privateRepository.save(entity);
             return new BasicResponse(true, resourceKey);
         } catch (Exception e) {
