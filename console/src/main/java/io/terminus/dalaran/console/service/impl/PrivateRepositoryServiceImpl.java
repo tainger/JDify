@@ -22,9 +22,9 @@ import io.terminus.dalaran.model.BasicResponse;
 import io.terminus.dalaran.model.dto.BasicResourceRequest;
 import io.terminus.dalaran.model.dto.PrivateRepositoryDTO;
 import io.terminus.dalaran.model.dto.ResourceGroupDTO;
-import io.terminus.dalaran.model.market.MarketProcessor;
 import io.terminus.dalaran.model.market.ResourceFile;
 import io.terminus.dalaran.model.query.PrivateRepositoryQuery;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
@@ -38,10 +38,12 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static io.terminus.dalaran.DalaranConstants.*;
 
+@Slf4j
 @Service
 public class PrivateRepositoryServiceImpl implements PrivateRepositoryService {
 
@@ -86,6 +88,8 @@ public class PrivateRepositoryServiceImpl implements PrivateRepositoryService {
 
     private final RestTemplate restTemplate = new RestTemplate();
 
+    private final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
     @Override
     public Collection<MarketResourceVersionDTO> listPrivateResource(PrivateRepositoryQuery query) {
         List<PrivateRepositoryEntity> entities =  privateResourceQueryService.query(query);
@@ -95,7 +99,9 @@ public class PrivateRepositoryServiceImpl implements PrivateRepositoryService {
             BasicResourceDTO basicResource = new BasicResourceDTO();
             try {
                 BeanUtils.copyProperties(basicResource, entity);
+                basicResource.setUpdateAt(format.format(entity.getUpdatedAt()));
                 basicResource.setId(resourceKey);
+                basicResource.setLabel(entity.getLabel());
 
                 List<BasicResourceDTO> resourceList = resourceMap.get(resourceKey);
                 if (CollectionUtils.isEmpty(resourceList)) {
@@ -148,10 +154,10 @@ public class PrivateRepositoryServiceImpl implements PrivateRepositoryService {
             privateRepositoryDTO.setId(entity.getResourceKey());
             switch (entity.getType()) {
                 case PROCESSOR:
-                    MarketProcessor marketProcessor = JSON.parseObject(entity.getData(), MarketProcessor.class);
-                    String openUrl = OSSUtils.getFileUrl(marketProcessor.getData().getFilePath(), ossAccount);
-                    marketProcessor.getData().setFilePath(openUrl);
-                    privateRepositoryDTO.setData(marketProcessor);
+                    ResourceFile resourceFile = JSON.parseObject(entity.getData(), ResourceFile.class);
+                    String openUrl = OSSUtils.getFileUrl(resourceFile.getFilePath(), ossAccount);
+                    resourceFile.setFilePath(openUrl);
+                    privateRepositoryDTO.setData(resourceFile);
                     break;
                 case FLOW_TEMPLATE:
                 case SUB_FLOW_TEMPLATE:
@@ -190,7 +196,6 @@ public class PrivateRepositoryServiceImpl implements PrivateRepositoryService {
     @Override
     public BasicResponse install(PrivateRepositoryDTO privateRepositoryDTO) {
         try {
-            resourceInstall(privateRepositoryDTO);
             PrivateRepositoryEntity entity;
             List<PrivateRepositoryEntity> entities = privateResourceQueryService.findByResourceKeyAndVersion(privateRepositoryDTO.getId(), privateRepositoryDTO.getVersion());
             if (CollectionUtils.isNotEmpty(entities)) {
@@ -199,6 +204,7 @@ public class PrivateRepositoryServiceImpl implements PrivateRepositoryService {
                 entity = toEntity(privateRepositoryDTO);
                 entity.setId(null);
             }
+            resourceInstall(privateRepositoryDTO, entity);
             entity.setResourceKey(privateRepositoryDTO.getId());
             entity.setOrigin(MARKET);
             privateRepository.save(entity);
@@ -316,28 +322,30 @@ public class PrivateRepositoryServiceImpl implements PrivateRepositoryService {
         return entity;
     }
 
-    private void resourceInstall(PrivateRepositoryDTO privateRepositoryDTO) throws Exception {
+    private void resourceInstall(PrivateRepositoryDTO privateRepositoryDTO, PrivateRepositoryEntity privateRepositoryEntity) throws Exception {
         switch (privateRepositoryDTO.getType()) {
             case PROCESSOR:
                 ResourceFile resourceFile = JSON.parseObject((String)privateRepositoryDTO.getData(), ResourceFile.class);
-                PrivatePackageEntity privatePackageEntity = privatePackageRepository.findByResourceKeyAndVersion(privateRepositoryDTO.getId(), privateRepositoryDTO.getVersion());
-                if (privatePackageEntity != null) {
-                    return;
+                PrivatePackageEntity entity = privatePackageRepository.findByResourceKeyAndVersion(privateRepositoryDTO.getId(), privateRepositoryDTO.getVersion());
+                if (entity == null) {
+                    entity = new PrivatePackageEntity();
                 }
 
-                PrivatePackageEntity entity = new PrivatePackageEntity();
                 BeanUtils.copyProperties(entity, privateRepositoryDTO);
 
                 String fileUrl = resourceFile.getFilePath();
+                log.info("fileUrl: " + fileUrl);
                 OSSObject ossObject = OSSUtils.downloadByUrl(fileUrl, ossAccount);
-                entity.setFilePath(OSSUtils.upload(ossObject.getKey(), ossObject.getObjectContent(), ossAccount));
+                log.info("ossObject size: " + ossObject.getObjectMetadata().getContentLength());
+
+                String fileKey = OSSUtils.upload(ossObject.getRequestId() + ".jar", ossObject, ossAccount);
+                privateRepositoryEntity.setData(JSON.toJSONString(new ResourceFile(fileKey)));
+                entity.setFilePath(fileKey);
                 entity.setResourceKey(privateRepositoryDTO.getId());
-                entity.setId(null);
                 privatePackageRepository.save(entity);
 
-                OSSObject object = OSSUtils.downloadByUrl(fileUrl, ossAccount);
-                File file = DalaranFileUtils.createFile(object.getKey());
-                FileUtils.copyToFile(object.getObjectContent(), file);
+                File file = OSSUtils.downloadByPath(fileKey, ossAccount);
+                log.info("temp file: " + file.getName() + ", size: " + file.getTotalSpace());
                 marketResourceLoader.install(file, MARKET, entity.getVersion());
                 break;
             case FLOW_TEMPLATE:
@@ -420,7 +428,7 @@ public class PrivateRepositoryServiceImpl implements PrivateRepositoryService {
 
                     String fileUrl = entityEntry.getValue().getFilePath();
                     OSSObject ossObject = OSSUtils.downloadByUrl(fileUrl, ossAccount);
-                    entity.setFilePath(OSSUtils.upload(ossObject.getKey(), ossObject.getObjectContent(), ossAccount));
+                    entity.setFilePath(OSSUtils.upload(ossObject.getRequestId() + ".jar", ossObject, ossAccount));
 
                     entity.setId(null);
                     privatePackageRepository.save(entity);
@@ -432,7 +440,7 @@ public class PrivateRepositoryServiceImpl implements PrivateRepositoryService {
 
     private void loadProcessor(String fileUrl, String group, String version) throws Exception {
         OSSObject ossObject = OSSUtils.downloadByUrl(fileUrl, ossAccount);
-        File file = DalaranFileUtils.createFile(ossObject.getKey());
+        File file = DalaranFileUtils.createFile(ossObject.getRequestId());
         FileUtils.copyToFile(ossObject.getObjectContent(), file);
         marketResourceLoader.install(file, group, version);
     }
