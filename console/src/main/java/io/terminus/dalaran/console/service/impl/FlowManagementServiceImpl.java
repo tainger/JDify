@@ -215,6 +215,7 @@ public class FlowManagementServiceImpl implements FlowManagementService {
                     triggerFlowEntity.setCreatedFrom(entity.getResourceKey());
                     triggerFlowEntity.setModuleId(template.getModuleId());
                     triggerFlowEntity.setName(entity.getName());
+                    triggerFlowEntity.setOnline(true);
                     triggerFlowEntity.setResourceKey(GenerateKeyUtils.resourceKey(propertyService.getTenantCode()));
                     triggerFlowEntity.setId(null);
                     log.info("now triggerFlowEntity: " + JSON.toJSONString(triggerFlowEntity));
