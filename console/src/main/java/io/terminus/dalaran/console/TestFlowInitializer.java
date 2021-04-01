@@ -99,7 +99,11 @@ public class TestFlowInitializer implements DalaranStarter {
             try {
                 ResourceFile resourceFile = JSON.parseObject(entity.getData(), ResourceFile.class);
                 File file = OSSUtils.downloadByPath(resourceFile.getFilePath(), ossAccount);
-                marketResourceLoader.install(file, entity.getType(), entity.getVersion());
+//                String origin = entity.getOrigin();
+//                if (StringUtils.equalsIgnoreCase(origin, "PRIVATE")) {
+//                    origin = "CUSTOM";
+//                }
+                marketResourceLoader.install(file, entity.getOrigin(), entity.getVersion());
             } catch (Exception e) {
                 e.printStackTrace();
             }

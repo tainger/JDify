@@ -33,6 +33,7 @@ public class FieldInputType {
     public static final String ModuleSelector = "ModuleSelector";
     public static final String LimiterSelector = "LimiterSelector";
     public static final String TemplateSelector = "TemplateSelector";
+    public static final String SubFlowTemplateSelector = "SubFlowTemplateSelector";
     public static final String Routes = "Routes";
     public static final String Pipeline = "Pipeline";
     public static final String Branches = "Branches";
