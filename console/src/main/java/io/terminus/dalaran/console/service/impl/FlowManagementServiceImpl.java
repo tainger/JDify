@@ -244,7 +244,11 @@ public class FlowManagementServiceImpl implements FlowManagementService {
         String oldConfig = JSON.toJSONString(flowEntity);
         String newConfig = StringUtils.replaceEach(oldConfig, ArrayUtils.toStringArray(resourceKeyMap.keySet().toArray()), ArrayUtils.toStringArray(resourceKeyMap.values().toArray()));
         log.info("new config: " + newConfig);
-        flowEntity = JSON.parseObject(newConfig, TriggerFlowEntity.class);
+        if (StringUtils.isBlank(templateData.getTriggerConfig()) && StringUtils.isBlank(templateData.getTriggerType())) {
+            flowEntity = JSON.parseObject(newConfig, SubFlowEntity.class);
+        } else {
+            flowEntity = JSON.parseObject(newConfig, TriggerFlowEntity.class);
+        }
         flowEntity.setResourceKey(GenerateKeyUtils.resourceKey(propertyService.getTenantCode()));
         flowEntity.setId(null);
         log.info("new flowEntity: " + JSON.toJSONString(flowEntity));

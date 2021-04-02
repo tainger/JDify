@@ -304,6 +304,14 @@ public class PrivateRepositoryServiceImpl implements PrivateRepositoryService {
 
     private PrivateRepositoryEntity flowTemplateToEntity(FlowTemplate flowTemplate) throws Exception {
         String resourceKey = flowTemplate.getId();
+        Map<String, Object> triggerConfig = JSON.parseObject(flowTemplate.getData().getTriggerConfig(), Map.class);
+        if (MapUtils.isNotEmpty(triggerConfig)) {
+            Map<String, Object> newTriggerConfig = new HashMap<>();
+            newTriggerConfig.put("inModelId", triggerConfig.get("inModelId"));
+            newTriggerConfig.put("outModelId", triggerConfig.get("outModelId"));
+            flowTemplate.getData().setTriggerConfig(JSON.toJSONString(newTriggerConfig));
+        }
+
         if (StringUtils.isBlank(resourceKey)) {
             resourceKey = GenerateKeyUtils.resourceKey(propertyService.getTenantCode());
         }

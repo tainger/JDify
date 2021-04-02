@@ -9,8 +9,8 @@ public class FileUtils {
 
     public static File transfer(MultipartFile origin) throws IOException {
         File dir = new File("/var/tmp");
-        String fileName = "dalaran-" + origin.getOriginalFilename();
-        File dest = File.createTempFile(fileName, "", dir);
+        String fileName = "dalaran-" + origin.getOriginalFilename().hashCode();
+        File dest = File.createTempFile(fileName, ".jar", dir);
         origin.transferTo(dest);
         return dest;
     }
