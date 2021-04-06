@@ -15,6 +15,9 @@ public class PropertyService {
     @Value("${terminus.dalaran.market.upload}")
     private String marketUpload;
 
+    @Value("${terminus.dalaran.market.delete.resource-relation}")
+    private String deleteTenantResourceRelation;
+
     @Value("${terminus.dalaran.market.group}")
     private String resourceGroup;
 
@@ -32,5 +35,9 @@ public class PropertyService {
 
     public String getResourceGroup() {
         return resourceGroup;
+    }
+
+    public String getDeleteTenantResourceRelation() {
+        return deleteTenantResourceRelation;
     }
 }

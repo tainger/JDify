@@ -19,4 +19,6 @@ public class PrivateRepositoryQuery {
         this.name = name;
         this.type = type;
     }
+
+
 }

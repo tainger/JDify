@@ -24,6 +24,7 @@ import io.terminus.dalaran.model.dto.PrivateRepositoryDTO;
 import io.terminus.dalaran.model.dto.ResourceGroupDTO;
 import io.terminus.dalaran.model.market.ResourceFile;
 import io.terminus.dalaran.model.query.PrivateRepositoryQuery;
+import io.terminus.dalaran.model.query.ResourceQuery;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.collections4.CollectionUtils;
@@ -36,7 +37,6 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -246,9 +246,9 @@ public class PrivateRepositoryServiceImpl implements PrivateRepositoryService {
             entity.setResourceKey(resourceKey);
             entity.setData(JSON.toJSONString(resourceFile));
             entity.setId(null);
-            entity.setTenantCode("terminus");
-            entity.setType("Processor");
-            entity.setOrigin("Private");
+            entity.setTenantCode(propertyService.getTenantCode());
+            entity.setType(PROCESSOR);
+            entity.setOrigin(PRIVATE);
             privateRepository.save(entity);
             return new BasicResponse(true, resourceKey);
         } catch (Exception e) {
@@ -275,6 +275,12 @@ public class PrivateRepositoryServiceImpl implements PrivateRepositoryService {
             if (StringUtils.isNotBlank(flowName)) {
                 return new BasicResponse(false, "该资源已经被其他流程依赖，删除失败. 流程名：" + flowName);
             }
+
+            ResourceQuery resourceQuery = new ResourceQuery(entity.getTenantCode(), entity.getResourceKey(), entity.getVersion());
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            HttpEntity<ResourceQuery> httpEntity = new HttpEntity<>(resourceQuery, headers);
+            restTemplate.postForObject(propertyService.getMarketHost() + propertyService.getDeleteTenantResourceRelation(), httpEntity, BasicResponse.class);
 
             return new BasicResponse(true, "删除成功");
         } catch (Exception e) {
