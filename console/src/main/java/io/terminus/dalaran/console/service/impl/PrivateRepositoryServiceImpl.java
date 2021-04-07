@@ -37,6 +37,7 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
+
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -165,8 +166,10 @@ public class PrivateRepositoryServiceImpl implements PrivateRepositoryService {
                     Map<String, PrivatePackageEntity> packages = templateData.getRelationPackage();
                     if (MapUtils.isNotEmpty(packages)) {
                         packages.values().forEach(value -> {
+                            log.info("value: " + value.toString());
                             String url = OSSUtils.getFileUrl(value.getFilePath(), ossAccount);
                             value.setFilePath(url);
+                            log.info("url: " + url);
                         });
                     }
                     privateRepositoryDTO.setData(templateData);
@@ -234,12 +237,28 @@ public class PrivateRepositoryServiceImpl implements PrivateRepositoryService {
     @Override
     public BasicResponse localResourceUpload(MultipartFile file, String name, String version, String resourceGroup) {
         try {
+            List<PrivateRepositoryEntity> privateRepositoryEntityList;
+            PrivateRepositoryQuery privateRepositoryQuery = new PrivateRepositoryQuery(name, version, PROCESSOR);
+            privateRepositoryEntityList = privateResourceQueryService.query(privateRepositoryQuery);
+            if (CollectionUtils.isNotEmpty(privateRepositoryEntityList)) {
+                return new BasicResponse(false, "resource is exist, " + name + ", " + version);
+            }
+
+            String resourceKey = null;
+            privateRepositoryQuery.setVersion(null);
+            privateRepositoryEntityList = privateResourceQueryService.query(privateRepositoryQuery);
+            if (CollectionUtils.isNotEmpty(privateRepositoryEntityList)) {
+                resourceKey = privateRepositoryEntityList.get(0).getResourceKey();
+            }
+
             File local = io.terminus.dalaran.console.util.FileUtils.transfer(file);
             String filePath = OSSUtils.upload(local, ossAccount);
             ResourceFile resourceFile = new ResourceFile(filePath);
             marketResourceLoader.install(local, CUSTOM, version);
+            if (StringUtils.isBlank(resourceKey)) {
+                resourceKey = GenerateKeyUtils.resourceKey(propertyService.getTenantCode());
+            }
             PrivateRepositoryEntity entity = new PrivateRepositoryEntity();
-            String resourceKey = GenerateKeyUtils.resourceKey(propertyService.getTenantCode());
             entity.setName(name);
             entity.setVersion(version);
             entity.setResourceGroup(resourceGroup);
@@ -265,23 +284,27 @@ public class PrivateRepositoryServiceImpl implements PrivateRepositoryService {
                 return new BasicResponse(true);
             }
             PrivateRepositoryEntity entity = entities.get(0);
-            entity.setExist(false);
-            privateRepository.save(entity);
-            if (StringUtils.equalsIgnoreCase(entity.getType(), PROCESSOR) || StringUtils.equalsIgnoreCase(entity.getType(), TRIGGER)) {
-                marketResourceLoader.uninstall(entity.getResourceGroup(), entity.getName(), entity.getVersion());
-            }
-
             String flowName = checkResourceDependency(entity);
             if (StringUtils.isNotBlank(flowName)) {
                 return new BasicResponse(false, "该资源已经被其他流程依赖，删除失败. 流程名：" + flowName);
             }
 
-            ResourceQuery resourceQuery = new ResourceQuery(entity.getTenantCode(), entity.getResourceKey(), entity.getVersion());
+            entity.setExist(false);
+            if (StringUtils.equalsIgnoreCase(entity.getType(), PROCESSOR) || StringUtils.equalsIgnoreCase(entity.getType(), TRIGGER)) {
+                marketResourceLoader.uninstall(entity.getResourceGroup(), entity.getName(), entity.getVersion());
+            }
+
+            if (StringUtils.equalsIgnoreCase(entity.getOrigin(), PRIVATE)) {
+                privateRepository.save(entity);
+                return new BasicResponse(true, "删除成功");
+            }
+
+            ResourceQuery resourceQuery = new ResourceQuery(entity.getResourceKey(), entity.getVersion(), propertyService.getTenantCode());
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
             HttpEntity<ResourceQuery> httpEntity = new HttpEntity<>(resourceQuery, headers);
             restTemplate.postForObject(propertyService.getMarketHost() + propertyService.getDeleteTenantResourceRelation(), httpEntity, BasicResponse.class);
-
+            privateRepository.save(entity);
             return new BasicResponse(true, "删除成功");
         } catch (Exception e) {
             e.printStackTrace();
@@ -290,6 +313,9 @@ public class PrivateRepositoryServiceImpl implements PrivateRepositoryService {
     }
 
     private String checkResourceDependency(PrivateRepositoryEntity entity) {
+        if (StringUtils.equalsIgnoreCase(entity.getType(), FLOW_TEMPLATE) || StringUtils.equalsIgnoreCase(entity.getType(), SUB_FLOW_TEMPLATE)) {
+            return null;
+        }
         String resourceType = entity.getName();
         List<TriggerFlowEntity> triggerFlowEntityList = triggerFlowRepository.findByIsExistTrue();
         for (TriggerFlowEntity flowEntity : triggerFlowEntityList) {
@@ -340,12 +366,13 @@ public class PrivateRepositoryServiceImpl implements PrivateRepositoryService {
         switch (privateRepositoryDTO.getType()) {
             case PROCESSOR:
                 ResourceFile resourceFile = JSON.parseObject((String)privateRepositoryDTO.getData(), ResourceFile.class);
+
                 PrivatePackageEntity entity = privatePackageRepository.findByResourceKeyAndVersion(privateRepositoryDTO.getId(), privateRepositoryDTO.getVersion());
                 if (entity == null) {
                     entity = new PrivatePackageEntity();
+                    BeanUtils.copyProperties(entity, privateRepositoryDTO);
+                    entity.setId(null);
                 }
-
-                BeanUtils.copyProperties(entity, privateRepositoryDTO);
 
                 String fileUrl = resourceFile.getFilePath();
                 log.info("fileUrl: " + fileUrl);

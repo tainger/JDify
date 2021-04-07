@@ -34,6 +34,16 @@ public class PrivateResourceQueryServiceImpl implements PrivateResourceQueryServ
         Specification<PrivateRepositoryEntity> specification = (root, criteriaQuery, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
 
+            if (StringUtils.isNoneBlank(query.getName())) {
+                Predicate name = criteriaBuilder.equal(root.get("name"), query.getName());
+                predicates.add(name);
+            }
+
+            if (StringUtils.isNoneBlank(query.getVersion())) {
+                Predicate version = criteriaBuilder.equal(root.get("version"), query.getVersion());
+                predicates.add(version);
+            }
+
             if (StringUtils.isNoneBlank(query.getOrigin())) {
                 Predicate origin = criteriaBuilder.equal(root.get("origin"), query.getOrigin());
                 predicates.add(origin);

@@ -3,6 +3,7 @@ package io.terminus.dalaran.console.service.impl;
 import com.alibaba.fastjson.JSON;
 import io.terminus.dalaran.DalaranConstants;
 import io.terminus.dalaran.ModelImportMode;
+import io.terminus.dalaran.component.subflow.DalaranSubFlowConfig;
 import io.terminus.dalaran.config.ProcessorInfo;
 import io.terminus.dalaran.config.TriggerInfo;
 import io.terminus.dalaran.console.TestFlowInitializer;
@@ -23,6 +24,7 @@ import io.terminus.dalaran.core.flow.DalaranFlowBuilder;
 import io.terminus.dalaran.core.resource.DalaranResourceBuilder;
 import io.terminus.dalaran.core.resource.DalaranResourceLoader;
 import io.terminus.dalaran.core.resource.entity.ModelAbstractEntity;
+import io.terminus.dalaran.core.resource.entity.SubFlowAbstractEntity;
 import io.terminus.dalaran.core.resource.entity.TriggerFlowAbstractEntity;
 import io.terminus.dalaran.core.resource.entity.basic.BasicFlowEntity;
 import io.terminus.dalaran.core.resource.entity.common.PrivateRepositoryEntity;
@@ -46,6 +48,7 @@ import io.terminus.dalaran.model.flow.FlowStatus;
 import io.terminus.dalaran.model.flow.FlowValidation;
 import io.terminus.dalaran.model.flow.TriggerFlow;
 import io.terminus.dalaran.model.flow.ValidateMessageLevel;
+import io.terminus.dalaran.model.market.ResourceFile;
 import io.terminus.dalaran.model.query.FlowQuery;
 import io.terminus.dalaran.model.query.PrivateRepositoryQuery;
 import io.terminus.dalaran.response.ResponseErrorMsg;
@@ -825,6 +828,7 @@ public class FlowManagementServiceImpl implements FlowManagementService {
         Map connectors = templateData.getRelationConnector();
         Map services = templateData.getRelationService();
         Map packages = templateData.getRelationPackage();
+        Map subFlows = templateData.getRelationSubFlow();
         String inModelId = origin.getInModel();
         String outModelId = origin.getOutModel();
         if (StringUtils.isNotBlank(inModelId)) {
@@ -841,7 +845,12 @@ public class FlowManagementServiceImpl implements FlowManagementService {
             if (StringUtils.equalsIgnoreCase(triggerInfo.getOrigin(), DalaranConstants.PARTNER)) {
                 List<PrivateRepositoryEntity> privateRepositoryEntity = privateResourceQueryService.query(new PrivateRepositoryQuery(triggerInfo.getName(), DalaranConstants.TRIGGER));
                 if (CollectionUtils.isNotEmpty(privateRepositoryEntity)) {
-                    packages.put(privateRepositoryEntity.get(0).getResourceKey(), privateRepositoryEntity.get(0));
+                    PrivateRepositoryEntity repositoryEntity = privateRepositoryEntity.get(0);
+                    PrivatePackageEntity packageEntity = new PrivatePackageEntity();
+                    BeanUtils.copyProperties(packageEntity, repositoryEntity);
+                    ResourceFile resourceFile = JSON.parseObject(repositoryEntity.getData(), ResourceFile.class);
+                    packageEntity.setFilePath(resourceFile.getFilePath());
+                    packages.put(repositoryEntity.getResourceKey() + "#" + repositoryEntity.getVersion(), packageEntity);
                 }
             }
 
@@ -860,7 +869,12 @@ public class FlowManagementServiceImpl implements FlowManagementService {
             if (StringUtils.equalsIgnoreCase(processorInfo.getOrigin(), DalaranConstants.PARTNER)) {
                 List<PrivateRepositoryEntity> privateRepositoryEntity = privateResourceQueryService.query(new PrivateRepositoryQuery(processorInfo.getName(), DalaranConstants.PROCESSOR));
                 if (CollectionUtils.isNotEmpty(privateRepositoryEntity)) {
-                    packages.put(privateRepositoryEntity.get(0).getResourceKey() + "#" + privateRepositoryEntity.get(0).getVersion(), privateRepositoryEntity.get(0));
+                    PrivateRepositoryEntity repositoryEntity = privateRepositoryEntity.get(0);
+                    PrivatePackageEntity packageEntity = new PrivatePackageEntity();
+                    BeanUtils.copyProperties(packageEntity, repositoryEntity);
+                    ResourceFile resourceFile = JSON.parseObject(repositoryEntity.getData(), ResourceFile.class);
+                    packageEntity.setFilePath(resourceFile.getFilePath());
+                    packages.put(repositoryEntity.getResourceKey() + "#" + repositoryEntity.getVersion(), packageEntity);
                 }
             }
 
@@ -884,6 +898,14 @@ public class FlowManagementServiceImpl implements FlowManagementService {
                 }
                 List<ModelEntity> serviceModels = modelRepository.findByTargetTypeAndTargetId(ModelTargetType.Service, serviceId);
                 serviceModels.forEach(modelEntity -> models.put(modelEntity.getResourceKey(), modelEntity));
+            }
+            if (processorConfig instanceof DalaranSubFlowConfig) {
+                DalaranSubFlowConfig subFlowConfig = (DalaranSubFlowConfig) processorConfig;
+                String subFlowId = subFlowConfig.getSubFlowId();
+                SubFlowAbstractEntity entity = resourceLoader.loadSubFlow(subFlowId);
+                if (entity != null) {
+                    subFlows.put(subFlowId, entity);
+                }
             }
         }
     }

@@ -15,10 +15,19 @@ public class PrivateRepositoryQuery {
 
     private String tenantCode;
 
+    private String version;
+
+    public PrivateRepositoryQuery() {
+    }
+
     public PrivateRepositoryQuery(String name, String type) {
         this.name = name;
         this.type = type;
     }
 
-
+    public PrivateRepositoryQuery(String name, String version, String type) {
+        this.name = name;
+        this.type = type;
+        this.version = version;
+    }
 }
