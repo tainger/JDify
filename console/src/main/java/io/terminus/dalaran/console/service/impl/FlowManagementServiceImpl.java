@@ -601,7 +601,7 @@ public class FlowManagementServiceImpl implements FlowManagementService {
 
         TriggerFlowEntity newFlowEntity = new TriggerFlowEntity();
         try {
-            BeanUtils.copyProperties(flowEntity, newFlowEntity);
+            BeanUtils.copyProperties(newFlowEntity, flowEntity);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -948,36 +948,54 @@ public class FlowManagementServiceImpl implements FlowManagementService {
             case "model":
                 PrivateModelEntity privateModelEntity = new PrivateModelEntity();
                 BeanUtils.copyProperties(privateModelEntity, origin);
+                if (privateModelRepository.findByResourceKey(privateModelEntity.getResourceKey()) != null) {
+                    break;
+                }
                 privateModelEntity.setId(null);
                 privateModelRepository.save(privateModelEntity);
                 break;
             case "connector":
                 PrivateConnectorEntity privateConnectorEntity = new PrivateConnectorEntity();
                 BeanUtils.copyProperties(privateConnectorEntity, origin);
+                if (privateConnectorRepository.findByResourceKey(privateConnectorEntity.getResourceKey()) != null) {
+                    break;
+                }
                 privateConnectorEntity.setId(null);
                 privateConnectorRepository.save(privateConnectorEntity);
                 break;
             case "service":
                 PrivateServiceEntity privateServiceEntity = new PrivateServiceEntity();
                 BeanUtils.copyProperties(privateServiceEntity, origin);
+                if (privateServiceRepository.findByResourceKey(privateServiceEntity.getResourceKey()) != null) {
+                    break;
+                }
                 privateServiceEntity.setId(null);
                 privateServiceRepository.save(privateServiceEntity);
                 break;
             case "function":
                 PrivateFunctionEntity privateFunctionEntity = new PrivateFunctionEntity();
                 BeanUtils.copyProperties(privateFunctionEntity, origin);
+                if (privateFunctionRepository.findByResourceKey(privateFunctionEntity.getResourceKey()) != null) {
+                    break;
+                }
                 privateFunctionEntity.setId(null);
                 privateFunctionRepository.save(privateFunctionEntity);
                 break;
             case "subflow":
                 PrivateSubFlowEntity privateSubFlowEntity = new PrivateSubFlowEntity();
                 BeanUtils.copyProperties(privateSubFlowEntity, origin);
+                if (privateSubFlowRepository.findByResourceKey(privateSubFlowEntity.getResourceKey()) != null) {
+                    break;
+                }
                 privateSubFlowEntity.setId(null);
                 privateSubFlowRepository.save(privateSubFlowEntity);
                 break;
             case "package":
                 PrivatePackageEntity privatePackageEntity = new PrivatePackageEntity();
                 BeanUtils.copyProperties(privatePackageEntity, origin);
+                if (privatePackageRepository.findByResourceKeyAndVersion(privatePackageEntity.getResourceKey(), privatePackageEntity.getVersion()) != null) {
+                    break;
+                }
                 privatePackageEntity.setId(null);
                 privatePackageRepository.save(privatePackageEntity);
                 break;
