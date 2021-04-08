@@ -12,6 +12,7 @@ import io.terminus.dalaran.model.query.PrivateRepositoryQuery;
 import io.terminus.dalaran.rest.read.PrivateRepositoryReadAPI;
 import io.terminus.dalaran.rest.write.PrivateRepositoryWriteAPI;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -30,6 +31,11 @@ public class PrivateRepositoryRest implements PrivateRepositoryReadAPI, PrivateR
     @Override
     public Collection<MarketResourceVersionDTO> listPrivateResource(PrivateRepositoryQuery query) {
         return privateRepositoryService.listPrivateResource(query);
+    }
+
+    @Override
+    public Page<MarketResourceVersionDTO> pagingPrivateResource(PrivateRepositoryQuery query, Integer pageNumber, Integer pageSize) {
+        return privateRepositoryService.pagingPrivateResource(query, pageNumber, pageSize);
     }
 
     @Override

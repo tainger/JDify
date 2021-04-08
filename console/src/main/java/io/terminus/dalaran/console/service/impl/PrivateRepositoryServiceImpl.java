@@ -14,6 +14,7 @@ import io.terminus.dalaran.console.util.GenerateKeyUtils;
 import io.terminus.dalaran.core.market.MarketResourceLoader;
 import io.terminus.dalaran.core.oss.OSSAccount;
 import io.terminus.dalaran.core.resource.entity.common.PrivateRepositoryEntity;
+import io.terminus.dalaran.core.resource.entity.common.ProcessorEntity;
 import io.terminus.dalaran.core.resource.property.PropertyService;
 import io.terminus.dalaran.core.resource.repository.PrivateRepositoryRepository;
 import io.terminus.dalaran.market.model.BasicResourceDTO;
@@ -33,6 +34,9 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -137,6 +141,48 @@ public class PrivateRepositoryServiceImpl implements PrivateRepositoryService {
     }
 
     @Override
+    public Page<MarketResourceVersionDTO> pagingPrivateResource(PrivateRepositoryQuery query, Integer pageNumber, Integer pageSize) {
+        Page<PrivateRepositoryEntity> entities = privateResourceQueryService.paging(query, pageNumber, pageSize);
+        Map<String, List<BasicResourceDTO>> resourceMap = new HashMap<>();
+        for (PrivateRepositoryEntity entity: entities) {
+            List<PrivateRepositoryEntity> privateRepositoryList = privateRepository.findByResourceKey(entity.getResourceKey());
+            List<BasicResourceDTO> basicResourceList = new ArrayList<>();
+            for (PrivateRepositoryEntity repositoryEntity: privateRepositoryList) {
+                BasicResourceDTO basicResource = new BasicResourceDTO();
+                try {
+                    BeanUtils.copyProperties(basicResource, repositoryEntity);
+                    basicResource.setUpdateAt(format.format(repositoryEntity.getUpdatedAt()));
+                    basicResource.setId(repositoryEntity.getResourceKey());
+                    basicResource.setLabel(repositoryEntity.getLabel());
+                    basicResourceList.add(basicResource);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            resourceMap.put(entity.getResourceKey(), basicResourceList);
+        }
+
+        List<MarketResourceVersionDTO> versionResourceList = new ArrayList<>();
+        resourceMap.forEach((key, resources) -> {
+            MarketResourceVersionDTO versionResource = new MarketResourceVersionDTO();
+            if (CollectionUtils.isNotEmpty(resources)) {
+                Map<String, BasicResourceDTO> versions = new HashMap<>();
+                resources.forEach(resource -> versions.put(resource.getVersion(), resource));
+                versionResource.setVersions(versions);
+                BasicResourceDTO lastResource = resources.get(0);
+                try {
+                    BeanUtils.copyProperties(versionResource, lastResource);
+                    versionResource.setLastVersion(lastResource.getVersion());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                versionResourceList.add(versionResource);
+            }
+        });
+        return new PageImpl<>(versionResourceList, PageRequest.of(pageNumber - 1, pageSize), versionResourceList.size());
+    }
+
+    @Override
     public List<ResourceGroupDTO> listResourceGroup() {
         ResponseEntity<List<ResourceGroupDTO>> responseEntity = restTemplate.exchange(
                 propertyService.getMarketHost() + propertyService.getResourceGroup(),
@@ -210,6 +256,7 @@ public class PrivateRepositoryServiceImpl implements PrivateRepositoryService {
             resourceInstall(privateRepositoryDTO, entity);
             entity.setResourceKey(privateRepositoryDTO.getId());
             entity.setOrigin(MARKET);
+            entity.setData(JSON.toJSONString(privateRepositoryDTO.getData()));
             privateRepository.save(entity);
             return new BasicResponse(true, entity.getResourceKey());
         } catch (Exception e) {
@@ -254,7 +301,7 @@ public class PrivateRepositoryServiceImpl implements PrivateRepositoryService {
             File local = io.terminus.dalaran.console.util.FileUtils.transfer(file);
             String filePath = OSSUtils.upload(local, ossAccount);
             ResourceFile resourceFile = new ResourceFile(filePath);
-            marketResourceLoader.install(local, CUSTOM, version);
+            marketResourceLoader.install(local, PRIVATE, version);
             if (StringUtils.isBlank(resourceKey)) {
                 resourceKey = GenerateKeyUtils.resourceKey(propertyService.getTenantCode());
             }
@@ -291,7 +338,7 @@ public class PrivateRepositoryServiceImpl implements PrivateRepositoryService {
 
             entity.setExist(false);
             if (StringUtils.equalsIgnoreCase(entity.getType(), PROCESSOR) || StringUtils.equalsIgnoreCase(entity.getType(), TRIGGER)) {
-                marketResourceLoader.uninstall(entity.getResourceGroup(), entity.getName(), entity.getVersion());
+                marketResourceLoader.uninstall(entity.getOrigin(), entity.getName(), entity.getVersion());
             }
 
             if (StringUtils.equalsIgnoreCase(entity.getOrigin(), PRIVATE)) {
@@ -393,11 +440,18 @@ public class PrivateRepositoryServiceImpl implements PrivateRepositoryService {
             case SUB_FLOW_TEMPLATE:
                 TemplateData templateData = JSON.parseObject((String) privateRepositoryDTO.getData(), TemplateData.class);
                 loadRelationResource(templateData);
+                privateRepositoryDTO.setData(templateData);
                 break;
         }
     }
 
     private void loadRelationResource(TemplateData templateData) throws Exception {
+        List<ProcessorEntity> processorEntityList = templateData.getPipeline();
+        for (ProcessorEntity processorEntity: processorEntityList) {
+            if (StringUtils.isNotBlank(processorEntity.getGroup()) && StringUtils.equalsIgnoreCase(processorEntity.getGroup(), PRIVATE)) {
+                processorEntity.setGroup(MARKET);
+            }
+        }
         Map<String, ModelEntity> models =  templateData.getRelationModel();
         if (MapUtils.isNotEmpty(models)) {
             for (Map.Entry<String, ModelEntity> entityEntry: models.entrySet()) {

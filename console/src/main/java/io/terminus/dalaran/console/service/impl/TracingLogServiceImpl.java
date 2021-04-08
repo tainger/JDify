@@ -68,7 +68,6 @@ public class TracingLogServiceImpl implements TracingLogService {
     @Autowired
     private AlarmRuleRepository alarmRuleRepository;
 
-
     private String timeZone = System.getenv("TZ");
 
     @Override

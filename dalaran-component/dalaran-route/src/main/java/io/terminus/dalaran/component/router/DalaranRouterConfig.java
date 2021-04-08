@@ -9,13 +9,13 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-class DalaranRouterConfig extends OutModelConfig {
+public class DalaranRouterConfig extends OutModelConfig {
 
     @ConfigFieldInfo(label = "路由列表", inputType = FieldInputType.Routes)
     private List<Route> routes;
 
     @Data
-    class Route {
+    public class Route {
         private String displayName;
 
         private String expression;

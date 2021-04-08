@@ -9,13 +9,13 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-class ScatterGatherConfig extends OutModelConfig {
+public class ScatterGatherConfig extends OutModelConfig {
 
     @ConfigFieldInfo(label = "分支列表", inputType = FieldInputType.Branches)
     private List<Branch> branches;
 
     @Data
-    class Branch {
+    public class Branch {
         private String displayName;
 
         private List<ProcessorRouteInfo> pipeline;

@@ -19,6 +19,8 @@ public class ProcessorRouteInfo {
 
     private String version;
 
+    private String key;
+
     @Nullable
     private String config;
 }

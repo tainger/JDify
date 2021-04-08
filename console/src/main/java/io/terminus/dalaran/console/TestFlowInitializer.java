@@ -69,6 +69,22 @@ public class TestFlowInitializer implements DalaranStarter {
                 e.printStackTrace();
             }
         }
+
+        List<PrivateRepositoryEntity> privateRepositoryEntityList = resourceLoader.loadPackage();
+        for (PrivateRepositoryEntity entity : privateRepositoryEntityList) {
+            try {
+                ResourceFile resourceFile = JSON.parseObject(entity.getData(), ResourceFile.class);
+                File file = OSSUtils.downloadByPath(resourceFile.getFilePath(), ossAccount);
+//                String origin = entity.getOrigin();
+//                if (StringUtils.equalsIgnoreCase(origin, "PRIVATE")) {
+//                    origin = "CUSTOM";
+//                }
+                marketResourceLoader.install(file, entity.getOrigin(), entity.getVersion());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
         List<TriggerFlowEntity> triggerFlows = resourceLoader.loadAvailableTriggerFlow();
         for (TriggerFlowEntity triggerFlowEntity : triggerFlows) {
             try {
@@ -91,21 +107,6 @@ public class TestFlowInitializer implements DalaranStarter {
             } catch (Throwable e) {
                 e.printStackTrace();
                 log.error("load sub flow [{}] error", subFlowEntity.getResourceKey());
-            }
-        }
-
-        List<PrivateRepositoryEntity> privateRepositoryEntityList = resourceLoader.loadPackage();
-        for (PrivateRepositoryEntity entity : privateRepositoryEntityList) {
-            try {
-                ResourceFile resourceFile = JSON.parseObject(entity.getData(), ResourceFile.class);
-                File file = OSSUtils.downloadByPath(resourceFile.getFilePath(), ossAccount);
-//                String origin = entity.getOrigin();
-//                if (StringUtils.equalsIgnoreCase(origin, "PRIVATE")) {
-//                    origin = "CUSTOM";
-//                }
-                marketResourceLoader.install(file, entity.getOrigin(), entity.getVersion());
-            } catch (Exception e) {
-                e.printStackTrace();
             }
         }
 

@@ -82,6 +82,12 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext {
     public boolean removeProcessorInfo(String group, String processorType, String version) {
         try {
             groupProcessorInfo.get(group).get(processorType).remove(version);
+            if (MapUtils.isEmpty(groupProcessorInfo.get(group).get(processorType))) {
+                groupProcessorInfo.get(group).remove(processorType);
+                if (MapUtils.isEmpty(groupProcessorInfo.get(group))) {
+                    groupProcessorInfo.remove(group);
+                }
+            }
             return true;
         } catch (Exception e) {
             e.printStackTrace();

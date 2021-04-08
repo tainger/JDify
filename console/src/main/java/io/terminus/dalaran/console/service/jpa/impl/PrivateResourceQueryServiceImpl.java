@@ -7,11 +7,12 @@ import io.terminus.dalaran.core.resource.repository.PrivateRepositoryRepository;
 import io.terminus.dalaran.model.query.PrivateRepositoryQuery;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
@@ -70,6 +71,29 @@ public class PrivateResourceQueryServiceImpl implements PrivateResourceQueryServ
             return criteriaBuilder.and(predicates.toArray(new Predicate[predicates.size()]));
         };
         return privateRepository.findAll(specification, Sort.by(Sort.Direction.DESC, "createdAt"));
+    }
+
+    @Override
+    public Page<PrivateRepositoryEntity> paging(PrivateRepositoryQuery query, Integer pageNumber, Integer pageSize) {
+
+        Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
+
+        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<PrivateRepositoryEntity> criteriaQuery = builder.createQuery(PrivateRepositoryEntity.class);
+
+        Root<PrivateRepositoryEntity> root = criteriaQuery.from(PrivateRepositoryEntity.class);
+
+        CriteriaQuery<PrivateRepositoryEntity> select = criteriaQuery.select(root);
+
+        criteriaQuery.where(builder.equal(root.get("isExist"), true)).groupBy(root.get("resourceKey"));
+
+        TypedQuery<PrivateRepositoryEntity> typedQuery = entityManager.createQuery(select);
+        typedQuery.setFirstResult((pageNumber - 1) * pageSize);
+        typedQuery.setMaxResults(pageSize);
+
+        List result = typedQuery.getResultList();
+
+        return new PageImpl<>(result, pageable, result.size());
     }
 
     @Override

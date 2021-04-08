@@ -3,6 +3,11 @@ package io.terminus.dalaran.console.service.impl;
 import com.alibaba.fastjson.JSON;
 import io.terminus.dalaran.DalaranConstants;
 import io.terminus.dalaran.ModelImportMode;
+import io.terminus.dalaran.component.foreach.ForEachConfig;
+import io.terminus.dalaran.component.loopwhile.LoopWhileConfig;
+import io.terminus.dalaran.component.multicast.ScatterGatherConfig;
+import io.terminus.dalaran.component.retry.RetryConfig;
+import io.terminus.dalaran.component.router.DalaranRouterConfig;
 import io.terminus.dalaran.component.subflow.DalaranSubFlowConfig;
 import io.terminus.dalaran.config.ProcessorInfo;
 import io.terminus.dalaran.config.TriggerInfo;
@@ -39,6 +44,7 @@ import io.terminus.dalaran.core.resource.repository.TriggerFlowReleasedRepositor
 import io.terminus.dalaran.exception.flow.FlowNotExistException;
 import io.terminus.dalaran.model.BasicResponse;
 import io.terminus.dalaran.model.ModelTargetType;
+import io.terminus.dalaran.model.component.ProcessorRouteInfo;
 import io.terminus.dalaran.model.dto.*;
 import io.terminus.dalaran.model.dto.basic.BasicFlowInfo;
 import io.terminus.dalaran.model.dto.flow.BindAlarmRuleDto;
@@ -899,15 +905,145 @@ public class FlowManagementServiceImpl implements FlowManagementService {
                 List<ModelEntity> serviceModels = modelRepository.findByTargetTypeAndTargetId(ModelTargetType.Service, serviceId);
                 serviceModels.forEach(modelEntity -> models.put(modelEntity.getResourceKey(), modelEntity));
             }
+
+            if (processorConfig instanceof DalaranRouterConfig) {
+                DalaranRouterConfig dalaranRouterConfig = (DalaranRouterConfig) processorConfig;
+                for (DalaranRouterConfig.Route route: dalaranRouterConfig.getRoutes()) {
+                    parseBranchRelationResource(route.getPipeline(), templateData);
+                }
+            }
+
+            if (processorConfig instanceof ScatterGatherConfig) {
+                ScatterGatherConfig scatterGatherConfig = (ScatterGatherConfig) processorConfig;
+                for (ScatterGatherConfig.Branch branch: scatterGatherConfig.getBranches()) {
+                    parseBranchRelationResource(branch.getPipeline(), templateData);
+                }
+            }
+
+            if (processorConfig instanceof RetryConfig) {
+                RetryConfig retryConfig = (RetryConfig) processorConfig;
+                parseBranchRelationResource(retryConfig.getPipeline(), templateData);
+            }
+
+            if (processorConfig instanceof LoopWhileConfig) {
+                LoopWhileConfig loopWhileConfig = (LoopWhileConfig) processorConfig;
+                parseBranchRelationResource(loopWhileConfig.getPipeline(), templateData);
+            }
+
+            if (processorConfig instanceof ForEachConfig) {
+                ForEachConfig forEachConfig = (ForEachConfig) processorConfig;
+                parseBranchRelationResource(forEachConfig.getPipeline(), templateData);
+            }
+
+            if (processorConfig instanceof ErrorCatchConfig) {
+                ErrorCatchConfig errorCatchConfig = (ErrorCatchConfig) processorConfig;
+                for (ErrorCatchConfig.Route route: errorCatchConfig.getRoutes()) {
+                    parseBranchRelationResource(route.getPipeline(), templateData);
+                }
+            }
+
             if (processorConfig instanceof DalaranSubFlowConfig) {
                 DalaranSubFlowConfig subFlowConfig = (DalaranSubFlowConfig) processorConfig;
                 String subFlowId = subFlowConfig.getSubFlowId();
                 SubFlowAbstractEntity entity = resourceLoader.loadSubFlow(subFlowId);
                 if (entity != null) {
                     subFlows.put(subFlowId, entity);
+                    buildTemplateRelationResource(templateData, entity);
                 }
             }
         }
+    }
+
+    private void parseBranchRelationResource(List<ProcessorRouteInfo> processorRouteInfoList, TemplateData templateData) throws Exception {
+        Map models = templateData.getRelationModel();
+        Map connectors = templateData.getRelationConnector();
+        Map services = templateData.getRelationService();
+        Map packages = templateData.getRelationPackage();
+        Map subFlows = templateData.getRelationSubFlow();
+
+        for (ProcessorRouteInfo processorRouteInfo : processorRouteInfoList) {
+            ProcessorInfo processorInfo = dalaranContext.getDalaranComponentContext().getProcessorInfo(processorRouteInfo.getGroup(), processorRouteInfo.getType(), processorRouteInfo.getVersion());
+            if (StringUtils.equalsIgnoreCase(processorInfo.getOrigin(), DalaranConstants.PARTNER)) {
+                List<PrivateRepositoryEntity> privateRepositoryEntity = privateResourceQueryService.query(new PrivateRepositoryQuery(processorInfo.getName(), DalaranConstants.PROCESSOR));
+                if (CollectionUtils.isNotEmpty(privateRepositoryEntity)) {
+                    PrivateRepositoryEntity repositoryEntity = privateRepositoryEntity.get(0);
+                    PrivatePackageEntity packageEntity = new PrivatePackageEntity();
+                    BeanUtils.copyProperties(packageEntity, repositoryEntity);
+                    ResourceFile resourceFile = JSON.parseObject(repositoryEntity.getData(), ResourceFile.class);
+                    packageEntity.setFilePath(resourceFile.getFilePath());
+                    packages.put(repositoryEntity.getResourceKey() + "#" + repositoryEntity.getVersion(), packageEntity);
+                }
+            }
+
+            Object processorConfig = resourceBuilder.buildConfig(processorRouteInfo.getConfig(), processorInfo.getConfigType());
+            parseProcessorModel(processorConfig, models);
+            if (processorConfig instanceof ConnectorConfig) {
+                ConnectorConfig connectorConfig = (ConnectorConfig) processorConfig;
+                String connectorId = connectorConfig.getConnectorId();
+                if (StringUtils.isNotBlank(connectorId)) {
+                    connectors.put(connectorId, resourceLoader.loadConnector(connectorId));
+                }
+            }
+            if (processorConfig instanceof ServiceOperationConfig) {
+                ServiceOperationConfig serviceOperationConfig = (ServiceOperationConfig) processorConfig;
+                String serviceId = null;
+                if(StringUtils.isNotBlank(serviceOperationConfig.getServiceId())) {
+                    serviceId =  serviceOperationConfig.getServiceId();
+                }
+                if (StringUtils.isNotBlank(serviceId)) {
+                    services.put(serviceId, resourceLoader.loadService(serviceId));
+                }
+                List<ModelEntity> serviceModels = modelRepository.findByTargetTypeAndTargetId(ModelTargetType.Service, serviceId);
+                serviceModels.forEach(modelEntity -> models.put(modelEntity.getResourceKey(), modelEntity));
+            }
+
+            if (processorConfig instanceof DalaranRouterConfig) {
+                DalaranRouterConfig dalaranRouterConfig = (DalaranRouterConfig) processorConfig;
+                for (DalaranRouterConfig.Route route: dalaranRouterConfig.getRoutes()) {
+                    parseBranchRelationResource(route.getPipeline(), templateData);
+                }
+            }
+
+            if (processorConfig instanceof ScatterGatherConfig) {
+                ScatterGatherConfig scatterGatherConfig = (ScatterGatherConfig) processorConfig;
+                for (ScatterGatherConfig.Branch branch: scatterGatherConfig.getBranches()) {
+                    parseBranchRelationResource(branch.getPipeline(), templateData);
+                }
+            }
+
+            if (processorConfig instanceof RetryConfig) {
+                RetryConfig retryConfig = (RetryConfig) processorConfig;
+                parseBranchRelationResource(retryConfig.getPipeline(), templateData);
+            }
+
+            if (processorConfig instanceof LoopWhileConfig) {
+                LoopWhileConfig loopWhileConfig = (LoopWhileConfig) processorConfig;
+                parseBranchRelationResource(loopWhileConfig.getPipeline(), templateData);
+            }
+
+            if (processorConfig instanceof ForEachConfig) {
+                ForEachConfig forEachConfig = (ForEachConfig) processorConfig;
+                parseBranchRelationResource(forEachConfig.getPipeline(), templateData);
+            }
+
+            if (processorConfig instanceof ErrorCatchConfig) {
+                ErrorCatchConfig errorCatchConfig = (ErrorCatchConfig) processorConfig;
+                for (ErrorCatchConfig.Route route: errorCatchConfig.getRoutes()) {
+                    parseBranchRelationResource(route.getPipeline(), templateData);
+                }
+            }
+
+            if (processorConfig instanceof DalaranSubFlowConfig) {
+                DalaranSubFlowConfig subFlowConfig = (DalaranSubFlowConfig) processorConfig;
+                String subFlowId = subFlowConfig.getSubFlowId();
+                SubFlowAbstractEntity entity = resourceLoader.loadSubFlow(subFlowId);
+                if (entity != null) {
+                    subFlows.put(subFlowId, entity);
+                    buildTemplateRelationResource(templateData, entity);
+                }
+            }
+        }
+
     }
 
     private void parseProcessorModel(Object config, Map models) {

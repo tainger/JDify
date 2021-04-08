@@ -21,6 +21,7 @@ import io.terminus.dalaran.model.flow.ValidateMessageLevel;
 import io.terminus.dalaran.model.query.FlowQuery;
 import io.terminus.draco.web.autoconfig.context.UserContext;
 import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -116,12 +117,13 @@ public class SubFlowManagementServiceImpl implements SubFlowManagementService {
         }
         SubFlowEntity newFlowEntity = new SubFlowEntity();
         try {
-            BeanUtils.copyProperties(flowEntity, newFlowEntity);
+            BeanUtils.copyProperties(newFlowEntity, flowEntity);
         } catch (Exception e) {
             e.printStackTrace();
         }
         newFlowEntity.setId(null);
         newFlowEntity.setName(copyFlow.getName());
+        newFlowEntity.setResourceKey("copy_" + copyFlow.getId() + "_" + RandomStringUtils.random(4, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMN"));
         subFlowRepository.save(newFlowEntity);
         return newFlowEntity.getResourceKey();
     }
