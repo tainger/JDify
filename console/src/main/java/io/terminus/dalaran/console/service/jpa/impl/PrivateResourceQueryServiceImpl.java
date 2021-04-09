@@ -60,11 +60,6 @@ public class PrivateResourceQueryServiceImpl implements PrivateResourceQueryServ
                 predicates.add(type);
             }
 
-            if (StringUtils.isNoneBlank(query.getId())) {
-                Predicate id = criteriaBuilder.equal(root.get("resourceKey"), query.getId());
-                predicates.add(id);
-            }
-
             Predicate isExist = criteriaBuilder.equal(root.get("isExist"),true);
             predicates.add(isExist);
 
@@ -85,7 +80,35 @@ public class PrivateResourceQueryServiceImpl implements PrivateResourceQueryServ
 
         CriteriaQuery<PrivateRepositoryEntity> select = criteriaQuery.select(root);
 
-        criteriaQuery.where(builder.equal(root.get("isExist"), true)).groupBy(root.get("resourceKey"));
+        criteriaQuery.where(builder.equal(root.get("isExist"), true));
+
+        if (StringUtils.isNoneBlank(query.getName())) {
+            criteriaQuery.where(builder.equal(root.get("name"), query.getName()));
+        }
+
+        if (StringUtils.isNoneBlank(query.getVersion())) {
+            criteriaQuery.where(builder.equal(root.get("version"), query.getVersion()));
+        }
+
+        if (StringUtils.isNoneBlank(query.getOrigin())) {
+            criteriaQuery.where(builder.equal(root.get("origin"), query.getOrigin()));
+        }
+
+        if (StringUtils.isNoneBlank(query.getTenantCode())) {
+            criteriaQuery.where(builder.equal(root.get("tenantCode"), query.getTenantCode()));
+        }
+
+        if (StringUtils.isNoneBlank(query.getType())) {
+            criteriaQuery.where(builder.equal(root.get("type"), query.getType()));
+        }
+
+        if (StringUtils.isNoneBlank(query.getId())) {
+            criteriaQuery.where(builder.equal(root.get("resourceKey"), query.getId()));
+        }
+
+        criteriaQuery.groupBy(root.get("resourceKey"));
+
+        long totalSize = entityManager.createQuery(criteriaQuery).getResultList().size();
 
         TypedQuery<PrivateRepositoryEntity> typedQuery = entityManager.createQuery(select);
         typedQuery.setFirstResult((pageNumber - 1) * pageSize);
@@ -93,7 +116,7 @@ public class PrivateResourceQueryServiceImpl implements PrivateResourceQueryServ
 
         List result = typedQuery.getResultList();
 
-        return new PageImpl<>(result, pageable, result.size());
+        return new PageImpl<>(result, pageable, totalSize);
     }
 
     @Override

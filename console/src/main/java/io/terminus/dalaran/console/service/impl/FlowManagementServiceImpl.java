@@ -336,6 +336,12 @@ public class FlowManagementServiceImpl implements FlowManagementService {
             }
             SubFlowEntity subflowEntity = new SubFlowEntity();
             BeanUtils.copyProperties(subflowEntity, entityEntry.getValue());
+
+            String oldConfig = JSON.toJSONString(subflowEntity);
+            String newConfig = StringUtils.replaceEach(oldConfig, ArrayUtils.toStringArray(resourceKeyMap.keySet().toArray()), ArrayUtils.toStringArray(resourceKeyMap.values().toArray()));
+
+            subflowEntity = JSON.parseObject(newConfig, SubFlowEntity.class);
+
             String newResourceKey = GenerateKeyUtils.resourceKey(propertyService.getTenantCode());
             subflowEntity.setResourceKey(newResourceKey);
             subflowEntity.setCreatedFrom(entityEntry.getValue().getResourceKey());

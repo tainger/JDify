@@ -179,7 +179,7 @@ public class PrivateRepositoryServiceImpl implements PrivateRepositoryService {
                 versionResourceList.add(versionResource);
             }
         });
-        return new PageImpl<>(versionResourceList, PageRequest.of(pageNumber - 1, pageSize), versionResourceList.size());
+        return new PageImpl<>(versionResourceList, PageRequest.of(pageNumber - 1, pageSize), entities.getTotalElements());
     }
 
     @Override
@@ -248,7 +248,7 @@ public class PrivateRepositoryServiceImpl implements PrivateRepositoryService {
             PrivateRepositoryEntity entity;
             List<PrivateRepositoryEntity> entities = privateResourceQueryService.findByResourceKeyAndVersion(privateRepositoryDTO.getId(), privateRepositoryDTO.getVersion());
             if (CollectionUtils.isNotEmpty(entities)) {
-                entity = entities.get(0);
+                return new BasicResponse(false, "资源已存在");
             } else {
                 entity = toEntity(privateRepositoryDTO);
                 entity.setId(null);
