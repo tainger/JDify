@@ -4,6 +4,7 @@ import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSClientBuilder;
 import com.aliyun.oss.model.GetObjectRequest;
 import com.aliyun.oss.model.OSSObject;
+import com.google.common.io.ByteSource;
 import io.terminus.dalaran.core.oss.OSSAccount;
 
 import java.io.File;
@@ -27,6 +28,13 @@ public class OSSUtils {
         OSS client = new OSSClientBuilder().build(ossAccount.getEndpoint(), ossAccount.getAccessId(), ossAccount.getAccessSecret());
         String key = ossAccount.getRootDir() + "/" + fileName;
         client.putObject(ossAccount.getBucketName(), key, ossObject.getObjectContent());
+        return key;
+    }
+
+    public static String upload(String fileName, byte[] content, OSSAccount ossAccount) throws Exception {
+        OSS client = new OSSClientBuilder().build(ossAccount.getEndpoint(), ossAccount.getAccessId(), ossAccount.getAccessSecret());
+        String key = ossAccount.getRootDir() + "/" + fileName;
+        client.putObject(ossAccount.getBucketName(), key, ByteSource.wrap(content).openStream());
         return key;
     }
 

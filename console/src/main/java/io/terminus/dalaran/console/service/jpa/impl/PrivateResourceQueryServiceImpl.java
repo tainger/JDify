@@ -80,31 +80,50 @@ public class PrivateResourceQueryServiceImpl implements PrivateResourceQueryServ
 
         CriteriaQuery<PrivateRepositoryEntity> select = criteriaQuery.select(root);
 
-        criteriaQuery.where(builder.equal(root.get("isExist"), true));
+        List<Predicate> predicates = new ArrayList<>();
+
+        Predicate exist = builder.equal(root.get("isExist"), true);
+        predicates.add(exist);
+//        criteriaQuery.where(builder.equal(root.get("isExist"), true));
 
         if (StringUtils.isNoneBlank(query.getName())) {
-            criteriaQuery.where(builder.equal(root.get("name"), query.getName()));
+            Predicate name = builder.equal(root.get("name"), query.getName());
+            predicates.add(name);
+//            criteriaQuery.where(builder.equal(root.get("name"), query.getName()));
         }
 
         if (StringUtils.isNoneBlank(query.getVersion())) {
-            criteriaQuery.where(builder.equal(root.get("version"), query.getVersion()));
+            Predicate version = builder.equal(root.get("version"), query.getVersion());
+            predicates.add(version);
+//            criteriaQuery.where(builder.equal(root.get("version"), query.getVersion()));
         }
 
         if (StringUtils.isNoneBlank(query.getOrigin())) {
-            criteriaQuery.where(builder.equal(root.get("origin"), query.getOrigin()));
+            Predicate origin = builder.equal(root.get("origin"), query.getOrigin());
+            predicates.add(origin);
+//            criteriaQuery.where(builder.equal(root.get("origin"), query.getOrigin()));
         }
 
         if (StringUtils.isNoneBlank(query.getTenantCode())) {
-            criteriaQuery.where(builder.equal(root.get("tenantCode"), query.getTenantCode()));
+            Predicate tenant = builder.equal(root.get("tenantCode"), query.getTenantCode());
+            predicates.add(tenant);
+//            criteriaQuery.where(builder.equal(root.get("tenantCode"), query.getTenantCode()));
         }
 
         if (StringUtils.isNoneBlank(query.getType())) {
-            criteriaQuery.where(builder.equal(root.get("type"), query.getType()));
+            Predicate type = builder.equal(root.get("type"), query.getType());
+            predicates.add(type);
+//            criteriaQuery.where(builder.equal(root.get("type"), query.getType()));
         }
 
         if (StringUtils.isNoneBlank(query.getId())) {
-            criteriaQuery.where(builder.equal(root.get("resourceKey"), query.getId()));
+            Predicate resourceKey = builder.equal(root.get("resourceKey"), query.getId());
+            predicates.add(resourceKey);
+//            criteriaQuery.where(builder.equal(root.get("resourceKey"), query.getId()));
         }
+
+        Predicate[] predicatesArray = {};
+        criteriaQuery.where(predicates.toArray(predicatesArray));
 
         criteriaQuery.groupBy(root.get("resourceKey"));
 

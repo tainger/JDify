@@ -1,8 +1,9 @@
 package io.terminus.dalaran.console.service.impl;
 
 import com.alibaba.fastjson.JSON;
-import com.aliyun.oss.model.OSSObject;
+import com.google.common.io.ByteSource;
 import io.terminus.dalaran.component.utils.DalaranFileUtils;
+import io.terminus.dalaran.component.utils.HttpUtils;
 import io.terminus.dalaran.component.utils.OSSUtils;
 import io.terminus.dalaran.console.entity.*;
 import io.terminus.dalaran.console.model.FlowTemplate;
@@ -184,10 +185,13 @@ public class PrivateRepositoryServiceImpl implements PrivateRepositoryService {
 
     @Override
     public List<ResourceGroupDTO> listResourceGroup() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity request = new HttpEntity<>(headers);
         ResponseEntity<List<ResourceGroupDTO>> responseEntity = restTemplate.exchange(
                 propertyService.getMarketHost() + propertyService.getResourceGroup(),
                 HttpMethod.GET,
-                null,
+                request,
                 new ParameterizedTypeReference<List<ResourceGroupDTO>>() {});
         return responseEntity.getBody();
     }
@@ -423,10 +427,14 @@ public class PrivateRepositoryServiceImpl implements PrivateRepositoryService {
 
                 String fileUrl = resourceFile.getFilePath();
                 log.info("fileUrl: " + fileUrl);
-                OSSObject ossObject = OSSUtils.downloadByUrl(fileUrl, ossAccount);
-                log.info("ossObject size: " + ossObject.getObjectMetadata().getContentLength());
+                byte[] content = HttpUtils.get(fileUrl);
+                if (content == null) {
+                    log.info("file url: " + fileUrl + " get content null.");
+                    return;
+                }
+                log.info("file size: " + content.length);
 
-                String fileKey = OSSUtils.upload(ossObject.getRequestId() + ".jar", ossObject, ossAccount);
+                String fileKey = OSSUtils.upload(  System.currentTimeMillis() + fileUrl.hashCode() + ".jar", content, ossAccount);
                 privateRepositoryEntity.setData(JSON.toJSONString(new ResourceFile(fileKey)));
                 entity.setFilePath(fileKey);
                 entity.setResourceKey(privateRepositoryDTO.getId());
@@ -522,9 +530,12 @@ public class PrivateRepositoryServiceImpl implements PrivateRepositoryService {
                     BeanUtils.copyProperties(entity, entityEntry.getValue());
 
                     String fileUrl = entityEntry.getValue().getFilePath();
-                    OSSObject ossObject = OSSUtils.downloadByUrl(fileUrl, ossAccount);
-                    entity.setFilePath(OSSUtils.upload(ossObject.getRequestId() + ".jar", ossObject, ossAccount));
-
+                    byte[] content = HttpUtils.get(fileUrl);
+                    if (content == null) {
+                        log.info("file url: " + fileUrl + " get content null.");
+                        continue;
+                    }
+                    entity.setFilePath(OSSUtils.upload(System.currentTimeMillis() + fileUrl.hashCode() + ".jar", content, ossAccount));
                     entity.setId(null);
                     privatePackageRepository.save(entity);
                     loadProcessor(entityEntry.getValue().getFilePath(), MARKET, entity.getVersion());
@@ -534,9 +545,13 @@ public class PrivateRepositoryServiceImpl implements PrivateRepositoryService {
     }
 
     private void loadProcessor(String fileUrl, String group, String version) throws Exception {
-        OSSObject ossObject = OSSUtils.downloadByUrl(fileUrl, ossAccount);
-        File file = DalaranFileUtils.createFile(ossObject.getRequestId());
-        FileUtils.copyToFile(ossObject.getObjectContent(), file);
+        byte[] content = HttpUtils.get(fileUrl);
+        if (content == null) {
+            log.info("file url: " + fileUrl + " get content null.");
+            return;
+        }
+        File file = DalaranFileUtils.createFile(System.currentTimeMillis() + fileUrl.hashCode() + "");
+        FileUtils.copyToFile(ByteSource.wrap(content).openStream(), file);
         marketResourceLoader.install(file, group, version);
     }
 }

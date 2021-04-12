@@ -1,8 +1,11 @@
 package io.terminus.dalaran.rest.read;
 
 import io.swagger.annotations.ApiOperation;
+import io.terminus.dalaran.model.BasicResponse;
+import io.terminus.dalaran.model.common.OSSAccount;
 import io.terminus.dalaran.model.dto.PropertyDTO;
 import io.terminus.dalaran.model.query.PropertyQuery;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
@@ -18,4 +21,12 @@ public interface PropertyReadAPI {
     @ApiOperation(value = "全量查询环境变量")
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     List<PropertyDTO> list();
+
+    @ApiOperation(value = "获取当前环境OSS信息")
+    @GetMapping(value = "/oss")
+    OSSAccount getOSSAccount();
+
+    @ApiOperation(value = "获取组件市场地址")
+    @GetMapping(value = "/market/host")
+    BasicResponse getDalaranMarket();
 }
