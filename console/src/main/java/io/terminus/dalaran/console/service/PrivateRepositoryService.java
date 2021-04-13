@@ -4,6 +4,7 @@ import io.terminus.dalaran.console.model.FlowTemplate;
 import io.terminus.dalaran.market.model.BasicResourceDTO;
 import io.terminus.dalaran.market.model.MarketResourceVersionDTO;
 import io.terminus.dalaran.model.BasicResponse;
+import io.terminus.dalaran.model.ResourceUploadRequest;
 import io.terminus.dalaran.model.dto.BasicResourceRequest;
 import io.terminus.dalaran.model.dto.PrivateRepositoryDTO;
 import io.terminus.dalaran.model.dto.ResourceGroupDTO;
@@ -29,6 +30,8 @@ public interface PrivateRepositoryService {
     BasicResponse saveTemplate(FlowTemplate flowTemplate);
 
     BasicResponse localResourceUpload(MultipartFile file, String name, String version, String resourceGroup);
+
+    BasicResponse localResourceUpload(ResourceUploadRequest resourceUploadRequest);
 
     List<ResourceGroupDTO> listResourceGroup();
 

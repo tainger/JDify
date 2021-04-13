@@ -12,6 +12,7 @@ import io.terminus.dalaran.core.context.DalaranContext;
 import io.terminus.dalaran.core.resource.property.PropertyService;
 import io.terminus.dalaran.model.BasicResponse;
 import io.terminus.dalaran.model.DalaranAccount;
+import io.terminus.dalaran.model.ResourceUploadRequest;
 import io.terminus.dalaran.model.dto.ImportJarRequest;
 import io.terminus.dalaran.model.dto.ReleaseRecordDTO;
 import io.terminus.dalaran.model.dto.ReleaseRequestDTO;
@@ -263,7 +264,7 @@ public class PlatformRest implements PlatformInfoAPI, PlatformImportAPI, Platfor
     }
 
     @Override
-    public BasicResponse localUpload(MultipartFile file, String name, String version, String resourceGroup) {
-        return privateRepositoryService.localResourceUpload(file, name, version, resourceGroup);
+    public BasicResponse localUpload(ResourceUploadRequest resourceUploadRequest) {
+        return privateRepositoryService.localResourceUpload(resourceUploadRequest);
     }
 }

@@ -2,6 +2,7 @@ package io.terminus.dalaran.rest.write;
 
 import io.swagger.annotations.ApiOperation;
 import io.terminus.dalaran.model.BasicResponse;
+import io.terminus.dalaran.model.ResourceUploadRequest;
 import io.terminus.dalaran.model.dto.ImportJarRequest;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -19,5 +20,5 @@ public interface PlatformImportAPI {
 
     @ApiOperation(value = "本地开发资源上报")
     @PostMapping(value = "/resource/upload")
-    BasicResponse localUpload(@RequestPart MultipartFile file, @RequestParam String name, @RequestParam String version, @RequestParam String resourceGroup);
+    BasicResponse localUpload(@RequestBody ResourceUploadRequest resourceUploadRequest);
 }

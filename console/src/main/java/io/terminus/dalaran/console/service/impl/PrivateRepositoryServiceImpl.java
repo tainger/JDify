@@ -21,6 +21,7 @@ import io.terminus.dalaran.core.resource.repository.PrivateRepositoryRepository;
 import io.terminus.dalaran.market.model.BasicResourceDTO;
 import io.terminus.dalaran.market.model.MarketResourceVersionDTO;
 import io.terminus.dalaran.model.BasicResponse;
+import io.terminus.dalaran.model.ResourceUploadRequest;
 import io.terminus.dalaran.model.dto.BasicResourceRequest;
 import io.terminus.dalaran.model.dto.PrivateRepositoryDTO;
 import io.terminus.dalaran.model.dto.ResourceGroupDTO;
@@ -293,9 +294,9 @@ public class PrivateRepositoryServiceImpl implements PrivateRepositoryService {
 
             String resourceKey = null;
             privateRepositoryQuery.setVersion(null);
-            privateRepositoryEntityList = privateResourceQueryService.query(privateRepositoryQuery);
-            if (CollectionUtils.isNotEmpty(privateRepositoryEntityList)) {
-                resourceKey = privateRepositoryEntityList.get(0).getResourceKey();
+            PrivateRepositoryEntity privateRepositoryEntity = privateRepository.findByNameAndType(name, PROCESSOR);
+            if (privateRepositoryEntity != null) {
+                resourceKey = privateRepositoryEntity.getResourceKey();
             }
 
             File local = io.terminus.dalaran.console.util.FileUtils.transfer(file);
@@ -322,6 +323,54 @@ public class PrivateRepositoryServiceImpl implements PrivateRepositoryService {
         }
         return new BasicResponse(false, "上传失败");
     }
+
+    @Override
+    public BasicResponse localResourceUpload(ResourceUploadRequest resourceUploadRequest) {
+        String name = resourceUploadRequest.getName();
+        String version = resourceUploadRequest.getVersion();
+        String resourceGroup = resourceUploadRequest.getResourceGroup();
+        String type = resourceUploadRequest.getType();
+        if (StringUtils.isBlank(type)) {
+            type = PROCESSOR;
+        }
+        try {
+            List<PrivateRepositoryEntity> privateRepositoryEntityList;
+            PrivateRepositoryQuery privateRepositoryQuery = new PrivateRepositoryQuery(name, version, PROCESSOR);
+            privateRepositoryEntityList = privateResourceQueryService.query(privateRepositoryQuery);
+            if (CollectionUtils.isNotEmpty(privateRepositoryEntityList)) {
+                return new BasicResponse(false, "resource is exist, " + name + ", " + version);
+            }
+
+            String resourceKey = null;
+            privateRepositoryQuery.setVersion(null);
+            PrivateRepositoryEntity privateRepositoryEntity = privateRepository.findByNameAndType(name, type);
+            if (privateRepositoryEntity != null) {
+                resourceKey = privateRepositoryEntity.getResourceKey();
+            }
+
+            String filePath = resourceUploadRequest.getFilePath();
+            File local = OSSUtils.downloadByPath(resourceUploadRequest.getFilePath(), ossAccount);
+            ResourceFile resourceFile = new ResourceFile(filePath);
+            marketResourceLoader.install(local, PRIVATE, version);
+            if (StringUtils.isBlank(resourceKey)) {
+                resourceKey = GenerateKeyUtils.resourceKey(propertyService.getTenantCode());
+            }
+            PrivateRepositoryEntity entity = new PrivateRepositoryEntity();
+            entity.setName(name);
+            entity.setVersion(version);
+            entity.setResourceGroup(resourceGroup);
+            entity.setResourceKey(resourceKey);
+            entity.setData(JSON.toJSONString(resourceFile));
+            entity.setId(null);
+            entity.setTenantCode(propertyService.getTenantCode());
+            entity.setType(type);
+            entity.setOrigin(PRIVATE);
+            privateRepository.save(entity);
+            return new BasicResponse(true, resourceKey);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return new BasicResponse(false, "上传失败");    }
 
     @Override
     public BasicResponse delete(BasicResourceRequest request) {
