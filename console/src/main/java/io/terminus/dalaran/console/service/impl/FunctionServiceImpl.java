@@ -88,7 +88,7 @@ public class FunctionServiceImpl implements FunctionService {
     private FunctionDTO toDTO(FunctionEntity entity) {
         FunctionDTO dto = new FunctionDTO();
         try {
-            BeanUtils.copyProperties(entity, dto);
+            BeanUtils.copyProperties(dto, entity);
             dto.setId(entity.getResourceKey());
             dto.setExist(true);
         } catch (Exception e) {
@@ -100,7 +100,7 @@ public class FunctionServiceImpl implements FunctionService {
     private FunctionEntity toEntity(FunctionDTO dto) {
         FunctionEntity entity = new FunctionEntity();
         try {
-            BeanUtils.copyProperties(dto, entity);
+            BeanUtils.copyProperties(entity, dto);
             entity.setExist(true);
             String resourceKey = dto.getId();
             if (StringUtils.isBlank(resourceKey)) {
