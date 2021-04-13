@@ -21,6 +21,8 @@ public class PropertyService {
     @Value("${terminus.dalaran.market.group}")
     private String resourceGroup;
 
+    private final String DALARAN_MARKET_UI = "DALARAN_MARKET_UI";
+
     public String getTenantCode() {
         return tenantCode;
     }
@@ -39,5 +41,9 @@ public class PropertyService {
 
     public String getDeleteTenantResourceRelation() {
         return deleteTenantResourceRelation;
+    }
+
+    public String getMarketUi() {
+        return System.getenv(DALARAN_MARKET_UI);
     }
 }

@@ -26,7 +26,7 @@ public interface PropertyReadAPI {
     @GetMapping(value = "/oss")
     OSSAccount getOSSAccount();
 
-    @ApiOperation(value = "获取组件市场地址")
+    @ApiOperation(value = "获取组件市场前端地址")
     @GetMapping(value = "/market/host")
-    BasicResponse getDalaranMarket();
+    BasicResponse getDalaranMarketUi();
 }

@@ -71,7 +71,7 @@ public class PropertyManagementRest implements PropertyReadAPI, PropertyWriteAPI
     }
 
     @Override
-    public BasicResponse getDalaranMarket() {
-        return new BasicResponse(true, propertyService.getMarketHost());
+    public BasicResponse getDalaranMarketUi() {
+        return new BasicResponse(true, propertyService.getMarketUi());
     }
 }
