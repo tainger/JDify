@@ -9,11 +9,10 @@ import io.terminus.dalaran.core.context.DalaranFunctionContext;
 import io.terminus.dalaran.model.dto.FunctionDTO;
 import io.terminus.dalaran.model.dto.basic.BasicFunctionInfo;
 import io.terminus.draco.web.autoconfig.context.UserContext;
+import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import javax.persistence.EntityManager;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -88,21 +87,29 @@ public class FunctionServiceImpl implements FunctionService {
 
     private FunctionDTO toDTO(FunctionEntity entity) {
         FunctionDTO dto = new FunctionDTO();
-        BeanUtils.copyProperties(entity, dto);
-        dto.setId(entity.getResourceKey());
-        dto.setExist(true);
+        try {
+            BeanUtils.copyProperties(entity, dto);
+            dto.setId(entity.getResourceKey());
+            dto.setExist(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return dto;
     }
 
     private FunctionEntity toEntity(FunctionDTO dto) {
         FunctionEntity entity = new FunctionEntity();
-        BeanUtils.copyProperties(dto, entity);
-        entity.setExist(true);
-        String resourceKey = dto.getId();
-        if (StringUtils.isBlank(resourceKey)) {
-            resourceKey = GenerateKeyUtils.resourceKey();
+        try {
+            BeanUtils.copyProperties(dto, entity);
+            entity.setExist(true);
+            String resourceKey = dto.getId();
+            if (StringUtils.isBlank(resourceKey)) {
+                resourceKey = GenerateKeyUtils.resourceKey();
+            }
+            entity.setResourceKey(resourceKey);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        entity.setResourceKey(resourceKey);
         return entity;
     }
 
