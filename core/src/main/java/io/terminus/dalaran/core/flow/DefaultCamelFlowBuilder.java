@@ -228,7 +228,7 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
                         ErrorCatchConfig config = jsonObject.toJavaObject(ErrorCatchConfig.class);
                         processorCustomMessageList = ((DalaranComponentValidator) processor).validate(config);
                     }
-                }else {
+                } else {
                     processorCustomMessageList = ((DalaranComponentValidator) processor).validate(processorModel.getConfig());
                 }
                 processorMessageList.addAll(processorCustomMessageList);
