@@ -34,11 +34,12 @@ import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
@@ -185,15 +186,10 @@ public class PrivateRepositoryServiceImpl implements PrivateRepositoryService {
 
     @Override
     public List<ResourceGroupDTO> listResourceGroup() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity request = new HttpEntity<>(headers);
-        ResponseEntity<List<ResourceGroupDTO>> responseEntity = restTemplate.exchange(
+        List<ResourceGroupDTO> responseEntity = restTemplate.getForObject(
                 propertyService.getMarketHost() + propertyService.getResourceGroup(),
-                HttpMethod.GET,
-                request,
-                new ParameterizedTypeReference<List<ResourceGroupDTO>>() {});
-        return responseEntity.getBody();
+                List.class);
+        return responseEntity;
     }
 
     @Override
