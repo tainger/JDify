@@ -24,6 +24,10 @@ import io.terminus.dalaran.console.service.jpa.FlowQueryService;
 import io.terminus.dalaran.console.service.jpa.PrivateResourceQueryService;
 import io.terminus.dalaran.console.util.GenerateKeyUtils;
 import io.terminus.dalaran.core.component.config.*;
+import io.terminus.dalaran.core.component.model.FunctionType;
+import io.terminus.dalaran.core.component.model.MappingFunction;
+import io.terminus.dalaran.core.component.model.MappingType;
+import io.terminus.dalaran.core.component.model.SimpleMapping;
 import io.terminus.dalaran.core.context.DalaranContext;
 import io.terminus.dalaran.core.flow.DalaranFlowBuilder;
 import io.terminus.dalaran.core.resource.DalaranResourceBuilder;
@@ -76,8 +80,8 @@ import javax.transaction.Transactional;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static io.terminus.dalaran.DalaranConstants.FLOW_TEMPLATE;
-import static io.terminus.dalaran.DalaranConstants.SUB_FLOW_TEMPLATE;
+import static io.terminus.dalaran.DalaranConstants.*;
+
 @Slf4j
 @Service
 @Transactional
@@ -841,6 +845,8 @@ public class FlowManagementServiceImpl implements FlowManagementService {
         Map services = templateData.getRelationService();
         Map packages = templateData.getRelationPackage();
         Map subFlows = templateData.getRelationSubFlow();
+        Map functions = templateData.getRelationFunction();
+
         String inModelId = origin.getInModel();
         String outModelId = origin.getOutModel();
         if (StringUtils.isNotBlank(inModelId)) {
@@ -912,6 +918,28 @@ public class FlowManagementServiceImpl implements FlowManagementService {
                 serviceModels.forEach(modelEntity -> models.put(modelEntity.getResourceKey(), modelEntity));
             }
 
+            if (processorConfig instanceof DalaranMapperConfig) {
+                DalaranMapperConfig mapperConfig = (DalaranMapperConfig) processorConfig;
+                Map<String, SimpleMapping> messageMapping = mapperConfig.getMessageMapping();
+                List<SimpleMapping> simpleMappings = new ArrayList<>(messageMapping.values());
+                List<SimpleMapping> noDestinationMappings = mapperConfig.getNoDestinationMappings();
+                simpleMappings.addAll(noDestinationMappings);
+                for (SimpleMapping simpleMapping: simpleMappings) {
+                    if (simpleMapping.getMappingType() == MappingType.FUNCTION) {
+                        MappingFunction mappingFunction = (MappingFunction) (simpleMapping.getValue());
+                        if (mappingFunction.getType() == FunctionType.STATIC) {
+                            continue;
+                        }
+                        String functionKey = mappingFunction.getId();
+                        if (functions.containsKey(functionKey)) {
+                            continue;
+                        }
+                        FunctionEntity entity = functionRepository.findByResourceKey(functionKey);
+                        functions.put(functionKey, entity);
+                    }
+                }
+            }
+
             if (processorConfig instanceof DalaranRouterConfig) {
                 DalaranRouterConfig dalaranRouterConfig = (DalaranRouterConfig) processorConfig;
                 for (DalaranRouterConfig.Route route: dalaranRouterConfig.getRoutes()) {
@@ -966,6 +994,7 @@ public class FlowManagementServiceImpl implements FlowManagementService {
         Map services = templateData.getRelationService();
         Map packages = templateData.getRelationPackage();
         Map subFlows = templateData.getRelationSubFlow();
+        Map functions = templateData.getRelationFunction();
 
         for (ProcessorRouteInfo processorRouteInfo : processorRouteInfoList) {
             ProcessorInfo processorInfo = dalaranContext.getDalaranComponentContext().getProcessorInfo(processorRouteInfo.getGroup(), processorRouteInfo.getType(), processorRouteInfo.getVersion());
@@ -1001,6 +1030,27 @@ public class FlowManagementServiceImpl implements FlowManagementService {
                 }
                 List<ModelEntity> serviceModels = modelRepository.findByTargetTypeAndTargetId(ModelTargetType.Service, serviceId);
                 serviceModels.forEach(modelEntity -> models.put(modelEntity.getResourceKey(), modelEntity));
+            }
+            if (processorConfig instanceof DalaranMapperConfig) {
+                DalaranMapperConfig mapperConfig = (DalaranMapperConfig) processorConfig;
+                Map<String, SimpleMapping> messageMapping = mapperConfig.getMessageMapping();
+                List<SimpleMapping> simpleMappings = new ArrayList<>(messageMapping.values());
+                List<SimpleMapping> noDestinationMappings = mapperConfig.getNoDestinationMappings();
+                simpleMappings.addAll(noDestinationMappings);
+                for (SimpleMapping simpleMapping: simpleMappings) {
+                    if (simpleMapping.getMappingType() == MappingType.FUNCTION) {
+                        MappingFunction mappingFunction = (MappingFunction) (simpleMapping.getValue());
+                        if (mappingFunction.getType() == FunctionType.STATIC) {
+                            continue;
+                        }
+                        String functionKey = mappingFunction.getId();
+                        if (functions.containsKey(functionKey)) {
+                            continue;
+                        }
+                        FunctionEntity entity = functionRepository.findByResourceKey(functionKey);
+                        functions.put(functionKey, entity);
+                    }
+                }
             }
 
             if (processorConfig instanceof DalaranRouterConfig) {
