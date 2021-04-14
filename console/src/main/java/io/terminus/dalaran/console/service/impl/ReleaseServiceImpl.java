@@ -1,38 +1,23 @@
 package io.terminus.dalaran.console.service.impl;
 
-import com.alibaba.fastjson.JSONObject;
-import io.terminus.dalaran.config.ComponentInfo;
-import io.terminus.dalaran.config.DalaranConfigField;
-import io.terminus.dalaran.config.ProcessorInfo;
 import io.terminus.dalaran.console.convertor.FlowConvertor;
-import io.terminus.dalaran.console.entity.TriggerFlowEntity;
 import io.terminus.dalaran.console.repository.*;
 import io.terminus.dalaran.console.service.ModuleManagementService;
 import io.terminus.dalaran.console.service.ReleaseService;
-import io.terminus.dalaran.core.component.DalaranComponentValidator;
-import io.terminus.dalaran.core.component.DalaranProcessor;
-import io.terminus.dalaran.core.component.config.DalaranMapperConfig;
-import io.terminus.dalaran.core.component.config.ErrorCatchConfig;
-import io.terminus.dalaran.core.component.config.ServiceOperationConfig;
-import io.terminus.dalaran.core.context.DalaranComponentContext;
 import io.terminus.dalaran.core.flow.DalaranFlowBuilder;
+import io.terminus.dalaran.core.resource.DalaranResourceBuilder;
 import io.terminus.dalaran.core.resource.entity.basic.BasicEntity;
 import io.terminus.dalaran.core.resource.entity.common.ModuleEntity;
-import io.terminus.dalaran.core.resource.entity.common.ProcessorEntity;
 import io.terminus.dalaran.core.resource.entity.common.ReleaseRecordEntity;
 import io.terminus.dalaran.core.resource.entity.released.*;
 import io.terminus.dalaran.core.resource.redis.RedisService;
 import io.terminus.dalaran.core.resource.repository.*;
-import io.terminus.dalaran.model.MessageModel;
-import io.terminus.dalaran.model.component.FlowValidationModel;
-import io.terminus.dalaran.model.component.ProcessorModel;
-import io.terminus.dalaran.model.component.RoutesModel;
 import io.terminus.dalaran.model.dto.ReleaseRecordDTO;
 import io.terminus.dalaran.model.dto.ReleaseRequestDTO;
 import io.terminus.dalaran.model.dto.flow.ReleaseFlowDTO;
 import io.terminus.dalaran.model.flow.FlowStatus;
 import io.terminus.dalaran.model.flow.FlowValidation;
-import io.terminus.dalaran.model.flow.FlowValidationBuilder;
+import io.terminus.dalaran.model.flow.TriggerFlow;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
@@ -43,12 +28,10 @@ import org.springframework.stereotype.Service;
 
 import javax.persistence.criteria.Predicate;
 import javax.transaction.Transactional;
-import java.lang.reflect.InvocationTargetException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static io.terminus.dalaran.core.flow.DefaultFlowValidateMessages.FIELD_NOT_NULL;
 
 @Slf4j
 @Service
@@ -134,7 +117,7 @@ public class ReleaseServiceImpl implements ReleaseService {
     private DalaranFlowBuilder flowBuilder;
 
     @Autowired
-    private DalaranComponentContext componentContext;
+    private DalaranResourceBuilder resourceBuilder;
 
 
 
@@ -157,7 +140,6 @@ public class ReleaseServiceImpl implements ReleaseService {
         recordEntity.setLastVersion(lastVersion);
         recordEntity.setReleaseLog(requestDTO.getReleaseLog());
         recordEntity.setReleaseTime(new Date());
-        // TODO 需要校验是否有误, 暂时没做
         recordEntity.setSuccessful(true);
         recordEntity.setResourceKey("key");
         releaseRecordRepository.save(recordEntity);
@@ -168,11 +150,15 @@ public class ReleaseServiceImpl implements ReleaseService {
         moduleEntities.forEach(moduleEntity -> releasedTriggerFlowEntities.addAll(toReleasedData(triggerFlowRepository.findByModuleIdAndIsExistTrue(moduleEntity.getResourceKey()),TriggerFlowReleasedEntity.class, requestDTO.getVersion())));
        // List<TriggerFlowReleasedEntity> releasedTriggerFlowEntities = toReleasedData(triggerFlowRepository.findAll(), TriggerFlowReleasedEntity.class, requestDTO.getVersion());
 
-//        releasedTriggerFlowEntities.forEach(releasedEntity -> {
-//            if (!validatePipeline(releasedEntity.getPipeline())) {
-//                releasedTriggerFlowEntities.remove(releasedEntity);
-//            }
-//        });
+        List<TriggerFlowReleasedEntity> invalidFlows = new ArrayList<>();
+        releasedTriggerFlowEntities.forEach(releasedEntity -> {
+            TriggerFlow triggerFlow = resourceBuilder.buildTriggerFlow(releasedEntity);
+            List<FlowValidation> validateMessage= flowBuilder.validateFlow(triggerFlow);
+            if (validateMessage != null && validateMessage.size() != 0) {
+                invalidFlows.add(releasedEntity);
+            }
+        });
+        releasedTriggerFlowEntities.removeAll(invalidFlows);
 
         triggerFlowReleasedRepository.saveAll(releasedTriggerFlowEntities);
 
@@ -321,74 +307,5 @@ public class ReleaseServiceImpl implements ReleaseService {
         ReleaseRecordDTO dto = new ReleaseRecordDTO();
         BeanUtils.copyProperties(recordEntity, dto);
         return dto;
-    }
-
-    private FlowValidationModel validatePipeline(List<ProcessorEntity> pipeline, MessageModel lastModel, FlowValidationModel flowValidationModel) {
-        for (ProcessorEntity processorEntity : pipeline) {
-            DalaranProcessor processor = componentContext.getProcessor(processorEntity.getGroup(), processorEntity.getType(), processorEntity.getVersion());
-            ProcessorInfo processorInfo = componentContext.getProcessorInfo(processorEntity.getGroup(), processorEntity.getType(), processorEntity.getVersion());
-            String json = JSONObject.toJSONString(processorEntity.getConfig());
-            JSONObject jsonObject;
-            if (json.startsWith("\"")) {
-                jsonObject = JSONObject.parseObject(processorEntity.getConfig());
-            } else {
-                jsonObject = JSONObject.parseObject(json);
-            }
-            if (jsonObject.containsKey("routes")) {
-                List<RoutesModel> routesModelList = jsonObject.getJSONArray("routes").toJavaList(RoutesModel.class);
-                for(RoutesModel routesModel : routesModelList) {
-                    String pipelineJson = JSONObject.toJSONString(routesModel);
-                    JSONObject pipelineJsonObject;
-                    if (json.startsWith("\"")) {
-                        pipelineJsonObject = JSONObject.parseObject(routesModel.toString());
-                    } else {
-                        pipelineJsonObject = JSONObject.parseObject(pipelineJson);
-                    }
-                    if ((pipelineJsonObject.getJSONArray("pipeline")) != null) {
-                        validatePipeline((pipelineJsonObject.getJSONArray("pipeline")).toJavaList(ProcessorEntity.class), lastModel, flowValidationModel);
-                    }
-                }
-            }
-            if (jsonObject.containsKey("pipeline")) {
-                validatePipeline((jsonObject.getJSONArray("pipeline")).toJavaList(ProcessorEntity.class), lastModel, flowValidationModel);
-            }
-            List<FlowValidation> processorMessageList = validate(processorInfo, jsonObject);
-            if (processor instanceof DalaranComponentValidator) {
-                List<FlowValidation> processorCustomMessageList = null;
-                if (processorEntity.getConfig() instanceof String) {
-                    if (processorEntity.getType().equals("mapper-convert")) {
-                        DalaranMapperConfig config = jsonObject.toJavaObject(DalaranMapperConfig.class);
-                        processorCustomMessageList = ((DalaranComponentValidator) processor).validate(config);
-                    } else if (processorEntity.getType().equals("service")) {
-                        ServiceOperationConfig config = jsonObject.toJavaObject(ServiceOperationConfig.class);
-                        processorCustomMessageList = ((DalaranComponentValidator) processor).validate(config);
-                    } else if (processorEntity.getType().equals("error-catch")) {
-                        ErrorCatchConfig config = jsonObject.toJavaObject(ErrorCatchConfig.class);
-                        processorCustomMessageList = ((DalaranComponentValidator) processor).validate(config);
-                    }
-                } else {
-                    processorCustomMessageList = ((DalaranComponentValidator) processor).validate(processorEntity.getConfig());
-                }
-                processorMessageList.addAll(processorCustomMessageList);
-            }
-//            lastModel = processorEntity.
-        }
-        return flowValidationModel;
-    }
-
-    private List<FlowValidation> validate(ComponentInfo componentInfo, Object config) {
-        List<FlowValidation> validateMessages = new ArrayList<>();
-        for (DalaranConfigField configField : componentInfo.getConfigFields()) {
-            try {
-                if (configField.isRequired() && StringUtils.isBlank(org.apache.commons.beanutils.BeanUtils.getProperty(config, configField.getName()))) {
-                    FlowValidation message = FlowValidationBuilder.newBuilder()
-                            .field(configField.getName()).message(FIELD_NOT_NULL).build();
-                    validateMessages.add(message);
-                }
-            } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-                e.printStackTrace();
-            }
-        }
-        return validateMessages;
     }
 }
