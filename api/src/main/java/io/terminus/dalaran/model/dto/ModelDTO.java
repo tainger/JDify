@@ -3,6 +3,7 @@ package io.terminus.dalaran.model.dto;
 import io.terminus.dalaran.model.ModelTargetType;
 import io.terminus.dalaran.model.dto.basic.BasicModelInfo;
 import lombok.Data;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
 
@@ -12,6 +13,7 @@ import java.util.Map;
 @Data
 public class ModelDTO extends BasicModelInfo {
 
+    @Nullable
     private Map<String, Object> modelSchema;
 
     private String targetId;

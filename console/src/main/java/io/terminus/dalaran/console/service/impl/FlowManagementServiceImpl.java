@@ -920,10 +920,17 @@ public class FlowManagementServiceImpl implements FlowManagementService {
 
             if (processorConfig instanceof DalaranMapperConfig) {
                 DalaranMapperConfig mapperConfig = (DalaranMapperConfig) processorConfig;
+
+                log.info("mapperConfig: " + JSON.toJSONString(mapperConfig));
+
                 Map<String, SimpleMapping> messageMapping = mapperConfig.getMessageMapping();
                 List<SimpleMapping> simpleMappings = new ArrayList<>(messageMapping.values());
                 List<SimpleMapping> noDestinationMappings = mapperConfig.getNoDestinationMappings();
-                simpleMappings.addAll(noDestinationMappings);
+                log.info("noDestinationMappings: " + noDestinationMappings);
+                if (CollectionUtils.isNotEmpty(noDestinationMappings)) {
+                    simpleMappings.addAll(noDestinationMappings);
+                }
+                log.info("simpleMappings: " + simpleMappings.toString());
                 for (SimpleMapping simpleMapping: simpleMappings) {
                     if (simpleMapping.getMappingType() == MappingType.FUNCTION) {
                         MappingFunction mappingFunction = (MappingFunction) (simpleMapping.getValue());

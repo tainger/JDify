@@ -7,6 +7,7 @@ import io.terminus.dalaran.model.BasicResponse;
 import io.terminus.dalaran.model.ResourceUploadRequest;
 import io.terminus.dalaran.model.dto.BasicResourceRequest;
 import io.terminus.dalaran.model.dto.PrivateRepositoryDTO;
+import io.terminus.dalaran.model.dto.PrivateRelationResource;
 import io.terminus.dalaran.model.dto.ResourceGroupDTO;
 import io.terminus.dalaran.model.query.PrivateRepositoryQuery;
 import org.springframework.data.domain.Page;
@@ -36,4 +37,6 @@ public interface PrivateRepositoryService {
     List<ResourceGroupDTO> listResourceGroup();
 
     BasicResponse delete(BasicResourceRequest request);
+
+    PrivateRelationResource listPrivateRelationResource() throws Exception;
 }
