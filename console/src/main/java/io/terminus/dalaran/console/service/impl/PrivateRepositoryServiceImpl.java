@@ -14,6 +14,7 @@ import io.terminus.dalaran.console.service.jpa.PrivateResourceQueryService;
 import io.terminus.dalaran.console.util.GenerateKeyUtils;
 import io.terminus.dalaran.core.market.MarketResourceLoader;
 import io.terminus.dalaran.core.oss.OSSAccount;
+import io.terminus.dalaran.core.resource.entity.*;
 import io.terminus.dalaran.core.resource.entity.common.PrivateRepositoryEntity;
 import io.terminus.dalaran.core.resource.entity.common.ProcessorEntity;
 import io.terminus.dalaran.core.resource.property.PropertyService;
@@ -80,6 +81,18 @@ public class PrivateRepositoryServiceImpl implements PrivateRepositoryService {
 
     @Autowired
     private SubFlowRepository subFlowRepository;
+
+    @Autowired
+    private ModelRepository modelRepository;
+
+    @Autowired
+    private ConnectorRepository connectorRepository;
+
+    @Autowired
+    private FunctionRepository functionRepository;
+
+    @Autowired
+    private ServiceRepository serviceRepository;
 
     @Autowired
     private OSSAccount ossAccount;
@@ -196,8 +209,16 @@ public class PrivateRepositoryServiceImpl implements PrivateRepositoryService {
     public PrivateRelationResource listPrivateRelationResource() throws Exception {
         PrivateRelationResource privateRelationResource = new PrivateRelationResource();
         List<SubFlowDTO> subFlows = privateRelationResource.getSubFlows();
+        List<SubFlowAbstractEntity> subFlowAbstractEntityList = new ArrayList<>();
         List<PrivateSubFlowEntity> privateSubFlowEntityList = privateSubFlowRepository.findAll();
-        for (PrivateSubFlowEntity subFlowEntity : privateSubFlowEntityList) {
+        if (CollectionUtils.isNotEmpty(privateSubFlowEntityList)) {
+            subFlowAbstractEntityList.addAll(privateSubFlowEntityList);
+        }
+        List<SubFlowEntity> subFlowEntityList = subFlowRepository.findAll();
+        if (CollectionUtils.isNotEmpty(subFlowEntityList)) {
+            subFlowAbstractEntityList.addAll(subFlowEntityList);
+        }
+        for (SubFlowAbstractEntity subFlowEntity : subFlowAbstractEntityList) {
             SubFlowDTO subFlowDTO = new SubFlowDTO();
             BeanUtils.copyProperties(subFlowDTO, subFlowEntity);
             subFlowDTO.setId(subFlowEntity.getResourceKey());
@@ -213,8 +234,16 @@ public class PrivateRepositoryServiceImpl implements PrivateRepositoryService {
         }
 
         List<ModelDTO> models = privateRelationResource.getModels();
+        List<ModelAbstractEntity> modelAbstractEntityList = new ArrayList<>();
         List<PrivateModelEntity> privateModelEntityList = privateModelRepository.findAll();
-        for (PrivateModelEntity modelEntity : privateModelEntityList) {
+        if (CollectionUtils.isNotEmpty(privateModelEntityList)) {
+            modelAbstractEntityList.addAll(privateModelEntityList);
+        }
+        List<ModelEntity> modelEntityList = modelRepository.findAll();
+        if (CollectionUtils.isNotEmpty(modelEntityList)) {
+            modelAbstractEntityList.addAll(modelEntityList);
+        }
+        for (ModelAbstractEntity modelEntity : modelAbstractEntityList) {
             ModelDTO modelDTO = new ModelDTO();
 //            BeanUtils.copyProperties(modelDTO, modelEntity);
             modelDTO.setName(modelEntity.getName());
@@ -228,8 +257,16 @@ public class PrivateRepositoryServiceImpl implements PrivateRepositoryService {
         }
 
         List<ConnectorDTO> connectors = privateRelationResource.getConnectors();
-        List<PrivateConnectorEntity> connectorEntityList = privateConnectorRepository.findAll();
-        for (PrivateConnectorEntity connectorEntity : connectorEntityList) {
+        List<ConnectorAbstractEntity> connectorAbstractEntityList = new ArrayList<>();
+        List<PrivateConnectorEntity> privateConnectorEntityList = privateConnectorRepository.findAll();
+        if (CollectionUtils.isNotEmpty(privateConnectorEntityList)) {
+            connectorAbstractEntityList.addAll(privateConnectorEntityList);
+        }
+        List<ConnectorEntity> connectorEntityList = connectorRepository.findAll();
+        if (CollectionUtils.isNotEmpty(connectorEntityList)) {
+            connectorAbstractEntityList.addAll(connectorEntityList);
+        }
+        for (ConnectorAbstractEntity connectorEntity : connectorAbstractEntityList) {
             ConnectorDTO connectorDTO = new ConnectorDTO();
 //            BeanUtils.copyProperties(connectorDTO, connectorEntity);
             connectorDTO.setName(connectorEntity.getName());
@@ -241,8 +278,16 @@ public class PrivateRepositoryServiceImpl implements PrivateRepositoryService {
         }
 
         List<ServiceDTO> services = privateRelationResource.getServices();
+        List<ServiceAbstractEntity> serviceAbstractEntityList = new ArrayList<>();
         List<PrivateServiceEntity> privateServiceEntityList = privateServiceRepository.findAll();
-        for (PrivateServiceEntity serviceEntity : privateServiceEntityList) {
+        if (CollectionUtils.isNotEmpty(privateServiceEntityList)) {
+            serviceAbstractEntityList.addAll(privateServiceEntityList);
+        }
+        List<ServiceEntity> serviceEntityList = serviceRepository.findAll();
+        if (CollectionUtils.isNotEmpty(serviceEntityList)) {
+            serviceAbstractEntityList.addAll(serviceEntityList);
+        }
+        for (ServiceAbstractEntity serviceEntity : serviceAbstractEntityList) {
             ServiceDTO serviceDTO = new ServiceDTO();
 //            BeanUtils.copyProperties(serviceDTO, serviceEntity);
             serviceDTO.setName(serviceEntity.getName());
@@ -254,8 +299,16 @@ public class PrivateRepositoryServiceImpl implements PrivateRepositoryService {
         }
 
         List<FunctionDTO> functions = privateRelationResource.getFunctions();
+        List<FunctionAbstractEntity> functionAbstractEntityList = new ArrayList<>();
         List<PrivateFunctionEntity> privateFunctionEntityList = privateFunctionRepository.findAll();
-        for (PrivateFunctionEntity functionEntity : privateFunctionEntityList) {
+        if (CollectionUtils.isNotEmpty(privateFunctionEntityList)) {
+            functionAbstractEntityList.addAll(privateFunctionEntityList);
+        }
+        List<FunctionEntity> functionEntityList = functionRepository.findAll();
+        if (CollectionUtils.isNotEmpty(functionEntityList)) {
+            functionAbstractEntityList.addAll(functionEntityList);
+        }
+        for (FunctionAbstractEntity functionEntity : functionAbstractEntityList) {
             FunctionDTO functionDTO = new FunctionDTO();
             BeanUtils.copyProperties(functionDTO, functionEntity);
             functionDTO.setId(functionEntity.getResourceKey());
