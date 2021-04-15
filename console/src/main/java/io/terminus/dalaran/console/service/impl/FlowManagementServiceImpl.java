@@ -688,9 +688,12 @@ public class FlowManagementServiceImpl implements FlowManagementService {
             //被监管就加入缓存
             if(bindAlarmRuleDto.getIsMonitor()) {
                 redisService.persistKey(RedisUtil.getAlarmConfigKey(bindAlarmRuleDto.getFlowId()),bindAlarmRuleDto.getAlarmRuleId());
+            }else {
+                redisService.deleteKey(RedisUtil.getAlarmConfigKey(bindAlarmRuleDto.getFlowId()));
             }
 
         } catch (Exception e) {
+            e.printStackTrace();
             return fail(e.getMessage());
         }
         return success();
