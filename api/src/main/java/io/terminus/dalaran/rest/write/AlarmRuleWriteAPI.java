@@ -3,8 +3,6 @@ package io.terminus.dalaran.rest.write;
 import io.swagger.annotations.ApiOperation;
 import io.terminus.dalaran.model.dto.AlarmRuleDTO;
 import io.terminus.dalaran.model.dto.TriggerAlarmRuleDTO;
-import io.terminus.dalaran.model.flow.TriggerFlow;
-import io.terminus.dalaran.response.ResponseResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
