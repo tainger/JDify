@@ -47,7 +47,6 @@ public class DalaranNoticeServiceImpl implements DalaranNoticeService {
 
     @Override
     public void sendShortMessage(NoticeMessage noticeMessage) {
-//        String noticeCode = "SMS_213077210";
         List<String> keys = new ArrayList<>();
         keys.add("flowName");
         keys.add("createDate");

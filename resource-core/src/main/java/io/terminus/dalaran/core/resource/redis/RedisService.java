@@ -56,7 +56,7 @@ public class RedisService {
 
     public Long incrKey(String key) {
         if(null == redisTemplate.opsForValue().get(key)) {
-            setValueMinutes(key, "1", 2);
+            setValueMinutes(key, "0", 2);
         }
         return redisTemplate.opsForValue().increment(key);
     }
