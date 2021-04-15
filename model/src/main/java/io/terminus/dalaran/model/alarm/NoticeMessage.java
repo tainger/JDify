@@ -1,7 +1,5 @@
 package io.terminus.dalaran.model.alarm;
 
-import java.util.Arrays;
-import java.util.Date;
 
 public class NoticeMessage {
 
@@ -9,27 +7,27 @@ public class NoticeMessage {
 
     private Boolean isTouchFailureAlarm;
 
-    private Long failureCount;
+    private Integer failureCount;
 
-    private Long failureFrequency;
+    private Integer failureFrequency;
 
     private Boolean isTouchTimeOutAlarm;
 
-    private Long timeOutFrequency;
+    private Integer timeOutFrequency;
 
-    private Long timeOutCount;
+    private Integer timeOutCount;
 
     private String createDate;
 
-    private String []contactWays;
+    private String[] contactWays;
 
     public NoticeMessage() {
         this.isTouchFailureAlarm = false;
-        this.failureCount = 0L;
-        this.failureFrequency = 0L;
+        this.failureCount = 0;
+        this.failureFrequency = 0;
         this.isTouchTimeOutAlarm = false;
-        this.timeOutFrequency = 0L;
-        this.timeOutCount = 0L;
+        this.timeOutFrequency = 0;
+        this.timeOutCount = 0;
     }
 
     public String getFlowName() {
@@ -48,19 +46,19 @@ public class NoticeMessage {
         isTouchFailureAlarm = touchFailureAlarm;
     }
 
-    public Long getFailureCount() {
+    public Integer getFailureCount() {
         return failureCount;
     }
 
-    public void setFailureCount(Long failureCount) {
+    public void setFailureCount(Integer failureCount) {
         this.failureCount = failureCount;
     }
 
-    public Long getFailureFrequency() {
+    public Integer getFailureFrequency() {
         return failureFrequency;
     }
 
-    public void setFailureFrequency(Long failureFrequency) {
+    public void setFailureFrequency(Integer failureFrequency) {
         this.failureFrequency = failureFrequency;
     }
 
@@ -72,19 +70,19 @@ public class NoticeMessage {
         isTouchTimeOutAlarm = touchTimeOutAlarm;
     }
 
-    public Long getTimeOutFrequency() {
+    public Integer getTimeOutFrequency() {
         return timeOutFrequency;
     }
 
-    public void setTimeOutFrequency(Long timeOutFrequency) {
+    public void setTimeOutFrequency(Integer timeOutFrequency) {
         this.timeOutFrequency = timeOutFrequency;
     }
 
-    public Long getTimeOutCount() {
+    public Integer getTimeOutCount() {
         return timeOutCount;
     }
 
-    public void setTimeOutCount(Long timeOutCount) {
+    public void setTimeOutCount(Integer timeOutCount) {
         this.timeOutCount = timeOutCount;
     }
 
@@ -103,20 +101,5 @@ public class NoticeMessage {
     public void setContactWays(String[] contactWays) {
         this.contactWays = contactWays;
     }
-
-    @Override
-    public String toString() {
-        return "NoticeMessage{" +
-                "flowName='" + flowName + '\'' +
-                ", isTouchFailureAlarm=" + isTouchFailureAlarm +
-                ", failureCount=" + failureCount +
-                ", failureFrequency=" + failureFrequency +
-                ", isTouchTimeOutAlarm=" + isTouchTimeOutAlarm +
-                ", timeOutFrequency=" + timeOutFrequency +
-                ", timeOutCount=" + timeOutCount +
-                ", createDate=" + createDate +
-                ", contactWays=" + Arrays.toString(contactWays) +
-                '}';
-    }
-
 }
+
