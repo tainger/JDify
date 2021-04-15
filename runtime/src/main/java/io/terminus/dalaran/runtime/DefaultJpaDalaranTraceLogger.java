@@ -59,7 +59,10 @@ public class DefaultJpaDalaranTraceLogger implements DalaranTraceLogger {
 
     private void alarmCount(DalaranTracingLog tracingLog) {
         if (tracingLog.isMain() && tracingLog.getTracingType() == TracingType.Flow) {
-            String value = redisService.getValue(RedisUtil.getAlarmConfigKey(tracingLog.getFlowId()));
+            String value = getAlarmConfigIfAlarmConfigKey(tracingLog.getFlowId());
+            if(null == value) {
+                return;
+            }
             AlarmRuleConfig alarmRuleConfig = JSONObject.parseObject(value, AlarmRuleConfig.class);
             if (alarmRuleConfig.getFailureAlarm().getIsOpen() && !tracingLog.isSuccessful()) {
                 redisService.incrKey(
@@ -73,6 +76,19 @@ public class DefaultJpaDalaranTraceLogger implements DalaranTraceLogger {
                 );
             }
         }
+    }
+
+    private String getAlarmConfigIfAlarmConfigKey(String flowId) {
+        String alarmRuleId = redisService.getValue(RedisUtil.getAlarmConfigKey(flowId));
+        if (alarmRuleId == null) {
+            return null;
+        }
+        String alarmConfig = redisService.getValue(RedisUtil.getAlarmRuleKey(alarmRuleId));
+        if (alarmConfig == null) {
+            redisService.deleteKey(RedisUtil.getAlarmConfigKey(flowId));
+            return null;
+        }
+        return alarmConfig;
     }
 
     public String getCurrentVersion() {
