@@ -22,9 +22,9 @@ public class AlarmRuleConfig {
 
         private Boolean isOpen;
 
-        private Long elapse;
+        private Integer elapse;
 
-        private Long elapsedFrequency;
+        private Integer elapsedFrequency;
     }
 
     @Data
@@ -32,7 +32,7 @@ public class AlarmRuleConfig {
 
         private Boolean isOpen;
 
-        private Long failureFrequency;
+        private Integer failureFrequency;
     }
 
 

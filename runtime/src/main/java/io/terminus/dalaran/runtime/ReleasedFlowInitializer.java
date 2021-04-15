@@ -65,14 +65,6 @@ public class ReleasedFlowInitializer implements DalaranStarter {
     @Autowired
     private CamelContext camelContext;
 
-    @Autowired
-    private DalaranNoticeService dalaranNoticeService;
-
-    @Autowired
-    private TracingLogService tracingLogService;
-
-    @Autowired
-    private TriggerFlowReleasedRepository triggerFlowReleasedRepository;
 
     @Autowired
     private MarketResourceLoader marketResourceLoader;
@@ -86,10 +78,6 @@ public class ReleasedFlowInitializer implements DalaranStarter {
     private Swagger swagger;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
-
-    private Map<String, String> alarmConfig;
-
-    private Long current = System.currentTimeMillis();
 
     @PostConstruct
     private void init() throws Exception {
@@ -134,18 +122,16 @@ public class ReleasedFlowInitializer implements DalaranStarter {
             resourceLoader.setLastVersion(recordEntity.getLastVersion());
 
 
-
             List<String> flowIds = new ArrayList<>();
             List<TriggerFlowReleasedEntity> triggerFlowReleasedEntities = resourceLoader.loadAllTriggerFlow();
             for (TriggerFlowReleasedEntity triggerFlowReleasedEntity : triggerFlowReleasedEntities) {
-                if(triggerFlowReleasedEntity.isExist()&& triggerFlowReleasedEntity.isTracing() &&triggerFlowReleasedEntity.isOnline()){
+                if (triggerFlowReleasedEntity.isExist() && triggerFlowReleasedEntity.isTracing() && triggerFlowReleasedEntity.isOnline()) {
                     String originId = triggerFlowReleasedEntity.getOriginId();
                     flowIds.add(originId);
                 }
             }
             String join = String.join(",", flowIds);
             redisService.persistKey(RedisUtil.getReleasedFlowIdsKey(), join);
-
 
 
             // load client info
@@ -244,89 +230,4 @@ public class ReleasedFlowInitializer implements DalaranStarter {
     public String getSwaggerJson() throws JsonProcessingException {
         return objectMapper.writeValueAsString(swagger);
     }
-
-
-//    private void monitor() {
-//        if(null == alarmConfig) {
-//            return;
-//        }
-//        logger.error("------------monitor------------");
-//        Date oneMinBeforeCurrent = new Date(current - 60 * 1000L);
-//        Date now = new Date(current);
-//        logger.error("-------------报警配置:{}-----", alarmConfig);
-//        for (Map.Entry<String, String> entry : alarmConfig.entrySet()) {
-//            String flowId = entry.getKey();
-//            String alarmRuleId = entry.getValue();
-//            AlarmRuleConfig alarmRuleConfig = (AlarmRuleConfig) resourceBuilder.buildAlarmRuleConfig(alarmRuleId, AlarmRuleConfig.class);
-//            Map<AlarmRuleConfig.ChannelType, String> alarmChannel = alarmRuleConfig.getAlarmChannel();
-//            if (alarmChannel.isEmpty()) {
-//                continue;
-//            }
-//            NoticeMessage noticeMessage = alarmRuleValidate(alarmRuleConfig, oneMinBeforeCurrent, now, flowId);
-//            if (noticeMessage.getIsTouchFailureAlarm() || noticeMessage.getIsTouchTimeOutAlarm()) {
-//                logger.error("------------产生报警消息{}，准备发送通知------------", noticeMessage);
-//                TriggerFlowReleasedEntity triggerFlowReleasedEntity = triggerFlowReleasedRepository.findByVersionAndOriginId(resourceLoader.getVersion(), String.valueOf(flowId));
-//                noticeMessage.setFlowName(triggerFlowReleasedEntity.getName());
-//                noticeMessage.setCreateDate(now);
-//                sendNotice(noticeMessage, alarmChannel);
-//            }
-//        }
-//        current = current + 60 * 1000L;
-//    }
-//
-////    private void sendNotice(NoticeMessage noticeMessage, Map<AlarmRuleConfig.ChannelType, String> alarmChannel) {
-////        for (Map.Entry<AlarmRuleConfig.ChannelType, String> entry : alarmChannel.entrySet()) {
-////            AlarmRuleConfig.ChannelType channelType = entry.getKey();
-////            String contactWays = entry.getValue();
-////            noticeMessage.setContactWays(contactWays.split(","));
-////            logger.error("---------联系人的方式为 {} -------------", contactWays);
-////            switch (channelType) {
-////                case mail:
-////                    dalaranNoticeService.sendEmail(noticeMessage);
-////                    break;
-////                case shortMessage:
-////                    dalaranNoticeService.sendShortMessage(noticeMessage);
-////                    break;
-////                default:
-////                    throw new RuntimeException();
-////            }
-////        }
-////    }
-//
-//
-//    private NoticeMessage alarmRuleValidate(AlarmRuleConfig alarmRuleConfig, Date oneMinBeforeCurrent, Date now, String flowId) {
-//        NoticeMessage noticeMessage = new NoticeMessage();
-//        AlarmRuleConfig.FailureAlarm failureAlarm = alarmRuleConfig.getFailureAlarm();
-//        if (null != failureAlarm && failureAlarm.getIsOpen()) {
-//            Long failureFrequency = failureAlarm.getFailureFrequency();
-//            long failureCount = tracingLogService.countFailureLog(oneMinBeforeCurrent, now, flowId);
-//            if (failureCount >= failureFrequency) {
-//                noticeMessage.setIsTouchFailureAlarm(true);
-//            }
-//            noticeMessage.setFailureCount(failureCount);
-//            noticeMessage.setFailureFrequency(failureFrequency);
-//        }
-//        AlarmRuleConfig.TimeOutAlarm timeOutAlarm = alarmRuleConfig.getTimeOutAlarm();
-//        if (null != timeOutAlarm && timeOutAlarm.getIsOpen()) {
-//            Long elapse = timeOutAlarm.getElapse();
-//            Long overTimeFrequency = timeOutAlarm.getElapsedFrequency();
-//            long elapseCount = tracingLogService.countElapseLog(oneMinBeforeCurrent, now, flowId, elapse);
-//            if (overTimeFrequency >= elapseCount) {
-//                noticeMessage.setIsTouchTimeOutAlarm(true);
-//            }
-//            noticeMessage.setTimeOutCount(elapseCount);
-//            noticeMessage.setTimeOutFrequency(overTimeFrequency);
-//        }
-//        return noticeMessage;
-//    }
-//
-//    private void initAlarmConfig(String version) {
-//        alarmConfig = new HashMap<>();
-//        List<TriggerFlowReleasedEntity> triggerFlowEntities = triggerFlowReleasedRepository.findByVersionAndIsMonitorTrue(version);
-//        for (TriggerFlowReleasedEntity triggerFlowReleasedEntity : triggerFlowEntities) {
-//            String id = triggerFlowReleasedEntity.getOriginId();
-//            String alarmRuleId = triggerFlowReleasedEntity.getAlarmResourceKey();
-//            alarmConfig.put(id, alarmRuleId);
-//        }
-//    }
 }
