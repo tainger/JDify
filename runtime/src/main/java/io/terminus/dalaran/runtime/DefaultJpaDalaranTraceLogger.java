@@ -1,16 +1,21 @@
 package io.terminus.dalaran.runtime;
 
+import com.alibaba.fastjson.JSONObject;
+import io.terminus.dalaran.TracingType;
+import io.terminus.dalaran.core.component.config.AlarmRuleConfig;
 import io.terminus.dalaran.core.log.DalaranTraceLogger;
 import io.terminus.dalaran.core.log.DalaranTracingLog;
 import io.terminus.dalaran.core.resource.entity.common.ReleaseRecordEntity;
 import io.terminus.dalaran.core.resource.entity.common.TracingLogEntity;
+import io.terminus.dalaran.core.resource.redis.RedisService;
+import io.terminus.dalaran.core.resource.redis.RedisUtil;
 import io.terminus.dalaran.core.resource.repository.ReleaseRecordRepository;
 import io.terminus.dalaran.core.resource.repository.TracingLogRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.beanutils.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-
 import javax.annotation.PostConstruct;
+import java.text.SimpleDateFormat;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -23,7 +28,12 @@ public class DefaultJpaDalaranTraceLogger implements DalaranTraceLogger {
     @Autowired
     private ReleaseRecordRepository releaseRecordRepository;
 
+    @Autowired
+    private RedisService redisService;
+
     private BlockingQueue<DalaranTracingLog> logQueue = new LinkedBlockingQueue<>();
+
+    private final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 
     @Override
     public void log(DalaranTracingLog tracingLog) {
@@ -39,11 +49,30 @@ public class DefaultJpaDalaranTraceLogger implements DalaranTraceLogger {
                     DalaranTracingLog tracingLog = logQueue.take();
                     tracingLog.setVersion(getCurrentVersion());
                     tracingLogRepository.save(toEntity(tracingLog));
+                    alarmCount(tracingLog);
                 } catch (Throwable e) {
                     e.printStackTrace();
                 }
             }
         }).start();
+    }
+
+    private void alarmCount(DalaranTracingLog tracingLog) {
+        if (tracingLog.isMain() && tracingLog.getTracingType() == TracingType.Flow) {
+            String value = redisService.getValue(RedisUtil.getAlarmConfigKey(tracingLog.getFlowId()));
+            AlarmRuleConfig alarmRuleConfig = JSONObject.parseObject(value, AlarmRuleConfig.class);
+            if (alarmRuleConfig.getFailureAlarm().getIsOpen() && !tracingLog.isSuccessful()) {
+                redisService.incrKey(
+                        RedisUtil.getFailureKey(tracingLog.getFlowId(), simpleDateFormat.format(tracingLog.getTimestamp()))
+                );
+            }
+
+            if (alarmRuleConfig.getTimeOutAlarm().getIsOpen() && alarmRuleConfig.getTimeOutAlarm().getElapse() <= tracingLog.getElapsed()) {
+                redisService.incrKey(
+                        RedisUtil.getTimeOutKey(tracingLog.getFlowId(), simpleDateFormat.format(tracingLog.getTimestamp()))
+                );
+            }
+        }
     }
 
     public String getCurrentVersion() {

@@ -54,6 +54,14 @@ public class RedisService {
         }
     }
 
+    public Long incrKey(String key) {
+        if(null == redisTemplate.opsForValue().get(key)) {
+            setValueMinutes(key, "1", 2);
+        }
+        return redisTemplate.opsForValue().increment(key);
+    }
+
+
     public Boolean deleteKey(String key) {
         return redisTemplate.delete(key);
     }
