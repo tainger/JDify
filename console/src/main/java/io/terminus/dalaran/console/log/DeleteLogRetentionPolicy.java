@@ -32,7 +32,7 @@ public class DeleteLogRetentionPolicy implements LogRetentionPolicy {
                 "  `id` bigint(20) NOT NULL AUTO_INCREMENT,\n" +
                 "  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n" +
                 "  `elapsed` bigint(20) NOT NULL,\n" +
-                "  `flow_id` bigint(20) NOT NULL,\n" +
+                "  `flow_id` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,\n" +
                 "  `input_body` longtext COLLATE utf8mb4_unicode_ci,\n" +
                 "  `input_body_type` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL,\n" +
                 "  `main` bit(1) NOT NULL,\n" +

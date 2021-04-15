@@ -8,7 +8,7 @@ public class RedisUtil {
 
     private static final String  ALARM_CONFIG = "alarm_config:trigger_id:";
 
-    private static final String  RELEASED_FLOW_IDS = "released_ids";
+    private static final String  RELEASED_FLOW_IDS = "released_flow_ids";
 
     private static final String  RECORD_FLOW_ID = "log_record:flow_id";
 
