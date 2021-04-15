@@ -38,7 +38,7 @@ public class RedisUtil {
     }
 
     public static String getTimeOutKey(String flowId, String time) {
-        return  RECORD_FLOW_ID + SPLIT + flowId + SPLIT + FAILURE_FILED_KEY + SPLIT + time;
+        return  RECORD_FLOW_ID + SPLIT + flowId + SPLIT + TIMEOUT_FILED_KEY + SPLIT + time;
     }
 
 

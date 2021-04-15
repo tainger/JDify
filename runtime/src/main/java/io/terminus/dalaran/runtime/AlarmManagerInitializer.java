@@ -75,6 +75,9 @@ public class AlarmManagerInitializer implements DalaranStarter {
             if (null == alarmConfigStr) {
                 continue;
             }
+            if (null == timeOutCountStr && failureCountStr == null) {
+                continue;
+            }
             AlarmRuleConfig alarmRuleConfig = JSONObject.parseObject(alarmConfigStr, AlarmRuleConfig.class);
             log.error("-------------报警规则：----{}----", alarmRuleConfig);
             NoticeMessage noticeMessage = new NoticeMessage();
