@@ -22,9 +22,8 @@ import io.terminus.dalaran.market.model.BasicResourceDTO;
 import io.terminus.dalaran.market.model.MarketResourceVersionDTO;
 import io.terminus.dalaran.model.BasicResponse;
 import io.terminus.dalaran.model.ResourceUploadRequest;
-import io.terminus.dalaran.model.dto.BasicResourceRequest;
-import io.terminus.dalaran.model.dto.PrivateRepositoryDTO;
-import io.terminus.dalaran.model.dto.ResourceGroupDTO;
+import io.terminus.dalaran.model.dto.*;
+import io.terminus.dalaran.model.dto.flow.SubFlowDTO;
 import io.terminus.dalaran.model.market.ResourceFile;
 import io.terminus.dalaran.model.query.PrivateRepositoryQuery;
 import io.terminus.dalaran.model.query.ResourceQuery;
@@ -194,10 +193,83 @@ public class PrivateRepositoryServiceImpl implements PrivateRepositoryService {
     }
 
     @Override
+    public PrivateRelationResource listPrivateRelationResource() throws Exception {
+        PrivateRelationResource privateRelationResource = new PrivateRelationResource();
+        List<SubFlowDTO> subFlows = privateRelationResource.getSubFlows();
+        List<PrivateSubFlowEntity> privateSubFlowEntityList = privateSubFlowRepository.findAll();
+        for (PrivateSubFlowEntity subFlowEntity : privateSubFlowEntityList) {
+            SubFlowDTO subFlowDTO = new SubFlowDTO();
+            BeanUtils.copyProperties(subFlowDTO, subFlowEntity);
+            subFlowDTO.setId(subFlowEntity.getResourceKey());
+            List<ProcessorDTO> pipeline = new ArrayList<>();
+            for (ProcessorEntity processorEntity : subFlowEntity.getPipeline()) {
+                ProcessorDTO processor = new ProcessorDTO();
+                BeanUtils.copyProperties(processor, processorEntity);
+                processor.setConfig(JSON.parseObject(processorEntity.getConfig(), Map.class));
+                pipeline.add(processor);
+            }
+            subFlowDTO.setPipeline(pipeline);
+            subFlows.add(subFlowDTO);
+        }
+
+        List<ModelDTO> models = privateRelationResource.getModels();
+        List<PrivateModelEntity> privateModelEntityList = privateModelRepository.findAll();
+        for (PrivateModelEntity modelEntity : privateModelEntityList) {
+            ModelDTO modelDTO = new ModelDTO();
+//            BeanUtils.copyProperties(modelDTO, modelEntity);
+            modelDTO.setName(modelEntity.getName());
+            modelDTO.setModelType(modelEntity.getType());
+            modelDTO.setId(modelEntity.getResourceKey());
+            modelDTO.setTargetId(modelEntity.getTargetId());
+            modelDTO.setTargetType(modelEntity.getTargetType());
+            modelDTO.setModelSchema(JSON.parseObject(modelEntity.getModelSchema(), Map.class));
+            modelDTO.setId(modelEntity.getResourceKey());
+            models.add(modelDTO);
+        }
+
+        List<ConnectorDTO> connectors = privateRelationResource.getConnectors();
+        List<PrivateConnectorEntity> connectorEntityList = privateConnectorRepository.findAll();
+        for (PrivateConnectorEntity connectorEntity : connectorEntityList) {
+            ConnectorDTO connectorDTO = new ConnectorDTO();
+//            BeanUtils.copyProperties(connectorDTO, connectorEntity);
+            connectorDTO.setName(connectorEntity.getName());
+            connectorDTO.setConnectorType(connectorEntity.getConnectorType());
+            connectorDTO.setDescription(connectorEntity.getDescription());
+            connectorDTO.setConfig(JSON.parseObject(connectorEntity.getConfig(), Map.class));
+            connectorDTO.setId(connectorEntity.getResourceKey());
+            connectors.add(connectorDTO);
+        }
+
+        List<ServiceDTO> services = privateRelationResource.getServices();
+        List<PrivateServiceEntity> privateServiceEntityList = privateServiceRepository.findAll();
+        for (PrivateServiceEntity serviceEntity : privateServiceEntityList) {
+            ServiceDTO serviceDTO = new ServiceDTO();
+//            BeanUtils.copyProperties(serviceDTO, serviceEntity);
+            serviceDTO.setName(serviceEntity.getName());
+            serviceDTO.setType(serviceEntity.getType());
+            serviceDTO.setImportConfig(JSON.parseObject(serviceEntity.getImportConfig(), Map.class));
+            serviceDTO.setServiceConfig(JSON.parseObject(serviceEntity.getServiceConfig(), Map.class));
+            serviceDTO.setId(serviceEntity.getResourceKey());
+            services.add(serviceDTO);
+        }
+
+        List<FunctionDTO> functions = privateRelationResource.getFunctions();
+        List<PrivateFunctionEntity> privateFunctionEntityList = privateFunctionRepository.findAll();
+        for (PrivateFunctionEntity functionEntity : privateFunctionEntityList) {
+            FunctionDTO functionDTO = new FunctionDTO();
+            BeanUtils.copyProperties(functionDTO, functionEntity);
+            functionDTO.setId(functionEntity.getResourceKey());
+            functions.add(functionDTO);
+        }
+
+        return privateRelationResource;
+    }
+
+    @Override
     public PrivateRepositoryDTO getResourceDetail(String id, String version) {
         PrivateRepositoryDTO privateRepositoryDTO = new PrivateRepositoryDTO();
         try {
-            PrivateRepositoryEntity entity = privateResourceQueryService.findByResourceKeyAndVersion(id, version).get(0);
+            PrivateRepositoryEntity entity = privateRepository.findByResourceKeyAndVersion(id, version);
             BeanUtils.copyProperties(privateRepositoryDTO, entity);
             privateRepositoryDTO.setId(entity.getResourceKey());
             switch (entity.getType()) {
@@ -535,7 +607,7 @@ public class PrivateRepositoryServiceImpl implements PrivateRepositoryService {
                 List<PrivateFunctionEntity> functionEntities = privateFunctionRepository.findByResourceKey(entityEntry.getKey());
                 if (CollectionUtils.isEmpty(functionEntities)) {
                     PrivateFunctionEntity privateFunctionEntity = new PrivateFunctionEntity();
-                    BeanUtils.copyProperties(privateFunctionEntity, entityEntry.getKey());
+                    BeanUtils.copyProperties(privateFunctionEntity, entityEntry.getValue());
                     privateFunctionEntity.setId(null);
                     privateFunctionRepository.save(privateFunctionEntity);
                 }

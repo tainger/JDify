@@ -2,6 +2,7 @@ package io.terminus.dalaran.rest.read;
 
 import io.swagger.annotations.ApiOperation;
 import io.terminus.dalaran.market.model.MarketResourceVersionDTO;
+import io.terminus.dalaran.model.dto.PrivateRelationResource;
 import io.terminus.dalaran.model.dto.PrivateRepositoryDTO;
 import io.terminus.dalaran.model.dto.ResourceGroupDTO;
 import io.terminus.dalaran.model.query.PrivateRepositoryQuery;
@@ -35,4 +36,8 @@ public interface PrivateRepositoryReadAPI {
     @ApiOperation(value = "根据资源ID获取模板版本列表")
     @GetMapping(value = "/version/{id}")
     List<String> listResourceVersion(@PathVariable String id);
+
+    @ApiOperation(value = "获取私仓关联资源列表")
+    @GetMapping(value = "/resource/relation")
+    PrivateRelationResource listResourceRelation();
 }
