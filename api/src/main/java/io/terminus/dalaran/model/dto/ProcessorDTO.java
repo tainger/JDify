@@ -23,4 +23,8 @@ public class ProcessorDTO {
 
     @Nullable
     private Map<String, Object> config;
+
+    public ProcessorDTO() {
+
+    }
 }

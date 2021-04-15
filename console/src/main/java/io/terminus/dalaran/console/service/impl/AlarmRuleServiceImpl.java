@@ -94,6 +94,8 @@ public class AlarmRuleServiceImpl implements AlarmRuleService , InitializingBean
         triggerFlowAlarmRuleEntities.forEach((triggerFlowAlarmRuleEntity)->{
             triggerFlowAlarmRuleEntity.setExist(false);
             triggerFlowAlarmRuleRepository.save(triggerFlowAlarmRuleEntity);
+            //删除缓存
+            redisService.deleteKey(RedisUtil.getAlarmConfigKey(triggerFlowAlarmRuleEntity.getTriggerFlowId()));
         });
     }
 
