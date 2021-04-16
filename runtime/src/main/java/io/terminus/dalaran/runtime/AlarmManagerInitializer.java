@@ -68,8 +68,6 @@ public class AlarmManagerInitializer implements DalaranStarter {
             return;
         }
         for (String flowId : ids) {
-
-            log.error("日了狗", flowId);
             String format = dateFormat.format(new Date());
             String failureCountStr = redisService.getValue(RedisUtil.getFailureKey(flowId, format));
             String timeOutCountStr = redisService.getValue(RedisUtil.getTimeOutKey(flowId, format));
