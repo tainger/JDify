@@ -3,6 +3,7 @@ package io.terminus.dalaran.runtime;
 import com.alibaba.fastjson.JSONObject;
 import io.terminus.dalaran.core.component.config.AlarmRuleConfig;
 import io.terminus.dalaran.core.resource.DalaranStarter;
+import io.terminus.dalaran.core.resource.entity.common.ReleaseRecordEntity;
 import io.terminus.dalaran.core.resource.entity.released.TriggerFlowReleasedEntity;
 import io.terminus.dalaran.core.resource.redis.RedisService;
 import io.terminus.dalaran.core.resource.redis.RedisUtil;
@@ -38,7 +39,6 @@ public class AlarmManagerInitializer implements DalaranStarter {
     @Autowired
     private ReleaseRecordRepository releaseRecordRepository;
 
-    private Long current = System.currentTimeMillis();
 
 
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
@@ -68,11 +68,14 @@ public class AlarmManagerInitializer implements DalaranStarter {
             return;
         }
         for (String flowId : ids) {
-            String failureCountStr = redisService.getValue(RedisUtil.getFailureKey(flowId, dateFormat.format(new Date())));
-            String timeOutCountStr = redisService.getValue(RedisUtil.getTimeOutKey(flowId, dateFormat.format(new Date())));
-            //todo 可优化
+
+            log.error("日了狗", flowId);
+            String format = dateFormat.format(new Date());
+            String failureCountStr = redisService.getValue(RedisUtil.getFailureKey(flowId, format));
+            String timeOutCountStr = redisService.getValue(RedisUtil.getTimeOutKey(flowId, format));
             String alarmConfigStr = getAlarmConfigIfAlarmConfigKey(flowId);
             if (null == alarmConfigStr) {
+                log.error("没有流程{}的报警配置", flowId);
                 continue;
             }
             if (null == timeOutCountStr && failureCountStr == null) {
@@ -88,13 +91,15 @@ public class AlarmManagerInitializer implements DalaranStarter {
                     noticeMessage.setFailureCount(failureCount);
                 }
             }
-            noticeMessage.setTimeOutFrequency(alarmRuleConfig.getTimeOutAlarm().getElapsedFrequency());
+            noticeMessage.setFailureFrequency(alarmRuleConfig.getTimeOutAlarm().getElapsedFrequency());
             if (null != timeOutCountStr) {
                 int timeOutCount = Integer.parseInt(timeOutCountStr);
                 if(timeOutCount  >= alarmRuleConfig.getFailureAlarm().getFailureFrequency())
                 noticeMessage.setIsTouchTimeOutAlarm(true);
                 noticeMessage.setTimeOutCount(timeOutCount);
             }
+            noticeMessage.setCreateDate(format);
+            noticeMessage.setFlowName(flowId);
             noticeMessage.setTimeOutFrequency(alarmRuleConfig.getTimeOutAlarm().getElapsedFrequency());
             sendNotice(noticeMessage, alarmRuleConfig.getAlarmChannel());
         }
