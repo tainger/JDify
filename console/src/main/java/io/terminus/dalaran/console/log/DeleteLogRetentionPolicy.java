@@ -36,7 +36,7 @@ public class DeleteLogRetentionPolicy implements LogRetentionPolicy {
                 "  `input_body` longtext COLLATE utf8mb4_unicode_ci,\n" +
                 "  `input_body_type` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL,\n" +
                 "  `main` bit(1) NOT NULL,\n" +
-                "  `module_id` bigint(20) DEFAULT NULL,\n" +
+                "  `module_id` varchar(256) COLLATE utf8mb4_unicode_ci DEFAULT NULL,\n" +
                 "  `output_body` longtext COLLATE utf8mb4_unicode_ci,\n" +
                 "  `output_body_type` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL,\n" +
                 "  `processor_id` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT NULL,\n" +
