@@ -27,7 +27,6 @@ import io.terminus.dalaran.model.flow.TriggerFlow;
 import lombok.val;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringSubstitutor;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

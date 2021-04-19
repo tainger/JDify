@@ -14,6 +14,7 @@ import io.terminus.dalaran.core.resource.repository.TracingLogRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.beanutils.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+
 import javax.annotation.PostConstruct;
 import java.text.SimpleDateFormat;
 import java.util.concurrent.BlockingQueue;
@@ -60,19 +61,31 @@ public class DefaultJpaDalaranTraceLogger implements DalaranTraceLogger {
     private void alarmCount(DalaranTracingLog tracingLog) {
         if (tracingLog.isMain() && tracingLog.getTracingType() == TracingType.Flow) {
             String value = getAlarmConfigIfAlarmConfigKey(tracingLog.getFlowId());
-            if(null == value) {
+            if (null == value) {
                 return;
+            }
+            String format = simpleDateFormat.format(tracingLog.getTimestamp());
+            log.error("---format--{}-----", format);
+            String currentTime = redisService.getValue(RedisUtil.getCurrentTime());
+            log.error("---currentTime--{}-----", currentTime);
+            if (currentTime == null) {
+                redisService.persistKey(RedisUtil.getCurrentTime(), format);
+            }else if(!currentTime.equals(format)){
+                log.error("-----{}-----","exchange");
+                redisService.persistKey(RedisUtil.getCurrentTime(), format);
+                redisService.persistKey(RedisUtil.getTimeToMonitor(), currentTime);
+                log.error("-----{}-----", redisService.getValue(RedisUtil.getTimeToMonitor()));
             }
             AlarmRuleConfig alarmRuleConfig = JSONObject.parseObject(value, AlarmRuleConfig.class);
             if (alarmRuleConfig.getFailureAlarm().getIsOpen() && !tracingLog.isSuccessful()) {
                 redisService.incrKey(
-                        RedisUtil.getFailureKey(tracingLog.getFlowId(), simpleDateFormat.format(tracingLog.getTimestamp()))
+                        RedisUtil.getFailureKey(tracingLog.getFlowId(), format)
                 );
             }
 
             if (alarmRuleConfig.getTimeOutAlarm().getIsOpen() && alarmRuleConfig.getTimeOutAlarm().getElapse() <= tracingLog.getElapsed()) {
                 redisService.incrKey(
-                        RedisUtil.getTimeOutKey(tracingLog.getFlowId(), simpleDateFormat.format(tracingLog.getTimestamp()))
+                        RedisUtil.getTimeOutKey(tracingLog.getFlowId(), format)
                 );
             }
         }

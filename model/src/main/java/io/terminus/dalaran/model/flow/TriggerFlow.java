@@ -12,4 +12,8 @@ public class TriggerFlow extends BasicFlow {
 
     @Nullable
     private Object triggerConfig;
+
+    public TriggerFlow() {
+
+    }
 }
