@@ -1,6 +1,7 @@
 package io.terminus.dalaran.runtime.service.Impl;
 
 import io.terminus.common.model.Response;
+import io.terminus.dalaran.core.resource.property.PropertyService;
 import io.terminus.dalaran.model.alarm.NoticeMessage;
 import io.terminus.dalaran.runtime.service.DalaranNoticeService;
 import io.terminus.notice.api.dto.EmailSendDTO;
@@ -17,11 +18,8 @@ import java.util.*;
 public class DalaranNoticeServiceImpl implements DalaranNoticeService {
 
 
-    @Value("${noticeMessage.mailNoticeCode}")
-    private String mailNoticeCode;
-
-    @Value("${noticeMessage.SMSNoticeCode}")
-    private String SMSNoticeCode;
+    @Autowired
+    private PropertyService propertyService;
 
     private static final Logger logger = LoggerFactory.getLogger(DalaranNoticeServiceImpl.class);
 
@@ -38,7 +36,7 @@ public class DalaranNoticeServiceImpl implements DalaranNoticeService {
         emailSendDTO.setSenderEmail("no-reply@terminus.io");
         List<String> contents = buildNoticeMessage(noticeMessage);
         String[] contactWays = noticeMessage.getContactWays();
-        Response<String> result = emailSenderService.send(mailNoticeCode, Arrays.asList(contactWays), emailSendDTO, contents);
+        Response<String> result = emailSenderService.send(propertyService.getMailNoticeCode(), Arrays.asList(contactWays), emailSendDTO, contents);
         if (result.isSuccess())
             logger.error("发送成功");
         else
@@ -58,7 +56,7 @@ public class DalaranNoticeServiceImpl implements DalaranNoticeService {
         keys.add("timeOutCount");
         List<String> contents = buildNoticeMessage(noticeMessage);
         List<String> phoneNumbers = Arrays.asList(noticeMessage.getContactWays());
-        Response<String> sendResult = smsSenderService.templateSend(phoneNumbers, keys, contents, SMSNoticeCode);
+        Response<String> sendResult = smsSenderService.templateSend(phoneNumbers, keys, contents, propertyService.getSMSNoticeCode());
         if (sendResult.isSuccess())
             logger.error("发送成功");
         else

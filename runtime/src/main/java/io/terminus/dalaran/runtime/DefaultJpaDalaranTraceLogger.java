@@ -77,13 +77,13 @@ public class DefaultJpaDalaranTraceLogger implements DalaranTraceLogger {
                 log.error("-----{}-----", redisService.getValue(RedisUtil.getTimeToMonitor()));
             }
             AlarmRuleConfig alarmRuleConfig = JSONObject.parseObject(value, AlarmRuleConfig.class);
-            if (alarmRuleConfig.getFailureAlarm().getIsOpen() && !tracingLog.isSuccessful()) {
+            if (!tracingLog.isSuccessful()) {
                 redisService.incrKey(
                         RedisUtil.getFailureKey(tracingLog.getFlowId(), format)
                 );
             }
 
-            if (alarmRuleConfig.getTimeOutAlarm().getIsOpen() && alarmRuleConfig.getTimeOutAlarm().getElapse() <= tracingLog.getElapsed()) {
+            if ( alarmRuleConfig.getTimeOutAlarm().getElapse() <= tracingLog.getElapsed()) {
                 redisService.incrKey(
                         RedisUtil.getTimeOutKey(tracingLog.getFlowId(), format)
                 );
