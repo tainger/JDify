@@ -6,6 +6,7 @@ import io.terminus.dalaran.core.log.DalaranTracingLog;
 import io.terminus.dalaran.core.resource.DalaranStarter;
 import io.terminus.dalaran.core.resource.entity.common.ReleaseRecordEntity;
 import io.terminus.dalaran.core.resource.entity.released.TriggerFlowReleasedEntity;
+import io.terminus.dalaran.core.resource.property.PropertyService;
 import io.terminus.dalaran.core.resource.redis.RedisService;
 import io.terminus.dalaran.core.resource.redis.RedisUtil;
 import io.terminus.dalaran.core.resource.repository.ReleaseRecordRepository;
@@ -78,19 +79,19 @@ public class AlarmManagerInitializer implements DalaranStarter {
             log.error("-------------failureCount：----{}----", failureCountStr);
             if (failureCountStr != null) {
                 int failureCount = Integer.parseInt(failureCountStr);
-                if (failureCount >= alarmRuleConfig.getFailureAlarm().getFailureFrequency()) {
+                if (alarmRuleConfig.getFailureAlarm().getIsOpen() && failureCount >= alarmRuleConfig.getFailureAlarm().getFailureFrequency()) {
                     noticeMessage.setIsTouchFailureAlarm(true);
-                    noticeMessage.setFailureCount(failureCount);
                     noticeMessage.setFailureFrequency(alarmRuleConfig.getTimeOutAlarm().getElapsedFrequency());
                 }
+                noticeMessage.setFailureCount(failureCount);
             }
             if (null != timeOutCountStr) {
                 int timeOutCount = Integer.parseInt(timeOutCountStr);
-                if (timeOutCount >= alarmRuleConfig.getTimeOutAlarm().getElapsedFrequency()) {
+                if (alarmRuleConfig.getFailureAlarm().getIsOpen() && timeOutCount >= alarmRuleConfig.getTimeOutAlarm().getElapsedFrequency()) {
                     noticeMessage.setIsTouchTimeOutAlarm(true);
-                    noticeMessage.setTimeOutCount(timeOutCount);
                     noticeMessage.setTimeOutFrequency(alarmRuleConfig.getTimeOutAlarm().getElapsedFrequency());
                 }
+                noticeMessage.setTimeOutCount(timeOutCount);
             }
             noticeMessage.setCreateDate(timeToMonitor);
             noticeMessage.setFlowName(split[1]);

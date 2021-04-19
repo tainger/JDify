@@ -21,6 +21,13 @@ public class PropertyService {
     @Value("${terminus.dalaran.market.group}")
     private String resourceGroup;
 
+    @Value("${noticeMessage.mailNoticeCode}")
+    private String mailNoticeCode;
+
+    @Value("${noticeMessage.SMSNoticeCode}")
+    private String SMSNoticeCode;
+
+
     private final String DALARAN_MARKET_UI = "DALARAN_MARKET_UI";
 
     public String getTenantCode() {
@@ -45,5 +52,21 @@ public class PropertyService {
 
     public String getMarketUi() {
         return System.getenv(DALARAN_MARKET_UI);
+    }
+
+    public String getMailNoticeCode() {
+        return mailNoticeCode;
+    }
+
+    public void setMailNoticeCode(String mailNoticeCode) {
+        this.mailNoticeCode = mailNoticeCode;
+    }
+
+    public String getSMSNoticeCode() {
+        return SMSNoticeCode;
+    }
+
+    public void setSMSNoticeCode(String SMSNoticeCode) {
+        this.SMSNoticeCode = SMSNoticeCode;
     }
 }
