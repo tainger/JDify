@@ -1,6 +1,9 @@
 package io.terminus.dalaran.runtime;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.JSONPObject;
+import com.ctc.wstx.util.StringUtil;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -33,6 +36,7 @@ import io.terminus.dalaran.runtime.service.TracingLogService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.camel.CamelContext;
 import org.apache.camel.model.RouteDefinition;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -127,11 +131,12 @@ public class ReleasedFlowInitializer implements DalaranStarter {
             for (TriggerFlowReleasedEntity triggerFlowReleasedEntity : triggerFlowReleasedEntities) {
                 if (triggerFlowReleasedEntity.isExist() && triggerFlowReleasedEntity.isTracing() && triggerFlowReleasedEntity.isOnline()) {
                     String originId = triggerFlowReleasedEntity.getOriginId();
-                    flowIds.add(originId);
+                    String name = triggerFlowReleasedEntity.getName();
+                    String idNameEntry = originId + "," + name;
+                    flowIds.add(idNameEntry);
                 }
             }
-            String join = String.join(",", flowIds);
-            redisService.persistKey(RedisUtil.getReleasedFlowIdsKey(), join);
+            redisService.persistKey(RedisUtil.getReleasedFlowIdsKey(), JSONObject.toJSONString(flowIds));
 
 
             // load client info

@@ -2,6 +2,7 @@ package io.terminus.dalaran.runtime;
 
 import com.alibaba.fastjson.JSONObject;
 import io.terminus.dalaran.core.component.config.AlarmRuleConfig;
+import io.terminus.dalaran.core.log.DalaranTracingLog;
 import io.terminus.dalaran.core.resource.DalaranStarter;
 import io.terminus.dalaran.core.resource.entity.common.ReleaseRecordEntity;
 import io.terminus.dalaran.core.resource.entity.released.TriggerFlowReleasedEntity;
@@ -22,58 +23,50 @@ import java.util.*;
 public class AlarmManagerInitializer implements DalaranStarter {
 
     @Autowired
-    private ReleasedResourceLoader resourceLoader;
-
-    @Autowired
-    private TracingLogService tracingLogService;
-
-    @Autowired
     private DalaranNoticeService dalaranNoticeService;
-
-    @Autowired
-    private TriggerFlowReleasedRepository triggerFlowReleasedRepository;
 
     @Autowired
     private RedisService redisService;
 
-    @Autowired
-    private ReleaseRecordRepository releaseRecordRepository;
-
-
-
-    private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 
     @Override
     public void start() {
-        Timer timer = new Timer();
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
+        new Thread(() -> {
+            for (; ; ) {
                 try {
-                    monitor();
+                    String timeToMonitor = redisService.getValue(RedisUtil.getTimeToMonitor());
+                    if (null == timeToMonitor) {
+                    log.error("没有要监控的日志报警时间戳");
+                        continue;
+                    }
+                    monitor(timeToMonitor);
+                    redisService.deleteKey(RedisUtil.getTimeToMonitor());
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
+
             }
-        }, 0, 60 * 1000L);
+        }).start();
     }
 
-    private void monitor() {
-        String flowIds = redisService.getValue(RedisUtil.getReleasedFlowIdsKey());
-        if (flowIds == null) {
+    private void monitor(String timeToMonitor) {
+        String idNameStrs = redisService.getValue(RedisUtil.getReleasedFlowIdsKey());
+        if (idNameStrs == null) {
             return;
         }
-        String[] ids = flowIds.split(",");
-        if (ids.length == 0) {
+        List<String> idNameList = JSONObject.parseObject(idNameStrs, List.class);
+        if (idNameList.size() == 0) {
             return;
         }
-        for (String flowId : ids) {
-            String format = dateFormat.format(new Date());
-            String failureCountStr = redisService.getValue(RedisUtil.getFailureKey(flowId, format));
-            String timeOutCountStr = redisService.getValue(RedisUtil.getTimeOutKey(flowId, format));
-            String alarmConfigStr = getAlarmConfigIfAlarmConfigKey(flowId);
+        for (String idName : idNameList) {
+            String[] split = idName.split(",");
+            String failureCountStr = redisService.getValue(RedisUtil.getFailureKey(split[0], timeToMonitor));
+            redisService.deleteKey(RedisUtil.getFailureKey(split[0], timeToMonitor));
+            String timeOutCountStr = redisService.getValue(RedisUtil.getTimeOutKey(split[0], timeToMonitor));
+            redisService.deleteKey(RedisUtil.getTimeOutKey(split[0], timeToMonitor));
+            String alarmConfigStr = getAlarmConfigIfAlarmConfigKey(split[0]);
             if (null == alarmConfigStr) {
-                log.error("没有流程{}的报警配置", flowId);
+                log.error("没有流程{}的报警配置", split[0]);
                 continue;
             }
             if (null == timeOutCountStr && failureCountStr == null) {
@@ -82,23 +75,25 @@ public class AlarmManagerInitializer implements DalaranStarter {
             AlarmRuleConfig alarmRuleConfig = JSONObject.parseObject(alarmConfigStr, AlarmRuleConfig.class);
             log.error("-------------报警规则：----{}----", alarmRuleConfig);
             NoticeMessage noticeMessage = new NoticeMessage();
+            log.error("-------------failureCount：----{}----", failureCountStr);
             if (failureCountStr != null) {
                 int failureCount = Integer.parseInt(failureCountStr);
-                if(failureCount >= alarmRuleConfig.getFailureAlarm().getFailureFrequency()){
+                if (failureCount >= alarmRuleConfig.getFailureAlarm().getFailureFrequency()) {
                     noticeMessage.setIsTouchFailureAlarm(true);
                     noticeMessage.setFailureCount(failureCount);
+                    noticeMessage.setFailureFrequency(alarmRuleConfig.getTimeOutAlarm().getElapsedFrequency());
                 }
             }
-            noticeMessage.setFailureFrequency(alarmRuleConfig.getTimeOutAlarm().getElapsedFrequency());
             if (null != timeOutCountStr) {
                 int timeOutCount = Integer.parseInt(timeOutCountStr);
-                if(timeOutCount  >= alarmRuleConfig.getFailureAlarm().getFailureFrequency())
-                noticeMessage.setIsTouchTimeOutAlarm(true);
-                noticeMessage.setTimeOutCount(timeOutCount);
+                if (timeOutCount >= alarmRuleConfig.getTimeOutAlarm().getElapsedFrequency()) {
+                    noticeMessage.setIsTouchTimeOutAlarm(true);
+                    noticeMessage.setTimeOutCount(timeOutCount);
+                    noticeMessage.setTimeOutFrequency(alarmRuleConfig.getTimeOutAlarm().getElapsedFrequency());
+                }
             }
-            noticeMessage.setCreateDate(format);
-            noticeMessage.setFlowName(flowId);
-            noticeMessage.setTimeOutFrequency(alarmRuleConfig.getTimeOutAlarm().getElapsedFrequency());
+            noticeMessage.setCreateDate(timeToMonitor);
+            noticeMessage.setFlowName(split[1]);
             sendNotice(noticeMessage, alarmRuleConfig.getAlarmChannel());
         }
     }

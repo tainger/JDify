@@ -38,6 +38,10 @@ public class BasicFlow {
 
     private boolean tracing;
 
+    public BasicFlow() {
+
+    }
+
     public String getRouteId() {
         return DalaranConstants.FLOW_PREFIX + this.getId();
     }
