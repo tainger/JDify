@@ -225,7 +225,11 @@ public class PrivateRepositoryServiceImpl implements PrivateRepositoryService {
             List<ProcessorDTO> pipeline = new ArrayList<>();
             for (ProcessorEntity processorEntity : subFlowEntity.getPipeline()) {
                 ProcessorDTO processor = new ProcessorDTO();
-                BeanUtils.copyProperties(processor, processorEntity);
+                processor.setGroup(processorEntity.getGroup());
+                processor.setVersion(processorEntity.getVersion());
+                processor.setId(processorEntity.getId());
+                processor.setType(processorEntity.getType());
+                processor.setName(processorEntity.getName());
                 processor.setConfig(JSON.parseObject(processorEntity.getConfig(), Map.class));
                 pipeline.add(processor);
             }
