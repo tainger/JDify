@@ -18,4 +18,6 @@ public class TriggerFlowReleasedEntity extends TriggerFlowAbstractEntity impleme
 
     @Column(nullable = false, length = 64)
     private String version;
+
+
 }

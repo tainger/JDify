@@ -56,7 +56,6 @@ public class AlarmRuleServiceImpl implements AlarmRuleService , InitializingBean
     @Override
     public void afterPropertiesSet() {
         List<AlarmRuleEntity> alarmRuleEntities = alarmRuleRepository.findByIsExistTrue();
-        logger.error("-----报警规则:{}-----", alarmRuleEntities);
         alarmRuleEntities.forEach((alarmRule)->{
             String id = alarmRule.getResourceKey();
             String config = alarmRule.getConfig();

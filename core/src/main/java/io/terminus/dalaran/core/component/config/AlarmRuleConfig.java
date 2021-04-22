@@ -37,6 +37,6 @@ public class AlarmRuleConfig {
 
 
     public enum ChannelType {
-        mail, message, appPush
+        mail, message, dingDingRobot
     }
 }

@@ -1,6 +1,9 @@
 package io.terminus.dalaran.model.alarm;
 
 
+import lombok.Data;
+
+@Data
 public class NoticeMessage {
 
     private String flowName;

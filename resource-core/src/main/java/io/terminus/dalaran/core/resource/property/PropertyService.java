@@ -27,6 +27,9 @@ public class PropertyService {
     @Value("${noticeMessage.SMSNoticeCode}")
     private String SMSNoticeCode;
 
+    @Value("${noticeMessage.dingAccessToken}")
+    private String dingAccessToken;
+
 
     private final String DALARAN_MARKET_UI = "DALARAN_MARKET_UI";
 
@@ -69,4 +72,14 @@ public class PropertyService {
     public void setSMSNoticeCode(String SMSNoticeCode) {
         this.SMSNoticeCode = SMSNoticeCode;
     }
+
+    public String getDingAccessToken() {
+        return dingAccessToken;
+    }
+
+    public void setDingAccessToken(String dingAccessToken) {
+        this.dingAccessToken = dingAccessToken;
+    }
+
+
 }
