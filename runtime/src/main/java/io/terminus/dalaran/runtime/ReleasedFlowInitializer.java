@@ -32,10 +32,7 @@ import io.terminus.dalaran.model.market.ResourceFile;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.camel.CamelContext;
 import org.apache.camel.model.RouteDefinition;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-
 import javax.annotation.PostConstruct;
 import java.io.File;
 import java.util.*;
@@ -62,7 +59,6 @@ public class ReleasedFlowInitializer implements DalaranStarter {
 
     @Autowired
     private CamelContext camelContext;
-
 
     @Autowired
     private MarketResourceLoader marketResourceLoader;
@@ -123,9 +119,7 @@ public class ReleasedFlowInitializer implements DalaranStarter {
             log.error("---刷新版本---");
             List<TriggerFlowReleasedEntity> triggerFlowReleasedEntities = resourceLoader.loadAllTriggerFlow();
             //todo 此处应该优化掉只有报警的
-
             try {
-
                 for (TriggerFlowReleasedEntity triggerFlowReleasedEntity : triggerFlowReleasedEntities) {
                     log.error("---刷新版本呀:{}---", triggerFlowReleasedEntity.toString());
                     if (triggerFlowReleasedEntity.isExist() && triggerFlowReleasedEntity.isTracing() && triggerFlowReleasedEntity.isOnline()) {
@@ -134,7 +128,7 @@ public class ReleasedFlowInitializer implements DalaranStarter {
                         String triggerConfig = triggerFlowReleasedEntity.getTriggerConfig();
                         JSONObject triggerConfigJSON = JSONObject.parseObject(triggerConfig);
                         log.error("--json数据-{}--", triggerConfigJSON.toJSONString());
-                        Long timeout =Long.valueOf((Integer)triggerConfigJSON.get("timeout")) ;
+                        Long timeout = Long.valueOf((Integer) (triggerConfigJSON.get("timeout")));
                         Map<String, Object> flowInfo = new HashMap<>();
                         flowInfo.put("name", name);
                         flowInfo.put("timeout", timeout);
@@ -146,7 +140,7 @@ public class ReleasedFlowInitializer implements DalaranStarter {
                         log.error("--{}---{}", redisService.getValue(RedisUtil.getReleasedFlowIdsTimeOut()), redisService.getValue(RedisUtil.getReleasedFlowIdsKey()));
                     }
                 }
-            }catch (Exception e){
+            } catch (Exception e) {
                 log.error("----报错:{}----", RequestID.getExceptionStackTrace(e));
             }
 
