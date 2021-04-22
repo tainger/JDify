@@ -2,33 +2,25 @@ package io.terminus.dalaran.runtime;
 
 import com.alibaba.fastjson.JSONObject;
 import io.terminus.dalaran.core.component.config.AlarmRuleConfig;
-import io.terminus.dalaran.core.log.DalaranTracingLog;
+import io.terminus.dalaran.core.flow.DalaranNoticeBuilder;
 import io.terminus.dalaran.core.resource.DalaranStarter;
-import io.terminus.dalaran.core.resource.entity.common.ReleaseRecordEntity;
-import io.terminus.dalaran.core.resource.entity.released.TriggerFlowReleasedEntity;
-import io.terminus.dalaran.core.resource.property.PropertyService;
+import io.terminus.dalaran.core.resource.log.RequestID;
 import io.terminus.dalaran.core.resource.redis.RedisService;
 import io.terminus.dalaran.core.resource.redis.RedisUtil;
-import io.terminus.dalaran.core.resource.repository.ReleaseRecordRepository;
-import io.terminus.dalaran.core.resource.repository.TriggerFlowReleasedRepository;
 import io.terminus.dalaran.model.alarm.NoticeMessage;
-import io.terminus.dalaran.runtime.service.DalaranNoticeService;
-import io.terminus.dalaran.runtime.service.TracingLogService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Slf4j
 public class AlarmManagerInitializer implements DalaranStarter {
 
     @Autowired
-    private DalaranNoticeService dalaranNoticeService;
-
-    @Autowired
     private RedisService redisService;
 
+    @Autowired
+    private DalaranNoticeBuilder dalaranNotice;
 
     @Override
     public void start() {
@@ -37,9 +29,9 @@ public class AlarmManagerInitializer implements DalaranStarter {
                 try {
                     String timeToMonitor = redisService.getValue(RedisUtil.getTimeToMonitor());
                     if (null == timeToMonitor) {
-                    log.error("没有要监控的日志报警时间戳");
                         continue;
                     }
+                    log.error("-----{}---", timeToMonitor);
                     monitor(timeToMonitor);
                     redisService.deleteKey(RedisUtil.getTimeToMonitor());
                 } catch (Exception e) {
@@ -51,51 +43,50 @@ public class AlarmManagerInitializer implements DalaranStarter {
     }
 
     private void monitor(String timeToMonitor) {
-        String idNameStrs = redisService.getValue(RedisUtil.getReleasedFlowIdsKey());
-        if (idNameStrs == null) {
-            return;
-        }
-        List<String> idNameList = JSONObject.parseObject(idNameStrs, List.class);
-        if (idNameList.size() == 0) {
-            return;
-        }
-        for (String idName : idNameList) {
-            String[] split = idName.split(",");
-            String failureCountStr = redisService.getValue(RedisUtil.getFailureKey(split[0], timeToMonitor));
-            redisService.deleteKey(RedisUtil.getFailureKey(split[0], timeToMonitor));
-            String timeOutCountStr = redisService.getValue(RedisUtil.getTimeOutKey(split[0], timeToMonitor));
-            redisService.deleteKey(RedisUtil.getTimeOutKey(split[0], timeToMonitor));
-            String alarmConfigStr = getAlarmConfigIfAlarmConfigKey(split[0]);
-            if (null == alarmConfigStr) {
-                log.error("没有流程{}的报警配置", split[0]);
-                continue;
+        try {
+            String flowInfosStr = redisService.getValue(RedisUtil.getReleasedFlowIdsKey());
+            if (flowInfosStr == null) {
+                return;
             }
-            if (null == timeOutCountStr && failureCountStr == null) {
-                continue;
-            }
-            AlarmRuleConfig alarmRuleConfig = JSONObject.parseObject(alarmConfigStr, AlarmRuleConfig.class);
-            log.error("-------------报警规则：----{}----", alarmRuleConfig);
-            NoticeMessage noticeMessage = new NoticeMessage();
-            log.error("-------------failureCount：----{}----", failureCountStr);
-            if (failureCountStr != null) {
-                int failureCount = Integer.parseInt(failureCountStr);
-                if (alarmRuleConfig.getFailureAlarm().getIsOpen() && failureCount >= alarmRuleConfig.getFailureAlarm().getFailureFrequency()) {
-                    noticeMessage.setIsTouchFailureAlarm(true);
-                    noticeMessage.setFailureFrequency(alarmRuleConfig.getTimeOutAlarm().getElapsedFrequency());
+            List<Map<String, Object>> flowInfos = JSONObject.parseObject(flowInfosStr, List.class);
+            for (Map<String, Object> flow : flowInfos) {
+                String id = (String) flow.get("id");
+                String failureCountStr = redisService.getValue(RedisUtil.getFailureKey(id, timeToMonitor));
+                redisService.deleteKey(RedisUtil.getFailureKey(id, timeToMonitor));
+                String timeOutCountStr = redisService.getValue(RedisUtil.getTimeOutKey(id, timeToMonitor));
+                redisService.deleteKey(RedisUtil.getTimeOutKey(id, timeToMonitor));
+                String alarmConfigStr = getAlarmConfigIfAlarmConfigKey(id);
+                if (null == alarmConfigStr) {
+                    log.error("没有流程{}的报警配置", id);
+                    continue;
                 }
-                noticeMessage.setFailureCount(failureCount);
-            }
-            if (null != timeOutCountStr) {
-                int timeOutCount = Integer.parseInt(timeOutCountStr);
-                if (alarmRuleConfig.getFailureAlarm().getIsOpen() && timeOutCount >= alarmRuleConfig.getTimeOutAlarm().getElapsedFrequency()) {
-                    noticeMessage.setIsTouchTimeOutAlarm(true);
+                AlarmRuleConfig alarmRuleConfig = JSONObject.parseObject(alarmConfigStr, AlarmRuleConfig.class);
+                log.error("-------------报警规则：----{}----", alarmRuleConfig);
+                NoticeMessage noticeMessage = new NoticeMessage();
+                log.error("-------------failureCount：----{}----", failureCountStr);
+                if (failureCountStr != null) {
+                    int failureCount = Integer.parseInt(failureCountStr);
+                    if (alarmRuleConfig.getFailureAlarm().getIsOpen() && failureCount >= alarmRuleConfig.getFailureAlarm().getFailureFrequency()) {
+                        noticeMessage.setIsTouchFailureAlarm(true);
+                    }
+                    noticeMessage.setFailureFrequency(alarmRuleConfig.getFailureAlarm().getFailureFrequency());
+                    noticeMessage.setFailureCount(failureCount);
+                }
+                if (null != timeOutCountStr) {
+                    int timeOutCount = Integer.parseInt(timeOutCountStr);
+                    if (alarmRuleConfig.getTimeOutAlarm().getIsOpen() && timeOutCount >= alarmRuleConfig.getTimeOutAlarm().getElapsedFrequency()) {
+                        noticeMessage.setIsTouchTimeOutAlarm(true);
+                    }
                     noticeMessage.setTimeOutFrequency(alarmRuleConfig.getTimeOutAlarm().getElapsedFrequency());
+                    noticeMessage.setTimeOutCount(timeOutCount);
                 }
-                noticeMessage.setTimeOutCount(timeOutCount);
+                String name = (String) flow.get("name");
+                noticeMessage.setCreateDate(timeToMonitor);
+                noticeMessage.setFlowName(name);
+                sendNotice(noticeMessage, alarmRuleConfig.getAlarmChannel());
             }
-            noticeMessage.setCreateDate(timeToMonitor);
-            noticeMessage.setFlowName(split[1]);
-            sendNotice(noticeMessage, alarmRuleConfig.getAlarmChannel());
+        } catch (Exception e) {
+            log.error("---读取方式:--{}----", RequestID.getExceptionStackTrace(e));
         }
     }
 
@@ -108,10 +99,13 @@ public class AlarmManagerInitializer implements DalaranStarter {
             log.error("---------联系人的方式为 {} -------------", contactWays);
             switch (channelType) {
                 case mail:
-                    dalaranNoticeService.sendEmail(noticeMessage);
+                    dalaranNotice.sendEmail(noticeMessage);
                     break;
                 case message:
-                    dalaranNoticeService.sendShortMessage(noticeMessage);
+                    dalaranNotice.sendShortMessage(noticeMessage);
+                    break;
+                case dingDingRobot:
+                    dalaranNotice.sendDingMessage(noticeMessage);
                     break;
                 default:
                     break;

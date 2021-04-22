@@ -32,7 +32,6 @@ public class DalaranRuntimeConfigure {
         return new ReleasedFlowInitializer();
     }
 
-
     @Bean
     public AlarmManagerInitializer alarmManagerInitializer() {
         return new AlarmManagerInitializer();
