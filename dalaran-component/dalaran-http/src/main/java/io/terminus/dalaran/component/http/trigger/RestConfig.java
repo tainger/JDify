@@ -14,7 +14,6 @@ import io.terminus.dalaran.core.component.config.LimiterConfig;
 import io.terminus.dalaran.model.HttpProtocol;
 import lombok.Data;
 
-import java.util.List;
 
 @Data
 public class RestConfig extends AllModelConfig implements  AuthenticatorConfig<DalaranAuthenticator>, LimiterConfig<DalaranLimiter> {
@@ -42,7 +41,7 @@ public class RestConfig extends AllModelConfig implements  AuthenticatorConfig<D
     @JsonIgnore
     private DalaranAuthenticator authenticator;
 
-    @ConfigFieldInfo(label = "鉴权器", inputType = FieldInputType.Authenticator, required = false, authenticatorType = AuthenticatorRestConfig.class)
+    @ConfigFieldInfo(label = "鉴权器", inputType = FieldInputType.Authenticator, required = false, authenticatorType = DalaranAuthenticator.class)
     private String authenticatorId;
 
 //    @ConfigFieldInfo(label = "开启鉴权", inputType = FieldInputType.Switch, defaultValue = "false")

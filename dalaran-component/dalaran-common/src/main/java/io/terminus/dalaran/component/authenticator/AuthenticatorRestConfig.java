@@ -1,7 +1,6 @@
 package io.terminus.dalaran.component.authenticator;
 
 import io.terminus.dalaran.FieldInputType;
-import io.terminus.dalaran.core.component.annotation.Authenticator;
 import io.terminus.dalaran.core.component.annotation.ConfigFieldInfo;
 import io.terminus.dalaran.model.authenticator.AuthenticatorKeyLocation;
 import lombok.Data;
