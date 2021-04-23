@@ -99,7 +99,7 @@ public class DefaultJpaDalaranTraceLogger implements DalaranTraceLogger {
     private Long getTriggerTimeOut(DalaranTracingLog tracingLog, AlarmRuleConfig alarmRuleConfig) {
         String flowTimeOut = redisService.getValue(RedisUtil.getReleasedFlowIdsTimeOut());
         Map<String, Object> map = JSONObject.parseObject(flowTimeOut, Map.class);
-        String triggerFlowTime = (String) map.get(tracingLog.getFlowId());
+        Integer triggerFlowTime = (Integer) map.get(tracingLog.getFlowId());
         if(null != triggerFlowTime) {
             return Long.valueOf(triggerFlowTime);
         }
