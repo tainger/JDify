@@ -30,7 +30,7 @@ public class AuthenticatorProcessor implements Processor {
     @Override
     public void process(Exchange exchange) {
         Map<String, String> body = exchange.getIn().getBody(Map.class);
-        if (authenticator.getType() == AuthenticatorType.Default) {
+        if (authenticator.getType() == "") {
             checkValue(exchange, body);
         }
     }
@@ -66,7 +66,7 @@ public class AuthenticatorProcessor implements Processor {
     }
 
     void checkGetValue(Exchange exchange, Map<String, String> param) {
-        if (authenticator.getType() == AuthenticatorType.Default) {
+        if (authenticator.getType() == "") {
             List<AuthenticatorRestConfig> authenticatorRestConfigs = authenticator.getConfig();
             authenticatorRestConfigs.forEach(authenticatorRestConfig -> {
                 String value = authenticatorRestConfig.getAuthenticatorValue();
