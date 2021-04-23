@@ -32,7 +32,7 @@ public class RocketMQConsumerConfig extends AllModelConfig implements ConnectorC
     @ConfigFieldInfo(label = "消费者组", inputType = FieldInputType.String)
     private String consumerGroup;
 
-    @ConfigFieldInfo(label = "tag", inputType = FieldInputType.String, required = false)
+    @ConfigFieldInfo(label = "标签", inputType = FieldInputType.String, required = false)
     private String tags;
 
     @ConfigFieldInfo(label = "消费自动确认", inputType = FieldInputType.Switch, defaultValue = "true")
