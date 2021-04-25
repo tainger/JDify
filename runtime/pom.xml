@@ -12,11 +12,7 @@
     <artifactId>dalaran-runtime</artifactId>
 
     <dependencies>
-        <dependency>
-            <groupId>io.terminus.common</groupId>
-            <artifactId>notice-sender</artifactId>
-            <version>${terminus.notice.sender}</version>
-        </dependency>
+
         <dependency>
             <groupId>io.terminus</groupId>
             <artifactId>dalaran-resource-core</artifactId>

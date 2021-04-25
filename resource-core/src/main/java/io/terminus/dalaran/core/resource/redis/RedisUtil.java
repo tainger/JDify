@@ -8,7 +8,9 @@ public class RedisUtil {
 
     private static final String  ALARM_CONFIG = "alarm_config:trigger_id:";
 
-    private static final String  RELEASED_FLOW_IDS = "released_flow_ids";
+    private static final String  RELEASED_FLOW_INFO = "released_flow_info";
+
+    private static final String  RELEASED_FLOW_INFO_TIME_OUT = "released_flow_ids_time_out";
 
     private static final String  RECORD_FLOW_ID = "log_record:flow_id";
 
@@ -30,8 +32,13 @@ public class RedisUtil {
     }
 
     public static String getReleasedFlowIdsKey() {
-        return  RELEASED_FLOW_IDS;
+        return  RELEASED_FLOW_INFO;
     }
+
+    public static String getReleasedFlowIdsTimeOut() {
+        return  RELEASED_FLOW_INFO_TIME_OUT;
+    }
+
 
     public static String getRecordFlowId(String flowId) {
         return  RECORD_FLOW_ID + SPLIT + flowId;

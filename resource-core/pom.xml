@@ -12,6 +12,24 @@
     <artifactId>dalaran-resource-core</artifactId>
 
     <dependencies>
+<!--        <dependency>-->
+<!--            <groupId>com.taobao.top</groupId>-->
+<!--            <artifactId>top-api-sdk-dev</artifactId>-->
+<!--            <version>ding-open-mc-SNAPSHOT</version>-->
+<!--            <scope>system</scope>-->
+<!--            <systemPath>${pom.basedir}/src/lib/taobao-sdk-java-auto_1479188381469-20210416.jar</systemPath>-->
+<!--        </dependency>-->
+        <dependency>
+            <groupId>io.terminus.ding</groupId>
+            <artifactId>sdk-java</artifactId>
+            <version>2.0.0-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.terminus.common</groupId>
+            <artifactId>notice-sender</artifactId>
+            <version>${terminus.notice.sender}</version>
+        </dependency>
         <dependency>
             <groupId>io.terminus</groupId>
             <artifactId>dalaran-flow-core</artifactId>

@@ -30,7 +30,7 @@ import java.util.concurrent.TimeUnit;
 import static io.terminus.dalaran.DalaranConstants.UNKNOWN_MODEL_TYPE;
 
 @Processor(
-        value = "BrotliHttpClient",
+        value = {"OKHttpClient", "BrotliHttpClient"},
         order = 8,
         configType = OKHttpClientConfig.class,
         bodyType = UNKNOWN_MODEL_TYPE

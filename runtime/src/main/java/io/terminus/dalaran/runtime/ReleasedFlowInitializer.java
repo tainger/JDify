@@ -2,8 +2,6 @@ package io.terminus.dalaran.runtime;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.JSONPObject;
-import com.ctc.wstx.util.StringUtil;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -23,24 +21,18 @@ import io.terminus.dalaran.core.resource.entity.released.ClientReleasedEntity;
 import io.terminus.dalaran.core.resource.entity.released.FunctionReleasedEntity;
 import io.terminus.dalaran.core.resource.entity.released.SubFlowReleasedEntity;
 import io.terminus.dalaran.core.resource.entity.released.TriggerFlowReleasedEntity;
+import io.terminus.dalaran.core.resource.log.RequestID;
 import io.terminus.dalaran.core.resource.redis.RedisService;
 import io.terminus.dalaran.core.resource.redis.RedisUtil;
 import io.terminus.dalaran.core.resource.repository.ModuleRepository;
 import io.terminus.dalaran.core.resource.repository.ReleaseRecordRepository;
-import io.terminus.dalaran.core.resource.repository.TriggerFlowReleasedRepository;
 import io.terminus.dalaran.model.flow.SubFlow;
 import io.terminus.dalaran.model.flow.TriggerFlow;
 import io.terminus.dalaran.model.market.ResourceFile;
-import io.terminus.dalaran.runtime.service.DalaranNoticeService;
-import io.terminus.dalaran.runtime.service.TracingLogService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.camel.CamelContext;
 import org.apache.camel.model.RouteDefinition;
-import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-
 import javax.annotation.PostConstruct;
 import java.io.File;
 import java.util.*;
@@ -49,7 +41,6 @@ import java.util.stream.Collectors;
 @Slf4j
 public class ReleasedFlowInitializer implements DalaranStarter {
 
-    private static final Logger logger = LoggerFactory.getLogger(ReleasedFlowInitializer.class);
 
     @Autowired
     private ModuleRepository moduleRepository;
@@ -68,7 +59,6 @@ public class ReleasedFlowInitializer implements DalaranStarter {
 
     @Autowired
     private CamelContext camelContext;
-
 
     @Autowired
     private MarketResourceLoader marketResourceLoader;
@@ -124,19 +114,35 @@ public class ReleasedFlowInitializer implements DalaranStarter {
             }
             resourceLoader.setVersion(recordEntity.getVersion());
             resourceLoader.setLastVersion(recordEntity.getLastVersion());
-
-
-            List<String> flowIds = new ArrayList<>();
+            Map<String, Object> time = new HashMap<>();
+            List<Map<String, Object>> flowInfos = new ArrayList<>();
+            log.error("---刷新版本---");
             List<TriggerFlowReleasedEntity> triggerFlowReleasedEntities = resourceLoader.loadAllTriggerFlow();
-            for (TriggerFlowReleasedEntity triggerFlowReleasedEntity : triggerFlowReleasedEntities) {
-                if (triggerFlowReleasedEntity.isExist() && triggerFlowReleasedEntity.isTracing() && triggerFlowReleasedEntity.isOnline()) {
-                    String originId = triggerFlowReleasedEntity.getOriginId();
-                    String name = triggerFlowReleasedEntity.getName();
-                    String idNameEntry = originId + "," + name;
-                    flowIds.add(idNameEntry);
+            //todo 此处应该优化掉只有报警的
+            try {
+                for (TriggerFlowReleasedEntity triggerFlowReleasedEntity : triggerFlowReleasedEntities) {
+                    log.error("---刷新版本呀:{}---", triggerFlowReleasedEntity.toString());
+                    if (triggerFlowReleasedEntity.isExist() && triggerFlowReleasedEntity.isTracing() && triggerFlowReleasedEntity.isOnline()) {
+                        String originId = triggerFlowReleasedEntity.getOriginId();
+                        String name = triggerFlowReleasedEntity.getName();
+                        String triggerConfig = triggerFlowReleasedEntity.getTriggerConfig();
+                        JSONObject triggerConfigJSON = JSONObject.parseObject(triggerConfig);
+                        log.error("--json数据-{}--", triggerConfigJSON.toJSONString());
+                        Long timeout = Long.valueOf((Integer) (triggerConfigJSON.get("timeout")));
+                        Map<String, Object> flowInfo = new HashMap<>();
+                        flowInfo.put("name", name);
+                        flowInfo.put("timeout", timeout);
+                        flowInfo.put("id", originId);
+                        flowInfos.add(flowInfo);
+                        time.put(originId, timeout);
+                        redisService.persistKey(RedisUtil.getReleasedFlowIdsTimeOut(), JSONObject.toJSONString(time));
+                        redisService.persistKey(RedisUtil.getReleasedFlowIdsKey(), JSONObject.toJSONString(flowInfos));
+                        log.error("--{}---{}", redisService.getValue(RedisUtil.getReleasedFlowIdsTimeOut()), redisService.getValue(RedisUtil.getReleasedFlowIdsKey()));
+                    }
                 }
+            } catch (Exception e) {
+                log.error("----报错:{}----", RequestID.getExceptionStackTrace(e));
             }
-            redisService.persistKey(RedisUtil.getReleasedFlowIdsKey(), JSONObject.toJSONString(flowIds));
 
 
             // load client info
@@ -159,7 +165,6 @@ public class ReleasedFlowInitializer implements DalaranStarter {
                     e.printStackTrace();
                 }
             }
-
             List<PrivateRepositoryEntity> privateRepositoryEntityList = resourceLoader.loadPackage();
             for (PrivateRepositoryEntity entity : privateRepositoryEntityList) {
                 try {
@@ -173,7 +178,6 @@ public class ReleasedFlowInitializer implements DalaranStarter {
 
             List<TriggerFlowReleasedEntity> triggerFlows = resourceLoader.loadAvailableTriggerFlow();
             List<TriggerFlowReleasedEntity> lastVersionTriggerFlows = resourceLoader.loadLastVersionAvailableTriggerFlow();
-
             for (TriggerFlowReleasedEntity triggerFlowEntity : lastVersionTriggerFlows) {
                 if (triggerFlowEntity.getTriggerType().equalsIgnoreCase("as2-server")) {
                     continue;
@@ -197,7 +201,6 @@ public class ReleasedFlowInitializer implements DalaranStarter {
                     e.printStackTrace();
                 }
             }
-
             List<SubFlowReleasedEntity> subFLows = resourceLoader.loadAvailableSubFlow();
             List<SubFlowReleasedEntity> lastVersionSubFLows = resourceLoader.loadLastVersionAvailableSubFlow();
             for (SubFlowReleasedEntity subFlowEntity : lastVersionSubFLows) {
@@ -217,7 +220,6 @@ public class ReleasedFlowInitializer implements DalaranStarter {
                     e.printStackTrace();
                 }
             }
-
             List<ApiInfo> apiInfoList = getExportApiInfoList();
             swagger = SwaggerUtils.buildSwagger(apiInfoList);
         }
