@@ -19,8 +19,8 @@ public class AuthenticatorAbstractEntity extends BasicEntity {
     @Column(nullable = false)
     private String name;
 
-    @Enumerated(EnumType.STRING)
-    private AuthenticatorType type;
+    @Column(nullable = false)
+    private String type;
 
     @Column(nullable = false)
     private String config;

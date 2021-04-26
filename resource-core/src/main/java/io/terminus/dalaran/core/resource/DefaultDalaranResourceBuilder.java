@@ -266,11 +266,11 @@ public class DefaultDalaranResourceBuilder implements DalaranResourceBuilder {
         return JSON.parseObject(replacedConfig, configType);
     }
 
-    public  <T> T buildArrayConfig(String configValue, Class<T> configType, AuthenticatorType type) {
+    public  <T> T buildArrayConfig(String configValue, Class<T> configType, String type) {
         String replacedConfig = replaceProperties(configValue, getProperties());
         DalaranAuthenticator authenticator = new DalaranAuthenticator();
         switch (type) {
-            case Default:
+            case "Default":
                 List<AuthenticatorRestConfig> configs = JSON.parseArray(replacedConfig, AuthenticatorRestConfig.class);
                 authenticator.setConfig(configs);
         }

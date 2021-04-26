@@ -79,7 +79,7 @@ public class AuthenticatorServiceImpl implements AuthenticatorService {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<QueryAuthenticatorInfo> criteriaQuery = builder.createQuery(QueryAuthenticatorInfo.class);
         Root<AuthenticatorEntity> root = criteriaQuery.from(AuthenticatorEntity.class);
-        criteriaQuery.multiselect(root.get("resourceKey"), root.get("moduleId"), root.get("name"), root.get("isExist"))
+        criteriaQuery.multiselect(root.get("resourceKey"), root.get("moduleId"), root.get("name"), root.get("type"), root.get("isExist"))
                 .where(builder.equal(root.get("moduleId"), moduleId) , builder.equal(root.get("isExist"), true));
         List<QueryAuthenticatorInfo> authenticators = entityManager.createQuery(criteriaQuery).getResultList();
         List<BasicAuthenticatorInfo> basicAuthenticatorInfos = new ArrayList<>();
