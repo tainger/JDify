@@ -1,32 +1,47 @@
 package io.terminus.dalaran.console.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.predic8.wsdl.Definitions;
 import io.swagger.models.Swagger;
+import io.terminus.dalaran.SourceType;
 import io.terminus.dalaran.component.http.trigger.model.ApiInfo;
 import io.terminus.dalaran.component.http.trigger.utils.SwaggerUtils;
+import io.terminus.dalaran.component.loopwhile.LoopWhileConfig;
+import io.terminus.dalaran.component.multicast.ScatterGatherConfig;
+import io.terminus.dalaran.component.service.soap.SoapServiceConfig;
 import io.terminus.dalaran.component.soap.trigger.model.SoapApiInfo;
 import io.terminus.dalaran.component.soap.trigger.utils.WSDLUtils;
+import io.terminus.dalaran.component.subflow.DalaranSubFlowConfig;
 import io.terminus.dalaran.console.ExportData;
 import io.terminus.dalaran.console.TestFlowInitializer;
+import io.terminus.dalaran.console.entity.ServiceEntity;
+import io.terminus.dalaran.console.entity.SubFlowEntity;
 import io.terminus.dalaran.console.entity.TriggerFlowEntity;
+import io.terminus.dalaran.console.model.FlowResourceCollector;
 import io.terminus.dalaran.console.repository.*;
 import io.terminus.dalaran.console.service.ExportService;
 import io.terminus.dalaran.console.service.ModelManagementService;
 import io.terminus.dalaran.core.component.DalaranTrigger;
 import io.terminus.dalaran.core.component.DalaranTriggerApiDocExport;
 import io.terminus.dalaran.core.component.DalaranTriggerWordDocExport;
+import io.terminus.dalaran.core.component.annotation.ConfigFieldInfo;
+import io.terminus.dalaran.core.component.config.ServiceOperationConfig;
 import io.terminus.dalaran.core.context.DalaranComponentContext;
 import io.terminus.dalaran.core.context.DalaranModelTypeContext;
+import io.terminus.dalaran.core.context.support.DefaultDalaranServiceContext;
 import io.terminus.dalaran.core.resource.DalaranResourceBuilder;
 import io.terminus.dalaran.core.resource.entity.common.ModuleEntity;
+import io.terminus.dalaran.core.resource.entity.common.ProcessorEntity;
 import io.terminus.dalaran.core.resource.repository.ModuleRepository;
+import io.terminus.dalaran.model.component.ProcessorRouteInfo;
 import io.terminus.dalaran.model.flow.FlowStatus;
 import io.terminus.dalaran.model.flow.TriggerFlow;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.metamodel.spi.MetamodelImplementor;
 import org.hibernate.persister.entity.AbstractEntityPersister;
 import org.hibernate.persister.entity.EntityPersister;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -35,6 +50,7 @@ import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -89,8 +105,22 @@ public class ExportServiceImpl implements ExportService {
     @Autowired
     private ModelManagementService modelManagementService;
 
+    @Autowired
+    private AuthenticatorRepository authenticatorRepository;
+
     @Value("${terminus.dalaran.runtime-location}")
     private String runtimeLocation;
+
+    private FlowResourceCollector flowsCollector;
+
+    @Autowired
+    private LimiterRepository limiterRepository;
+
+    @Autowired
+    private DalaranComponentContext dalaranComponentContext;
+
+    @Autowired
+    private DefaultDalaranServiceContext defaultDalaranServiceContext;
 
     // TODO 数据量暴多可能炸内存, 而且会涉及到清表, 所以事务也是个问题
     @Override
@@ -184,6 +214,281 @@ public class ExportServiceImpl implements ExportService {
     }
 
     @Override
+    public ExportData exportFlow(String ids) {
+        flowsCollector = new FlowResourceCollector();
+        List<String> idList = Arrays.asList(ids.split(","));
+        List<TriggerFlowEntity> triggerFlowEntities = triggerFlowRepository.findByResourceKeyIn(idList);
+        for (TriggerFlowEntity triggerFlowEntity : triggerFlowEntities) {
+            collectTriggerResourceKey(triggerFlowEntity);
+            //basic Info
+            collectBaseInfoResourceKey(triggerFlowEntity);
+            //pipeLine
+            List<ProcessorEntity> pipeline = triggerFlowEntity.getPipeline();
+            for (ProcessorEntity processorEntity : pipeline) {
+                collectProcessorResourceKey(processorEntity);
+            }
+        }
+        ExportData exportData = buildExportData(flowsCollector);
+        exportData.setTriggerFlows(triggerFlowEntities);
+        return exportData;
+    }
+
+    private ExportData buildExportData(FlowResourceCollector flowResourceCollector) {
+        ExportData exportData = new ExportData();
+        Map<String, Set<String>> resourceKeyCollector = flowResourceCollector.getResourceKeyCollector();
+        for (Map.Entry<String, Set<String>> entry : resourceKeyCollector.entrySet()) {
+            switch (entry.getKey()) {
+                case SourceType.SERVICE:
+                    exportData.setServices(serviceRepository.findByResourceKeyIn(new ArrayList<>(entry.getValue())));
+                    break;
+                case SourceType.AUTHENTICATOR:
+                    exportData.setAuthenticatorEntities(authenticatorRepository.findByResourceKeyIn(new ArrayList<>(entry.getValue())));
+                    break;
+
+                case SourceType.CLIENT:
+                    exportData.setClients(clientRepository.findByResourceKeyIn(new ArrayList<>(entry.getValue())));
+                    break;
+
+                case SourceType.CONNECTOR:
+                    exportData.setConnectors(connectorRepository.findByResourceKeyIn(new ArrayList<>(entry.getValue())));
+                    break;
+
+                case SourceType.FUNCTION:
+                    exportData.setFunctions(functionRepository.findByResourceKeyIn(new ArrayList<>(entry.getValue())));
+                    break;
+
+                case SourceType.LIMITER:
+                    exportData.setLimiterEntities(limiterRepository.findByResourceKeyIn(new ArrayList<>(entry.getValue())));
+                    break;
+
+                case SourceType.MODEL:
+                    exportData.setModels(modelRepository.findByResourceKeyIn(new ArrayList<>(entry.getValue())));
+                    break;
+
+                case SourceType.MODULE:
+                    exportData.setModules(moduleRepository.findByResourceKeyIn(new ArrayList<>(entry.getValue())));
+                    break;
+
+                case SourceType.SUB_FLOW:
+                    exportData.setSubFlows(subFlowRepository.findByResourceKeyIn(new ArrayList<>(entry.getValue())));
+                    break;
+            }
+        }
+        return exportData;
+    }
+
+    private void collectProcessorResourceKey(ProcessorEntity processorEntity) {
+        String type = processorEntity.getType();
+        String processorEntityConfig = processorEntity.getConfig();
+
+        if ("scatter-gather".equals(type)) {
+            ScatterGatherConfig scatterGatherConfig = JSONObject.parseObject(processorEntityConfig, ScatterGatherConfig.class);
+            List<ScatterGatherConfig.Branch> branches = scatterGatherConfig.getBranches();
+            for (ScatterGatherConfig.Branch branch : branches) {
+                List<ProcessorRouteInfo> branchPipeline = branch.getPipeline();
+                for (ProcessorRouteInfo processorRouteInfo : branchPipeline) {
+                    ProcessorEntity branchProcessor = new ProcessorEntity();
+                    BeanUtils.copyProperties(processorRouteInfo, branchProcessor);
+                    collectProcessorResourceKey(branchProcessor);
+                }
+            }
+        }
+
+        if ("sub-flow".equals(type)) {
+            DalaranSubFlowConfig dalaranSubFlowConfig = JSONObject.parseObject(processorEntityConfig, DalaranSubFlowConfig.class);
+            String subFlowId = dalaranSubFlowConfig.getSubFlowId();
+            SubFlowEntity subFlowEntity = subFlowRepository.findByResourceKey(subFlowId);
+            List<ProcessorEntity> pipeline = subFlowEntity.getPipeline();
+            for (ProcessorEntity subProcessorEntity : pipeline) {
+                collectProcessorResourceKey(subProcessorEntity);
+            }
+        }
+
+        if ("loop-while".equals(type)) {
+            LoopWhileConfig loopWhileConfig = JSONObject.parseObject(processorEntityConfig, LoopWhileConfig.class);
+            List<ProcessorRouteInfo> loopWhilePipeline = loopWhileConfig.getPipeline();
+            for (ProcessorRouteInfo processorRouteInfo : loopWhilePipeline) {
+                ProcessorEntity loopWhileProcessorEntity = new ProcessorEntity();
+                collectProcessorResourceKey(loopWhileProcessorEntity);
+            }
+        }
+
+        if ("service".equals(type)) {
+            ServiceOperationConfig serviceOperationConfig = JSONObject.parseObject(processorEntityConfig, ServiceOperationConfig.class);
+            String serviceId = serviceOperationConfig.getServiceId();
+            ServiceEntity service = serviceRepository.findByResourceKey(serviceId);
+            String serviceConfig = service.getServiceConfig();
+            collectServiceResourceKey(type, serviceConfig);
+        }
+        collectProcessResourceKey(processorEntity);
+    }
+
+    private void collectServiceResourceKey(String type, String config) {
+        String processorClassName = getProcessorClassName(type);
+        Class<?> configClass = null;
+        try {
+            configClass = Class.forName(processorClassName);
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        Object object = JSONObject.parseObject(config, configClass);
+        List<Field> fields = new ArrayList<>();
+        while (null != configClass) {
+            List<Field> fieldList = Arrays.asList(configClass.getDeclaredFields());
+            fields.addAll(fieldList);
+            configClass = configClass.getSuperclass();
+        }
+        for (Field declaredField : fields) {
+            ConfigFieldInfo configFieldInfo = declaredField.getDeclaredAnnotation(ConfigFieldInfo.class);
+            if (configFieldInfo == null) {
+                continue;
+            }
+            String sourceType = configFieldInfo.sourceType();
+            if (StringUtils.EMPTY.equals(sourceType)) {
+                continue;
+            }
+            String resourceKey = null;
+            try {
+                declaredField.setAccessible(true);
+
+                resourceKey = (String) declaredField.get(object);
+                flowsCollector.collect(sourceType, resourceKey);
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void collectProcessResourceKey(ProcessorEntity processorEntity) {
+        String type = processorEntity.getType();
+        String processorClassName = getProcessorClassName(type);
+        String processorEntityConfig = processorEntity.getConfig();
+        Class<?> configClass = null;
+        try {
+            configClass = Class.forName(processorClassName);
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        Object object = JSONObject.parseObject(processorEntityConfig, configClass);
+        List<Field> fields = new ArrayList<>();
+        while (null != configClass) {
+            List<Field> fieldList = Arrays.asList(configClass.getDeclaredFields());
+            fields.addAll(fieldList);
+            configClass = configClass.getSuperclass();
+        }
+        for (Field declaredField : fields) {
+            ConfigFieldInfo configFieldInfo = declaredField.getDeclaredAnnotation(ConfigFieldInfo.class);
+            if (configFieldInfo == null) {
+                continue;
+            }
+            String sourceType = configFieldInfo.sourceType();
+            if (StringUtils.EMPTY.equals(sourceType)) {
+                continue;
+            }
+            String resourceKey = null;
+            try {
+                declaredField.setAccessible(true);
+
+                resourceKey = (String) declaredField.get(object);
+                flowsCollector.collect(sourceType, resourceKey);
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        }
+
+
+    }
+
+    private void collectBaseInfoResourceKey(TriggerFlowEntity triggerFlowEntity) {
+        String moduleId = triggerFlowEntity.getModuleId();
+        flowsCollector.collect(SourceType.MODULE, moduleId);
+    }
+
+    public void collectTriggerResourceKey(TriggerFlowEntity triggerFlowEntity) {
+        String triggerType = triggerFlowEntity.getTriggerType();
+        String triggerConfig = triggerFlowEntity.getTriggerConfig();
+        String triggerClassName = getTriggerClassName(triggerType);
+        Class<?> configClass = null;
+        try {
+            configClass = Class.forName(triggerClassName);
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        Object object = JSONObject.parseObject(triggerConfig, configClass);
+        List<Field> fields = new ArrayList<>();
+        while (null != configClass) {
+            List<Field> fieldList = Arrays.asList(configClass.getDeclaredFields());
+            fields.addAll(fieldList);
+            configClass = configClass.getSuperclass();
+        }
+        for (Field declaredField : fields) {
+            ConfigFieldInfo configFieldInfo = declaredField.getDeclaredAnnotation(ConfigFieldInfo.class);
+            if (configFieldInfo == null) {
+                continue;
+            }
+            String sourceType = configFieldInfo.sourceType();
+            if (!StringUtils.EMPTY.equals(sourceType)) {
+                String resourceKey = null;
+                try {
+                    declaredField.setAccessible(true);
+                    resourceKey = (String) declaredField.get(object);
+                    flowsCollector.collect(sourceType, resourceKey);
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+
+    public String getTriggerClassName(String triggerType) {
+        return dalaranComponentContext.getTriggerConfigMap().get(triggerType);
+    }
+
+
+    public String getProcessorClassName(String processorType) {
+        return dalaranComponentContext.getTriggerConfigMap().get(processorType);
+    }
+
+    public String getSoapConfigClassName(String soapType) {
+        return defaultDalaranServiceContext.getConfigClassMap().get(soapType);
+    }
+
+//    public void collectComponent(Object object) {
+//        if(object instanceof AllModelConfig) {
+//            AllModelConfig allModelConfig = (AllModelConfig) object;
+//            String inModelId = allModelConfig.getInModelId();
+//            String outModelId = allModelConfig.getOutModelId();
+//            flowsCollector.getModelIds().add(inModelId);
+//            flowsCollector.getModelIds().add(outModelId);
+//        }
+//
+//        if(object instanceof OutModelConfig) {
+//            OutModelConfig outModelConfig = (OutModelConfig) object;
+//            String outModelId = outModelConfig.getOutModelId();
+//            flowsCollector.getModelIds().add(outModelId);
+//        }
+//
+//        if(object instanceof InModelConfig) {
+//            InModelConfig inModelConfig = (InModelConfig) object;
+//            String inModelId= inModelConfig.getInModelId();
+//            flowsCollector.getModelIds().add(inModelId);
+//        }
+//
+//        if(object instanceof AuthenticatorConfig) {
+//            AuthenticatorConfig authenticatorConfig = (AuthenticatorConfig) object;
+//            String authenticatorId = authenticatorConfig.getAuthenticatorId();
+//            flowsCollector.getAuthenticatorIds().add(authenticatorId);
+//        }
+//        if(object instanceof LimiterConfig) {
+//            LimiterConfig limiterConfig = (LimiterConfig) object;
+//            String limiterId = limiterConfig.getLimiterId();
+//            flowsCollector.getLimiterIds().add(limiterId);
+//        }
+//    }
+
+    @Override
+
     public Definitions exportWSDL() {
         List<SoapApiInfo> soapApiList = getExportSoapListeners();
         return WSDLUtils.buildDefinitions(soapApiList, runtimeLocation);
@@ -237,7 +542,7 @@ public class ExportServiceImpl implements ExportService {
         restFlowList.stream().forEach(flowEntity -> {
             ModuleEntity moduleEntity = moduleRepository.findByResourceKey(flowEntity.getModuleId());
             TriggerFlow triggerFlow = resourceBuilder.buildTriggerFlow(flowEntity);
-            if(triggerFlow.getInModel()!=null && triggerFlow.getOutModel()!=null) {
+            if (triggerFlow.getInModel() != null && triggerFlow.getOutModel() != null) {
                 apiInfo.add(new ApiInfo(moduleEntity.getName(), triggerFlow));
             }
         });

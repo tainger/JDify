@@ -25,4 +25,5 @@ public interface ExportService {
 
     Object exportApiDocs(String triggerType);
 
+    ExportData exportFlow(String ids);
 }

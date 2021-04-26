@@ -18,4 +18,6 @@ public class ExportData {
     private List<ClientEntity> clients;
     private List<PropertyEntity> properties;
     private List<TrantorEntity> trantorEntities;
+    private List<AuthenticatorEntity> authenticatorEntities;
+    private List<LimiterEntity> limiterEntities;
 }

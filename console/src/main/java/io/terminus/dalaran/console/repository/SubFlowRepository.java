@@ -5,6 +5,7 @@ import io.terminus.dalaran.model.flow.FlowStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public interface SubFlowRepository extends JpaRepository<SubFlowEntity, Long>, JpaSpecificationExecutor<SubFlowEntity> {
@@ -16,4 +17,6 @@ public interface SubFlowRepository extends JpaRepository<SubFlowEntity, Long>, J
     List<SubFlowEntity> findByStatusNotAndIsExistTrue(FlowStatus error);
 
     SubFlowEntity findByResourceKey(String resourceKey);
+
+    List<SubFlowEntity> findByResourceKeyIn(List<String> resourceKeys);
 }

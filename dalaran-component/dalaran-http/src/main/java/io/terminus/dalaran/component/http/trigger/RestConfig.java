@@ -3,6 +3,7 @@ package io.terminus.dalaran.component.http.trigger;
 import com.alibaba.fastjson.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.terminus.dalaran.FieldInputType;
+import io.terminus.dalaran.SourceType;
 import io.terminus.dalaran.component.authenticator.AuthenticatorRestConfig;
 import io.terminus.dalaran.component.authenticator.DalaranAuthenticator;
 import io.terminus.dalaran.component.common.HttpMethod;
@@ -24,7 +25,8 @@ public class RestConfig extends AllModelConfig implements  AuthenticatorConfig<D
     @JsonIgnore
     private DalaranLimiter limiter;
 
-    @ConfigFieldInfo(label = "限流熔断器", inputType = FieldInputType.Limiter, required = false, limiterType = DalaranLimiter.class)
+    @ConfigFieldInfo(label = "限流熔断器", inputType = FieldInputType.Limiter, required = false,
+            limiterType = DalaranLimiter.class, sourceType = SourceType.LIMITER)
     private String limiterId;
 
     @ConfigFieldInfo(label = "开启限流", inputType = FieldInputType.Switch, defaultValue = "false")
@@ -42,7 +44,8 @@ public class RestConfig extends AllModelConfig implements  AuthenticatorConfig<D
     @JsonIgnore
     private DalaranAuthenticator authenticator;
 
-    @ConfigFieldInfo(label = "鉴权器", inputType = FieldInputType.Authenticator, required = false, authenticatorType = AuthenticatorRestConfig.class)
+    @ConfigFieldInfo(label = "鉴权器", inputType = FieldInputType.Authenticator, required = false,
+            authenticatorType = AuthenticatorRestConfig.class, sourceType = SourceType.AUTHENTICATOR)
     private String authenticatorId;
 
 //    @ConfigFieldInfo(label = "开启鉴权", inputType = FieldInputType.Switch, defaultValue = "false")

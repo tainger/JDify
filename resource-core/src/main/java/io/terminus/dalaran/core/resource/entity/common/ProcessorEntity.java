@@ -24,6 +24,7 @@ public class ProcessorEntity {
     @Nullable
     private String config;
 
+
     public ProcessorEntity() {
 
     }

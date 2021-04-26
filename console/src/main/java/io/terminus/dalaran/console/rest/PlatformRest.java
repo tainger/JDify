@@ -229,6 +229,16 @@ public class PlatformRest implements PlatformInfoAPI, PlatformImportAPI, Platfor
         return exportService.exportOperationWSDL(operation).getAsString();
     }
 
+    @CrossOrigin
+    @ApiOperation(value = "批量导出流程")
+    @GetMapping(value = "/export/flow")
+    @OnException(code = ResponseMessage.CONFIG_EXPORT_ERROR)
+    public ExportData exportFlow(String ids, HttpServletResponse res) {
+        String currentDate = DateFormatUtils.format(new Date(), "yyyy-MM-dd HH:mm:ss");
+        res.addHeader("Content-Disposition", "attachment;filename=" + currentDate + ".dlr");
+        return exportService.exportFlow(ids);
+    }
+
     @Override
     @OnException(code = ResponseMessage.CONFIG_IMPORT_ERROR)
     public void importAll(@RequestParam MultipartFile importFile) {

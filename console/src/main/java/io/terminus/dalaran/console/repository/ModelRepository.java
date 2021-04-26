@@ -5,6 +5,7 @@ import io.terminus.dalaran.model.ModelTargetType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -35,4 +36,6 @@ public interface ModelRepository extends JpaRepository<ModelEntity, Long>, JpaSp
     List<ModelEntity> findByModuleIdAndIsExistTrue(String moduleId);
 
     ModelEntity findByResourceKey(String resourceKey);
+
+    List<ModelEntity> findByResourceKeyIn(List<String> resourceKeys);
 }
