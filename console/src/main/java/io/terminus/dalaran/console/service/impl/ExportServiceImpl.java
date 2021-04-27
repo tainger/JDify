@@ -5,10 +5,12 @@ import com.alibaba.fastjson.JSONObject;
 import com.predic8.wsdl.Definitions;
 import io.swagger.models.Swagger;
 import io.terminus.dalaran.SourceType;
+import io.terminus.dalaran.component.foreach.ForEachConfig;
 import io.terminus.dalaran.component.http.trigger.model.ApiInfo;
 import io.terminus.dalaran.component.http.trigger.utils.SwaggerUtils;
 import io.terminus.dalaran.component.loopwhile.LoopWhileConfig;
 import io.terminus.dalaran.component.multicast.ScatterGatherConfig;
+import io.terminus.dalaran.component.retry.RetryConfig;
 import io.terminus.dalaran.component.service.soap.SoapServiceConfig;
 import io.terminus.dalaran.component.soap.trigger.model.SoapApiInfo;
 import io.terminus.dalaran.component.soap.trigger.utils.WSDLUtils;
@@ -309,6 +311,7 @@ public class ExportServiceImpl implements ExportService {
             List<ProcessorRouteInfo> loopWhilePipeline = loopWhileConfig.getPipeline();
             for (ProcessorRouteInfo processorRouteInfo : loopWhilePipeline) {
                 ProcessorEntity loopWhileProcessorEntity = new ProcessorEntity();
+                BeanUtils.copyProperties(processorRouteInfo, loopWhileProcessorEntity);
                 collectProcessorResourceKey(loopWhileProcessorEntity);
             }
         }
@@ -319,6 +322,26 @@ public class ExportServiceImpl implements ExportService {
             ServiceEntity service = serviceRepository.findByResourceKey(serviceId);
             String serviceConfig = service.getServiceConfig();
             collectServiceResourceKey(serviceConfig);
+        }
+
+        if ("foreach".equals(type)) {
+            ForEachConfig forEachConfig = JSONObject.parseObject(processorEntityConfig, ForEachConfig.class);
+            List<ProcessorRouteInfo> pipeline = forEachConfig.getPipeline();
+            for (ProcessorRouteInfo processorRouteInfo : pipeline) {
+                ProcessorEntity loopWhileProcessorEntity = new ProcessorEntity();
+                BeanUtils.copyProperties(processorRouteInfo, loopWhileProcessorEntity);
+                collectProcessorResourceKey(loopWhileProcessorEntity);
+            }
+        }
+
+        if ("retry".equals(type)) {
+            RetryConfig retryConfig = JSONObject.parseObject(processorEntityConfig, RetryConfig.class);
+            List<ProcessorRouteInfo> pipeline = retryConfig.getPipeline();
+            for (ProcessorRouteInfo processorRouteInfo : pipeline) {
+                ProcessorEntity loopWhileProcessorEntity = new ProcessorEntity();
+                BeanUtils.copyProperties(processorRouteInfo, loopWhileProcessorEntity);
+                collectProcessorResourceKey(loopWhileProcessorEntity);
+            }
         }
         collectProcessResourceKey(processorEntity);
     }

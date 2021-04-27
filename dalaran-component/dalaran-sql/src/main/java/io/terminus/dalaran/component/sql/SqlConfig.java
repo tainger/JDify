@@ -3,6 +3,7 @@ package io.terminus.dalaran.component.sql;
 import com.alibaba.fastjson.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.terminus.dalaran.FieldInputType;
+import io.terminus.dalaran.SourceType;
 import io.terminus.dalaran.component.connector.SqlDataSourceConnector;
 import io.terminus.dalaran.core.component.annotation.ConfigFieldInfo;
 import io.terminus.dalaran.core.component.config.ConnectorConfig;
@@ -17,7 +18,8 @@ public class SqlConfig extends OutModelConfig implements ConnectorConfig<SqlData
     @JsonIgnore
     private SqlDataSourceConnector connector;
 
-    @ConfigFieldInfo(label = "DB 数据源", inputType = FieldInputType.Connector, connectorType = SqlDataSourceConnector.class)
+    @ConfigFieldInfo(label = "DB 数据源", inputType = FieldInputType.Connector,
+            connectorType = SqlDataSourceConnector.class, sourceType = SourceType.CONNECTOR)
     private String connectorId;
 
     @ConfigFieldInfo(label = "SQL 语句", inputType = FieldInputType.SQL)
