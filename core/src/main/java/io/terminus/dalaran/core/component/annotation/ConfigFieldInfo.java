@@ -21,6 +21,8 @@ public @interface ConfigFieldInfo {
 
     boolean readonly() default false;
 
+    boolean dynamic() default false;
+
     String inputType() default FieldInputType.Auto;
 
     Class connectorType() default Void.class;

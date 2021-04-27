@@ -67,4 +67,8 @@ public interface PlatformInfoAPI {
     @ApiOperation(value = "获取当前用户信息")
     @GetMapping(value = "/getUserInfo")
     UserInfo getUserInfo();
+
+    @ApiOperation(value = "获取动态配置结构")
+    @GetMapping(value = "/dynamicConfig")
+    Collection<DynamicConfigInfo> listDynamicConfigInfo();
 }

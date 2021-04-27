@@ -1,7 +1,6 @@
 package io.terminus.dalaran.component.http.trigger.processor;
 
-import io.terminus.dalaran.component.authenticator.AuthenticatorRestConfig;
-import io.terminus.dalaran.component.authenticator.AuthenticatorType;
+import io.terminus.dalaran.component.dynamic.DynamicAuthenticatorDefault;
 import io.terminus.dalaran.component.authenticator.DalaranAuthenticator;
 import io.terminus.dalaran.core.resource.redis.RedisService;
 import io.terminus.dalaran.model.authenticator.AuthenticatorKeyLocation;
@@ -36,24 +35,24 @@ public class AuthenticatorProcessor implements Processor {
     }
 
     void checkValue(Exchange exchange, Map<String, String> body) {
-        List<AuthenticatorRestConfig> authenticatorRestConfigs = authenticator.getConfig();
-        authenticatorRestConfigs.forEach(authenticatorRestConfig -> {
-            String value = authenticatorRestConfig.getAuthenticatorValue();
+        List<DynamicAuthenticatorDefault> dynamicAuthenticatorDefaults = authenticator.getConfig();
+        dynamicAuthenticatorDefaults.forEach(dynamicAuthenticatorDefault -> {
+            String value = dynamicAuthenticatorDefault.getAuthenticatorValue();
             String requestValue;
-            if (!authenticatorRestConfig.getIsStatic()) {
-                value = redisService.getValue("Authenticator-" + authenticatorRestConfig.getAuthenticatorKey());
+            if (!dynamicAuthenticatorDefault.getIsStatic()) {
+                value = redisService.getValue("Authenticator-" + dynamicAuthenticatorDefault.getAuthenticatorKey());
                 if (StringUtils.isBlank(value)) {
                     stopExchangeOnInvalidAppKey(exchange);
                     return;
                 }
             }
-            if (StringUtils.equals(authenticatorRestConfig.getKeyLocation().name(), AuthenticatorKeyLocation.Header.name())) {
-                requestValue = exchange.getIn().getHeader(authenticatorRestConfig.getAuthenticatorKey(), String.class);
-            } else if (authenticatorRestConfig.getKeyLocation() == AuthenticatorKeyLocation.QueryParam) {
-                requestValue = exchange.getIn().getHeader(authenticatorRestConfig.getAuthenticatorKey(), String.class);
+            if (StringUtils.equals(dynamicAuthenticatorDefault.getKeyLocation().name(), AuthenticatorKeyLocation.Header.name())) {
+                requestValue = exchange.getIn().getHeader(dynamicAuthenticatorDefault.getAuthenticatorKey(), String.class);
+            } else if (dynamicAuthenticatorDefault.getKeyLocation() == AuthenticatorKeyLocation.QueryParam) {
+                requestValue = exchange.getIn().getHeader(dynamicAuthenticatorDefault.getAuthenticatorKey(), String.class);
             } else {
                 if (body != null) {
-                    requestValue = body.get(authenticatorRestConfig.getAuthenticatorKey());
+                    requestValue = body.get(dynamicAuthenticatorDefault.getAuthenticatorKey());
                 } else {
                     requestValue = "";
                 }
@@ -67,25 +66,25 @@ public class AuthenticatorProcessor implements Processor {
 
     void checkGetValue(Exchange exchange, Map<String, String> param) {
         if (authenticator.getType().equals("Default")) {
-            List<AuthenticatorRestConfig> authenticatorRestConfigs = authenticator.getConfig();
-            authenticatorRestConfigs.forEach(authenticatorRestConfig -> {
-                String value = authenticatorRestConfig.getAuthenticatorValue();
+            List<DynamicAuthenticatorDefault> dynamicAuthenticatorDefaults = authenticator.getConfig();
+            dynamicAuthenticatorDefaults.forEach(dynamicAuthenticatorDefault -> {
+                String value = dynamicAuthenticatorDefault.getAuthenticatorValue();
                 String requestValue;
-                if (!authenticatorRestConfig.getIsStatic()) {
-                    value = redisService.getValue("Authenticator-" + authenticatorRestConfig.getAuthenticatorKey());
+                if (!dynamicAuthenticatorDefault.getIsStatic()) {
+                    value = redisService.getValue("Authenticator-" + dynamicAuthenticatorDefault.getAuthenticatorKey());
                     if (StringUtils.isBlank(value)) {
                         stopExchangeOnInvalidAppKey(exchange);
                         return;
                     }
                 }
-                if (authenticatorRestConfig.getKeyLocation() == AuthenticatorKeyLocation.Header) {
-                    requestValue = exchange.getIn().getHeader(authenticatorRestConfig.getAuthenticatorKey(), String.class);
-                } else if (authenticatorRestConfig.getKeyLocation() == AuthenticatorKeyLocation.Body) {
+                if (dynamicAuthenticatorDefault.getKeyLocation() == AuthenticatorKeyLocation.Header) {
+                    requestValue = exchange.getIn().getHeader(dynamicAuthenticatorDefault.getAuthenticatorKey(), String.class);
+                } else if (dynamicAuthenticatorDefault.getKeyLocation() == AuthenticatorKeyLocation.Body) {
                     Map<String, String> body = exchange.getIn().getBody(Map.class);
-                    requestValue = body.get(authenticatorRestConfig.getAuthenticatorKey());
+                    requestValue = body.get(dynamicAuthenticatorDefault.getAuthenticatorKey());
                 } else {
                     if (param != null) {
-                        requestValue = param.get(authenticatorRestConfig.getAuthenticatorKey());
+                        requestValue = param.get(dynamicAuthenticatorDefault.getAuthenticatorKey());
                     } else {
                         requestValue = "";
                     }
