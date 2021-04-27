@@ -51,7 +51,8 @@ import io.terminus.dalaran.model.ModelTargetType;
 import io.terminus.dalaran.model.component.ProcessorRouteInfo;
 import io.terminus.dalaran.model.dto.*;
 import io.terminus.dalaran.model.dto.basic.BasicFlowInfo;
-import io.terminus.dalaran.model.dto.flow.BindAlarmRuleDto;
+import io.terminus.dalaran.model.dto.flow.BasicFlowInfoDTO;
+import io.terminus.dalaran.model.dto.flow.BindAlarmRuleDTO;
 import io.terminus.dalaran.model.dto.flow.ImportFlowDTO;
 import io.terminus.dalaran.model.dto.flow.TriggerFlowDTO;
 import io.terminus.dalaran.model.flow.FlowStatus;
@@ -75,8 +76,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import javax.transaction.Transactional;
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -663,7 +664,7 @@ public class FlowManagementServiceImpl implements FlowManagementService {
 
     //todo 事务
     @Override
-    public ResponseResult bindAlarm(BindAlarmRuleDto bindAlarmRuleDto) {
+    public ResponseResult bindAlarm(BindAlarmRuleDTO bindAlarmRuleDto) {
         if (bindAlarmRuleDto.getFlowId() == null || bindAlarmRuleDto.getAlarmRuleId() == null) {
             return fail(ResponseErrorMsg.PARAM_IS_NULL);
         }
@@ -697,6 +698,24 @@ public class FlowManagementServiceImpl implements FlowManagementService {
             return fail(e.getMessage());
         }
         return success();
+    }
+
+    @Override
+    public List<BasicFlowInfoDTO> listBasicInfo() {
+        List<TriggerFlowEntity> triggerFlowEntities = flowRepository.findByIsExistTrue();
+        List<BasicFlowInfoDTO> models = new LinkedList<>();
+        for (TriggerFlowEntity entity : triggerFlowEntities) {
+            BasicFlowInfoDTO basicFlowInfoDTO = new BasicFlowInfoDTO();
+            try {
+                BeanUtils.copyProperties(basicFlowInfoDTO, entity);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            basicFlowInfoDTO.setId(entity.getResourceKey());
+            basicFlowInfoDTO.setModuleName(moduleRepository.findByResourceKey(entity.getModuleId()).getName());
+            models.add(basicFlowInfoDTO);
+        }
+        return models;
     }
 
     public ResponseResult isOnline(TriggerFlowDTO flowDTO, boolean isOnline) {

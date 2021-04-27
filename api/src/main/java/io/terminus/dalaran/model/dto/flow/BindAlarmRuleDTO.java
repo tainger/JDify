@@ -2,8 +2,8 @@ package io.terminus.dalaran.model.dto.flow;
 
 import lombok.Data;
 
-
-public class BindAlarmRuleDto {
+@Data
+public class BindAlarmRuleDTO {
 
     private boolean isMonitor;
 

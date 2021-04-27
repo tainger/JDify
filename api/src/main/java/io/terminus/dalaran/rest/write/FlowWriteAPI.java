@@ -7,7 +7,7 @@ import io.terminus.dalaran.exception.flow.UpdateFlowException;
 import io.terminus.dalaran.model.BasicResponse;
 import io.terminus.dalaran.model.CreateResponse;
 import io.terminus.dalaran.model.dto.*;
-import io.terminus.dalaran.model.dto.flow.BindAlarmRuleDto;
+import io.terminus.dalaran.model.dto.flow.BindAlarmRuleDTO;
 import io.terminus.dalaran.model.dto.flow.ImportFlowDTO;
 import io.terminus.dalaran.model.dto.flow.TriggerFlowDTO;
 import io.terminus.dalaran.response.ResponseResult;
@@ -62,5 +62,5 @@ public interface FlowWriteAPI {
 
     @ApiOperation(value = "流程绑定报警")
     @PostMapping(value = "/trigger/bind")
-    ResponseResult bindAlarm(@RequestBody BindAlarmRuleDto bindAlarmRuleDto);
+    ResponseResult bindAlarm(@RequestBody BindAlarmRuleDTO bindAlarmRuleDTO);
 }

@@ -5,7 +5,8 @@ import io.terminus.dalaran.exception.flow.FlowNotExistException;
 import io.terminus.dalaran.model.BasicResponse;
 import io.terminus.dalaran.model.dto.*;
 import io.terminus.dalaran.model.dto.basic.BasicFlowInfo;
-import io.terminus.dalaran.model.dto.flow.BindAlarmRuleDto;
+import io.terminus.dalaran.model.dto.flow.BasicFlowInfoDTO;
+import io.terminus.dalaran.model.dto.flow.BindAlarmRuleDTO;
 import io.terminus.dalaran.model.dto.flow.ImportFlowDTO;
 import io.terminus.dalaran.model.dto.flow.TriggerFlowDTO;
 import io.terminus.dalaran.model.flow.FlowValidation;
@@ -59,5 +60,7 @@ public interface FlowManagementService {
 
     ResponseResult online(TriggerFlowDTO flowDTO);
 
-    ResponseResult bindAlarm(BindAlarmRuleDto bindAlarmRuleDto);
+    ResponseResult bindAlarm(BindAlarmRuleDTO bindAlarmRuleDto);
+
+    List<BasicFlowInfoDTO> listBasicInfo();
 }

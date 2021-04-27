@@ -37,6 +37,7 @@ import io.terminus.dalaran.core.resource.repository.ModuleRepository;
 import io.terminus.dalaran.model.component.ProcessorRouteInfo;
 import io.terminus.dalaran.model.flow.FlowStatus;
 import io.terminus.dalaran.model.flow.TriggerFlow;
+import io.terminus.dalaran.model.soap.model.SoapOperationConfig;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.metamodel.spi.MetamodelImplementor;
 import org.hibernate.persister.entity.AbstractEntityPersister;
@@ -45,7 +46,6 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
 import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
 import java.io.File;
@@ -318,44 +318,19 @@ public class ExportServiceImpl implements ExportService {
             String serviceId = serviceOperationConfig.getServiceId();
             ServiceEntity service = serviceRepository.findByResourceKey(serviceId);
             String serviceConfig = service.getServiceConfig();
-            collectServiceResourceKey(type, serviceConfig);
+            collectServiceResourceKey(serviceConfig);
         }
         collectProcessResourceKey(processorEntity);
     }
 
-    private void collectServiceResourceKey(String type, String config) {
-        String processorClassName = getProcessorClassName(type);
-        Class<?> configClass = null;
-        try {
-            configClass = Class.forName(processorClassName);
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-        Object object = JSONObject.parseObject(config, configClass);
-        List<Field> fields = new ArrayList<>();
-        while (null != configClass) {
-            List<Field> fieldList = Arrays.asList(configClass.getDeclaredFields());
-            fields.addAll(fieldList);
-            configClass = configClass.getSuperclass();
-        }
-        for (Field declaredField : fields) {
-            ConfigFieldInfo configFieldInfo = declaredField.getDeclaredAnnotation(ConfigFieldInfo.class);
-            if (configFieldInfo == null) {
-                continue;
-            }
-            String sourceType = configFieldInfo.sourceType();
-            if (StringUtils.EMPTY.equals(sourceType)) {
-                continue;
-            }
-            String resourceKey = null;
-            try {
-                declaredField.setAccessible(true);
-
-                resourceKey = (String) declaredField.get(object);
-                flowsCollector.collect(sourceType, resourceKey);
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            }
+    private void collectServiceResourceKey(String config) {
+        SoapServiceConfig soapServiceConfig = JSONObject.parseObject(config, SoapServiceConfig.class);
+        List<SoapOperationConfig> configs = soapServiceConfig.getConfigs();
+        for (SoapOperationConfig soapOperationConfig : configs) {
+            String inModelId = soapOperationConfig.getInModelId();
+            String outModelId = soapOperationConfig.getOutModelId();
+            flowsCollector.collect(SourceType.MODEL, inModelId);
+            flowsCollector.collect(SourceType.MODEL, outModelId);
         }
     }
 
@@ -388,7 +363,6 @@ public class ExportServiceImpl implements ExportService {
             String resourceKey = null;
             try {
                 declaredField.setAccessible(true);
-
                 resourceKey = (String) declaredField.get(object);
                 flowsCollector.collect(sourceType, resourceKey);
             } catch (IllegalAccessException e) {
@@ -432,6 +406,9 @@ public class ExportServiceImpl implements ExportService {
                 try {
                     declaredField.setAccessible(true);
                     resourceKey = (String) declaredField.get(object);
+                    if(StringUtils.isEmpty(resourceKey)){
+                        continue;
+                    }
                     flowsCollector.collect(sourceType, resourceKey);
                 } catch (IllegalAccessException e) {
                     e.printStackTrace();
@@ -447,7 +424,7 @@ public class ExportServiceImpl implements ExportService {
 
 
     public String getProcessorClassName(String processorType) {
-        return dalaranComponentContext.getTriggerConfigMap().get(processorType);
+        return dalaranComponentContext.getProcessorConfigMap().get(processorType);
     }
 
     public String getSoapConfigClassName(String soapType) {
