@@ -138,6 +138,8 @@ public class ExportServiceImpl implements ExportService {
         exportData.getClients().forEach(client -> client.setExist(true));
         exportData.getConnectors().forEach(connector -> connector.setExist(true));
         exportData.getFunctions().forEach(function -> function.setExist(true));
+        exportData.getAuthenticatorEntities().forEach(authenticatorEntity -> authenticatorEntity.setExist(true));
+        exportData.getLimiterEntities().forEach(limiterEntity -> limiterEntity.setExist(true));
         moduleRepository.saveAll(exportData.getModules());
         modelRepository.saveAll(exportData.getModels());
         triggerFlowRepository.saveAll(exportData.getTriggerFlows());
@@ -148,7 +150,8 @@ public class ExportServiceImpl implements ExportService {
         clientRepository.saveAll(exportData.getClients());
         propertyRepository.saveAll(exportData.getProperties());
         trantorRepository.saveAll(exportData.getTrantorEntities());
-
+        limiterRepository.saveAll(exportData.getLimiterEntities());
+        authenticatorRepository.saveAll(exportData.getAuthenticatorEntities());
         // load test flow
         testFlowInitializer.start();
     }
