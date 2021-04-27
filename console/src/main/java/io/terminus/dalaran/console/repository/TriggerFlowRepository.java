@@ -21,4 +21,5 @@ public interface TriggerFlowRepository extends JpaRepository<TriggerFlowEntity, 
 
     TriggerFlowEntity findByResourceKey(String resourceKey);
 
+    List<TriggerFlowEntity> findByResourceKeyIn(List<String> resourceKeys);
 }

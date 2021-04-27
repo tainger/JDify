@@ -4,6 +4,8 @@ import io.terminus.dalaran.config.ServiceInfo;
 import io.terminus.dalaran.core.component.DalaranService;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 public interface DalaranServiceContext {
 
@@ -12,4 +14,6 @@ public interface DalaranServiceContext {
     ServiceInfo getServiceInfo(String serviceType);
 
     Collection<ServiceInfo> getAllServiceInfo();
+
+    Map<String, String> getConfigClassMap();
 }

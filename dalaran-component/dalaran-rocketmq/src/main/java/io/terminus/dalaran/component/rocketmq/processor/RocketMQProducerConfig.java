@@ -3,6 +3,7 @@ package io.terminus.dalaran.component.rocketmq.processor;
 import com.alibaba.fastjson.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.terminus.dalaran.FieldInputType;
+import io.terminus.dalaran.SourceType;
 import io.terminus.dalaran.component.connector.RocketMQConnector;
 import io.terminus.dalaran.core.component.annotation.ConfigFieldInfo;
 import io.terminus.dalaran.core.component.config.ConnectorConfig;
@@ -20,7 +21,8 @@ public class RocketMQProducerConfig extends OutModelConfig implements ConnectorC
     @JsonIgnore
     private RocketMQConnector connector;
 
-    @ConfigFieldInfo(label = "RocketMQ 连接器", inputType = FieldInputType.Connector, connectorType = RocketMQConnector.class)
+    @ConfigFieldInfo(label = "RocketMQ 连接器", inputType = FieldInputType.Connector,
+            connectorType = RocketMQConnector.class, sourceType = SourceType.CONNECTOR)
     private String connectorId;
 
     @ConfigFieldInfo(label = "主题", inputType = FieldInputType.String)

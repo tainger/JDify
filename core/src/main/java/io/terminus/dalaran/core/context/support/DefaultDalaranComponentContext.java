@@ -34,6 +34,9 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext {
     private final Map<String, TriggerInfo> triggerInfoMapping = new ConcurrentHashMap<>();
     private final Map<String, ProcessorInfo> processorInfoMapping = new ConcurrentHashMap<>();
 
+    private final Map<String, String> triggerConfig = new ConcurrentHashMap<>();
+    private final Map<String, String> processorConfig = new ConcurrentHashMap<>();
+
     private final Map<String, ConnectorInfo> connectorInfoMapping = new ConcurrentHashMap<>();
 
     private final Map<String, BasicComponentInfo> basicComponentInfoMap = new ConcurrentHashMap<>();
@@ -262,6 +265,8 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext {
             }
             triggerInfoMapping.put(triggerType, triggerInfo);
             triggerMapping.put(triggerType, trigger);
+            triggerMapping.put(triggerType, trigger);
+            triggerConfig.put(triggerType, triggerAnnotation.configType().getName());
         }
         log.info("load trigger {}", triggerAnnotation);
     }
@@ -296,6 +301,8 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext {
 
             processorInfoMapping.put(processorType, processorInfo);
             processorMapping.put(processorType, processor);
+
+            processorConfig.put(processorType, processorAnnotation.configType().getName());
 
             Map<String, Map<String, ProcessorInfo>> processorInfos = groupProcessorInfo.get(group);
             if (MapUtils.isEmpty(processorInfos)) {
@@ -341,6 +348,16 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext {
     @Override
     public Map<String, Map<String, Map<String, ProcessorInfo>>> listAllGroupProcessor() {
         return groupProcessorInfo;
+    }
+
+    @Override
+    public Map<String, String> getTriggerConfigMap() {
+        return triggerConfig;
+    }
+
+    @Override
+    public Map<String, String> getProcessorConfigMap() {
+        return processorConfig;
     }
 
     private ConnectorInfo buildConnectorInfo(ComponentType component, Class classType, Connector connector, String componentName) {

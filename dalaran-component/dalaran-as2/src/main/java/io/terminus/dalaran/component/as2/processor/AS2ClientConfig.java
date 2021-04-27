@@ -3,6 +3,7 @@ package io.terminus.dalaran.component.as2.processor;
 import com.alibaba.fastjson.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.terminus.dalaran.FieldInputType;
+import io.terminus.dalaran.SourceType;
 import io.terminus.dalaran.component.connector.AS2Connector;
 import io.terminus.dalaran.core.component.annotation.ConfigFieldInfo;
 import io.terminus.dalaran.core.component.config.ConnectorConfig;
@@ -17,7 +18,8 @@ public class AS2ClientConfig extends OutModelConfig implements ConnectorConfig<A
     @JsonIgnore
     private AS2Connector connector;
 
-    @ConfigFieldInfo(label = "AS2 连接器", inputType = FieldInputType.Connector, connectorType = AS2Connector.class)
+    @ConfigFieldInfo(label = "AS2 连接器", inputType = FieldInputType.Connector,
+            connectorType = AS2Connector.class, sourceType = SourceType.CONNECTOR)
     private String connectorId;
 
     @ConfigFieldInfo(label = "路径", inputType = FieldInputType.String, defaultValue = "/")

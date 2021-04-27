@@ -1,6 +1,7 @@
 package io.terminus.dalaran.component.mail.camel;
 
 import io.terminus.dalaran.FieldInputType;
+import io.terminus.dalaran.SourceType;
 import io.terminus.dalaran.component.connector.MailConnector;
 import io.terminus.dalaran.core.component.annotation.ConfigFieldInfo;
 import io.terminus.dalaran.core.component.config.ConnectorConfig;
@@ -12,7 +13,8 @@ public class DalaranMailSenderConfig implements ConnectorConfig<MailConnector> {
     @ConfigFieldInfo(inputType = FieldInputType.Hidden)
     private MailConnector connector;
 
-    @ConfigFieldInfo(label = "Mail 连接器", inputType = FieldInputType.Connector, connectorType = MailConnector.class)
+    @ConfigFieldInfo(label = "Mail 连接器", inputType = FieldInputType.Connector,
+            connectorType = MailConnector.class, sourceType = SourceType.CONNECTOR)
     private String connectorId;
 
 //    @ConfigFieldInfo(label = "收件人(逗号分隔)", inputType = FieldInputType.Switch, defaultValue = "false")

@@ -3,6 +3,7 @@ package io.terminus.dalaran.component.http.processor;
 import com.alibaba.fastjson.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.terminus.dalaran.FieldInputType;
+import io.terminus.dalaran.SourceType;
 import io.terminus.dalaran.component.common.ContentType;
 import io.terminus.dalaran.component.common.HttpMethod;
 import io.terminus.dalaran.component.connector.RestClientConnector;
@@ -19,7 +20,8 @@ public class HttpClientConfig extends OutModelConfig implements ConnectorConfig<
     @JsonIgnore
     private RestClientConnector connector;
 
-    @ConfigFieldInfo(label = "Http 连接器", inputType = FieldInputType.Connector, connectorType = RestClientConnector.class)
+    @ConfigFieldInfo(label = "Http 连接器", inputType = FieldInputType.Connector,
+            connectorType = RestClientConnector.class, sourceType = SourceType.CONNECTOR)
     private String connectorId;
 
     @ConfigFieldInfo(label = "Http Method", inputType = FieldInputType.Select, defaultValue = "GET")

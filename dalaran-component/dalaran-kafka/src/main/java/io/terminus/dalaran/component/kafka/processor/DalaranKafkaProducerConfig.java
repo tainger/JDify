@@ -3,6 +3,7 @@ package io.terminus.dalaran.component.kafka.processor;
 import com.alibaba.fastjson.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.terminus.dalaran.FieldInputType;
+import io.terminus.dalaran.SourceType;
 import io.terminus.dalaran.component.connector.KafkaConnector;
 import io.terminus.dalaran.core.component.annotation.ConfigFieldInfo;
 import io.terminus.dalaran.core.component.config.ConnectorConfig;
@@ -20,7 +21,8 @@ public class DalaranKafkaProducerConfig extends OutModelConfig implements Connec
     @JsonIgnore
     private KafkaConnector connector;
 
-    @ConfigFieldInfo(label = "kafka 连接器", inputType = FieldInputType.Connector, connectorType = KafkaConnector.class)
+    @ConfigFieldInfo(label = "kafka 连接器", inputType = FieldInputType.Connector,
+            connectorType = KafkaConnector.class, sourceType = SourceType.CONNECTOR)
     private String connectorId;
 
     @ConfigFieldInfo(label = "主题", inputType = FieldInputType.String)

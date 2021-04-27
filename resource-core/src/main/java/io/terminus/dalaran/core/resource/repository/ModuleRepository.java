@@ -4,6 +4,7 @@ import io.terminus.dalaran.core.resource.entity.common.ModuleEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -16,4 +17,6 @@ public interface ModuleRepository extends JpaRepository<ModuleEntity, Long>, Jpa
     ModuleEntity findByIdAndIsExistTrue(Long id);
 
     ModuleEntity findByResourceKey(String resourceKey);
+
+    List<ModuleEntity> findByResourceKeyIn(ArrayList<String> resourceKeys);
 }

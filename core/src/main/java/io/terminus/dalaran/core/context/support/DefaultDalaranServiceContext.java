@@ -22,6 +22,9 @@ public class DefaultDalaranServiceContext implements DalaranServiceContext, Appl
     private final Map<String, DalaranService> serviceMapping = new ConcurrentHashMap<>();
     private final Map<String, ServiceInfo> serviceInfoMapping = new ConcurrentHashMap<>();
 
+    private final Map<String, String> serviceConfigClassMapping = new ConcurrentHashMap<>();
+
+
     @PostConstruct
     public void loadComponents() {
         Map<String, DalaranService> serviceBeanMap = applicationContext.getBeansOfType(DalaranService.class);
@@ -35,7 +38,7 @@ public class DefaultDalaranServiceContext implements DalaranServiceContext, Appl
 
             DalaranConfigField[] importConfigFields = ConfigFieldUtils.buildConfigFields(serviceAnnotation.importConfigType());
             serviceInfo.setConfigFields(importConfigFields);
-
+            serviceConfigClassMapping.put(serviceAnnotation.value(), serviceAnnotation.serviceConfigType().getName());
             serviceMapping.put(serviceAnnotation.value(), bean);
             serviceInfoMapping.put(serviceAnnotation.value(), serviceInfo);
         });
@@ -54,6 +57,11 @@ public class DefaultDalaranServiceContext implements DalaranServiceContext, Appl
     @Override
     public Collection<ServiceInfo> getAllServiceInfo() {
         return serviceInfoMapping.values();
+    }
+
+    @Override
+    public Map<String, String> getConfigClassMap() {
+        return serviceConfigClassMapping;
     }
 
     @Override

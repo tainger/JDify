@@ -14,7 +14,8 @@ import io.terminus.dalaran.exception.flow.UpdateFlowException;
 import io.terminus.dalaran.model.BasicResponse;
 import io.terminus.dalaran.model.CreateResponse;
 import io.terminus.dalaran.model.dto.*;
-import io.terminus.dalaran.model.dto.flow.BindAlarmRuleDto;
+import io.terminus.dalaran.model.dto.flow.BasicFlowInfoDTO;
+import io.terminus.dalaran.model.dto.flow.BindAlarmRuleDTO;
 import io.terminus.dalaran.model.dto.flow.ImportFlowDTO;
 import io.terminus.dalaran.model.dto.flow.TriggerFlowDTO;
 import io.terminus.dalaran.model.dto.log.MainLogDTO;
@@ -94,6 +95,12 @@ public class FlowManagementRest implements FlowReadAPI, FlowWriteAPI {
     }
 
     @Override
+    @OnException(code = ResponseMessage.FLOW_QUERY_ERROR)
+    public List<BasicFlowInfoDTO> listBasicInfo() {
+        return flowManagementService.listBasicInfo();
+    }
+
+    @Override
     public ResponseResult offline(@RequestBody TriggerFlowDTO flowDTO) {
         return flowManagementService.offline(flowDTO);
     }
@@ -110,7 +117,7 @@ public class FlowManagementRest implements FlowReadAPI, FlowWriteAPI {
     }
 
     @Override
-    public ResponseResult bindAlarm(BindAlarmRuleDto bindAlarmRuleDto) {
+    public ResponseResult bindAlarm(BindAlarmRuleDTO bindAlarmRuleDto) {
         return flowManagementService.bindAlarm(bindAlarmRuleDto);
     }
 

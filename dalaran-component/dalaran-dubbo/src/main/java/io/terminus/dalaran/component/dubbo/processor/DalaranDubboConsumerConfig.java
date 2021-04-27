@@ -3,6 +3,7 @@ package io.terminus.dalaran.component.dubbo.processor;
 import com.alibaba.fastjson.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.terminus.dalaran.FieldInputType;
+import io.terminus.dalaran.SourceType;
 import io.terminus.dalaran.component.connector.DubboRegistryConnector;
 import io.terminus.dalaran.core.component.annotation.ConfigFieldInfo;
 import io.terminus.dalaran.core.component.config.ConnectorConfig;
@@ -12,7 +13,8 @@ import lombok.Data;
 @Data
 public class DalaranDubboConsumerConfig extends OutModelConfig implements ConnectorConfig<DubboRegistryConnector> {
 
-    @ConfigFieldInfo(label = "注册中心", inputType = FieldInputType.Connector, connectorType = DubboRegistryConnector.class)
+    @ConfigFieldInfo(label = "注册中心", inputType = FieldInputType.Connector,
+            connectorType = DubboRegistryConnector.class, sourceType = SourceType.CONNECTOR)
     private String connectorId;
 
     @ConfigFieldInfo(inputType = FieldInputType.Hidden)

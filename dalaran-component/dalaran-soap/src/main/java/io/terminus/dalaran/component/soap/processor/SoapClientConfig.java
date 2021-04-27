@@ -21,7 +21,8 @@ public class SoapClientConfig extends OutModelConfig implements ConnectorConfig<
     @JsonIgnore
     private SoapClientConnector connector;
 
-    @ConfigFieldInfo(label = "SOAP 连接器", inputType = FieldInputType.Connector, connectorType = SoapClientConnector.class)
+    @ConfigFieldInfo(label = "SOAP 连接器", inputType = FieldInputType.Connector,
+            connectorType = SoapClientConnector.class)
     private String connectorId;
 
     @ConfigFieldInfo(label = "Http Method", inputType = FieldInputType.Select, defaultValue = "POST")

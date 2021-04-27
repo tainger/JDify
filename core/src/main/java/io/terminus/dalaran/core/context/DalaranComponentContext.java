@@ -39,4 +39,8 @@ public interface DalaranComponentContext {
     Collection<BasicComponentInfo> getAllBasicComponentInfo();
 
     Map<String, Map<String, Map<String, ProcessorInfo>>> listAllGroupProcessor();
+
+    Map<String, String> getTriggerConfigMap();
+
+    Map<String, String> getProcessorConfigMap();
 }
