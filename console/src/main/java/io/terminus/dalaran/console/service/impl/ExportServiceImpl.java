@@ -129,29 +129,55 @@ public class ExportServiceImpl implements ExportService {
     @Transactional
     public void importAll(ExportData exportData) throws IOException {
         truncateTable();
+        if(null != exportData.getModules()){
+            exportData.getModules().forEach(module -> module.setExist(true));
+            moduleRepository.saveAll(exportData.getModules());
+        }
 
-        exportData.getModules().forEach(module -> module.setExist(true));
-        exportData.getModels().forEach(model -> model.setExist(true));
-        exportData.getTriggerFlows().forEach(triggerFlow -> triggerFlow.setExist(true));
-        exportData.getSubFlows().forEach(subFlow -> subFlow.setExist(true));
-        exportData.getServices().forEach(service -> service.setExist(true));
-        exportData.getClients().forEach(client -> client.setExist(true));
-        exportData.getConnectors().forEach(connector -> connector.setExist(true));
-        exportData.getFunctions().forEach(function -> function.setExist(true));
-        exportData.getAuthenticatorEntities().forEach(authenticatorEntity -> authenticatorEntity.setExist(true));
-        exportData.getLimiterEntities().forEach(limiterEntity -> limiterEntity.setExist(true));
-        moduleRepository.saveAll(exportData.getModules());
-        modelRepository.saveAll(exportData.getModels());
-        triggerFlowRepository.saveAll(exportData.getTriggerFlows());
-        subFlowRepository.saveAll(exportData.getSubFlows());
-        serviceRepository.saveAll(exportData.getServices());
-        functionRepository.saveAll(exportData.getFunctions());
-        connectorRepository.saveAll(exportData.getConnectors());
-        clientRepository.saveAll(exportData.getClients());
-        propertyRepository.saveAll(exportData.getProperties());
-        trantorRepository.saveAll(exportData.getTrantorEntities());
-        limiterRepository.saveAll(exportData.getLimiterEntities());
-        authenticatorRepository.saveAll(exportData.getAuthenticatorEntities());
+        if(null != exportData.getModels()) {
+            exportData.getModels().forEach(model -> model.setExist(true));
+            modelRepository.saveAll(exportData.getModels());
+        }
+
+        if(null != exportData.getTriggerFlows()) {
+            exportData.getTriggerFlows().forEach(triggerFlow -> triggerFlow.setExist(true));
+            triggerFlowRepository.saveAll(exportData.getTriggerFlows());
+        }
+
+        if(null !=  exportData.getSubFlows()) {
+            exportData.getSubFlows().forEach(subFlow -> subFlow.setExist(true));
+            subFlowRepository.saveAll(exportData.getSubFlows());
+        }
+
+        if(null !=  exportData.getServices()) {
+            exportData.getServices().forEach(service -> service.setExist(true));
+            serviceRepository.saveAll(exportData.getServices());
+        }
+
+        if(null !=   exportData.getClients()) {
+            exportData.getClients().forEach(client -> client.setExist(true));
+            clientRepository.saveAll(exportData.getClients());
+        }
+
+        if(null !=   exportData.getConnectors()) {
+            exportData.getConnectors().forEach(connector -> connector.setExist(true));
+            connectorRepository.saveAll(exportData.getConnectors());
+        }
+
+        if(null != exportData.getFunctions()) {
+            exportData.getFunctions().forEach(function -> function.setExist(true));
+            functionRepository.saveAll(exportData.getFunctions());
+        }
+
+        if(null != exportData.getAuthenticatorEntities()) {
+            exportData.getAuthenticatorEntities().forEach(authenticatorEntity -> authenticatorEntity.setExist(true));
+            authenticatorRepository.saveAll(exportData.getAuthenticatorEntities());
+        }
+
+        if(null !=  exportData.getLimiterEntities()) {
+            exportData.getLimiterEntities().forEach(limiterEntity -> limiterEntity.setExist(true));
+            limiterRepository.saveAll(exportData.getLimiterEntities());
+        }
         // load test flow
         testFlowInitializer.start();
     }
