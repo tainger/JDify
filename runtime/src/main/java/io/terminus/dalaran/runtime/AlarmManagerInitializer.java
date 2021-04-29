@@ -43,7 +43,6 @@ public class AlarmManagerInitializer implements DalaranStarter {
     }
 
     private void monitor(String timeToMonitor) {
-        try {
             String flowInfosStr = redisService.getValue(RedisUtil.getReleasedFlowIdsKey());
             if (flowInfosStr == null) {
                 return;
@@ -57,13 +56,10 @@ public class AlarmManagerInitializer implements DalaranStarter {
                 redisService.deleteKey(RedisUtil.getTimeOutKey(id, timeToMonitor));
                 String alarmConfigStr = getAlarmConfigIfAlarmConfigKey(id);
                 if (null == alarmConfigStr) {
-                    log.error("没有流程{}的报警配置", id);
                     continue;
                 }
                 AlarmRuleConfig alarmRuleConfig = JSONObject.parseObject(alarmConfigStr, AlarmRuleConfig.class);
-                log.error("-------------报警规则：----{}----", alarmRuleConfig);
                 NoticeMessage noticeMessage = new NoticeMessage();
-                log.error("-------------failureCount：----{}----", failureCountStr);
                 if (failureCountStr != null) {
                     int failureCount = Integer.parseInt(failureCountStr);
                     if (alarmRuleConfig.getFailureAlarm().getIsOpen() && failureCount >= alarmRuleConfig.getFailureAlarm().getFailureFrequency()) {
@@ -85,18 +81,13 @@ public class AlarmManagerInitializer implements DalaranStarter {
                 noticeMessage.setFlowName(name);
                 sendNotice(noticeMessage, alarmRuleConfig.getAlarmChannel());
             }
-        } catch (Exception e) {
-            log.error("---读取方式:--{}----", RequestID.getExceptionStackTrace(e));
-        }
     }
 
     private void sendNotice(NoticeMessage noticeMessage, Map<AlarmRuleConfig.ChannelType, String> alarmChannel) {
-        log.error("---------通知渠道 {} -------------", alarmChannel);
         for (Map.Entry<AlarmRuleConfig.ChannelType, String> entry : alarmChannel.entrySet()) {
             AlarmRuleConfig.ChannelType channelType = entry.getKey();
             String contactWays = entry.getValue();
             noticeMessage.setContactWays(contactWays.split(","));
-            log.error("---------联系人的方式为 {} -------------", contactWays);
             switch (channelType) {
                 case mail:
                     dalaranNotice.sendEmail(noticeMessage);
