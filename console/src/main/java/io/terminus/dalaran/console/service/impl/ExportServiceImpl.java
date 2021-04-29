@@ -17,9 +17,7 @@ import io.terminus.dalaran.component.soap.trigger.utils.WSDLUtils;
 import io.terminus.dalaran.component.subflow.DalaranSubFlowConfig;
 import io.terminus.dalaran.console.ExportData;
 import io.terminus.dalaran.console.TestFlowInitializer;
-import io.terminus.dalaran.console.entity.ServiceEntity;
-import io.terminus.dalaran.console.entity.SubFlowEntity;
-import io.terminus.dalaran.console.entity.TriggerFlowEntity;
+import io.terminus.dalaran.console.entity.*;
 import io.terminus.dalaran.console.model.FlowResourceCollector;
 import io.terminus.dalaran.console.repository.*;
 import io.terminus.dalaran.console.service.ExportService;
@@ -130,52 +128,112 @@ public class ExportServiceImpl implements ExportService {
     public void importAll(ExportData exportData) throws IOException {
         truncateTable();
         if(null != exportData.getModules()){
-            exportData.getModules().forEach(module -> module.setExist(true));
+            exportData.getModules().forEach(module -> {
+                module.setExist(true);
+                ModuleEntity moduleEntity = moduleRepository.findByResourceKey(module.getResourceKey());
+                if(null != moduleEntity) {
+                   module.setId(moduleEntity.getId());
+                }
+            });
             moduleRepository.saveAll(exportData.getModules());
         }
 
         if(null != exportData.getModels()) {
-            exportData.getModels().forEach(model -> model.setExist(true));
+            exportData.getModels().forEach(model -> {
+                model.setExist(true);
+                ModelEntity modelEntity = modelRepository.findByResourceKey(model.getResourceKey());
+                if(null != modelEntity) {
+                    model.setId(modelEntity.getId());
+                }
+            });
             modelRepository.saveAll(exportData.getModels());
         }
 
         if(null != exportData.getTriggerFlows()) {
-            exportData.getTriggerFlows().forEach(triggerFlow -> triggerFlow.setExist(true));
+            exportData.getTriggerFlows().forEach(triggerFlow -> {
+                triggerFlow.setExist(true);
+                TriggerFlowEntity triggerFlowEntity = triggerFlowRepository.findByResourceKey(triggerFlow.getResourceKey());
+                if(null != triggerFlowEntity) {
+                    triggerFlow.setId(triggerFlowEntity.getId());
+                }
+            });
             triggerFlowRepository.saveAll(exportData.getTriggerFlows());
         }
 
         if(null !=  exportData.getSubFlows()) {
-            exportData.getSubFlows().forEach(subFlow -> subFlow.setExist(true));
+            exportData.getSubFlows().forEach(subFlow -> {
+                subFlow.setExist(true);
+                SubFlowEntity subFlowEntity = subFlowRepository.findByResourceKey(subFlow.getResourceKey());
+                if(null != subFlowEntity) {
+                    subFlow.setId(subFlowEntity.getId());
+                }
+            });
             subFlowRepository.saveAll(exportData.getSubFlows());
         }
 
         if(null !=  exportData.getServices()) {
-            exportData.getServices().forEach(service -> service.setExist(true));
+            exportData.getServices().forEach(service -> {
+                service.setExist(true);
+                ServiceEntity serviceEntity = serviceRepository.findByResourceKey(service.getResourceKey());
+                if(null != serviceEntity) {
+                    service.setId(serviceEntity.getId());
+                }
+            });
             serviceRepository.saveAll(exportData.getServices());
         }
 
         if(null !=   exportData.getClients()) {
-            exportData.getClients().forEach(client -> client.setExist(true));
+            exportData.getClients().forEach(client -> {
+                client.setExist(true);
+                ClientEntity clientEntity = clientRepository.findByResourceKey(client.getResourceKey());
+                if(null != clientEntity) {
+                    client.setId(clientEntity.getId());
+                }
+            });
             clientRepository.saveAll(exportData.getClients());
         }
 
         if(null !=   exportData.getConnectors()) {
-            exportData.getConnectors().forEach(connector -> connector.setExist(true));
+            exportData.getConnectors().forEach(connector -> {
+                connector.setExist(true);
+                ConnectorEntity connectorEntity = connectorRepository.findByResourceKey(connector.getResourceKey());
+                if(null != connectorEntity) {
+                    connector.setId(connectorEntity.getId());
+                }
+            });
             connectorRepository.saveAll(exportData.getConnectors());
         }
 
         if(null != exportData.getFunctions()) {
-            exportData.getFunctions().forEach(function -> function.setExist(true));
+            exportData.getFunctions().forEach(function -> {
+                function.setExist(true);
+                FunctionEntity functionEntity = functionRepository.findByResourceKey(function.getResourceKey());
+                if(null != functionEntity) {
+                    function.setId(functionEntity.getId());
+                }
+            });
             functionRepository.saveAll(exportData.getFunctions());
         }
 
         if(null != exportData.getAuthenticatorEntities()) {
-            exportData.getAuthenticatorEntities().forEach(authenticatorEntity -> authenticatorEntity.setExist(true));
+            exportData.getAuthenticatorEntities().forEach(authenticator -> {
+                authenticator.setExist(true);
+                AuthenticatorEntity authenticatorEntity = authenticatorRepository.findByResourceKey(authenticator.getResourceKey());
+                if(null != authenticatorEntity) {
+                    authenticator.setId(authenticatorEntity.getId());
+                }
+            });
             authenticatorRepository.saveAll(exportData.getAuthenticatorEntities());
         }
 
         if(null !=  exportData.getLimiterEntities()) {
-            exportData.getLimiterEntities().forEach(limiterEntity -> limiterEntity.setExist(true));
+            exportData.getLimiterEntities().forEach(limiter -> {
+                limiter.setExist(true);
+                LimiterEntity limiterEntity = limiterRepository.findByResourceKey(limiter.getResourceKey());
+                if(null != limiterEntity) {
+                    limiter.setId(limiterEntity.getId());
+                }
+            });
             limiterRepository.saveAll(exportData.getLimiterEntities());
         }
         // load test flow

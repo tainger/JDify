@@ -128,7 +128,7 @@ public class ReleasedFlowInitializer implements DalaranStarter {
                         String triggerConfig = triggerFlowReleasedEntity.getTriggerConfig();
                         JSONObject triggerConfigJSON = JSONObject.parseObject(triggerConfig);
                         log.error("--json数据-{}--", triggerConfigJSON.toJSONString());
-                        Long timeout = Long.valueOf((Integer) (triggerConfigJSON.get("timeout")));
+                        Long timeout = Long.valueOf((String) (triggerConfigJSON.get("timeout")));
                         Map<String, Object> flowInfo = new HashMap<>();
                         flowInfo.put("name", name);
                         flowInfo.put("timeout", timeout);
