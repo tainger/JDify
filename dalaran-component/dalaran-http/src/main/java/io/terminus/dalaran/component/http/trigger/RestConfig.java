@@ -4,7 +4,6 @@ import com.alibaba.fastjson.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.terminus.dalaran.FieldInputType;
 import io.terminus.dalaran.SourceType;
-import io.terminus.dalaran.component.authenticator.AuthenticatorRestConfig;
 import io.terminus.dalaran.component.authenticator.DalaranAuthenticator;
 import io.terminus.dalaran.component.common.HttpMethod;
 import io.terminus.dalaran.component.limiter.DalaranLimiter;
