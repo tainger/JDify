@@ -33,6 +33,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.camel.CamelContext;
 import org.apache.camel.model.RouteDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
+
 import javax.annotation.PostConstruct;
 import java.io.File;
 import java.util.*;
@@ -114,35 +115,6 @@ public class ReleasedFlowInitializer implements DalaranStarter {
             }
             resourceLoader.setVersion(recordEntity.getVersion());
             resourceLoader.setLastVersion(recordEntity.getLastVersion());
-            Map<String, Object> time = new HashMap<>();
-            List<Map<String, Object>> flowInfos = new ArrayList<>();
-            log.error("---刷新版本---");
-            List<TriggerFlowReleasedEntity> triggerFlowReleasedEntities = resourceLoader.loadAllTriggerFlow();
-            //todo 此处应该优化掉只有报警的
-            try {
-                for (TriggerFlowReleasedEntity triggerFlowReleasedEntity : triggerFlowReleasedEntities) {
-                    log.error("---刷新版本呀:{}---", triggerFlowReleasedEntity.toString());
-                    if (triggerFlowReleasedEntity.isExist() && triggerFlowReleasedEntity.isTracing() && triggerFlowReleasedEntity.isOnline()) {
-                        String originId = triggerFlowReleasedEntity.getOriginId();
-                        String name = triggerFlowReleasedEntity.getName();
-                        String triggerConfig = triggerFlowReleasedEntity.getTriggerConfig();
-                        JSONObject triggerConfigJSON = JSONObject.parseObject(triggerConfig);
-                        log.error("--json数据-{}--", triggerConfigJSON.toJSONString());
-                        Long timeout = Long.valueOf((String) (triggerConfigJSON.get("timeout")));
-                        Map<String, Object> flowInfo = new HashMap<>();
-                        flowInfo.put("name", name);
-                        flowInfo.put("timeout", timeout);
-                        flowInfo.put("id", originId);
-                        flowInfos.add(flowInfo);
-                        time.put(originId, timeout);
-                        redisService.persistKey(RedisUtil.getReleasedFlowIdsTimeOut(), JSONObject.toJSONString(time));
-                        redisService.persistKey(RedisUtil.getReleasedFlowIdsKey(), JSONObject.toJSONString(flowInfos));
-                        log.error("--{}---{}", redisService.getValue(RedisUtil.getReleasedFlowIdsTimeOut()), redisService.getValue(RedisUtil.getReleasedFlowIdsKey()));
-                    }
-                }
-            } catch (Exception e) {
-                log.error("----报错:{}----", RequestID.getExceptionStackTrace(e));
-            }
 
 
             // load client info
@@ -189,6 +161,10 @@ public class ReleasedFlowInitializer implements DalaranStarter {
                     e.printStackTrace();
                 }
             }
+
+            // build some info like flowName etc.
+            buildForAlarmInfo(triggerFlows);
+
             for (TriggerFlowReleasedEntity triggerFlowEntity : triggerFlows) {
                 if (triggerFlowEntity.getTriggerType().equalsIgnoreCase("as2-server")) {
                     continue;
@@ -222,6 +198,28 @@ public class ReleasedFlowInitializer implements DalaranStarter {
             }
             List<ApiInfo> apiInfoList = getExportApiInfoList();
             swagger = SwaggerUtils.buildSwagger(apiInfoList);
+        }
+    }
+
+    private void buildForAlarmInfo(List<TriggerFlowReleasedEntity> triggerFlowReleasedEntities) {
+        Map<String, Object> time = new HashMap<>();
+        List<Map<String, Object>> flowInfos = new ArrayList<>();
+        for (TriggerFlowReleasedEntity triggerFlowReleasedEntity : triggerFlowReleasedEntities) {
+            if (triggerFlowReleasedEntity.isExist() && triggerFlowReleasedEntity.isTracing() && triggerFlowReleasedEntity.isOnline()) {
+                String originId = triggerFlowReleasedEntity.getOriginId();
+                String name = triggerFlowReleasedEntity.getName();
+                String triggerConfig = triggerFlowReleasedEntity.getTriggerConfig();
+                JSONObject triggerConfigJSON = JSONObject.parseObject(triggerConfig);
+                Long timeout = Long.valueOf((String) (triggerConfigJSON.get("timeout")));
+                Map<String, Object> flowInfo = new HashMap<>();
+                flowInfo.put("name", name);
+                flowInfo.put("timeout", timeout);
+                flowInfo.put("id", originId);
+                flowInfos.add(flowInfo);
+                time.put(originId, timeout);
+                redisService.persistKey(RedisUtil.getReleasedFlowIdsTimeOut(), JSONObject.toJSONString(time));
+                redisService.persistKey(RedisUtil.getReleasedFlowIdsKey(), JSONObject.toJSONString(flowInfos));
+            }
         }
     }
 

@@ -31,7 +31,6 @@ public class AlarmManagerInitializer implements DalaranStarter {
                     if (null == timeToMonitor) {
                         continue;
                     }
-                    log.error("-----{}---", timeToMonitor);
                     monitor(timeToMonitor);
                     redisService.deleteKey(RedisUtil.getTimeToMonitor());
                 } catch (Exception e) {
