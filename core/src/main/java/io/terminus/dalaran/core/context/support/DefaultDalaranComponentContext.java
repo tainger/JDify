@@ -49,6 +49,8 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext {
 
     private final Map<String, Map<String, Map<String, DalaranProcessor>>> groupProcessor = new ConcurrentHashMap<>();
 
+    private final Map<String, DynamicConfigInfo> dynamicConfigInfoMap = new ConcurrentHashMap<>();
+
     @Override
     public DalaranTrigger getTrigger(String triggerType) {
         // TODO check null
@@ -346,6 +348,39 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext {
     }
 
     @Override
+    public void addDynamicConfig(DalaranDynamicConfig config) {
+        DynamicConfig configAnnotation = config.getClass().getDeclaredAnnotation(DynamicConfig.class);
+        DalaranConfigField[] configFields = ConfigFieldUtils.buildConfigFields(config.getClass());
+        DynamicConfigTypeField[] oldConfigTypeFields;
+        DynamicConfigTypeField[] newConfigTypeFields;
+        if (configAnnotation.type().equals("switch")) {
+            newConfigTypeFields =  new DynamicConfigTypeField[2];
+            newConfigTypeFields[0] = new DynamicConfigTypeField();
+            newConfigTypeFields[0].setType("true");
+            newConfigTypeFields[0].setConfigFields(configFields);
+            newConfigTypeFields[1] = new DynamicConfigTypeField();
+            newConfigTypeFields[1].setType("false");
+        } else {
+            newConfigTypeFields = new DynamicConfigTypeField[1];
+            newConfigTypeFields[0] = new DynamicConfigTypeField();
+            newConfigTypeFields[0].setType(configAnnotation.type());
+            newConfigTypeFields[0].setConfigFields(configFields);
+        }
+        DynamicConfigInfo configInfo = new DynamicConfigInfo();
+        if (dynamicConfigInfoMap.get(configAnnotation.name()) != null) {
+            oldConfigTypeFields = Arrays.copyOf(dynamicConfigInfoMap.get(configAnnotation.name()).getConfigTypeFields(), dynamicConfigInfoMap.get(configAnnotation.name()).getConfigTypeFields().length + 1);
+            oldConfigTypeFields[oldConfigTypeFields.length - 1] = newConfigTypeFields[0];
+        } else {
+            oldConfigTypeFields = newConfigTypeFields;
+        }
+        configInfo.setName(configAnnotation.name());
+        configInfo.setOrigin(configAnnotation.origin());
+        configInfo.setVersion(configAnnotation.version());
+        configInfo.setConfigTypeFields(oldConfigTypeFields);
+        dynamicConfigInfoMap.put(configAnnotation.name(), configInfo);
+    }
+
+    @Override
     public Map<String, Map<String, Map<String, ProcessorInfo>>> listAllGroupProcessor() {
         return groupProcessorInfo;
     }
@@ -358,6 +393,15 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext {
     @Override
     public Map<String, String> getProcessorConfigMap() {
         return processorConfig;
+    }
+
+    @Override
+    public Collection<DynamicConfigInfo> getAllDynamicConfigInfo() {
+        return dynamicConfigInfoMap.values().stream().map(dynamicConfigInfo -> {
+            DynamicConfigInfo newDynamicConfigInfo = new DynamicConfigInfo();
+            BeanUtils.copyProperties(dynamicConfigInfo, newDynamicConfigInfo);
+            return newDynamicConfigInfo;
+        }).collect(Collectors.toList());
     }
 
     private ConnectorInfo buildConnectorInfo(ComponentType component, Class classType, Connector connector, String componentName) {

@@ -29,6 +29,7 @@ public class ConfigFieldUtils {
                 configField.setLabel(configFieldInfo.label());
                 configField.setRequired(configFieldInfo.required());
                 configField.setReadonly(configFieldInfo.readonly());
+                configField.setDynamic(configFieldInfo.dynamic());
 
                 //TODO 暂时放在这里，后面统一处理
                 if (configFieldInfo.inputType().equals("String")) {

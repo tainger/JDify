@@ -1,13 +1,15 @@
-package io.terminus.dalaran.component.authenticator;
+package io.terminus.dalaran.component.dynamic;
 
 import io.terminus.dalaran.FieldInputType;
-import io.terminus.dalaran.core.component.annotation.Authenticator;
+import io.terminus.dalaran.core.component.DalaranDynamicConfig;
 import io.terminus.dalaran.core.component.annotation.ConfigFieldInfo;
+import io.terminus.dalaran.core.component.annotation.DynamicConfig;
 import io.terminus.dalaran.model.authenticator.AuthenticatorKeyLocation;
 import lombok.Data;
 
 @Data
-public class AuthenticatorRestConfig {
+@DynamicConfig(value = "AuthenticatorTypeDefault", name = "AuthenticatorType", type = "Default", origin = "basic")
+public class DynamicAuthenticatorDefault implements DalaranDynamicConfig {
 
     @ConfigFieldInfo(label = "所处位置", inputType = FieldInputType.Select)
     private AuthenticatorKeyLocation keyLocation;

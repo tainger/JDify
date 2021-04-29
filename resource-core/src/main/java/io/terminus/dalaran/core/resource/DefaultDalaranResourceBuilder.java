@@ -2,7 +2,7 @@ package io.terminus.dalaran.core.resource;
 
 import com.alibaba.fastjson.JSON;
 import io.terminus.dalaran.DalaranConstants;
-import io.terminus.dalaran.component.authenticator.AuthenticatorRestConfig;
+import io.terminus.dalaran.component.dynamic.DynamicAuthenticatorDefault;
 import io.terminus.dalaran.component.authenticator.DalaranAuthenticator;
 import io.terminus.dalaran.config.ProcessorInfo;
 import io.terminus.dalaran.config.ServiceInfo;
@@ -182,7 +182,7 @@ public class DefaultDalaranResourceBuilder implements DalaranResourceBuilder {
         if (entity == null) {
             throw new RuntimeException("authenticator [" + authenticatorId + "] not found");
         }
-        return buildArrayConfig(entity.getConfig(), authenticatorConfigType);
+        return buildArrayConfig(entity.getConfig(), authenticatorConfigType, entity.getType());
     }
 
     @Override
@@ -265,11 +265,14 @@ public class DefaultDalaranResourceBuilder implements DalaranResourceBuilder {
         return JSON.parseObject(replacedConfig, configType);
     }
 
-    public  <T> T buildArrayConfig(String configValue, Class<T> configType) {
+    public  <T> T buildArrayConfig(String configValue, Class<T> configType, String type) {
         String replacedConfig = replaceProperties(configValue, getProperties());
         DalaranAuthenticator authenticator = new DalaranAuthenticator();
-        List<AuthenticatorRestConfig> configs = JSON.parseArray(replacedConfig, AuthenticatorRestConfig.class);
-        authenticator.setConfig(configs);
+        switch (type) {
+            case "Default":
+                List<DynamicAuthenticatorDefault> configs = JSON.parseArray(replacedConfig, DynamicAuthenticatorDefault.class);
+                authenticator.setConfig(configs);
+        }
         return JSON.parseObject(JSON.toJSONString(authenticator), configType);
     }
 

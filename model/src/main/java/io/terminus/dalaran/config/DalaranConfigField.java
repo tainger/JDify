@@ -23,6 +23,8 @@ public class DalaranConfigField {
 
     private boolean readonly;
 
+    private boolean dynamic;
+
     Map<String, String> enumValues;
 
     private ValidateConfig validateConfig;

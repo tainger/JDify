@@ -269,6 +269,11 @@ public class PlatformRest implements PlatformInfoAPI, PlatformImportAPI, Platfor
     }
 
     @Override
+    public Collection<DynamicConfigInfo> listDynamicConfigInfo() {
+        return dalaranContext.getDalaranComponentContext().getAllDynamicConfigInfo();
+    }
+
+    @Override
     public void importJarFile(ImportJarRequest request) {
         marketManagementService.upload(request.getFilePath());
     }

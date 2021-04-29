@@ -2,6 +2,7 @@ package io.terminus.dalaran.core.context;
 
 import io.terminus.dalaran.config.*;
 import io.terminus.dalaran.core.component.DalaranBasicComponent;
+import io.terminus.dalaran.core.component.DalaranDynamicConfig;
 import io.terminus.dalaran.core.component.DalaranProcessor;
 import io.terminus.dalaran.core.component.DalaranTrigger;
 
@@ -36,9 +37,13 @@ public interface DalaranComponentContext {
 
     void addBasicComponent(DalaranBasicComponent bean);
 
+    void addDynamicConfig(DalaranDynamicConfig bean);
+
     Collection<BasicComponentInfo> getAllBasicComponentInfo();
 
     Map<String, Map<String, Map<String, ProcessorInfo>>> listAllGroupProcessor();
+
+    Collection<DynamicConfigInfo> getAllDynamicConfigInfo();
 
     Map<String, String> getTriggerConfigMap();
 

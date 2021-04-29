@@ -41,4 +41,5 @@ public class FieldInputType {
     public static final String TrantorModule = "TrantorModule";
     public static final String TrantorIntegration = "TrantorIntegration";
     public static final String TrantorIntegrationPoint = "TrantorIntegrationPoint";
+    public static final String AuthenticatorSelector = "AuthenticatorSelector";
 }
