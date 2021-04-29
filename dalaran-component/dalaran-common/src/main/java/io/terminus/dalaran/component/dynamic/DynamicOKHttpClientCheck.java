@@ -10,7 +10,7 @@ import lombok.Data;
 @DynamicConfig(value = "OKHttpClientCheckCertificate", name = "OKHttpClientCheckCertificate", type = "switch", origin = "basic")
 public class DynamicOKHttpClientCheck implements DalaranDynamicConfig {
 
-    @ConfigFieldInfo(label = "上传https证书" ,inputType = FieldInputType.String)
+    @ConfigFieldInfo(label = "SSL Certificate", inputType = FieldInputType.FileUpload, required = false)
     private String sslCertificate;
 
 }

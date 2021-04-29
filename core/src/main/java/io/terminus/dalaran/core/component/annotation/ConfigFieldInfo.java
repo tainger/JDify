@@ -25,6 +25,10 @@ public @interface ConfigFieldInfo {
 
     boolean dynamic() default false;
 
+    String path() default "";
+
+    String param() default "";
+
     String inputType() default FieldInputType.Auto;
 
     Class connectorType() default Void.class;
