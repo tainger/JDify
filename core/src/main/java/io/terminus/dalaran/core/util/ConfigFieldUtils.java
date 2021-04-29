@@ -30,6 +30,8 @@ public class ConfigFieldUtils {
                 configField.setRequired(configFieldInfo.required());
                 configField.setReadonly(configFieldInfo.readonly());
                 configField.setDynamic(configFieldInfo.dynamic());
+                configField.setPath(configFieldInfo.path());
+                configField.setParam(configFieldInfo.param());
 
                 //TODO 暂时放在这里，后面统一处理
                 if (configFieldInfo.inputType().equals("String")) {

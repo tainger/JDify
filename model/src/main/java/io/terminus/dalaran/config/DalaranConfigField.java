@@ -25,6 +25,10 @@ public class DalaranConfigField {
 
     private boolean dynamic;
 
+    private String path;
+
+    private String param;
+
     Map<String, String> enumValues;
 
     private ValidateConfig validateConfig;

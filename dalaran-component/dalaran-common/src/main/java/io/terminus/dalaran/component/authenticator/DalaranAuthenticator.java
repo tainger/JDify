@@ -14,7 +14,8 @@ public class DalaranAuthenticator<T> {
     @ConfigFieldInfo(label = "策略名称", inputType = FieldInputType.String)
     private String name;
 
-    @ConfigFieldInfo(label = "鉴权器类型", inputType = FieldInputType.AuthenticatorSelector, dynamic = true)
+    @ConfigFieldInfo(label = "鉴权器类型", inputType = FieldInputType.AuthenticatorSelector, dynamic = true,
+            path = "/api/platform/dynamicConfig")
     private String type;
 
     private List<T> config;

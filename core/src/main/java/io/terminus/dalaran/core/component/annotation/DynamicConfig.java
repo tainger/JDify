@@ -20,5 +20,4 @@ public @interface DynamicConfig {
     String origin();
 
     String version() default "";
-
 }
