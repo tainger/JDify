@@ -25,6 +25,7 @@ import io.terminus.dalaran.response.ResponseResult;
 import io.terminus.dalaran.rest.read.FlowReadAPI;
 import io.terminus.dalaran.rest.write.FlowWriteAPI;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -96,7 +97,7 @@ public class FlowManagementRest implements FlowReadAPI, FlowWriteAPI {
 
     @Override
     @OnException(code = ResponseMessage.FLOW_QUERY_ERROR)
-    public List<BasicFlowInfoDTO> queryBasicInfo(FlowQuery flowQuery, @RequestParam Integer pageNumber, @RequestParam Integer pageSize) {
+    public Page<BasicFlowInfoDTO> queryBasicInfo(FlowQuery flowQuery, @RequestParam Integer pageNumber, @RequestParam Integer pageSize) {
         return flowManagementService.listBasicInfo(flowQuery, pageNumber, pageSize);
     }
 

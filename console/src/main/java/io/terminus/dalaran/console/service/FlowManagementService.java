@@ -13,6 +13,8 @@ import io.terminus.dalaran.model.flow.FlowValidation;
 import io.terminus.dalaran.model.query.FlowQuery;
 import io.terminus.dalaran.response.ResponseResult;
 import org.jetbrains.annotations.Nullable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
@@ -63,5 +65,5 @@ public interface FlowManagementService {
 
     ResponseResult bindAlarm(BindAlarmRuleDTO bindAlarmRuleDto);
 
-    List<BasicFlowInfoDTO> listBasicInfo(FlowQuery flowQuery,  Integer pageNumber,  Integer pageSize);
+    Page<BasicFlowInfoDTO> listBasicInfo(FlowQuery flowQuery, Integer pageNumber, Integer pageSize);
 }

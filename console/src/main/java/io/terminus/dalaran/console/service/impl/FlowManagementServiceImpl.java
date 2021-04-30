@@ -77,10 +77,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -711,7 +708,7 @@ public class FlowManagementServiceImpl implements FlowManagementService {
     }
 
     @Override
-    public List<BasicFlowInfoDTO> listBasicInfo(FlowQuery flowQuery,  Integer pageNumber,  Integer pageSize) {
+    public Page<BasicFlowInfoDTO> listBasicInfo(FlowQuery flowQuery,  Integer pageNumber,  Integer pageSize) {
         Sort order = new Sort(new Sort.Order(Sort.Direction.DESC, "createdAt"));
         Pageable pageable = PageRequest.of(pageNumber - 1, pageSize, order);
         Page<TriggerFlowEntity> triggerFlowEntities = flowRepository.findAll(buildSpecification(flowQuery), pageable);
@@ -727,7 +724,7 @@ public class FlowManagementServiceImpl implements FlowManagementService {
             basicFlowInfoDTO.setModuleName(moduleRepository.findByResourceKey(entity.getModuleId()).getName());
             models.add(basicFlowInfoDTO);
         }
-        return models;
+        return new PageImpl<>(models, pageable, triggerFlowEntities.getTotalElements());
     }
 
     private Specification<TriggerFlowEntity> buildSpecification(FlowQuery flowQuery) {
