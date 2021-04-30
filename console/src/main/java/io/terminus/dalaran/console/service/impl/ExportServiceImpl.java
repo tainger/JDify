@@ -22,7 +22,6 @@ import io.terminus.dalaran.console.model.FlowResourceCollector;
 import io.terminus.dalaran.console.repository.*;
 import io.terminus.dalaran.console.service.ExportService;
 import io.terminus.dalaran.console.service.ModelManagementService;
-import io.terminus.dalaran.console.service.PrivateRepositoryService;
 import io.terminus.dalaran.core.component.DalaranTrigger;
 import io.terminus.dalaran.core.component.DalaranTriggerApiDocExport;
 import io.terminus.dalaran.core.component.DalaranTriggerWordDocExport;

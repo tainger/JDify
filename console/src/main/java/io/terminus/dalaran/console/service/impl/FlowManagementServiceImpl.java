@@ -61,6 +61,7 @@ import io.terminus.dalaran.model.flow.FlowValidation;
 import io.terminus.dalaran.model.flow.TriggerFlow;
 import io.terminus.dalaran.model.flow.ValidateMessageLevel;
 import io.terminus.dalaran.model.market.ResourceFile;
+import io.terminus.dalaran.model.query.AlarmRuleQuery;
 import io.terminus.dalaran.model.query.FlowQuery;
 import io.terminus.dalaran.model.query.PrivateRepositoryQuery;
 import io.terminus.dalaran.response.ResponseErrorMsg;
@@ -76,7 +77,15 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import javax.persistence.criteria.Predicate;
 import javax.transaction.Transactional;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
@@ -702,21 +711,34 @@ public class FlowManagementServiceImpl implements FlowManagementService {
     }
 
     @Override
-    public List<BasicFlowInfoDTO> listBasicInfo() {
-        List<TriggerFlowEntity> triggerFlowEntities = flowRepository.findByIsExistTrue();
+    public List<BasicFlowInfoDTO> listBasicInfo(FlowQuery flowQuery,  Integer pageNumber,  Integer pageSize) {
+        Sort order = new Sort(new Sort.Order(Sort.Direction.DESC, "createdAt"));
+        Pageable pageable = PageRequest.of(pageNumber - 1, pageSize, order);
+        Page<TriggerFlowEntity> triggerFlowEntities = flowRepository.findAll(buildSpecification(flowQuery), pageable);
         List<BasicFlowInfoDTO> models = new LinkedList<>();
         for (TriggerFlowEntity entity : triggerFlowEntities) {
             BasicFlowInfoDTO basicFlowInfoDTO = new BasicFlowInfoDTO();
             try {
                 BeanUtils.copyProperties(basicFlowInfoDTO, entity);
             } catch (Exception e) {
-                e.printStackTrace();
+              e.printStackTrace();
             }
             basicFlowInfoDTO.setId(entity.getResourceKey());
             basicFlowInfoDTO.setModuleName(moduleRepository.findByResourceKey(entity.getModuleId()).getName());
             models.add(basicFlowInfoDTO);
         }
         return models;
+    }
+
+    private Specification<TriggerFlowEntity> buildSpecification(FlowQuery flowQuery) {
+        return (root, criteriaQuery, builder) -> {
+            List<Predicate> predicates = new ArrayList<>();
+            predicates.add(builder.equal(root.get("isExist"), Boolean.TRUE));
+            if (null != flowQuery.getName()) {
+                predicates.add(builder.like(root.get("name"), "%" + flowQuery.getName() + "%"));
+            }
+            return builder.and(predicates.toArray(new Predicate[0]));
+        };
     }
 
     public ResponseResult isOnline(TriggerFlowDTO flowDTO, boolean isOnline) {

@@ -96,8 +96,8 @@ public class FlowManagementRest implements FlowReadAPI, FlowWriteAPI {
 
     @Override
     @OnException(code = ResponseMessage.FLOW_QUERY_ERROR)
-    public List<BasicFlowInfoDTO> listBasicInfo() {
-        return flowManagementService.listBasicInfo();
+    public List<BasicFlowInfoDTO> queryBasicInfo(FlowQuery flowQuery, @RequestParam Integer pageNumber, @RequestParam Integer pageSize) {
+        return flowManagementService.listBasicInfo(flowQuery, pageNumber, pageSize);
     }
 
     @Override

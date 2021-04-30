@@ -48,6 +48,6 @@ public interface FlowReadAPI {
 
 
     @ApiOperation(value = "全量查询集成流(basic Info)")
-    @GetMapping(value = "/list/basic")
-    List<BasicFlowInfoDTO> listBasicInfo();
+    @GetMapping(value = "/pageable/basic")
+    List<BasicFlowInfoDTO> queryBasicInfo(FlowQuery flowQuery, @RequestParam Integer pageNumber, @RequestParam Integer pageSize);
 }
