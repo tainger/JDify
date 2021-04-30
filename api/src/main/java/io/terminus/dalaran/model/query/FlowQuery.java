@@ -17,4 +17,6 @@ public class FlowQuery {
     private String type;
 
     private String name;
+
+    private String fuzzySearch;
 }
