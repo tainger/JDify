@@ -32,8 +32,10 @@ import io.terminus.dalaran.core.context.DalaranModelTypeContext;
 import io.terminus.dalaran.core.context.support.DefaultDalaranServiceContext;
 import io.terminus.dalaran.core.resource.DalaranResourceBuilder;
 import io.terminus.dalaran.core.resource.entity.common.ModuleEntity;
+import io.terminus.dalaran.core.resource.entity.common.PrivateRepositoryEntity;
 import io.terminus.dalaran.core.resource.entity.common.ProcessorEntity;
 import io.terminus.dalaran.core.resource.repository.ModuleRepository;
+import io.terminus.dalaran.core.resource.repository.PrivateRepositoryRepository;
 import io.terminus.dalaran.model.component.ProcessorRouteInfo;
 import io.terminus.dalaran.model.flow.FlowStatus;
 import io.terminus.dalaran.model.flow.TriggerFlow;
@@ -122,6 +124,9 @@ public class ExportServiceImpl implements ExportService {
     @Autowired
     private DefaultDalaranServiceContext defaultDalaranServiceContext;
 
+    @Autowired
+    private PrivateRepositoryRepository privateRepositoryRepository;
+
     // TODO 数据量暴多可能炸内存, 而且会涉及到清表, 所以事务也是个问题
     @Override
     @Transactional
@@ -134,8 +139,8 @@ public class ExportServiceImpl implements ExportService {
                 if(null != moduleEntity) {
                    module.setId(moduleEntity.getId());
                 }
+                moduleRepository.save(module);
             });
-            moduleRepository.saveAll(exportData.getModules());
         }
 
         if(null != exportData.getModels()) {
@@ -145,8 +150,8 @@ public class ExportServiceImpl implements ExportService {
                 if(null != modelEntity) {
                     model.setId(modelEntity.getId());
                 }
+                modelRepository.save(model);
             });
-            modelRepository.saveAll(exportData.getModels());
         }
 
         if(null != exportData.getTriggerFlows()) {
@@ -156,8 +161,8 @@ public class ExportServiceImpl implements ExportService {
                 if(null != triggerFlowEntity) {
                     triggerFlow.setId(triggerFlowEntity.getId());
                 }
+                triggerFlowRepository.save(triggerFlow);
             });
-            triggerFlowRepository.saveAll(exportData.getTriggerFlows());
         }
 
         if(null !=  exportData.getSubFlows()) {
@@ -167,8 +172,8 @@ public class ExportServiceImpl implements ExportService {
                 if(null != subFlowEntity) {
                     subFlow.setId(subFlowEntity.getId());
                 }
+                subFlowRepository.save(subFlow);
             });
-            subFlowRepository.saveAll(exportData.getSubFlows());
         }
 
         if(null !=  exportData.getServices()) {
@@ -178,8 +183,8 @@ public class ExportServiceImpl implements ExportService {
                 if(null != serviceEntity) {
                     service.setId(serviceEntity.getId());
                 }
+                serviceRepository.save(service);
             });
-            serviceRepository.saveAll(exportData.getServices());
         }
 
         if(null !=   exportData.getClients()) {
@@ -189,8 +194,8 @@ public class ExportServiceImpl implements ExportService {
                 if(null != clientEntity) {
                     client.setId(clientEntity.getId());
                 }
+                clientRepository.save(client);
             });
-            clientRepository.saveAll(exportData.getClients());
         }
 
         if(null !=   exportData.getConnectors()) {
@@ -200,8 +205,8 @@ public class ExportServiceImpl implements ExportService {
                 if(null != connectorEntity) {
                     connector.setId(connectorEntity.getId());
                 }
+                connectorRepository.save(connector);
             });
-            connectorRepository.saveAll(exportData.getConnectors());
         }
 
         if(null != exportData.getFunctions()) {
@@ -211,8 +216,8 @@ public class ExportServiceImpl implements ExportService {
                 if(null != functionEntity) {
                     function.setId(functionEntity.getId());
                 }
+                functionRepository.save(function);
             });
-            functionRepository.saveAll(exportData.getFunctions());
         }
 
         if(null != exportData.getAuthenticatorEntities()) {
@@ -222,8 +227,8 @@ public class ExportServiceImpl implements ExportService {
                 if(null != authenticatorEntity) {
                     authenticator.setId(authenticatorEntity.getId());
                 }
+                authenticatorRepository.save(authenticator);
             });
-            authenticatorRepository.saveAll(exportData.getAuthenticatorEntities());
         }
 
         if(null !=  exportData.getLimiterEntities()) {
@@ -233,9 +238,12 @@ public class ExportServiceImpl implements ExportService {
                 if(null != limiterEntity) {
                     limiter.setId(limiterEntity.getId());
                 }
+                limiterRepository.save(limiter);
             });
-            limiterRepository.saveAll(exportData.getLimiterEntities());
         }
+        List<PrivateRepositoryEntity> privateRepositoryEntities = exportData.getPrivateRepositoryEntities();
+        truncateTable("dalaran_private_repository");
+        privateRepositoryRepository.saveAll(privateRepositoryEntities);
         // load test flow
         testFlowInitializer.start();
     }
@@ -318,7 +326,9 @@ public class ExportServiceImpl implements ExportService {
             }
         }
         ExportData exportData = buildExportData(flowsCollector);
+        List<PrivateRepositoryEntity> privateRepositoryEntities = privateRepositoryRepository.findAll();
         exportData.setTriggerFlows(triggerFlowEntities);
+        exportData.setPrivateRepositoryEntities(privateRepositoryEntities);
         return exportData;
     }
 
@@ -595,6 +605,11 @@ public class ExportServiceImpl implements ExportService {
             entityManager.createNativeQuery("TRUNCATE TABLE " + tableName).executeUpdate();
         }
     }
+
+    private void truncateTable(String tableName) {
+            entityManager.createNativeQuery("TRUNCATE TABLE " + tableName).executeUpdate();
+    }
+
 
     private Map<String, List<TriggerFlow>> buildModuleTriggerFlowList(String triggerType) {
         List<TriggerFlowEntity> restFlowList = triggerFlowRepository.findByStatusNotAndTriggerTypeAndIsExistTrue(FlowStatus.Error, triggerType);

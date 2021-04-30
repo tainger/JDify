@@ -2,6 +2,7 @@ package io.terminus.dalaran.console;
 
 import io.terminus.dalaran.console.entity.*;
 import io.terminus.dalaran.core.resource.entity.common.ModuleEntity;
+import io.terminus.dalaran.core.resource.entity.common.PrivateRepositoryEntity;
 import lombok.Data;
 
 import java.util.List;
@@ -20,4 +21,5 @@ public class ExportData {
     private List<TrantorEntity> trantorEntities;
     private List<AuthenticatorEntity> authenticatorEntities;
     private List<LimiterEntity> limiterEntities;
+    private List<PrivateRepositoryEntity> privateRepositoryEntities;
 }
