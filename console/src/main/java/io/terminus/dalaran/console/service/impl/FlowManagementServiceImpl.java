@@ -75,6 +75,7 @@ import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.hibernate.query.criteria.internal.predicate.LikePredicate;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
@@ -278,7 +279,7 @@ public class FlowManagementServiceImpl implements FlowManagementService {
 
     private void copyResourceFromPrivateRepo(TemplateData templateData, Map<String, String> resourceKeyMap, String moduleId) throws Exception {
         Map<String, ModelEntity> models = templateData.getRelationModel();
-        for (Map.Entry<String, ModelEntity> entityEntry: models.entrySet()) {
+        for (Map.Entry<String, ModelEntity> entityEntry : models.entrySet()) {
             if (modelRepository.findByResourceKey(entityEntry.getKey()) != null) {
                 continue;
             }
@@ -294,7 +295,7 @@ public class FlowManagementServiceImpl implements FlowManagementService {
         }
 
         Map<String, ConnectorEntity> connectors = templateData.getRelationConnector();
-        for (Map.Entry<String, ConnectorEntity> entityEntry: connectors.entrySet()) {
+        for (Map.Entry<String, ConnectorEntity> entityEntry : connectors.entrySet()) {
             if (connectorRepository.findByResourceKey(entityEntry.getKey()) != null) {
                 continue;
             }
@@ -310,7 +311,7 @@ public class FlowManagementServiceImpl implements FlowManagementService {
         }
 
         Map<String, FunctionEntity> functions = templateData.getRelationFunction();
-        for (Map.Entry<String, FunctionEntity> entityEntry: functions.entrySet()) {
+        for (Map.Entry<String, FunctionEntity> entityEntry : functions.entrySet()) {
             if (functionRepository.findByResourceKey(entityEntry.getKey()) != null) {
                 continue;
             }
@@ -326,7 +327,7 @@ public class FlowManagementServiceImpl implements FlowManagementService {
         }
 
         Map<String, ServiceEntity> services = templateData.getRelationService();
-        for (Map.Entry<String, ServiceEntity> entityEntry: services.entrySet()) {
+        for (Map.Entry<String, ServiceEntity> entityEntry : services.entrySet()) {
             if (serviceRepository.findByResourceKey(entityEntry.getKey()) != null) {
                 continue;
             }
@@ -342,7 +343,7 @@ public class FlowManagementServiceImpl implements FlowManagementService {
         }
 
         Map<String, SubFlowEntity> subflows = templateData.getRelationSubFlow();
-        for (Map.Entry<String, SubFlowEntity> entityEntry: subflows.entrySet()) {
+        for (Map.Entry<String, SubFlowEntity> entityEntry : subflows.entrySet()) {
             if (subFlowRepository.findByResourceKey(entityEntry.getKey()) != null) {
                 continue;
             }
@@ -677,26 +678,26 @@ public class FlowManagementServiceImpl implements FlowManagementService {
         }
         try {
             TriggerFlowEntity triggerFlowEntity = flowRepository.findByResourceKey(bindAlarmRuleDto.getFlowId());
-            if(triggerFlowEntity == null) {
+            if (triggerFlowEntity == null) {
                 return fail(ResponseErrorMsg.FLOW_IS_NOT_EXIT);
             }
 
             //关联表
             TriggerFlowAlarmRuleEntity triggerFlowAlarmRuleEntity = triggerFlowAlarmRuleRepository.findByTriggerFlowIdAndIsExistTrue(bindAlarmRuleDto.getFlowId());
-            if(triggerFlowAlarmRuleEntity == null) {
+            if (triggerFlowAlarmRuleEntity == null) {
                 triggerFlowAlarmRuleEntity = new TriggerFlowAlarmRuleEntity();
                 triggerFlowAlarmRuleEntity.setAlarmRuleId(bindAlarmRuleDto.getAlarmRuleId());
                 triggerFlowAlarmRuleEntity.setTriggerFlowId(bindAlarmRuleDto.getFlowId());
-            }else {
+            } else {
                 triggerFlowAlarmRuleEntity.setAlarmRuleId(bindAlarmRuleDto.getAlarmRuleId());
             }
             triggerFlowAlarmRuleEntity.setMonitor(bindAlarmRuleDto.getIsMonitor());
             triggerFlowAlarmRuleRepository.save(triggerFlowAlarmRuleEntity);
 
             //被监管就加入缓存
-            if(bindAlarmRuleDto.getIsMonitor()) {
-                redisService.persistKey(RedisUtil.getAlarmConfigKey(bindAlarmRuleDto.getFlowId()),bindAlarmRuleDto.getAlarmRuleId());
-            }else {
+            if (bindAlarmRuleDto.getIsMonitor()) {
+                redisService.persistKey(RedisUtil.getAlarmConfigKey(bindAlarmRuleDto.getFlowId()), bindAlarmRuleDto.getAlarmRuleId());
+            } else {
                 redisService.deleteKey(RedisUtil.getAlarmConfigKey(bindAlarmRuleDto.getFlowId()));
             }
 
@@ -708,7 +709,7 @@ public class FlowManagementServiceImpl implements FlowManagementService {
     }
 
     @Override
-    public Page<BasicFlowInfoDTO> listBasicInfo(FlowQuery flowQuery,  Integer pageNumber,  Integer pageSize) {
+    public Page<BasicFlowInfoDTO> listBasicInfo(FlowQuery flowQuery, Integer pageNumber, Integer pageSize) {
         Sort order = new Sort(new Sort.Order(Sort.Direction.DESC, "createdAt"));
         Pageable pageable = PageRequest.of(pageNumber - 1, pageSize, order);
         Page<TriggerFlowEntity> triggerFlowEntities = flowRepository.findAll(buildSpecification(flowQuery), pageable);
@@ -718,7 +719,7 @@ public class FlowManagementServiceImpl implements FlowManagementService {
             try {
                 BeanUtils.copyProperties(basicFlowInfoDTO, entity);
             } catch (Exception e) {
-              e.printStackTrace();
+                e.printStackTrace();
             }
             basicFlowInfoDTO.setId(entity.getResourceKey());
             basicFlowInfoDTO.setModuleName(moduleRepository.findByResourceKey(entity.getModuleId()).getName());
@@ -730,9 +731,14 @@ public class FlowManagementServiceImpl implements FlowManagementService {
     private Specification<TriggerFlowEntity> buildSpecification(FlowQuery flowQuery) {
         return (root, criteriaQuery, builder) -> {
             List<Predicate> predicates = new ArrayList<>();
-            predicates.add(builder.equal(root.get("isExist"), Boolean.TRUE));
-            if (null != flowQuery.getName()) {
-                predicates.add(builder.like(root.get("name"), "%" + flowQuery.getName() + "%"));
+            if (null != flowQuery.getModuleId()) {
+                predicates.add(builder.equal(root.get("moduleId"), flowQuery.getModuleId()));
+            }
+            String fuzzySearch = flowQuery.getFuzzySearch();
+            if (null != fuzzySearch) {
+                Predicate searchName = builder.like(root.get("name"), "%" + fuzzySearch + "%");
+                Predicate searchType = builder.like(root.get("triggerType"), "%" + fuzzySearch + "%");
+                predicates.add(builder.or(searchName, searchType));
             }
             return builder.and(predicates.toArray(new Predicate[0]));
         };
@@ -796,7 +802,7 @@ public class FlowManagementServiceImpl implements FlowManagementService {
             flowEntity.setInModel((String) triggerFlow.getTriggerConfig().get("inModelId"));
         }
         if (triggerFlow.getTriggerConfig().get("outModelId") != null) {
-            flowEntity.setOutModel((String)triggerFlow.getTriggerConfig().get("outModelId"));
+            flowEntity.setOutModel((String) triggerFlow.getTriggerConfig().get("outModelId"));
         }
         flowEntity.setPipeline(pipeline);
         flowEntity.setTracing(triggerFlow.isTracing());
@@ -840,42 +846,42 @@ public class FlowManagementServiceImpl implements FlowManagementService {
     private void saveRelationResource(TemplateData templateData) throws Exception {
         Map<String, ModelEntity> models = templateData.getRelationModel();
         if (MapUtils.isNotEmpty(models)) {
-            for (ModelEntity entity: models.values()) {
+            for (ModelEntity entity : models.values()) {
                 savePrivateResource(entity, DalaranConstants.MODEL);
             }
         }
 
         Map<String, ConnectorEntity> connectors = templateData.getRelationConnector();
         if (MapUtils.isNotEmpty(connectors)) {
-            for (ConnectorEntity entity: connectors.values()) {
+            for (ConnectorEntity entity : connectors.values()) {
                 savePrivateResource(entity, DalaranConstants.CONNECTOR);
             }
         }
 
         Map<String, ServiceEntity> services = templateData.getRelationService();
         if (MapUtils.isNotEmpty(services)) {
-            for (ServiceEntity entity: services.values()) {
+            for (ServiceEntity entity : services.values()) {
                 savePrivateResource(entity, DalaranConstants.SERVICE);
             }
         }
 
         Map<String, PrivatePackageEntity> packages = templateData.getRelationPackage();
         if (MapUtils.isNotEmpty(packages)) {
-            for (PrivatePackageEntity entity: packages.values()) {
+            for (PrivatePackageEntity entity : packages.values()) {
                 savePrivateResource(entity, DalaranConstants.PACKAGE);
             }
         }
 
         Map<String, FunctionEntity> functions = templateData.getRelationFunction();
         if (MapUtils.isNotEmpty(functions)) {
-            for (FunctionEntity entity: functions.values()) {
+            for (FunctionEntity entity : functions.values()) {
                 savePrivateResource(entity, DalaranConstants.FUNCTION);
             }
         }
 
         Map<String, SubFlowEntity> subflows = templateData.getRelationSubFlow();
         if (MapUtils.isNotEmpty(subflows)) {
-            for (SubFlowEntity entity: subflows.values()) {
+            for (SubFlowEntity entity : subflows.values()) {
                 savePrivateResource(entity, DalaranConstants.SUB_FLOW);
             }
         }
@@ -901,7 +907,7 @@ public class FlowManagementServiceImpl implements FlowManagementService {
         }
 
         if (origin instanceof TriggerFlowAbstractEntity) {
-            TriggerInfo triggerInfo = dalaranContext.getDalaranComponentContext().getTriggerInfo(((TriggerFlowAbstractEntity)origin).getTriggerType());
+            TriggerInfo triggerInfo = dalaranContext.getDalaranComponentContext().getTriggerInfo(((TriggerFlowAbstractEntity) origin).getTriggerType());
             if (StringUtils.equalsIgnoreCase(triggerInfo.getOrigin(), DalaranConstants.PARTNER)) {
                 List<PrivateRepositoryEntity> privateRepositoryEntity = privateResourceQueryService.query(new PrivateRepositoryQuery(triggerInfo.getName(), DalaranConstants.TRIGGER));
                 if (CollectionUtils.isNotEmpty(privateRepositoryEntity)) {
@@ -914,7 +920,7 @@ public class FlowManagementServiceImpl implements FlowManagementService {
                 }
             }
 
-            Object config = resourceBuilder.buildConfig(((TriggerFlowAbstractEntity)origin).getTriggerConfig(), triggerInfo.getConfigType());
+            Object config = resourceBuilder.buildConfig(((TriggerFlowAbstractEntity) origin).getTriggerConfig(), triggerInfo.getConfigType());
             if (config instanceof ConnectorConfig) {
                 ConnectorConfig connectorConfig = (ConnectorConfig) config;
                 String connectorId = connectorConfig.getConnectorId();
@@ -950,8 +956,8 @@ public class FlowManagementServiceImpl implements FlowManagementService {
             if (processorConfig instanceof ServiceOperationConfig) {
                 ServiceOperationConfig serviceOperationConfig = (ServiceOperationConfig) processorConfig;
                 String serviceId = null;
-                if(StringUtils.isNotBlank(serviceOperationConfig.getServiceId())) {
-                    serviceId =  serviceOperationConfig.getServiceId();
+                if (StringUtils.isNotBlank(serviceOperationConfig.getServiceId())) {
+                    serviceId = serviceOperationConfig.getServiceId();
                 }
                 if (StringUtils.isNotBlank(serviceId)) {
                     services.put(serviceId, resourceLoader.loadService(serviceId));
@@ -973,7 +979,7 @@ public class FlowManagementServiceImpl implements FlowManagementService {
                     simpleMappings.addAll(noDestinationMappings);
                 }
                 log.info("simpleMappings: " + simpleMappings.toString());
-                for (SimpleMapping simpleMapping: simpleMappings) {
+                for (SimpleMapping simpleMapping : simpleMappings) {
                     if (simpleMapping.getMappingType() == MappingType.FUNCTION) {
                         MappingFunction mappingFunction = (MappingFunction) (simpleMapping.getValue());
                         if (mappingFunction.getType() == FunctionType.STATIC) {
@@ -991,14 +997,14 @@ public class FlowManagementServiceImpl implements FlowManagementService {
 
             if (processorConfig instanceof DalaranRouterConfig) {
                 DalaranRouterConfig dalaranRouterConfig = (DalaranRouterConfig) processorConfig;
-                for (DalaranRouterConfig.Route route: dalaranRouterConfig.getRoutes()) {
+                for (DalaranRouterConfig.Route route : dalaranRouterConfig.getRoutes()) {
                     parseBranchRelationResource(route.getPipeline(), templateData);
                 }
             }
 
             if (processorConfig instanceof ScatterGatherConfig) {
                 ScatterGatherConfig scatterGatherConfig = (ScatterGatherConfig) processorConfig;
-                for (ScatterGatherConfig.Branch branch: scatterGatherConfig.getBranches()) {
+                for (ScatterGatherConfig.Branch branch : scatterGatherConfig.getBranches()) {
                     parseBranchRelationResource(branch.getPipeline(), templateData);
                 }
             }
@@ -1020,7 +1026,7 @@ public class FlowManagementServiceImpl implements FlowManagementService {
 
             if (processorConfig instanceof ErrorCatchConfig) {
                 ErrorCatchConfig errorCatchConfig = (ErrorCatchConfig) processorConfig;
-                for (ErrorCatchConfig.Route route: errorCatchConfig.getRoutes()) {
+                for (ErrorCatchConfig.Route route : errorCatchConfig.getRoutes()) {
                     parseBranchRelationResource(route.getPipeline(), templateData);
                 }
             }
@@ -1071,8 +1077,8 @@ public class FlowManagementServiceImpl implements FlowManagementService {
             if (processorConfig instanceof ServiceOperationConfig) {
                 ServiceOperationConfig serviceOperationConfig = (ServiceOperationConfig) processorConfig;
                 String serviceId = null;
-                if(StringUtils.isNotBlank(serviceOperationConfig.getServiceId())) {
-                    serviceId =  serviceOperationConfig.getServiceId();
+                if (StringUtils.isNotBlank(serviceOperationConfig.getServiceId())) {
+                    serviceId = serviceOperationConfig.getServiceId();
                 }
                 if (StringUtils.isNotBlank(serviceId)) {
                     services.put(serviceId, resourceLoader.loadService(serviceId));
@@ -1086,7 +1092,7 @@ public class FlowManagementServiceImpl implements FlowManagementService {
                 List<SimpleMapping> simpleMappings = new ArrayList<>(messageMapping.values());
                 List<SimpleMapping> noDestinationMappings = mapperConfig.getNoDestinationMappings();
                 simpleMappings.addAll(noDestinationMappings);
-                for (SimpleMapping simpleMapping: simpleMappings) {
+                for (SimpleMapping simpleMapping : simpleMappings) {
                     if (simpleMapping.getMappingType() == MappingType.FUNCTION) {
                         MappingFunction mappingFunction = (MappingFunction) (simpleMapping.getValue());
                         if (mappingFunction.getType() == FunctionType.STATIC) {
@@ -1104,14 +1110,14 @@ public class FlowManagementServiceImpl implements FlowManagementService {
 
             if (processorConfig instanceof DalaranRouterConfig) {
                 DalaranRouterConfig dalaranRouterConfig = (DalaranRouterConfig) processorConfig;
-                for (DalaranRouterConfig.Route route: dalaranRouterConfig.getRoutes()) {
+                for (DalaranRouterConfig.Route route : dalaranRouterConfig.getRoutes()) {
                     parseBranchRelationResource(route.getPipeline(), templateData);
                 }
             }
 
             if (processorConfig instanceof ScatterGatherConfig) {
                 ScatterGatherConfig scatterGatherConfig = (ScatterGatherConfig) processorConfig;
-                for (ScatterGatherConfig.Branch branch: scatterGatherConfig.getBranches()) {
+                for (ScatterGatherConfig.Branch branch : scatterGatherConfig.getBranches()) {
                     parseBranchRelationResource(branch.getPipeline(), templateData);
                 }
             }
@@ -1133,7 +1139,7 @@ public class FlowManagementServiceImpl implements FlowManagementService {
 
             if (processorConfig instanceof ErrorCatchConfig) {
                 ErrorCatchConfig errorCatchConfig = (ErrorCatchConfig) processorConfig;
-                for (ErrorCatchConfig.Route route: errorCatchConfig.getRoutes()) {
+                for (ErrorCatchConfig.Route route : errorCatchConfig.getRoutes()) {
                     parseBranchRelationResource(route.getPipeline(), templateData);
                 }
             }
