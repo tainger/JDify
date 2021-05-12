@@ -34,8 +34,8 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext {
     private final Map<String, TriggerInfo> triggerInfoMapping = new ConcurrentHashMap<>();
     private final Map<String, ProcessorInfo> processorInfoMapping = new ConcurrentHashMap<>();
 
-    private final Map<String, String> triggerConfig = new ConcurrentHashMap<>();
-    private final Map<String, String> processorConfig = new ConcurrentHashMap<>();
+    private final Map<String, Class> triggerConfigClass = new ConcurrentHashMap<>();
+    private final Map<String, Class> processorConfigClass = new ConcurrentHashMap<>();
 
     private final Map<String, ConnectorInfo> connectorInfoMapping = new ConcurrentHashMap<>();
 
@@ -268,7 +268,7 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext {
             triggerInfoMapping.put(triggerType, triggerInfo);
             triggerMapping.put(triggerType, trigger);
             triggerMapping.put(triggerType, trigger);
-            triggerConfig.put(triggerType, triggerAnnotation.configType().getName());
+            triggerConfigClass.put(triggerType, triggerAnnotation.configType());
         }
         log.info("load trigger {}", triggerAnnotation);
     }
@@ -304,7 +304,7 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext {
             processorInfoMapping.put(processorType, processorInfo);
             processorMapping.put(processorType, processor);
 
-            processorConfig.put(processorType, processorAnnotation.configType().getName());
+            processorConfigClass.put(processorType, processorAnnotation.configType());
 
             Map<String, Map<String, ProcessorInfo>> processorInfos = groupProcessorInfo.get(group);
             if (MapUtils.isEmpty(processorInfos)) {
@@ -386,13 +386,13 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext {
     }
 
     @Override
-    public Map<String, String> getTriggerConfigMap() {
-        return triggerConfig;
+    public Map<String, Class> getTriggerConfigMap() {
+        return triggerConfigClass;
     }
 
     @Override
-    public Map<String, String> getProcessorConfigMap() {
-        return processorConfig;
+    public Map<String, Class> getProcessorConfigMap() {
+        return processorConfigClass;
     }
 
     @Override
