@@ -167,6 +167,7 @@ public class ReleasedFlowInitializer implements DalaranStarter {
                 buildForAlarmInfo(triggerFlows);
             } catch (Exception e) {
                 e.printStackTrace();
+                log.error("---报错:{}---", RequestID.getExceptionStackTrace(e));
             }
 
             for (TriggerFlowReleasedEntity triggerFlowEntity : triggerFlows) {

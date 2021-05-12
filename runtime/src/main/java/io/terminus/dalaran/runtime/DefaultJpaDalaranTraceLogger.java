@@ -55,6 +55,7 @@ public class DefaultJpaDalaranTraceLogger implements DalaranTraceLogger {
                     alarmCount(tracingLog);
                 } catch (Throwable e) {
                     e.printStackTrace();
+                    log.error("---报错:{}---", RequestID.getExceptionStackTrace(e));
                 }
             }
         }).start();
@@ -80,14 +81,12 @@ public class DefaultJpaDalaranTraceLogger implements DalaranTraceLogger {
                         RedisUtil.getFailureKey(tracingLog.getFlowId(), format)
                 );
             }
-            log.error("---计算超时时间-{}-----", "time");
             Long triggerTimeOut = 0L;
             try {
                triggerTimeOut = getTriggerTimeOut(tracingLog, alarmRuleConfig);
             }catch (Exception e) {
                 log.error("---报错:{}---", RequestID.getExceptionStackTrace(e));
             }
-            log.error("---超时时间-{}-----", triggerTimeOut);
             if (triggerTimeOut != null && triggerTimeOut <= tracingLog.getElapsed()) {
                 redisService.incrKey(
                         RedisUtil.getTimeOutKey(tracingLog.getFlowId(), format)
