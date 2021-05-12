@@ -13,7 +13,7 @@ public class BasicAuthenticator implements DalaranBasicComponent {
     @ConfigFieldInfo(label = "策略名称", inputType = FieldInputType.String)
     private String name;
 
-    @ConfigFieldInfo(label = "鉴权器类型", inputType = FieldInputType.AuthenticatorSelector, dynamic = true,
+    @ConfigFieldInfo(label = "鉴权器类型", inputType = FieldInputType.AuthenticatorSelector,
             path = "/api/platform/authenticator")
     private String type;
 

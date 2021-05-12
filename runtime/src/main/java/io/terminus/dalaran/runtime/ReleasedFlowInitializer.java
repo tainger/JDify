@@ -163,7 +163,11 @@ public class ReleasedFlowInitializer implements DalaranStarter {
             }
 
             // build some info like flowName etc.
-            buildForAlarmInfo(triggerFlows);
+            try {
+                buildForAlarmInfo(triggerFlows);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 
             for (TriggerFlowReleasedEntity triggerFlowEntity : triggerFlows) {
                 if (triggerFlowEntity.getTriggerType().equalsIgnoreCase("as2-server")) {

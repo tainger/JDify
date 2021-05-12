@@ -23,8 +23,6 @@ public @interface ConfigFieldInfo {
 
     boolean readonly() default false;
 
-    boolean dynamic() default false;
-
     String path() default "";
 
     String param() default "";
