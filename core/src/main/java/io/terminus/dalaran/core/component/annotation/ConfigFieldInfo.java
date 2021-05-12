@@ -29,6 +29,8 @@ public @interface ConfigFieldInfo {
 
     String param() default "";
 
+    String show() default "";
+
     String inputType() default FieldInputType.Auto;
 
     Class connectorType() default Void.class;

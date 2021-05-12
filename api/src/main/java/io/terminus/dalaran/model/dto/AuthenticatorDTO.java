@@ -6,7 +6,7 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class AuthenticatorDTO extends BasicAuthenticatorInfo {
+public class AuthenticatorDTO<T> extends BasicAuthenticatorInfo {
 
-    List<AuthenticatorConfigDTO> authenticator;
+    List<T> authenticator;
 }

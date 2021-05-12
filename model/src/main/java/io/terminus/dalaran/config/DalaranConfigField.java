@@ -23,11 +23,11 @@ public class DalaranConfigField {
 
     private boolean readonly;
 
-    private boolean dynamic;
-
     private String path;
 
     private String param;
+
+    private String show;
 
     Map<String, String> enumValues;
 

@@ -16,7 +16,7 @@ import lombok.Data;
 
 
 @Data
-public class RestConfig extends AllModelConfig implements  AuthenticatorConfig<DalaranAuthenticator>, LimiterConfig<DalaranLimiter> {
+public class RestConfig extends AllModelConfig implements AuthenticatorConfig<DalaranAuthenticator>, LimiterConfig<DalaranLimiter> {
 
     @ConfigFieldInfo(inputType = FieldInputType.Hidden, required = false)
     @JSONField(serialize = false)

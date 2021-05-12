@@ -11,15 +11,15 @@ import lombok.Data;
 @DynamicModel(value = "SubFlow")
 public class BasicSubFlow implements DalaranBasicComponent {
 
-    @ConfigFieldInfo(label = "子流程名称", inputType = FieldInputType.String)
+    @ConfigFieldInfo(label = "子流程名称", inputType = FieldInputType.String, show = "createdType == \"Custom\"")
     private String name;
 
-    @ConfigFieldInfo(label = "创建方式", inputType = FieldInputType.Radio)
+    @ConfigFieldInfo(label = "创建方式", inputType = FieldInputType.Radio, show = "!isEditMode")
     private SubFlowCreateType createdType;
 
-    @ConfigFieldInfo(label = "子流程模板", inputType = FieldInputType.SubFlowTemplateSelector, required = false)
+    @ConfigFieldInfo(label = "子流程模板", inputType = FieldInputType.SubFlowTemplateSelector, required = false, show = "createdType == \"Template\" && !isEditMode")
     private String template;
 
-    @ConfigFieldInfo(label = "子流程描述", inputType = FieldInputType.String, required = false)
+    @ConfigFieldInfo(label = "子流程描述", inputType = FieldInputType.String, required = false, show = "createdType == \"Custom\"")
     private String description;
 }

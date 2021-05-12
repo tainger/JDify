@@ -13,6 +13,6 @@ public class BasicModel implements DalaranBasicComponent {
     @ConfigFieldInfo(label = "名称", inputType = FieldInputType.String)
     private String name;
 
-    @ConfigFieldInfo(label = "类型", inputType = FieldInputType.ModelSelector)
+    @ConfigFieldInfo(label = "类型", inputType = FieldInputType.ModelSelector, path = "/api/platform/model")
     private String modelType;
 }

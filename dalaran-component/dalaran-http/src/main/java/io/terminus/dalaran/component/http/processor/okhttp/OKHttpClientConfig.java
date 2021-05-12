@@ -45,10 +45,10 @@ public class OKHttpClientConfig extends OutModelConfig implements ConnectorConfi
 //    @ConfigFieldInfo(label = "Add Last Headers", inputType = FieldInputType.Switch, required = false)
 //    private Boolean addLastHeaders = false;
 
-    @ConfigFieldInfo(label = "是否校验证书", inputType = FieldInputType.Switch, required = false,
-            dynamic = true, path = "/api/platform/dynamicConfig")
+    @ConfigFieldInfo(label = "是否校验证书", inputType = FieldInputType.Switch, required = false)
     private Boolean checkCertificate = true;
 
-    @ConfigFieldInfo(label = "SSL Certificate", inputType = FieldInputType.FileUpload, required = false)
+    @ConfigFieldInfo(label = "SSL Certificate", inputType = FieldInputType.FileUpload, required = false,
+     show = "checkCertificate == true")
     private String sslCertificate;
 }
