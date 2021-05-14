@@ -20,6 +20,8 @@ public class BasicFlowInfo {
 
     private boolean isOnline;
 
+    private String resourceKey;
+
     public BasicFlowInfo() {
     }
 
