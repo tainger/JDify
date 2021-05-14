@@ -11,6 +11,7 @@ public class ServiceOperationConfig extends ImmutableModelConfig {
     @ConfigFieldInfo(label = "服务", inputType = FieldInputType.Service, sourceType = SourceType.SERVICE)
     private String serviceId;
 
-    @ConfigFieldInfo(label = "操作", inputType = FieldInputType.ServiceOperation)
+    @ConfigFieldInfo(label = "操作", inputType = FieldInputType.ServiceOperation, path = "/api/service/{serviceId}/operation",
+            param = "serviceId={serviceId}")
     private String operation;
 }
