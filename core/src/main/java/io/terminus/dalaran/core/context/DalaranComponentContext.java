@@ -45,7 +45,7 @@ public interface DalaranComponentContext {
 
     Collection<DynamicConfigInfo> getAllDynamicConfigInfo();
 
-    Map<String, String> getTriggerConfigMap();
+    Map<String, Class> getTriggerConfigMap();
 
-    Map<String, String> getProcessorConfigMap();
+    Map<String, Class> getProcessorConfigMap();
 }
