@@ -66,6 +66,9 @@ public class SwaggerService implements DalaranService<SwaggerImportConfig, Swagg
 
     @Override
     public SwaggerOperationConfig getOperationConfig(SwaggerServiceConfig swaggerServiceConfig, @NotNull String operationKey) {
+        if (StringUtils.isBlank(operationKey)) {
+            return null;
+        }
         String[] operation = operationKey.split(OPERATION_SPLIT);
         Optional<SwaggerOperationConfig> operationConfigOptional = swaggerServiceConfig.getConfigs().stream()
                 .filter(config -> StringUtils.equals(config.getPath(), operation[1]) && StringUtils.equals(config.getMethod().toString(), operation[0]))
