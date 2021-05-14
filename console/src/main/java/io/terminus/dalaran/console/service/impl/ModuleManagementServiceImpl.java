@@ -9,6 +9,8 @@ import io.terminus.dalaran.core.resource.entity.common.ModuleEntity;
 import io.terminus.dalaran.core.resource.repository.ModuleRepository;
 import io.terminus.dalaran.model.dto.ModuleDTO;
 import io.terminus.dalaran.model.dto.ModuleDetailDTO;
+import io.terminus.dalaran.model.dto.ModuleFlowDTO;
+import io.terminus.dalaran.model.dto.basic.BasicFlowInfo;
 import io.terminus.dalaran.model.query.ModuleQuery;
 import io.terminus.draco.web.autoconfig.context.UserContext;
 import org.apache.commons.lang3.StringUtils;
@@ -17,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -200,6 +203,24 @@ public class ModuleManagementServiceImpl implements ModuleManagementService {
             return null;
         }
         return moduleEntity.getName();
+    }
+
+    @Override
+    public List<ModuleFlowDTO> flowInfoList() {
+        List<ModuleEntity> moduleEntities = moduleRepository.findByIsExistTrue();
+        List<ModuleFlowDTO> moduleFlowDTOS = new ArrayList<>();
+        for (ModuleEntity moduleEntity : moduleEntities) {
+            ModuleFlowDTO moduleFlowDTO = new ModuleFlowDTO();
+            moduleFlowDTO.setModuleName(moduleEntity.getName());
+            moduleFlowDTO.setId(moduleEntity.getResourceKey());
+            List<BasicFlowInfo> basicFlowInfos = flowManagementService.listBasicFlowInfoByModuleId(moduleEntity.getResourceKey());
+            for (BasicFlowInfo basicFlowInfo : basicFlowInfos) {
+                basicFlowInfo.setId(basicFlowInfo.getResourceKey());
+            }
+            moduleFlowDTO.setBasicFlowInfos(basicFlowInfos);
+            moduleFlowDTOS.add(moduleFlowDTO);
+        }
+        return moduleFlowDTOS;
     }
 
     private ModuleEntity buildEntity(ModuleDTO module) {

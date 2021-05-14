@@ -2,6 +2,7 @@ package io.terminus.dalaran.console.service;
 
 import io.terminus.dalaran.model.dto.ModuleDTO;
 import io.terminus.dalaran.model.dto.ModuleDetailDTO;
+import io.terminus.dalaran.model.dto.ModuleFlowDTO;
 import io.terminus.dalaran.model.query.ModuleQuery;
 import org.jetbrains.annotations.NotNull;
 
@@ -25,4 +26,6 @@ public interface ModuleManagementService {
     ModuleDetailDTO getModuleDetail(String moduleId);
 
     String getModuleName(@NotNull String moduleId);
+
+    List<ModuleFlowDTO> flowInfoList();
 }

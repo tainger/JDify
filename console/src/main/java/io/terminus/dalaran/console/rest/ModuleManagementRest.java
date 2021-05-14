@@ -6,6 +6,7 @@ import io.terminus.dalaran.console.service.ModuleManagementService;
 import io.terminus.dalaran.model.CreateResponse;
 import io.terminus.dalaran.model.dto.ModuleDTO;
 import io.terminus.dalaran.model.dto.ModuleDetailDTO;
+import io.terminus.dalaran.model.dto.ModuleFlowDTO;
 import io.terminus.dalaran.model.query.ModuleQuery;
 import io.terminus.dalaran.rest.read.ModuleReadAPI;
 import io.terminus.dalaran.rest.write.ModuleWriteAPI;
@@ -58,5 +59,10 @@ public class ModuleManagementRest implements ModuleReadAPI, ModuleWriteAPI {
     @OnException(code = ResponseMessage.MODULE_QUERY_ERROR)
     public ModuleDetailDTO moduleDetail(@PathVariable String id) {
         return moduleManagementService.getModuleDetail(id);
+    }
+
+    @Override
+    public List<ModuleFlowDTO> flowInfoList() {
+        return moduleManagementService.flowInfoList();
     }
 }
