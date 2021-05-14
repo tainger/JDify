@@ -456,14 +456,8 @@ public class ExportServiceImpl implements ExportService {
 
     private void collectProcessResourceKey(ProcessorEntity processorEntity) {
         String type = processorEntity.getType();
-        String processorClassName = getProcessorClassName(type);
+        Class configClass = getProcessorClassName(type);
         String processorEntityConfig = processorEntity.getConfig();
-        Class<?> configClass = null;
-        try {
-            configClass = Class.forName(processorClassName);
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
         Object object = JSONObject.parseObject(processorEntityConfig, configClass);
         List<Field> fields = new ArrayList<>();
         while (null != configClass) {
@@ -489,8 +483,6 @@ public class ExportServiceImpl implements ExportService {
                 e.printStackTrace();
             }
         }
-
-
     }
 
     private void collectBaseInfoResourceKey(TriggerFlowEntity triggerFlowEntity) {
@@ -501,13 +493,7 @@ public class ExportServiceImpl implements ExportService {
     public void collectTriggerResourceKey(TriggerFlowEntity triggerFlowEntity) {
         String triggerType = triggerFlowEntity.getTriggerType();
         String triggerConfig = triggerFlowEntity.getTriggerConfig();
-        String triggerClassName = getTriggerClassName(triggerType);
-        Class<?> configClass = null;
-        try {
-            configClass = Class.forName(triggerClassName);
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
+        Class configClass = getTriggerClassName(triggerType);
         Object object = JSONObject.parseObject(triggerConfig, configClass);
         List<Field> fields = new ArrayList<>();
         while (null != configClass) {
@@ -538,51 +524,15 @@ public class ExportServiceImpl implements ExportService {
     }
 
 
-    public String getTriggerClassName(String triggerType) {
+    public Class getTriggerClassName(String triggerType) {
         return dalaranComponentContext.getTriggerConfigMap().get(triggerType);
     }
 
 
-    public String getProcessorClassName(String processorType) {
+    public Class getProcessorClassName(String processorType) {
         return dalaranComponentContext.getProcessorConfigMap().get(processorType);
     }
 
-    public String getSoapConfigClassName(String soapType) {
-        return defaultDalaranServiceContext.getConfigClassMap().get(soapType);
-    }
-
-//    public void collectComponent(Object object) {
-//        if(object instanceof AllModelConfig) {
-//            AllModelConfig allModelConfig = (AllModelConfig) object;
-//            String inModelId = allModelConfig.getInModelId();
-//            String outModelId = allModelConfig.getOutModelId();
-//            flowsCollector.getModelIds().add(inModelId);
-//            flowsCollector.getModelIds().add(outModelId);
-//        }
-//
-//        if(object instanceof OutModelConfig) {
-//            OutModelConfig outModelConfig = (OutModelConfig) object;
-//            String outModelId = outModelConfig.getOutModelId();
-//            flowsCollector.getModelIds().add(outModelId);
-//        }
-//
-//        if(object instanceof InModelConfig) {
-//            InModelConfig inModelConfig = (InModelConfig) object;
-//            String inModelId= inModelConfig.getInModelId();
-//            flowsCollector.getModelIds().add(inModelId);
-//        }
-//
-//        if(object instanceof AuthenticatorConfig) {
-//            AuthenticatorConfig authenticatorConfig = (AuthenticatorConfig) object;
-//            String authenticatorId = authenticatorConfig.getAuthenticatorId();
-//            flowsCollector.getAuthenticatorIds().add(authenticatorId);
-//        }
-//        if(object instanceof LimiterConfig) {
-//            LimiterConfig limiterConfig = (LimiterConfig) object;
-//            String limiterId = limiterConfig.getLimiterId();
-//            flowsCollector.getLimiterIds().add(limiterId);
-//        }
-//    }
 
     @Override
 
