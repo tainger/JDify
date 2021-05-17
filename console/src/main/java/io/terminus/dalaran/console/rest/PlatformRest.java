@@ -72,6 +72,9 @@ public class PlatformRest implements PlatformInfoAPI, PlatformImportAPI, Platfor
     @Autowired
     private PropertyService propertyService;
 
+    @Autowired
+    private VersionUpdateService versionUpdateService;
+
     private final String libPath = "lib/";
     private final String classSuffix = ".class";
 
@@ -281,5 +284,16 @@ public class PlatformRest implements PlatformInfoAPI, PlatformImportAPI, Platfor
     @Override
     public BasicResponse localUpload(ResourceUploadRequest resourceUploadRequest) {
         return privateRepositoryService.localResourceUpload(resourceUploadRequest);
+    }
+
+    @Override
+    public BasicResponse versionUpdate() {
+        try {
+            versionUpdateService.cleanOldData();
+            return new BasicResponse(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return new BasicResponse(false);
     }
 }

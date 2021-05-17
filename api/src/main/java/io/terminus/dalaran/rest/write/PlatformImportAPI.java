@@ -21,4 +21,8 @@ public interface PlatformImportAPI {
     @ApiOperation(value = "本地开发资源上报")
     @PostMapping(value = "/resource/upload")
     BasicResponse localUpload(@RequestBody ResourceUploadRequest resourceUploadRequest);
+
+    @ApiOperation(value = "2.4.8配置数据升级")
+    @PostMapping(value = "/version/2.4.8/update")
+    BasicResponse versionUpdate();
 }
