@@ -7,9 +7,12 @@ import io.terminus.dalaran.core.resource.entity.common.ModuleEntity;
 import io.terminus.dalaran.core.resource.repository.ModuleRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+@Service
 public class VersionUpdateServiceImpl implements VersionUpdateService {
 
     @Autowired
@@ -34,6 +37,7 @@ public class VersionUpdateServiceImpl implements VersionUpdateService {
     private SubFlowRepository subFlowRepository;
 
     @Override
+    @Transactional
     public void cleanOldData() {
         List<ModuleEntity> moduleEntityList = moduleRepository.findAll();
         moduleEntityList.forEach(moduleEntity -> {
