@@ -23,15 +23,7 @@ public class QueryFlowInfo {
     public QueryFlowInfo() {
     }
 
-    public QueryFlowInfo(String moduleId, String name, FlowStatus status, boolean isExist, String resourceKey) {
-        this.resourceKey = resourceKey;
-        this.moduleId = moduleId;
-        this.name = name;
-        this.status = status;
-        this.isExist = isExist;
-    }
-
-    public QueryFlowInfo(String moduleId, String name, FlowStatus status, String triggerType, boolean isExist, boolean isOnline, String resourceKey) {
+    public QueryFlowInfo(String resourceKey, String moduleId, String name, FlowStatus status, String triggerType, boolean isExist, boolean isOnline) {
         this.resourceKey = resourceKey;
         this.moduleId = moduleId;
         this.name = name;
@@ -39,5 +31,13 @@ public class QueryFlowInfo {
         this.triggerType = triggerType;
         this.isExist = isExist;
         this.isOnline = isOnline;
+    }
+
+    public QueryFlowInfo(String resourceKey, String moduleId, String name, FlowStatus status,  boolean isExist) {
+        this.resourceKey = resourceKey;
+        this.moduleId = moduleId;
+        this.name = name;
+        this.status = status;
+        this.isExist = isExist;
     }
 }
