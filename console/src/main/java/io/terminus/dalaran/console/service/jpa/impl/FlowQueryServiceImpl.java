@@ -80,8 +80,8 @@ public class FlowQueryServiceImpl implements FlowQueryService {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<QueryFlowInfo> criteriaQuery = builder.createQuery(QueryFlowInfo.class);
         Root<TriggerFlowEntity> root = criteriaQuery.from(TriggerFlowEntity.class);
-        criteriaQuery.multiselect(root.get("moduleId"), root.get("name"), root.get("status"),
-                root.get("triggerType"), root.get("isExist"), root.get("isOnline"), root.get("resourceKey"))
+        criteriaQuery.multiselect(root.get("resourceKey"), root.get("moduleId"), root.get("name"), root.get("status"),
+                root.get("triggerType"), root.get("isExist"), root.get("isOnline"))
                 .where(builder.equal(root.get("moduleId"), moduleId), builder.equal(root.get("isExist"),true));
         List<QueryFlowInfo> flows = entityManager.createQuery(criteriaQuery).getResultList();
         List<BasicFlowInfo> basicFlows = new ArrayList<>();
