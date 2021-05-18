@@ -10,6 +10,7 @@ import java.util.Date;
 public class TracingLogQuery {
 
     private String moduleId;
+
     private String flowId;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
