@@ -9,6 +9,9 @@ public class PropertyService {
     @Value("${terminus.dalaran.tenant-code}")
     private String tenantCode = "terminus";
 
+    @Value("${terminus.dalaran.tenant-console-url}")
+    private String tenantConsoleUrl = "console-url";
+
     @Value("${terminus.dalaran.market.host}")
     private String marketHost;
 
@@ -20,6 +23,9 @@ public class PropertyService {
 
     @Value("${terminus.dalaran.market.group}")
     private String resourceGroup;
+
+    @Value("${terminus.dalaran.market.register}")
+    private String register;
 
     @Value("${noticeMessage.mailNoticeCode}")
     private String mailNoticeCode;
@@ -35,6 +41,9 @@ public class PropertyService {
 
     public String getTenantCode() {
         return tenantCode;
+    }
+    public String getTenantConsoleUrl() {
+        return tenantConsoleUrl;
     }
 
     public String getMarketHost() {
@@ -61,25 +70,11 @@ public class PropertyService {
         return mailNoticeCode;
     }
 
-    public void setMailNoticeCode(String mailNoticeCode) {
-        this.mailNoticeCode = mailNoticeCode;
-    }
-
     public String getSMSNoticeCode() {
         return SMSNoticeCode;
     }
 
-    public void setSMSNoticeCode(String SMSNoticeCode) {
-        this.SMSNoticeCode = SMSNoticeCode;
+    public String getRegister() {
+        return register;
     }
-
-    public String getDingAccessToken() {
-        return dingAccessToken;
-    }
-
-    public void setDingAccessToken(String dingAccessToken) {
-        this.dingAccessToken = dingAccessToken;
-    }
-
-
 }

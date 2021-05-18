@@ -39,4 +39,10 @@ public class DalaranConsoleConstants {
 
     public static final String REDIS_EXPIRETIME_KEY = "ExpireTime-";
 
+    public static final String REGISTER_ATTRIBUTE_NAME = "name";
+
+    public static final String REMOTE_CONSOLE_URL = "remoteConsoleUrl";
+
+    public static final String ID = "id";
+
 }
