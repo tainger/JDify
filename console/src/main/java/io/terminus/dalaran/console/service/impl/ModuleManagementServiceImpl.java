@@ -157,7 +157,7 @@ public class ModuleManagementServiceImpl implements ModuleManagementService {
         List<ModuleDTO> models = new LinkedList<>();
 
         for (ModuleEntity entity : entities) {
-            models.add(buildModel(entity));
+            models.add(buildModule(entity));
         }
 
         return models;
@@ -169,7 +169,7 @@ public class ModuleManagementServiceImpl implements ModuleManagementService {
         List<ModuleDTO> models = new LinkedList<>();
 
         for (ModuleEntity entity : entities) {
-            models.add(buildModel(entity));
+            models.add(buildModule(entity));
         }
 
         return models;
@@ -245,13 +245,14 @@ public class ModuleManagementServiceImpl implements ModuleManagementService {
         return moduleEntity;
     }
 
-    private ModuleDTO buildModel(ModuleEntity entity) {
-        ModuleDTO moduleModel = new ModuleDTO();
-        moduleModel.setId(entity.getResourceKey());
-        moduleModel.setName(entity.getName());
-        moduleModel.setDependencies(entity.getDependencies());
-        moduleModel.setDescription(entity.getDescription());
-        return moduleModel;
+    private ModuleDTO buildModule(ModuleEntity entity) {
+        ModuleDTO module = new ModuleDTO();
+        module.setId(entity.getResourceKey());
+        module.setName(entity.getName());
+        module.setExist(entity.isExist());
+        module.setDependencies(entity.getDependencies());
+        module.setDescription(entity.getDescription());
+        return module;
     }
 
     private void setCreatedBy(ModuleEntity moduleEntity){
