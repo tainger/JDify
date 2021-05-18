@@ -4,7 +4,6 @@ import io.terminus.dalaran.console.entity.NodeEntity;
 import io.terminus.dalaran.console.repository.NodeRepository;
 import io.terminus.dalaran.console.service.NodeService;
 import io.terminus.dalaran.console.util.GenerateKeyUtils;
-import io.terminus.dalaran.model.CreateResponse;
 import io.terminus.dalaran.model.dto.NodeDTO;
 import io.terminus.draco.web.autoconfig.context.UserContext;
 import org.apache.commons.lang3.StringUtils;
@@ -50,7 +49,9 @@ public class NodeServiceImpl implements NodeService {
 
     @Override
     public void delete(String resourceKey) {
-
+        NodeEntity nodeEntity = nodeRepository.findByResourceKey(resourceKey);
+        nodeEntity.setExist(false);
+        nodeRepository.save(nodeEntity);
     }
 
     private void buildEntity(NodeDTO nodeDTO, NodeEntity nodeEntity){

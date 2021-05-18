@@ -24,16 +24,16 @@ public class NodeRest implements NodeReadAPI, NodeWriteAPI {
 
     @Override
     public CreateResponse create(@RequestBody NodeDTO nodeDTO) {
-        return null;
+        return new CreateResponse(nodeService.create(nodeDTO));
     }
 
     @Override
     public NodeDTO update(@RequestBody NodeDTO nodeDTO) {
-        return null;
+        return nodeService.update(nodeDTO);
     }
 
     @Override
     public void delete(@RequestParam String resourceKey) {
-
+        nodeService.delete(resourceKey);
     }
 }
