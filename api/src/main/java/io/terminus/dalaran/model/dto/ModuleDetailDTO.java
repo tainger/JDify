@@ -30,4 +30,5 @@ public class ModuleDetailDTO extends ModuleDTO {
     private List<BasicAlarmInfo> alarmRules;
 
     private List<BasicAuthenticatorInfo> authenticators;
+
 }
