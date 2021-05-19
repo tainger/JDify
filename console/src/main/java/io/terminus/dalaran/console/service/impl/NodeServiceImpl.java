@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import javax.persistence.criteria.Predicate;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,6 +30,16 @@ public class NodeServiceImpl implements NodeService {
         Pageable pageable = PageRequest.of(pageNumber - 1, pageSize, order);
         Page<NodeEntity> page = nodeRepository.findAll(buildSpecification(), pageable);
         return new PageImpl<>(page.stream().map(this::buildNodeDTO).collect(Collectors.toList()), pageable, page.getTotalElements());
+    }
+
+    @Override
+    public List<NodeDTO> list() {
+        List<NodeEntity> nodeEntityList = nodeRepository.findByIsExistTrue();
+        List<NodeDTO> nodeDTOList = new LinkedList<>();
+        for (NodeEntity nodeEntity : nodeEntityList) {
+            nodeDTOList.add(buildNodeDTO(nodeEntity));
+        }
+        return nodeDTOList;
     }
 
     @Override
@@ -77,6 +88,7 @@ public class NodeServiceImpl implements NodeService {
 
     private NodeDTO buildNodeDTO(NodeEntity entity) {
         NodeDTO nodeDTO = new NodeDTO();
+        nodeDTO.setResourceKey(entity.getResourceKey());
         nodeDTO.setName(entity.getName());
         nodeDTO.setCompany(entity.getCompany());
         nodeDTO.setApplication(entity.getApplication());

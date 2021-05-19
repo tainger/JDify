@@ -87,6 +87,9 @@ public class ModuleManagementServiceImpl implements ModuleManagementService {
     @Autowired
     private AuthenticatorService authenticatorService;
 
+    @Autowired
+    private AuthenticatorRepository authenticatorRepository;
+
     @Override
     public String createModule(ModuleDTO moduleModel) {
         ModuleEntity moduleEntity = buildEntity(moduleModel);
@@ -101,45 +104,51 @@ public class ModuleManagementServiceImpl implements ModuleManagementService {
         moduleRepository.save(moduleEntity);
 
         List<TriggerFlowEntity> triggerFlowEntityList = flowRepository.findByModuleIdAndIsExistTrue(moduleId);
-        for(TriggerFlowEntity triggerFlowEntity: triggerFlowEntityList) {
+        for (TriggerFlowEntity triggerFlowEntity : triggerFlowEntityList) {
             triggerFlowEntity.setExist(false);
             flowRepository.save(triggerFlowEntity);
         }
 
         List<ModelEntity> modelEntityList = modelRepository.findByModuleIdAndIsExistTrue(moduleId);
-        for(ModelEntity modelEntity:modelEntityList) {
+        for (ModelEntity modelEntity : modelEntityList) {
             modelEntity.setExist(false);
             modelRepository.save(modelEntity);
         }
 
         List<SubFlowEntity> subFlowEntityList = subFlowRepository.findByModuleIdAndIsExistTrue(moduleId);
-        for(SubFlowEntity subFlowEntity:subFlowEntityList) {
+        for (SubFlowEntity subFlowEntity : subFlowEntityList) {
             subFlowEntity.setExist(false);
             subFlowRepository.save(subFlowEntity);
         }
 
         List<ClientEntity> clientEntityList = clientRepository.findByModuleIdAndIsExistTrue(moduleId);
-        for(ClientEntity clientEntity:clientEntityList) {
+        for (ClientEntity clientEntity : clientEntityList) {
             clientEntity.setExist(false);
             clientRepository.save(clientEntity);
         }
 
         List<ServiceEntity> serviceEntityList = serviceRepository.findByModuleIdAndIsExistTrue(moduleId);
-        for(ServiceEntity serviceEntity:serviceEntityList) {
+        for (ServiceEntity serviceEntity : serviceEntityList) {
             serviceEntity.setExist(false);
             serviceRepository.save(serviceEntity);
         }
 
         List<ConnectorEntity> connectorEntityList = connectorRepository.findByModuleIdAndIsExistTrue(moduleId);
-        for(ConnectorEntity connectorEntity:connectorEntityList) {
+        for (ConnectorEntity connectorEntity : connectorEntityList) {
             connectorEntity.setExist(false);
             connectorRepository.save(connectorEntity);
         }
 
         List<FunctionEntity> functionEntityList = functionRepository.findByModuleIdAndIsExistTrue(moduleId);
-        for(FunctionEntity functionEntity:functionEntityList) {
+        for (FunctionEntity functionEntity : functionEntityList) {
             functionEntity.setExist(false);
             functionRepository.save(functionEntity);
+        }
+
+        List<AuthenticatorEntity> authenticatorEntityList = authenticatorRepository.findByModuleIdAndIsExistTrue(moduleId);
+        for (AuthenticatorEntity authenticatorEntity : authenticatorEntityList) {
+            authenticatorEntity.setExist(false);
+            authenticatorRepository.save(authenticatorEntity);
         }
     }
 

@@ -14,4 +14,6 @@ public interface AuthenticatorRepository extends JpaRepository<AuthenticatorEnti
     List<AuthenticatorEntity> findByIsExistTrue();
 
     List<AuthenticatorEntity> findByResourceKeyIn(List<String> resourceKeys);
+
+    List<AuthenticatorEntity> findByModuleIdAndIsExistTrue(String moduleId);
 }
