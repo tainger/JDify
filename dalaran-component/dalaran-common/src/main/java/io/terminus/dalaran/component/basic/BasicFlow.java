@@ -20,7 +20,8 @@ public class BasicFlow implements DalaranBasicComponent {
     @ConfigFieldInfo(label = "流程模板", inputType = FieldInputType.TemplateSelector, required = false, show = "createdType == \"Template\" && !isEditMode")
     private String template;
 
-    @ConfigFieldInfo(label = "触发器类型", inputType = FieldInputType.TriggerSelector, required = false, show = "createdType == \"Custom\" || isEditMode")
+    @ConfigFieldInfo(label = "触发器类型", inputType = FieldInputType.TriggerSelector, required = false, show = "createdType == \"Custom\" || isEditMode",
+    path = "/api/platform/trigger")
     private String triggerType;
 
     @ConfigFieldInfo(label = "配置数据", inputType = FieldInputType.String, required = false, show = "createdType == \"DataConfig\" && !isEditMode")

@@ -13,6 +13,6 @@ public class BasicProcessor implements DalaranBasicComponent {
     @ConfigFieldInfo(label = "展示名称", inputType = FieldInputType.String)
     private String name;
 
-    @ConfigFieldInfo(label = "节点类型", inputType = FieldInputType.ProcessorSelector)
+    @ConfigFieldInfo(label = "节点类型", inputType = FieldInputType.ProcessorSelector, path = "/api/platform/processor")
     private String type;
 }
