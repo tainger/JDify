@@ -17,7 +17,8 @@ public class BasicSubFlow implements DalaranBasicComponent {
     @ConfigFieldInfo(label = "创建方式", inputType = FieldInputType.Radio, show = "!isEditMode")
     private SubFlowCreateType createdType;
 
-    @ConfigFieldInfo(label = "子流程模板", inputType = FieldInputType.SubFlowTemplateSelector, required = false, show = "createdType == \"Template\" && !isEditMode")
+    @ConfigFieldInfo(label = "子流程模板", inputType = FieldInputType.SubFlowTemplateSelector, required = false, show = "createdType == \"Template\" && !isEditMode",
+    path = "/api/repository/private/resource", param = "type")
     private String template;
 
     @ConfigFieldInfo(label = "子流程描述", inputType = FieldInputType.String, required = false, show = "createdType == \"Custom\" || isEditMode")
