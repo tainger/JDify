@@ -7,6 +7,8 @@ public class BasicConnectorInfo {
 
     private String id;
 
+    private String nodeId;
+
     private String moduleId;
 
     private String name;
@@ -18,8 +20,9 @@ public class BasicConnectorInfo {
     public BasicConnectorInfo() {
     }
 
-    public BasicConnectorInfo(String id, String moduleId, String name, String connectorType, boolean isExist) {
+    public BasicConnectorInfo(String id, String nodeId, String moduleId, String name, String connectorType, boolean isExist) {
         this.id = id;
+        this.nodeId = nodeId;
         this.moduleId = moduleId;
         this.name = name;
         this.connectorType = connectorType;
