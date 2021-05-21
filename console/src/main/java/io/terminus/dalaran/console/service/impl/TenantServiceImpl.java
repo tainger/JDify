@@ -2,13 +2,12 @@ package io.terminus.dalaran.console.service.impl;
 
 import io.terminus.dalaran.DalaranConsoleConstants;
 import io.terminus.dalaran.console.entity.TenantKeyEntity;
-import io.terminus.dalaran.console.model.BasicResponse;
 import io.terminus.dalaran.console.repository.TenantKeyRepository;
-import io.terminus.dalaran.console.service.HelloMarketService;
+import io.terminus.dalaran.console.service.TenantService;
 import io.terminus.dalaran.console.util.GenerateKeyUtils;
 import io.terminus.dalaran.core.resource.property.PropertyService;
+import io.terminus.dalaran.model.BasicResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -20,9 +19,9 @@ import java.util.List;
 import java.util.Map;
 
 
-@Slf4j
 @Service
-public class HelloMarketServiceImpl implements HelloMarketService, InitializingBean {
+@Slf4j
+public class TenantServiceImpl implements TenantService {
 
     @Autowired
     private PropertyService propertyService;
@@ -32,14 +31,9 @@ public class HelloMarketServiceImpl implements HelloMarketService, InitializingB
 
     private final RestTemplate restTemplate = new RestTemplate();
 
-
     @Override
-    public void afterPropertiesSet() throws Exception {
-        registerMarket();
-    }
-
-    @Override
-    public void registerMarket() {
+    public BasicResponse register() {
+        BasicResponse basicResponse = new BasicResponse();
         String tenantCode = propertyService.getTenantCode();
         String tenantConsoleUrl = propertyService.getTenantConsoleUrl();
         String resourceKey = getResourcekey();
@@ -50,16 +44,14 @@ public class HelloMarketServiceImpl implements HelloMarketService, InitializingB
         HttpHeaders requestHeaders = new HttpHeaders();
         requestHeaders.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<Map> requestEntity = new HttpEntity<>(request, requestHeaders);
-        ResponseEntity<BasicResponse> response = restTemplate.postForEntity(propertyService.getMarketHost() + propertyService.getRegister(), requestEntity, BasicResponse.class);
+        ResponseEntity<BasicResponse> response = restTemplate.postForEntity(propertyService.getMarketHost() + propertyService.getRegister(), requestEntity,BasicResponse.class);
         if(response.getStatusCode() != HttpStatus.OK) {
-            log.error("注册市场失败，原因: {}", response.getBody());
-            return;
+             basicResponse.setSuccess(false);
+            basicResponse.setResult(response.getBody());
         }
-        BasicResponse basicResponse = response.getBody();
-        if(!basicResponse.isSuccess()){
-            log.error("注册市场失败，原因: {}", response.getBody());
-        }
+        return response.getBody();
     }
+
 
     //  when distribute env may be in danger.
     private String getResourcekey() {
