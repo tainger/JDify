@@ -66,4 +66,14 @@ public class RedisService {
         return redisTemplate.delete(key);
     }
 
+
+    public Long push(String queueName, String value) {
+        return redisTemplate.opsForList().leftPush(queueName, value);
+    }
+
+
+    public String pop(String queueName) {
+        return redisTemplate.opsForList().rightPop(queueName, 0, TimeUnit.MILLISECONDS);
+    }
+
 }

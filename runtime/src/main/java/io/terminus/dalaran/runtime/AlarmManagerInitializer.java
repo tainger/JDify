@@ -1,6 +1,7 @@
 package io.terminus.dalaran.runtime;
 
 import com.alibaba.fastjson.JSONObject;
+import io.lettuce.core.RedisCommandTimeoutException;
 import io.terminus.dalaran.core.component.config.AlarmRuleConfig;
 import io.terminus.dalaran.core.flow.DalaranNoticeBuilder;
 import io.terminus.dalaran.core.resource.DalaranStarter;
@@ -26,60 +27,66 @@ public class AlarmManagerInitializer implements DalaranStarter {
     public void start() {
         new Thread(() -> {
             for (; ; ) {
+                String timeToMonitor = null;
+                //something to be optimized
                 try {
-                    String timeToMonitor = redisService.getValue(RedisUtil.getTimeToMonitor());
-                    if (null == timeToMonitor) {
-                        continue;
-                    }
-                    monitor(timeToMonitor);
-                    redisService.deleteKey(RedisUtil.getTimeToMonitor());
+                    timeToMonitor = redisService.pop(RedisUtil.getTimeToMonitor());
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-
+                if (null != timeToMonitor) {
+                    try {
+                        monitor(timeToMonitor);
+                    } catch (Exception e) {
+                        log.error("报错:{}", RequestID.getExceptionStackTrace(e));
+                    }
+                }
             }
         }).start();
     }
 
     private void monitor(String timeToMonitor) {
-            String flowInfosStr = redisService.getValue(RedisUtil.getReleasedFlowIdsKey());
-            if (flowInfosStr == null) {
-                return;
+        String flowInfosStr = redisService.getValue(RedisUtil.getReleasedFlowIdsKey());
+        if (flowInfosStr == null) {
+            return;
+        }
+        List<Map<String, Object>> flowInfos = JSONObject.parseObject(flowInfosStr, List.class);
+        for (Map<String, Object> flow : flowInfos) {
+            String id = (String) flow.get("id");
+            String failureCountStr = redisService.getValue(RedisUtil.getFailureKey(id, timeToMonitor));
+            redisService.deleteKey(RedisUtil.getFailureKey(id, timeToMonitor));
+            String timeOutCountStr = redisService.getValue(RedisUtil.getTimeOutKey(id, timeToMonitor));
+            redisService.deleteKey(RedisUtil.getTimeOutKey(id, timeToMonitor));
+            String alarmConfigStr = getAlarmConfigIfAlarmConfigKey(id);
+            if (null == alarmConfigStr) {
+                continue;
             }
-            List<Map<String, Object>> flowInfos = JSONObject.parseObject(flowInfosStr, List.class);
-            for (Map<String, Object> flow : flowInfos) {
-                String id = (String) flow.get("id");
-                String failureCountStr = redisService.getValue(RedisUtil.getFailureKey(id, timeToMonitor));
-                redisService.deleteKey(RedisUtil.getFailureKey(id, timeToMonitor));
-                String timeOutCountStr = redisService.getValue(RedisUtil.getTimeOutKey(id, timeToMonitor));
-                redisService.deleteKey(RedisUtil.getTimeOutKey(id, timeToMonitor));
-                String alarmConfigStr = getAlarmConfigIfAlarmConfigKey(id);
-                if (null == alarmConfigStr) {
-                    continue;
+            AlarmRuleConfig alarmRuleConfig = JSONObject.parseObject(alarmConfigStr, AlarmRuleConfig.class);
+            NoticeMessage noticeMessage = new NoticeMessage();
+            if (failureCountStr != null) {
+                int failureCount = Integer.parseInt(failureCountStr);
+                if (alarmRuleConfig.getFailureAlarm().getIsOpen() && failureCount >= alarmRuleConfig.getFailureAlarm().getFailureFrequency()) {
+                    noticeMessage.setIsTouchFailureAlarm(true);
                 }
-                AlarmRuleConfig alarmRuleConfig = JSONObject.parseObject(alarmConfigStr, AlarmRuleConfig.class);
-                NoticeMessage noticeMessage = new NoticeMessage();
-                if (failureCountStr != null) {
-                    int failureCount = Integer.parseInt(failureCountStr);
-                    if (alarmRuleConfig.getFailureAlarm().getIsOpen() && failureCount >= alarmRuleConfig.getFailureAlarm().getFailureFrequency()) {
-                        noticeMessage.setIsTouchFailureAlarm(true);
-                    }
-                    noticeMessage.setFailureFrequency(alarmRuleConfig.getFailureAlarm().getFailureFrequency());
-                    noticeMessage.setFailureCount(failureCount);
+                noticeMessage.setFailureCount(failureCount);
+            }
+            noticeMessage.setFailureFrequency(alarmRuleConfig.getFailureAlarm().getFailureFrequency());
+            if (null != timeOutCountStr) {
+                int timeOutCount = Integer.parseInt(timeOutCountStr);
+                if (alarmRuleConfig.getTimeOutAlarm().getIsOpen() && timeOutCount >= alarmRuleConfig.getTimeOutAlarm().getElapsedFrequency()) {
+                    noticeMessage.setIsTouchTimeOutAlarm(true);
                 }
-                if (null != timeOutCountStr) {
-                    int timeOutCount = Integer.parseInt(timeOutCountStr);
-                    if (alarmRuleConfig.getTimeOutAlarm().getIsOpen() && timeOutCount >= alarmRuleConfig.getTimeOutAlarm().getElapsedFrequency()) {
-                        noticeMessage.setIsTouchTimeOutAlarm(true);
-                    }
-                    noticeMessage.setTimeOutFrequency(alarmRuleConfig.getTimeOutAlarm().getElapsedFrequency());
-                    noticeMessage.setTimeOutCount(timeOutCount);
-                }
+
+                noticeMessage.setTimeOutCount(timeOutCount);
+            }
+            noticeMessage.setTimeOutFrequency(alarmRuleConfig.getTimeOutAlarm().getElapsedFrequency());
+            if(noticeMessage.getIsTouchFailureAlarm() || noticeMessage.getIsTouchTimeOutAlarm()) {
                 String name = (String) flow.get("name");
                 noticeMessage.setCreateDate(timeToMonitor);
                 noticeMessage.setFlowName(name);
                 sendNotice(noticeMessage, alarmRuleConfig.getAlarmChannel());
             }
+        }
     }
 
     private void sendNotice(NoticeMessage noticeMessage, Map<AlarmRuleConfig.ChannelType, String> alarmChannel) {

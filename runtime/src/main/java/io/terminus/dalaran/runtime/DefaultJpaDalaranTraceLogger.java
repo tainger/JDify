@@ -72,8 +72,8 @@ public class DefaultJpaDalaranTraceLogger implements DalaranTraceLogger {
             if (currentTime == null) {
                 redisService.persistKey(RedisUtil.getCurrentTime(), format);
             } else if (!currentTime.equals(format)) {
+                redisService.push(RedisUtil.getTimeToMonitor(), currentTime);
                 redisService.persistKey(RedisUtil.getCurrentTime(), format);
-                redisService.persistKey(RedisUtil.getTimeToMonitor(), currentTime);
             }
             AlarmRuleConfig alarmRuleConfig = JSONObject.parseObject(value, AlarmRuleConfig.class);
             if (!tracingLog.isSuccessful()) {
