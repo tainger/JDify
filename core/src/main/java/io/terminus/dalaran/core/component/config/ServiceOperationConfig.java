@@ -12,6 +12,6 @@ public class ServiceOperationConfig extends ImmutableModelConfig {
     private String serviceId;
 
     @ConfigFieldInfo(label = "操作", inputType = FieldInputType.ServiceOperation, path = "/api/service/{serviceId}/operation",
-            param = "serviceId={serviceId}")
+            param = "serviceId={serviceId}", dynamic = true)
     private String operation;
 }

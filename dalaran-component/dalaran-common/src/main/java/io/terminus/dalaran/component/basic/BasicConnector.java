@@ -13,6 +13,6 @@ public class BasicConnector implements DalaranBasicComponent {
     @ConfigFieldInfo(label = "组件名称", inputType = FieldInputType.String)
     private String name;
 
-    @ConfigFieldInfo(label = "连接器类型", inputType = FieldInputType.ConnectorSelector, path = "/api/platform/connector")
+    @ConfigFieldInfo(label = "连接器类型", inputType = FieldInputType.ConnectorSelector, path = "/api/platform/connector", dynamic = true)
     private String connectorType;
 }

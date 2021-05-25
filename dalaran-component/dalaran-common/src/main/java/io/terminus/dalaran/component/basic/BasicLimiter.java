@@ -13,6 +13,6 @@ public class BasicLimiter implements DalaranBasicComponent {
     @ConfigFieldInfo(label = "组件名称", inputType = FieldInputType.String)
     private String name;
 
-    @ConfigFieldInfo(label = "限流器类型", inputType = FieldInputType.LimiterSelector, path = "/api/platform/limiter")
+    @ConfigFieldInfo(label = "限流器类型", inputType = FieldInputType.LimiterSelector, path = "/api/platform/limiter", dynamic = true)
     private String limiterType;
 }

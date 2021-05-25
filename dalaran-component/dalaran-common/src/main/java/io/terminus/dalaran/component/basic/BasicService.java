@@ -14,7 +14,7 @@ public class BasicService implements DalaranBasicComponent {
     @ConfigFieldInfo(label = "服务名称", inputType = FieldInputType.String)
     private String name;
 
-    @ConfigFieldInfo(label = "服务类型", inputType = FieldInputType.ServiceSelector, path = "/api/platform/service")
+    @ConfigFieldInfo(label = "服务类型", inputType = FieldInputType.ServiceSelector, path = "/api/platform/service", dynamic = true)
     private String type;
 
     @ConfigFieldInfo(label = "服务描述", inputType = FieldInputType.String, required = false)

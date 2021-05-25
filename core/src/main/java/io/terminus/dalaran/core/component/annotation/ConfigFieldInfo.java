@@ -31,6 +31,8 @@ public @interface ConfigFieldInfo {
 
     String inputType() default FieldInputType.Auto;
 
+    boolean dynamic() default false;
+
     Class connectorType() default Void.class;
 
     Class limiterType() default Void.class;

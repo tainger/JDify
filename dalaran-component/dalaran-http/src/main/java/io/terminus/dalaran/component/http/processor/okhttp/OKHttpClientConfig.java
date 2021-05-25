@@ -49,6 +49,6 @@ public class OKHttpClientConfig extends OutModelConfig implements ConnectorConfi
     private Boolean checkCertificate = true;
 
     @ConfigFieldInfo(label = "SSL Certificate", inputType = FieldInputType.FileUpload, required = false,
-     show = "checkCertificate == true")
+     show = "checkCertificate == true", dynamic = true)
     private String sslCertificate;
 }
