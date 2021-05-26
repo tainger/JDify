@@ -18,7 +18,7 @@ public class BasicFlow implements DalaranBasicComponent {
     private FLowCreatedType createdType;
 
     @ConfigFieldInfo(label = "流程模板", inputType = FieldInputType.TemplateSelector, required = false, show = "createdType == \"Template\" && !isEditMode",
-    path = "/api/repository/private/resource", param = "type")
+    path = "/api/repository/private/resource", param = "type=FlowTemplate")
     private String template;
 
     @ConfigFieldInfo(label = "触发器类型", inputType = FieldInputType.TriggerSelector, required = false, show = "createdType == \"Custom\" || isEditMode",
