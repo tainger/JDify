@@ -52,5 +52,5 @@ public interface FlowReadAPI {
 
     @ApiOperation(value = "生成node结构")
     @GetMapping(value = "/node")
-    List<NodeDTO> node(@RequestBody List<ProcessorDTO> pipeline);
+    List<NodeFlowDTO> node(@RequestBody List<ProcessorDTO> pipeline);
 }

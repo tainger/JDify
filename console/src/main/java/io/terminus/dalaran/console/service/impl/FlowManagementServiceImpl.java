@@ -1,6 +1,7 @@
 package io.terminus.dalaran.console.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import io.terminus.dalaran.DalaranConstants;
 import io.terminus.dalaran.ModelImportMode;
 import io.terminus.dalaran.component.foreach.ForEachConfig;
@@ -48,7 +49,9 @@ import io.terminus.dalaran.core.resource.repository.TriggerFlowReleasedRepositor
 import io.terminus.dalaran.exception.flow.FlowNotExistException;
 import io.terminus.dalaran.model.BasicResponse;
 import io.terminus.dalaran.model.ModelTargetType;
+import io.terminus.dalaran.model.component.ProcessorModel;
 import io.terminus.dalaran.model.component.ProcessorRouteInfo;
+import io.terminus.dalaran.model.component.RoutesModel;
 import io.terminus.dalaran.model.dto.*;
 import io.terminus.dalaran.model.dto.basic.BasicFlowInfo;
 import io.terminus.dalaran.model.dto.flow.BasicFlowInfoDTO;
@@ -80,6 +83,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import javax.persistence.criteria.Predicate;
 import javax.transaction.Transactional;
+import javax.xml.soap.Node;
 import java.util.*;
 import java.util.stream.Collectors;
 import static io.terminus.dalaran.DalaranConstants.*;
@@ -722,7 +726,40 @@ public class FlowManagementServiceImpl implements FlowManagementService {
     }
 
     @Override
-    public List<NodeDTO> node(List<ProcessorDTO> pipeline) {
+    public List<NodeFlowDTO> node(List<ProcessorDTO> pipeline) {
+        List<NodeFlowDTO> nodeFlowDTOList = new ArrayList<>();
+        nodeFlowDTOList = buildNode(pipeline, nodeFlowDTOList);
+        return nodeFlowDTOList;
+    }
+
+    public List<NodeFlowDTO> buildNode(List<ProcessorDTO> pipeline, List<NodeFlowDTO> nodeFlowDTOList) {
+        for (ProcessorDTO processorDTO : pipeline) {
+            String json = JSONObject.toJSONString(processorDTO.getConfig());
+            JSONObject jsonObject;
+            if (json.startsWith("\"")) {
+                jsonObject = JSONObject.parseObject(processorDTO.getConfig().toString());
+            } else {
+                jsonObject = JSONObject.parseObject(json);
+            }
+            if (jsonObject.containsKey("routes")) {
+                List<RoutesModel> routesModelList = jsonObject.getJSONArray("routes").toJavaList(RoutesModel.class);
+                for (RoutesModel routesModel : routesModelList) {
+                    String pipelineJson = JSONObject.toJSONString(routesModel);
+                    JSONObject pipelineJsonObject;
+                    if (json.startsWith("\"")) {
+                        pipelineJsonObject = JSONObject.parseObject(routesModel.toString());
+                    } else {
+                        pipelineJsonObject = JSONObject.parseObject(pipelineJson);
+                    }
+                    if ((pipelineJsonObject.getJSONArray("pipeline")) != null) {
+                        buildNode((pipelineJsonObject.getJSONArray("pipeline")).toJavaList(ProcessorDTO.class), nodeFlowDTOList);
+                    }
+                }
+            }
+            if (jsonObject.containsKey("pipeline")) {
+                buildNode((jsonObject.getJSONArray("pipeline")).toJavaList(ProcessorDTO.class), nodeFlowDTOList);
+            }
+        }
         return null;
     }
 

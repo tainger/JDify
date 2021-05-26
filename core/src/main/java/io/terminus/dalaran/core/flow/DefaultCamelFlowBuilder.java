@@ -185,20 +185,20 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
         return route;
     }
 
-    public FlowValidationModel validatePipeline(List<ProcessorModel> pipeline, List<FlowValidation> validateMessages, MessageModel lastModel, FlowValidationModel flowValidationModel){
-        for(ProcessorModel processorModel : pipeline){
+    public FlowValidationModel validatePipeline(List<ProcessorModel> pipeline, List<FlowValidation> validateMessages, MessageModel lastModel, FlowValidationModel flowValidationModel) {
+        for (ProcessorModel processorModel : pipeline) {
             DalaranProcessor processor = componentContext.getProcessor(processorModel.getGroup(), processorModel.getType(), processorModel.getVersion());
             ProcessorInfo processorInfo = componentContext.getProcessorInfo(processorModel.getGroup(), processorModel.getType(), processorModel.getVersion());
             String json = JSONObject.toJSONString(processorModel.getConfig());
             JSONObject jsonObject;
             if (json.startsWith("\"")) {
                 jsonObject = JSONObject.parseObject(processorModel.getConfig().toString());
-            }else {
+            } else {
                 jsonObject = JSONObject.parseObject(json);
             }
-            if(jsonObject.containsKey("routes")){
+            if (jsonObject.containsKey("routes")) {
                 List<RoutesModel> routesModelList = jsonObject.getJSONArray("routes").toJavaList(RoutesModel.class);
-                for(RoutesModel routesModel : routesModelList) {
+                for (RoutesModel routesModel : routesModelList) {
                     String pipelineJson = JSONObject.toJSONString(routesModel);
                     JSONObject pipelineJsonObject;
                     if (json.startsWith("\"")) {
@@ -206,12 +206,12 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
                     } else {
                         pipelineJsonObject = JSONObject.parseObject(pipelineJson);
                     }
-                    if((pipelineJsonObject.getJSONArray("pipeline")) != null) {
+                    if ((pipelineJsonObject.getJSONArray("pipeline")) != null) {
                         validatePipeline((pipelineJsonObject.getJSONArray("pipeline")).toJavaList(ProcessorModel.class), validateMessages, lastModel, flowValidationModel);
                     }
                 }
             }
-            if(jsonObject.containsKey("pipeline")){
+            if (jsonObject.containsKey("pipeline")) {
                 validatePipeline((jsonObject.getJSONArray("pipeline")).toJavaList(ProcessorModel.class), validateMessages, lastModel, flowValidationModel);
             }
             List<FlowValidation> processorMessageList = validate(processorInfo, jsonObject);
@@ -221,10 +221,10 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
                     if (processorModel.getType().equals("mapper-convert")) {
                         DalaranMapperConfig config = jsonObject.toJavaObject(DalaranMapperConfig.class);
                         processorCustomMessageList = ((DalaranComponentValidator) processor).validate(config);
-                    }else if(processorModel.getType().equals("service")) {
+                    } else if (processorModel.getType().equals("service")) {
                         ServiceOperationConfig config = jsonObject.toJavaObject(ServiceOperationConfig.class);
                         processorCustomMessageList = ((DalaranComponentValidator) processor).validate(config);
-                    }else if(processorModel.getType().equals("error-catch")) {
+                    } else if (processorModel.getType().equals("error-catch")) {
                         ErrorCatchConfig config = jsonObject.toJavaObject(ErrorCatchConfig.class);
                         processorCustomMessageList = ((DalaranComponentValidator) processor).validate(config);
                     }

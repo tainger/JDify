@@ -67,5 +67,5 @@ public interface FlowManagementService {
 
     Page<BasicFlowInfoDTO> listBasicInfo(FlowQuery flowQuery, Integer pageNumber, Integer pageSize);
 
-    List<NodeDTO> node(List<ProcessorDTO> pipeline);
+    List<NodeFlowDTO> node(List<ProcessorDTO> pipeline);
 }

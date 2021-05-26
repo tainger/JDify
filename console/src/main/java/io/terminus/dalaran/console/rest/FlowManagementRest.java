@@ -106,7 +106,7 @@ public class FlowManagementRest implements FlowReadAPI, FlowWriteAPI {
     }
 
     @Override
-    public List<NodeDTO> node(@RequestBody List<ProcessorDTO> pipeline) {
+    public List<NodeFlowDTO> node(@RequestBody List<ProcessorDTO> pipeline) {
         return flowManagementService.node(pipeline);
     }
 
