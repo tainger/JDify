@@ -721,6 +721,11 @@ public class FlowManagementServiceImpl implements FlowManagementService {
         return new PageImpl<>(models, pageable, triggerFlowEntities.getTotalElements());
     }
 
+    @Override
+    public List<NodeDTO> node(List<ProcessorDTO> pipeline) {
+        return null;
+    }
+
     private Specification<TriggerFlowEntity> buildSpecification(FlowQuery flowQuery) {
         return (root, criteriaQuery, builder) -> {
             List<Predicate> predicates = new ArrayList<>();

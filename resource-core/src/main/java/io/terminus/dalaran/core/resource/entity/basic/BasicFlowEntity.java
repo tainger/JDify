@@ -1,7 +1,6 @@
 package io.terminus.dalaran.core.resource.entity.basic;
 
 import io.terminus.dalaran.core.resource.converter.PipelineJsonConverter;
-import io.terminus.dalaran.core.resource.entity.common.NodeEntity;
 import io.terminus.dalaran.core.resource.entity.common.ProcessorEntity;
 import io.terminus.dalaran.model.flow.FlowStatus;
 import lombok.Data;
@@ -37,6 +36,4 @@ public class BasicFlowEntity extends BasicEntity {
     @Convert(converter = PipelineJsonConverter.class)
     @Column(nullable = false, columnDefinition = "LONGTEXT")
     private List<ProcessorEntity> pipeline;
-
-    private List<NodeEntity> node;
 }
