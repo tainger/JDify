@@ -4,12 +4,8 @@ import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.shardingsphere.elasticjob.api.ShardingContext;
 import org.apache.shardingsphere.elasticjob.simple.job.SimpleJob;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class ElasticJob implements SimpleJob {
-
-    private static final Logger LOG = LoggerFactory.getLogger(ElasticJob.class);
 
     private ElasticJobEndpoint endpoint;
 

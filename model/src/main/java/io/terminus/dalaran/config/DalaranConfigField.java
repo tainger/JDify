@@ -29,6 +29,8 @@ public class DalaranConfigField {
 
     private String show;
 
+    private boolean dynamic;
+
     Map<String, String> enumValues;
 
     private ValidateConfig validateConfig;

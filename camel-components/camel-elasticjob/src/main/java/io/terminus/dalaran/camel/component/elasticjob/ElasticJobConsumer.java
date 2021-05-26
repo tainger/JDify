@@ -1,24 +1,23 @@
 package io.terminus.dalaran.camel.component.elasticjob;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.camel.Processor;
 import org.apache.camel.impl.DefaultConsumer;
 import org.apache.shardingsphere.elasticjob.api.JobConfiguration;
 import org.apache.shardingsphere.elasticjob.lite.api.bootstrap.impl.ScheduleJobBootstrap;
 import org.apache.shardingsphere.elasticjob.lite.lifecycle.api.JobAPIFactory;
-import org.apache.shardingsphere.elasticjob.lite.lifecycle.api.JobOperateAPI;
 import org.apache.shardingsphere.elasticjob.reg.base.CoordinatorRegistryCenter;
 import org.apache.shardingsphere.elasticjob.reg.zookeeper.ZookeeperConfiguration;
 import org.apache.shardingsphere.elasticjob.reg.zookeeper.ZookeeperRegistryCenter;
-import org.springframework.beans.factory.annotation.Autowired;
 
+@Slf4j
 public class ElasticJobConsumer extends DefaultConsumer {
-
-    @Autowired
-    private JobOperateAPI jobOperateAPI;
 
     private ElasticJobEndpoint endpoint;
 
     private Processor processor;
+
+    private CoordinatorRegistryCenter regCenter;
 
 
     public ElasticJobConsumer(ElasticJobEndpoint endpoint, Processor processor) {
@@ -39,11 +38,16 @@ public class ElasticJobConsumer extends DefaultConsumer {
         new ScheduleJobBootstrap(createRegistryCenter(), new ElasticJob(endpoint, processor), createJobConfiguration()).shutdown();
         //这里需要先remove掉这个jobName在zk中的配置，否则会出现doStart后该jobName还是老的配置
         JobAPIFactory.createJobConfigurationAPI(endpoint.getServerLists(), endpoint.getNamespace(), null).removeJobConfiguration(endpoint.getJobName());
+        if (regCenter != null) {
+            regCenter.close();
+        }
     }
 
     private CoordinatorRegistryCenter createRegistryCenter() {
-        CoordinatorRegistryCenter regCenter = new ZookeeperRegistryCenter(new ZookeeperConfiguration(endpoint.getServerLists(), endpoint.getNamespace()));
-        regCenter.init();
+        if (regCenter == null) {
+            regCenter = new ZookeeperRegistryCenter(new ZookeeperConfiguration(endpoint.getServerLists(), endpoint.getNamespace()));
+            regCenter.init();
+        }
         return regCenter;
     }
 
