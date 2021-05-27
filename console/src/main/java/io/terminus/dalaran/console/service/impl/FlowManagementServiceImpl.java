@@ -734,6 +734,7 @@ public class FlowManagementServiceImpl implements FlowManagementService {
 
     public List<NodeFlowDTO> buildNode(List<ProcessorDTO> pipeline, List<NodeFlowDTO> nodeFlowDTOList) {
         for (ProcessorDTO processorDTO : pipeline) {
+            NodeFlowDTO nodeFlowDTO = new NodeFlowDTO();
             String json = JSONObject.toJSONString(processorDTO.getConfig());
             JSONObject jsonObject;
             if (json.startsWith("\"")) {
@@ -758,6 +759,9 @@ public class FlowManagementServiceImpl implements FlowManagementService {
             }
             if (jsonObject.containsKey("pipeline")) {
                 buildNode((jsonObject.getJSONArray("pipeline")).toJavaList(ProcessorDTO.class), nodeFlowDTOList);
+            }
+            if (processorDTO.getType().equals("connector") || processorDTO.getType().equals("service")) {
+
             }
         }
         return null;
