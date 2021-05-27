@@ -49,7 +49,6 @@ import io.terminus.dalaran.core.resource.repository.TriggerFlowReleasedRepositor
 import io.terminus.dalaran.exception.flow.FlowNotExistException;
 import io.terminus.dalaran.model.BasicResponse;
 import io.terminus.dalaran.model.ModelTargetType;
-import io.terminus.dalaran.model.component.ProcessorModel;
 import io.terminus.dalaran.model.component.ProcessorRouteInfo;
 import io.terminus.dalaran.model.component.RoutesModel;
 import io.terminus.dalaran.model.dto.*;
@@ -83,7 +82,6 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import javax.persistence.criteria.Predicate;
 import javax.transaction.Transactional;
-import javax.xml.soap.Node;
 import java.util.*;
 import java.util.stream.Collectors;
 import static io.terminus.dalaran.DalaranConstants.*;
@@ -122,6 +120,9 @@ public class FlowManagementServiceImpl implements FlowManagementService {
 
     @Autowired
     private SubFlowRepository subFlowRepository;
+
+    @Autowired
+    private NodeRepository nodeRepository;
 
     @Autowired
     private TestFlowInitializer testFlowInitializer;
@@ -743,6 +744,8 @@ public class FlowManagementServiceImpl implements FlowManagementService {
                 jsonObject = JSONObject.parseObject(json);
             }
             if (jsonObject.containsKey("routes")) {
+                Map<String, Object> config = new HashMap<>();
+                nodeFlowDTO.setConfig(config);
                 List<RoutesModel> routesModelList = jsonObject.getJSONArray("routes").toJavaList(RoutesModel.class);
                 for (RoutesModel routesModel : routesModelList) {
                     String pipelineJson = JSONObject.toJSONString(routesModel);
@@ -760,8 +763,12 @@ public class FlowManagementServiceImpl implements FlowManagementService {
             if (jsonObject.containsKey("pipeline")) {
                 buildNode((jsonObject.getJSONArray("pipeline")).toJavaList(ProcessorDTO.class), nodeFlowDTOList);
             }
-            if (processorDTO.getType().equals("connector") || processorDTO.getType().equals("service")) {
-
+            if (processorDTO.getType().equals("connector")) {
+                ConnectorEntity connectorEntity = connectorRepository.findByResourceKey(processorDTO.getId());
+                NodeEntity nodeEntity = nodeRepository.findByResourceKey(connectorEntity.getNodeId());
+            } else if (processorDTO.getType().equals("service")) {
+                ServiceEntity serviceEntity = serviceRepository.findByResourceKey(processorDTO.getId());
+                NodeEntity nodeEntity = nodeRepository.findByResourceKey(serviceEntity.getNodeId());
             }
         }
         return null;

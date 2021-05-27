@@ -140,6 +140,7 @@ public class ServiceManagementImpl implements ServiceManagement {
     private ServiceDTO toDTO(ServiceEntity entity) {
         ServiceDTO dto = new ServiceDTO();
         dto.setId(entity.getResourceKey());
+        dto.setNodeId(entity.getNodeId());
         dto.setModuleId(entity.getModuleId());
         dto.setName(entity.getName());
         dto.setType(entity.getType());
@@ -163,6 +164,7 @@ public class ServiceManagementImpl implements ServiceManagement {
             entity = serviceRepository.findByResourceKey(resourceKey);
         }
         entity.setResourceKey(resourceKey);
+        entity.setNodeId(dto.getNodeId());
         entity.setModuleId(moduleId);
         entity.setName(dto.getName());
         entity.setType(type);

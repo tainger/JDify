@@ -30,5 +30,7 @@ public abstract class ServiceAbstractEntity extends BasicEntity {
 
     @Column(nullable = false)
     private boolean isExist;
+
+    private String nodeId;
 }
 
