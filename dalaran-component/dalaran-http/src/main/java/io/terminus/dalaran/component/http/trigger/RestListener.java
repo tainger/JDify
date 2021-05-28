@@ -69,7 +69,6 @@ public class RestListener implements DalaranTrigger<RestConfig>, DalaranTriggerA
             route.convertBodyTo(String.class);
             return;
         }
-
         DalaranAuthenticator authenticator = config.getAuthenticator();
         if (config.getMethod().isNoBody()) {
             if (StringUtils.isNotBlank(config.getAuthenticatorId())) {
@@ -82,6 +81,9 @@ public class RestListener implements DalaranTrigger<RestConfig>, DalaranTriggerA
             if (StringUtils.isNotBlank(config.getAuthenticatorId())) {
                 route.unmarshal().json(JsonLibrary.Fastjson);
                 route.process(new AuthenticatorProcessor(authenticator, redisService));
+            } else {
+                route.unmarshal().json(JsonLibrary.Fastjson);
+                route.process(new BodyProcessor(config.getParams()));
             }
             route.convertBodyTo(String.class);
         }
