@@ -729,11 +729,11 @@ public class FlowManagementServiceImpl implements FlowManagementService {
     @Override
     public List<NodeFlowDTO> node(List<ProcessorDTO> pipeline) {
         List<NodeFlowDTO> nodeFlowDTOList = new ArrayList<>();
-        nodeFlowDTOList = buildNode(pipeline, nodeFlowDTOList);
+        nodeFlowDTOList = buildNode(pipeline, nodeFlowDTOList, false);
         return nodeFlowDTOList;
     }
 
-    public List<NodeFlowDTO> buildNode(List<ProcessorDTO> pipeline, List<NodeFlowDTO> nodeFlowDTOList) {
+    public List<NodeFlowDTO> buildNode(List<ProcessorDTO> pipeline, List<NodeFlowDTO> nodeFlowDTOList, boolean isRouter) {
         for (ProcessorDTO processorDTO : pipeline) {
             NodeFlowDTO nodeFlowDTO = new NodeFlowDTO();
             String json = JSONObject.toJSONString(processorDTO.getConfig());
@@ -745,7 +745,6 @@ public class FlowManagementServiceImpl implements FlowManagementService {
             }
             if (jsonObject.containsKey("routes")) {
                 Map<String, Object> config = new HashMap<>();
-                nodeFlowDTO.setConfig(config);
                 List<RoutesModel> routesModelList = jsonObject.getJSONArray("routes").toJavaList(RoutesModel.class);
                 for (RoutesModel routesModel : routesModelList) {
                     String pipelineJson = JSONObject.toJSONString(routesModel);
@@ -756,22 +755,37 @@ public class FlowManagementServiceImpl implements FlowManagementService {
                         pipelineJsonObject = JSONObject.parseObject(pipelineJson);
                     }
                     if ((pipelineJsonObject.getJSONArray("pipeline")) != null) {
-                        buildNode((pipelineJsonObject.getJSONArray("pipeline")).toJavaList(ProcessorDTO.class), nodeFlowDTOList);
+                        config.put("routes", buildNode((pipelineJsonObject.getJSONArray("pipeline")).toJavaList(ProcessorDTO.class), nodeFlowDTOList, true));
+                        nodeFlowDTO.setConfig(config);
                     }
                 }
             }
             if (jsonObject.containsKey("pipeline")) {
-                buildNode((jsonObject.getJSONArray("pipeline")).toJavaList(ProcessorDTO.class), nodeFlowDTOList);
+                Map<String, Object> config = new HashMap<>();
+                config.put("node", buildNode((jsonObject.getJSONArray("pipeline")).toJavaList(ProcessorDTO.class), nodeFlowDTOList, false));
+                nodeFlowDTO.setConfig(config);
             }
-            if (processorDTO.getType().equals("connector")) {
-                ConnectorEntity connectorEntity = connectorRepository.findByResourceKey(processorDTO.getId());
+            if (processorDTO.getType().equals("OKHttpClient") || processorDTO.getType().equals("http-client") || processorDTO.getType().equals("BrotliHttpClient")) {
+                ConnectorEntity connectorEntity = connectorRepository.findByResourceKey(jsonObject.getString("connectorId"));
                 NodeEntity nodeEntity = nodeRepository.findByResourceKey(connectorEntity.getNodeId());
+                nodeFlowDTO.setResourceKey(nodeEntity.getResourceKey());
+                nodeFlowDTO.setName(nodeEntity.getName());
+                nodeFlowDTO.setCompany(nodeEntity.getCompany());
+                nodeFlowDTO.setApplication(nodeEntity.getApplication());
+                nodeFlowDTO.setSystem(nodeEntity.getSystem());
+                nodeFlowDTOList.add(nodeFlowDTO);
             } else if (processorDTO.getType().equals("service")) {
-                ServiceEntity serviceEntity = serviceRepository.findByResourceKey(processorDTO.getId());
+                ServiceEntity serviceEntity = serviceRepository.findByResourceKey(jsonObject.getString("serviceId"));
                 NodeEntity nodeEntity = nodeRepository.findByResourceKey(serviceEntity.getNodeId());
+                nodeFlowDTO.setResourceKey(nodeEntity.getResourceKey());
+                nodeFlowDTO.setName(nodeEntity.getName());
+                nodeFlowDTO.setCompany(nodeEntity.getCompany());
+                nodeFlowDTO.setApplication(nodeEntity.getApplication());
+                nodeFlowDTO.setSystem(nodeEntity.getSystem());
+                nodeFlowDTOList.add(nodeFlowDTO);
             }
         }
-        return null;
+        return nodeFlowDTOList;
     }
 
     private Specification<TriggerFlowEntity> buildSpecification(FlowQuery flowQuery) {
