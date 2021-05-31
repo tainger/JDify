@@ -1,5 +1,6 @@
 package io.terminus.dalaran.component.http.trigger.processor;
 
+import com.alibaba.fastjson.JSONArray;
 import io.terminus.dalaran.component.authenticator.BasicAuthenticatorConfig;
 import io.terminus.dalaran.component.authenticator.DalaranAuthenticator;
 import io.terminus.dalaran.core.resource.redis.RedisService;
@@ -28,6 +29,9 @@ public class AuthenticatorProcessor implements Processor {
 
     @Override
     public void process(Exchange exchange) {
+        if (exchange.getIn().getBody() instanceof JSONArray) {
+            return;
+        }
         Map<String, String> body = exchange.getIn().getBody(Map.class);
         if (authenticator.getType().equals("BasicAuthenticator")) {
             checkValue(exchange, body);
