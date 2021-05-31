@@ -4,6 +4,7 @@ import io.terminus.dalaran.core.resource.entity.common.PrivateRepositoryEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public interface PrivateRepositoryRepository extends JpaRepository<PrivateRepositoryEntity, Long>, JpaSpecificationExecutor<PrivateRepositoryEntity> {
@@ -17,4 +18,6 @@ public interface PrivateRepositoryRepository extends JpaRepository<PrivateReposi
     List<PrivateRepositoryEntity> findByType(String type);
 
     void deleteByResourceKeyAndVersion(String resourceKey, String version);
+
+    List<PrivateRepositoryEntity> findByResourceKeyIn(List<String> strings);
 }

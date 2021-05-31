@@ -350,9 +350,7 @@ public class ExportServiceImpl implements ExportService {
             }
         }
         ExportData exportData = buildExportData(flowsCollector);
-        List<PrivateRepositoryEntity> privateRepositoryEntities = privateRepositoryRepository.findAll();
         exportData.setTriggerFlows(triggerFlowEntities);
-        exportData.setPrivateRepositoryEntities(privateRepositoryEntities);
         return exportData;
     }
 
@@ -394,6 +392,10 @@ public class ExportServiceImpl implements ExportService {
 
                 case SourceType.SUB_FLOW:
                     exportData.setSubFlows(subFlowRepository.findByResourceKeyIn(new ArrayList<>(entry.getValue())));
+                    break;
+
+                case SourceType.PRIVATE_REPOSITORY:
+                    exportData.setPrivateRepositoryEntities(privateRepositoryRepository.findByResourceKeyIn(new ArrayList<>(entry.getValue())));
                     break;
             }
         }
