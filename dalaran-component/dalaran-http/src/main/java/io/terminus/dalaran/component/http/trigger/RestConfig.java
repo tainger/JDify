@@ -67,6 +67,6 @@ public class RestConfig extends AllModelConfig implements AuthenticatorConfig<Da
     @ConfigFieldInfo(label = "超时时间(ms)", inputType = FieldInputType.Integer, defaultValue = "3000")
     private Long timeout = 3000L;
 
-    @ConfigFieldInfo(label = "参数", inputType = FieldInputType.String)
+    @ConfigFieldInfo(label = "参数", inputType = FieldInputType.String, required = false)
     private String params;
 }
