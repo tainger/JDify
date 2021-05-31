@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.predic8.wsdl.Definitions;
 import io.swagger.models.Swagger;
+import io.terminus.dalaran.DalaranConstants;
 import io.terminus.dalaran.SourceType;
 import io.terminus.dalaran.component.foreach.ForEachConfig;
 import io.terminus.dalaran.component.http.trigger.model.ApiInfo;
@@ -15,6 +16,8 @@ import io.terminus.dalaran.component.service.soap.SoapServiceConfig;
 import io.terminus.dalaran.component.soap.trigger.model.SoapApiInfo;
 import io.terminus.dalaran.component.soap.trigger.utils.WSDLUtils;
 import io.terminus.dalaran.component.subflow.DalaranSubFlowConfig;
+import io.terminus.dalaran.config.ProcessorInfo;
+import io.terminus.dalaran.config.TriggerInfo;
 import io.terminus.dalaran.console.ExportData;
 import io.terminus.dalaran.console.TestFlowInitializer;
 import io.terminus.dalaran.console.entity.*;
@@ -22,12 +25,14 @@ import io.terminus.dalaran.console.model.FlowResourceCollector;
 import io.terminus.dalaran.console.repository.*;
 import io.terminus.dalaran.console.service.ExportService;
 import io.terminus.dalaran.console.service.ModelManagementService;
+import io.terminus.dalaran.console.service.jpa.PrivateResourceQueryService;
 import io.terminus.dalaran.core.component.DalaranTrigger;
 import io.terminus.dalaran.core.component.DalaranTriggerApiDocExport;
 import io.terminus.dalaran.core.component.DalaranTriggerWordDocExport;
 import io.terminus.dalaran.core.component.annotation.ConfigFieldInfo;
 import io.terminus.dalaran.core.component.config.ServiceOperationConfig;
 import io.terminus.dalaran.core.context.DalaranComponentContext;
+import io.terminus.dalaran.core.context.DalaranContext;
 import io.terminus.dalaran.core.context.DalaranModelTypeContext;
 import io.terminus.dalaran.core.context.support.DefaultDalaranServiceContext;
 import io.terminus.dalaran.core.resource.DalaranResourceBuilder;
@@ -39,7 +44,10 @@ import io.terminus.dalaran.core.resource.repository.PrivateRepositoryRepository;
 import io.terminus.dalaran.model.component.ProcessorRouteInfo;
 import io.terminus.dalaran.model.flow.FlowStatus;
 import io.terminus.dalaran.model.flow.TriggerFlow;
+import io.terminus.dalaran.model.market.ResourceFile;
+import io.terminus.dalaran.model.query.PrivateRepositoryQuery;
 import io.terminus.dalaran.model.soap.model.SoapOperationConfig;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.metamodel.spi.MetamodelImplementor;
 import org.hibernate.persister.entity.AbstractEntityPersister;
@@ -126,6 +134,12 @@ public class ExportServiceImpl implements ExportService {
 
     @Autowired
     private PrivateRepositoryRepository privateRepositoryRepository;
+
+    @Autowired
+    private DalaranContext dalaranContext;
+
+    @Autowired
+    private PrivateResourceQueryService privateResourceQueryService;
 
     // TODO 数据量暴多可能炸内存, 而且会涉及到清表, 所以事务也是个问题
     @Override
@@ -324,6 +338,16 @@ public class ExportServiceImpl implements ExportService {
             for (ProcessorEntity processorEntity : pipeline) {
                 collectProcessorResourceKey(processorEntity);
             }
+            String triggerType = triggerFlowEntity.getTriggerType();
+            TriggerInfo triggerInfo = dalaranContext.getDalaranComponentContext().getTriggerInfo(triggerType);
+            if (StringUtils.equalsIgnoreCase(triggerInfo.getOrigin(), DalaranConstants.PARTNER)) {
+                List<PrivateRepositoryEntity> privateRepositoryEntity = privateResourceQueryService.query(new PrivateRepositoryQuery(triggerInfo.getName(), DalaranConstants.TRIGGER));
+                if (CollectionUtils.isNotEmpty(privateRepositoryEntity)) {
+                    PrivateRepositoryEntity repositoryEntity = privateRepositoryEntity.get(0);
+                    String resourceKey = repositoryEntity.getResourceKey();
+                    flowsCollector.collect(SourceType.PRIVATE_REPOSITORY, resourceKey);
+                }
+            }
         }
         ExportData exportData = buildExportData(flowsCollector);
         List<PrivateRepositoryEntity> privateRepositoryEntities = privateRepositoryRepository.findAll();
@@ -438,6 +462,17 @@ public class ExportServiceImpl implements ExportService {
                 ProcessorEntity loopWhileProcessorEntity = new ProcessorEntity();
                 BeanUtils.copyProperties(processorRouteInfo, loopWhileProcessorEntity);
                 collectProcessorResourceKey(loopWhileProcessorEntity);
+            }
+        }
+
+        String processorType = processorEntity.getType();
+        ProcessorInfo processorInfo = dalaranContext.getDalaranComponentContext().getProcessorInfo(processorEntity.getGroup(),processorType,processorEntity.getVersion());
+        if (StringUtils.equalsIgnoreCase(processorInfo.getOrigin(), DalaranConstants.PARTNER)) {
+            List<PrivateRepositoryEntity> privateRepositoryEntity = privateResourceQueryService.query(new PrivateRepositoryQuery(processorInfo.getName(), DalaranConstants.PROCESSOR));
+            if (CollectionUtils.isNotEmpty(privateRepositoryEntity)) {
+                PrivateRepositoryEntity repositoryEntity = privateRepositoryEntity.get(0);
+                String resourceKey = repositoryEntity.getResourceKey();
+                flowsCollector.collect(SourceType.PRIVATE_REPOSITORY, resourceKey);
             }
         }
         collectProcessResourceKey(processorEntity);
