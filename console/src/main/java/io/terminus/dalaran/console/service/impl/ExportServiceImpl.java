@@ -44,7 +44,6 @@ import io.terminus.dalaran.core.resource.repository.PrivateRepositoryRepository;
 import io.terminus.dalaran.model.component.ProcessorRouteInfo;
 import io.terminus.dalaran.model.flow.FlowStatus;
 import io.terminus.dalaran.model.flow.TriggerFlow;
-import io.terminus.dalaran.model.market.ResourceFile;
 import io.terminus.dalaran.model.query.PrivateRepositoryQuery;
 import io.terminus.dalaran.model.soap.model.SoapOperationConfig;
 import org.apache.commons.collections4.CollectionUtils;
@@ -255,9 +254,16 @@ public class ExportServiceImpl implements ExportService {
                 limiterRepository.save(limiter);
             });
         }
-        List<PrivateRepositoryEntity> privateRepositoryEntities = exportData.getPrivateRepositoryEntities();
-        truncateTable("dalaran_private_repository");
-        privateRepositoryRepository.saveAll(privateRepositoryEntities);
+        if(null !=  exportData.getPrivateRepositoryEntities()) {
+            exportData.getPrivateRepositoryEntities().forEach(privateRepository -> {
+                privateRepository.setExist(true);
+               PrivateRepositoryEntity privateRepositoryEntity = privateRepositoryRepository.findByResourceKeyAndVersion(privateRepository.getResourceKey(), privateRepository.getVersion());
+                if(null != privateRepositoryEntity) {
+                    privateRepository.setId(privateRepositoryEntity.getId());
+                }
+                privateRepositoryRepository.save(privateRepository);
+            });
+        }
         // load test flow
         testFlowInitializer.start();
     }
@@ -344,15 +350,12 @@ public class ExportServiceImpl implements ExportService {
                 List<PrivateRepositoryEntity> privateRepositoryEntity = privateResourceQueryService.query(new PrivateRepositoryQuery(triggerInfo.getName(), DalaranConstants.TRIGGER));
                 if (CollectionUtils.isNotEmpty(privateRepositoryEntity)) {
                     PrivateRepositoryEntity repositoryEntity = privateRepositoryEntity.get(0);
-                    String resourceKey = repositoryEntity.getResourceKey();
-                    flowsCollector.collect(SourceType.PRIVATE_REPOSITORY, resourceKey);
+                    flowsCollector.collect(SourceType.PRIVATE_REPOSITORY, repositoryEntity.getResourceKey() + "#" + repositoryEntity.getVersion());
                 }
             }
         }
         ExportData exportData = buildExportData(flowsCollector);
-        List<PrivateRepositoryEntity> privateRepositoryEntities = privateRepositoryRepository.findAll();
         exportData.setTriggerFlows(triggerFlowEntities);
-        exportData.setPrivateRepositoryEntities(privateRepositoryEntities);
         return exportData;
     }
 
@@ -394,6 +397,17 @@ public class ExportServiceImpl implements ExportService {
 
                 case SourceType.SUB_FLOW:
                     exportData.setSubFlows(subFlowRepository.findByResourceKeyIn(new ArrayList<>(entry.getValue())));
+                    break;
+
+                case SourceType.PRIVATE_REPOSITORY:
+                    List<PrivateRepositoryEntity> privateRepositoryEntities = new ArrayList<>();
+                    entry.getValue().stream().map(item -> item.split("#")).forEach(split -> {
+                        String resourceKey = split[0];
+                        String version = split[1];
+                        PrivateRepositoryEntity privateRepositoryEntity = privateRepositoryRepository.findByResourceKeyAndVersion(resourceKey, version);
+                        privateRepositoryEntities.add(privateRepositoryEntity);
+                    });
+                    exportData.setPrivateRepositoryEntities(privateRepositoryEntities);
                     break;
             }
         }
@@ -471,8 +485,7 @@ public class ExportServiceImpl implements ExportService {
             List<PrivateRepositoryEntity> privateRepositoryEntity = privateResourceQueryService.query(new PrivateRepositoryQuery(processorInfo.getName(), DalaranConstants.PROCESSOR));
             if (CollectionUtils.isNotEmpty(privateRepositoryEntity)) {
                 PrivateRepositoryEntity repositoryEntity = privateRepositoryEntity.get(0);
-                String resourceKey = repositoryEntity.getResourceKey();
-                flowsCollector.collect(SourceType.PRIVATE_REPOSITORY, resourceKey);
+                flowsCollector.collect(SourceType.PRIVATE_REPOSITORY, repositoryEntity.getResourceKey() + "#" + repositoryEntity.getVersion());
             }
         }
         collectProcessResourceKey(processorEntity);
