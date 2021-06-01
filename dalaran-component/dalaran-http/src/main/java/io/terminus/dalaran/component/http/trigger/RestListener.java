@@ -81,8 +81,6 @@ public class RestListener implements DalaranTrigger<RestConfig>, DalaranTriggerA
             route.unmarshal().json(JsonLibrary.Fastjson);
             if (StringUtils.isNotBlank(config.getAuthenticatorId())) {
                 route.process(new AuthenticatorProcessor(authenticator, redisService));
-            } else {
-                route.process(new BodyProcessor(config.getParams()));
             }
             route.convertBodyTo(String.class);
         }
