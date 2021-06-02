@@ -98,12 +98,8 @@ public class VersionUpdateServiceImpl implements VersionUpdateService {
 
         List<TriggerFlowEntity> triggerFlowEntityList = flowRepository.findAll();
         triggerFlowEntityList.forEach(triggerFlowEntity -> {
-            if (StringUtils.isNotBlank(triggerFlowEntity.getResourceKey())) {
-                return;
-            }
             triggerFlowEntity.setResourceKey(String.valueOf(triggerFlowEntity.getId()));
             triggerFlowEntity.setOnline(true);
-            flowRepository.save(triggerFlowEntity);
             List<ProcessorEntity> processorEntities = triggerFlowEntity.getPipeline();
             for (ProcessorEntity processorEntity : processorEntities) {
                 String config = processorEntity.getConfig();
