@@ -1,9 +1,11 @@
 package io.terminus.dalaran.console.service.impl;
 
+import com.alibaba.fastjson.JSONObject;
 import io.terminus.dalaran.console.entity.*;
 import io.terminus.dalaran.console.repository.*;
 import io.terminus.dalaran.console.service.VersionUpdateService;
 import io.terminus.dalaran.core.resource.entity.common.ModuleEntity;
+import io.terminus.dalaran.core.resource.entity.common.ProcessorEntity;
 import io.terminus.dalaran.core.resource.repository.ModuleRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class VersionUpdateServiceImpl implements VersionUpdateService {
@@ -101,6 +104,29 @@ public class VersionUpdateServiceImpl implements VersionUpdateService {
             triggerFlowEntity.setResourceKey(String.valueOf(triggerFlowEntity.getId()));
             triggerFlowEntity.setOnline(true);
             flowRepository.save(triggerFlowEntity);
+            List<ProcessorEntity> processorEntities = triggerFlowEntity.getPipeline();
+            for (ProcessorEntity processorEntity : processorEntities) {
+                String config = processorEntity.getConfig();
+                Map map = JSONObject.parseObject(config, Map.class);
+                handle(map);
+                processorEntity.setConfig(JSONObject.toJSONString(map));
+            }
+            String triggerConfig = triggerFlowEntity.getTriggerConfig();
+            Map map = JSONObject.parseObject(triggerConfig, Map.class);
+            handle(map);
+            triggerFlowEntity.setTriggerConfig(JSONObject.toJSONString(map));
+            flowRepository.save(triggerFlowEntity);
         });
+    }
+    private void handle(Map map) {
+        if(map.containsKey("inModelId") ) {
+            map.put("inModelId",String.valueOf(map.get("inModelId")));
+        }
+        if(map.containsKey("outModelId") ) {
+            map.put("outModelId",String.valueOf(map.get("outModelId")));
+        }
+        if( map.containsKey("connectorId")) {
+            map.put("connectorId",String.valueOf(map.get("connectorId")));
+        }
     }
 }
