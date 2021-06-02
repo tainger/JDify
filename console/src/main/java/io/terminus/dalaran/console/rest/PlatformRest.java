@@ -247,7 +247,7 @@ public class PlatformRest implements PlatformInfoAPI, PlatformImportAPI, Platfor
     public BasicResponse importAll(@RequestParam MultipartFile importFile) {
         BasicResponse basicResponse = new BasicResponse(true);
         try {
-            String fileName = importFile.getName();
+            String fileName = importFile.getOriginalFilename();
             String suffix = fileName.substring(fileName.lastIndexOf("."));
             if(!suffix.equals(".dlr")) {
                 basicResponse.setResult("文件类型不匹配");

@@ -144,7 +144,6 @@ public class ExportServiceImpl implements ExportService {
     @Override
     @Transactional
     public void importAll(ExportData exportData) throws IOException {
-        truncateTable();
         if(null != exportData.getModules()){
             exportData.getModules().forEach(module -> {
                 module.setExist(true);
