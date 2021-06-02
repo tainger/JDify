@@ -729,11 +729,12 @@ public class FlowManagementServiceImpl implements FlowManagementService {
     @Override
     public List<NodeFlowDTO> node(List<ProcessorDTO> pipeline) {
         List<NodeFlowDTO> nodeFlowDTOList = new ArrayList<>();
-        nodeFlowDTOList = buildNode(pipeline, nodeFlowDTOList, false);
+        List<NodeFlowDTO> routerList = new ArrayList<>();
+        nodeFlowDTOList = buildNode(pipeline, nodeFlowDTOList, routerList, false);
         return nodeFlowDTOList;
     }
 
-    public List<NodeFlowDTO> buildNode(List<ProcessorDTO> pipeline, List<NodeFlowDTO> nodeFlowDTOList, boolean isRouter) {
+    public List<NodeFlowDTO> buildNode(List<ProcessorDTO> pipeline, List<NodeFlowDTO> nodeFlowDTOList, List<NodeFlowDTO> routerList, boolean isRouter) {
         for (ProcessorDTO processorDTO : pipeline) {
             NodeFlowDTO nodeFlowDTO = new NodeFlowDTO();
             String json = JSONObject.toJSONString(processorDTO.getConfig());
@@ -744,9 +745,12 @@ public class FlowManagementServiceImpl implements FlowManagementService {
                 jsonObject = JSONObject.parseObject(json);
             }
             if (jsonObject.containsKey("routes")) {
-                Map<String, Object> config = new HashMap<>();
+                Map<String, Object> routeConfig = new HashMap<>();
                 List<RoutesModel> routesModelList = jsonObject.getJSONArray("routes").toJavaList(RoutesModel.class);
+                List<NodeFlowListDTO> nodeFlowListDTOS = new ArrayList<>();
                 for (RoutesModel routesModel : routesModelList) {
+                    List<NodeFlowDTO> routerFlowList = new ArrayList<>();
+                    NodeFlowListDTO nodeFlowListDTO = new NodeFlowListDTO();
                     String pipelineJson = JSONObject.toJSONString(routesModel);
                     JSONObject pipelineJsonObject;
                     if (json.startsWith("\"")) {
@@ -755,15 +759,20 @@ public class FlowManagementServiceImpl implements FlowManagementService {
                         pipelineJsonObject = JSONObject.parseObject(pipelineJson);
                     }
                     if ((pipelineJsonObject.getJSONArray("pipeline")) != null) {
-                        config.put("routes", buildNode((pipelineJsonObject.getJSONArray("pipeline")).toJavaList(ProcessorDTO.class), nodeFlowDTOList, true));
-                        nodeFlowDTO.setConfig(config);
+                        routerFlowList.addAll(buildNode((pipelineJsonObject.getJSONArray("pipeline")).toJavaList(ProcessorDTO.class), nodeFlowDTOList, routerList, true));
+                        nodeFlowListDTO.setNode(routerFlowList);
+                        nodeFlowListDTOS.add(nodeFlowListDTO);
                     }
+                    routerList = new ArrayList<>();
                 }
+                routeConfig.put("routes", nodeFlowListDTOS);
+                nodeFlowDTO.setConfig(routeConfig);
             }
             if (jsonObject.containsKey("pipeline")) {
-                Map<String, Object> config = new HashMap<>();
-                config.put("node", buildNode((jsonObject.getJSONArray("pipeline")).toJavaList(ProcessorDTO.class), nodeFlowDTOList, false));
-                nodeFlowDTO.setConfig(config);
+//                Map<String, Object> config = new HashMap<>();
+//                config.put("node", buildNode((jsonObject.getJSONArray("pipeline")).toJavaList(ProcessorDTO.class), nodeFlowDTOList, false));
+//                nodeFlowDTO.setConfig(config);
+                buildNode((jsonObject.getJSONArray("pipeline")).toJavaList(ProcessorDTO.class), nodeFlowDTOList, routerList,false);
             }
             if (processorDTO.getType().equals("OKHttpClient") || processorDTO.getType().equals("http-client") || processorDTO.getType().equals("BrotliHttpClient")) {
                 ConnectorEntity connectorEntity = connectorRepository.findByResourceKey(jsonObject.getString("connectorId"));
@@ -773,7 +782,11 @@ public class FlowManagementServiceImpl implements FlowManagementService {
                 nodeFlowDTO.setCompany(nodeEntity.getCompany());
                 nodeFlowDTO.setApplication(nodeEntity.getApplication());
                 nodeFlowDTO.setSystem(nodeEntity.getSystem());
-                nodeFlowDTOList.add(nodeFlowDTO);
+                if (isRouter) {
+                    routerList.add(nodeFlowDTO);
+                } else {
+                    nodeFlowDTOList.add(nodeFlowDTO);
+                }
             } else if (processorDTO.getType().equals("service")) {
                 ServiceEntity serviceEntity = serviceRepository.findByResourceKey(jsonObject.getString("serviceId"));
                 NodeEntity nodeEntity = nodeRepository.findByResourceKey(serviceEntity.getNodeId());
@@ -782,10 +795,20 @@ public class FlowManagementServiceImpl implements FlowManagementService {
                 nodeFlowDTO.setCompany(nodeEntity.getCompany());
                 nodeFlowDTO.setApplication(nodeEntity.getApplication());
                 nodeFlowDTO.setSystem(nodeEntity.getSystem());
+                if (isRouter) {
+                    routerList.add(nodeFlowDTO);
+                } else {
+                    nodeFlowDTOList.add(nodeFlowDTO);
+                }
+            } else if (processorDTO.getType().equals("router") || processorDTO.getType().equals("error-catch")) {
                 nodeFlowDTOList.add(nodeFlowDTO);
             }
         }
-        return nodeFlowDTOList;
+        if (routerList != null && routerList.size() > 0) {
+            return routerList;
+        } else {
+            return nodeFlowDTOList;
+        }
     }
 
     private Specification<TriggerFlowEntity> buildSpecification(FlowQuery flowQuery) {
