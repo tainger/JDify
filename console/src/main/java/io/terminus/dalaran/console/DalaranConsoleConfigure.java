@@ -1,14 +1,11 @@
 package io.terminus.dalaran.console;
 
-import io.terminus.dalaran.console.log.DeleteLogRetentionPolicy;
-import io.terminus.dalaran.console.log.LogRetentionPolicy;
-import io.terminus.dalaran.console.log.LogRetentionPolicyExecutor;
+import io.terminus.dalaran.console.log.*;
 import io.terminus.dalaran.core.log.DalaranTraceLogger;
 import io.terminus.dalaran.core.resource.repository.TracingLogRepository;
 import io.terminus.dalaran.core.spring.DalaranAutoConfiguration;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Bean;
@@ -54,15 +51,46 @@ public class DalaranConsoleConfigure {
     }
 
     @Bean
-    @ConditionalOnMissingBean(LogRetentionPolicy.class)
-    @ConditionalOnProperty(value = "terminus.dalaran.log.policy", havingValue = "delete")
-    public LogRetentionPolicy logRetentionPolicy(@Value("${terminus.dalaran.log.duration: 14}") Integer duration) {
-        return new DeleteLogRetentionPolicy(duration);
+    @ConditionalOnProperty(value = "terminus.dalaran.log.policy", havingValue = "archive")
+    public ArchiveLogRetentionPolicy logRetentionPolicy() {
+        return new ArchiveLogRetentionPolicy();
     }
 
     @Bean
-    @ConditionalOnBean(LogRetentionPolicy.class)
-    public LogRetentionPolicyExecutor logRetentionPolicyExecutor(LogRetentionPolicy logRetentionPolicy) {
-        return new LogRetentionPolicyExecutor(logRetentionPolicy);
+    @ConditionalOnBean(ArchiveLogRetentionPolicy.class)
+    public ArchiveLogRetentionPolicyExecutor archiveLogRetentionPolicyExecutor(ArchiveLogRetentionPolicy logRetentionPolicy) {
+        return new ArchiveLogRetentionPolicyExecutor(logRetentionPolicy);
     }
+
+
+    @Bean
+    @ConditionalOnBean(ArchiveLogRetentionPolicy.class)
+    public RemoveArchivingLogPolicy removeArchivingLogPolicy(@Value("${terminus.dalaran.log.archive.duration}") Integer duration,
+                                                             @Value("${terminus.dalaran.log.archive.dbName}") String dbName
+    ) {
+        return new RemoveArchivingLogPolicy(duration, dbName);
+    }
+
+
+    @Bean
+    @ConditionalOnBean(RemoveArchivingLogPolicy.class)
+    public RemoveArchivingLogPolicyExecutor removeArchivingLogPolicyExecutor(RemoveArchivingLogPolicy removeArchivingLogPolicy) {
+        return new RemoveArchivingLogPolicyExecutor(removeArchivingLogPolicy);
+    }
+
+    @Bean
+    @ConditionalOnProperty(value = "terminus.dalaran.log.policy", havingValue = "delete")
+    public DeleteLogRetentionPolicy deleteLogRetentionPolicy(@Value("${terminus.dalaran.log.duration}") Integer duration) {
+        return new DeleteLogRetentionPolicy(duration);
+    }
+
+
+    @Bean
+    @ConditionalOnBean(DeleteLogRetentionPolicy.class)
+    public DeleteLogRetentionPolicyExecutor deleteLogRetentionPolicyExecutor(DeleteLogRetentionPolicy deleteLogRetentionPolicy) {
+        return new DeleteLogRetentionPolicyExecutor(deleteLogRetentionPolicy);
+    }
+
+
+
 }
