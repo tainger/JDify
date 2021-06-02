@@ -4,6 +4,7 @@ import io.swagger.models.Swagger;
 import io.terminus.dalaran.component.authenticator.DalaranAuthenticator;
 import io.terminus.dalaran.component.common.HttpMethod;
 import io.terminus.dalaran.component.common.LimitOperation;
+import io.terminus.dalaran.component.http.processor.okhttp.ExceptionProcessor;
 import io.terminus.dalaran.component.http.trigger.model.ApiInfo;
 import io.terminus.dalaran.component.http.trigger.processor.*;
 import io.terminus.dalaran.component.http.trigger.utils.RestWordUtils;
@@ -150,6 +151,7 @@ public class RestListener implements DalaranTrigger<RestConfig>, DalaranTriggerA
             }
             throttleDefinition.to(DIRECT_PREFIX + hystrixRouteId).end();
         } catch (Exception e) {
+            route.process(new ExceptionProcessor(new RuntimeException("trigger config error, limiterId is null")));
             e.printStackTrace();
         }
     }
