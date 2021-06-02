@@ -12,7 +12,7 @@ public interface PlatformImportAPI {
 
     @ApiOperation(value = "导入所有配置, 会覆盖之前的内容")
     @PostMapping(value = "/import")
-    void importAll(@RequestParam MultipartFile importFile);
+    BasicResponse importAll(@RequestParam MultipartFile importFile);
 
     @ApiOperation(value = "导入jar文件（测试）")
     @PostMapping(value = "/import/jar")

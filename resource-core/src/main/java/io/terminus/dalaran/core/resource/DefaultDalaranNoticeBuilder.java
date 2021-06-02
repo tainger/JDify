@@ -105,7 +105,7 @@ public class DefaultDalaranNoticeBuilder implements DalaranNoticeBuilder {
         contents.add(String.valueOf(noticeMessage.getFailureFrequency()));
         contents.add(String.valueOf(noticeMessage.getFailureCount()));
         contents.add(noticeMessage.getIsTouchTimeOutAlarm() ? "" : "没有");
-        contents.add(String.valueOf(noticeMessage.getTimeOutFrequency()));
+        contents.add(String.valueOf(null == noticeMessage.getTimeOutFrequency()? 0:  noticeMessage.getTimeOutFrequency()));
         contents.add(String.valueOf(noticeMessage.getTimeOutCount()));
         return contents;
     }

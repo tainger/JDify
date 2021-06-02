@@ -244,13 +244,23 @@ public class PlatformRest implements PlatformInfoAPI, PlatformImportAPI, Platfor
 
     @Override
     @OnException(code = ResponseMessage.CONFIG_IMPORT_ERROR)
-    public void importAll(@RequestParam MultipartFile importFile) {
+    public BasicResponse importAll(@RequestParam MultipartFile importFile) {
+        BasicResponse basicResponse = new BasicResponse(true);
         try {
+            String fileName = importFile.getName();
+            String suffix = fileName.substring(fileName.lastIndexOf("."));
+            if(!suffix.equals(".dlr")) {
+                basicResponse.setResult("文件类型不匹配");
+                basicResponse.setSuccess(false);
+                return basicResponse;
+            }
             ExportData importData = JSON.parseObject(importFile.getInputStream(), ExportData.class);
             exportService.importAll(importData);
         } catch (IOException e) {
             e.printStackTrace();
+            basicResponse.setSuccess(false);
         }
+        return basicResponse;
     }
 
     @Override

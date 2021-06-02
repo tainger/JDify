@@ -76,7 +76,6 @@ public class AlarmManagerInitializer implements DalaranStarter {
                 if (alarmRuleConfig.getTimeOutAlarm().getIsOpen() && timeOutCount >= alarmRuleConfig.getTimeOutAlarm().getElapsedFrequency()) {
                     noticeMessage.setIsTouchTimeOutAlarm(true);
                 }
-
                 noticeMessage.setTimeOutCount(timeOutCount);
             }
             noticeMessage.setTimeOutFrequency(alarmRuleConfig.getTimeOutAlarm().getElapsedFrequency());
