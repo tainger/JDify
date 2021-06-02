@@ -13,6 +13,7 @@ import io.terminus.notice.api.dto.EmailSendDTO;
 import io.terminus.notice.sender.email.service.EmailSenderService;
 import io.terminus.notice.sender.sms.service.SmsSenderService;
 import lombok.extern.slf4j.Slf4j;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -70,29 +71,29 @@ public class DefaultDalaranNoticeBuilder implements DalaranNoticeBuilder {
     public void sendDingMessage(NoticeMessage noticeMessage) {
         String[] accessTokens = noticeMessage.getContactWays();
         try {
-        for (String accessToken : accessTokens) {
-            DingTalkClient dingTalkClient = new DefaultDingTalkClient("https://oapi.dingtalk.com/robot/send?access_token=" + accessToken);
-            OapiRobotSendRequest request = new OapiRobotSendRequest();
-            request.setMsgtype("text");
-            OapiRobotSendRequest.Text text = new OapiRobotSendRequest.Text();
-            String template = "Mule流程报警: 尊敬的用户:你的流程:%s于%s时候 ，" + "失败频次:%s超出阈值%d上限，频次为:%d，" +
-                    "超时频次:%s超出阈值%d上限，频次为:%d。";
-            String content = String.format(template, noticeMessage.getFlowName(), noticeMessage.getCreateDate(),
-                    noticeMessage.getIsTouchFailureAlarm() ? "" : "没有", noticeMessage.getFailureFrequency(), noticeMessage.getFailureCount(),
-                    noticeMessage.getIsTouchFailureAlarm() ? "" : "没有", noticeMessage.getTimeOutFrequency(), noticeMessage.getTimeOutCount());
-            text.setContent(content);
-            request.setText(text);
-            OapiRobotSendRequest.At at = new OapiRobotSendRequest.At();
-            at.setIsAtAll(true);
-            request.setAt(at);
+            for (String accessToken : accessTokens) {
+                DingTalkClient dingTalkClient = new DefaultDingTalkClient("https://oapi.dingtalk.com/robot/send?access_token=" + accessToken);
+                OapiRobotSendRequest request = new OapiRobotSendRequest();
+                request.setMsgtype("text");
+                OapiRobotSendRequest.Text text = new OapiRobotSendRequest.Text();
+                String template = "Mule流程报警: 尊敬的用户:你的流程:%s于%s时候 ，" + "失败频次:%s超出阈值%d上限，频次为:%d，" +
+                        "超时频次:%s超出阈值%d上限，频次为:%d。";
+                String content = String.format(template, noticeMessage.getFlowName(), noticeMessage.getCreateDate(),
+                        noticeMessage.getIsTouchFailureAlarm() ? "" : "没有", noticeMessage.getFailureFrequency(), noticeMessage.getFailureCount(),
+                        noticeMessage.getIsTouchFailureAlarm() ? "" : "没有", noticeMessage.getTimeOutFrequency(), noticeMessage.getTimeOutCount());
+                text.setContent(content);
+                request.setText(text);
+                OapiRobotSendRequest.At at = new OapiRobotSendRequest.At();
+                at.setIsAtAll(true);
+                request.setAt(at);
                 OapiRobotSendResponse execute = dingTalkClient.execute(request);
                 if (execute.isSuccess()) {
                     log.error("发送成功");
                 } else {
                     log.error("发送失败");
                 }
-        }
-        }catch(Exception e) {
+            }
+        } catch (Exception e) {
             log.error("ding send message error {}", e.getMessage());
         }
     }
@@ -102,10 +103,10 @@ public class DefaultDalaranNoticeBuilder implements DalaranNoticeBuilder {
         contents.add(noticeMessage.getFlowName());
         contents.add(noticeMessage.getCreateDate());
         contents.add(noticeMessage.getIsTouchFailureAlarm() ? "" : "没有");
-        contents.add(String.valueOf(noticeMessage.getFailureFrequency()));
+        contents.add(String.valueOf(null == noticeMessage.getFailureFrequency() ? 0 : noticeMessage.getFailureFrequency()));
         contents.add(String.valueOf(noticeMessage.getFailureCount()));
         contents.add(noticeMessage.getIsTouchTimeOutAlarm() ? "" : "没有");
-        contents.add(String.valueOf(null == noticeMessage.getTimeOutFrequency()? 0:  noticeMessage.getTimeOutFrequency()));
+        contents.add(String.valueOf(null == noticeMessage.getTimeOutFrequency() ? 0 : noticeMessage.getTimeOutFrequency()));
         contents.add(String.valueOf(noticeMessage.getTimeOutCount()));
         return contents;
     }
