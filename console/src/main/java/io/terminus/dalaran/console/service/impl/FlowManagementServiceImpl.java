@@ -733,6 +733,7 @@ public class FlowManagementServiceImpl implements FlowManagementService {
                 Predicate searchType = builder.like(root.get("triggerType"), "%" + fuzzySearch + "%");
                 predicates.add(builder.or(searchName, searchType));
             }
+            predicates.add(builder.equal(root.get("isExist"),true));
             return builder.and(predicates.toArray(new Predicate[0]));
         };
     }
