@@ -727,12 +727,12 @@ public class FlowManagementServiceImpl implements FlowManagementService {
     }
 
     @Override
-    public List<NodeFlowListDTO> node(List<ProcessorDTO> pipeline) {
+    public List<NodeFlowListDTO> node(PipelineListDTO pipeline) {
         List<NodeFlowListDTO> nodeFlowListDTOS = new ArrayList<>();
         NodeFlowListDTO nodeFlowListDTO = new NodeFlowListDTO();
         List<NodeFlowDTO> nodeFlowDTOList = new ArrayList<>();
         List<NodeFlowDTO> routerList = new ArrayList<>();
-        nodeFlowDTOList = buildNode(pipeline, nodeFlowDTOList, routerList, false);
+        nodeFlowDTOList = buildNode(pipeline.getPipeline(), nodeFlowDTOList, routerList, false);
         nodeFlowListDTO.setNode(nodeFlowDTOList);
         nodeFlowListDTOS.add(nodeFlowListDTO);
         return nodeFlowListDTOS;
@@ -781,8 +781,8 @@ public class FlowManagementServiceImpl implements FlowManagementService {
             if (processorDTO.getType().equals("OKHttpClient") || processorDTO.getType().equals("http-client") || processorDTO.getType().equals("BrotliHttpClient")) {
                 ConnectorEntity connectorEntity = connectorRepository.findByResourceKey(jsonObject.getString("connectorId"));
                 NodeEntity nodeEntity = nodeRepository.findByResourceKey(connectorEntity.getNodeId());
-                nodeFlowDTO.setResourceKey(nodeEntity.getResourceKey());
                 nodeFlowDTO.setName(nodeEntity.getName());
+                nodeFlowDTO.setId(nodeEntity.getResourceKey());
                 nodeFlowDTO.setCompany(nodeEntity.getCompany());
                 nodeFlowDTO.setApplication(nodeEntity.getApplication());
                 nodeFlowDTO.setSystem(nodeEntity.getSystem());
@@ -794,8 +794,8 @@ public class FlowManagementServiceImpl implements FlowManagementService {
             } else if (processorDTO.getType().equals("service")) {
                 ServiceEntity serviceEntity = serviceRepository.findByResourceKey(jsonObject.getString("serviceId"));
                 NodeEntity nodeEntity = nodeRepository.findByResourceKey(serviceEntity.getNodeId());
-                nodeFlowDTO.setResourceKey(nodeEntity.getResourceKey());
                 nodeFlowDTO.setName(nodeEntity.getName());
+                nodeFlowDTO.setId(nodeEntity.getResourceKey());
                 nodeFlowDTO.setCompany(nodeEntity.getCompany());
                 nodeFlowDTO.setApplication(nodeEntity.getApplication());
                 nodeFlowDTO.setSystem(nodeEntity.getSystem());

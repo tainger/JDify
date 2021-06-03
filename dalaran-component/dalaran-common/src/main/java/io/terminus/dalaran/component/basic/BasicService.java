@@ -20,4 +20,7 @@ public class BasicService implements DalaranBasicComponent {
     @ConfigFieldInfo(label = "服务描述", inputType = FieldInputType.String, required = false)
     private String description;
 
+    @ConfigFieldInfo(label = "节点", inputType = FieldInputType.NodeSelector, path = "/api/node/list", dynamic = true, required = false)
+    private String nodeId;
+
 }

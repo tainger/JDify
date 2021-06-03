@@ -10,7 +10,7 @@ import lombok.Data;
 @DynamicModel(value = "Node")
 public class BasicNode implements DalaranBasicComponent {
 
-    @ConfigFieldInfo(label = "节点名称", inputType = FieldInputType.String)
+    @ConfigFieldInfo(label = "名称", inputType = FieldInputType.String)
     private String name;
 
     @ConfigFieldInfo(label = "公司", inputType = FieldInputType.String)

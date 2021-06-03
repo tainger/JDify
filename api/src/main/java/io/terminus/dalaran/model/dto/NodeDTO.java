@@ -5,7 +5,7 @@ import lombok.Data;
 @Data
 public class NodeDTO{
 
-    private String resourceKey;
+    private String id;
 
     private String name;
 

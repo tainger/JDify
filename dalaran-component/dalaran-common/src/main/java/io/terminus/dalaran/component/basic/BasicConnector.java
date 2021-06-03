@@ -15,4 +15,8 @@ public class BasicConnector implements DalaranBasicComponent {
 
     @ConfigFieldInfo(label = "连接器类型", inputType = FieldInputType.ConnectorSelector, path = "/api/platform/connector", dynamic = true)
     private String connectorType;
+
+    @ConfigFieldInfo(label = "节点", inputType = FieldInputType.NodeSelector, path = "/api/node/list", dynamic = true, required = false)
+    private String nodeId;
+
 }

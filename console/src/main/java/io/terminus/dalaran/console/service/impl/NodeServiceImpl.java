@@ -52,7 +52,7 @@ public class NodeServiceImpl implements NodeService {
 
     @Override
     public NodeDTO update(NodeDTO nodeDTO) {
-        NodeEntity nodeEntity = nodeRepository.findByResourceKey(nodeDTO.getResourceKey());
+        NodeEntity nodeEntity = nodeRepository.findByResourceKey(nodeDTO.getId());
         buildEntity(nodeDTO, nodeEntity);
         nodeRepository.save(nodeEntity);
         return nodeDTO;
@@ -72,7 +72,7 @@ public class NodeServiceImpl implements NodeService {
         nodeEntity.setSystem(nodeDTO.getSystem());
         nodeEntity.setIcon(nodeDTO.getIcon());
         nodeEntity.setIconColour(nodeDTO.getIconColour());
-        String resourceKey = nodeDTO.getResourceKey();
+        String resourceKey = nodeDTO.getId();
         if (StringUtils.isBlank(resourceKey)) {
             resourceKey = GenerateKeyUtils.resourceKey();
         }
@@ -90,8 +90,8 @@ public class NodeServiceImpl implements NodeService {
 
     private NodeDTO buildNodeDTO(NodeEntity entity) {
         NodeDTO nodeDTO = new NodeDTO();
-        nodeDTO.setResourceKey(entity.getResourceKey());
         nodeDTO.setName(entity.getName());
+        nodeDTO.setId(entity.getResourceKey());
         nodeDTO.setCompany(entity.getCompany());
         nodeDTO.setApplication(entity.getApplication());
         nodeDTO.setSystem(entity.getSystem());

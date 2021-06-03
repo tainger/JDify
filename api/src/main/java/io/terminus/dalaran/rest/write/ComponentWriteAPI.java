@@ -9,14 +9,14 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping(value = "/api/component", produces = {"application/json; charset=UTF-8"})
 public interface ComponentWriteAPI {
     @PostMapping
-    @ApiOperation("新增连接器")
+    @ApiOperation("新增")
     CreateResponse create(@RequestBody ComponentDTO componentDTO);
 
     @PutMapping
-    @ApiOperation("更新连接器")
+    @ApiOperation("更新")
     Object update(@RequestBody ComponentDTO componentDTO);
 
     @DeleteMapping("/{type}/{id}")
-    @ApiOperation("删除连接器")
+    @ApiOperation("删除")
     void deleteById(@PathVariable BasicComponentType type,  @PathVariable String id);
 }
