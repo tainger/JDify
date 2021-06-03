@@ -69,8 +69,7 @@ public class ModelQueryServiceImpl implements ModelQueryService {
         CriteriaQuery<QueryModelInfo> criteriaQuery = builder.createQuery(QueryModelInfo.class);
         Root<ModelEntity> root = criteriaQuery.from(ModelEntity.class);
         criteriaQuery.multiselect(root.get("resourceKey"), root.get("moduleId"), root.get("name"), root.get("type"), root.get("isExist"))
-                .where(builder.equal(root.get("moduleId"), moduleId), builder.and(), root.get("targetType").in(ModelTargetType.editableTypes())
-                , builder.equal(root.get("isExist"), true));
+                .where(builder.equal(root.get("moduleId"), moduleId), builder.equal(root.get("isExist"),true));
         List<QueryModelInfo> models = entityManager.createQuery(criteriaQuery).getResultList();
         List<BasicModelInfo> basicModels = new ArrayList<>();
         models.forEach(model -> {
