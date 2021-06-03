@@ -4,6 +4,7 @@ import io.terminus.dalaran.console.convertor.FlowConvertor;
 import io.terminus.dalaran.console.repository.*;
 import io.terminus.dalaran.console.service.ModuleManagementService;
 import io.terminus.dalaran.console.service.ReleaseService;
+import io.terminus.dalaran.console.util.GenerateKeyUtils;
 import io.terminus.dalaran.core.flow.DalaranFlowBuilder;
 import io.terminus.dalaran.core.resource.DalaranResourceBuilder;
 import io.terminus.dalaran.core.resource.entity.basic.BasicEntity;
@@ -141,7 +142,7 @@ public class ReleaseServiceImpl implements ReleaseService {
         recordEntity.setReleaseLog(requestDTO.getReleaseLog());
         recordEntity.setReleaseTime(new Date());
         recordEntity.setSuccessful(true);
-        recordEntity.setResourceKey("key");
+        recordEntity.setResourceKey(GenerateKeyUtils.resourceKey());
         releaseRecordRepository.save(recordEntity);
 
 

@@ -51,6 +51,6 @@ public interface FlowReadAPI {
     Page<BasicFlowInfoDTO> queryBasicInfo(FlowQuery flowQuery, @RequestParam Integer pageNumber, @RequestParam Integer pageSize);
 
     @ApiOperation(value = "生成node结构")
-    @GetMapping(value = "/node")
-    List<NodeFlowListDTO> node(@RequestBody List<ProcessorDTO> pipeline);
+    @PostMapping(value = "/node")
+    List<NodeFlowListDTO> node(@RequestBody PipelineListDTO pipeline);
 }
