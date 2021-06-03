@@ -727,15 +727,13 @@ public class FlowManagementServiceImpl implements FlowManagementService {
     }
 
     @Override
-    public List<NodeFlowListDTO> node(PipelineListDTO pipeline) {
-        List<NodeFlowListDTO> nodeFlowListDTOS = new ArrayList<>();
+    public NodeFlowListDTO node(PipelineListDTO pipeline) {
         NodeFlowListDTO nodeFlowListDTO = new NodeFlowListDTO();
         List<NodeFlowDTO> nodeFlowDTOList = new ArrayList<>();
         List<NodeFlowDTO> routerList = new ArrayList<>();
         nodeFlowDTOList = buildNode(pipeline.getPipeline(), nodeFlowDTOList, routerList, false);
         nodeFlowListDTO.setNode(nodeFlowDTOList);
-        nodeFlowListDTOS.add(nodeFlowListDTO);
-        return nodeFlowListDTOS;
+        return nodeFlowListDTO;
     }
 
     public List<NodeFlowDTO> buildNode(List<ProcessorDTO> pipeline, List<NodeFlowDTO> nodeFlowDTOList, List<NodeFlowDTO> routerList, boolean isRouter) {
@@ -778,34 +776,50 @@ public class FlowManagementServiceImpl implements FlowManagementService {
 //                nodeFlowDTO.setConfig(config);
                 buildNode((jsonObject.getJSONArray("pipeline")).toJavaList(ProcessorDTO.class), nodeFlowDTOList, routerList,false);
             }
-            if (processorDTO.getType().equals("OKHttpClient") || processorDTO.getType().equals("http-client") || processorDTO.getType().equals("BrotliHttpClient")) {
-                ConnectorEntity connectorEntity = connectorRepository.findByResourceKey(jsonObject.getString("connectorId"));
-                NodeEntity nodeEntity = nodeRepository.findByResourceKey(connectorEntity.getNodeId());
-                nodeFlowDTO.setName(nodeEntity.getName());
-                nodeFlowDTO.setId(nodeEntity.getResourceKey());
-                nodeFlowDTO.setCompany(nodeEntity.getCompany());
-                nodeFlowDTO.setApplication(nodeEntity.getApplication());
-                nodeFlowDTO.setSystem(nodeEntity.getSystem());
-                if (isRouter) {
-                    routerList.add(nodeFlowDTO);
-                } else {
-                    nodeFlowDTOList.add(nodeFlowDTO);
+            if (processorDTO.getType().equals("OKHttpClient") || processorDTO.getType().equals("http-client") || processorDTO.getType().equals("BrotliHttpClient")
+                    || processorDTO.getType().equals("dubbo-consumer") || processorDTO.getType().equals("Mail-Sender") || processorDTO.getType().equals("ftp-upload")
+                    || processorDTO.getType().equals("sql") || processorDTO.getType().equals("custom-ftp-download") || processorDTO.getType().equals("soap-client")
+                    || processorDTO.getType().equals("rocketmq-producer") || processorDTO.getType().equals("kafka-producer") || processorDTO.getType().equals("DalaranMailSender")
+                    || processorDTO.getType().equals("as2-client") || processorDTO.getType().equals("custom-ftp-upload")) {
+                if (StringUtils.isNotBlank(jsonObject.getString("connectorId"))) {
+                    ConnectorEntity connectorEntity = connectorRepository.findByResourceKey(jsonObject.getString("connectorId"));
+                    if (connectorEntity != null) {
+                        NodeEntity nodeEntity = nodeRepository.findByResourceKey(connectorEntity.getNodeId());
+                        if (nodeEntity != null) {
+                            nodeFlowDTO.setName(nodeEntity.getName());
+                            nodeFlowDTO.setId(nodeEntity.getResourceKey());
+                            nodeFlowDTO.setCompany(nodeEntity.getCompany());
+                            nodeFlowDTO.setApplication(nodeEntity.getApplication());
+                            nodeFlowDTO.setSystem(nodeEntity.getSystem());
+                            if (isRouter) {
+                                routerList.add(nodeFlowDTO);
+                            } else {
+                                nodeFlowDTOList.add(nodeFlowDTO);
+                            }
+                        }
+                    }
                 }
             } else if (processorDTO.getType().equals("service")) {
-                ServiceEntity serviceEntity = serviceRepository.findByResourceKey(jsonObject.getString("serviceId"));
-                NodeEntity nodeEntity = nodeRepository.findByResourceKey(serviceEntity.getNodeId());
-                nodeFlowDTO.setName(nodeEntity.getName());
-                nodeFlowDTO.setId(nodeEntity.getResourceKey());
-                nodeFlowDTO.setCompany(nodeEntity.getCompany());
-                nodeFlowDTO.setApplication(nodeEntity.getApplication());
-                nodeFlowDTO.setSystem(nodeEntity.getSystem());
-                if (isRouter) {
-                    routerList.add(nodeFlowDTO);
-                } else {
-                    nodeFlowDTOList.add(nodeFlowDTO);
+                if (StringUtils.isNotBlank(jsonObject.getString("serviceId"))) {
+                    ServiceEntity serviceEntity = serviceRepository.findByResourceKey(jsonObject.getString("serviceId"));
+                    if (serviceEntity != null) {
+                        NodeEntity nodeEntity = nodeRepository.findByResourceKey(serviceEntity.getNodeId());
+                        if (nodeEntity != null) {
+                            nodeFlowDTO.setName(nodeEntity.getName());
+                            nodeFlowDTO.setId(nodeEntity.getResourceKey());
+                            nodeFlowDTO.setCompany(nodeEntity.getCompany());
+                            nodeFlowDTO.setApplication(nodeEntity.getApplication());
+                            nodeFlowDTO.setSystem(nodeEntity.getSystem());
+                            if (isRouter) {
+                                routerList.add(nodeFlowDTO);
+                            } else {
+                                nodeFlowDTOList.add(nodeFlowDTO);
+                            }
+                        } else if (processorDTO.getType().equals("router") || processorDTO.getType().equals("error-catch")) {
+                            nodeFlowDTOList.add(nodeFlowDTO);
+                        }
+                    }
                 }
-            } else if (processorDTO.getType().equals("router") || processorDTO.getType().equals("error-catch")) {
-                nodeFlowDTOList.add(nodeFlowDTO);
             }
         }
         if (routerList != null && routerList.size() > 0) {

@@ -52,5 +52,5 @@ public interface FlowReadAPI {
 
     @ApiOperation(value = "生成node结构")
     @PostMapping(value = "/node")
-    List<NodeFlowListDTO> node(@RequestBody PipelineListDTO pipeline);
+    NodeFlowListDTO node(@RequestBody PipelineListDTO pipeline);
 }
