@@ -17,4 +17,6 @@ public class NodeDTO{
 
     private String icon;
 
+    private String iconColour;
+
 }

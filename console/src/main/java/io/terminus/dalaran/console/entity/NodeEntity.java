@@ -24,4 +24,6 @@ public class NodeEntity extends BasicEntity {
 
     private String icon;
 
+    private String iconColour;
+
 }

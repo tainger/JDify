@@ -25,6 +25,9 @@ public class BasicNode implements DalaranBasicComponent {
     @ConfigFieldInfo(label = "图标", inputType = FieldInputType.String)
     private String icon;
 
+    @ConfigFieldInfo(label = "图标背景色", inputType = FieldInputType.String)
+    private String iconColour;
+
 
 
 
