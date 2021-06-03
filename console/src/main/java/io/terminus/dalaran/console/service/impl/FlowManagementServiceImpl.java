@@ -1,6 +1,7 @@
 package io.terminus.dalaran.console.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import io.terminus.dalaran.DalaranConstants;
 import io.terminus.dalaran.ModelImportMode;
 import io.terminus.dalaran.component.foreach.ForEachConfig;
@@ -49,6 +50,7 @@ import io.terminus.dalaran.exception.flow.FlowNotExistException;
 import io.terminus.dalaran.model.BasicResponse;
 import io.terminus.dalaran.model.ModelTargetType;
 import io.terminus.dalaran.model.component.ProcessorRouteInfo;
+import io.terminus.dalaran.model.component.RoutesModel;
 import io.terminus.dalaran.model.dto.*;
 import io.terminus.dalaran.model.dto.basic.BasicFlowInfo;
 import io.terminus.dalaran.model.dto.flow.BasicFlowInfoDTO;
@@ -118,6 +120,9 @@ public class FlowManagementServiceImpl implements FlowManagementService {
 
     @Autowired
     private SubFlowRepository subFlowRepository;
+
+    @Autowired
+    private NodeRepository nodeRepository;
 
     @Autowired
     private TestFlowInitializer testFlowInitializer;
@@ -719,6 +724,95 @@ public class FlowManagementServiceImpl implements FlowManagementService {
             models.add(basicFlowInfoDTO);
         }
         return new PageImpl<>(models, pageable, triggerFlowEntities.getTotalElements());
+    }
+
+    @Override
+    public List<NodeFlowListDTO> node(List<ProcessorDTO> pipeline) {
+        List<NodeFlowListDTO> nodeFlowListDTOS = new ArrayList<>();
+        NodeFlowListDTO nodeFlowListDTO = new NodeFlowListDTO();
+        List<NodeFlowDTO> nodeFlowDTOList = new ArrayList<>();
+        List<NodeFlowDTO> routerList = new ArrayList<>();
+        nodeFlowDTOList = buildNode(pipeline, nodeFlowDTOList, routerList, false);
+        nodeFlowListDTO.setNode(nodeFlowDTOList);
+        nodeFlowListDTOS.add(nodeFlowListDTO);
+        return nodeFlowListDTOS;
+    }
+
+    public List<NodeFlowDTO> buildNode(List<ProcessorDTO> pipeline, List<NodeFlowDTO> nodeFlowDTOList, List<NodeFlowDTO> routerList, boolean isRouter) {
+        for (ProcessorDTO processorDTO : pipeline) {
+            NodeFlowDTO nodeFlowDTO = new NodeFlowDTO();
+            String json = JSONObject.toJSONString(processorDTO.getConfig());
+            JSONObject jsonObject;
+            if (json.startsWith("\"")) {
+                jsonObject = JSONObject.parseObject(processorDTO.getConfig().toString());
+            } else {
+                jsonObject = JSONObject.parseObject(json);
+            }
+            if (jsonObject.containsKey("routes")) {
+                Map<String, Object> routeConfig = new HashMap<>();
+                List<RoutesModel> routesModelList = jsonObject.getJSONArray("routes").toJavaList(RoutesModel.class);
+                List<NodeFlowListDTO> nodeFlowListDTOS = new ArrayList<>();
+                for (RoutesModel routesModel : routesModelList) {
+                    List<NodeFlowDTO> routerFlowList = new ArrayList<>();
+                    NodeFlowListDTO nodeFlowListDTO = new NodeFlowListDTO();
+                    String pipelineJson = JSONObject.toJSONString(routesModel);
+                    JSONObject pipelineJsonObject;
+                    if (json.startsWith("\"")) {
+                        pipelineJsonObject = JSONObject.parseObject(routesModel.toString());
+                    } else {
+                        pipelineJsonObject = JSONObject.parseObject(pipelineJson);
+                    }
+                    if ((pipelineJsonObject.getJSONArray("pipeline")) != null) {
+                        routerFlowList.addAll(buildNode((pipelineJsonObject.getJSONArray("pipeline")).toJavaList(ProcessorDTO.class), nodeFlowDTOList, routerList, true));
+                        nodeFlowListDTO.setNode(routerFlowList);
+                        nodeFlowListDTOS.add(nodeFlowListDTO);
+                    }
+                    routerList = new ArrayList<>();
+                }
+                routeConfig.put("routes", nodeFlowListDTOS);
+                nodeFlowDTO.setConfig(routeConfig);
+            }
+            if (jsonObject.containsKey("pipeline")) {
+//                Map<String, Object> config = new HashMap<>();
+//                config.put("node", buildNode((jsonObject.getJSONArray("pipeline")).toJavaList(ProcessorDTO.class), nodeFlowDTOList, false));
+//                nodeFlowDTO.setConfig(config);
+                buildNode((jsonObject.getJSONArray("pipeline")).toJavaList(ProcessorDTO.class), nodeFlowDTOList, routerList,false);
+            }
+            if (processorDTO.getType().equals("OKHttpClient") || processorDTO.getType().equals("http-client") || processorDTO.getType().equals("BrotliHttpClient")) {
+                ConnectorEntity connectorEntity = connectorRepository.findByResourceKey(jsonObject.getString("connectorId"));
+                NodeEntity nodeEntity = nodeRepository.findByResourceKey(connectorEntity.getNodeId());
+                nodeFlowDTO.setResourceKey(nodeEntity.getResourceKey());
+                nodeFlowDTO.setName(nodeEntity.getName());
+                nodeFlowDTO.setCompany(nodeEntity.getCompany());
+                nodeFlowDTO.setApplication(nodeEntity.getApplication());
+                nodeFlowDTO.setSystem(nodeEntity.getSystem());
+                if (isRouter) {
+                    routerList.add(nodeFlowDTO);
+                } else {
+                    nodeFlowDTOList.add(nodeFlowDTO);
+                }
+            } else if (processorDTO.getType().equals("service")) {
+                ServiceEntity serviceEntity = serviceRepository.findByResourceKey(jsonObject.getString("serviceId"));
+                NodeEntity nodeEntity = nodeRepository.findByResourceKey(serviceEntity.getNodeId());
+                nodeFlowDTO.setResourceKey(nodeEntity.getResourceKey());
+                nodeFlowDTO.setName(nodeEntity.getName());
+                nodeFlowDTO.setCompany(nodeEntity.getCompany());
+                nodeFlowDTO.setApplication(nodeEntity.getApplication());
+                nodeFlowDTO.setSystem(nodeEntity.getSystem());
+                if (isRouter) {
+                    routerList.add(nodeFlowDTO);
+                } else {
+                    nodeFlowDTOList.add(nodeFlowDTO);
+                }
+            } else if (processorDTO.getType().equals("router") || processorDTO.getType().equals("error-catch")) {
+                nodeFlowDTOList.add(nodeFlowDTO);
+            }
+        }
+        if (routerList != null && routerList.size() > 0) {
+            return routerList;
+        } else {
+            return nodeFlowDTOList;
+        }
     }
 
     private Specification<TriggerFlowEntity> buildSpecification(FlowQuery flowQuery) {

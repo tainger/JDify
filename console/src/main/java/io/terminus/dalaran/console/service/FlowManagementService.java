@@ -66,4 +66,6 @@ public interface FlowManagementService {
     ResponseResult bindAlarm(BindAlarmRuleDTO bindAlarmRuleDto);
 
     Page<BasicFlowInfoDTO> listBasicInfo(FlowQuery flowQuery, Integer pageNumber, Integer pageSize);
+
+    List<NodeFlowListDTO> node(List<ProcessorDTO> pipeline);
 }

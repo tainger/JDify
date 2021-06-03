@@ -65,7 +65,7 @@ public class ConnectorServiceImpl implements ConnectorService {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<QueryConnectorInfo> criteriaQuery = builder.createQuery(QueryConnectorInfo.class);
         Root<ConnectorEntity> root = criteriaQuery.from(ConnectorEntity.class);
-        criteriaQuery.multiselect(root.get("resourceKey"), root.get("moduleId"), root.get("name"), root.get("connectorType"), root.get("isExist"))
+        criteriaQuery.multiselect(root.get("resourceKey"), root.get("nodeId"), root.get("moduleId"), root.get("name"), root.get("connectorType"), root.get("isExist"))
                 .where(builder.equal(root.get("moduleId"), moduleId), builder.equal(root.get("isExist"),true));
         List<QueryConnectorInfo> connectors = entityManager.createQuery(criteriaQuery).getResultList();
         List<BasicConnectorInfo> basicConnectors = new ArrayList<>();
@@ -88,7 +88,7 @@ public class ConnectorServiceImpl implements ConnectorService {
         CriteriaQuery<QueryConnectorInfo> criteriaQuery = builder.createQuery(QueryConnectorInfo.class);
         Root<ConnectorEntity> root = criteriaQuery.from(ConnectorEntity.class);
         Predicate where = builder.and(builder.equal(root.get("connectorType"), connectorType), builder.equal(root.get("isExist"),true));
-        criteriaQuery.multiselect(root.get("resourceKey"), root.get("moduleId"), root.get("name"), root.get("connectorType")).where(where);
+        criteriaQuery.multiselect(root.get("resourceKey"), root.get("nodeId"), root.get("moduleId"), root.get("name"), root.get("connectorType")).where(where);
         List<QueryConnectorInfo> connectors = entityManager.createQuery(criteriaQuery).getResultList();
         List<BasicConnectorInfo> basicConnectors = new ArrayList<>();
         connectors.forEach(connector -> {
@@ -110,6 +110,7 @@ public class ConnectorServiceImpl implements ConnectorService {
             return dto;
         }
         dto.setId(entity.getResourceKey());
+        dto.setNodeId(entity.getNodeId());
         dto.setName(entity.getName());
         dto.setConnectorType(entity.getConnectorType());
         dto.setDescription(entity.getDescription());
@@ -127,6 +128,7 @@ public class ConnectorServiceImpl implements ConnectorService {
             resourceKey = GenerateKeyUtils.resourceKey();
         }
         entity.setResourceKey(resourceKey);
+        entity.setNodeId(dto.getNodeId());
         entity.setConnectorType(dto.getConnectorType());
         entity.setDescription(dto.getDescription());
         entity.setModuleId(dto.getModuleId());
@@ -143,6 +145,7 @@ public class ConnectorServiceImpl implements ConnectorService {
 
     private ConnectorEntity buildEntity(ConnectorDTO connectorDTO){
         ConnectorEntity connectorEntity = connectorRepository.findByResourceKey(connectorDTO.getId());
+        connectorEntity.setNodeId(connectorDTO.getNodeId());
         connectorEntity.setModuleId(connectorDTO.getModuleId());
         connectorEntity.setName(connectorDTO.getName());
         connectorEntity.setConnectorType(connectorDTO.getConnectorType());

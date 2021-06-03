@@ -21,4 +21,6 @@ public class ServiceDTO extends BasicServiceInfo {
     private String description;
 
     private boolean isExist;
+
+    private String nodeId;
 }

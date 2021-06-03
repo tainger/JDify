@@ -15,4 +15,6 @@ public class ConnectorDTO extends BasicConnectorInfo {
     private Map<String, Object> config;
 
     private boolean isExist;
+
+    private String nodeId;
 }

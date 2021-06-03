@@ -27,4 +27,6 @@ public abstract class ConnectorAbstractEntity extends BasicEntity {
 
     @Column(nullable = false)
     private boolean isExist;
+
+    private String nodeId;
 }

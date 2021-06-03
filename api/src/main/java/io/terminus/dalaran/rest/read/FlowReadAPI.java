@@ -5,9 +5,7 @@ import io.terminus.dalaran.exception.flow.CreateFlowException;
 import io.terminus.dalaran.exception.flow.FlowNotExistException;
 import io.terminus.dalaran.exception.flow.FlowTestException;
 import io.terminus.dalaran.model.BasicResponse;
-import io.terminus.dalaran.model.dto.BasicResourceRequest;
-import io.terminus.dalaran.model.dto.ModuleFlowDTO;
-import io.terminus.dalaran.model.dto.TestRequestDTO;
+import io.terminus.dalaran.model.dto.*;
 import io.terminus.dalaran.model.dto.flow.BasicFlowInfoDTO;
 import io.terminus.dalaran.model.dto.flow.TriggerFlowDTO;
 import io.terminus.dalaran.model.dto.log.MainLogDTO;
@@ -48,8 +46,11 @@ public interface FlowReadAPI {
     @PostMapping(value = "/check/template/version")
     BasicResponse checkTemplateVersion(@RequestBody BasicResourceRequest flow) throws CreateFlowException;
 
-
     @ApiOperation(value = "全量查询集成流(basic Info)")
     @GetMapping(value = "/pageable/basic")
     Page<BasicFlowInfoDTO> queryBasicInfo(FlowQuery flowQuery, @RequestParam Integer pageNumber, @RequestParam Integer pageSize);
+
+    @ApiOperation(value = "生成node结构")
+    @GetMapping(value = "/node")
+    List<NodeFlowListDTO> node(@RequestBody List<ProcessorDTO> pipeline);
 }

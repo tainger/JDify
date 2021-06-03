@@ -7,6 +7,8 @@ public class QueryServiceInfo {
 
     private String resourceKey;
 
+    private String nodeId;
+
     private String moduleId;
 
     private String type;
@@ -18,8 +20,9 @@ public class QueryServiceInfo {
     public QueryServiceInfo() {
     }
 
-    public QueryServiceInfo(String resourceKey, String moduleId, String type, String name, boolean isExist) {
+    public QueryServiceInfo(String resourceKey, String nodeId, String moduleId, String type, String name, boolean isExist) {
         this.resourceKey = resourceKey;
+        this.nodeId = nodeId;
         this.moduleId = moduleId;
         this.type = type;
         this.name = name;

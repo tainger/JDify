@@ -8,7 +8,6 @@ import io.terminus.dalaran.console.service.FlowManagementService;
 import io.terminus.dalaran.console.service.ModelManagementService;
 import io.terminus.dalaran.console.service.TracingLogService;
 import io.terminus.dalaran.core.context.DalaranContext;
-import io.terminus.dalaran.core.resource.entity.common.ModuleEntity;
 import io.terminus.dalaran.core.resource.repository.ModuleRepository;
 import io.terminus.dalaran.exception.flow.CreateFlowException;
 import io.terminus.dalaran.exception.flow.FlowNotExistException;
@@ -16,7 +15,6 @@ import io.terminus.dalaran.exception.flow.UpdateFlowException;
 import io.terminus.dalaran.model.BasicResponse;
 import io.terminus.dalaran.model.CreateResponse;
 import io.terminus.dalaran.model.dto.*;
-import io.terminus.dalaran.model.dto.basic.BasicFlowInfo;
 import io.terminus.dalaran.model.dto.flow.BasicFlowInfoDTO;
 import io.terminus.dalaran.model.dto.flow.BindAlarmRuleDTO;
 import io.terminus.dalaran.model.dto.flow.ImportFlowDTO;
@@ -34,7 +32,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -106,6 +103,11 @@ public class FlowManagementRest implements FlowReadAPI, FlowWriteAPI {
     @OnException(code = ResponseMessage.FLOW_QUERY_ERROR)
     public Page<BasicFlowInfoDTO> queryBasicInfo(FlowQuery flowQuery, @RequestParam Integer pageNumber, @RequestParam Integer pageSize) {
         return flowManagementService.listBasicInfo(flowQuery, pageNumber, pageSize);
+    }
+
+    @Override
+    public List<NodeFlowListDTO> node(@RequestBody List<ProcessorDTO> pipeline) {
+        return flowManagementService.node(pipeline);
     }
 
     @Override

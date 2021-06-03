@@ -1,9 +1,9 @@
-package io.terminus.dalaran.model.dto;
+package io.terminus.dalaran.core.resource.entity.common;
 
 import lombok.Data;
 
 @Data
-public class NodeDTO{
+public class NodeEntity {
 
     private String resourceKey;
 
@@ -14,7 +14,4 @@ public class NodeDTO{
     private String application;
 
     private String system;
-
-    private String icon;
-
 }

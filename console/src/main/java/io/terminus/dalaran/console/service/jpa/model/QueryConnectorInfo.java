@@ -7,6 +7,8 @@ public class QueryConnectorInfo {
 
     private String resourceKey;
 
+    private String nodeId;
+
     private String moduleId;
 
     private String name;
@@ -18,7 +20,8 @@ public class QueryConnectorInfo {
     public QueryConnectorInfo() {
     }
 
-    public QueryConnectorInfo(String resourceKey, String moduleId, String name, String connectorType, boolean isExist) {
+    public QueryConnectorInfo(String resourceKey, String nodeId, String moduleId, String name, String connectorType, boolean isExist) {
+        this.nodeId = nodeId;
         this.resourceKey = resourceKey;
         this.moduleId = moduleId;
         this.name = name;

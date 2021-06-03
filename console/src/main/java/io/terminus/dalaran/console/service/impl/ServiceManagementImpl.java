@@ -120,7 +120,7 @@ public class ServiceManagementImpl implements ServiceManagement {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<QueryServiceInfo> criteriaQuery = builder.createQuery(QueryServiceInfo.class);
         Root<ServiceEntity> root = criteriaQuery.from(ServiceEntity.class);
-        criteriaQuery.multiselect(root.get("resourceKey"), root.get("moduleId"), root.get("type"), root.get("name"), root.get("isExist"))
+        criteriaQuery.multiselect(root.get("resourceKey"), root.get("nodeId"), root.get("moduleId"), root.get("type"), root.get("name"), root.get("isExist"))
                 .where(builder.equal(root.get("moduleId"), moduleId), builder.equal(root.get("isExist"),true));
         List<QueryServiceInfo> services = entityManager.createQuery(criteriaQuery).getResultList();
         List<BasicServiceInfo> basicServices = new ArrayList<>();
@@ -140,6 +140,7 @@ public class ServiceManagementImpl implements ServiceManagement {
     private ServiceDTO toDTO(ServiceEntity entity) {
         ServiceDTO dto = new ServiceDTO();
         dto.setId(entity.getResourceKey());
+        dto.setNodeId(entity.getNodeId());
         dto.setModuleId(entity.getModuleId());
         dto.setName(entity.getName());
         dto.setType(entity.getType());
@@ -163,6 +164,7 @@ public class ServiceManagementImpl implements ServiceManagement {
             entity = serviceRepository.findByResourceKey(resourceKey);
         }
         entity.setResourceKey(resourceKey);
+        entity.setNodeId(dto.getNodeId());
         entity.setModuleId(moduleId);
         entity.setName(dto.getName());
         entity.setType(type);

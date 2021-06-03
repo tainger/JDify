@@ -7,6 +7,8 @@ public class BasicServiceInfo {
 
     private String id;
 
+    private String nodeId;
+
     private String moduleId;
 
     private String type;
@@ -18,8 +20,9 @@ public class BasicServiceInfo {
     public BasicServiceInfo() {
     }
 
-    public BasicServiceInfo(String id, String moduleId, String type, String name, boolean isExist) {
+    public BasicServiceInfo(String id, String nodeId, String moduleId, String type, String name, boolean isExist) {
         this.id = id;
+        this.nodeId = nodeId;
         this.moduleId = moduleId;
         this.type = type;
         this.name = name;

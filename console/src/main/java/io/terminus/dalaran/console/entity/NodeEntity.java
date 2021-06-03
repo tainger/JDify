@@ -12,7 +12,6 @@ import javax.persistence.Table;
 @Table(name = "dalaran_node")
 public class NodeEntity extends BasicEntity {
 
-    @Column(nullable = false)
     private String name;
 
     @Column(nullable = false)
@@ -22,5 +21,7 @@ public class NodeEntity extends BasicEntity {
     private String application;
 
     private String system;
+
+    private String icon;
 
 }
