@@ -6,10 +6,14 @@ import io.swagger.models.Swagger;
 import io.terminus.dalaran.config.*;
 import io.terminus.dalaran.console.ExportData;
 import io.terminus.dalaran.console.ResponseMessage;
+import io.terminus.dalaran.console.exception.DalaranExceptionBuilder;
 import io.terminus.dalaran.console.exception.OnException;
 import io.terminus.dalaran.console.service.*;
 import io.terminus.dalaran.core.context.DalaranContext;
 import io.terminus.dalaran.core.resource.property.PropertyService;
+import io.terminus.dalaran.exception.DalaranRuntimeException;
+import io.terminus.dalaran.exception.flow.CreateFlowException;
+import io.terminus.dalaran.exception.flow.FIleNotLegalException;
 import io.terminus.dalaran.model.BasicResponse;
 import io.terminus.dalaran.model.DalaranAccount;
 import io.terminus.dalaran.model.ResourceUploadRequest;
@@ -250,13 +254,11 @@ public class PlatformRest implements PlatformInfoAPI, PlatformImportAPI, Platfor
             String fileName = importFile.getOriginalFilename();
             String suffix = fileName.substring(fileName.lastIndexOf("."));
             if(!suffix.equals(".dlr")) {
-                basicResponse.setResult("文件类型不匹配");
-                basicResponse.setSuccess(false);
-                return basicResponse;
+                throw DalaranExceptionBuilder.build(FIleNotLegalException.class, "文件不匹配");
             }
             ExportData importData = JSON.parseObject(importFile.getInputStream(), ExportData.class);
             exportService.importAll(importData);
-        } catch (IOException e) {
+        } catch (IOException | FIleNotLegalException e) {
             e.printStackTrace();
             basicResponse.setSuccess(false);
         }
