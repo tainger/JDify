@@ -15,5 +15,5 @@ public interface NodeService {
 
     NodeDTO update(NodeDTO nodeDTO);
 
-    void delete(String resourceKey);
+    void delete(String id);
 }

@@ -59,8 +59,8 @@ public class NodeServiceImpl implements NodeService {
     }
 
     @Override
-    public void delete(String resourceKey) {
-        NodeEntity nodeEntity = nodeRepository.findByResourceKey(resourceKey);
+    public void delete(String id) {
+        NodeEntity nodeEntity = nodeRepository.findByResourceKey(id);
         nodeEntity.setExist(false);
         nodeRepository.save(nodeEntity);
     }

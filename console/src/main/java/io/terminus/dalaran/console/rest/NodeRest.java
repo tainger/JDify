@@ -40,7 +40,7 @@ public class NodeRest implements NodeReadAPI, NodeWriteAPI {
     }
 
     @Override
-    public void delete(@RequestParam String resourceKey) {
-        nodeService.delete(resourceKey);
+    public void delete(@RequestParam String id) {
+        nodeService.delete(id);
     }
 }
