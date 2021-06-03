@@ -1,12 +1,12 @@
 package io.terminus.dalaran.console.service;
 
-import io.terminus.dalaran.model.dto.ScheduleTaskDetailDTO;
+import io.terminus.dalaran.model.dto.ElasticJobTaskDetailDTO;
 
 import java.util.List;
 
 public interface MonitorService {
 
-    List<ScheduleTaskDetailDTO> getTaskByTaskName(String taskName);
+    List<ElasticJobTaskDetailDTO> getTaskByTaskName(String taskName);
 
-    List<ScheduleTaskDetailDTO> getAllTask();
+    List<ElasticJobTaskDetailDTO> getAllTask();
 }

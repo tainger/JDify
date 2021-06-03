@@ -3,7 +3,7 @@ package io.terminus.dalaran.model.dto;
 import lombok.Data;
 
 @Data
-public class ScheduleTaskDetailDTO {
+public class ElasticJobTaskDetailDTO {
 
     private String taskName;
 
@@ -12,6 +12,4 @@ public class ScheduleTaskDetailDTO {
     private String fireTime;
 
     private Long executeTime;
-
-    private String timeZone;
 }

@@ -120,11 +120,6 @@
             <version>${project.version}</version>
         </dependency>
 
-        <dependency>
-            <groupId>io.terminus</groupId>
-            <artifactId>dalaran-scheduler</artifactId>
-            <version>${project.version}</version>
-        </dependency>
 
         <dependency>
             <groupId>io.terminus</groupId>

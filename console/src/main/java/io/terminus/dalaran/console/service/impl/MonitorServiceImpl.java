@@ -2,13 +2,13 @@ package io.terminus.dalaran.console.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import io.terminus.dalaran.TracingType;
-import io.terminus.dalaran.component.scheduler.DalaranSchedulerConfig;
+import io.terminus.dalaran.component.elasticjob.trigger.ElasticJobConfig;
 import io.terminus.dalaran.console.entity.TriggerFlowEntity;
 import io.terminus.dalaran.console.repository.TriggerFlowRepository;
 import io.terminus.dalaran.console.service.MonitorService;
 import io.terminus.dalaran.console.service.TracingLogService;
 import io.terminus.dalaran.core.resource.repository.TracingLogRepository;
-import io.terminus.dalaran.model.dto.ScheduleTaskDetailDTO;
+import io.terminus.dalaran.model.dto.ElasticJobTaskDetailDTO;
 import io.terminus.dalaran.model.query.TracingLogQuery;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,30 +30,29 @@ public class MonitorServiceImpl implements MonitorService {
     private TracingLogService logService;
 
     @Override
-    public List<ScheduleTaskDetailDTO> getTaskByTaskName(String taskName) {
-        List<ScheduleTaskDetailDTO> tasks = new ArrayList<>();
+    public List<ElasticJobTaskDetailDTO> getTaskByTaskName(String taskName) {
+        List<ElasticJobTaskDetailDTO> tasks = new ArrayList<>();
         TriggerFlowEntity flowEntity = flowRepository.findByName(taskName);
-        if (flowEntity == null || !StringUtils.equalsIgnoreCase(flowEntity.getTriggerType(), "scheduler")) {
+        if (flowEntity == null || !StringUtils.equalsIgnoreCase(flowEntity.getTriggerType(), "elastic-job")) {
             return tasks;
         }
-        DalaranSchedulerConfig schedulerConfig = JSON.parseObject(flowEntity.getTriggerConfig(), DalaranSchedulerConfig.class);
+        ElasticJobConfig elasticJobConfig = JSON.parseObject(flowEntity.getTriggerConfig(), ElasticJobConfig.class);
         TracingLogQuery logQuery = new TracingLogQuery();
         logQuery.setFlowId(flowEntity.getResourceKey());
         logQuery.setTracingType(TracingType.Flow);
         logService.triggerLogs(logQuery).forEach(log -> {
-            ScheduleTaskDetailDTO taskDetail = new ScheduleTaskDetailDTO();
+            ElasticJobTaskDetailDTO taskDetail = new ElasticJobTaskDetailDTO();
             taskDetail.setTaskName(taskName);
             taskDetail.setExecuteTime(log.getElapsed());
             taskDetail.setFireTime(log.getCreatedAt());
-            taskDetail.setCron(schedulerConfig.getCron());
-            taskDetail.setTimeZone(schedulerConfig.getTimezone());
+            taskDetail.setCron(elasticJobConfig.getCron());
             tasks.add(taskDetail);
         });
         return tasks;
     }
 
     @Override
-    public List<ScheduleTaskDetailDTO> getAllTask() {
+    public List<ElasticJobTaskDetailDTO> getAllTask() {
         return null;
     }
 

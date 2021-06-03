@@ -28,7 +28,6 @@
         <module>dalaran-sql</module>
         <module>dalaran-service</module>
         <module>dalaran-errorcatch</module>
-        <module>dalaran-scheduler</module>
         <module>dalaran-script</module>
         <module>dalaran-as2</module>
         <module>dalaran-retry</module>
