@@ -727,11 +727,15 @@ public class FlowManagementServiceImpl implements FlowManagementService {
     }
 
     @Override
-    public List<NodeFlowDTO> node(List<ProcessorDTO> pipeline) {
+    public List<NodeFlowListDTO> node(List<ProcessorDTO> pipeline) {
+        List<NodeFlowListDTO> nodeFlowListDTOS = new ArrayList<>();
+        NodeFlowListDTO nodeFlowListDTO = new NodeFlowListDTO();
         List<NodeFlowDTO> nodeFlowDTOList = new ArrayList<>();
         List<NodeFlowDTO> routerList = new ArrayList<>();
         nodeFlowDTOList = buildNode(pipeline, nodeFlowDTOList, routerList, false);
-        return nodeFlowDTOList;
+        nodeFlowListDTO.setNode(nodeFlowDTOList);
+        nodeFlowListDTOS.add(nodeFlowListDTO);
+        return nodeFlowListDTOS;
     }
 
     public List<NodeFlowDTO> buildNode(List<ProcessorDTO> pipeline, List<NodeFlowDTO> nodeFlowDTOList, List<NodeFlowDTO> routerList, boolean isRouter) {
