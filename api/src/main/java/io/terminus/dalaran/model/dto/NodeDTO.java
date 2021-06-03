@@ -15,4 +15,6 @@ public class NodeDTO{
 
     private String system;
 
+    private String icon;
+
 }

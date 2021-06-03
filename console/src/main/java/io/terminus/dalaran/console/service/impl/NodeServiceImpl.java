@@ -70,6 +70,7 @@ public class NodeServiceImpl implements NodeService {
         nodeEntity.setCompany(nodeDTO.getCompany());
         nodeEntity.setApplication(nodeDTO.getApplication());
         nodeEntity.setSystem(nodeDTO.getSystem());
+        nodeEntity.setIcon(nodeDTO.getIcon());
         String resourceKey = nodeDTO.getResourceKey();
         if (StringUtils.isBlank(resourceKey)) {
             resourceKey = GenerateKeyUtils.resourceKey();
@@ -93,6 +94,7 @@ public class NodeServiceImpl implements NodeService {
         nodeDTO.setCompany(entity.getCompany());
         nodeDTO.setApplication(entity.getApplication());
         nodeDTO.setSystem(entity.getSystem());
+        nodeDTO.setIcon(entity.getIcon());
         return nodeDTO;
     }
 
