@@ -42,6 +42,9 @@ public class ComponentManagementServiceImpl implements ComponentManagementServic
     @Autowired
     private AuthenticatorService authenticatorService;
 
+    @Autowired
+    private NodeService nodeService;
+
     @Override
     public String create(ComponentDTO componentDTO) {
         String componentConfig = componentDTO.getConfig();
@@ -67,6 +70,9 @@ public class ComponentManagementServiceImpl implements ComponentManagementServic
                     return limiterService.create(JSON.parseObject(componentConfig, LimiterDTO.class));
                 case Authenticator:
                     return authenticatorService.create(JSON.parseObject(componentConfig, AuthenticatorDTO.class));
+                case Node:
+                    return nodeService.create(JSON.parseObject(componentConfig, NodeDTO.class));
+
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -100,6 +106,8 @@ public class ComponentManagementServiceImpl implements ComponentManagementServic
                     return limiterService.update(JSON.parseObject(componentConfig, LimiterDTO.class));
                 case Authenticator:
                     return authenticatorService.update(JSON.parseObject(componentConfig, AuthenticatorDTO.class));
+                case Node:
+                    return nodeService.update(JSON.parseObject(componentConfig, NodeDTO.class));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -141,6 +149,9 @@ public class ComponentManagementServiceImpl implements ComponentManagementServic
                     break;
                 case Authenticator:
                     authenticatorService.delete(componentId);
+                    break;
+                case Node:
+                    nodeService.delete(componentId);
                     break;
             }
         } catch (Exception e) {
