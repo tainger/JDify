@@ -776,11 +776,7 @@ public class FlowManagementServiceImpl implements FlowManagementService {
 //                nodeFlowDTO.setConfig(config);
                 buildNode((jsonObject.getJSONArray("pipeline")).toJavaList(ProcessorDTO.class), nodeFlowDTOList, routerList,false);
             }
-            if (processorDTO.getType().equals("OKHttpClient") || processorDTO.getType().equals("http-client") || processorDTO.getType().equals("BrotliHttpClient")
-                    || processorDTO.getType().equals("dubbo-consumer") || processorDTO.getType().equals("Mail-Sender") || processorDTO.getType().equals("ftp-upload")
-                    || processorDTO.getType().equals("sql") || processorDTO.getType().equals("custom-ftp-download") || processorDTO.getType().equals("soap-client")
-                    || processorDTO.getType().equals("rocketmq-producer") || processorDTO.getType().equals("kafka-producer") || processorDTO.getType().equals("DalaranMailSender")
-                    || processorDTO.getType().equals("as2-client") || processorDTO.getType().equals("custom-ftp-upload")) {
+            if (jsonObject.containsKey("connectorId")) {
                 if (StringUtils.isNotBlank(jsonObject.getString("connectorId"))) {
                     ConnectorEntity connectorEntity = connectorRepository.findByResourceKey(jsonObject.getString("connectorId"));
                     if (connectorEntity != null) {
@@ -799,7 +795,7 @@ public class FlowManagementServiceImpl implements FlowManagementService {
                         }
                     }
                 }
-            } else if (processorDTO.getType().equals("service")) {
+            } else if (jsonObject.containsKey("serviceId")) {
                 if (StringUtils.isNotBlank(jsonObject.getString("serviceId"))) {
                     ServiceEntity serviceEntity = serviceRepository.findByResourceKey(jsonObject.getString("serviceId"));
                     if (serviceEntity != null) {
@@ -815,11 +811,11 @@ public class FlowManagementServiceImpl implements FlowManagementService {
                             } else {
                                 nodeFlowDTOList.add(nodeFlowDTO);
                             }
-                        } else if (processorDTO.getType().equals("router") || processorDTO.getType().equals("error-catch")) {
-                            nodeFlowDTOList.add(nodeFlowDTO);
                         }
                     }
                 }
+            } else if (processorDTO.getType().equals("router") || processorDTO.getType().equals("error-catch")) {
+                nodeFlowDTOList.add(nodeFlowDTO);
             }
         }
         if (routerList != null && routerList.size() > 0) {
