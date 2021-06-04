@@ -248,21 +248,18 @@ public class PlatformRest implements PlatformInfoAPI, PlatformImportAPI, Platfor
 
     @Override
     @OnException(code = ResponseMessage.CONFIG_IMPORT_ERROR)
-    public BasicResponse importAll(@RequestParam MultipartFile importFile) {
-        BasicResponse basicResponse = new BasicResponse(true);
+    public void importAll(@RequestParam MultipartFile importFile) throws FIleNotLegalException {
+        String fileName = importFile.getOriginalFilename();
+        String suffix = fileName.substring(fileName.lastIndexOf("."));
+        if (!suffix.equals(".dlr")) {
+            throw DalaranExceptionBuilder.build(FIleNotLegalException.class, "文件类型不匹配");
+        }
         try {
-            String fileName = importFile.getOriginalFilename();
-            String suffix = fileName.substring(fileName.lastIndexOf("."));
-            if(!suffix.equals(".dlr")) {
-                throw DalaranExceptionBuilder.build(FIleNotLegalException.class, "文件不匹配");
-            }
             ExportData importData = JSON.parseObject(importFile.getInputStream(), ExportData.class);
             exportService.importAll(importData);
-        } catch (IOException | FIleNotLegalException e) {
-            e.printStackTrace();
-            basicResponse.setSuccess(false);
+        } catch (Exception e) {
+            throw DalaranExceptionBuilder.build(FIleNotLegalException.class, "文件输入异常");
         }
-        return basicResponse;
     }
 
     @Override
