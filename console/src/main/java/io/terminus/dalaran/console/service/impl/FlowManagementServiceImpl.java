@@ -787,6 +787,8 @@ public class FlowManagementServiceImpl implements FlowManagementService {
                             nodeFlowDTO.setCompany(nodeEntity.getCompany());
                             nodeFlowDTO.setApplication(nodeEntity.getApplication());
                             nodeFlowDTO.setSystem(nodeEntity.getSystem());
+                            nodeFlowDTO.setIcon(nodeEntity.getIcon());
+                            nodeFlowDTO.setIconColour(nodeEntity.getIconColour());
                             if (isRouter) {
                                 routerList.add(nodeFlowDTO);
                             } else {
@@ -806,6 +808,8 @@ public class FlowManagementServiceImpl implements FlowManagementService {
                             nodeFlowDTO.setCompany(nodeEntity.getCompany());
                             nodeFlowDTO.setApplication(nodeEntity.getApplication());
                             nodeFlowDTO.setSystem(nodeEntity.getSystem());
+                            nodeFlowDTO.setIcon(nodeEntity.getIcon());
+                            nodeFlowDTO.setIconColour(nodeEntity.getIconColour());
                             if (isRouter) {
                                 routerList.add(nodeFlowDTO);
                             } else {

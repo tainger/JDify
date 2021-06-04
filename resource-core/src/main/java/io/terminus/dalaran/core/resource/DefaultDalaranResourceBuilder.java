@@ -182,7 +182,7 @@ public class DefaultDalaranResourceBuilder implements DalaranResourceBuilder {
         if (entity == null) {
             throw new RuntimeException("authenticator [" + authenticatorId + "] not found");
         }
-        return buildArrayConfig(entity.getConfig(), authenticatorConfigType, entity.getType());
+        return buildArrayConfig(entity.getConfig(), authenticatorConfigType);
     }
 
     @Override
@@ -265,13 +265,11 @@ public class DefaultDalaranResourceBuilder implements DalaranResourceBuilder {
         return JSON.parseObject(replacedConfig, configType);
     }
 
-    public  <T> T buildArrayConfig(String configValue, Class<T> configType, String type) {
+    public  <T> T buildArrayConfig(String configValue, Class<T> configType) {
         String replacedConfig = replaceProperties(configValue, getProperties());
         DalaranAuthenticator authenticator = new DalaranAuthenticator();
-        if (type.equals("BasicAuthenticator")) {
-            List<BasicAuthenticatorConfig> configs = JSON.parseArray(replacedConfig, BasicAuthenticatorConfig.class);
-            authenticator.setConfig(configs);
-        }
+        List<BasicAuthenticatorConfig> configs = JSON.parseArray(replacedConfig, BasicAuthenticatorConfig.class);
+        authenticator.setConfig(configs);
         return JSON.parseObject(JSON.toJSONString(authenticator), configType);
     }
 

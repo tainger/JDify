@@ -44,9 +44,7 @@ public class AuthenticatorServiceImpl implements AuthenticatorService {
         AuthenticatorEntity entity = toEntity(authenticatorDTO);
         setCreatedBy(entity);
         repository.save(entity);
-        if (authenticatorDTO.getType().equals("BasicAuthenticator")) {
-            saveToRedis(authenticatorDTO.getAuthenticator());
-        }
+        saveToRedis(authenticatorDTO.getAuthenticator());
         return entity.getResourceKey();
     }
 
@@ -54,9 +52,7 @@ public class AuthenticatorServiceImpl implements AuthenticatorService {
     public AuthenticatorDTO update(AuthenticatorDTO authenticatorDTO) {
         AuthenticatorEntity entity = buildEntity(authenticatorDTO);
         repository.save(entity);
-        if (authenticatorDTO.getType().equals("BasicAuthenticator")) {
-            saveToRedis(authenticatorDTO.getAuthenticator());
-        }
+        saveToRedis(authenticatorDTO.getAuthenticator());
         return authenticatorDTO;
     }
 
@@ -65,10 +61,8 @@ public class AuthenticatorServiceImpl implements AuthenticatorService {
         AuthenticatorEntity entity = repository.findByResourceKey(authenticatorId);
         entity.setExist(false);
         repository.save(entity);
-        if (entity.getType().equals("BasicAuthenticator")) {
-            List<AuthenticatorConfigDTO> authenticatorConfigDTOS = JSONObject.parseArray(entity.getConfig(), AuthenticatorConfigDTO.class);
-            deleteFromRedis(authenticatorConfigDTOS);
-        }
+        List<AuthenticatorConfigDTO> authenticatorConfigDTOS = JSONObject.parseArray(entity.getConfig(), AuthenticatorConfigDTO.class);
+        deleteFromRedis(authenticatorConfigDTOS);
     }
 
     @Override
@@ -85,7 +79,7 @@ public class AuthenticatorServiceImpl implements AuthenticatorService {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<QueryAuthenticatorInfo> criteriaQuery = builder.createQuery(QueryAuthenticatorInfo.class);
         Root<AuthenticatorEntity> root = criteriaQuery.from(AuthenticatorEntity.class);
-        criteriaQuery.multiselect(root.get("resourceKey"), root.get("moduleId"), root.get("name"), root.get("type"), root.get("isExist"))
+        criteriaQuery.multiselect(root.get("resourceKey"), root.get("moduleId"), root.get("name"), root.get("isExist"))
                 .where(builder.equal(root.get("moduleId"), moduleId) , builder.equal(root.get("isExist"), true));
         List<QueryAuthenticatorInfo> authenticators = entityManager.createQuery(criteriaQuery).getResultList();
         List<BasicAuthenticatorInfo> basicAuthenticatorInfos = new ArrayList<>();
@@ -121,7 +115,6 @@ public class AuthenticatorServiceImpl implements AuthenticatorService {
     private AuthenticatorEntity toEntity(AuthenticatorDTO dto) {
         AuthenticatorEntity entity = new AuthenticatorEntity();
         entity.setName(dto.getName());
-        entity.setType(dto.getType());
         entity.setConfig(JSON.toJSONString(dto.getAuthenticator()));
         entity.setModuleId(dto.getModuleId());
         String resourceKey = dto.getId();
@@ -142,7 +135,6 @@ public class AuthenticatorServiceImpl implements AuthenticatorService {
     private AuthenticatorEntity buildEntity(AuthenticatorDTO dto){
         AuthenticatorEntity entity = repository.findByResourceKey(dto.getId());
         entity.setName(dto.getName());
-        entity.setType(dto.getType());
         entity.setExist(dto.isExist());
         entity.setConfig(JSON.toJSONString(dto.getAuthenticator()));
         if(UserContext.getUserInfo() != null && UserContext.getUserInfo().getUsername() != null) {
