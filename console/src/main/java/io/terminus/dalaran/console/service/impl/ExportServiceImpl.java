@@ -29,8 +29,11 @@ import io.terminus.dalaran.console.service.jpa.PrivateResourceQueryService;
 import io.terminus.dalaran.core.component.DalaranTrigger;
 import io.terminus.dalaran.core.component.DalaranTriggerApiDocExport;
 import io.terminus.dalaran.core.component.DalaranTriggerWordDocExport;
-import io.terminus.dalaran.core.component.annotation.ConfigFieldInfo;
-import io.terminus.dalaran.core.component.config.ServiceOperationConfig;
+import io.terminus.dalaran.core.component.config.*;
+import io.terminus.dalaran.core.component.model.FunctionType;
+import io.terminus.dalaran.core.component.model.MappingFunction;
+import io.terminus.dalaran.core.component.model.MappingType;
+import io.terminus.dalaran.core.component.model.SimpleMapping;
 import io.terminus.dalaran.core.context.DalaranComponentContext;
 import io.terminus.dalaran.core.context.DalaranContext;
 import io.terminus.dalaran.core.context.DalaranModelTypeContext;
@@ -46,6 +49,7 @@ import io.terminus.dalaran.model.flow.FlowStatus;
 import io.terminus.dalaran.model.flow.TriggerFlow;
 import io.terminus.dalaran.model.query.PrivateRepositoryQuery;
 import io.terminus.dalaran.model.soap.model.SoapOperationConfig;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.metamodel.spi.MetamodelImplementor;
@@ -59,11 +63,11 @@ import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class ExportServiceImpl implements ExportService {
 
     @Autowired
@@ -355,6 +359,7 @@ public class ExportServiceImpl implements ExportService {
         }
         ExportData exportData = buildExportData(flowsCollector);
         exportData.setTriggerFlows(triggerFlowEntities);
+        exportData.setClients(clientRepository.findAll());
         return exportData;
     }
 
@@ -414,12 +419,32 @@ public class ExportServiceImpl implements ExportService {
     }
 
     private void collectProcessorResourceKey(ProcessorEntity processorEntity) {
-        String type = processorEntity.getType();
-        String processorEntityConfig = processorEntity.getConfig();
+        ProcessorInfo processorInfo = dalaranContext.getDalaranComponentContext().getProcessorInfo(processorEntity.getGroup(), processorEntity.getType(), processorEntity.getVersion());
+        if (StringUtils.equalsIgnoreCase(processorInfo.getOrigin(), DalaranConstants.PARTNER)) {
+            List<PrivateRepositoryEntity> privateRepositoryEntity = privateResourceQueryService.query(new PrivateRepositoryQuery(processorInfo.getName(), DalaranConstants.PROCESSOR));
+            if (CollectionUtils.isNotEmpty(privateRepositoryEntity)) {
+                PrivateRepositoryEntity repositoryEntity = privateRepositoryEntity.get(0);
+                flowsCollector.collect(SourceType.PRIVATE_REPOSITORY, repositoryEntity.getResourceKey() + "#" + repositoryEntity.getVersion());
+            }
+        }
 
-        if ("scatter-gather".equals(type)) {
-            ScatterGatherConfig scatterGatherConfig = JSONObject.parseObject(processorEntityConfig, ScatterGatherConfig.class);
-            List<ScatterGatherConfig.Branch> branches = scatterGatherConfig.getBranches();
+
+        String config = processorEntity.getConfig();
+        Class configType = processorInfo.getConfigType();
+        Object processorConfig = JSONObject.parseObject(config, configType);
+
+
+        if(processorConfig instanceof RetryConfig) {
+            List<ProcessorRouteInfo> pipeline = ((RetryConfig) processorConfig).getPipeline();
+            for (ProcessorRouteInfo processorRouteInfo : pipeline) {
+                ProcessorEntity transformProcessorEntity = new ProcessorEntity();
+                BeanUtils.copyProperties(processorRouteInfo, transformProcessorEntity);
+                collectProcessorResourceKey(transformProcessorEntity);
+            }
+        }
+
+        if (processorConfig instanceof ScatterGatherConfig) {
+            List<ScatterGatherConfig.Branch> branches = ((ScatterGatherConfig) processorConfig).getBranches();
             for (ScatterGatherConfig.Branch branch : branches) {
                 List<ProcessorRouteInfo> branchPipeline = branch.getPipeline();
                 for (ProcessorRouteInfo processorRouteInfo : branchPipeline) {
@@ -430,9 +455,9 @@ public class ExportServiceImpl implements ExportService {
             }
         }
 
-        if ("sub-flow".equals(type)) {
-            DalaranSubFlowConfig dalaranSubFlowConfig = JSONObject.parseObject(processorEntityConfig, DalaranSubFlowConfig.class);
-            String subFlowId = dalaranSubFlowConfig.getSubFlowId();
+        if (processorConfig instanceof DalaranSubFlowConfig) {
+            String subFlowId = ((DalaranSubFlowConfig) processorConfig).getSubFlowId();
+            flowsCollector.collect(SourceType.SUB_FLOW, subFlowId);
             SubFlowEntity subFlowEntity = subFlowRepository.findByResourceKey(subFlowId);
             List<ProcessorEntity> pipeline = subFlowEntity.getPipeline();
             for (ProcessorEntity subProcessorEntity : pipeline) {
@@ -440,8 +465,8 @@ public class ExportServiceImpl implements ExportService {
             }
         }
 
-        if ("loop-while".equals(type)) {
-            LoopWhileConfig loopWhileConfig = JSONObject.parseObject(processorEntityConfig, LoopWhileConfig.class);
+        if (processorConfig instanceof  LoopWhileConfig) {
+            LoopWhileConfig loopWhileConfig = (LoopWhileConfig)processorConfig;
             List<ProcessorRouteInfo> loopWhilePipeline = loopWhileConfig.getPipeline();
             for (ProcessorRouteInfo processorRouteInfo : loopWhilePipeline) {
                 ProcessorEntity loopWhileProcessorEntity = new ProcessorEntity();
@@ -450,17 +475,16 @@ public class ExportServiceImpl implements ExportService {
             }
         }
 
-        if ("service".equals(type)) {
-            ServiceOperationConfig serviceOperationConfig = JSONObject.parseObject(processorEntityConfig, ServiceOperationConfig.class);
-            String serviceId = serviceOperationConfig.getServiceId();
+        if (processorConfig instanceof ServiceOperationConfig) {
+            String serviceId = ((ServiceOperationConfig) processorConfig).getServiceId();
             ServiceEntity service = serviceRepository.findByResourceKey(serviceId);
+            flowsCollector.collect(SourceType.SERVICE, serviceId);
             String serviceConfig = service.getServiceConfig();
             collectServiceResourceKey(serviceConfig);
         }
 
-        if ("foreach".equals(type)) {
-            ForEachConfig forEachConfig = JSONObject.parseObject(processorEntityConfig, ForEachConfig.class);
-            List<ProcessorRouteInfo> pipeline = forEachConfig.getPipeline();
+        if (processorConfig instanceof ForEachConfig) {
+            List<ProcessorRouteInfo> pipeline = ((ForEachConfig) processorConfig).getPipeline();
             for (ProcessorRouteInfo processorRouteInfo : pipeline) {
                 ProcessorEntity loopWhileProcessorEntity = new ProcessorEntity();
                 BeanUtils.copyProperties(processorRouteInfo, loopWhileProcessorEntity);
@@ -468,18 +492,42 @@ public class ExportServiceImpl implements ExportService {
             }
         }
 
-        if ("retry".equals(type)) {
-            RetryConfig retryConfig = JSONObject.parseObject(processorEntityConfig, RetryConfig.class);
-            List<ProcessorRouteInfo> pipeline = retryConfig.getPipeline();
+        if (processorConfig instanceof  RetryConfig) {
+            List<ProcessorRouteInfo> pipeline = ((RetryConfig) processorConfig).getPipeline();
             for (ProcessorRouteInfo processorRouteInfo : pipeline) {
                 ProcessorEntity loopWhileProcessorEntity = new ProcessorEntity();
                 BeanUtils.copyProperties(processorRouteInfo, loopWhileProcessorEntity);
                 collectProcessorResourceKey(loopWhileProcessorEntity);
             }
         }
+
+
+        if (processorConfig instanceof DalaranMapperConfig) {
+            HashMap<String, SimpleMapping> messageMapping = ((DalaranMapperConfig) processorConfig).getMessageMapping();
+            DalaranMapperConfig mapperConfig = (DalaranMapperConfig) processorConfig;
+            log.info("mapperConfig: " + JSON.toJSONString(mapperConfig));
+            List<SimpleMapping> simpleMappings = new ArrayList<>(messageMapping.values());
+            List<SimpleMapping> noDestinationMappings = mapperConfig.getNoDestinationMappings();
+            log.info("noDestinationMappings: " + noDestinationMappings);
+            if (CollectionUtils.isNotEmpty(noDestinationMappings)) {
+                simpleMappings.addAll(noDestinationMappings);
+            }
+            log.info("simpleMappings: " + simpleMappings.toString());
+            for (SimpleMapping simpleMapping : simpleMappings) {
+                if (simpleMapping.getMappingType() == MappingType.FUNCTION) {
+                    MappingFunction mappingFunction = (MappingFunction) (simpleMapping.getValue());
+                    if (mappingFunction.getType() == FunctionType.STATIC) {
+                        continue;
+                    }
+                    flowsCollector.collect(SourceType.FUNCTION, mappingFunction.getId());
+                }
+            }
+        }
+
+        collectBasicResource(processorConfig);
 
         String processorType = processorEntity.getType();
-        ProcessorInfo processorInfo = dalaranContext.getDalaranComponentContext().getProcessorInfo(processorEntity.getGroup(),processorType,processorEntity.getVersion());
+        processorInfo = dalaranContext.getDalaranComponentContext().getProcessorInfo(processorEntity.getGroup(),processorType,processorEntity.getVersion());
         if (StringUtils.equalsIgnoreCase(processorInfo.getOrigin(), DalaranConstants.PARTNER)) {
             List<PrivateRepositoryEntity> privateRepositoryEntity = privateResourceQueryService.query(new PrivateRepositoryQuery(processorInfo.getName(), DalaranConstants.PROCESSOR));
             if (CollectionUtils.isNotEmpty(privateRepositoryEntity)) {
@@ -487,7 +535,6 @@ public class ExportServiceImpl implements ExportService {
                 flowsCollector.collect(SourceType.PRIVATE_REPOSITORY, repositoryEntity.getResourceKey() + "#" + repositoryEntity.getVersion());
             }
         }
-        collectProcessResourceKey(processorEntity);
     }
 
     private void collectServiceResourceKey(String config) {
@@ -500,37 +547,37 @@ public class ExportServiceImpl implements ExportService {
             flowsCollector.collect(SourceType.MODEL, outModelId);
         }
     }
-
-    private void collectProcessResourceKey(ProcessorEntity processorEntity) {
-        String type = processorEntity.getType();
-        Class configClass = getProcessorClassName(type);
-        String processorEntityConfig = processorEntity.getConfig();
-        Object object = JSONObject.parseObject(processorEntityConfig, configClass);
-        List<Field> fields = new ArrayList<>();
-        while (null != configClass) {
-            List<Field> fieldList = Arrays.asList(configClass.getDeclaredFields());
-            fields.addAll(fieldList);
-            configClass = configClass.getSuperclass();
-        }
-        for (Field declaredField : fields) {
-            ConfigFieldInfo configFieldInfo = declaredField.getDeclaredAnnotation(ConfigFieldInfo.class);
-            if (configFieldInfo == null) {
-                continue;
-            }
-            String sourceType = configFieldInfo.sourceType();
-            if (StringUtils.EMPTY.equals(sourceType)) {
-                continue;
-            }
-            String resourceKey = null;
-            try {
-                declaredField.setAccessible(true);
-                resourceKey = (String) declaredField.get(object);
-                flowsCollector.collect(sourceType, resourceKey);
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            }
-        }
-    }
+//
+//    private void collectProcessResourceKey(ProcessorEntity processorEntity) {
+//        String type = processorEntity.getType();
+//        Class configClass = getProcessorClassName(type);
+//        String processorEntityConfig = processorEntity.getConfig();
+//        Object object = JSONObject.parseObject(processorEntityConfig, configClass);
+//        List<Field> fields = new ArrayList<>();
+//        while (null != configClass) {
+//            List<Field> fieldList = Arrays.asList(configClass.getDeclaredFields());
+//            fields.addAll(fieldList);
+//            configClass = configClass.getSuperclass();
+//        }
+//        for (Field declaredField : fields) {
+//            ConfigFieldInfo configFieldInfo = declaredField.getDeclaredAnnotation(ConfigFieldInfo.class);
+//            if (configFieldInfo == null) {
+//                continue;
+//            }
+//            String sourceType = configFieldInfo.sourceType();
+//            if (StringUtils.EMPTY.equals(sourceType)) {
+//                continue;
+//            }
+//            String resourceKey = null;
+//            try {
+//                declaredField.setAccessible(true);
+//                resourceKey = (String) declaredField.get(object);
+//                flowsCollector.collect(sourceType, resourceKey);
+//            } catch (IllegalAccessException e) {
+//                e.printStackTrace();
+//            }
+//        }
+//    }
 
     private void collectBaseInfoResourceKey(TriggerFlowEntity triggerFlowEntity) {
         String moduleId = triggerFlowEntity.getModuleId();
@@ -539,45 +586,52 @@ public class ExportServiceImpl implements ExportService {
 
     public void collectTriggerResourceKey(TriggerFlowEntity triggerFlowEntity) {
         String triggerType = triggerFlowEntity.getTriggerType();
-        String triggerConfig = triggerFlowEntity.getTriggerConfig();
-        Class configClass = getTriggerClassName(triggerType);
-        Object object = JSONObject.parseObject(triggerConfig, configClass);
-        List<Field> fields = new ArrayList<>();
-        while (null != configClass) {
-            List<Field> fieldList = Arrays.asList(configClass.getDeclaredFields());
-            fields.addAll(fieldList);
-            configClass = configClass.getSuperclass();
-        }
-        for (Field declaredField : fields) {
-            ConfigFieldInfo configFieldInfo = declaredField.getDeclaredAnnotation(ConfigFieldInfo.class);
-            if (configFieldInfo == null) {
-                continue;
-            }
-            String sourceType = configFieldInfo.sourceType();
-            if (!StringUtils.EMPTY.equals(sourceType)) {
-                String resourceKey = null;
-                try {
-                    declaredField.setAccessible(true);
-                    resourceKey = (String) declaredField.get(object);
-                    if(StringUtils.isEmpty(resourceKey)){
-                        continue;
-                    }
-                    flowsCollector.collect(sourceType, resourceKey);
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
+        TriggerInfo triggerInfo = dalaranComponentContext.getTriggerInfo(triggerType);
+        Class configType = triggerInfo.getConfigType();
+        Object configObject = JSONObject.parseObject(triggerFlowEntity.getTriggerConfig(), configType);
+        collectBasicResource(configObject);
     }
 
 
-    public Class getTriggerClassName(String triggerType) {
-        return dalaranComponentContext.getTriggerConfigMap().get(triggerType);
-    }
+    private void collectBasicResource(Object configObject){
+        if(configObject instanceof AllModelConfig){
+            AllModelConfig allModelConfig = (AllModelConfig)configObject;
+            String inModelId = allModelConfig.getInModelId();
+            flowsCollector.collect(SourceType.MODEL, inModelId);
+            String outModelId = allModelConfig.getOutModelId();
+            flowsCollector.collect(SourceType.MODEL, outModelId);
+        }
+
+        if(configObject instanceof InModelConfig){
+            InModelConfig inModelConfig = (InModelConfig)configObject;
+            String inModelId = inModelConfig.getInModelId();
+            flowsCollector.collect(SourceType.MODEL, inModelId);
+        }
+
+        if(configObject instanceof ConnectorConfig){
+            ConnectorConfig connector = (ConnectorConfig)configObject;
+            String connectorId = connector.getConnectorId();
+            flowsCollector.collect(SourceType.CONNECTOR, connectorId);
+        }
 
 
-    public Class getProcessorClassName(String processorType) {
-        return dalaranComponentContext.getProcessorConfigMap().get(processorType);
+        if(configObject instanceof OutModelConfig){
+            OutModelConfig outModelConfig = (OutModelConfig)configObject;
+            String outModelId = outModelConfig.getOutModelId();
+            flowsCollector.collect(SourceType.MODEL, outModelId);
+        }
+
+        if(configObject instanceof AuthenticatorConfig){
+            AuthenticatorConfig authenticatorConfig = (AuthenticatorConfig)configObject;
+            String authenticatorId = authenticatorConfig.getAuthenticatorId();
+            flowsCollector.collect(SourceType.AUTHENTICATOR, authenticatorId);
+        }
+
+        if(configObject instanceof LimiterConfig){
+            LimiterConfig limiterConfig = (LimiterConfig)configObject;
+            String limiterId = limiterConfig.getLimiterId();
+            flowsCollector.collect(SourceType.LIMITER, limiterId);
+        }
     }
 
 

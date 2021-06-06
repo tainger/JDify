@@ -258,7 +258,7 @@ public class PlatformRest implements PlatformInfoAPI, PlatformImportAPI, Platfor
             ExportData importData = JSON.parseObject(importFile.getInputStream(), ExportData.class);
             exportService.importAll(importData);
         } catch (Exception e) {
-            throw DalaranExceptionBuilder.build(FIleNotLegalException.class, "文件输入异常");
+            throw DalaranExceptionBuilder.build(FIleNotLegalException.class, "文件导入异常");
         }
     }
 
