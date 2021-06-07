@@ -44,7 +44,7 @@ public class AuthenticatorServiceImpl implements AuthenticatorService {
         AuthenticatorEntity entity = toEntity(authenticatorDTO);
         setCreatedBy(entity);
         repository.save(entity);
-        saveToRedis(authenticatorDTO.getAuthenticator());
+        saveToRedis(JSON.parseArray(JSON.toJSONString(authenticatorDTO.getAuthenticator()), AuthenticatorConfigDTO.class));
         return entity.getResourceKey();
     }
 
@@ -52,7 +52,7 @@ public class AuthenticatorServiceImpl implements AuthenticatorService {
     public AuthenticatorDTO update(AuthenticatorDTO authenticatorDTO) {
         AuthenticatorEntity entity = buildEntity(authenticatorDTO);
         repository.save(entity);
-        saveToRedis(authenticatorDTO.getAuthenticator());
+        saveToRedis(JSON.parseArray(JSON.toJSONString(authenticatorDTO.getAuthenticator()), AuthenticatorConfigDTO.class));
         return authenticatorDTO;
     }
 
