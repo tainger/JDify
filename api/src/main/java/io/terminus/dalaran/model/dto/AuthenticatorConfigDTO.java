@@ -6,6 +6,8 @@ import lombok.Data;
 @Data
 public class AuthenticatorConfigDTO {
 
+    private String type;
+
     private AuthenticatorKeyLocation keyLocation;
 
     private Boolean isStatic;
