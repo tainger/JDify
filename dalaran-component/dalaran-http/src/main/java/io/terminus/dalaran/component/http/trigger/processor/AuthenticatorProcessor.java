@@ -1,6 +1,7 @@
 package io.terminus.dalaran.component.http.trigger.processor;
 
 import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import io.terminus.dalaran.component.authenticator.BasicAuthenticatorConfig;
 import io.terminus.dalaran.component.authenticator.DalaranAuthenticator;
 import io.terminus.dalaran.core.resource.redis.RedisService;

@@ -16,6 +16,6 @@ public class AuthenticatorAbstractEntity extends BasicEntity {
     @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 2550)
     private String config;
 }

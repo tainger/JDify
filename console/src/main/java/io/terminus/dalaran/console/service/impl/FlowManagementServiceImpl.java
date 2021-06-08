@@ -771,9 +771,6 @@ public class FlowManagementServiceImpl implements FlowManagementService {
                 nodeFlowDTO.setConfig(routeConfig);
             }
             if (jsonObject.containsKey("pipeline")) {
-//                Map<String, Object> config = new HashMap<>();
-//                config.put("node", buildNode((jsonObject.getJSONArray("pipeline")).toJavaList(ProcessorDTO.class), nodeFlowDTOList, false));
-//                nodeFlowDTO.setConfig(config);
                 buildNode((jsonObject.getJSONArray("pipeline")).toJavaList(ProcessorDTO.class), nodeFlowDTOList, routerList,false);
             }
             if (jsonObject.containsKey("connectorId")) {
