@@ -24,6 +24,7 @@ import io.terminus.dalaran.model.flow.BasicFlow;
 import io.terminus.dalaran.model.flow.FlowFragment;
 import io.terminus.dalaran.model.flow.SubFlow;
 import io.terminus.dalaran.model.flow.TriggerFlow;
+import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringSubstitutor;
@@ -32,6 +33,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 public class DefaultDalaranResourceBuilder implements DalaranResourceBuilder {
 
     private final DalaranResourceLoader resourceLoader;
@@ -71,7 +73,6 @@ public class DefaultDalaranResourceBuilder implements DalaranResourceBuilder {
         flow.setTriggerType(triggerFlowEntity.getTriggerType());
 //        flow.setInModel(buildModel(triggerFlowEntity.getInModel()));
 //        flow.setOutModel(buildModel(triggerFlowEntity.getOutModel()));
-
         Object config = buildConfig(triggerFlowEntity.getTriggerConfig(), triggerInfo.getConfigType());
 
         flow.setTriggerConfig(config);
