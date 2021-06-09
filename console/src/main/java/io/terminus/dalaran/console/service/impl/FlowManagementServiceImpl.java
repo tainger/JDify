@@ -732,7 +732,7 @@ public class FlowManagementServiceImpl implements FlowManagementService {
         List<NodeFlowDTO> nodeFlowDTOList = new ArrayList<>();
         List<NodeFlowDTO> routerList = new ArrayList<>();
         nodeFlowDTOList = buildNode(pipeline.getPipeline(), nodeFlowDTOList, routerList, false);
-        nodeFlowListDTO.setNode(nodeFlowDTOList);
+        nodeFlowListDTO.setPipeline(nodeFlowDTOList);
         return nodeFlowListDTO;
     }
 
@@ -762,7 +762,7 @@ public class FlowManagementServiceImpl implements FlowManagementService {
                     }
                     if ((pipelineJsonObject.getJSONArray("pipeline")) != null) {
                         routerFlowList.addAll(buildNode((pipelineJsonObject.getJSONArray("pipeline")).toJavaList(ProcessorDTO.class), nodeFlowDTOList, routerList, true));
-                        nodeFlowListDTO.setNode(routerFlowList);
+                        nodeFlowListDTO.setPipeline(routerFlowList);
                         nodeFlowListDTOS.add(nodeFlowListDTO);
                     }
                     routerList = new ArrayList<>();

@@ -80,7 +80,7 @@ public class AuthenticatorServiceImpl implements AuthenticatorService {
         CriteriaQuery<QueryAuthenticatorInfo> criteriaQuery = builder.createQuery(QueryAuthenticatorInfo.class);
         Root<AuthenticatorEntity> root = criteriaQuery.from(AuthenticatorEntity.class);
         criteriaQuery.multiselect(root.get("resourceKey"), root.get("moduleId"), root.get("name"), root.get("isExist"))
-                .where(builder.equal(root.get("moduleId"), moduleId) , builder.equal(root.get("isExist"), true));
+                .where(builder.equal(root.get("moduleId"), moduleId), builder.equal(root.get("isExist"), true));
         List<QueryAuthenticatorInfo> authenticators = entityManager.createQuery(criteriaQuery).getResultList();
         List<BasicAuthenticatorInfo> basicAuthenticatorInfos = new ArrayList<>();
         authenticators.forEach(authenticator -> {
@@ -126,18 +126,18 @@ public class AuthenticatorServiceImpl implements AuthenticatorService {
         return entity;
     }
 
-    private void setCreatedBy(AuthenticatorEntity entity){
-        if(UserContext.getUserInfo() != null && UserContext.getUserInfo().getUsername() != null){
+    private void setCreatedBy(AuthenticatorEntity entity) {
+        if (UserContext.getUserInfo() != null && UserContext.getUserInfo().getUsername() != null) {
             entity.setCreatedBy(UserContext.getUserInfo().getUsername());
         }
     }
 
-    private AuthenticatorEntity buildEntity(AuthenticatorDTO dto){
+    private AuthenticatorEntity buildEntity(AuthenticatorDTO dto) {
         AuthenticatorEntity entity = repository.findByResourceKey(dto.getId());
         entity.setName(dto.getName());
         entity.setExist(dto.isExist());
         entity.setConfig(JSON.toJSONString(dto.getAuthenticator()));
-        if(UserContext.getUserInfo() != null && UserContext.getUserInfo().getUsername() != null) {
+        if (UserContext.getUserInfo() != null && UserContext.getUserInfo().getUsername() != null) {
             entity.setUpdatedBy(UserContext.getUserInfo().getUsername());
         }
         entity.setExist(true);
@@ -173,7 +173,6 @@ public class AuthenticatorServiceImpl implements AuthenticatorService {
             }
         });
     }
-
 
 
 }

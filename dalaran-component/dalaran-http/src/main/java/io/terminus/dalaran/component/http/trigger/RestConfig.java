@@ -23,15 +23,15 @@ public class RestConfig extends AllModelConfig implements AuthenticatorConfig<Da
     @JsonIgnore
     private DalaranLimiter limiter;
 
-    @ConfigFieldInfo(label = "限流熔断器", inputType = FieldInputType.Limiter, required = false,
-            limiterType = DalaranLimiter.class, sourceType = SourceType.LIMITER)
-    private String limiterId;
-
     @ConfigFieldInfo(label = "开启限流", inputType = FieldInputType.Switch, defaultValue = "false")
     private boolean enableLimit = false;
 
     @ConfigFieldInfo(label = "开启熔断", inputType = FieldInputType.Switch, defaultValue = "false")
     private boolean enableBreaker = false;
+
+    @ConfigFieldInfo(label = "限流熔断器", inputType = FieldInputType.Limiter, required = false,
+            limiterType = DalaranLimiter.class, sourceType = SourceType.LIMITER, show = "enableLimit == true || enableBreaker == true")
+    private String limiterId;
 
     // TODO load by application.yml
     @ConfigFieldInfo(label = "端口", inputType = FieldInputType.Hidden)
@@ -42,12 +42,12 @@ public class RestConfig extends AllModelConfig implements AuthenticatorConfig<Da
     @JsonIgnore
     private DalaranAuthenticator authenticator;
 
-    @ConfigFieldInfo(label = "鉴权器", inputType = FieldInputType.Authenticator, required = false,
-            authenticatorType = DalaranAuthenticator.class, sourceType = SourceType.AUTHENTICATOR)
-    private String authenticatorId;
+    @ConfigFieldInfo(label = "开启鉴权", inputType = FieldInputType.Switch, defaultValue = "false")
+    private boolean enableSign = false;
 
-//    @ConfigFieldInfo(label = "开启鉴权", inputType = FieldInputType.Switch, defaultValue = "false")
-//    private boolean enableSign = false;
+    @ConfigFieldInfo(label = "鉴权器", inputType = FieldInputType.Authenticator, required = false,
+            authenticatorType = DalaranAuthenticator.class, sourceType = SourceType.AUTHENTICATOR, show = "enableSign == true")
+    private String authenticatorId;
 
 //    @ConfigFieldInfo(label = "计算签名", inputType = FieldInputType.Switch, defaultValue = "false")
 //    private boolean checkSign = false;

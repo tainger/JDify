@@ -7,6 +7,6 @@ import java.util.List;
 @Data
 public class NodeFlowListDTO {
 
-    List<NodeFlowDTO> node;
+    List<NodeFlowDTO> pipeline;
 
 }
