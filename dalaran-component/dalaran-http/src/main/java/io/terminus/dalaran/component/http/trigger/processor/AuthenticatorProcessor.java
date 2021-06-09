@@ -1,11 +1,11 @@
 package io.terminus.dalaran.component.http.trigger.processor;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import io.terminus.dalaran.component.authenticator.BasicAuthenticatorConfig;
 import io.terminus.dalaran.component.authenticator.DalaranAuthenticator;
 import io.terminus.dalaran.core.resource.redis.RedisService;
 import io.terminus.dalaran.model.authenticator.AuthenticatorKeyLocation;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.commons.lang3.StringUtils;
@@ -15,7 +15,6 @@ import java.util.Map;
 
 import static io.terminus.dalaran.component.http.trigger.utils.SignUtils.stopExchangeOnInvalidAppKey;
 
-@Slf4j
 public class AuthenticatorProcessor implements Processor {
 
     private DalaranAuthenticator authenticator;
@@ -37,7 +36,7 @@ public class AuthenticatorProcessor implements Processor {
     }
 
     void checkValue(Exchange exchange, Map<String, String> body) {
-        List<BasicAuthenticatorConfig> basicAuthenticatorConfigs = authenticator.getConfig();
+        List<BasicAuthenticatorConfig> basicAuthenticatorConfigs = JSON.parseArray(JSON.toJSONString(authenticator.getConfig()), BasicAuthenticatorConfig.class);
         basicAuthenticatorConfigs.forEach(basicAuthenticatorConfig -> {
             String value = basicAuthenticatorConfig.getAuthenticatorValue();
             String requestValue;
@@ -67,7 +66,7 @@ public class AuthenticatorProcessor implements Processor {
     }
 
     void checkGetValue(Exchange exchange, Map<String, String> param) {
-        List<BasicAuthenticatorConfig> basicAuthenticatorConfigs = authenticator.getConfig();
+        List<BasicAuthenticatorConfig> basicAuthenticatorConfigs = JSON.parseArray(JSON.toJSONString(authenticator.getConfig()), BasicAuthenticatorConfig.class);
         basicAuthenticatorConfigs.forEach(basicAuthenticatorConfig -> {
             String value = basicAuthenticatorConfig.getAuthenticatorValue();
             String requestValue;
