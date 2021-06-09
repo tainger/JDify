@@ -28,7 +28,7 @@ public class DalaranAuthenticator<T> {
     @ConfigFieldInfo(label = "字段值", inputType = FieldInputType.String)
     private String authenticatorValue;
 
-    @ConfigFieldInfo(label = "过期时间", inputType = FieldInputType.String)
+    @ConfigFieldInfo(label = "过期时间", inputType = FieldInputType.String, show = "isStatic == false", dynamic = true)
     private String expireTime;
 
 }

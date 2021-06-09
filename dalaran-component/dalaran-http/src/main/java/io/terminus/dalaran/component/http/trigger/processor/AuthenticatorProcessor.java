@@ -1,7 +1,6 @@
 package io.terminus.dalaran.component.http.trigger.processor;
 
 import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import io.terminus.dalaran.component.authenticator.BasicAuthenticatorConfig;
 import io.terminus.dalaran.component.authenticator.DalaranAuthenticator;
 import io.terminus.dalaran.core.resource.redis.RedisService;
@@ -34,9 +33,7 @@ public class AuthenticatorProcessor implements Processor {
             return;
         }
         Map<String, String> body = exchange.getIn().getBody(Map.class);
-        if (authenticator.getType().equals("BasicAuthenticator")) {
-            checkValue(exchange, body);
-        }
+        checkValue(exchange, body);
     }
 
     void checkValue(Exchange exchange, Map<String, String> body) {
@@ -70,35 +67,33 @@ public class AuthenticatorProcessor implements Processor {
     }
 
     void checkGetValue(Exchange exchange, Map<String, String> param) {
-        if (authenticator.getType().equals("BasicAuthenticator")) {
-            List<BasicAuthenticatorConfig> basicAuthenticatorConfigs = authenticator.getConfig();
-            basicAuthenticatorConfigs.forEach(basicAuthenticatorConfig -> {
-                String value = basicAuthenticatorConfig.getAuthenticatorValue();
-                String requestValue;
-                if (!basicAuthenticatorConfig.getIsStatic()) {
-                    value = redisService.getValue("Authenticator-" + basicAuthenticatorConfig.getAuthenticatorKey());
-                    if (StringUtils.isBlank(value)) {
-                        stopExchangeOnInvalidAppKey(exchange);
-                        return;
-                    }
-                }
-                if (basicAuthenticatorConfig.getKeyLocation() == AuthenticatorKeyLocation.Header) {
-                    requestValue = exchange.getIn().getHeader(basicAuthenticatorConfig.getAuthenticatorKey(), String.class);
-                } else if (basicAuthenticatorConfig.getKeyLocation() == AuthenticatorKeyLocation.Body) {
-                    Map<String, String> body = exchange.getIn().getBody(Map.class);
-                    requestValue = body.get(basicAuthenticatorConfig.getAuthenticatorKey());
-                } else {
-                    if (param != null) {
-                        requestValue = param.get(basicAuthenticatorConfig.getAuthenticatorKey());
-                    } else {
-                        requestValue = "";
-                    }
-                }
-                if (StringUtils.isBlank(requestValue) || !requestValue.equals(value)) {
+        List<BasicAuthenticatorConfig> basicAuthenticatorConfigs = authenticator.getConfig();
+        basicAuthenticatorConfigs.forEach(basicAuthenticatorConfig -> {
+            String value = basicAuthenticatorConfig.getAuthenticatorValue();
+            String requestValue;
+            if (!basicAuthenticatorConfig.getIsStatic()) {
+                value = redisService.getValue("Authenticator-" + basicAuthenticatorConfig.getAuthenticatorKey());
+                if (StringUtils.isBlank(value)) {
                     stopExchangeOnInvalidAppKey(exchange);
+                    return;
                 }
-            });
-            exchange.getOut().setBody(param);
-        }
+            }
+            if (basicAuthenticatorConfig.getKeyLocation() == AuthenticatorKeyLocation.Header) {
+                requestValue = exchange.getIn().getHeader(basicAuthenticatorConfig.getAuthenticatorKey(), String.class);
+            } else if (basicAuthenticatorConfig.getKeyLocation() == AuthenticatorKeyLocation.Body) {
+                Map<String, String> body = exchange.getIn().getBody(Map.class);
+                requestValue = body.get(basicAuthenticatorConfig.getAuthenticatorKey());
+            } else {
+                if (param != null) {
+                    requestValue = param.get(basicAuthenticatorConfig.getAuthenticatorKey());
+                } else {
+                    requestValue = "";
+                }
+            }
+            if (StringUtils.isBlank(requestValue) || !requestValue.equals(value)) {
+                stopExchangeOnInvalidAppKey(exchange);
+            }
+        });
+        exchange.getOut().setBody(param);
     }
 }
