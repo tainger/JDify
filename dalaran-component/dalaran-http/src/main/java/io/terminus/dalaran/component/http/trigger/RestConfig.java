@@ -30,7 +30,7 @@ public class RestConfig extends AllModelConfig implements AuthenticatorConfig<Da
     private boolean enableBreaker = false;
 
     @ConfigFieldInfo(label = "限流熔断器", inputType = FieldInputType.Limiter, required = false,
-            limiterType = DalaranLimiter.class, sourceType = SourceType.LIMITER, show = "enableLimit == true || enableBreaker == true")
+            limiterType = DalaranLimiter.class, sourceType = SourceType.LIMITER, show = "enableLimit == true || enableBreaker == true", dynamic = true)
     private String limiterId;
 
     // TODO load by application.yml
@@ -43,10 +43,10 @@ public class RestConfig extends AllModelConfig implements AuthenticatorConfig<Da
     private DalaranAuthenticator authenticator;
 
     @ConfigFieldInfo(label = "开启鉴权", inputType = FieldInputType.Switch, defaultValue = "false")
-    private boolean enableSign = false;
+    private boolean enableAuthenticator = false;
 
     @ConfigFieldInfo(label = "鉴权器", inputType = FieldInputType.Authenticator, required = false,
-            authenticatorType = DalaranAuthenticator.class, sourceType = SourceType.AUTHENTICATOR, show = "enableSign == true")
+            authenticatorType = DalaranAuthenticator.class, sourceType = SourceType.AUTHENTICATOR, show = "enableAuthenticator == true", dynamic = true)
     private String authenticatorId;
 
 //    @ConfigFieldInfo(label = "计算签名", inputType = FieldInputType.Switch, defaultValue = "false")
