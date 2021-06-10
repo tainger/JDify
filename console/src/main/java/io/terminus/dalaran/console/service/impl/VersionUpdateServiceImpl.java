@@ -117,7 +117,7 @@ public class VersionUpdateServiceImpl implements VersionUpdateService {
                 return;
             }
             connectorEntity.setResourceKey(String.valueOf(connectorEntity.getId()));
-             connectorRepository.save(connectorEntity);
+            connectorRepository.save(connectorEntity);
         });
 
         List<FunctionEntity> functionEntityList = functionRepository.findAll();
@@ -176,6 +176,11 @@ public class VersionUpdateServiceImpl implements VersionUpdateService {
                 return;
             }
             subFlowEntity.setResourceKey(String.valueOf(subFlowEntity.getId()));
+            log.error("第{}条子流程", subFlowEntity.getId());
+            List<ProcessorEntity> pipeline = subFlowEntity.getPipeline();
+            for (ProcessorEntity processorEntity : pipeline) {
+                handleProcessor(processorEntity);
+            }
             subFlowRepository.save(subFlowEntity);
         });
 
@@ -220,7 +225,9 @@ public class VersionUpdateServiceImpl implements VersionUpdateService {
                 ProcessorEntity transformProcessorEntity = new ProcessorEntity();
                 BeanUtils.copyProperties(processorRouteInfo, transformProcessorEntity);
                 handleProcessor(transformProcessorEntity);
+                BeanUtils.copyProperties(transformProcessorEntity, processorRouteInfo);
             }
+            return;
         }
 
         if (processorConfig instanceof ScatterGatherConfig) {
@@ -232,21 +239,13 @@ public class VersionUpdateServiceImpl implements VersionUpdateService {
                         ProcessorEntity branchProcessor = new ProcessorEntity();
                         BeanUtils.copyProperties(processorRouteInfo, branchProcessor);
                         handleProcessor(branchProcessor);
+                        BeanUtils.copyProperties(branchProcessor, processorRouteInfo);
                     }
                 }
             }
+            return;
         }
 
-        if (processorConfig instanceof DalaranSubFlowConfig) {
-            String subFlowId = ((DalaranSubFlowConfig) processorConfig).getSubFlowId();
-            SubFlowEntity subFlowEntity = subFlowRepository.findByResourceKey(subFlowId);
-            List<ProcessorEntity> pipeline = subFlowEntity.getPipeline();
-            if(CollectionUtils.isNotEmpty(pipeline)) {
-                for (ProcessorEntity subProcessorEntity : pipeline) {
-                    handleProcessor(subProcessorEntity);
-                }
-            }
-        }
 
         if (processorConfig instanceof LoopWhileConfig) {
             LoopWhileConfig loopWhileConfig = (LoopWhileConfig) processorConfig;
@@ -256,8 +255,10 @@ public class VersionUpdateServiceImpl implements VersionUpdateService {
                     ProcessorEntity loopWhileProcessorEntity = new ProcessorEntity();
                     BeanUtils.copyProperties(processorRouteInfo, loopWhileProcessorEntity);
                     handleProcessor(loopWhileProcessorEntity);
+                    BeanUtils.copyProperties(loopWhileProcessorEntity, processorRouteInfo);
                 }
             }
+            return;
         }
 
         if (processorConfig instanceof ServiceOperationConfig) {
@@ -273,18 +274,24 @@ public class VersionUpdateServiceImpl implements VersionUpdateService {
                     ProcessorEntity loopWhileProcessorEntity = new ProcessorEntity();
                     BeanUtils.copyProperties(processorRouteInfo, loopWhileProcessorEntity);
                     handleProcessor(loopWhileProcessorEntity);
+                    BeanUtils.copyProperties(loopWhileProcessorEntity, processorRouteInfo);
                 }
             }
-
+            return;
         }
 
-        if (processorConfig instanceof RetryConfig) {
-            List<ProcessorRouteInfo> pipeline = ((RetryConfig) processorConfig).getPipeline();
-            if(CollectionUtils.isNotEmpty(pipeline)) {
-                for (ProcessorRouteInfo processorRouteInfo : pipeline) {
-                    ProcessorEntity loopWhileProcessorEntity = new ProcessorEntity();
-                    BeanUtils.copyProperties(processorRouteInfo, loopWhileProcessorEntity);
-                    handleProcessor(loopWhileProcessorEntity);
+
+        if (processorConfig instanceof ErrorCatchConfig) {
+            List<ErrorCatchConfig.Route> routes = ((ErrorCatchConfig) processorConfig).getRoutes();
+            if(CollectionUtils.isNotEmpty(routes)) {
+                for (ErrorCatchConfig.Route route : routes) {
+                    List<ProcessorRouteInfo> pipeline = route.getPipeline();
+                    for (ProcessorRouteInfo processorRouteInfo : pipeline) {
+                        ProcessorEntity loopWhileProcessorEntity = new ProcessorEntity();
+                        BeanUtils.copyProperties(processorRouteInfo, loopWhileProcessorEntity);
+                        handleProcessor(loopWhileProcessorEntity);
+                        BeanUtils.copyProperties(loopWhileProcessorEntity, processorRouteInfo);
+                    }
                 }
             }
         }
@@ -361,6 +368,7 @@ public class VersionUpdateServiceImpl implements VersionUpdateService {
             limiterConfig.setLimiterId(String.valueOf(jsonObject.get("limitId")));
         }
         processorEntityConfig = JSONObject.toJSONString(processorConfig);
+        System.out.println(processorEntityConfig);
         processorEntity.setConfig(processorEntityConfig);
     }
 
