@@ -368,7 +368,6 @@ public class VersionUpdateServiceImpl implements VersionUpdateService {
             limiterConfig.setLimiterId(String.valueOf(jsonObject.get("limitId")));
         }
         processorEntityConfig = JSONObject.toJSONString(processorConfig);
-        System.out.println(processorEntityConfig);
         processorEntity.setConfig(processorEntityConfig);
     }
 
