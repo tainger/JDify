@@ -2,20 +2,20 @@ package io.terminus.dalaran.runtime;
 
 import com.alibaba.fastjson.JSONObject;
 import io.terminus.dalaran.TracingType;
-import io.terminus.dalaran.core.component.config.AlarmRuleConfig;
 import io.terminus.dalaran.core.log.DalaranTraceLogger;
 import io.terminus.dalaran.core.log.DalaranTracingLog;
 import io.terminus.dalaran.core.resource.entity.common.ReleaseRecordEntity;
 import io.terminus.dalaran.core.resource.entity.common.TracingLogEntity;
-import io.terminus.dalaran.core.resource.log.RequestID;
+import io.terminus.dalaran.core.resource.property.PropertyService;
 import io.terminus.dalaran.core.resource.redis.RedisService;
 import io.terminus.dalaran.core.resource.redis.RedisUtil;
 import io.terminus.dalaran.core.resource.repository.ReleaseRecordRepository;
 import io.terminus.dalaran.core.resource.repository.TracingLogRepository;
+import io.terminus.dalaran.model.alarm.AlarmRuleConfig;
+import io.terminus.dalaran.model.alarm.NoticeMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.beanutils.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-
 import javax.annotation.PostConstruct;
 import java.text.SimpleDateFormat;
 import java.util.Map;
@@ -34,9 +34,15 @@ public class DefaultJpaDalaranTraceLogger implements DalaranTraceLogger {
     @Autowired
     private RedisService redisService;
 
+    @Autowired
+    private DefaultAlarmManager defaultAlarmManager;
+
     private BlockingQueue<DalaranTracingLog> logQueue = new LinkedBlockingQueue<>();
 
     private final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+
+    @Autowired
+    private PropertyService propertyService;
 
     @Override
     public void log(DalaranTracingLog tracingLog) {
@@ -52,71 +58,95 @@ public class DefaultJpaDalaranTraceLogger implements DalaranTraceLogger {
                     DalaranTracingLog tracingLog = logQueue.take();
                     tracingLog.setVersion(getCurrentVersion());
                     tracingLogRepository.save(toEntity(tracingLog));
-                    alarmCount(tracingLog);
+                    NoticeMessage noticeMessage = alarmCount(tracingLog);
+                    if(null != noticeMessage) {
+                        defaultAlarmManager.alarm(noticeMessage);
+                    }
                 } catch (Throwable e) {
                     e.printStackTrace();
-                    log.error("---报错:{}---", RequestID.getExceptionStackTrace(e));
                 }
             }
         }).start();
     }
 
-    private void alarmCount(DalaranTracingLog tracingLog) {
+    private NoticeMessage alarmCount(DalaranTracingLog tracingLog) {
         if (tracingLog.isMain() && tracingLog.getTracingType() == TracingType.Flow) {
             String value = getAlarmConfigIfAlarmConfigKey(tracingLog.getFlowId());
             if (null == value) {
-                return;
+                return null;
             }
             String format = simpleDateFormat.format(tracingLog.getTimestamp());
-            String currentTime = redisService.getValue(RedisUtil.getCurrentTime());
-            if (currentTime == null) {
-                redisService.persistKey(RedisUtil.getCurrentTime(), format);
-            } else if (!currentTime.equals(format)) {
-                redisService.push(RedisUtil.getTimeToMonitor(), currentTime);
-                redisService.persistKey(RedisUtil.getCurrentTime(), format);
-            }
             AlarmRuleConfig alarmRuleConfig = JSONObject.parseObject(value, AlarmRuleConfig.class);
+
+            long failureCount = 0;
             if (!tracingLog.isSuccessful()) {
-                redisService.incrKey(
+                failureCount = redisService.incrKey(
                         RedisUtil.getFailureKey(tracingLog.getFlowId(), format)
                 );
             }
             Long triggerTimeOut = 0L;
             try {
-               triggerTimeOut = getTriggerTimeOut(tracingLog, alarmRuleConfig);
-            }catch (Exception e) {
-                log.error("---报错:{}---", RequestID.getExceptionStackTrace(e));
+                triggerTimeOut = getTriggerTimeOut(tracingLog, alarmRuleConfig);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
+            long timeOutCount = 0;
             if (triggerTimeOut != null && triggerTimeOut <= tracingLog.getElapsed()) {
-                redisService.incrKey(
+                timeOutCount = redisService.incrKey(
                         RedisUtil.getTimeOutKey(tracingLog.getFlowId(), format)
                 );
             }
+
+            //报警的延时
+            if(null != redisService.getValue(RedisUtil.getIsHaveAlarmed(tracingLog.getFlowId()))) {
+                return null;
+            }
+
+            Long failureFrequency = alarmRuleConfig.getFailureAlarm().getFailureFrequency();
+            Long elapsedFrequency = alarmRuleConfig.getTimeOutAlarm().getElapsedFrequency();
+            if (failureFrequency <= failureCount && elapsedFrequency <= timeOutCount) {
+                return null;
+            }
+            NoticeMessage noticeMessage = new NoticeMessage();
+            if (failureFrequency >= failureCount) {
+                noticeMessage.setTouchFailureAlarm(true);
+            }
+            noticeMessage.setFailureCount(failureCount);
+            noticeMessage.setFailureFrequency(failureFrequency);
+            if (elapsedFrequency >= timeOutCount) {
+                noticeMessage.setTouchTimeOutAlarm(true);
+            }
+            noticeMessage.setTimeOutCount(timeOutCount);
+            noticeMessage.setTimeOutFrequency(elapsedFrequency);
+            noticeMessage.setCreateDate(format);
+            redisService.setValueMinutes(RedisUtil.getIsHaveAlarmed(tracingLog.getFlowId()),"1", propertyService.getInterval());
+            return noticeMessage;
         }
+        return null;
     }
 
     private Long getTriggerTimeOut(DalaranTracingLog tracingLog, AlarmRuleConfig alarmRuleConfig) {
         String flowTimeOut = redisService.getValue(RedisUtil.getReleasedFlowIdsTimeOut());
         Map<String, Object> map = JSONObject.parseObject(flowTimeOut, Map.class);
         Integer triggerFlowTime = (Integer) map.get(tracingLog.getFlowId());
-        if(null != triggerFlowTime) {
+        if (null != triggerFlowTime) {
             return Long.valueOf(triggerFlowTime);
         }
-        if(alarmRuleConfig.getTimeOutAlarm().getIsOpen()){
+        if (alarmRuleConfig.getTimeOutAlarm().getIsOpen()) {
             return Long.valueOf(alarmRuleConfig.getTimeOutAlarm().getElapse());
         }
-        return  null;
+        return null;
     }
 
     private String getAlarmConfigIfAlarmConfigKey(String flowId) {
         String alarmRuleId = redisService.getValue(RedisUtil.getAlarmConfigKey(flowId));
         if (alarmRuleId == null) {
-            return null;
+            throw new RuntimeException("流程id关联报警规则id不存在!");
         }
         String alarmConfig = redisService.getValue(RedisUtil.getAlarmRuleKey(alarmRuleId));
         if (alarmConfig == null) {
             redisService.deleteKey(RedisUtil.getAlarmConfigKey(flowId));
-            return null;
+            throw new RuntimeException("报警规则id对应的报警不存在!");
         }
         return alarmConfig;
     }

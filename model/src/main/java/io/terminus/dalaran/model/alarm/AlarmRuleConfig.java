@@ -1,9 +1,8 @@
-package io.terminus.dalaran.core.component.config;
+package io.terminus.dalaran.model.alarm;
 
 import lombok.Data;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 
@@ -24,7 +23,7 @@ public class AlarmRuleConfig {
 
         private Integer elapse;
 
-        private Integer elapsedFrequency;
+        private Long elapsedFrequency;
     }
 
     @Data
@@ -32,7 +31,7 @@ public class AlarmRuleConfig {
 
         private Boolean isOpen;
 
-        private Integer failureFrequency;
+        private Long failureFrequency;
     }
 
 

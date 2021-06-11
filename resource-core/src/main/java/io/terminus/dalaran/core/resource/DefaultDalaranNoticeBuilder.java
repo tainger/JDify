@@ -4,7 +4,6 @@ import com.dingtalk.api.DefaultDingTalkClient;
 import com.dingtalk.api.DingTalkClient;
 import com.dingtalk.api.request.OapiRobotSendRequest;
 import com.dingtalk.api.response.OapiRobotSendResponse;
-import com.taobao.api.ApiException;
 import io.terminus.common.model.Response;
 import io.terminus.dalaran.core.flow.DalaranNoticeBuilder;
 import io.terminus.dalaran.core.resource.property.PropertyService;
@@ -13,7 +12,6 @@ import io.terminus.notice.api.dto.EmailSendDTO;
 import io.terminus.notice.sender.email.service.EmailSenderService;
 import io.terminus.notice.sender.sms.service.SmsSenderService;
 import lombok.extern.slf4j.Slf4j;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -36,20 +34,19 @@ public class DefaultDalaranNoticeBuilder implements DalaranNoticeBuilder {
         this.smsSenderService = smsSenderService;
     }
 
-    public void sendEmail(NoticeMessage noticeMessage) {
+    public void sendEmail(NoticeMessage noticeMessage, String[] connectWays) {
         EmailSendDTO emailSendDTO = new EmailSendDTO();
         emailSendDTO.setSubject("mule流程报警");
         emailSendDTO.setSenderEmail("no-reply@terminus.io");
         List<String> contents = buildNoticeMessage(noticeMessage);
-        String[] contactWays = noticeMessage.getContactWays();
-        Response<String> result = emailSenderService.send(propertyService.getMailNoticeCode(), Arrays.asList(contactWays), emailSendDTO, contents);
+        Response<String> result = emailSenderService.send(propertyService.getMailNoticeCode(), Arrays.asList(connectWays), emailSendDTO, contents);
         if (result.isSuccess())
             log.error("发送成功");
         else
             log.error("发送失败，错误码是：" + result.getError());
     }
 
-    public void sendShortMessage(NoticeMessage noticeMessage) {
+    public void sendShortMessage(NoticeMessage noticeMessage, String[] connectWays) {
         List<String> keys = new ArrayList<>();
         keys.add("flowName");
         keys.add("createDate");
@@ -60,18 +57,16 @@ public class DefaultDalaranNoticeBuilder implements DalaranNoticeBuilder {
         keys.add("timeOutFrequency");
         keys.add("timeOutCount");
         List<String> contents = buildNoticeMessage(noticeMessage);
-        List<String> phoneNumbers = Arrays.asList(noticeMessage.getContactWays());
-        Response<String> sendResult = smsSenderService.templateSend(phoneNumbers, keys, contents, propertyService.getSMSNoticeCode());
+        Response<String> sendResult = smsSenderService.templateSend(Arrays.asList(connectWays), keys, contents, propertyService.getSMSNoticeCode());
         if (sendResult.isSuccess())
             log.error("发送成功");
         else
             log.error("发送失败，错误码是：" + sendResult.getError());
     }
 
-    public void sendDingMessage(NoticeMessage noticeMessage) {
-        String[] accessTokens = noticeMessage.getContactWays();
+    public void sendDingMessage(NoticeMessage noticeMessage, String[] connectWays) {
         try {
-            for (String accessToken : accessTokens) {
+            for (String accessToken : connectWays) {
                 DingTalkClient dingTalkClient = new DefaultDingTalkClient("https://oapi.dingtalk.com/robot/send?access_token=" + accessToken);
                 OapiRobotSendRequest request = new OapiRobotSendRequest();
                 request.setMsgtype("text");

@@ -12,6 +12,7 @@ import io.terminus.dalaran.component.http.trigger.utils.SwaggerUtils;
 import io.terminus.dalaran.component.loopwhile.LoopWhileConfig;
 import io.terminus.dalaran.component.multicast.ScatterGatherConfig;
 import io.terminus.dalaran.component.retry.RetryConfig;
+import io.terminus.dalaran.component.router.DalaranRouterConfig;
 import io.terminus.dalaran.component.service.soap.SoapServiceConfig;
 import io.terminus.dalaran.component.soap.trigger.model.SoapApiInfo;
 import io.terminus.dalaran.component.soap.trigger.utils.WSDLUtils;
@@ -44,6 +45,7 @@ import io.terminus.dalaran.core.resource.entity.common.PrivateRepositoryEntity;
 import io.terminus.dalaran.core.resource.entity.common.ProcessorEntity;
 import io.terminus.dalaran.core.resource.repository.ModuleRepository;
 import io.terminus.dalaran.core.resource.repository.PrivateRepositoryRepository;
+import io.terminus.dalaran.model.MessageModel;
 import io.terminus.dalaran.model.component.ProcessorRouteInfo;
 import io.terminus.dalaran.model.flow.FlowStatus;
 import io.terminus.dalaran.model.flow.TriggerFlow;
@@ -154,6 +156,8 @@ public class ExportServiceImpl implements ExportService {
                 ModuleEntity moduleEntity = moduleRepository.findByResourceKey(module.getResourceKey());
                 if(null != moduleEntity) {
                    module.setId(moduleEntity.getId());
+                }else {
+                    module.setId(null);
                 }
                 moduleRepository.save(module);
             });
@@ -165,6 +169,8 @@ public class ExportServiceImpl implements ExportService {
                 ModelEntity modelEntity = modelRepository.findByResourceKey(model.getResourceKey());
                 if(null != modelEntity) {
                     model.setId(modelEntity.getId());
+                }else {
+                    model.setId(null);
                 }
                 modelRepository.save(model);
             });
@@ -176,6 +182,8 @@ public class ExportServiceImpl implements ExportService {
                 TriggerFlowEntity triggerFlowEntity = triggerFlowRepository.findByResourceKey(triggerFlow.getResourceKey());
                 if(null != triggerFlowEntity) {
                     triggerFlow.setId(triggerFlowEntity.getId());
+                }else {
+                    triggerFlow.setId(null);
                 }
                 triggerFlowRepository.save(triggerFlow);
             });
@@ -187,6 +195,8 @@ public class ExportServiceImpl implements ExportService {
                 SubFlowEntity subFlowEntity = subFlowRepository.findByResourceKey(subFlow.getResourceKey());
                 if(null != subFlowEntity) {
                     subFlow.setId(subFlowEntity.getId());
+                }else {
+                    subFlow.setId(null);
                 }
                 subFlowRepository.save(subFlow);
             });
@@ -198,6 +208,8 @@ public class ExportServiceImpl implements ExportService {
                 ServiceEntity serviceEntity = serviceRepository.findByResourceKey(service.getResourceKey());
                 if(null != serviceEntity) {
                     service.setId(serviceEntity.getId());
+                }else {
+                    service.setId(null);
                 }
                 serviceRepository.save(service);
             });
@@ -209,6 +221,8 @@ public class ExportServiceImpl implements ExportService {
                 ClientEntity clientEntity = clientRepository.findByResourceKey(client.getResourceKey());
                 if(null != clientEntity) {
                     client.setId(clientEntity.getId());
+                }else {
+                    client.setId(null);
                 }
                 clientRepository.save(client);
             });
@@ -220,6 +234,8 @@ public class ExportServiceImpl implements ExportService {
                 ConnectorEntity connectorEntity = connectorRepository.findByResourceKey(connector.getResourceKey());
                 if(null != connectorEntity) {
                     connector.setId(connectorEntity.getId());
+                }else {
+                    connector.setId(null);
                 }
                 connectorRepository.save(connector);
             });
@@ -231,6 +247,8 @@ public class ExportServiceImpl implements ExportService {
                 FunctionEntity functionEntity = functionRepository.findByResourceKey(function.getResourceKey());
                 if(null != functionEntity) {
                     function.setId(functionEntity.getId());
+                }else {
+                    function.setId(null);
                 }
                 functionRepository.save(function);
             });
@@ -242,6 +260,8 @@ public class ExportServiceImpl implements ExportService {
                 AuthenticatorEntity authenticatorEntity = authenticatorRepository.findByResourceKey(authenticator.getResourceKey());
                 if(null != authenticatorEntity) {
                     authenticator.setId(authenticatorEntity.getId());
+                }else {
+                    authenticator.setId(null);
                 }
                 authenticatorRepository.save(authenticator);
             });
@@ -253,6 +273,8 @@ public class ExportServiceImpl implements ExportService {
                 LimiterEntity limiterEntity = limiterRepository.findByResourceKey(limiter.getResourceKey());
                 if(null != limiterEntity) {
                     limiter.setId(limiterEntity.getId());
+                }else {
+                    limiter.setId(null);
                 }
                 limiterRepository.save(limiter);
             });
@@ -263,6 +285,8 @@ public class ExportServiceImpl implements ExportService {
                PrivateRepositoryEntity privateRepositoryEntity = privateRepositoryRepository.findByResourceKeyAndVersion(privateRepository.getResourceKey(), privateRepository.getVersion());
                 if(null != privateRepositoryEntity) {
                     privateRepository.setId(privateRepositoryEntity.getId());
+                }else {
+                    privateRepository.setId(null);
                 }
                 privateRepositoryRepository.save(privateRepository);
             });
@@ -503,7 +527,8 @@ public class ExportServiceImpl implements ExportService {
 
 
         if (processorConfig instanceof DalaranMapperConfig) {
-            HashMap<String, SimpleMapping> messageMapping = ((DalaranMapperConfig) processorConfig).getMessageMapping();
+            DalaranMapperConfig dalaranMapperConfig = (DalaranMapperConfig) processorConfig;
+            HashMap<String, SimpleMapping> messageMapping = dalaranMapperConfig.getMessageMapping();
             DalaranMapperConfig mapperConfig = (DalaranMapperConfig) processorConfig;
             log.info("mapperConfig: " + JSON.toJSONString(mapperConfig));
             List<SimpleMapping> simpleMappings = new ArrayList<>(messageMapping.values());
@@ -524,17 +549,36 @@ public class ExportServiceImpl implements ExportService {
             }
         }
 
-        collectBasicResource(processorConfig);
-
-        String processorType = processorEntity.getType();
-        processorInfo = dalaranContext.getDalaranComponentContext().getProcessorInfo(processorEntity.getGroup(),processorType,processorEntity.getVersion());
-        if (StringUtils.equalsIgnoreCase(processorInfo.getOrigin(), DalaranConstants.PARTNER)) {
-            List<PrivateRepositoryEntity> privateRepositoryEntity = privateResourceQueryService.query(new PrivateRepositoryQuery(processorInfo.getName(), DalaranConstants.PROCESSOR));
-            if (CollectionUtils.isNotEmpty(privateRepositoryEntity)) {
-                PrivateRepositoryEntity repositoryEntity = privateRepositoryEntity.get(0);
-                flowsCollector.collect(SourceType.PRIVATE_REPOSITORY, repositoryEntity.getResourceKey() + "#" + repositoryEntity.getVersion());
+        if (processorConfig instanceof ErrorCatchConfig) {
+            List<ErrorCatchConfig.Route> routes = ((ErrorCatchConfig) processorConfig).getRoutes();
+            if(CollectionUtils.isNotEmpty(routes)) {
+                for (ErrorCatchConfig.Route route : routes) {
+                    List<ProcessorRouteInfo> pipeline = route.getPipeline();
+                    for (ProcessorRouteInfo processorRouteInfo : pipeline) {
+                        ProcessorEntity errorProcessorEntity = new ProcessorEntity();
+                        BeanUtils.copyProperties(processorRouteInfo, errorProcessorEntity);
+                        collectProcessorResourceKey(errorProcessorEntity);
+                    }
+                }
             }
         }
+
+
+        if (processorConfig instanceof DalaranRouterConfig) {
+            List<DalaranRouterConfig.Route> routes = ((DalaranRouterConfig) processorConfig).getRoutes();
+            if(CollectionUtils.isNotEmpty(routes)) {
+                for (DalaranRouterConfig.Route route : routes) {
+                    List<ProcessorRouteInfo> pipeline = route.getPipeline();
+                    for (ProcessorRouteInfo processorRouteInfo : pipeline) {
+                        ProcessorEntity processorEntityRoute = new ProcessorEntity();
+                        BeanUtils.copyProperties(processorRouteInfo, processorEntityRoute);
+                        collectProcessorResourceKey(processorEntityRoute);
+                    }
+                }
+            }
+        }
+
+        collectBasicResource(processorConfig);
     }
 
     private void collectServiceResourceKey(String config) {
@@ -547,37 +591,6 @@ public class ExportServiceImpl implements ExportService {
             flowsCollector.collect(SourceType.MODEL, outModelId);
         }
     }
-//
-//    private void collectProcessResourceKey(ProcessorEntity processorEntity) {
-//        String type = processorEntity.getType();
-//        Class configClass = getProcessorClassName(type);
-//        String processorEntityConfig = processorEntity.getConfig();
-//        Object object = JSONObject.parseObject(processorEntityConfig, configClass);
-//        List<Field> fields = new ArrayList<>();
-//        while (null != configClass) {
-//            List<Field> fieldList = Arrays.asList(configClass.getDeclaredFields());
-//            fields.addAll(fieldList);
-//            configClass = configClass.getSuperclass();
-//        }
-//        for (Field declaredField : fields) {
-//            ConfigFieldInfo configFieldInfo = declaredField.getDeclaredAnnotation(ConfigFieldInfo.class);
-//            if (configFieldInfo == null) {
-//                continue;
-//            }
-//            String sourceType = configFieldInfo.sourceType();
-//            if (StringUtils.EMPTY.equals(sourceType)) {
-//                continue;
-//            }
-//            String resourceKey = null;
-//            try {
-//                declaredField.setAccessible(true);
-//                resourceKey = (String) declaredField.get(object);
-//                flowsCollector.collect(sourceType, resourceKey);
-//            } catch (IllegalAccessException e) {
-//                e.printStackTrace();
-//            }
-//        }
-//    }
 
     private void collectBaseInfoResourceKey(TriggerFlowEntity triggerFlowEntity) {
         String moduleId = triggerFlowEntity.getModuleId();
@@ -631,6 +644,14 @@ public class ExportServiceImpl implements ExportService {
             LimiterConfig limiterConfig = (LimiterConfig)configObject;
             String limiterId = limiterConfig.getLimiterId();
             flowsCollector.collect(SourceType.LIMITER, limiterId);
+        }
+
+        if(configObject instanceof ImmutableInModelConfig){
+            ImmutableInModelConfig immutableInModelConfig = (ImmutableInModelConfig)configObject;
+            String inModelId = immutableInModelConfig.getInModelId();
+            String outModelId = immutableInModelConfig.getOutModelId();
+            flowsCollector.collect(SourceType.MODEL, inModelId);
+            flowsCollector.collect(SourceType.MODEL, outModelId);
         }
     }
 
