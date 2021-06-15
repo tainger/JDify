@@ -28,6 +28,7 @@
         <module>dalaran-mapper-sdk</module>
         <module>dalaran-component</module>
         <module>resource-core</module>
+        <module>dalaran-open</module>
     </modules>
 
     <properties>
