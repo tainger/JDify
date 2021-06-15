@@ -184,7 +184,7 @@ public class DefaultDalaranResourceBuilder implements DalaranResourceBuilder {
         if (entity == null) {
             throw new RuntimeException("authenticator [" + authenticatorId + "] not found");
         }
-        return buildArrayConfig(entity.getConfig(), authenticatorConfigType, entity.getType());
+        return buildArrayConfig(entity.getConfig(), authenticatorConfigType, entity.getAuthenticatorType());
     }
 
     @Override
