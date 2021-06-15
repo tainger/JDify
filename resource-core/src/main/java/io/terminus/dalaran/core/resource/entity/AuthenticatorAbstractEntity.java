@@ -20,5 +20,5 @@ public class AuthenticatorAbstractEntity extends BasicEntity {
     private String config;
 
     @Column(nullable = false)
-    private String type;
+    private String authenticatorType;
 }

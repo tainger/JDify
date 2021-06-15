@@ -65,7 +65,7 @@ public class AuthenticatorServiceImpl implements AuthenticatorService {
         AuthenticatorEntity entity = repository.findByResourceKey(authenticatorId);
         entity.setExist(false);
         repository.save(entity);
-        if (entity.getType().equals("BasicAuthenticator")) {
+        if (entity.getAuthenticatorType().equals("BasicAuthenticator")) {
             List<AuthenticatorConfigDTO> authenticatorConfigDTOS = JSONObject.parseArray(entity.getConfig(), AuthenticatorConfigDTO.class);
             deleteFromRedis(authenticatorConfigDTOS);
         }
@@ -121,7 +121,7 @@ public class AuthenticatorServiceImpl implements AuthenticatorService {
     private AuthenticatorEntity toEntity(AuthenticatorDTO dto) {
         AuthenticatorEntity entity = new AuthenticatorEntity();
         entity.setName(dto.getName());
-        entity.setType(dto.getAuthenticatorType());
+        entity.setAuthenticatorType(dto.getAuthenticatorType());
         entity.setConfig(JSON.toJSONString(dto.getConfig()));
         entity.setModuleId(dto.getModuleId());
         String resourceKey = dto.getId();
@@ -142,7 +142,7 @@ public class AuthenticatorServiceImpl implements AuthenticatorService {
     private AuthenticatorEntity buildEntity(AuthenticatorDTO dto) {
         AuthenticatorEntity entity = repository.findByResourceKey(dto.getId());
         entity.setName(dto.getName());
-        entity.setType(dto.getAuthenticatorType());
+        entity.setAuthenticatorType(dto.getAuthenticatorType());
         entity.setExist(dto.isExist());
         entity.setConfig(JSON.toJSONString(dto.getConfig()));
         if (UserContext.getUserInfo() != null && UserContext.getUserInfo().getUsername() != null) {
@@ -155,7 +155,7 @@ public class AuthenticatorServiceImpl implements AuthenticatorService {
     private AuthenticatorDTO toDTO(AuthenticatorEntity entity) {
         AuthenticatorDTO dto = new AuthenticatorDTO();
         dto.setName(entity.getName());
-        dto.setAuthenticatorType(entity.getType());
+        dto.setAuthenticatorType(entity.getAuthenticatorType());
         dto.setConfig(JSONObject.parseArray(entity.getConfig(), AuthenticatorConfigDTO.class));
         dto.setModuleId(entity.getModuleId());
         dto.setExist(entity.isExist());
