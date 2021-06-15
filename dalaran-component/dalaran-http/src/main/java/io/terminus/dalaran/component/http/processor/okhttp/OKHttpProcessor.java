@@ -32,13 +32,12 @@ public class OKHttpProcessor implements Processor {
     @Override
     public void process(Exchange exchange) throws Exception {
         String path = buildPath(config.getPath(), exchange);
-        String url = "";
+        String url;
         if (config.getConnector().getProtocol().name().equals("HTTPS")){
             url = config.getConnector().getProtocol().name().toLowerCase() + "://" + config.getConnector().getHost() + path;
         } else {
             url = config.getConnector().getProtocol().name().toLowerCase() + "://" + config.getConnector().getHost() + ":" + config.getConnector().getPort() + path;
         }
-        log.info("url: " + url);
         Request request;
         HttpUrl.Builder httpBuilder = HttpUrl.parse(url).newBuilder();
 
@@ -81,7 +80,6 @@ public class OKHttpProcessor implements Processor {
                     request = makeRequest(url, headers, config.getMethod(), body);
             }
         }
-        log.info("url: " + url);
         Response response = client.newCall(request).execute();
         if (response.code() != 200) {
             throw new RuntimeException("Http Request Error! " + Objects.requireNonNull(response.body()).string());

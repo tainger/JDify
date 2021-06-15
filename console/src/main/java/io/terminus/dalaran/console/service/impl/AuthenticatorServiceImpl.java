@@ -44,7 +44,9 @@ public class AuthenticatorServiceImpl implements AuthenticatorService {
         AuthenticatorEntity entity = toEntity(authenticatorDTO);
         setCreatedBy(entity);
         repository.save(entity);
-        saveToRedis(JSON.parseArray(JSON.toJSONString(authenticatorDTO.getAuthenticator()), AuthenticatorConfigDTO.class));
+        if (authenticatorDTO.getAuthenticatorType().equals("BasicAuthenticator")) {
+            saveToRedis(JSON.parseArray(JSON.toJSONString(authenticatorDTO.getConfig()), AuthenticatorConfigDTO.class));
+        }
         return entity.getResourceKey();
     }
 
@@ -52,7 +54,9 @@ public class AuthenticatorServiceImpl implements AuthenticatorService {
     public AuthenticatorDTO update(AuthenticatorDTO authenticatorDTO) {
         AuthenticatorEntity entity = buildEntity(authenticatorDTO);
         repository.save(entity);
-        saveToRedis(JSON.parseArray(JSON.toJSONString(authenticatorDTO.getAuthenticator()), AuthenticatorConfigDTO.class));
+        if (authenticatorDTO.getAuthenticatorType().equals("BasicAuthenticator")) {
+            saveToRedis(JSON.parseArray(JSON.toJSONString(authenticatorDTO.getConfig()), AuthenticatorConfigDTO.class));
+        }
         return authenticatorDTO;
     }
 
@@ -61,8 +65,10 @@ public class AuthenticatorServiceImpl implements AuthenticatorService {
         AuthenticatorEntity entity = repository.findByResourceKey(authenticatorId);
         entity.setExist(false);
         repository.save(entity);
-        List<AuthenticatorConfigDTO> authenticatorConfigDTOS = JSONObject.parseArray(entity.getConfig(), AuthenticatorConfigDTO.class);
-        deleteFromRedis(authenticatorConfigDTOS);
+        if (entity.getAuthenticatorType().equals("BasicAuthenticator")) {
+            List<AuthenticatorConfigDTO> authenticatorConfigDTOS = JSONObject.parseArray(entity.getConfig(), AuthenticatorConfigDTO.class);
+            deleteFromRedis(authenticatorConfigDTOS);
+        }
     }
 
     @Override
@@ -79,8 +85,8 @@ public class AuthenticatorServiceImpl implements AuthenticatorService {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<QueryAuthenticatorInfo> criteriaQuery = builder.createQuery(QueryAuthenticatorInfo.class);
         Root<AuthenticatorEntity> root = criteriaQuery.from(AuthenticatorEntity.class);
-        criteriaQuery.multiselect(root.get("resourceKey"), root.get("moduleId"), root.get("name"), root.get("isExist"))
-                .where(builder.equal(root.get("moduleId"), moduleId), builder.equal(root.get("isExist"), true));
+        criteriaQuery.multiselect(root.get("resourceKey"), root.get("moduleId"), root.get("name"), root.get("authenticatorType"),
+                root.get("isExist")).where(builder.equal(root.get("moduleId"), moduleId), builder.equal(root.get("isExist"), true));
         List<QueryAuthenticatorInfo> authenticators = entityManager.createQuery(criteriaQuery).getResultList();
         List<BasicAuthenticatorInfo> basicAuthenticatorInfos = new ArrayList<>();
         authenticators.forEach(authenticator -> {
@@ -115,7 +121,8 @@ public class AuthenticatorServiceImpl implements AuthenticatorService {
     private AuthenticatorEntity toEntity(AuthenticatorDTO dto) {
         AuthenticatorEntity entity = new AuthenticatorEntity();
         entity.setName(dto.getName());
-        entity.setConfig(JSON.toJSONString(dto.getAuthenticator()));
+        entity.setAuthenticatorType(dto.getAuthenticatorType());
+        entity.setConfig(JSON.toJSONString(dto.getConfig()));
         entity.setModuleId(dto.getModuleId());
         String resourceKey = dto.getId();
         if (StringUtils.isBlank(resourceKey)) {
@@ -135,8 +142,9 @@ public class AuthenticatorServiceImpl implements AuthenticatorService {
     private AuthenticatorEntity buildEntity(AuthenticatorDTO dto) {
         AuthenticatorEntity entity = repository.findByResourceKey(dto.getId());
         entity.setName(dto.getName());
+        entity.setAuthenticatorType(dto.getAuthenticatorType());
         entity.setExist(dto.isExist());
-        entity.setConfig(JSON.toJSONString(dto.getAuthenticator()));
+        entity.setConfig(JSON.toJSONString(dto.getConfig()));
         if (UserContext.getUserInfo() != null && UserContext.getUserInfo().getUsername() != null) {
             entity.setUpdatedBy(UserContext.getUserInfo().getUsername());
         }
@@ -147,7 +155,8 @@ public class AuthenticatorServiceImpl implements AuthenticatorService {
     private AuthenticatorDTO toDTO(AuthenticatorEntity entity) {
         AuthenticatorDTO dto = new AuthenticatorDTO();
         dto.setName(entity.getName());
-        dto.setAuthenticator(JSONObject.parseArray(entity.getConfig(), AuthenticatorConfigDTO.class));
+        dto.setAuthenticatorType(entity.getAuthenticatorType());
+        dto.setConfig(JSONObject.parseArray(entity.getConfig(), AuthenticatorConfigDTO.class));
         dto.setModuleId(entity.getModuleId());
         dto.setExist(entity.isExist());
         dto.setId(entity.getResourceKey());

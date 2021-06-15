@@ -45,7 +45,6 @@ public class OKHttpClient implements DalaranProcessor<OKHttpClientConfig> {
     public void configure(ProcessorDefinition route, OKHttpClientConfig config) {
         if (config.getConnector().getProtocol().name().equals("HTTPS")) {
             if (config.getCheckCertificate() && StringUtils.isNotBlank(config.getSslCertificate())) {
-                log.info("ossAccount: " + ossAccount.getBucketName());
                 File dir = new File("/var/tmp");
                 try {
                     X509TrustManager trustManager;

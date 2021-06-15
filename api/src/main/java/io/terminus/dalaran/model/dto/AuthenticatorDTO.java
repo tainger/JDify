@@ -8,5 +8,5 @@ import java.util.List;
 @Data
 public class AuthenticatorDTO<T> extends BasicAuthenticatorInfo {
 
-    List<T> authenticator;
+    List<T> config;
 }
