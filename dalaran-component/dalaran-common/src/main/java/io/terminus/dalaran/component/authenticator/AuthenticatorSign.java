@@ -7,7 +7,7 @@ import io.terminus.dalaran.model.authenticator.AuthenticatorKeyLocation;
 import lombok.Data;
 
 @Data
-@Authenticator(value = "Sign")
+@Authenticator("Sign")
 public class AuthenticatorSign {
 
     @ConfigFieldInfo(label = "签名字段", inputType = FieldInputType.String)

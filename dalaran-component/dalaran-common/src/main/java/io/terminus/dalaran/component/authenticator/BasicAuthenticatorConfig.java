@@ -7,7 +7,7 @@ import io.terminus.dalaran.model.authenticator.AuthenticatorKeyLocation;
 import lombok.Data;
 
 @Data
-@Authenticator(value = "BasicAuthenticator")
+@Authenticator("BasicAuthenticator")
 public class BasicAuthenticatorConfig {
 
     @ConfigFieldInfo(label = "所处位置", inputType = FieldInputType.Select)
