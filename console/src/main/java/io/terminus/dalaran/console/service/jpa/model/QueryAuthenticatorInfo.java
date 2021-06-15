@@ -11,16 +11,19 @@ public class QueryAuthenticatorInfo {
 
     private String name;
 
+    private String authenticatorType;
+
     private boolean isExist;
 
     public QueryAuthenticatorInfo() {
 
     }
 
-    public QueryAuthenticatorInfo(String resourceKey, String moduleId, String name, boolean isExist) {
+    public QueryAuthenticatorInfo(String resourceKey, String moduleId, String name, String authenticatorType, boolean isExist) {
         this.resourceKey = resourceKey;
         this.moduleId = moduleId;
         this.name = name;
+        this.authenticatorType = authenticatorType;
         this.isExist = isExist;
     }
 }

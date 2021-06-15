@@ -7,14 +7,9 @@ import org.apache.camel.impl.ProcessorEndpoint;
 import org.apache.camel.spi.Metadata;
 import org.apache.camel.spi.UriEndpoint;
 import org.apache.camel.spi.UriParam;
-import org.apache.shardingsphere.elasticjob.lite.lifecycle.api.JobOperateAPI;
-import org.springframework.beans.factory.annotation.Autowired;
 
 @UriEndpoint(firstVersion = "1.0.0", scheme = "elasticjob", title = "ElasticJob", syntax = "elasticjob:jobName", label = "schedule")
 public class ElasticJobEndpoint extends ProcessorEndpoint {
-
-    @Autowired
-    private JobOperateAPI jobOperateAPI;
 
     @UriParam(description = "连接 ZooKeeper 服务器的列表", javaType = "java.lang.String")
     @Metadata(required = "true")

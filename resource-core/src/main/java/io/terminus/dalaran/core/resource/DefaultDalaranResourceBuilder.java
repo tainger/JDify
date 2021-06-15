@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import io.terminus.dalaran.DalaranConstants;
 import io.terminus.dalaran.component.authenticator.BasicAuthenticatorConfig;
 import io.terminus.dalaran.component.authenticator.DalaranAuthenticator;
+import io.terminus.dalaran.component.authenticator.AuthenticatorSign;
 import io.terminus.dalaran.config.ProcessorInfo;
 import io.terminus.dalaran.config.ServiceInfo;
 import io.terminus.dalaran.config.TriggerInfo;
@@ -183,7 +184,7 @@ public class DefaultDalaranResourceBuilder implements DalaranResourceBuilder {
         if (entity == null) {
             throw new RuntimeException("authenticator [" + authenticatorId + "] not found");
         }
-        return buildArrayConfig(entity.getConfig(), authenticatorConfigType);
+        return buildArrayConfig(entity.getConfig(), authenticatorConfigType, entity.getType());
     }
 
     @Override
@@ -266,11 +267,17 @@ public class DefaultDalaranResourceBuilder implements DalaranResourceBuilder {
         return JSON.parseObject(replacedConfig, configType);
     }
 
-    public  <T> T buildArrayConfig(String configValue, Class<T> configType) {
+    public  <T> T buildArrayConfig(String configValue, Class<T> configType, String type) {
         String replacedConfig = replaceProperties(configValue, getProperties());
         DalaranAuthenticator authenticator = new DalaranAuthenticator();
-        List<BasicAuthenticatorConfig> configs = JSON.parseArray(replacedConfig, BasicAuthenticatorConfig.class);
-        authenticator.setConfig(configs);
+        if (type.equals("BasicAuthenticator")) {
+            List<BasicAuthenticatorConfig> configs = JSON.parseArray(replacedConfig, BasicAuthenticatorConfig.class);
+            authenticator.setConfig(configs);
+        } else if (type.equals("Sign")) {
+            List<AuthenticatorSign> configs = JSON.parseArray(replacedConfig, AuthenticatorSign.class);
+            authenticator.setConfig(configs);
+        }
+        authenticator.setType(type);
         return JSON.parseObject(JSON.toJSONString(authenticator), configType);
     }
 

@@ -13,13 +13,16 @@ public class BasicAuthenticatorInfo {
 
     private boolean isExist;
 
+    private String authenticatorType;
+
     public BasicAuthenticatorInfo(){
     }
 
-    public BasicAuthenticatorInfo(String id, String moduleId, String name, boolean isExist) {
+    public BasicAuthenticatorInfo(String id, String moduleId, String name, boolean isExist, String authenticatorType) {
         this.id = id;
         this.moduleId = moduleId;
         this.name = name;
         this.isExist = isExist;
+        this.authenticatorType = authenticatorType;
     }
 }
