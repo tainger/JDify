@@ -33,8 +33,8 @@ public class DalaranRuntimeConfigure {
     }
 
     @Bean
-    public AlarmManagerInitializer alarmManagerInitializer() {
-        return new AlarmManagerInitializer();
+    public DefaultAlarmManager alarmManagerInitializer() {
+        return new DefaultAlarmManager();
     }
 
 }

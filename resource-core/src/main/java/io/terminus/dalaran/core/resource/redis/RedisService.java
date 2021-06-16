@@ -1,5 +1,6 @@
 package io.terminus.dalaran.core.resource.redis;
 
+import com.alibaba.fastjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
@@ -56,7 +57,7 @@ public class RedisService {
 
     public Long incrKey(String key) {
         if(null == redisTemplate.opsForValue().get(key)) {
-            persistKey(key, "0");
+            setValueMinutes(key, "0", 3 * 60L);
         }
         return redisTemplate.opsForValue().increment(key);
     }
@@ -72,8 +73,13 @@ public class RedisService {
     }
 
 
-    public String pop(String queueName) {
-        return redisTemplate.opsForList().rightPop(queueName, 0, TimeUnit.MILLISECONDS);
+    public <T> T pop(String queueName, Class<T> classTra) {
+        String value = redisTemplate.opsForList().rightPop(queueName, 0, TimeUnit.MILLISECONDS);
+        if(value == null) {
+            return null;
+        }
+         return JSONObject.parseObject(value, classTra);
     }
+
 
 }

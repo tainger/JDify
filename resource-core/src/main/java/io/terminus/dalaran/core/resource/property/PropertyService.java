@@ -36,6 +36,9 @@ public class PropertyService {
     @Value("${noticeMessage.dingAccessToken}")
     private String dingAccessToken;
 
+    @Value("${noticeMessage.interval}")
+    private Long interval;
+
 
     private final String DALARAN_MARKET_UI = "DALARAN_MARKET_UI";
 
@@ -76,5 +79,9 @@ public class PropertyService {
 
     public String getRegister() {
         return register;
+    }
+
+    public Long getInterval() {
+        return interval;
     }
 }

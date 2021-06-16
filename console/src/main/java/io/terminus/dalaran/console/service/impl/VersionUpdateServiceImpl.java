@@ -1,25 +1,19 @@
 package io.terminus.dalaran.console.service.impl;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import io.terminus.dalaran.DalaranConstants;
-import io.terminus.dalaran.SourceType;
 import io.terminus.dalaran.component.foreach.ForEachConfig;
 import io.terminus.dalaran.component.loopwhile.LoopWhileConfig;
 import io.terminus.dalaran.component.multicast.ScatterGatherConfig;
 import io.terminus.dalaran.component.retry.RetryConfig;
+import io.terminus.dalaran.component.router.DalaranRouterConfig;
 import io.terminus.dalaran.component.service.soap.SoapServiceConfig;
 import io.terminus.dalaran.component.service.swagger.SwaggerOperationConfig;
 import io.terminus.dalaran.component.service.swagger.SwaggerServiceConfig;
-import io.terminus.dalaran.component.subflow.DalaranSubFlowConfig;
-import io.terminus.dalaran.config.ProcessorInfo;
 import io.terminus.dalaran.config.ServiceInfo;
-import io.terminus.dalaran.config.TriggerInfo;
 import io.terminus.dalaran.console.entity.*;
 import io.terminus.dalaran.console.repository.*;
 import io.terminus.dalaran.console.service.VersionUpdateService;
-import io.terminus.dalaran.core.component.DalaranService;
 import io.terminus.dalaran.core.component.config.*;
 import io.terminus.dalaran.core.component.model.FunctionType;
 import io.terminus.dalaran.core.component.model.MappingFunction;
@@ -31,11 +25,9 @@ import io.terminus.dalaran.core.context.DalaranServiceContext;
 import io.terminus.dalaran.core.context.support.DefaultDalaranServiceContext;
 import io.terminus.dalaran.core.resource.DalaranResourceBuilder;
 import io.terminus.dalaran.core.resource.entity.common.ModuleEntity;
-import io.terminus.dalaran.core.resource.entity.common.PrivateRepositoryEntity;
 import io.terminus.dalaran.core.resource.entity.common.ProcessorEntity;
 import io.terminus.dalaran.core.resource.repository.ModuleRepository;
 import io.terminus.dalaran.model.component.ProcessorRouteInfo;
-import io.terminus.dalaran.model.query.PrivateRepositoryQuery;
 import io.terminus.dalaran.model.soap.model.SoapOperationConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -44,8 +36,6 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -74,6 +64,12 @@ public class VersionUpdateServiceImpl implements VersionUpdateService {
 
     @Autowired
     private SubFlowRepository subFlowRepository;
+
+    @Autowired
+    private ClientRepository clientRepository;
+
+    @Autowired
+    private LimiterRepository limiterRepository;
 
     @Autowired
     private DalaranContext dalaranContext;
@@ -128,6 +124,25 @@ public class VersionUpdateServiceImpl implements VersionUpdateService {
             functionEntity.setResourceKey(String.valueOf(functionEntity.getId()));
             functionRepository.save(functionEntity);
         });
+
+        List<ClientEntity> clientEntityList = clientRepository.findAll();
+        clientEntityList.forEach(clientEntity -> {
+            if(StringUtils.isNotBlank(clientEntity.getResourceKey())) {
+                return;
+            }
+            clientEntity.setResourceKey(clientEntity.getResourceKey());
+            clientRepository.save(clientEntity);
+        });
+
+        List<LimiterEntity> limiterEntities = limiterRepository.findAll();
+        limiterEntities.forEach(limiterEntity -> {
+            if(StringUtils.isNotBlank(limiterEntity.getResourceKey())) {
+                return;
+            }
+            limiterEntity.setResourceKey(limiterEntity.getResourceKey());
+            limiterRepository.save(limiterEntity);
+        });
+
 
         List<ServiceEntity> serviceEntityList = serviceRepository.findAll();
         serviceEntityList.forEach(serviceEntity -> {
@@ -287,13 +302,31 @@ public class VersionUpdateServiceImpl implements VersionUpdateService {
                 for (ErrorCatchConfig.Route route : routes) {
                     List<ProcessorRouteInfo> pipeline = route.getPipeline();
                     for (ProcessorRouteInfo processorRouteInfo : pipeline) {
-                        ProcessorEntity loopWhileProcessorEntity = new ProcessorEntity();
-                        BeanUtils.copyProperties(processorRouteInfo, loopWhileProcessorEntity);
-                        handleProcessor(loopWhileProcessorEntity);
-                        BeanUtils.copyProperties(loopWhileProcessorEntity, processorRouteInfo);
+                        ProcessorEntity errorProcessorEntity = new ProcessorEntity();
+                        BeanUtils.copyProperties(processorRouteInfo, errorProcessorEntity);
+                        handleProcessor(errorProcessorEntity);
+                        BeanUtils.copyProperties(errorProcessorEntity, processorRouteInfo);
                     }
                 }
             }
+            return;
+        }
+
+
+        if (processorConfig instanceof DalaranRouterConfig) {
+            List<DalaranRouterConfig.Route> routes = ((DalaranRouterConfig) processorConfig).getRoutes();
+            if(CollectionUtils.isNotEmpty(routes)) {
+                for (DalaranRouterConfig.Route route : routes) {
+                    List<ProcessorRouteInfo> pipeline = route.getPipeline();
+                    for (ProcessorRouteInfo processorRouteInfo : pipeline) {
+                        ProcessorEntity processorEntityRoute = new ProcessorEntity();
+                        BeanUtils.copyProperties(processorRouteInfo, processorEntityRoute);
+                        handleProcessor(processorEntityRoute);
+                        BeanUtils.copyProperties(processorEntityRoute, processorRouteInfo);
+                    }
+                }
+            }
+            return;
         }
 
 
