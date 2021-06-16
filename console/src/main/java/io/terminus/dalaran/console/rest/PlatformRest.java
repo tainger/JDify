@@ -28,6 +28,7 @@ import io.terminus.dalaran.rest.write.PlatformImportAPI;
 import io.terminus.dalaran.rest.write.ReleaseWriteAPI;
 import io.terminus.draco.api.response.UserInfo;
 import org.apache.commons.lang3.time.DateFormatUtils;
+import org.apache.dubbo.common.utils.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.data.domain.Page;
@@ -221,8 +222,7 @@ public class PlatformRest implements PlatformInfoAPI, PlatformImportAPI, Platfor
     @GetMapping(value = "/export")
     @OnException(code = ResponseMessage.CONFIG_EXPORT_ERROR)
     public ExportData exportAll(HttpServletResponse res) {
-        String currentDate = DateFormatUtils.format(new Date(), "yyyy-MM-dd HH:mm:ss");
-        res.addHeader("Content-Disposition", "attachment;filename=" + currentDate + ".dlr");
+        res.addHeader("Content-Disposition", "attachment;filename=" + buildFileName() + ".dlr");
         return exportService.exportAll();
     }
 
@@ -238,8 +238,7 @@ public class PlatformRest implements PlatformInfoAPI, PlatformImportAPI, Platfor
     @GetMapping(value = "/export/flow")
     @OnException(code = ResponseMessage.CONFIG_EXPORT_ERROR)
     public ExportData exportFlow(String ids, HttpServletResponse res) {
-        String currentDate = DateFormatUtils.format(new Date(), "yyyy-MM-dd HH:mm:ss");
-        res.addHeader("Content-Disposition", "attachment;filename=" + currentDate + ".dlr");
+        res.addHeader("Content-Disposition", "attachment;filename=" + buildFileName() + ".dlr");
         return exportService.exportFlow(ids);
     }
 
@@ -301,5 +300,13 @@ public class PlatformRest implements PlatformInfoAPI, PlatformImportAPI, Platfor
             e.printStackTrace();
         }
         return new BasicResponse(false);
+    }
+
+    private String buildFileName() {
+        String name = DateFormatUtils.format(new Date(), "yyyy-MM-dd HH:mm:ss");
+        if (!StringUtils.isBlank(System.getenv("DICE_PROJECT_ID")) && !StringUtils.isBlank(System.getenv("DICE_WORKSPACE"))) {
+            name = System.getenv("DICE_PROJECT_ID") + "_" + System.getenv("DICE_WORKSPACE") + "_" + name;
+        }
+        return name;
     }
 }

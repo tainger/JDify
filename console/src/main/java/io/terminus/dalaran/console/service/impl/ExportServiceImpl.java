@@ -634,9 +634,7 @@ public class ExportServiceImpl implements ExportService {
         }
     }
 
-
     @Override
-
     public Definitions exportWSDL() {
         List<SoapApiInfo> soapApiList = getExportSoapListeners();
         return WSDLUtils.buildDefinitions(soapApiList, runtimeLocation);
@@ -660,7 +658,6 @@ public class ExportServiceImpl implements ExportService {
     private void truncateTable(String tableName) {
             entityManager.createNativeQuery("TRUNCATE TABLE " + tableName).executeUpdate();
     }
-
 
     private Map<String, List<TriggerFlow>> buildModuleTriggerFlowList(String triggerType) {
         List<TriggerFlowEntity> restFlowList = triggerFlowRepository.findByStatusNotAndTriggerTypeAndIsExistTrue(FlowStatus.Error, triggerType);
