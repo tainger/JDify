@@ -1,10 +1,7 @@
 package io.terminus.dalaran.core.context;
 
 import io.terminus.dalaran.config.*;
-import io.terminus.dalaran.core.component.DalaranBasicComponent;
-import io.terminus.dalaran.core.component.DalaranDynamicConfig;
-import io.terminus.dalaran.core.component.DalaranProcessor;
-import io.terminus.dalaran.core.component.DalaranTrigger;
+import io.terminus.dalaran.core.component.*;
 
 import java.util.Collection;
 import java.util.Map;
@@ -37,7 +34,7 @@ public interface DalaranComponentContext {
 
     void addBasicComponent(DalaranBasicComponent bean);
 
-    void addDynamicConfig(DalaranDynamicConfig bean);
+    void addAuthenticator(DalaranAuthenticator bean);
 
     Collection<BasicComponentInfo> getAllBasicComponentInfo();
 

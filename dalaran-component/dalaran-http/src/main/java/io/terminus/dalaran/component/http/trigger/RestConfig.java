@@ -4,7 +4,7 @@ import com.alibaba.fastjson.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.terminus.dalaran.FieldInputType;
 import io.terminus.dalaran.SourceType;
-import io.terminus.dalaran.component.authenticator.DalaranAuthenticator;
+import io.terminus.dalaran.component.authenticator.AuthenticatorConfigType;
 import io.terminus.dalaran.component.common.HttpMethod;
 import io.terminus.dalaran.component.limiter.DalaranLimiter;
 import io.terminus.dalaran.core.component.annotation.ConfigFieldInfo;
@@ -16,7 +16,7 @@ import lombok.Data;
 
 
 @Data
-public class RestConfig extends AllModelConfig implements AuthenticatorConfig<DalaranAuthenticator>, LimiterConfig<DalaranLimiter> {
+public class RestConfig extends AllModelConfig implements AuthenticatorConfig<AuthenticatorConfigType>, LimiterConfig<DalaranLimiter> {
 
     @ConfigFieldInfo(inputType = FieldInputType.Hidden, required = false)
     @JSONField(serialize = false)
@@ -40,13 +40,13 @@ public class RestConfig extends AllModelConfig implements AuthenticatorConfig<Da
     @ConfigFieldInfo(inputType = FieldInputType.Hidden, required = false)
     @JSONField(serialize = false)
     @JsonIgnore
-    private DalaranAuthenticator authenticator;
+    private AuthenticatorConfigType authenticator;
 
     @ConfigFieldInfo(label = "开启鉴权", inputType = FieldInputType.Switch, defaultValue = "false")
     private boolean enableAuthenticator = false;
 
     @ConfigFieldInfo(label = "鉴权器", inputType = FieldInputType.Authenticator, required = false,
-            authenticatorType = DalaranAuthenticator.class, sourceType = SourceType.AUTHENTICATOR, show = "enableAuthenticator == true", dynamic = true)
+            authenticatorType = AuthenticatorConfigType.class, sourceType = SourceType.AUTHENTICATOR, show = "enableAuthenticator == true", dynamic = true)
     private String authenticatorId;
 
 //    @ConfigFieldInfo(label = "计算签名", inputType = FieldInputType.Switch, defaultValue = "false")

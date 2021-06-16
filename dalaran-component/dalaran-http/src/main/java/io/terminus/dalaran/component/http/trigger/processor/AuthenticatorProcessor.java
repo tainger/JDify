@@ -2,8 +2,8 @@ package io.terminus.dalaran.component.http.trigger.processor;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
-import io.terminus.dalaran.component.authenticator.BasicAuthenticatorConfig;
-import io.terminus.dalaran.component.authenticator.DalaranAuthenticator;
+import io.terminus.dalaran.component.authenticator.AuthenticatorBasic;
+import io.terminus.dalaran.component.authenticator.AuthenticatorConfigType;
 import io.terminus.dalaran.component.authenticator.AuthenticatorSign;
 import io.terminus.dalaran.component.http.trigger.utils.SignUtils;
 import io.terminus.dalaran.core.resource.redis.RedisService;
@@ -23,11 +23,11 @@ import static io.terminus.dalaran.component.http.trigger.utils.SignUtils.*;
 
 public class AuthenticatorProcessor implements Processor {
 
-    private DalaranAuthenticator authenticator;
+    private AuthenticatorConfigType authenticator;
 
     private RedisService redisService;
 
-    public AuthenticatorProcessor(DalaranAuthenticator authenticator, RedisService redisService) {
+    public AuthenticatorProcessor(AuthenticatorConfigType authenticator, RedisService redisService) {
         this.authenticator = authenticator;
         this.redisService = redisService;
     }
@@ -46,24 +46,24 @@ public class AuthenticatorProcessor implements Processor {
     }
 
     public void checkBasicAuthenticator(Exchange exchange, Map<String, String> body) {
-        List<BasicAuthenticatorConfig> basicAuthenticatorConfigs = JSON.parseArray(JSON.toJSONString(authenticator.getConfig()), BasicAuthenticatorConfig.class);
-        basicAuthenticatorConfigs.forEach(basicAuthenticatorConfig -> {
-            String value = basicAuthenticatorConfig.getAuthenticatorValue();
+        List<AuthenticatorBasic> authenticatorBasics = JSON.parseArray(JSON.toJSONString(authenticator.getConfig()), AuthenticatorBasic.class);
+        authenticatorBasics.forEach(authenticatorBasic -> {
+            String value = authenticatorBasic.getAuthenticatorValue();
             String requestValue;
-            if (!basicAuthenticatorConfig.getIsStatic()) {
-                value = redisService.getValue("Authenticator-" + basicAuthenticatorConfig.getAuthenticatorKey());
+            if (!authenticatorBasic.getIsStatic()) {
+                value = redisService.getValue("Authenticator-" + authenticatorBasic.getAuthenticatorKey());
                 if (StringUtils.isBlank(value)) {
                     stopExchangeOnInvalidAppKey(exchange);
                     return;
                 }
             }
-            if (StringUtils.equals(basicAuthenticatorConfig.getKeyLocation().name(), AuthenticatorKeyLocation.Header.name())) {
-                requestValue = exchange.getIn().getHeader(basicAuthenticatorConfig.getAuthenticatorKey(), String.class);
-            } else if (StringUtils.equals(basicAuthenticatorConfig.getKeyLocation().name(), AuthenticatorKeyLocation.QueryParam.name())) {
-                requestValue = exchange.getIn().getHeader(basicAuthenticatorConfig.getAuthenticatorKey(), String.class);
+            if (StringUtils.equals(authenticatorBasic.getKeyLocation().name(), AuthenticatorKeyLocation.Header.name())) {
+                requestValue = exchange.getIn().getHeader(authenticatorBasic.getAuthenticatorKey(), String.class);
+            } else if (StringUtils.equals(authenticatorBasic.getKeyLocation().name(), AuthenticatorKeyLocation.QueryParam.name())) {
+                requestValue = exchange.getIn().getHeader(authenticatorBasic.getAuthenticatorKey(), String.class);
             } else {
                 if (body != null) {
-                    requestValue = body.get(basicAuthenticatorConfig.getAuthenticatorKey());
+                    requestValue = body.get(authenticatorBasic.getAuthenticatorKey());
                 } else {
                     requestValue = "";
                 }
@@ -154,25 +154,25 @@ public class AuthenticatorProcessor implements Processor {
 
     public void checkGetValue(Exchange exchange, Map<String, String> param) {
         if (authenticator.getType().equals("BasicAuthenticator")) {
-            List<BasicAuthenticatorConfig> basicAuthenticatorConfigs = JSON.parseArray(JSON.toJSONString(authenticator.getConfig()), BasicAuthenticatorConfig.class);
-            basicAuthenticatorConfigs.forEach(basicAuthenticatorConfig -> {
-                String value = basicAuthenticatorConfig.getAuthenticatorValue();
+            List<AuthenticatorBasic> authenticatorBasics = JSON.parseArray(JSON.toJSONString(authenticator.getConfig()), AuthenticatorBasic.class);
+            authenticatorBasics.forEach(authenticatorBasic -> {
+                String value = authenticatorBasic.getAuthenticatorValue();
                 String requestValue;
-                if (!basicAuthenticatorConfig.getIsStatic()) {
-                    value = redisService.getValue("Authenticator-" + basicAuthenticatorConfig.getAuthenticatorKey());
+                if (!authenticatorBasic.getIsStatic()) {
+                    value = redisService.getValue("Authenticator-" + authenticatorBasic.getAuthenticatorKey());
                     if (StringUtils.isBlank(value)) {
                         stopExchangeOnInvalidAppKey(exchange);
                         return;
                     }
                 }
-                if (StringUtils.equals(basicAuthenticatorConfig.getKeyLocation().name(), AuthenticatorKeyLocation.Header.name())) {
-                    requestValue = exchange.getIn().getHeader(basicAuthenticatorConfig.getAuthenticatorKey(), String.class);
-                } else if (StringUtils.equals(basicAuthenticatorConfig.getKeyLocation().name(), AuthenticatorKeyLocation.Body.name())) {
+                if (StringUtils.equals(authenticatorBasic.getKeyLocation().name(), AuthenticatorKeyLocation.Header.name())) {
+                    requestValue = exchange.getIn().getHeader(authenticatorBasic.getAuthenticatorKey(), String.class);
+                } else if (StringUtils.equals(authenticatorBasic.getKeyLocation().name(), AuthenticatorKeyLocation.Body.name())) {
                     Map<String, String> body = exchange.getIn().getBody(Map.class);
-                    requestValue = body.get(basicAuthenticatorConfig.getAuthenticatorKey());
+                    requestValue = body.get(authenticatorBasic.getAuthenticatorKey());
                 } else {
                     if (param != null) {
-                        requestValue = param.get(basicAuthenticatorConfig.getAuthenticatorKey());
+                        requestValue = param.get(authenticatorBasic.getAuthenticatorKey());
                     } else {
                         requestValue = "";
                     }

@@ -2,8 +2,8 @@ package io.terminus.dalaran.core.resource;
 
 import com.alibaba.fastjson.JSON;
 import io.terminus.dalaran.DalaranConstants;
-import io.terminus.dalaran.component.authenticator.BasicAuthenticatorConfig;
-import io.terminus.dalaran.component.authenticator.DalaranAuthenticator;
+import io.terminus.dalaran.component.authenticator.AuthenticatorBasic;
+import io.terminus.dalaran.component.authenticator.AuthenticatorConfigType;
 import io.terminus.dalaran.component.authenticator.AuthenticatorSign;
 import io.terminus.dalaran.config.ProcessorInfo;
 import io.terminus.dalaran.config.ServiceInfo;
@@ -96,8 +96,8 @@ public class DefaultDalaranResourceBuilder implements DalaranResourceBuilder {
             }
         }
 
-        if (config instanceof AuthenticatorConfig) {
-            AuthenticatorConfig authenticatorConfig = (AuthenticatorConfig) config;
+        if (config instanceof io.terminus.dalaran.core.component.config.AuthenticatorConfig) {
+            io.terminus.dalaran.core.component.config.AuthenticatorConfig authenticatorConfig = (io.terminus.dalaran.core.component.config.AuthenticatorConfig) config;
             String authenticatorId = authenticatorConfig.getAuthenticatorId();
             if (StringUtils.isNotBlank(authenticatorId)) {
                 Object authenticator = buildAuthenticatorConfig(authenticatorId, triggerInfo.getAuthenticatorInfo().getClassType());
@@ -269,9 +269,9 @@ public class DefaultDalaranResourceBuilder implements DalaranResourceBuilder {
 
     public  <T> T buildArrayConfig(String configValue, Class<T> configType, String type) {
         String replacedConfig = replaceProperties(configValue, getProperties());
-        DalaranAuthenticator authenticator = new DalaranAuthenticator();
+        AuthenticatorConfigType authenticator = new AuthenticatorConfigType();
         if (type.equals("BasicAuthenticator")) {
-            List<BasicAuthenticatorConfig> configs = JSON.parseArray(replacedConfig, BasicAuthenticatorConfig.class);
+            List<AuthenticatorBasic> configs = JSON.parseArray(replacedConfig, AuthenticatorBasic.class);
             authenticator.setConfig(configs);
         } else if (type.equals("Sign")) {
             List<AuthenticatorSign> configs = JSON.parseArray(replacedConfig, AuthenticatorSign.class);

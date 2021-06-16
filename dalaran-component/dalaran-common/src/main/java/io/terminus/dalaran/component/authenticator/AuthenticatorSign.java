@@ -1,14 +1,15 @@
 package io.terminus.dalaran.component.authenticator;
 
 import io.terminus.dalaran.FieldInputType;
+import io.terminus.dalaran.core.component.DalaranAuthenticator;
 import io.terminus.dalaran.core.component.annotation.Authenticator;
 import io.terminus.dalaran.core.component.annotation.ConfigFieldInfo;
 import io.terminus.dalaran.model.authenticator.AuthenticatorKeyLocation;
 import lombok.Data;
 
 @Data
-@Authenticator("Sign")
-public class AuthenticatorSign {
+@Authenticator(value = "Sign")
+public class AuthenticatorSign implements DalaranAuthenticator {
 
     @ConfigFieldInfo(label = "签名字段", inputType = FieldInputType.String)
     private String appKey;

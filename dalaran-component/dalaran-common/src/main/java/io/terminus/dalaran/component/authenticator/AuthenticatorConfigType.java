@@ -5,7 +5,7 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class DalaranAuthenticator<T> {
+public class AuthenticatorConfigType<T> {
 
     private String type;
 

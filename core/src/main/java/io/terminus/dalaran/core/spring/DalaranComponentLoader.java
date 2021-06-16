@@ -1,9 +1,6 @@
 package io.terminus.dalaran.core.spring;
 
-import io.terminus.dalaran.core.component.DalaranBasicComponent;
-import io.terminus.dalaran.core.component.DalaranDynamicConfig;
-import io.terminus.dalaran.core.component.DalaranProcessor;
-import io.terminus.dalaran.core.component.DalaranTrigger;
+import io.terminus.dalaran.core.component.*;
 import io.terminus.dalaran.core.component.annotation.MappingFunction;
 import io.terminus.dalaran.core.component.annotation.ModelType;
 import io.terminus.dalaran.core.component.model.DalaranModelType;
@@ -43,8 +40,8 @@ public class DalaranComponentLoader implements BeanPostProcessor {
         if (bean instanceof DalaranBasicComponent) {
             componentContext.addBasicComponent((DalaranBasicComponent) bean);
         }
-        if (bean instanceof DalaranDynamicConfig) {
-            componentContext.addDynamicConfig((DalaranDynamicConfig) bean);
+        if (bean instanceof DalaranAuthenticator) {
+            componentContext.addAuthenticator((DalaranAuthenticator) bean);
         }
         ModelType modelType = bean.getClass().getAnnotation(ModelType.class);
         if (modelType != null && bean instanceof DalaranModelType) {

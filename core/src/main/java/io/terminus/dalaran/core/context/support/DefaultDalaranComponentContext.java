@@ -4,6 +4,7 @@ import io.terminus.dalaran.ComponentType;
 import io.terminus.dalaran.config.*;
 import io.terminus.dalaran.core.component.*;
 import io.terminus.dalaran.core.component.annotation.*;
+import io.terminus.dalaran.core.component.annotation.Authenticator;
 import io.terminus.dalaran.core.component.config.AuthenticatorConfig;
 import io.terminus.dalaran.core.component.config.ConnectorConfig;
 import io.terminus.dalaran.core.component.config.LimiterConfig;
@@ -334,7 +335,20 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext {
         log.info("load processor {}", processorAnnotation);
     }
 
-
+    @Override
+    public void addAuthenticator(DalaranAuthenticator bean) {
+        Authenticator authenticator = bean.getClass().getDeclaredAnnotation(Authenticator.class);
+        authenticatorInfoMap.computeIfAbsent(authenticator.value(), key -> {
+            DalaranConfigField[] authenticatorFields = ConfigFieldUtils.buildConfigFields(bean.getClass());
+            AuthenticatorInfo newAuthenticatorInfo = new AuthenticatorInfo();
+            newAuthenticatorInfo.setName(authenticator.value());
+            newAuthenticatorInfo.setOrder(authenticator.order());
+            newAuthenticatorInfo.setClassType(bean.getClass());
+            newAuthenticatorInfo.setType(authenticator.value());
+            newAuthenticatorInfo.setConfigFields(authenticatorFields);
+            return newAuthenticatorInfo;
+        });
+    }
 
     @Override
     public void addBasicComponent(DalaranBasicComponent component) {
@@ -345,39 +359,6 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext {
         componentInfo.setName(componentAnnotation.value());
         componentInfo.setType(componentAnnotation.value());
         basicComponentInfoMap.put(componentAnnotation.value(), componentInfo);
-    }
-
-    @Override
-    public void addDynamicConfig(DalaranDynamicConfig config) {
-        DynamicConfig configAnnotation = config.getClass().getDeclaredAnnotation(DynamicConfig.class);
-        DalaranConfigField[] configFields = ConfigFieldUtils.buildConfigFields(config.getClass());
-        DynamicConfigTypeField[] oldConfigTypeFields;
-        DynamicConfigTypeField[] newConfigTypeFields;
-        if (configAnnotation.type().equals("switch")) {
-            newConfigTypeFields =  new DynamicConfigTypeField[2];
-            newConfigTypeFields[0] = new DynamicConfigTypeField();
-            newConfigTypeFields[0].setType("true");
-            newConfigTypeFields[0].setConfigFields(configFields);
-            newConfigTypeFields[1] = new DynamicConfigTypeField();
-            newConfigTypeFields[1].setType("false");
-        } else {
-            newConfigTypeFields = new DynamicConfigTypeField[1];
-            newConfigTypeFields[0] = new DynamicConfigTypeField();
-            newConfigTypeFields[0].setType(configAnnotation.type());
-            newConfigTypeFields[0].setConfigFields(configFields);
-        }
-        DynamicConfigInfo configInfo = new DynamicConfigInfo();
-        if (dynamicConfigInfoMap.get(configAnnotation.name()) != null) {
-            oldConfigTypeFields = Arrays.copyOf(dynamicConfigInfoMap.get(configAnnotation.name()).getConfigTypeFields(), dynamicConfigInfoMap.get(configAnnotation.name()).getConfigTypeFields().length + 1);
-            oldConfigTypeFields[oldConfigTypeFields.length - 1] = newConfigTypeFields[0];
-        } else {
-            oldConfigTypeFields = newConfigTypeFields;
-        }
-        configInfo.setName(configAnnotation.name());
-        configInfo.setOrigin(configAnnotation.origin());
-        configInfo.setVersion(configAnnotation.version());
-        configInfo.setConfigTypeFields(oldConfigTypeFields);
-        dynamicConfigInfoMap.put(configAnnotation.name(), configInfo);
     }
 
     @Override
