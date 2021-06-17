@@ -78,7 +78,18 @@ public class AuthenticatorProcessor implements Processor {
     public void checkSign(Exchange exchange, Map<String, String> body) {
         List<AuthenticatorSign> authenticatorSigns = JSON.parseArray(JSON.toJSONString(authenticator.getConfig()), AuthenticatorSign.class);
         authenticatorSigns.forEach(authenticatorSign -> {
-            String appKey = body.get(AUTH_APP_KEY);
+            String appKey;
+            String requestSign;
+            if (StringUtils.equals(authenticatorSign.getSignLocation().name(), AuthenticatorKeyLocation.Header.name())) {
+                appKey = exchange.getIn().getHeader(AUTH_APP_KEY, String.class);
+                requestSign = exchange.getIn().getHeader(AUTH_SIGN, String.class);
+            } else if (StringUtils.equals(authenticatorSign.getSignLocation().name(), AuthenticatorKeyLocation.QueryParam.name())) {
+                appKey = exchange.getIn().getHeader(AUTH_APP_KEY, String.class);
+                requestSign = exchange.getIn().getHeader(AUTH_SIGN, String.class);
+            } else {
+                appKey = body.get(AUTH_APP_KEY);
+                requestSign = body.get(AUTH_SIGN);
+            }
             if (StringUtils.isBlank(appKey)) {
                 stopExchangeOnMissingAppKey(exchange);
                 return;
@@ -86,14 +97,6 @@ public class AuthenticatorProcessor implements Processor {
             if (StringUtils.equals(appKey, authenticatorSign.getAppKey())) {
                 stopExchangeOnInvalidAppKey(exchange);
                 return;
-            }
-            String requestSign;
-            if (StringUtils.equals(authenticatorSign.getSignLocation().name(), AuthenticatorKeyLocation.Header.name())) {
-                requestSign = exchange.getIn().getHeader(AUTH_SIGN, String.class);
-            } else if (StringUtils.equals(authenticatorSign.getSignLocation().name(), AuthenticatorKeyLocation.QueryParam.name())) {
-                requestSign = exchange.getIn().getHeader(AUTH_SIGN, String.class);
-            } else {
-                requestSign = body.get(AUTH_SIGN);
             }
             if (StringUtils.isNotBlank(requestSign)) {
                 String appSecret = authenticatorSign.getAppSecret();
@@ -116,7 +119,19 @@ public class AuthenticatorProcessor implements Processor {
     public void checkGetSign(Exchange exchange, Map<String, String> param) {
         List<AuthenticatorSign> authenticatorSigns = JSON.parseArray(JSON.toJSONString(authenticator.getConfig()), AuthenticatorSign.class);
         authenticatorSigns.forEach(authenticatorSign -> {
-            String appKey = param.get(AUTH_APP_KEY);
+            String appKey;
+            String requestSign;
+            if (StringUtils.equals(authenticatorSign.getSignLocation().name(), AuthenticatorKeyLocation.Header.name())) {
+                appKey = exchange.getIn().getHeader(AUTH_APP_KEY, String.class);
+                requestSign = exchange.getIn().getHeader(AUTH_SIGN, String.class);
+            } else if (StringUtils.equals(authenticatorSign.getSignLocation().name(), AuthenticatorKeyLocation.Body.name())) {
+                Map<String, String> body = exchange.getIn().getBody(Map.class);
+                appKey = body.get(AUTH_APP_KEY);
+                requestSign = body.get(AUTH_SIGN);
+            } else {
+                appKey = param.get(AUTH_APP_KEY);
+                requestSign = param.get(AUTH_SIGN);
+            }
             if (StringUtils.isBlank(appKey)) {
                 stopExchangeOnMissingAppKey(exchange);
                 return;
@@ -124,15 +139,6 @@ public class AuthenticatorProcessor implements Processor {
             if (StringUtils.equals(appKey, authenticatorSign.getAppKey())) {
                 stopExchangeOnInvalidAppKey(exchange);
                 return;
-            }
-            String requestSign;
-            if (StringUtils.equals(authenticatorSign.getSignLocation().name(), AuthenticatorKeyLocation.Header.name())) {
-                requestSign = exchange.getIn().getHeader(AUTH_SIGN, String.class);
-            } else if (StringUtils.equals(authenticatorSign.getSignLocation().name(), AuthenticatorKeyLocation.Body.name())) {
-                Map<String, String> body = exchange.getIn().getBody(Map.class);
-                requestSign = body.get(AUTH_SIGN);
-            } else {
-                requestSign = param.get(AUTH_SIGN);
             }
             if (StringUtils.isNotBlank(requestSign)) {
                 String appSecret = authenticatorSign.getAppSecret();
