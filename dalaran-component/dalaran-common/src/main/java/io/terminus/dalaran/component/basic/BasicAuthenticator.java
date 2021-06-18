@@ -15,6 +15,6 @@ public class BasicAuthenticator implements DalaranBasicComponent {
 
     @ConfigFieldInfo(label = "鉴权器类型", inputType = FieldInputType.AuthenticatorSelector,
             path = "/api/platform/authenticator", dynamic = true)
-    private String type;
+    private String authenticatorType;
 
 }
