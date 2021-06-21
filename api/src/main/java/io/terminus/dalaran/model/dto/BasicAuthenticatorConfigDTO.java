@@ -4,7 +4,7 @@ import io.terminus.dalaran.model.authenticator.AuthenticatorKeyLocation;
 import lombok.Data;
 
 @Data
-public class AuthenticatorConfigDTO {
+public class BasicAuthenticatorConfigDTO {
 
     private AuthenticatorKeyLocation keyLocation;
 
