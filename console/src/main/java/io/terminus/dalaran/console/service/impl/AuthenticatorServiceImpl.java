@@ -11,8 +11,9 @@ import io.terminus.dalaran.console.util.GenerateKeyUtils;
 import io.terminus.dalaran.core.resource.redis.RedisService;
 import io.terminus.dalaran.model.AuthenticatorKeyResponse;
 import io.terminus.dalaran.model.AuthenticatorValueResponse;
-import io.terminus.dalaran.model.dto.AuthenticatorConfigDTO;
+import io.terminus.dalaran.model.dto.BasicAuthenticatorConfigDTO;
 import io.terminus.dalaran.model.dto.AuthenticatorDTO;
+import io.terminus.dalaran.model.dto.SignAuthenticatorConfigDTO;
 import io.terminus.dalaran.model.dto.basic.BasicAuthenticatorInfo;
 import io.terminus.draco.web.autoconfig.context.UserContext;
 import org.apache.commons.lang3.StringUtils;
@@ -45,7 +46,7 @@ public class AuthenticatorServiceImpl implements AuthenticatorService {
         setCreatedBy(entity);
         repository.save(entity);
         if (authenticatorDTO.getAuthenticatorType().equals("BasicAuthenticator")) {
-            saveToRedis(JSON.parseArray(JSON.toJSONString(authenticatorDTO.getConfig()), AuthenticatorConfigDTO.class));
+            saveToRedis(JSON.parseArray(JSON.toJSONString(authenticatorDTO.getConfig()), BasicAuthenticatorConfigDTO.class));
         }
         return entity.getResourceKey();
     }
@@ -55,7 +56,7 @@ public class AuthenticatorServiceImpl implements AuthenticatorService {
         AuthenticatorEntity entity = buildEntity(authenticatorDTO);
         repository.save(entity);
         if (authenticatorDTO.getAuthenticatorType().equals("BasicAuthenticator")) {
-            saveToRedis(JSON.parseArray(JSON.toJSONString(authenticatorDTO.getConfig()), AuthenticatorConfigDTO.class));
+            saveToRedis(JSON.parseArray(JSON.toJSONString(authenticatorDTO.getConfig()), BasicAuthenticatorConfigDTO.class));
         }
         return authenticatorDTO;
     }
@@ -66,8 +67,8 @@ public class AuthenticatorServiceImpl implements AuthenticatorService {
         entity.setExist(false);
         repository.save(entity);
         if (entity.getAuthenticatorType().equals("BasicAuthenticator")) {
-            List<AuthenticatorConfigDTO> authenticatorConfigDTOS = JSONObject.parseArray(entity.getConfig(), AuthenticatorConfigDTO.class);
-            deleteFromRedis(authenticatorConfigDTOS);
+            List<BasicAuthenticatorConfigDTO> basicAuthenticatorConfigDTOS = JSONObject.parseArray(entity.getConfig(), BasicAuthenticatorConfigDTO.class);
+            deleteFromRedis(basicAuthenticatorConfigDTOS);
         }
     }
 
@@ -156,14 +157,18 @@ public class AuthenticatorServiceImpl implements AuthenticatorService {
         AuthenticatorDTO dto = new AuthenticatorDTO();
         dto.setName(entity.getName());
         dto.setAuthenticatorType(entity.getAuthenticatorType());
-        dto.setConfig(JSONObject.parseArray(entity.getConfig(), AuthenticatorConfigDTO.class));
+        if (entity.getAuthenticatorType().equals("BasicAuthenticator")) {
+            dto.setConfig(JSONObject.parseArray(entity.getConfig(), BasicAuthenticatorConfigDTO.class));
+        } else if (entity.getAuthenticatorType().equals("SignAuthenticator")) {
+            dto.setConfig(JSONObject.parseArray(entity.getConfig(), SignAuthenticatorConfigDTO.class));
+        }
         dto.setModuleId(entity.getModuleId());
         dto.setExist(entity.isExist());
         dto.setId(entity.getResourceKey());
         return dto;
     }
 
-    private void saveToRedis(List<AuthenticatorConfigDTO> dtos) {
+    private void saveToRedis(List<BasicAuthenticatorConfigDTO> dtos) {
         dtos.forEach(dto -> {
             if (dto.getIsStatic()) {
                 redisService.persistKey(DalaranConsoleConstants.REDIS_AUTHENTICATOR_KEY + dto.getAuthenticatorKey(), dto.getAuthenticatorValue());
@@ -173,7 +178,7 @@ public class AuthenticatorServiceImpl implements AuthenticatorService {
         });
     }
 
-    private void deleteFromRedis(List<AuthenticatorConfigDTO> dtos) {
+    private void deleteFromRedis(List<BasicAuthenticatorConfigDTO> dtos) {
         dtos.forEach(dto -> {
             if (dto.getIsStatic()) {
                 redisService.deleteKey(DalaranConsoleConstants.REDIS_AUTHENTICATOR_KEY + dto.getAuthenticatorKey());
