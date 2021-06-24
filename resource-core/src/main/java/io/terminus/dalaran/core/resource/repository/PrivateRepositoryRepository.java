@@ -9,9 +9,9 @@ import java.util.List;
 
 public interface PrivateRepositoryRepository extends JpaRepository<PrivateRepositoryEntity, Long>, JpaSpecificationExecutor<PrivateRepositoryEntity> {
 
-    PrivateRepositoryEntity findByResourceKeyAndVersion(String resourceKey, String version);
+    PrivateRepositoryEntity findByResourceKeyAndVersionAndIsExistTrue(String resourceKey, String version);
 
-    List<PrivateRepositoryEntity> findByResourceKey(String resourceKey);
+    List<PrivateRepositoryEntity> findByResourceKeyAndIsExistTrue(String resourceKey);
 
     PrivateRepositoryEntity findByNameAndType(String name, String type);
 

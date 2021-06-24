@@ -160,7 +160,7 @@ public class PrivateRepositoryServiceImpl implements PrivateRepositoryService {
         Page<PrivateRepositoryEntity> entities = privateResourceQueryService.paging(query, pageNumber, pageSize);
         Map<String, List<BasicResourceDTO>> resourceMap = new HashMap<>();
         for (PrivateRepositoryEntity entity: entities) {
-            List<PrivateRepositoryEntity> privateRepositoryList = privateRepository.findByResourceKey(entity.getResourceKey());
+            List<PrivateRepositoryEntity> privateRepositoryList = privateRepository.findByResourceKeyAndIsExistTrue(entity.getResourceKey());
             List<BasicResourceDTO> basicResourceList = new ArrayList<>();
             for (PrivateRepositoryEntity repositoryEntity: privateRepositoryList) {
                 BasicResourceDTO basicResource = new BasicResourceDTO();
@@ -326,7 +326,7 @@ public class PrivateRepositoryServiceImpl implements PrivateRepositoryService {
     public PrivateRepositoryDTO getResourceDetail(String id, String version) {
         PrivateRepositoryDTO privateRepositoryDTO = new PrivateRepositoryDTO();
         try {
-            PrivateRepositoryEntity entity = privateRepository.findByResourceKeyAndVersion(id, version);
+            PrivateRepositoryEntity entity = privateRepository.findByResourceKeyAndVersionAndIsExistTrue(id, version);
             BeanUtils.copyProperties(privateRepositoryDTO, entity);
             privateRepositoryDTO.setId(entity.getResourceKey());
             switch (entity.getType()) {

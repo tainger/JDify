@@ -45,7 +45,6 @@ import io.terminus.dalaran.core.resource.entity.common.PrivateRepositoryEntity;
 import io.terminus.dalaran.core.resource.entity.common.ProcessorEntity;
 import io.terminus.dalaran.core.resource.repository.ModuleRepository;
 import io.terminus.dalaran.core.resource.repository.PrivateRepositoryRepository;
-import io.terminus.dalaran.model.MessageModel;
 import io.terminus.dalaran.model.component.ProcessorRouteInfo;
 import io.terminus.dalaran.model.flow.FlowStatus;
 import io.terminus.dalaran.model.flow.TriggerFlow;
@@ -282,7 +281,7 @@ public class ExportServiceImpl implements ExportService {
         if(null !=  exportData.getPrivateRepositoryEntities()) {
             exportData.getPrivateRepositoryEntities().forEach(privateRepository -> {
                 privateRepository.setExist(true);
-               PrivateRepositoryEntity privateRepositoryEntity = privateRepositoryRepository.findByResourceKeyAndVersion(privateRepository.getResourceKey(), privateRepository.getVersion());
+               PrivateRepositoryEntity privateRepositoryEntity = privateRepositoryRepository.findByResourceKeyAndVersionAndIsExistTrue(privateRepository.getResourceKey(), privateRepository.getVersion());
                 if(null != privateRepositoryEntity) {
                     privateRepository.setId(privateRepositoryEntity.getId());
                 }else {
@@ -432,7 +431,7 @@ public class ExportServiceImpl implements ExportService {
                     entry.getValue().stream().map(item -> item.split("#")).forEach(split -> {
                         String resourceKey = split[0];
                         String version = split[1];
-                        PrivateRepositoryEntity privateRepositoryEntity = privateRepositoryRepository.findByResourceKeyAndVersion(resourceKey, version);
+                        PrivateRepositoryEntity privateRepositoryEntity = privateRepositoryRepository.findByResourceKeyAndVersionAndIsExistTrue(resourceKey, version);
                         privateRepositoryEntities.add(privateRepositoryEntity);
                     });
                     exportData.setPrivateRepositoryEntities(privateRepositoryEntities);

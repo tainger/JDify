@@ -1,5 +1,6 @@
 package io.terminus.dalaran.console.service.impl;
 
+import io.terminus.dalaran.console.model.TenantInfo;
 import io.terminus.dalaran.console.service.AuthorizeService;
 import io.terminus.dalaran.core.resource.property.PropertyService;
 import io.terminus.dalaran.model.DalaranAccount;
@@ -12,7 +13,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-
 
 @Service
 public class AuthorizeServiceImpl implements AuthorizeService {
@@ -42,5 +42,13 @@ public class AuthorizeServiceImpl implements AuthorizeService {
             userInfo.setUsername(propertyService.getTenantCode());
         }
         return userInfo;
+    }
+
+    @Override
+    public TenantInfo getCurrentTenant() {
+        TenantInfo tenantInfo = new TenantInfo();
+        tenantInfo.setName(propertyService.getTenantCode());
+        tenantInfo.setCode(propertyService.getTenantCode());
+        return tenantInfo;
     }
 }
