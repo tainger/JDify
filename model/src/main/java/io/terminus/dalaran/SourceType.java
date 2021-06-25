@@ -28,6 +28,9 @@ public class SourceType {
 
     public static final String SUB_FLOW = "dalaran_sub_flow";
 
+    public static final String NODE = "dalaran_node";
+
+
     public static final String PRIVATE_REPOSITORY = "dalaran_private_repository";
 
 }

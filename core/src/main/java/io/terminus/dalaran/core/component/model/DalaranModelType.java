@@ -12,7 +12,7 @@ public interface DalaranModelType<T, Schema extends DalaranModelSchema> {
 
     void toObject(ProcessorDefinition route, Schema schema);
 
-    String buildTemplateData(Map fields);
+    String buildTemplateData(Schema schemaStr);
 
     Schema buildSchemaFromTemplateData(String dataStr);
 

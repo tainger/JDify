@@ -145,6 +145,9 @@ public class ExportServiceImpl implements ExportService {
     @Autowired
     private PrivateResourceQueryService privateResourceQueryService;
 
+    @Autowired
+    private NodeRepository nodeRepository;
+
     // TODO 数据量暴多可能炸内存, 而且会涉及到清表, 所以事务也是个问题
     @Override
     @Transactional
@@ -290,6 +293,19 @@ public class ExportServiceImpl implements ExportService {
                 privateRepositoryRepository.save(privateRepository);
             });
         }
+
+        if(null !=  exportData.getNodeEntities()) {
+            exportData.getNodeEntities().forEach(item -> {
+                item.setExist(true);
+                NodeEntity nodeEntity = nodeRepository.findByResourceKey(item.getResourceKey());
+                if(null != nodeEntity) {
+                    item.setId(nodeEntity.getId());
+                }else {
+                    item.setId(null);
+                }
+                nodeRepository.save(item);
+            });
+        }
         // load test flow
         testFlowInitializer.start();
     }
@@ -382,7 +398,6 @@ public class ExportServiceImpl implements ExportService {
         }
         ExportData exportData = buildExportData(flowsCollector);
         exportData.setTriggerFlows(triggerFlowEntities);
-        exportData.setClients(clientRepository.findAll());
         return exportData;
     }
 
@@ -403,7 +418,15 @@ public class ExportServiceImpl implements ExportService {
                     break;
 
                 case SourceType.CONNECTOR:
-                    exportData.setConnectors(connectorRepository.findByResourceKeyIn(new ArrayList<>(entry.getValue())));
+                    Set<String> value = entry.getValue();
+                    List<ConnectorEntity> connectorEntityList = new ArrayList<>();
+                    List<String> idList = value.stream().map((item)->{
+                        ConnectorEntity connectorEntity = connectorRepository.findByResourceKey(item);
+                        connectorEntityList.add(connectorEntity);
+                       return connectorEntity.getNodeId();
+                    }).collect(Collectors.toList());
+                    exportData.setConnectors(connectorEntityList);
+                    exportData.setNodeEntities(nodeRepository.findByResourceKeyIn(idList));
                     break;
 
                 case SourceType.FUNCTION:
