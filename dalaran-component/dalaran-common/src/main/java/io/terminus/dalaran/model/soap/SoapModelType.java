@@ -1,6 +1,7 @@
 package io.terminus.dalaran.model.soap;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import io.terminus.dalaran.DalaranConstants;
@@ -45,13 +46,10 @@ public class SoapModelType implements DalaranModelType<String, SoapSchema> {
     }
 
     @Override
-    public String buildTemplateData(Map fields) {
-        SoapSchema schema = new SoapSchema();
-        schema.setFields(fields);
-        schema.setOperationConfig(new SoapSchemaOperation());
-        Object body = ModelUtils.buildBody(schema);
-        ObjectToSoapProcessor processor = new ObjectToSoapProcessor(schema);
-        ModelField field = schema.getFields().get(DalaranConstants.MODEL_ROOT);
+    public String buildTemplateData(SoapSchema soapSchema) {
+        Object body = ModelUtils.buildBody(soapSchema);
+        ObjectToSoapProcessor processor = new ObjectToSoapProcessor(soapSchema);
+        ModelField field = soapSchema.getFields().get(DalaranConstants.MODEL_ROOT);
         try {
             return processor.buildSoapBody(field, body);
         } catch (Exception e) {

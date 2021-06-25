@@ -1,6 +1,7 @@
 package io.terminus.dalaran.model;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import io.terminus.dalaran.core.component.annotation.ModelType;
 import io.terminus.dalaran.core.component.model.DalaranModelType;
 import io.terminus.dalaran.model.json.JsonMarshalPreProcessor;
@@ -29,10 +30,8 @@ public class JsonModelType implements DalaranModelType<String, JsonSchema> {
     }
 
     @Override
-    public String buildTemplateData(Map fields) {
-        JsonSchema schema = new JsonSchema();
-        schema.setFields(fields);
-        Object body = ModelUtils.buildBody(schema);
+    public String buildTemplateData(JsonSchema jsonSchema) {
+        Object body = ModelUtils.buildBody(jsonSchema);
         if (body != null) {
             return JSON.toJSONString(body);
         }

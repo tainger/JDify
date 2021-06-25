@@ -21,10 +21,7 @@ import io.terminus.dalaran.model.*;
 import io.terminus.dalaran.model.dto.ModelDTO;
 import io.terminus.dalaran.model.dto.basic.BasicModelInfo;
 import io.terminus.dalaran.model.query.ModelQuery;
-import io.terminus.dalaran.model.schema.CsvModelSchema;
-import io.terminus.dalaran.model.schema.DataTemplate;
-import io.terminus.dalaran.model.schema.JsonSchema;
-import io.terminus.dalaran.model.schema.SoapSchema;
+import io.terminus.dalaran.model.schema.*;
 import io.terminus.draco.web.autoconfig.context.UserContext;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
@@ -39,7 +36,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-
 import javax.transaction.Transactional;
 import java.io.InputStream;
 import java.util.*;
@@ -259,10 +255,27 @@ public class ModelManagementServiceImpl implements ModelManagementService {
     @Override
     public DalaranModelTemplate buildDataTemplate(DalaranModelSchema schema, String id) {
         ModelEntity model = modelRepository.findByResourceKey(id);
-       // Map fields = schema.getFields();
         DalaranModelTemplate dalaranModelTemplate = new DalaranModelTemplate();
-        DalaranModelSchema modelSchema = JSONObject.parseObject(model.getModelSchema(),DalaranModelSchema.class);
-        dalaranModelTemplate.setData(dalaranContext.getDalaranModelTypeContext().getModelType(model.getType()).buildTemplateData(modelSchema.getFields()));
+        String modelSchemaStr = model.getModelSchema();
+        DalaranModelSchema modelSchema = null;
+
+        switch (model.getType()){
+            case "SOAP":
+                modelSchema = JSONObject.parseObject(modelSchemaStr, SoapSchema.class);
+                break;
+            case "JSON":
+                modelSchema = JSONObject.parseObject(modelSchemaStr, JsonSchema.class);
+                break;
+
+            case "XML":
+                modelSchema = JSONObject.parseObject(modelSchemaStr, XMLSchema.class);
+                break;
+
+            case "CSV":
+                modelSchema = JSONObject.parseObject(modelSchemaStr, CsvModelSchema.class);
+                break;
+        }
+        dalaranModelTemplate.setData(dalaranContext.getDalaranModelTypeContext().getModelType(model.getType()).buildTemplateData(modelSchema));
         dalaranModelTemplate.setType(model.getType());
         return dalaranModelTemplate;
 //        Map<String, ModelField> modelField = schema.getFields();
@@ -276,9 +289,8 @@ public class ModelManagementServiceImpl implements ModelManagementService {
 
     @Override
     public DalaranModelTemplate buildSwaggerDataTemplate(DalaranModelSchema schema, String type) {
-        Map fields = schema.getFields();
         DalaranModelTemplate dalaranModelTemplate = new DalaranModelTemplate();
-        dalaranModelTemplate.setData(dalaranContext.getDalaranModelTypeContext().getModelType(type).buildTemplateData(fields));
+        dalaranModelTemplate.setData(dalaranContext.getDalaranModelTypeContext().getModelType(type).buildTemplateData(schema));
         dalaranModelTemplate.setType(type);
         return dalaranModelTemplate;
     }

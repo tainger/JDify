@@ -22,4 +22,5 @@ public class ExportData {
     private List<AuthenticatorEntity> authenticatorEntities;
     private List<LimiterEntity> limiterEntities;
     private List<PrivateRepositoryEntity> privateRepositoryEntities;
+    private List<NodeEntity> nodeEntities;
 }

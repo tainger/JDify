@@ -30,9 +30,7 @@ public class XMLModelType implements DalaranModelType<String, XMLSchema> {
     }
 
     @Override
-    public String buildTemplateData(Map fields) {
-        XMLSchema schema = new XMLSchema();
-        schema.setFields(fields);
+    public String buildTemplateData(XMLSchema schema) {
         Object body = ModelUtils.buildBody(schema);
         if (body != null) {
             return JSON.toJSONString(body);

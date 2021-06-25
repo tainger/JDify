@@ -10,6 +10,7 @@ import io.terminus.dalaran.core.resource.redis.RedisUtil;
 import io.terminus.dalaran.core.resource.repository.ReleaseRecordRepository;
 import io.terminus.dalaran.model.alarm.AlarmRuleConfig;
 import io.terminus.dalaran.model.alarm.NoticeMessage;
+import lombok.extern.flogger.Flogger;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import javax.annotation.PostConstruct;
@@ -45,9 +46,7 @@ public class DefaultAlarmManager implements AlarmManager {
                 try {
                     noticeMessage = redisService.pop(RedisUtil.getNoticeQueue(), NoticeMessage.class);
                     handle(noticeMessage);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                } catch (Exception ignored) { }
             }
         }).start();
     }

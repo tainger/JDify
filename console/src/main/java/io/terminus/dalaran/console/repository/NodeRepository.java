@@ -12,4 +12,5 @@ public interface NodeRepository extends JpaRepository<NodeEntity, Long>, JpaSpec
 
     List<NodeEntity> findByIsExistTrue();
 
+    List<NodeEntity> findByResourceKeyIn(List<String> resourceKeys);
 }
