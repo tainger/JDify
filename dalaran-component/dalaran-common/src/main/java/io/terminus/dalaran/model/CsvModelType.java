@@ -1,6 +1,7 @@
 package io.terminus.dalaran.model;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Lists;
 import io.terminus.dalaran.core.component.annotation.ModelType;
 import io.terminus.dalaran.core.component.model.DalaranModelType;
@@ -195,10 +196,8 @@ public class CsvModelType implements DalaranModelType<String, CsvModelSchema> {
     }
 
     @Override
-    public String buildTemplateData(Map fields) {
-        CsvModelSchema schema = new CsvModelSchema();
-        schema.setFields(fields);
-        Object body = ModelUtils.buildBody(schema);
+    public String buildTemplateData(CsvModelSchema csvModelSchema ) {
+        Object body = ModelUtils.buildBody(csvModelSchema);
         if (body != null) {
             return JSON.toJSONString(body);
         }

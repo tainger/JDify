@@ -208,22 +208,20 @@ public class ReleasedFlowInitializer implements DalaranStarter {
 
     private void buildForAlarmInfo(List<TriggerFlowReleasedEntity> triggerFlowReleasedEntities) {
         Map<String, Object> time = new HashMap<>();
-        List<Map<String, Object>> flowInfos = new ArrayList<>();
         for (TriggerFlowReleasedEntity triggerFlowReleasedEntity : triggerFlowReleasedEntities) {
             if (triggerFlowReleasedEntity.isExist() && triggerFlowReleasedEntity.isTracing() && triggerFlowReleasedEntity.isOnline()) {
                 String originId = triggerFlowReleasedEntity.getOriginId();
-                String name = triggerFlowReleasedEntity.getName();
                 String triggerConfig = triggerFlowReleasedEntity.getTriggerConfig();
                 JSONObject triggerConfigJSON = JSONObject.parseObject(triggerConfig);
-                Long timeout = Long.valueOf((String) (triggerConfigJSON.get("timeout")));
-                Map<String, Object> flowInfo = new HashMap<>();
-                flowInfo.put("name", name);
-                flowInfo.put("timeout", timeout);
-                flowInfo.put("id", originId);
-                flowInfos.add(flowInfo);
-                time.put(originId, timeout);
+                Object timeout = triggerConfigJSON.get("timeout");
+                if(timeout instanceof Integer) {
+                    time.put(originId, timeout);
+                }
+
+                if(timeout instanceof String){
+                    time.put(originId, Integer.parseInt((String) timeout) );
+                }
                 redisService.persistKey(RedisUtil.getReleasedFlowIdsTimeOut(), JSONObject.toJSONString(time));
-                redisService.persistKey(RedisUtil.getReleasedFlowIdsKey(), JSONObject.toJSONString(flowInfos));
             }
         }
     }

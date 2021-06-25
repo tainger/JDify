@@ -59,6 +59,7 @@ public class DefaultJpaDalaranTraceLogger implements DalaranTraceLogger {
                     tracingLog.setVersion(getCurrentVersion());
                     tracingLogRepository.save(toEntity(tracingLog));
                     NoticeMessage noticeMessage = alarmCount(tracingLog);
+                    log.error("统计出的报警:{}", noticeMessage);
                     if(null != noticeMessage) {
                         defaultAlarmManager.alarm(noticeMessage);
                     }
@@ -77,7 +78,6 @@ public class DefaultJpaDalaranTraceLogger implements DalaranTraceLogger {
             }
             String format = simpleDateFormat.format(tracingLog.getTimestamp());
             AlarmRuleConfig alarmRuleConfig = JSONObject.parseObject(value, AlarmRuleConfig.class);
-
             long failureCount = 0;
             if (!tracingLog.isSuccessful()) {
                 failureCount = redisService.incrKey(
@@ -96,30 +96,30 @@ public class DefaultJpaDalaranTraceLogger implements DalaranTraceLogger {
                         RedisUtil.getTimeOutKey(tracingLog.getFlowId(), format)
                 );
             }
-
-            //报警的延时
             if(null != redisService.getValue(RedisUtil.getIsHaveAlarmed(tracingLog.getFlowId()))) {
                 return null;
             }
 
             Long failureFrequency = alarmRuleConfig.getFailureAlarm().getFailureFrequency();
             Long elapsedFrequency = alarmRuleConfig.getTimeOutAlarm().getElapsedFrequency();
-            if (failureFrequency <= failureCount && elapsedFrequency <= timeOutCount) {
+            if (failureFrequency > failureCount && elapsedFrequency >timeOutCount) {
                 return null;
             }
             NoticeMessage noticeMessage = new NoticeMessage();
-            if (failureFrequency >= failureCount) {
+            if (failureFrequency <=  failureCount) {
                 noticeMessage.setTouchFailureAlarm(true);
             }
             noticeMessage.setFailureCount(failureCount);
             noticeMessage.setFailureFrequency(failureFrequency);
-            if (elapsedFrequency >= timeOutCount) {
+            if (elapsedFrequency <= timeOutCount) {
                 noticeMessage.setTouchTimeOutAlarm(true);
             }
             noticeMessage.setTimeOutCount(timeOutCount);
             noticeMessage.setTimeOutFrequency(elapsedFrequency);
             noticeMessage.setCreateDate(format);
-            redisService.setValueMinutes(RedisUtil.getIsHaveAlarmed(tracingLog.getFlowId()),"1", propertyService.getInterval());
+            noticeMessage.setFlowId(tracingLog.getFlowId());
+            noticeMessage.setAlarmChannel(alarmRuleConfig.getAlarmChannel());
+            redisService.setValueMinutes(RedisUtil.getIsHaveAlarmed(tracingLog.getFlowId()),"$", propertyService.getInterval());
             return noticeMessage;
         }
         return null;
@@ -141,12 +141,12 @@ public class DefaultJpaDalaranTraceLogger implements DalaranTraceLogger {
     private String getAlarmConfigIfAlarmConfigKey(String flowId) {
         String alarmRuleId = redisService.getValue(RedisUtil.getAlarmConfigKey(flowId));
         if (alarmRuleId == null) {
-            throw new RuntimeException("流程id关联报警规则id不存在!");
+            return null;
         }
         String alarmConfig = redisService.getValue(RedisUtil.getAlarmRuleKey(alarmRuleId));
         if (alarmConfig == null) {
             redisService.deleteKey(RedisUtil.getAlarmConfigKey(flowId));
-            throw new RuntimeException("报警规则id对应的报警不存在!");
+           return null;
         }
         return alarmConfig;
     }

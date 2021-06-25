@@ -1,11 +1,13 @@
 package io.terminus.dalaran.model;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import io.terminus.dalaran.DalaranConstants;
 import io.terminus.dalaran.core.component.annotation.ModelType;
 import io.terminus.dalaran.core.component.model.DalaranModelType;
 import io.terminus.dalaran.model.schema.DataTemplate;
 import io.terminus.dalaran.model.schema.ObjectSchema;
+import io.terminus.dalaran.model.schema.SoapSchema;
 import io.terminus.dalaran.model.utils.ModelUtils;
 import org.apache.camel.model.ProcessorDefinition;
 import org.apache.commons.lang3.StringUtils;
@@ -25,10 +27,8 @@ public class ObjectModelType implements DalaranModelType<Object, ObjectSchema> {
     }
 
     @Override
-    public String buildTemplateData(Map fields) {
-        ObjectSchema schema = new ObjectSchema();
-        schema.setFields(fields);
-        Object body = ModelUtils.buildBody(schema);
+    public String buildTemplateData(ObjectSchema objectSchema) {
+        Object body = ModelUtils.buildBody(objectSchema);
         if (body != null) {
             return JSON.toJSONString(body);
         }
