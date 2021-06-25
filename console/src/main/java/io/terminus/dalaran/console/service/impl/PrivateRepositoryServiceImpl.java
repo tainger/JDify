@@ -28,6 +28,7 @@ import io.terminus.dalaran.model.dto.flow.SubFlowDTO;
 import io.terminus.dalaran.model.market.ResourceFile;
 import io.terminus.dalaran.model.query.PrivateRepositoryQuery;
 import io.terminus.dalaran.model.query.ResourceQuery;
+import io.terminus.draco.web.autoconfig.context.UserContext;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.collections4.CollectionUtils;
@@ -38,9 +39,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
@@ -199,10 +198,16 @@ public class PrivateRepositoryServiceImpl implements PrivateRepositoryService {
 
     @Override
     public List<ResourceGroupDTO> listResourceGroup() {
-        List<ResourceGroupDTO> responseEntity = restTemplate.getForObject(
-                propertyService.getMarketHost() + propertyService.getResourceGroup(),
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        if (UserContext.getUserInfo() != null) {
+            headers.add(HttpHeaders.COOKIE, System.getenv("LOGIN_SHARE_COOKIE_NAME") + "=" + UserContext.getCookies().get(System.getenv("LOGIN_SHARE_COOKIE_NAME")));
+        }
+        HttpEntity httpEntity = new HttpEntity(headers);
+        ResponseEntity<List> responseEntity = restTemplate.exchange(
+                propertyService.getMarketHost() + propertyService.getResourceGroup(), HttpMethod.GET, httpEntity,
                 List.class);
-        return responseEntity;
+        return responseEntity.getBody();
     }
 
     @Override
@@ -364,6 +369,9 @@ public class PrivateRepositoryServiceImpl implements PrivateRepositoryService {
             BeanUtils.copyProperties(privateResource, basicResource);
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
+            if (UserContext.getUserInfo() != null) {
+                headers.add(HttpHeaders.COOKIE, System.getenv("LOGIN_SHARE_COOKIE_NAME") + "=" + UserContext.getCookies().get(System.getenv("LOGIN_SHARE_COOKIE_NAME")));
+            }
             HttpEntity<PrivateRepositoryDTO> request = new HttpEntity<>(privateResource, headers);
             return restTemplate.postForObject(propertyService.getMarketHost() + propertyService.getMarketUpload(), request, BasicResponse.class);
         } catch (Exception e) {

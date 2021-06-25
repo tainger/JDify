@@ -32,7 +32,7 @@ public class DalaranRestExceptionHandler {
             message.setCode(((DalaranThrowable) ex).getCode());
             message.setLocalMessage(i18nUtils.getExceptionMessage(message.getCode()));
             message.setExceptionMessage(ex.getMessage());
-            message.setCause(ex.getCause().toString());
+            message.setCause(String.valueOf(ex.getCause()));
         } else {
             OnException exceptionMessage = method.getMethodAnnotation(OnException.class);
             if (exceptionMessage != null) {
@@ -45,7 +45,7 @@ public class DalaranRestExceptionHandler {
                 response.setStatus(500);
                 message.setLocalMessage(ex.getMessage());
                 message.setExceptionMessage(ex.getMessage());
-                message.setCause(ex.getCause().toString());
+                message.setCause(String.valueOf(ex.getCause()));
             }
         }
         return message;

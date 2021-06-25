@@ -1,5 +1,8 @@
 package io.terminus.dalaran.console.filter;
 
+import io.terminus.draco.web.autoconfig.context.UserContext;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.*;
@@ -20,6 +23,9 @@ public class CORSFilter implements Filter {
         HttpServletRequest req = (HttpServletRequest) request;
         if (req.getMethod().equals("OPTIONS")) {
             resp.setStatus(200);
+            if (UserContext.getUserInfo() != null) {
+                resp.setHeader(HttpHeaders.SET_COOKIE, StringUtils.substring(UserContext.getCookies().toString(), 1, UserContext.getCookies().toString().length() - 1));
+            }
             resp.flushBuffer();
         } else {
             chain.doFilter(request, response);
