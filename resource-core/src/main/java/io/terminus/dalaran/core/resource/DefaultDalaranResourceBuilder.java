@@ -64,7 +64,6 @@ public class DefaultDalaranResourceBuilder implements DalaranResourceBuilder {
 
     @Override
     public TriggerFlow buildTriggerFlow(TriggerFlowAbstractEntity triggerFlowEntity) {
-
         TriggerFlow flow = new TriggerFlow();
         TriggerInfo triggerInfo = componentContext.getTriggerInfo(triggerFlowEntity.getTriggerType());
         buildFlow(flow, triggerFlowEntity);
