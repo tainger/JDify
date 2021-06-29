@@ -10,6 +10,8 @@ import org.apache.camel.util.AsyncProcessorHelper;
 import org.apache.camel.util.CamelLogger;
 import org.apache.commons.lang3.StringUtils;
 import io.terminus.dalaran.core.cache.*;
+
+import java.util.Arrays;
 import java.util.concurrent.ScheduledExecutorService;
 
 import static io.terminus.dalaran.DalaranConstants.*;
@@ -68,7 +70,7 @@ public class TracingErrorHandlerFactory extends DefaultErrorHandlerBuilder imple
             super.process(exchange, callback);
             // TODO 当执行发成异常时, 记录未持久化的日志
             if (exchange.getException() != null) {
-                String body = exchange.getException().toString();
+                String body = exchange.getException().toString() + "\n" + Arrays.toString(exchange.getException().getStackTrace());
                 log(exchange, FLOW_TRACING_LOG, body);
                 log(exchange, TEST_FLOW_TRACING_LOG, body);
                 log(exchange, TEST_SUB_FLOW_TRACING_LOG, body);

@@ -20,7 +20,7 @@ public class DalaranMailSenderConfig implements ConnectorConfig<MailConnector> {
 //    @ConfigFieldInfo(label = "收件人(逗号分隔)", inputType = FieldInputType.Switch, defaultValue = "false")
     private boolean dynamicAddress;
 
-    @ConfigFieldInfo(label = "收件人(逗号分隔)", inputType = FieldInputType.String, required = false)
+    @ConfigFieldInfo(label = "收件人(逗号分隔)", inputType = FieldInputType.String)
     private String sendTo;
 
     @ConfigFieldInfo(label = "抄送人(逗号分隔)", inputType = FieldInputType.String, required = false)
