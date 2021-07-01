@@ -249,17 +249,6 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext {
                 }
             }
 
-            Class authenticatorType = getConfigType(triggerAnnotation.configType(), AuthenticatorConfig.class);
-            if (authenticatorType != null) {
-                Authenticator authenticator = (Authenticator) authenticatorType.getDeclaredAnnotation(Authenticator.class);
-                if (authenticator != null) {
-                    AuthenticatorInfo authenticatorInfo = buildAuthenticatorInfo(authenticatorType, authenticator, triggerType);
-                    triggerInfo.setAuthenticatorInfo(authenticatorInfo);
-                    triggerInfo.setAuthenticatorType(authenticator.value());
-                }
-            }
-
-
             if (trigger instanceof DalaranTriggerApiDocExport) {
                 triggerInfo.setApiDocs(true);
             }
