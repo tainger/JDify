@@ -59,7 +59,6 @@ public class DefaultJpaDalaranTraceLogger implements DalaranTraceLogger {
                     tracingLog.setVersion(getCurrentVersion());
                     tracingLogRepository.save(toEntity(tracingLog));
                     NoticeMessage noticeMessage = alarmCount(tracingLog);
-                    log.error("统计出的报警:{}", noticeMessage);
                     if(null != noticeMessage) {
                         defaultAlarmManager.alarm(noticeMessage);
                     }

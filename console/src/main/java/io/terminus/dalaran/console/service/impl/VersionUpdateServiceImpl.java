@@ -27,15 +27,14 @@ import io.terminus.dalaran.core.resource.DalaranResourceBuilder;
 import io.terminus.dalaran.core.resource.entity.common.ModuleEntity;
 import io.terminus.dalaran.core.resource.entity.common.ProcessorEntity;
 import io.terminus.dalaran.core.resource.repository.ModuleRepository;
-import io.terminus.dalaran.model.component.ProcessorRouteInfo;
 import io.terminus.dalaran.model.soap.model.SoapOperationConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -127,16 +126,16 @@ public class VersionUpdateServiceImpl implements VersionUpdateService {
 
         List<ClientEntity> clientEntityList = clientRepository.findAll();
         clientEntityList.forEach(clientEntity -> {
-            if(StringUtils.isNotBlank(clientEntity.getResourceKey())) {
+            if (StringUtils.isNotBlank(clientEntity.getResourceKey())) {
                 return;
             }
-            clientEntity.setResourceKey(clientEntity.getResourceKey());
+            clientEntity.setResourceKey(String.valueOf(clientEntity.getId()));
             clientRepository.save(clientEntity);
         });
 
         List<LimiterEntity> limiterEntities = limiterRepository.findAll();
         limiterEntities.forEach(limiterEntity -> {
-            if(StringUtils.isNotBlank(limiterEntity.getResourceKey())) {
+            if (StringUtils.isNotBlank(limiterEntity.getResourceKey())) {
                 return;
             }
             limiterEntity.setResourceKey(limiterEntity.getResourceKey());
@@ -231,111 +230,74 @@ public class VersionUpdateServiceImpl implements VersionUpdateService {
         String processorEntityType = processorEntity.getType();
         Class processorConfigType = getProcessorConfig(processorEntityType);
         String processorEntityConfig = processorEntity.getConfig();
+        processorEntity.setGroup("Basic");
+        processorEntity.setVersion("1.0.0");
+
         Object processorConfig = JSONObject.parseObject(processorEntityConfig, processorConfigType);
-        Map<String, Object> jsonObject = JSONObject.parseObject(processorEntityConfig, Map.class);
+        JSONObject dataJSON = JSONObject.parseObject(processorEntityConfig);
+
 
         if (processorConfig instanceof RetryConfig) {
-            List<ProcessorRouteInfo> pipeline = ((RetryConfig) processorConfig).getPipeline();
-            for (ProcessorRouteInfo processorRouteInfo : pipeline) {
-                ProcessorEntity transformProcessorEntity = new ProcessorEntity();
-                BeanUtils.copyProperties(processorRouteInfo, transformProcessorEntity);
-                handleProcessor(transformProcessorEntity);
-                BeanUtils.copyProperties(transformProcessorEntity, processorRouteInfo);
-            }
-            return;
+            //特殊化处理
+            JSONArray jsonArray = (JSONArray) dataJSON.get("pipeline");
+            handleJsonArray(jsonArray);
         }
 
-        if (processorConfig instanceof ScatterGatherConfig) {
-            List<ScatterGatherConfig.Branch> branches = ((ScatterGatherConfig) processorConfig).getBranches();
-            for (ScatterGatherConfig.Branch branch : branches) {
-                List<ProcessorRouteInfo> branchPipeline = branch.getPipeline();
-                if(CollectionUtils.isNotEmpty(branchPipeline)) {
-                    for (ProcessorRouteInfo processorRouteInfo : branchPipeline) {
-                        ProcessorEntity branchProcessor = new ProcessorEntity();
-                        BeanUtils.copyProperties(processorRouteInfo, branchProcessor);
-                        handleProcessor(branchProcessor);
-                        BeanUtils.copyProperties(branchProcessor, processorRouteInfo);
-                    }
-                }
-            }
-            return;
+        if (processorConfig instanceof ForEachConfig) {
+            //特殊化处理
+            JSONArray jsonArray = (JSONArray) dataJSON.get("pipeline");
+            handleJsonArray(jsonArray);
         }
-
 
         if (processorConfig instanceof LoopWhileConfig) {
-            LoopWhileConfig loopWhileConfig = (LoopWhileConfig) processorConfig;
-            List<ProcessorRouteInfo> loopWhilePipeline = loopWhileConfig.getPipeline();
-            if(CollectionUtils.isNotEmpty(loopWhilePipeline)) {
-                for (ProcessorRouteInfo processorRouteInfo : loopWhilePipeline) {
-                    ProcessorEntity loopWhileProcessorEntity = new ProcessorEntity();
-                    BeanUtils.copyProperties(processorRouteInfo, loopWhileProcessorEntity);
-                    handleProcessor(loopWhileProcessorEntity);
-                    BeanUtils.copyProperties(loopWhileProcessorEntity, processorRouteInfo);
-                }
-            }
-            return;
+            JSONArray jsonArray = (JSONArray) dataJSON.get("pipeline");
+            handleJsonArray(jsonArray);
         }
 
         if (processorConfig instanceof ServiceOperationConfig) {
             ServiceOperationConfig serviceOperationConfig = ((ServiceOperationConfig) processorConfig);
-            String serviceId = String.valueOf(jsonObject.get("serviceId"));
+            String serviceId = String.valueOf(dataJSON.get("serviceId"));
             serviceOperationConfig.setServiceId(serviceId);
+            dataJSON.put("serviceId", check(dataJSON.get("serviceId")));
         }
 
-        if (processorConfig instanceof ForEachConfig) {
-            List<ProcessorRouteInfo> pipeline = ((ForEachConfig) processorConfig).getPipeline();
-            if(CollectionUtils.isNotEmpty(pipeline)) {
-                for (ProcessorRouteInfo processorRouteInfo : pipeline) {
-                    ProcessorEntity loopWhileProcessorEntity = new ProcessorEntity();
-                    BeanUtils.copyProperties(processorRouteInfo, loopWhileProcessorEntity);
-                    handleProcessor(loopWhileProcessorEntity);
-                    BeanUtils.copyProperties(loopWhileProcessorEntity, processorRouteInfo);
-                }
+
+        if (processorConfig instanceof ScatterGatherConfig) {
+            JSONArray jsonArray = (JSONArray) dataJSON.get("branches");
+            for (Object o : jsonArray) {
+                JSONObject jsonObject = (JSONObject) o;
+                JSONArray pipeline = (JSONArray) jsonObject.get("pipeline");
+                handleJsonArray(pipeline);
             }
-            return;
         }
 
 
         if (processorConfig instanceof ErrorCatchConfig) {
-            List<ErrorCatchConfig.Route> routes = ((ErrorCatchConfig) processorConfig).getRoutes();
-            if(CollectionUtils.isNotEmpty(routes)) {
-                for (ErrorCatchConfig.Route route : routes) {
-                    List<ProcessorRouteInfo> pipeline = route.getPipeline();
-                    for (ProcessorRouteInfo processorRouteInfo : pipeline) {
-                        ProcessorEntity errorProcessorEntity = new ProcessorEntity();
-                        BeanUtils.copyProperties(processorRouteInfo, errorProcessorEntity);
-                        handleProcessor(errorProcessorEntity);
-                        BeanUtils.copyProperties(errorProcessorEntity, processorRouteInfo);
-                    }
-                }
+            JSONArray jsonArray = (JSONArray) dataJSON.get("routes");
+            for (Object o : jsonArray) {
+                JSONObject jsonObject = (JSONObject) o;
+                JSONArray pipeline = (JSONArray) jsonObject.get("pipeline");
+                handleJsonArray(pipeline);
             }
-            return;
+
         }
 
 
         if (processorConfig instanceof DalaranRouterConfig) {
-            List<DalaranRouterConfig.Route> routes = ((DalaranRouterConfig) processorConfig).getRoutes();
-            if(CollectionUtils.isNotEmpty(routes)) {
-                for (DalaranRouterConfig.Route route : routes) {
-                    List<ProcessorRouteInfo> pipeline = route.getPipeline();
-                    for (ProcessorRouteInfo processorRouteInfo : pipeline) {
-                        ProcessorEntity processorEntityRoute = new ProcessorEntity();
-                        BeanUtils.copyProperties(processorRouteInfo, processorEntityRoute);
-                        handleProcessor(processorEntityRoute);
-                        BeanUtils.copyProperties(processorEntityRoute, processorRouteInfo);
-                    }
-                }
+            JSONArray jsonArray = (JSONArray) dataJSON.get("routes");
+            for (Object o : jsonArray) {
+                JSONObject jsonObject = (JSONObject) o;
+                JSONArray pipeline = (JSONArray) jsonObject.get("pipeline");
+                handleJsonArray(pipeline);
             }
-            return;
         }
 
 
         if (processorConfig instanceof DalaranMapperConfig) {
-
             DalaranMapperConfig dalaranMapperConfig = (DalaranMapperConfig) processorConfig;
             HashMap<String, SimpleMapping> messageMappingMap = dalaranMapperConfig.getMessageMapping();
-            JSONObject messageMappingMapJsonObject = (JSONObject) jsonObject.get("messageMapping");
-            if(null != messageMappingMap && null != messageMappingMapJsonObject && !messageMappingMap.isEmpty()&& !messageMappingMapJsonObject.isEmpty()) {
+            JSONObject messageMappingMapJsonObject = (JSONObject) dataJSON.get("messageMapping");
+            if (null != messageMappingMap && null != messageMappingMapJsonObject && !messageMappingMap.isEmpty() && !messageMappingMapJsonObject.isEmpty()) {
                 for (Map.Entry<String, SimpleMapping> entry : messageMappingMap.entrySet()) {
                     String key = entry.getKey();
                     SimpleMapping simpleMapping = entry.getValue();
@@ -345,14 +307,17 @@ public class VersionUpdateServiceImpl implements VersionUpdateService {
                             continue;
                         }
                         JSONObject simpleMappingJSONObject = (JSONObject) messageMappingMapJsonObject.get(key);
-                        mappingFunction.setId(String.valueOf(simpleMappingJSONObject.get("id")));
+                        simpleMappingJSONObject.put("id", check(simpleMappingJSONObject.get("id")));
+                        JSONObject rightRelation = (JSONObject) simpleMappingJSONObject.get("value");
+                        rightRelation.put("id", check(rightRelation.get("id")));
+
                     }
                 }
             }
 
             List<SimpleMapping> noDestinationMappings = dalaranMapperConfig.getNoDestinationMappings();
             if (CollectionUtils.isNotEmpty(noDestinationMappings)) {
-                JSONArray noDestinationMappingsJsonObject = (JSONArray) jsonObject.get("noDestinationMappings");
+                JSONArray noDestinationMappingsJsonObject = (JSONArray) dataJSON.get("noDestinationMappings");
                 int i = 0;
                 for (SimpleMapping simpleMapping : noDestinationMappings) {
                     i++;
@@ -371,37 +336,103 @@ public class VersionUpdateServiceImpl implements VersionUpdateService {
         }
 
         if (processorConfig instanceof AllModelConfig) {
-            AllModelConfig allModelConfig = (AllModelConfig) processorConfig;
-            allModelConfig.setInModelId(String.valueOf(jsonObject.get("inModelId")));
-            allModelConfig.setOutModelId(String.valueOf(jsonObject.get("outModelId")));
+            dataJSON.put("inModelId", check(dataJSON.get("inModelId")));
+            dataJSON.put("outModelId", check(dataJSON.get("outModelId")));
         }
 
         if (processorConfig instanceof InModelConfig) {
-            InModelConfig inModelConfig = (InModelConfig) processorConfig;
-            inModelConfig.setInModelId(String.valueOf(jsonObject.get("inModelId")));
+            dataJSON.put("inModelId", check(dataJSON.get("inModelId")));
         }
 
         if (processorConfig instanceof OutModelConfig) {
-            OutModelConfig outModelConfig = (OutModelConfig) processorConfig;
-            outModelConfig.setOutModelId(String.valueOf(jsonObject.get("outModelId")));
+            dataJSON.put("outModelId", check(dataJSON.get("outModelId")));
         }
         if (processorConfig instanceof ConnectorConfig) {
-            ConnectorConfig connector = (ConnectorConfig) processorConfig;
-            connector.setConnectorId(String.valueOf(jsonObject.get("connectorId")));
+            dataJSON.put("connectorId", check(dataJSON.get("connectorId")));
         }
 
-
         if (processorConfig instanceof AuthenticatorConfig) {
-            AuthenticatorConfig authenticatorConfig = (AuthenticatorConfig) processorConfig;
-            authenticatorConfig.setAuthenticatorId(String.valueOf(jsonObject.get("authenticatorId")));
+            dataJSON.put("authenticatorId", check(dataJSON.get("authenticatorId")));
         }
 
         if (processorConfig instanceof LimiterConfig) {
-            LimiterConfig limiterConfig = (LimiterConfig) processorConfig;
-            limiterConfig.setLimiterId(String.valueOf(jsonObject.get("limitId")));
+            dataJSON.put("limitId", check(dataJSON.get("limitId")));
         }
-        processorEntityConfig = JSONObject.toJSONString(processorConfig);
-        processorEntity.setConfig(processorEntityConfig);
+
+//        dataJSON.put("moduleId", check(dataJSON.get("moduleId")));
+        processorEntity.setConfig(JSONObject.toJSONString(dataJSON));
+    }
+
+    private void handleJsonArray(JSONArray jsonArray) {
+        for (Object o : jsonArray) {
+            JSONObject jsonObject = (JSONObject) o;
+            jsonObject.put("group", "Basic");
+            jsonObject.put("version", "1.0.0");
+            String type = (String) jsonObject.get("type");
+            Class processorConfigType = getProcessorConfig(type);
+            String config = JSONObject.toJSONString(jsonObject.get("config"));
+            Object processorConfig = JSONObject.parseObject(config, processorConfigType);
+            JSONObject dataJSON = JSONObject.parseObject(config);
+            if (processorConfig instanceof ForEachConfig) {
+                JSONArray pipeline = (JSONArray) dataJSON.get("pipeline");
+                handleJsonArray(pipeline);
+            }
+
+            if (processorConfig instanceof DalaranMapperConfig) {
+                DalaranMapperConfig dalaranMapperConfig = (DalaranMapperConfig) processorConfig;
+                HashMap<String, SimpleMapping> messageMappingMap = dalaranMapperConfig.getMessageMapping();
+                JSONObject messageMappingMapJsonObject = (JSONObject) dataJSON.get("messageMapping");
+                if (null != messageMappingMap && null != messageMappingMapJsonObject && !messageMappingMap.isEmpty() && !messageMappingMapJsonObject.isEmpty()) {
+                    for (Map.Entry<String, SimpleMapping> entry : messageMappingMap.entrySet()) {
+                        String key = entry.getKey();
+                        SimpleMapping simpleMapping = entry.getValue();
+                        if (simpleMapping.getMappingType() == MappingType.FUNCTION) {
+                            MappingFunction mappingFunction = (MappingFunction) simpleMapping.getValue();
+                            if (mappingFunction.getType() == FunctionType.STATIC) {
+                                continue;
+                            }
+                            JSONObject simpleMappingJSONObject = (JSONObject) messageMappingMapJsonObject.get(key);
+                            mappingFunction.setId(String.valueOf(simpleMappingJSONObject.get("id")));
+                        }
+                    }
+                }
+
+                dataJSON.put("inModelId", check(dataJSON.get("inModelId")));
+                dataJSON.put("outModelId", check(dataJSON.get("outModelId")));
+            }
+
+
+            if (processorConfig instanceof AllModelConfig) {
+                dataJSON.put("inModelId", check(dataJSON.get("inModelId")));
+                dataJSON.put("outModelId", check(dataJSON.get("outModelId")));
+            }
+
+            if (processorConfig instanceof InModelConfig) {
+                dataJSON.put("inModelId", check(dataJSON.get("inModelId")));
+            }
+
+            if (processorConfig instanceof OutModelConfig) {
+                dataJSON.put("outModelId", check(dataJSON.get("outModelId")));
+            }
+            if (processorConfig instanceof ConnectorConfig) {
+                dataJSON.put("connectorId", check(dataJSON.get("connectorId")));
+            }
+
+            if (processorConfig instanceof AuthenticatorConfig) {
+                dataJSON.put("authenticatorId", check(dataJSON.get("authenticatorId")));
+            }
+
+            if (processorConfig instanceof LimiterConfig) {
+                dataJSON.put("limitId", check(dataJSON.get("limitId")));
+            }
+
+            jsonObject.put("moduleId", check(jsonObject.get("moduleId")));
+            jsonObject.put("config", dataJSON);
+        }
+    }
+
+    private String check(Object id) {
+        return (null == id || "null".equals(id)) ? "" : String.valueOf(id);
     }
 
     private void handleTriggerConfig(TriggerFlowEntity flowEntity) {
@@ -412,33 +443,33 @@ public class VersionUpdateServiceImpl implements VersionUpdateService {
         Map map = JSONObject.parseObject(triggerConfig, Map.class);
         if (configObject instanceof AllModelConfig) {
             AllModelConfig allModelConfig = (AllModelConfig) configObject;
-            allModelConfig.setInModelId(String.valueOf(map.get("inModelId")));
-            allModelConfig.setOutModelId(String.valueOf(map.get("outModelId")));
+            allModelConfig.setInModelId(check(map.get("inModelId")));
+            allModelConfig.setOutModelId(check(map.get("outModelId")));
         }
 
         if (configObject instanceof InModelConfig) {
             InModelConfig inModelConfig = (InModelConfig) configObject;
-            inModelConfig.setInModelId(String.valueOf(map.get("inModelId")));
+            inModelConfig.setInModelId(check(map.get("inModelId")));
         }
 
         if (configObject instanceof OutModelConfig) {
             OutModelConfig outModelConfig = (OutModelConfig) configObject;
-            outModelConfig.setOutModelId(String.valueOf(map.get("outModelId")));
+            outModelConfig.setOutModelId(check(map.get("outModelId")));
         }
         if (configObject instanceof ConnectorConfig) {
             ConnectorConfig connector = (ConnectorConfig) configObject;
-            connector.setConnectorId(String.valueOf(map.get("connectorId")));
+            connector.setConnectorId(check(map.get("connectorId")));
         }
 
 
         if (configObject instanceof AuthenticatorConfig) {
             AuthenticatorConfig authenticatorConfig = (AuthenticatorConfig) configObject;
-            authenticatorConfig.setAuthenticatorId(String.valueOf(map.get("authenticatorId")));
+            authenticatorConfig.setAuthenticatorId(check(map.get("authenticatorId")));
         }
 
         if (configObject instanceof LimiterConfig) {
             LimiterConfig limiterConfig = (LimiterConfig) configObject;
-            limiterConfig.setLimiterId(String.valueOf(map.get("limitId")));
+            limiterConfig.setLimiterId(check(map.get("limitId")));
         }
         flowEntity.setTriggerConfig(JSONObject.toJSONString(configObject));
     }

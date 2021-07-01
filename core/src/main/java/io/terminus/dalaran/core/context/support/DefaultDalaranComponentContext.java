@@ -78,7 +78,7 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext {
     public ProcessorInfo getProcessorInfo(String group, String processorType, String version) {
         // TODO check null
         if (StringUtils.isNotBlank(group) && StringUtils.isNotBlank(version)) {
-            return groupProcessorInfo.get(group).get(processorType).get(version);
+                return groupProcessorInfo.get(group).get(processorType).get(version);
         } else {
             return processorInfoMapping.get(processorType);
         }
