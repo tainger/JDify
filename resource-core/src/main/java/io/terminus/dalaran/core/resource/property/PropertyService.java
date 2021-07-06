@@ -39,6 +39,9 @@ public class PropertyService {
     @Value("${noticeMessage.interval}")
     private Long interval;
 
+    @Value("${draco.user-info}")
+    private String userInfoUrl;
+
 
     private final String DALARAN_MARKET_UI = "DALARAN_MARKET_UI";
 
@@ -83,5 +86,13 @@ public class PropertyService {
 
     public Long getInterval() {
         return interval;
+    }
+
+    public String getUserInfoUrl() {
+        return userInfoUrl;
+    }
+
+    public void setUserInfoUrl(String userInfoUrl) {
+        this.userInfoUrl = userInfoUrl;
     }
 }
