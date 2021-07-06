@@ -26,6 +26,7 @@ import lombok.val;
 import org.apache.camel.CamelContext;
 import org.apache.camel.builder.Builder;
 import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
@@ -416,7 +417,7 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
 
     private String resolveForStr(String text) {
         if (text.startsWith("\"")) {
-            text = text.replace("\\", "");
+            text = StringEscapeUtils.unescapeJava(text);
             text = text.substring(1);
             text = text.substring(0, text.length() - 1);
         }
