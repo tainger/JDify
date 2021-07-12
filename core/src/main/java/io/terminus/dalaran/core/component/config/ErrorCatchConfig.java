@@ -13,7 +13,7 @@ public class ErrorCatchConfig extends OutModelConfig {
     private List<Route> routes;
 
     @Data
-    public class Route {
+    public static class Route {
         private List<ProcessorRouteInfo> pipeline;
     }
 }

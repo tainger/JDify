@@ -5,10 +5,9 @@ import io.terminus.dalaran.DalaranConstants;
 import io.terminus.dalaran.component.authenticator.AuthenticatorBasic;
 import io.terminus.dalaran.component.authenticator.AuthenticatorConfigType;
 import io.terminus.dalaran.component.authenticator.AuthenticatorSign;
-import io.terminus.dalaran.config.ProcessorInfo;
-import io.terminus.dalaran.config.ServiceInfo;
-import io.terminus.dalaran.config.TriggerInfo;
+import io.terminus.dalaran.config.*;
 import io.terminus.dalaran.core.component.DalaranService;
+import io.terminus.dalaran.core.component.annotation.Authenticator;
 import io.terminus.dalaran.core.component.config.*;
 import io.terminus.dalaran.core.context.DalaranComponentContext;
 import io.terminus.dalaran.core.context.DalaranModelTypeContext;
@@ -17,6 +16,7 @@ import io.terminus.dalaran.core.resource.entity.*;
 import io.terminus.dalaran.core.resource.entity.basic.BasicFlowEntity;
 import io.terminus.dalaran.core.resource.entity.common.ProcessorEntity;
 import io.terminus.dalaran.core.resource.entity.released.ReleasedEntity;
+import io.terminus.dalaran.core.util.ConfigFieldUtils;
 import io.terminus.dalaran.model.DalaranModelSchema;
 import io.terminus.dalaran.model.MessageModel;
 import io.terminus.dalaran.model.component.ProcessorModel;
@@ -64,7 +64,6 @@ public class DefaultDalaranResourceBuilder implements DalaranResourceBuilder {
 
     @Override
     public TriggerFlow buildTriggerFlow(TriggerFlowAbstractEntity triggerFlowEntity) {
-
         TriggerFlow flow = new TriggerFlow();
         TriggerInfo triggerInfo = componentContext.getTriggerInfo(triggerFlowEntity.getTriggerType());
         buildFlow(flow, triggerFlowEntity);
@@ -96,18 +95,19 @@ public class DefaultDalaranResourceBuilder implements DalaranResourceBuilder {
             }
         }
 
-        if (config instanceof io.terminus.dalaran.core.component.config.AuthenticatorConfig) {
-            io.terminus.dalaran.core.component.config.AuthenticatorConfig authenticatorConfig = (io.terminus.dalaran.core.component.config.AuthenticatorConfig) config;
+        if (config instanceof AuthenticatorConfig) {
+            AuthenticatorConfig authenticatorConfig = (AuthenticatorConfig) config;
             String authenticatorId = authenticatorConfig.getAuthenticatorId();
             if (StringUtils.isNotBlank(authenticatorId)) {
-                Object authenticator = buildAuthenticatorConfig(authenticatorId, triggerInfo.getAuthenticatorInfo().getClassType());
+//                AuthenticatorInfo authenticatorInfo = buildAuthenticatorInfo(authenticatorId);
+                Object authenticator = buildAuthenticatorConfig(authenticatorId, AuthenticatorConfigType.class);
                 authenticatorConfig.setAuthenticator(authenticator);
             }
         }
-
-
         return flow;
     }
+
+
 
     @Override
     public SubFlow buildSubFlow(SubFlowAbstractEntity subFlowEntity) {
@@ -193,7 +193,6 @@ public class DefaultDalaranResourceBuilder implements DalaranResourceBuilder {
         return buildConfig(serviceEntity.getServiceConfig(), serviceInfo.getServiceConfigType());
     }
 
-
     private void buildFlow(BasicFlow flow, BasicFlowEntity flowEntity) {
         if (flowEntity instanceof ReleasedEntity) {
             flow.setId(String.valueOf(((ReleasedEntity) flowEntity).getOriginId()));
@@ -273,7 +272,7 @@ public class DefaultDalaranResourceBuilder implements DalaranResourceBuilder {
         if (type.equals("BasicAuthenticator")) {
             List<AuthenticatorBasic> configs = JSON.parseArray(replacedConfig, AuthenticatorBasic.class);
             authenticator.setConfig(configs);
-        } else if (type.equals("Sign")) {
+        } else if (type.equals("SignAuthenticator")) {
             List<AuthenticatorSign> configs = JSON.parseArray(replacedConfig, AuthenticatorSign.class);
             authenticator.setConfig(configs);
         }

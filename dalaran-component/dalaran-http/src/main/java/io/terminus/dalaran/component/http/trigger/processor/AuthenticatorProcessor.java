@@ -40,7 +40,7 @@ public class AuthenticatorProcessor implements Processor {
         Map<String, String> body = exchange.getIn().getBody(Map.class);
         if (authenticator.getType().equals("BasicAuthenticator")) {
             checkBasicAuthenticator(exchange, body);
-        } else if (authenticator.getType().equals("Sign")) {
+        } else if (authenticator.getType().equals("SignAuthenticator")) {
             checkSign(exchange, body);
         }
     }
@@ -57,9 +57,9 @@ public class AuthenticatorProcessor implements Processor {
                     return;
                 }
             }
-            if (StringUtils.equals(authenticatorBasic.getKeyLocation().name(), AuthenticatorKeyLocation.Header.name())) {
+            if (authenticatorBasic.getKeyLocation().name().equals(AuthenticatorKeyLocation.Header.name())) {
                 requestValue = exchange.getIn().getHeader(authenticatorBasic.getAuthenticatorKey(), String.class);
-            } else if (StringUtils.equals(authenticatorBasic.getKeyLocation().name(), AuthenticatorKeyLocation.QueryParam.name())) {
+            } else if (authenticatorBasic.getKeyLocation().name().equals(AuthenticatorKeyLocation.QueryParam.name())) {
                 requestValue = exchange.getIn().getHeader(authenticatorBasic.getAuthenticatorKey(), String.class);
             } else {
                 if (body != null) {
@@ -80,10 +80,10 @@ public class AuthenticatorProcessor implements Processor {
         authenticatorSigns.forEach(authenticatorSign -> {
             String appKey;
             String requestSign;
-            if (StringUtils.equals(authenticatorSign.getSignLocation().name(), AuthenticatorKeyLocation.Header.name())) {
+            if (authenticatorSign.getSignLocation().name().equals(AuthenticatorKeyLocation.Header.name())) {
                 appKey = exchange.getIn().getHeader(AUTH_APP_KEY, String.class);
                 requestSign = exchange.getIn().getHeader(AUTH_SIGN, String.class);
-            } else if (StringUtils.equals(authenticatorSign.getSignLocation().name(), AuthenticatorKeyLocation.QueryParam.name())) {
+            } else if (authenticatorSign.getSignLocation().name().equals(AuthenticatorKeyLocation.QueryParam.name())) {
                 appKey = exchange.getIn().getHeader(AUTH_APP_KEY, String.class);
                 requestSign = exchange.getIn().getHeader(AUTH_SIGN, String.class);
             } else {
@@ -94,7 +94,7 @@ public class AuthenticatorProcessor implements Processor {
                 stopExchangeOnMissingAppKey(exchange);
                 return;
             }
-            if (StringUtils.equals(appKey, authenticatorSign.getAppKey())) {
+            if (!appKey.equals(authenticatorSign.getAppKey())) {
                 stopExchangeOnInvalidAppKey(exchange);
                 return;
             }
@@ -121,10 +121,10 @@ public class AuthenticatorProcessor implements Processor {
         authenticatorSigns.forEach(authenticatorSign -> {
             String appKey;
             String requestSign;
-            if (StringUtils.equals(authenticatorSign.getSignLocation().name(), AuthenticatorKeyLocation.Header.name())) {
+            if (authenticatorSign.getSignLocation().name().equals(AuthenticatorKeyLocation.Header.name())) {
                 appKey = exchange.getIn().getHeader(AUTH_APP_KEY, String.class);
                 requestSign = exchange.getIn().getHeader(AUTH_SIGN, String.class);
-            } else if (StringUtils.equals(authenticatorSign.getSignLocation().name(), AuthenticatorKeyLocation.Body.name())) {
+            } else if (authenticatorSign.getSignLocation().name().equals(AuthenticatorKeyLocation.Body.name())) {
                 Map<String, String> body = exchange.getIn().getBody(Map.class);
                 appKey = body.get(AUTH_APP_KEY);
                 requestSign = body.get(AUTH_SIGN);
@@ -136,7 +136,7 @@ public class AuthenticatorProcessor implements Processor {
                 stopExchangeOnMissingAppKey(exchange);
                 return;
             }
-            if (StringUtils.equals(appKey, authenticatorSign.getAppKey())) {
+            if (!appKey.equals(authenticatorSign.getAppKey())) {
                 stopExchangeOnInvalidAppKey(exchange);
                 return;
             }
@@ -171,9 +171,9 @@ public class AuthenticatorProcessor implements Processor {
                         return;
                     }
                 }
-                if (StringUtils.equals(authenticatorBasic.getKeyLocation().name(), AuthenticatorKeyLocation.Header.name())) {
+                if (authenticatorBasic.getKeyLocation().name().equals(AuthenticatorKeyLocation.Header.name())) {
                     requestValue = exchange.getIn().getHeader(authenticatorBasic.getAuthenticatorKey(), String.class);
-                } else if (StringUtils.equals(authenticatorBasic.getKeyLocation().name(), AuthenticatorKeyLocation.Body.name())) {
+                } else if (authenticatorBasic.getKeyLocation().name().equals(AuthenticatorKeyLocation.Body.name())) {
                     Map<String, String> body = exchange.getIn().getBody(Map.class);
                     requestValue = body.get(authenticatorBasic.getAuthenticatorKey());
                 } else {
@@ -188,7 +188,7 @@ public class AuthenticatorProcessor implements Processor {
                 }
             });
             exchange.getOut().setBody(param);
-        } else if (authenticator.getType().equals("Sign")) {
+        } else if (authenticator.getType().equals("SignAuthenticator")) {
             checkGetSign(exchange, param);
         }
     }

@@ -78,7 +78,7 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext {
     public ProcessorInfo getProcessorInfo(String group, String processorType, String version) {
         // TODO check null
         if (StringUtils.isNotBlank(group) && StringUtils.isNotBlank(version)) {
-            return groupProcessorInfo.get(group).get(processorType).get(version);
+                return groupProcessorInfo.get(group).get(processorType).get(version);
         } else {
             return processorInfoMapping.get(processorType);
         }
@@ -248,17 +248,6 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext {
                     triggerInfo.setLimiterType(limiter.value());
                 }
             }
-
-            Class authenticatorType = getConfigType(triggerAnnotation.configType(), AuthenticatorConfig.class);
-            if (authenticatorType != null) {
-                Authenticator authenticator = (Authenticator) authenticatorType.getDeclaredAnnotation(Authenticator.class);
-                if (authenticator != null) {
-                    AuthenticatorInfo authenticatorInfo = buildAuthenticatorInfo(authenticatorType, authenticator, triggerType);
-                    triggerInfo.setAuthenticatorInfo(authenticatorInfo);
-                    triggerInfo.setAuthenticatorType(authenticator.value());
-                }
-            }
-
 
             if (trigger instanceof DalaranTriggerApiDocExport) {
                 triggerInfo.setApiDocs(true);

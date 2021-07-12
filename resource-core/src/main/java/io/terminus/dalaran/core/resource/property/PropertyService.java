@@ -84,4 +84,5 @@ public class PropertyService {
     public Long getInterval() {
         return interval;
     }
+
 }

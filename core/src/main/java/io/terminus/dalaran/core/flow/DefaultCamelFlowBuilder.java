@@ -26,6 +26,7 @@ import lombok.val;
 import org.apache.camel.CamelContext;
 import org.apache.camel.builder.Builder;
 import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
@@ -191,21 +192,19 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
             ProcessorInfo processorInfo = componentContext.getProcessorInfo(processorModel.getGroup(), processorModel.getType(), processorModel.getVersion());
             String json = JSONObject.toJSONString(processorModel.getConfig());
             JSONObject jsonObject;
-            if (json.startsWith("\"")) {
-                jsonObject = JSONObject.parseObject(processorModel.getConfig().toString());
-            } else {
-                jsonObject = JSONObject.parseObject(json);
+            while (json.startsWith("\"")) {
+                json = resolveForStr(json);
             }
+            jsonObject = JSONObject.parseObject(json);
             if (jsonObject.containsKey("routes")) {
                 List<RoutesModel> routesModelList = jsonObject.getJSONArray("routes").toJavaList(RoutesModel.class);
                 for (RoutesModel routesModel : routesModelList) {
                     String pipelineJson = JSONObject.toJSONString(routesModel);
                     JSONObject pipelineJsonObject;
-                    if (json.startsWith("\"")) {
-                        pipelineJsonObject = JSONObject.parseObject(routesModel.toString());
-                    } else {
-                        pipelineJsonObject = JSONObject.parseObject(pipelineJson);
+                    while (pipelineJson.startsWith("\"")) {
+                        pipelineJson = resolveForStr(pipelineJson);
                     }
+                    pipelineJsonObject = JSONObject.parseObject(pipelineJson);
                     if ((pipelineJsonObject.getJSONArray("pipeline")) != null) {
                         validatePipeline((pipelineJsonObject.getJSONArray("pipeline")).toJavaList(ProcessorModel.class), validateMessages, lastModel, flowValidationModel);
                     }
@@ -217,19 +216,15 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
             List<FlowValidation> processorMessageList = validate(processorInfo, jsonObject);
             if (processor instanceof DalaranComponentValidator) {
                 List<FlowValidation> processorCustomMessageList = null;
-                if (processorModel.getConfig() instanceof String) {
-                    if (processorModel.getType().equals("mapper-convert")) {
-                        DalaranMapperConfig config = jsonObject.toJavaObject(DalaranMapperConfig.class);
-                        processorCustomMessageList = ((DalaranComponentValidator) processor).validate(config);
-                    } else if (processorModel.getType().equals("service")) {
-                        ServiceOperationConfig config = jsonObject.toJavaObject(ServiceOperationConfig.class);
-                        processorCustomMessageList = ((DalaranComponentValidator) processor).validate(config);
-                    } else if (processorModel.getType().equals("error-catch")) {
-                        ErrorCatchConfig config = jsonObject.toJavaObject(ErrorCatchConfig.class);
-                        processorCustomMessageList = ((DalaranComponentValidator) processor).validate(config);
-                    }
-                } else {
-                    processorCustomMessageList = ((DalaranComponentValidator) processor).validate(processorModel.getConfig());
+                if (processorModel.getType().equals("mapper-convert")) {
+                    DalaranMapperConfig config = jsonObject.toJavaObject(DalaranMapperConfig.class);
+                    processorCustomMessageList = ((DalaranComponentValidator) processor).validate(config);
+                } else if (processorModel.getType().equals("service")) {
+                    ServiceOperationConfig config = jsonObject.toJavaObject(ServiceOperationConfig.class);
+                    processorCustomMessageList = ((DalaranComponentValidator) processor).validate(config);
+                } else if (processorModel.getType().equals("error-catch")) {
+                    ErrorCatchConfig config = jsonObject.toJavaObject(ErrorCatchConfig.class);
+                    processorCustomMessageList = ((DalaranComponentValidator) processor).validate(config);
                 }
                 processorMessageList.addAll(processorCustomMessageList);
             }
@@ -418,5 +413,14 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
         DalaranRoute route = new DalaranRoute();
         route.errorHandler(errorHandlerFactory);
         return route;
+    }
+
+    private String resolveForStr(String text) {
+        if (text.startsWith("\"")) {
+            text = StringEscapeUtils.unescapeJava(text);
+            text = text.substring(1);
+            text = text.substring(0, text.length() - 1);
+        }
+        return text;
     }
 }
