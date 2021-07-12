@@ -262,7 +262,19 @@ public class FlowManagementServiceImpl implements FlowManagementService {
     private Object buildFlowEntity(BasicFlowEntity flowEntity, TemplateData templateData, Map<String, String> resourceKeyMap) throws Exception {
         BeanUtils.copyProperties(flowEntity, templateData);
         String oldConfig = JSON.toJSONString(flowEntity);
-        String newConfig = StringUtils.replaceEach(oldConfig, ArrayUtils.toStringArray(resourceKeyMap.keySet().toArray()), ArrayUtils.toStringArray(resourceKeyMap.values().toArray()));
+
+        //临时过渡下。。
+        Map<String, String> newResourceKeyMap = new HashMap<>();
+        resourceKeyMap.forEach((k, v) -> {
+            newResourceKeyMap.put(":"+ k, ":" + v);
+        });
+
+
+        log.info("old config: " + oldConfig);
+        log.info("replace str1 : " + Arrays.toString(ArrayUtils.toStringArray(resourceKeyMap.keySet().toArray())));
+        log.info("replace str2 : " + Arrays.toString(ArrayUtils.toStringArray(resourceKeyMap.values().toArray())));
+
+        String newConfig = StringUtils.replaceEach(oldConfig, ArrayUtils.toStringArray(newResourceKeyMap.keySet().toArray()), ArrayUtils.toStringArray(newResourceKeyMap.values().toArray()));
         log.info("new config: " + newConfig);
         if (StringUtils.isBlank(templateData.getTriggerConfig()) && StringUtils.isBlank(templateData.getTriggerType())) {
             flowEntity = JSON.parseObject(newConfig, SubFlowEntity.class);
