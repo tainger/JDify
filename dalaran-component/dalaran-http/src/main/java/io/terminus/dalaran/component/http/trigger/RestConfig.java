@@ -7,6 +7,7 @@ import io.terminus.dalaran.SourceType;
 import io.terminus.dalaran.component.authenticator.AuthenticatorBasic;
 import io.terminus.dalaran.component.authenticator.AuthenticatorConfigType;
 import io.terminus.dalaran.component.basic.BasicAuthenticator;
+import io.terminus.dalaran.component.common.ContentType;
 import io.terminus.dalaran.component.common.HttpMethod;
 import io.terminus.dalaran.component.limiter.DalaranLimiter;
 import io.terminus.dalaran.core.component.annotation.ConfigFieldInfo;
@@ -38,6 +39,9 @@ public class RestConfig extends AllModelConfig implements AuthenticatorConfig<Au
     // TODO load by application.yml
     @ConfigFieldInfo(label = "端口", inputType = FieldInputType.Hidden)
     private Integer port = 8080;
+
+    @ConfigFieldInfo(label = "数据类型", inputType = FieldInputType.Select, defaultValue = "APPLICATION_JSON", required = false)
+    private ContentType contentType = ContentType.APPLICATION_JSON;
 
     @ConfigFieldInfo(inputType = FieldInputType.Hidden, required = false)
     @JSONField(serialize = false)

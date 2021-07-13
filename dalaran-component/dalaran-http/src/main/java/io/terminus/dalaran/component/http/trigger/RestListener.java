@@ -3,6 +3,7 @@ package io.terminus.dalaran.component.http.trigger;
 import io.swagger.models.Swagger;
 import io.terminus.dalaran.DalaranConstants;
 import io.terminus.dalaran.component.authenticator.AuthenticatorConfigType;
+import io.terminus.dalaran.component.common.ContentType;
 import io.terminus.dalaran.component.common.HttpMethod;
 import io.terminus.dalaran.component.common.LimitOperation;
 import io.terminus.dalaran.component.http.processor.okhttp.ExceptionProcessor;
@@ -86,6 +87,9 @@ public class RestListener implements DalaranTrigger<RestConfig>, DalaranTriggerA
                 route.process(new AuthenticatorProcessor(authenticator, redisService));
             }
             route.convertBodyTo(String.class);
+            if (config.getContentType() == ContentType.APPLICATION_FORM_URLENCODED) {
+                route.process(new UrlEncodedProcessor());
+            }
         }
     }
 
