@@ -12,10 +12,7 @@ import io.terminus.dalaran.component.http.trigger.processor.*;
 import io.terminus.dalaran.component.http.trigger.utils.RestWordUtils;
 import io.terminus.dalaran.component.http.trigger.utils.SwaggerUtils;
 import io.terminus.dalaran.component.limiter.DalaranLimiter;
-import io.terminus.dalaran.core.component.DalaranCircuitBreaker;
-import io.terminus.dalaran.core.component.DalaranTrigger;
-import io.terminus.dalaran.core.component.DalaranTriggerApiDocExport;
-import io.terminus.dalaran.core.component.DalaranTriggerWordDocExport;
+import io.terminus.dalaran.core.component.*;
 import io.terminus.dalaran.core.component.annotation.Trigger;
 import io.terminus.dalaran.core.context.DalaranClientContext;
 import io.terminus.dalaran.core.flow.DalaranRoute;
@@ -45,7 +42,7 @@ import static io.terminus.dalaran.DalaranConstants.DIRECT_PREFIX;
         bodyType = "JSON",
         developer = DalaranConstants.DALARAN
 )
-public class RestListener implements DalaranTrigger<RestConfig>, DalaranTriggerApiDocExport<Swagger>, DalaranTriggerWordDocExport, DalaranCircuitBreaker<RestConfig> {
+public class RestListener implements DalaranTrigger<RestConfig>, DalaranTriggerApiDocExport<Swagger>, DalaranTriggerBuildAfterProcessor<RestConfig>, DalaranTriggerWordDocExport, DalaranCircuitBreaker<RestConfig> {
 
     @Autowired
     private DalaranClientContext clientContext;
@@ -160,6 +157,11 @@ public class RestListener implements DalaranTrigger<RestConfig>, DalaranTriggerA
             route.process(new ExceptionProcessor(new RuntimeException("trigger config error, limiterId is null")));
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void buildAfter(RouteDefinition route, RestConfig config) {
+        route.process(new HttpTriggerAfterProcessor());
     }
 
     private List<ApiInfo> buildApiInfoList(Map<String, List<TriggerFlow>> moduleTriggerFlows) {
