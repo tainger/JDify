@@ -1,5 +1,6 @@
 package io.terminus.dalaran.component.service;
 
+import io.terminus.dalaran.DalaranConstants;
 import io.terminus.dalaran.core.component.DalaranComponentValidator;
 import io.terminus.dalaran.core.component.DalaranProcessor;
 import io.terminus.dalaran.core.component.DalaranProcessorConfigCustomConverter;
@@ -29,7 +30,8 @@ import static io.terminus.dalaran.component.service.ServiceValidationMessages.SE
         value = "service",
         order = 11,
         bodyType = UNKNOWN_MODEL_TYPE,
-        configType = ServiceOperationConfig.class
+        configType = ServiceOperationConfig.class,
+        developer = DalaranConstants.DALARAN
 )
 public class DalaranServiceProcessor implements DalaranProcessor<DalaranServiceOperation>, DalaranProcessorConfigCustomConverter<ServiceOperationConfig, DalaranServiceOperation>, DalaranComponentValidator<ServiceOperationConfig> {
 

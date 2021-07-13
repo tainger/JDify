@@ -23,7 +23,7 @@ public @interface Processor {
 
     Class configType() default Void.class;
 
-    String origin() default DalaranConstants.DALARAN;
+    String developer() default DalaranConstants.PARTNER;
 
     String description() default DalaranConstants.DALARAN_COMPONENT_DEFAULT_DESC;
 }

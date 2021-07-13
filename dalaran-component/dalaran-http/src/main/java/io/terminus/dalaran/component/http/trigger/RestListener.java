@@ -1,6 +1,7 @@
 package io.terminus.dalaran.component.http.trigger;
 
 import io.swagger.models.Swagger;
+import io.terminus.dalaran.DalaranConstants;
 import io.terminus.dalaran.component.authenticator.AuthenticatorConfigType;
 import io.terminus.dalaran.component.common.HttpMethod;
 import io.terminus.dalaran.component.common.LimitOperation;
@@ -40,7 +41,8 @@ import static io.terminus.dalaran.DalaranConstants.DIRECT_PREFIX;
         value = {"http-rest-listener", "netty-http-listener"},
         order = 10,
         configType = RestConfig.class,
-        bodyType = "JSON"
+        bodyType = "JSON",
+        developer = DalaranConstants.DALARAN
 )
 public class RestListener implements DalaranTrigger<RestConfig>, DalaranTriggerApiDocExport<Swagger>, DalaranTriggerWordDocExport, DalaranCircuitBreaker<RestConfig> {
 

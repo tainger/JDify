@@ -1,5 +1,6 @@
 package io.terminus.dalaran.component.as2.processor;
 
+import io.terminus.dalaran.DalaranConstants;
 import io.terminus.dalaran.component.as2.trigger.CertificateConfig;
 import io.terminus.dalaran.core.component.DalaranProcessor;
 import io.terminus.dalaran.core.component.annotation.Processor;
@@ -14,7 +15,6 @@ import org.apache.http.entity.ContentType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-
 import java.nio.charset.StandardCharsets;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
@@ -23,7 +23,8 @@ import java.security.cert.Certificate;
         value = "as2-client",
         order = 18,
         configType = AS2ClientConfig.class,
-        bodyType = "JSON"
+        bodyType = "JSON",
+        developer = DalaranConstants.DALARAN
 )
 public class DalaranAS2Client implements DalaranProcessor<AS2ClientConfig> {
 

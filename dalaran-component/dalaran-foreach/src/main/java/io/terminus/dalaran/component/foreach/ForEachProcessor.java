@@ -1,5 +1,6 @@
 package io.terminus.dalaran.component.foreach;
 
+import io.terminus.dalaran.DalaranConstants;
 import io.terminus.dalaran.core.component.DalaranProcessor;
 import io.terminus.dalaran.core.component.DalaranProcessorConfigCustomConverter;
 import io.terminus.dalaran.core.component.annotation.Processor;
@@ -18,7 +19,8 @@ import static org.apache.camel.builder.Builder.body;
         value = "foreach",
         order = 20,
         configType = ForEachConfig.class,
-        description = "For循环：模拟For循环，循环节点会将数组类型的数据自动切分，循环执行"
+        description = "For循环：模拟For循环，循环节点会将数组类型的数据自动切分，循环执行",
+        developer = DalaranConstants.DALARAN
 )
 public class ForEachProcessor implements DalaranProcessor<String>, DalaranProcessorConfigCustomConverter<ForEachConfig, String> {
 

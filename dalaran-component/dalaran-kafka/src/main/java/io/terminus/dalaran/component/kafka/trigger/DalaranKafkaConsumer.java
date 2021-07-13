@@ -1,5 +1,6 @@
 package io.terminus.dalaran.component.kafka.trigger;
 
+import io.terminus.dalaran.DalaranConstants;
 import io.terminus.dalaran.core.component.DalaranTrigger;
 import io.terminus.dalaran.core.component.annotation.Trigger;
 import org.apache.camel.model.RouteDefinition;
@@ -10,7 +11,8 @@ import org.apache.camel.model.RouteDefinition;
 @Trigger(
         value = "kafka-consumer",
         order = 14,
-        configType = DalaranKafkaConsumerConfig.class
+        configType = DalaranKafkaConsumerConfig.class,
+        developer = DalaranConstants.DALARAN
 )
 public class DalaranKafkaConsumer implements DalaranTrigger<DalaranKafkaConsumerConfig> {
 

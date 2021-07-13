@@ -1,5 +1,6 @@
 package io.terminus.dalaran.component.ftp.trigger;
 
+import io.terminus.dalaran.DalaranConstants;
 import io.terminus.dalaran.component.connector.FtpConnector;
 import io.terminus.dalaran.core.component.DalaranTrigger;
 import io.terminus.dalaran.core.component.annotation.Trigger;
@@ -10,7 +11,8 @@ import org.apache.commons.lang3.StringUtils;
         value = "ftp-download",
         order = 11,
         configType = FtpDownloadConfig.class,
-        bodyType = "CSV"
+        bodyType = "CSV",
+        developer = DalaranConstants.DALARAN
 )
 public class FtpDownload implements DalaranTrigger<FtpDownloadConfig> {
 

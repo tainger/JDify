@@ -27,7 +27,8 @@ import static io.terminus.dalaran.DalaranConstants.DELIMITER;
 @Processor(
         value = "scatter-gather",
         configType = ScatterGatherConfig.class,
-        description = "并行节点：使用该组件能够达到多分支并行的效果"
+        description = "并行节点：使用该组件能够达到多分支并行的效果",
+        developer = DalaranConstants.DALARAN
 )
 public class ScatterGather implements DalaranProcessor<List<String>>, DalaranProcessorConfigCustomConverter<ScatterGatherConfig, List<String>> {
 

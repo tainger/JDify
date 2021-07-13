@@ -1,5 +1,6 @@
 package io.terminus.dalaran.component.soap.processor;
 
+import io.terminus.dalaran.DalaranConstants;
 import io.terminus.dalaran.core.component.DalaranProcessor;
 import io.terminus.dalaran.core.component.annotation.Processor;
 import okhttp3.OkHttpClient;
@@ -14,7 +15,8 @@ import java.util.concurrent.TimeUnit;
         value = "soap-client",
         order = 11,
         configType = SoapClientConfig.class,
-        bodyType = "SOAP"
+        bodyType = "SOAP",
+        developer = DalaranConstants.DALARAN
 )
 public class DalaranSoapClient implements DalaranProcessor<SoapClientConfig> {
 

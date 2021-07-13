@@ -41,7 +41,8 @@ import static io.terminus.dalaran.component.processor.mapper.MapperValidationMes
         value = "mapper-convert",
         order = 6,
         configType = DalaranMapperConfig.class,
-        description = "模型字段映射：通过连线，在不同结构的模型字段间做数据映射"
+        description = "模型字段映射：通过连线，在不同结构的模型字段间做数据映射",
+        developer = DalaranConstants.DALARAN
 )
 @Data
 public class DalaranMessageMapper implements DalaranProcessor<DalaranMapperConfig>, DalaranComponentValidator<DalaranMapperConfig> {

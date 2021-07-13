@@ -1014,7 +1014,7 @@ public class FlowManagementServiceImpl implements FlowManagementService {
 
         if (origin instanceof TriggerFlowAbstractEntity) {
             TriggerInfo triggerInfo = dalaranContext.getDalaranComponentContext().getTriggerInfo(((TriggerFlowAbstractEntity) origin).getTriggerType());
-            if (StringUtils.equalsIgnoreCase(triggerInfo.getOrigin(), DalaranConstants.PARTNER)) {
+            if (StringUtils.equalsIgnoreCase(triggerInfo.getDeveloper(), DalaranConstants.PARTNER)) {
                 List<PrivateRepositoryEntity> privateRepositoryEntity = privateResourceQueryService.query(new PrivateRepositoryQuery(triggerInfo.getName(), DalaranConstants.TRIGGER));
                 if (CollectionUtils.isNotEmpty(privateRepositoryEntity)) {
                     PrivateRepositoryEntity repositoryEntity = privateRepositoryEntity.get(0);
@@ -1038,7 +1038,7 @@ public class FlowManagementServiceImpl implements FlowManagementService {
 
         for (ProcessorEntity processorEntity : origin.getPipeline()) {
             ProcessorInfo processorInfo = dalaranContext.getDalaranComponentContext().getProcessorInfo(processorEntity.getGroup(), processorEntity.getType(), processorEntity.getVersion());
-            if (StringUtils.equalsIgnoreCase(processorInfo.getOrigin(), DalaranConstants.PARTNER)) {
+            if (StringUtils.equalsIgnoreCase(processorInfo.getDeveloper(), DalaranConstants.PARTNER)) {
                 List<PrivateRepositoryEntity> privateRepositoryEntity = privateResourceQueryService.query(new PrivateRepositoryQuery(processorInfo.getName(), DalaranConstants.PROCESSOR));
                 if (CollectionUtils.isNotEmpty(privateRepositoryEntity)) {
                     PrivateRepositoryEntity repositoryEntity = privateRepositoryEntity.get(0);
@@ -1159,7 +1159,7 @@ public class FlowManagementServiceImpl implements FlowManagementService {
 
         for (ProcessorRouteInfo processorRouteInfo : processorRouteInfoList) {
             ProcessorInfo processorInfo = dalaranContext.getDalaranComponentContext().getProcessorInfo(processorRouteInfo.getGroup(), processorRouteInfo.getType(), processorRouteInfo.getVersion());
-            if (StringUtils.equalsIgnoreCase(processorInfo.getOrigin(), DalaranConstants.PARTNER)) {
+            if (StringUtils.equalsIgnoreCase(processorInfo.getDeveloper(), DalaranConstants.PARTNER)) {
                 List<PrivateRepositoryEntity> privateRepositoryEntity = privateResourceQueryService.query(new PrivateRepositoryQuery(processorInfo.getName(), DalaranConstants.PROCESSOR));
                 if (CollectionUtils.isNotEmpty(privateRepositoryEntity)) {
                     PrivateRepositoryEntity repositoryEntity = privateRepositoryEntity.get(0);

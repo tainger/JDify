@@ -1,5 +1,6 @@
 package io.terminus.dalaran.component.kafka.processor;
 
+import io.terminus.dalaran.DalaranConstants;
 import io.terminus.dalaran.core.component.DalaranProcessor;
 import io.terminus.dalaran.core.component.annotation.Processor;
 import org.apache.camel.model.ProcessorDefinition;
@@ -11,7 +12,8 @@ import org.apache.camel.model.ProcessorDefinition;
         value = "kafka-producer",
         order = 13,
         bodyType = "JSON",
-        configType = DalaranKafkaProducerConfig.class
+        configType = DalaranKafkaProducerConfig.class,
+        developer = DalaranConstants.DALARAN
 )
 public class DalaranKafkaProducer implements DalaranProcessor<DalaranKafkaProducerConfig> {
 

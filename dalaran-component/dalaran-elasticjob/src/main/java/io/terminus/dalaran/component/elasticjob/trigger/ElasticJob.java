@@ -1,5 +1,6 @@
 package io.terminus.dalaran.component.elasticjob.trigger;
 
+import io.terminus.dalaran.DalaranConstants;
 import io.terminus.dalaran.core.component.DalaranTrigger;
 import io.terminus.dalaran.core.component.annotation.Trigger;
 import io.terminus.dalaran.core.util.UriUtils;
@@ -12,7 +13,8 @@ import java.util.Map;
 @Trigger(
         value = "elastic-job",
         order = 16,
-        configType = ElasticJobConfig.class
+        configType = ElasticJobConfig.class,
+        developer = DalaranConstants.DALARAN
 )
 @Slf4j
 public class ElasticJob implements DalaranTrigger<ElasticJobConfig> {

@@ -1,5 +1,6 @@
 package io.terminus.dalaran.component.as2.trigger;
 
+import io.terminus.dalaran.DalaranConstants;
 import io.terminus.dalaran.core.component.DalaranTrigger;
 import io.terminus.dalaran.core.component.annotation.Trigger;
 import io.terminus.dalaran.core.oss.OSSAccount;
@@ -20,7 +21,8 @@ import static org.apache.camel.builder.Builder.constant;
 @Trigger(
         value = "as2-server",
         order = 19,
-        configType = AS2ServerConfig.class
+        configType = AS2ServerConfig.class,
+        developer = DalaranConstants.DALARAN
 )
 public class DalaranAS2Server implements DalaranTrigger<AS2ServerConfig> {
 

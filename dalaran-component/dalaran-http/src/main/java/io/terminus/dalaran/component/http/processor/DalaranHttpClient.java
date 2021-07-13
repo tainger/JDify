@@ -23,7 +23,8 @@ import static org.apache.camel.Exchange.*;
         value = "http-client",
         order = 7,
         configType = HttpClientConfig.class,
-        bodyType = "JSON"
+        bodyType = "JSON",
+        developer = DalaranConstants.DALARAN
 )
 public class DalaranHttpClient implements DalaranProcessor<HttpClientConfig>, DalaranMessageBodyCustomConverter<HttpClientConfig> {
 

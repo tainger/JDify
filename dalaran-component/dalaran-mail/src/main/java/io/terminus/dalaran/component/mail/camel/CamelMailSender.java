@@ -1,6 +1,7 @@
 package io.terminus.dalaran.component.mail.camel;
 
 import io.terminus.dalaran.ComponentConstants;
+import io.terminus.dalaran.DalaranConstants;
 import io.terminus.dalaran.component.connector.MailConnector;
 import io.terminus.dalaran.core.component.DalaranProcessor;
 import io.terminus.dalaran.core.component.annotation.Processor;
@@ -11,7 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 @Processor(
         value = "Mail-Sender",
         order = 23,
-        configType = DalaranMailSenderConfig.class
+        configType = DalaranMailSenderConfig.class,
+        developer = DalaranConstants.DALARAN
 )
 public class CamelMailSender implements DalaranProcessor<DalaranMailSenderConfig> {
 

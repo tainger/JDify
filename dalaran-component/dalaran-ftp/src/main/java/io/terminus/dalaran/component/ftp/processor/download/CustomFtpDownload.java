@@ -1,5 +1,6 @@
 package io.terminus.dalaran.component.ftp.processor.download;
 
+import io.terminus.dalaran.DalaranConstants;
 import io.terminus.dalaran.component.common.FtpProtocol;
 import io.terminus.dalaran.core.component.DalaranProcessor;
 import io.terminus.dalaran.core.component.annotation.Processor;
@@ -12,7 +13,8 @@ import org.apache.camel.model.ProcessorDefinition;
         value = "custom-ftp-download",
         order = 20,
         configType = CustomFtpDownloadConfig.class,
-        bodyType = "CSV"
+        bodyType = "CSV",
+        developer = DalaranConstants.DALARAN
 )
 public class CustomFtpDownload implements DalaranProcessor<CustomFtpDownloadConfig> {
 

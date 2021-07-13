@@ -388,7 +388,7 @@ public class ExportServiceImpl implements ExportService {
             }
             String triggerType = triggerFlowEntity.getTriggerType();
             TriggerInfo triggerInfo = dalaranContext.getDalaranComponentContext().getTriggerInfo(triggerType);
-            if (StringUtils.equalsIgnoreCase(triggerInfo.getOrigin(), DalaranConstants.PARTNER)) {
+            if (StringUtils.equalsIgnoreCase(triggerInfo.getDeveloper(), DalaranConstants.PARTNER)) {
                 List<PrivateRepositoryEntity> privateRepositoryEntity = privateResourceQueryService.query(new PrivateRepositoryQuery(triggerInfo.getName(), DalaranConstants.TRIGGER));
                 if (CollectionUtils.isNotEmpty(privateRepositoryEntity)) {
                     PrivateRepositoryEntity repositoryEntity = privateRepositoryEntity.get(0);
@@ -466,7 +466,7 @@ public class ExportServiceImpl implements ExportService {
 
     private void collectProcessorResourceKey(ProcessorEntity processorEntity) {
         ProcessorInfo processorInfo = dalaranContext.getDalaranComponentContext().getProcessorInfo(processorEntity.getGroup(), processorEntity.getType(), processorEntity.getVersion());
-        if (StringUtils.equalsIgnoreCase(processorInfo.getOrigin(), DalaranConstants.PARTNER)) {
+        if (StringUtils.equalsIgnoreCase(processorInfo.getDeveloper(), DalaranConstants.PARTNER)) {
             List<PrivateRepositoryEntity> privateRepositoryEntity = privateResourceQueryService.query(new PrivateRepositoryQuery(processorInfo.getName(), DalaranConstants.PROCESSOR));
             if (CollectionUtils.isNotEmpty(privateRepositoryEntity)) {
                 PrivateRepositoryEntity repositoryEntity = privateRepositoryEntity.get(0);

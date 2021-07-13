@@ -19,7 +19,8 @@ import org.springframework.beans.factory.annotation.Autowired;
         value = "rocketmq-producer",
         order = 13,
         bodyType = "JSON",
-        configType = RocketMQProducerConfig.class
+        configType = RocketMQProducerConfig.class,
+        developer = DalaranConstants.DALARAN
 )
 public class RocketMQProducer implements DalaranProcessor<RocketMQProducerConfig>, DalaranMessageBodyCustomConverter<RocketMQProducerConfig> {
 

@@ -1,5 +1,6 @@
 package io.terminus.dalaran.component.soap.trigger;
 
+import io.terminus.dalaran.DalaranConstants;
 import io.terminus.dalaran.component.soap.trigger.model.SoapApiInfo;
 import io.terminus.dalaran.component.soap.trigger.model.SoapAuthType;
 import io.terminus.dalaran.component.soap.trigger.model.SoapWordApiInfo;
@@ -31,7 +32,8 @@ import java.util.stream.Collectors;
         value = "soap-listener",
         order = 13,
         configType = SoapListenerConfig.class,
-        bodyType = "SOAP"
+        bodyType = "SOAP",
+        developer = DalaranConstants.DALARAN
 )
 public class DalaranSoapListener implements DalaranTrigger<SoapListenerConfig>, DalaranTriggerBuildAfterProcessor<SoapListenerConfig>, DalaranTriggerApiDocExport<String>, DalaranTriggerWordDocExport {
 

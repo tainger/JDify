@@ -1,5 +1,6 @@
 package io.terminus.dalaran.component.ftp.processor.common;
 
+import io.terminus.dalaran.DalaranConstants;
 import io.terminus.dalaran.component.connector.FtpConnector;
 import io.terminus.dalaran.core.component.DalaranProcessor;
 import io.terminus.dalaran.core.component.annotation.Processor;
@@ -10,7 +11,8 @@ import org.apache.commons.lang3.StringUtils;
         value = "ftp-upload",
         order = 11,
         configType = FtpUploadConfig.class,
-        bodyType = "CSV"
+        bodyType = "CSV",
+        developer = DalaranConstants.DALARAN
 )
 public class FtpUpload implements DalaranProcessor<FtpUploadConfig> {
 

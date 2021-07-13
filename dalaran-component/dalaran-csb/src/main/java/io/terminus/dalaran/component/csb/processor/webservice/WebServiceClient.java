@@ -1,5 +1,6 @@
 package io.terminus.dalaran.component.csb.processor.webservice;
 
+import io.terminus.dalaran.DalaranConstants;
 import io.terminus.dalaran.core.component.DalaranProcessor;
 import io.terminus.dalaran.core.component.annotation.Processor;
 import org.apache.camel.model.ProcessorDefinition;
@@ -8,7 +9,8 @@ import org.apache.camel.model.ProcessorDefinition;
         value = "WebServiceClient",
         order = 9,
         configType = WebServiceClientConfig.class,
-        bodyType = "JSON"
+        bodyType = "JSON",
+        developer = DalaranConstants.DALARAN
 )
 public class WebServiceClient implements DalaranProcessor<WebServiceClientConfig> {
 

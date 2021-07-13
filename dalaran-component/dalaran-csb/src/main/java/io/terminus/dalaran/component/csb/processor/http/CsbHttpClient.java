@@ -1,6 +1,7 @@
 package io.terminus.dalaran.component.csb.processor.http;
 
 import com.alibaba.csb.sdk.HttpParameters;
+import io.terminus.dalaran.DalaranConstants;
 import io.terminus.dalaran.core.component.DalaranProcessor;
 import io.terminus.dalaran.core.component.annotation.Processor;
 import org.apache.camel.model.ProcessorDefinition;
@@ -10,7 +11,8 @@ import org.apache.commons.lang3.StringUtils;
         value = "CsbHttpClient",
         order = 9,
         configType = CsbHttpClientConfig.class,
-        bodyType = "JSON"
+        bodyType = "JSON",
+        developer = DalaranConstants.DALARAN
 )
 public class CsbHttpClient implements DalaranProcessor<CsbHttpClientConfig> {
 

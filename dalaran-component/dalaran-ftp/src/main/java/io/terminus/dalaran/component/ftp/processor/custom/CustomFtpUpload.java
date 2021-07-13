@@ -5,6 +5,7 @@ import com.aliyun.oss.OSSClientBuilder;
 import com.aliyun.oss.model.GetObjectRequest;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
+import io.terminus.dalaran.DalaranConstants;
 import io.terminus.dalaran.component.connector.FtpConnector;
 import io.terminus.dalaran.core.component.DalaranProcessor;
 import io.terminus.dalaran.core.component.annotation.Processor;
@@ -19,7 +20,8 @@ import java.io.File;
         value = "custom-ftp-upload",
         order = 19,
         configType = CustomFtpUploadConfig.class,
-        bodyType = "CSV"
+        bodyType = "CSV",
+        developer = DalaranConstants.DALARAN
 )
 public class CustomFtpUpload implements DalaranProcessor<CustomFtpUploadConfig> {
 

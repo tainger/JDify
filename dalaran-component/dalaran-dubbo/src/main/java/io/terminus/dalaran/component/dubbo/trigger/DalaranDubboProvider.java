@@ -1,5 +1,6 @@
 package io.terminus.dalaran.component.dubbo.trigger;
 
+import io.terminus.dalaran.DalaranConstants;
 import io.terminus.dalaran.core.component.DalaranTrigger;
 import io.terminus.dalaran.core.component.annotation.Trigger;
 import org.apache.camel.model.RouteDefinition;
@@ -7,7 +8,8 @@ import org.apache.camel.model.RouteDefinition;
 @Trigger(
         value = "dubbo-provider",
         order = 12,
-        configType = DubboProviderConfig.class
+        configType = DubboProviderConfig.class,
+        developer = DalaranConstants.DALARAN
 )
 public class DalaranDubboProvider implements DalaranTrigger<DubboProviderConfig> {
 

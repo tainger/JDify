@@ -3,6 +3,7 @@ package io.terminus.dalaran.component.http.processor.okhttp;
 import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSClientBuilder;
 import com.aliyun.oss.model.GetObjectRequest;
+import io.terminus.dalaran.DalaranConstants;
 import io.terminus.dalaran.core.component.DalaranProcessor;
 import io.terminus.dalaran.core.component.annotation.Processor;
 import io.terminus.dalaran.core.oss.OSSAccount;
@@ -33,7 +34,8 @@ import static io.terminus.dalaran.DalaranConstants.UNKNOWN_MODEL_TYPE;
         value = {"OKHttpClient", "BrotliHttpClient"},
         order = 8,
         configType = OKHttpClientConfig.class,
-        bodyType = UNKNOWN_MODEL_TYPE
+        bodyType = UNKNOWN_MODEL_TYPE,
+        developer = DalaranConstants.DALARAN
 )
 @Slf4j
 public class OKHttpClient implements DalaranProcessor<OKHttpClientConfig> {

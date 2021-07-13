@@ -5,7 +5,6 @@ import io.terminus.dalaran.config.*;
 import io.terminus.dalaran.core.component.*;
 import io.terminus.dalaran.core.component.annotation.*;
 import io.terminus.dalaran.core.component.annotation.Authenticator;
-import io.terminus.dalaran.core.component.config.AuthenticatorConfig;
 import io.terminus.dalaran.core.component.config.ConnectorConfig;
 import io.terminus.dalaran.core.component.config.LimiterConfig;
 import io.terminus.dalaran.core.context.DalaranComponentContext;
@@ -221,7 +220,7 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext {
             triggerInfo.setOutdated(i != 0);
             triggerInfo.setType(triggerType);
             triggerInfo.setName(triggerType);
-            triggerInfo.setOrigin(triggerAnnotation.origin());
+            triggerInfo.setDeveloper(triggerAnnotation.developer());
             triggerInfo.setOrder(triggerAnnotation.order());
             triggerInfo.setConfigFields(configFields);
             triggerInfo.setConfigType(triggerAnnotation.configType());
@@ -274,7 +273,7 @@ public class DefaultDalaranComponentContext implements DalaranComponentContext {
             processorInfo.setType(processorType);
 
             processorInfo.setName(processorType);
-            processorInfo.setOrigin(processorAnnotation.origin());
+            processorInfo.setDeveloper(processorAnnotation.developer());
             processorInfo.setOrder(processorAnnotation.order());
             processorInfo.setConfigFields(configFields);
             processorInfo.setConfigType(processorAnnotation.configType());

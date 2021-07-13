@@ -1,5 +1,6 @@
 package io.terminus.dalaran.component.retry;
 
+import io.terminus.dalaran.DalaranConstants;
 import io.terminus.dalaran.core.component.DalaranProcessor;
 import io.terminus.dalaran.core.component.DalaranProcessorConfigCustomConverter;
 import io.terminus.dalaran.core.component.annotation.Processor;
@@ -18,7 +19,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 @Processor(
         value = "retry",
         configType = RetryConfig.class,
-        description = "重试节点：使该节点包含的部分流程在发生异常时，进行局部的流程重试"
+        description = "重试节点：使该节点包含的部分流程在发生异常时，进行局部的流程重试",
+        developer = DalaranConstants.DALARAN
 )
 public class Retry implements DalaranProcessor<RetryConvertFragmentInfo>, DalaranProcessorConfigCustomConverter<RetryConfig, RetryConvertFragmentInfo> {
 

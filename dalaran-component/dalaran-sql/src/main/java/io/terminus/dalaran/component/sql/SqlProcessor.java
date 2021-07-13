@@ -1,6 +1,7 @@
 package io.terminus.dalaran.component.sql;
 
 import io.terminus.dalaran.ComponentConstants;
+import io.terminus.dalaran.DalaranConstants;
 import io.terminus.dalaran.component.connector.SqlDataSourceConnector;
 import io.terminus.dalaran.core.component.DalaranProcessor;
 import io.terminus.dalaran.core.component.annotation.Processor;
@@ -14,7 +15,8 @@ import javax.sql.DataSource;
 @Processor(
         value = "sql",
         order = 12,
-        configType = SqlConfig.class
+        configType = SqlConfig.class,
+        developer = DalaranConstants.DALARAN
 )
 public class SqlProcessor implements DalaranProcessor<SqlConfig> {
 

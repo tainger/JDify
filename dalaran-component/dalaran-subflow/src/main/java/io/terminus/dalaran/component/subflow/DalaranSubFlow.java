@@ -10,7 +10,8 @@ import org.apache.camel.model.ProcessorDefinition;
 
 @Processor(
         value = "sub-flow",
-        configType = DalaranSubFlowConfig.class
+        configType = DalaranSubFlowConfig.class,
+        developer = DalaranConstants.DALARAN
 )
 public class DalaranSubFlow implements DalaranProcessor<DalaranSubFlowConfig>, DalaranProcessorConfigCustomConverter<DalaranSubFlowConfig, DalaranSubFlowConfig> {
 

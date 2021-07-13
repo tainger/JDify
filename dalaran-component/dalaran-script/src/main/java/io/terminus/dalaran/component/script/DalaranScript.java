@@ -1,17 +1,18 @@
 package io.terminus.dalaran.component.script;
 
+import io.terminus.dalaran.DalaranConstants;
 import io.terminus.dalaran.component.utils.ContextUtils;
 import io.terminus.dalaran.core.component.DalaranProcessor;
 import io.terminus.dalaran.core.component.annotation.Processor;
 import jdk.nashorn.api.scripting.ScriptObjectMirror;
 import org.apache.camel.model.ProcessorDefinition;
-
 import static io.terminus.dalaran.DalaranConstants.DALARAN_CONTEXT_EXCHANGE;
 
 @Processor(
         value = "script",
         order = 12,
-        configType = DalaranScriptConfig.class
+        configType = DalaranScriptConfig.class,
+        developer = DalaranConstants.DALARAN
 )
 public class DalaranScript implements DalaranProcessor<DalaranScriptConfig> {
 

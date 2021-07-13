@@ -1,5 +1,6 @@
 package io.terminus.dalaran.component.dubbo.processor;
 
+import io.terminus.dalaran.DalaranConstants;
 import io.terminus.dalaran.core.component.DalaranProcessor;
 import io.terminus.dalaran.core.component.annotation.Processor;
 import org.apache.camel.model.ProcessorDefinition;
@@ -7,7 +8,8 @@ import org.apache.camel.model.ProcessorDefinition;
 @Processor(
         value = "dubbo-consumer",
         order = 12,
-        configType = DalaranDubboConsumerConfig.class
+        configType = DalaranDubboConsumerConfig.class,
+        developer = DalaranConstants.DALARAN
 )
 public class DalaranDubboConsumer implements DalaranProcessor<DalaranDubboConsumerConfig> {
 

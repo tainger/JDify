@@ -12,7 +12,7 @@ public interface ComponentInfo {
 
     String getModelType();
 
-    String getOrigin();
+    String getDeveloper();
 
     ConnectorInfo getConnectorInfo();
 

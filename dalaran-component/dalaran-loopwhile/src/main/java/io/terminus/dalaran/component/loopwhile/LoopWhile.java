@@ -21,7 +21,8 @@ import static org.apache.camel.language.mvel.MvelExpression.mvel;
         value = "loop-while",
         order = 20,
         configType = LoopWhileConfig.class,
-        description = "While循环：模拟条件循环，使循环节点内的流程节点循环执行，直到条件表达式不成立"
+        description = "While循环：模拟条件循环，使循环节点内的流程节点循环执行，直到条件表达式不成立",
+        developer = DalaranConstants.DALARAN
 )
 public class LoopWhile implements DalaranProcessor<LoopWhileFragmentInfo>, DalaranProcessorConfigCustomConverter<LoopWhileConfig, LoopWhileFragmentInfo> {
     @Autowired
