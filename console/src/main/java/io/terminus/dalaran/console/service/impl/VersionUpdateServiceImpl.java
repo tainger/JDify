@@ -190,7 +190,6 @@ public class VersionUpdateServiceImpl implements VersionUpdateService {
                 return;
             }
             subFlowEntity.setResourceKey(String.valueOf(subFlowEntity.getId()));
-            log.error("第{}条子流程", subFlowEntity.getId());
             List<ProcessorEntity> pipeline = subFlowEntity.getPipeline();
             for (ProcessorEntity processorEntity : pipeline) {
                 handleProcessor(processorEntity);
@@ -200,7 +199,6 @@ public class VersionUpdateServiceImpl implements VersionUpdateService {
 
         List<TriggerFlowEntity> triggerFlowEntityList = flowRepository.findAll();
         triggerFlowEntityList.forEach((item) -> {
-            log.error("第{}条流程", item.getId());
             handleTriggerFlow(item);
             flowRepository.save(item);
         });

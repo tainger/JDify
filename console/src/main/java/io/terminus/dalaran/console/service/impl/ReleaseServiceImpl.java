@@ -153,7 +153,12 @@ public class ReleaseServiceImpl implements ReleaseService {
 
         List<TriggerFlowReleasedEntity> invalidFlows = new ArrayList<>();
         releasedTriggerFlowEntities.forEach(releasedEntity -> {
-            TriggerFlow triggerFlow = resourceBuilder.buildTriggerFlow(releasedEntity);
+            TriggerFlow triggerFlow = null;
+            try {
+                 triggerFlow = resourceBuilder.buildTriggerFlow(releasedEntity);
+            }catch (Exception e) {
+                log.error("产生问题的日志{}", releasedEntity.getOriginId());
+            }
             List<FlowValidation> validateMessage= flowBuilder.validateFlow(triggerFlow);
             if (validateMessage != null && validateMessage.size() != 0) {
                 invalidFlows.add(releasedEntity);

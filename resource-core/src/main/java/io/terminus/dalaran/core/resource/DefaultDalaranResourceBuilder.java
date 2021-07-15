@@ -222,7 +222,6 @@ public class DefaultDalaranResourceBuilder implements DalaranResourceBuilder {
         processor.setType(processorEntity.getType());
         processor.setGroup(processorEntity.getGroup());
         processor.setVersion(processorEntity.getVersion());
-
         ProcessorInfo processorInfo = componentContext.getProcessorInfo(processorEntity.getGroup(), processorEntity.getType(), processorEntity.getVersion());
         if (processorInfo == null) {
             return processor;
