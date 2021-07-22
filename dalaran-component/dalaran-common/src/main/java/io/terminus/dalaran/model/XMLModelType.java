@@ -6,6 +6,8 @@ import io.terminus.dalaran.core.component.model.DalaranModelType;
 import io.terminus.dalaran.model.schema.DataTemplate;
 import io.terminus.dalaran.model.schema.XMLSchema;
 import io.terminus.dalaran.model.utils.ModelUtils;
+import io.terminus.dalaran.model.xml.ObjectToXMLProcessor;
+import io.terminus.dalaran.model.xml.XMLToObjectProcessor;
 import org.apache.camel.model.ProcessorDefinition;
 import org.apache.camel.model.dataformat.JsonLibrary;
 import org.apache.camel.model.dataformat.XmlJsonDataFormat;
@@ -19,14 +21,16 @@ public class XMLModelType implements DalaranModelType<String, XMLSchema> {
 
     @Override
     public void fromObject(ProcessorDefinition route, XMLSchema schema) {
-        route.marshal().xmljson(buildOptions(schema));
-        route.unmarshal().json(JsonLibrary.Fastjson);
+//        route.marshal().xmljson(buildOptions(schema));
+//        route.unmarshal().json(JsonLibrary.Fastjson);
+        route.process(new ObjectToXMLProcessor(schema));
     }
 
     @Override
     public void toObject(ProcessorDefinition route, XMLSchema schema) {
-        route.marshal().json(JsonLibrary.Fastjson);
-        route.unmarshal(buildJsonFormat(schema));
+//        route.marshal().json(JsonLibrary.Fastjson);
+//        route.unmarshal(buildJsonFormat(schema));
+        route.process(new XMLToObjectProcessor(schema));
     }
 
     @Override

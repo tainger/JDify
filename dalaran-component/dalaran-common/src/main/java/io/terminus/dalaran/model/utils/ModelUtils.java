@@ -8,7 +8,7 @@ import io.terminus.dalaran.model.DalaranModelSchema;
 import io.terminus.dalaran.model.FieldType;
 import io.terminus.dalaran.model.ModelField;
 import org.apache.commons.collections.CollectionUtils;
-
+import org.apache.commons.io.IOUtils;
 import java.util.*;
 
 import static io.terminus.dalaran.ComponentConstants.MODEL_FIELD_ROOT;
@@ -154,5 +154,26 @@ public class ModelUtils {
             }
         }
         return "";
+    }
+
+    public static String parseBody(Object in) {
+        String out = "";
+        if (in == null) {
+            return out;
+        }
+        try {
+            if (in instanceof byte[]) {
+                out = IOUtils.toString((byte[]) in);
+            } else if (in instanceof String) {
+                out = (String)in;
+            } else if (in instanceof char[]) {
+                out = Arrays.toString(((char[]) in));
+            } else {
+                out = String.valueOf(in);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return out;
     }
 }
