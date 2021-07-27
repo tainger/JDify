@@ -334,15 +334,15 @@ public class PrivateRepositoryServiceImpl implements PrivateRepositoryService {
             PrivateRepositoryEntity entity = privateRepository.findByResourceKeyAndVersionAndIsExistTrue(id, version);
             BeanUtils.copyProperties(privateRepositoryDTO, entity);
             privateRepositoryDTO.setId(entity.getResourceKey());
-            switch (entity.getType()) {
-                case PROCESSOR:
+            switch (entity.getType().toUpperCase()) {
+                case PROCESSOR_UPPER:
                     ResourceFile resourceFile = JSON.parseObject(entity.getData(), ResourceFile.class);
                     String openUrl = OSSUtils.getFileUrl(resourceFile.getFilePath(), ossAccount);
                     resourceFile.setFilePath(openUrl);
                     privateRepositoryDTO.setData(resourceFile);
                     break;
-                case FLOW_TEMPLATE:
-                case SUB_FLOW_TEMPLATE:
+                case FLOW_TEMPLATE_UPPER:
+                case SUB_FLOW_TEMPLATE_UPPER:
                     TemplateData templateData = JSON.parseObject(entity.getData(), TemplateData.class);
                     Map<String, PrivatePackageEntity> packages = templateData.getRelationPackage();
                     if (MapUtils.isNotEmpty(packages)) {

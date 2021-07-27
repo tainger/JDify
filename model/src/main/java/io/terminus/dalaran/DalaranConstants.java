@@ -84,4 +84,12 @@ public final class DalaranConstants {
 
     public static final String MARKET = "Market";
     public static final String PRIVATE = "Private";
+
+
+
+    public static final String TRIGGER_UPPER = "TRIGGER";
+    public static final String PROCESSOR_UPPER = "PROCESSOR";
+    public static final String FLOW_TEMPLATE_UPPER = "FLOWTEMPLATE";
+    public static final String SUB_FLOW_TEMPLATE_UPPER = "SUBFLOWTEMPLATE";
+
 }

@@ -73,6 +73,7 @@ import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
@@ -262,20 +263,32 @@ public class FlowManagementServiceImpl implements FlowManagementService {
     private Object buildFlowEntity(BasicFlowEntity flowEntity, TemplateData templateData, Map<String, String> resourceKeyMap) throws Exception {
         BeanUtils.copyProperties(flowEntity, templateData);
         String oldConfig = JSON.toJSONString(flowEntity);
+        log.info("old config: " + oldConfig);
+
+        log.info("key map: " + JSON.toJSONString(resourceKeyMap));
+
+//        BasicFlowEntity newFlowEntity = new BasicFlowEntity();
+//
+//        log.info("new config before1 : " + JSON.toJSONString(newFlowEntity));
+//
+//        BeanUtils.copyProperties(newFlowEntity, templateData);
+
+        replaceResourceKey(flowEntity, resourceKeyMap);
 
         //临时过渡下。。
-        Map<String, String> newResourceKeyMap = new HashMap<>();
-        resourceKeyMap.forEach((k, v) -> {
-            newResourceKeyMap.put(":"+ k, ":" + v);
-        });
+//        Map<String, String> newResourceKeyMap = new HashMap<>();
+//        resourceKeyMap.forEach((k, v) -> {
+//            newResourceKeyMap.put(":"+ k, ":" + v);
+//        });
 
-        String newConfig = StringUtils.replaceEach(oldConfig, ArrayUtils.toStringArray(newResourceKeyMap.keySet().toArray()), ArrayUtils.toStringArray(newResourceKeyMap.values().toArray()));
-        log.info("new config: " + newConfig);
-        if (StringUtils.isBlank(templateData.getTriggerConfig()) && StringUtils.isBlank(templateData.getTriggerType())) {
-            flowEntity = JSON.parseObject(newConfig, SubFlowEntity.class);
-        } else {
-            flowEntity = JSON.parseObject(newConfig, TriggerFlowEntity.class);
-        }
+//        String newConfig = StringUtils.replaceEach(oldConfig, ArrayUtils.toStringArray(newResourceKeyMap.keySet().toArray()), ArrayUtils.toStringArray(newResourceKeyMap.values().toArray()));
+
+        log.info("new config: " + JSON.toJSONString(flowEntity));
+//        if (StringUtils.isBlank(templateData.getTriggerConfig()) && StringUtils.isBlank(templateData.getTriggerType())) {
+//            flowEntity = JSON.parseObject(newConfig, SubFlowEntity.class);
+//        } else {
+//            flowEntity = JSON.parseObject(newConfig, TriggerFlowEntity.class);
+//        }
         flowEntity.setResourceKey(GenerateKeyUtils.resourceKey(propertyService.getTenantCode()));
         flowEntity.setId(null);
         log.info("new flowEntity: " + JSON.toJSONString(flowEntity));
@@ -993,6 +1006,132 @@ public class FlowManagementServiceImpl implements FlowManagementService {
         }
     }
 
+    private void replaceResourceKey(BasicFlowEntity flowEntity, Map<String, String> keyMap) throws Exception {
+        String inModelId = flowEntity.getInModel();
+        flowEntity.setInModel(keyMap.get(inModelId));
+        String outModelId = flowEntity.getOutModel();
+        flowEntity.setOutModel(keyMap.get(outModelId));
+
+
+        if (flowEntity instanceof TriggerFlowAbstractEntity) {
+            TriggerInfo triggerInfo = dalaranContext.getDalaranComponentContext().getTriggerInfo(((TriggerFlowAbstractEntity) flowEntity).getTriggerType());
+            Object config = resourceBuilder.buildConfig(((TriggerFlowAbstractEntity) flowEntity).getTriggerConfig(), triggerInfo.getConfigType());
+            if (config instanceof ConnectorConfig) {
+                ConnectorConfig connectorConfig = (ConnectorConfig) config;
+                String connectorId = connectorConfig.getConnectorId();
+                ((ConnectorConfig) config).setConnectorId(keyMap.get(connectorId));
+            }
+
+            if (config instanceof AllModelConfig) {
+                AllModelConfig allModelConfig = (AllModelConfig) config;
+                allModelConfig.setInModelId(keyMap.get(allModelConfig.getInModelId()));
+                allModelConfig.setOutModelId(keyMap.get(allModelConfig.getOutModelId()));
+            }
+
+            ((TriggerFlowAbstractEntity) flowEntity).setTriggerConfig(JSON.toJSONString(config));
+        }
+
+        for (ProcessorEntity processorEntity : flowEntity.getPipeline()) {
+
+            ProcessorInfo processorInfo = dalaranContext.getDalaranComponentContext().getProcessorInfo(processorEntity.getGroup(), processorEntity.getType(), processorEntity.getVersion());
+            Object processorConfig = resourceBuilder.buildConfig(processorEntity.getConfig(), processorInfo.getConfigType());
+            replaceProcessorModel(processorConfig, keyMap);
+            if (processorConfig instanceof ConnectorConfig) {
+                ConnectorConfig connectorConfig = (ConnectorConfig) processorConfig;
+                connectorConfig.setConnectorId(keyMap.get(connectorConfig.getConnectorId()));
+            }
+            if (processorConfig instanceof ServiceOperationConfig) {
+                ServiceOperationConfig serviceOperationConfig = (ServiceOperationConfig) processorConfig;
+                String serviceId = null;
+                if (StringUtils.isNotBlank(serviceOperationConfig.getServiceId())) {
+                    serviceId = serviceOperationConfig.getServiceId();
+                    serviceOperationConfig.setServiceId(keyMap.get(serviceOperationConfig.getServiceId()));
+                }
+//                List<ModelEntity> serviceModels = modelRepository.findByTargetTypeAndTargetId(ModelTargetType.Service, serviceId);
+//                serviceModels.forEach(modelEntity -> models.put(modelEntity.getResourceKey(), modelEntity));
+            }
+
+            if (processorConfig instanceof DalaranMapperConfig) {
+                DalaranMapperConfig mapperConfig = (DalaranMapperConfig) processorConfig;
+
+                mapperConfig.setInModelId(keyMap.get(mapperConfig.getInModelId()));
+                mapperConfig.setOutModelId(keyMap.get(mapperConfig.getOutModelId()));
+
+//                log.info("mapperConfig: " + JSON.toJSONString(mapperConfig));
+//
+//                Map<String, SimpleMapping> messageMapping = mapperConfig.getMessageMapping();
+//                List<SimpleMapping> simpleMappings = new ArrayList<>(messageMapping.values());
+//                List<SimpleMapping> noDestinationMappings = mapperConfig.getNoDestinationMappings();
+//                log.info("noDestinationMappings: " + noDestinationMappings);
+//                if (CollectionUtils.isNotEmpty(noDestinationMappings)) {
+//                    simpleMappings.addAll(noDestinationMappings);
+//                }
+//                log.info("simpleMappings: " + simpleMappings.toString());
+//                for (SimpleMapping simpleMapping : simpleMappings) {
+//                    if (simpleMapping.getMappingType() == MappingType.FUNCTION) {
+//                        MappingFunction mappingFunction = (MappingFunction) (simpleMapping.getValue());
+//                        if (mappingFunction.getType() == FunctionType.STATIC) {
+//                            continue;
+//                        }
+//                        String functionKey = mappingFunction.getId();
+//                        if (functions.containsKey(functionKey)) {
+//                            continue;
+//                        }
+//                        FunctionEntity entity = functionRepository.findByResourceKey(functionKey);
+//                        functions.put(functionKey, entity);
+//                    }
+//                }
+            }
+
+            if (processorConfig instanceof DalaranRouterConfig) {
+                DalaranRouterConfig dalaranRouterConfig = (DalaranRouterConfig) processorConfig;
+                for (DalaranRouterConfig.Route route : dalaranRouterConfig.getRoutes()) {
+                    replaceBranchResourceKey(route.getPipeline(), keyMap);
+                }
+            }
+
+            if (processorConfig instanceof ScatterGatherConfig) {
+                ScatterGatherConfig scatterGatherConfig = (ScatterGatherConfig) processorConfig;
+                for (ScatterGatherConfig.Branch branch : scatterGatherConfig.getBranches()) {
+                    replaceBranchResourceKey(branch.getPipeline(), keyMap);
+                }
+            }
+
+            if (processorConfig instanceof RetryConfig) {
+                RetryConfig retryConfig = (RetryConfig) processorConfig;
+                replaceBranchResourceKey(retryConfig.getPipeline(), keyMap);
+            }
+
+            if (processorConfig instanceof LoopWhileConfig) {
+                LoopWhileConfig loopWhileConfig = (LoopWhileConfig) processorConfig;
+                replaceBranchResourceKey(loopWhileConfig.getPipeline(), keyMap);
+            }
+
+            if (processorConfig instanceof ForEachConfig) {
+                ForEachConfig forEachConfig = (ForEachConfig) processorConfig;
+                replaceBranchResourceKey(forEachConfig.getPipeline(), keyMap);
+            }
+
+            if (processorConfig instanceof ErrorCatchConfig) {
+                ErrorCatchConfig errorCatchConfig = (ErrorCatchConfig) processorConfig;
+                for (ErrorCatchConfig.Route route : errorCatchConfig.getRoutes()) {
+                    replaceBranchResourceKey(route.getPipeline(), keyMap);
+                }
+            }
+
+            if (processorConfig instanceof DalaranSubFlowConfig) {
+                DalaranSubFlowConfig subFlowConfig = (DalaranSubFlowConfig) processorConfig;
+                String subFlowId = subFlowConfig.getSubFlowId();
+                subFlowConfig.setSubFlowId(keyMap.get(subFlowId));
+                SubFlowAbstractEntity entity = resourceLoader.loadSubFlow(subFlowId);
+                if (entity != null) {
+                    replaceResourceKey(entity, keyMap);
+                }
+            }
+            processorEntity.setConfig(JSON.toJSONString(processorConfig));
+        }
+    }
+
     private void buildTemplateRelationResource(TemplateData templateData, BasicFlowEntity origin) throws Exception {
         Map models = templateData.getRelationModel();
         Map connectors = templateData.getRelationConnector();
@@ -1263,6 +1402,111 @@ public class FlowManagementServiceImpl implements FlowManagementService {
 
     }
 
+
+
+    private void replaceBranchResourceKey(List<ProcessorRouteInfo> processorRouteInfoList, Map<String, String> keyMap) throws Exception {
+
+        for (ProcessorRouteInfo processorRouteInfo : processorRouteInfoList) {
+            ProcessorInfo processorInfo = dalaranContext.getDalaranComponentContext().getProcessorInfo(processorRouteInfo.getGroup(), processorRouteInfo.getType(), processorRouteInfo.getVersion());
+            Object processorConfig = resourceBuilder.buildConfig(processorRouteInfo.getConfig(), processorInfo.getConfigType());
+            replaceProcessorModel(processorConfig, keyMap);
+            if (processorConfig instanceof ConnectorConfig) {
+                ConnectorConfig connectorConfig = (ConnectorConfig) processorConfig;
+                connectorConfig.setConnectorId(keyMap.get(connectorConfig.getConnectorId()));
+            }
+            if (processorConfig instanceof ServiceOperationConfig) {
+                ServiceOperationConfig serviceOperationConfig = (ServiceOperationConfig) processorConfig;
+                String serviceId = null;
+                if (StringUtils.isNotBlank(serviceOperationConfig.getServiceId())) {
+                    serviceOperationConfig.setServiceId(keyMap.get(serviceOperationConfig.getServiceId()));
+                }
+//                List<ModelEntity> serviceModels = modelRepository.findByTargetTypeAndTargetId(ModelTargetType.Service, serviceId);
+//                serviceModels.forEach(modelEntity -> models.put(modelEntity.getResourceKey(), modelEntity));
+            }
+
+            if (processorConfig instanceof DalaranMapperConfig) {
+                DalaranMapperConfig mapperConfig = (DalaranMapperConfig) processorConfig;
+
+                mapperConfig.setInModelId(keyMap.get(mapperConfig.getInModelId()));
+                mapperConfig.setOutModelId(keyMap.get(mapperConfig.getOutModelId()));
+
+//                log.info("mapperConfig: " + JSON.toJSONString(mapperConfig));
+//
+//                Map<String, SimpleMapping> messageMapping = mapperConfig.getMessageMapping();
+//                List<SimpleMapping> simpleMappings = new ArrayList<>(messageMapping.values());
+//                List<SimpleMapping> noDestinationMappings = mapperConfig.getNoDestinationMappings();
+//                log.info("noDestinationMappings: " + noDestinationMappings);
+//                if (CollectionUtils.isNotEmpty(noDestinationMappings)) {
+//                    simpleMappings.addAll(noDestinationMappings);
+//                }
+//                log.info("simpleMappings: " + simpleMappings.toString());
+//                for (SimpleMapping simpleMapping : simpleMappings) {
+//                    if (simpleMapping.getMappingType() == MappingType.FUNCTION) {
+//                        MappingFunction mappingFunction = (MappingFunction) (simpleMapping.getValue());
+//                        if (mappingFunction.getType() == FunctionType.STATIC) {
+//                            continue;
+//                        }
+//                        String functionKey = mappingFunction.getId();
+//                        if (functions.containsKey(functionKey)) {
+//                            continue;
+//                        }
+//                        FunctionEntity entity = functionRepository.findByResourceKey(functionKey);
+//                        functions.put(functionKey, entity);
+//                    }
+//                }
+            }
+
+            if (processorConfig instanceof DalaranRouterConfig) {
+                DalaranRouterConfig dalaranRouterConfig = (DalaranRouterConfig) processorConfig;
+                for (DalaranRouterConfig.Route route : dalaranRouterConfig.getRoutes()) {
+                    replaceBranchResourceKey(route.getPipeline(), keyMap);
+                }
+            }
+
+            if (processorConfig instanceof ScatterGatherConfig) {
+                ScatterGatherConfig scatterGatherConfig = (ScatterGatherConfig) processorConfig;
+                for (ScatterGatherConfig.Branch branch : scatterGatherConfig.getBranches()) {
+                    replaceBranchResourceKey(branch.getPipeline(), keyMap);
+                }
+            }
+
+            if (processorConfig instanceof RetryConfig) {
+                RetryConfig retryConfig = (RetryConfig) processorConfig;
+                replaceBranchResourceKey(retryConfig.getPipeline(), keyMap);
+            }
+
+            if (processorConfig instanceof LoopWhileConfig) {
+                LoopWhileConfig loopWhileConfig = (LoopWhileConfig) processorConfig;
+                replaceBranchResourceKey(loopWhileConfig.getPipeline(), keyMap);
+            }
+
+            if (processorConfig instanceof ForEachConfig) {
+                ForEachConfig forEachConfig = (ForEachConfig) processorConfig;
+                replaceBranchResourceKey(forEachConfig.getPipeline(), keyMap);
+            }
+
+            if (processorConfig instanceof ErrorCatchConfig) {
+                ErrorCatchConfig errorCatchConfig = (ErrorCatchConfig) processorConfig;
+                for (ErrorCatchConfig.Route route : errorCatchConfig.getRoutes()) {
+                    replaceBranchResourceKey(route.getPipeline(), keyMap);
+                }
+            }
+
+            if (processorConfig instanceof DalaranSubFlowConfig) {
+                DalaranSubFlowConfig subFlowConfig = (DalaranSubFlowConfig) processorConfig;
+                String subFlowId = subFlowConfig.getSubFlowId();
+                subFlowConfig.setSubFlowId(keyMap.get(subFlowId));
+                SubFlowAbstractEntity entity = resourceLoader.loadSubFlow(subFlowId);
+                if (entity != null) {
+                    replaceResourceKey(entity, keyMap);
+                }
+            }
+        }
+    }
+
+
+
+
     private void parseProcessorModel(Object config, Map models) {
         if (config instanceof OutModelConfig) {
             OutModelConfig outModelConfig = (OutModelConfig) config;
@@ -1293,6 +1537,24 @@ public class FlowManagementServiceImpl implements FlowManagementService {
             if (StringUtils.isNotBlank(outModelId)) {
                 models.put(outModelId, resourceLoader.loadModel(outModelId));
             }
+        }
+    }
+
+
+    private void replaceProcessorModel(Object config, Map<String, String> keyMap) {
+        if (config instanceof OutModelConfig) {
+            OutModelConfig outModelConfig = (OutModelConfig) config;
+            outModelConfig.setOutModelId(keyMap.get(outModelConfig.getOutModelId()));
+        }
+        if (config instanceof AllModelConfig) {
+            AllModelConfig allModelConfig = (AllModelConfig) config;
+            allModelConfig.setInModelId(keyMap.get(allModelConfig.getInModelId()));
+            allModelConfig.setOutModelId(keyMap.get(allModelConfig.getOutModelId()));
+        }
+        if (config instanceof ImmutableInModelConfig) {
+            ImmutableInModelConfig immutableInModelConfig = (ImmutableInModelConfig) config;
+            immutableInModelConfig.setInModelId(keyMap.get(immutableInModelConfig.getInModelId()));
+            immutableInModelConfig.setOutModelId(keyMap.get(immutableInModelConfig.getOutModelId()));
         }
     }
 
