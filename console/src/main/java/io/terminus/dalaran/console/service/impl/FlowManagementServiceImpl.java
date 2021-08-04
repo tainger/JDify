@@ -299,6 +299,7 @@ public class FlowManagementServiceImpl implements FlowManagementService {
         Map<String, ModelEntity> models = templateData.getRelationModel();
         for (Map.Entry<String, ModelEntity> entityEntry : models.entrySet()) {
             if (modelRepository.findByResourceKey(entityEntry.getKey()) != null) {
+                resourceKeyMap.put(entityEntry.getKey(), entityEntry.getKey());
                 continue;
             }
             ModelEntity modelEntity = new ModelEntity();
@@ -315,6 +316,7 @@ public class FlowManagementServiceImpl implements FlowManagementService {
         Map<String, ConnectorEntity> connectors = templateData.getRelationConnector();
         for (Map.Entry<String, ConnectorEntity> entityEntry : connectors.entrySet()) {
             if (connectorRepository.findByResourceKey(entityEntry.getKey()) != null) {
+                resourceKeyMap.put(entityEntry.getKey(), entityEntry.getKey());
                 continue;
             }
             ConnectorEntity connectorEntity = new ConnectorEntity();
@@ -331,6 +333,7 @@ public class FlowManagementServiceImpl implements FlowManagementService {
         Map<String, FunctionEntity> functions = templateData.getRelationFunction();
         for (Map.Entry<String, FunctionEntity> entityEntry : functions.entrySet()) {
             if (functionRepository.findByResourceKey(entityEntry.getKey()) != null) {
+                resourceKeyMap.put(entityEntry.getKey(), entityEntry.getKey());
                 continue;
             }
             FunctionEntity functionEntity = new FunctionEntity();
@@ -347,6 +350,7 @@ public class FlowManagementServiceImpl implements FlowManagementService {
         Map<String, ServiceEntity> services = templateData.getRelationService();
         for (Map.Entry<String, ServiceEntity> entityEntry : services.entrySet()) {
             if (serviceRepository.findByResourceKey(entityEntry.getKey()) != null) {
+                resourceKeyMap.put(entityEntry.getKey(), entityEntry.getKey());
                 continue;
             }
             ServiceEntity serviceEntity = new ServiceEntity();
@@ -363,6 +367,7 @@ public class FlowManagementServiceImpl implements FlowManagementService {
         Map<String, SubFlowEntity> subflows = templateData.getRelationSubFlow();
         for (Map.Entry<String, SubFlowEntity> entityEntry : subflows.entrySet()) {
             if (subFlowRepository.findByResourceKey(entityEntry.getKey()) != null) {
+                resourceKeyMap.put(entityEntry.getKey(), entityEntry.getKey());
                 continue;
             }
             SubFlowEntity subflowEntity = new SubFlowEntity();
