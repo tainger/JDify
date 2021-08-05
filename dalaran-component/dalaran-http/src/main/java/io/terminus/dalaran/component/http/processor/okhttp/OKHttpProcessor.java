@@ -14,9 +14,7 @@ import org.apache.camel.Processor;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 @Slf4j
 public class OKHttpProcessor implements Processor {
@@ -24,6 +22,8 @@ public class OKHttpProcessor implements Processor {
     private OKHttpClientConfig config;
 
     private OkHttpClient client;
+
+    private final List<Integer> SUCCESS_CODE = Arrays.asList(200, 201, 202, 203, 204, 205, 206);
 
     public OKHttpProcessor(OKHttpClientConfig config, OkHttpClient client) {
         this.config = config;
@@ -83,7 +83,7 @@ public class OKHttpProcessor implements Processor {
             }
         }
         Response response = client.newCall(request).execute();
-        if (response.code() != 200) {
+        if ( !SUCCESS_CODE.contains(response.code())) {
             throw new RuntimeException("Http Request Error! " + Objects.requireNonNull(response.body()).string());
         }
         String responseBody = Objects.requireNonNull(response.body()).string();
