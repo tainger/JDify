@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.var;
 import okhttp3.*;
 import org.apache.camel.Exchange;
+import org.apache.camel.Message;
 import org.apache.camel.Processor;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -159,7 +160,9 @@ public class OKHttpProcessor implements Processor {
         }
     }
 
-    private String buildPath(String path, Exchange exchange) {
+    private String buildPath(String path, Exchange exchange) throws Exception {
+        Object body = exchange.getIn().getBody();
+        Map<String, String> bodyParameter = buildFormBody(body);
         if (!StringUtils.contains(path, "{") || !StringUtils.contains(path, "}")) {
             return path;
         }
@@ -174,6 +177,12 @@ public class OKHttpProcessor implements Processor {
             String paramKey = StringUtils.substring(param, 1, param.length() - 1);
             if (contextValues.containsKey(paramKey)) {
                 String pathValue = contextValues.get(paramKey).toString();
+                if(null == pathValue) {
+                    pathValue = bodyParameter.get(paramKey);
+                    if(null == pathValue) {
+                        throw  new RuntimeException("parameter in url path not configure:" + paramKey);
+                    }
+                }
                 pathBuilder = new StringBuilder(StringUtils.replace(pathBuilder.toString(), param, pathValue));
 
             }
