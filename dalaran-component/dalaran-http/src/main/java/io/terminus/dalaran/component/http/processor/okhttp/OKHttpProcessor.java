@@ -179,12 +179,11 @@ public class OKHttpProcessor implements Processor {
             if (contextValues.containsKey(paramKey) || bodyParameter.containsKey(paramKey)) {
                 String pathValue = bodyParameter.get(paramKey);
                 if(null == pathValue) {
-                    Object object =  contextValues.get(paramKey);
-                    pathValue = object.toString();
+                    pathValue =  contextValues.get(paramKey).toString();
                 }
                 pathBuilder = new StringBuilder(StringUtils.replace(pathBuilder.toString(), param, pathValue));
             }else  {
-                throw  new RuntimeException("parameter in url path not configure:" + paramKey);
+                throw  new RuntimeException("parameter in url path not configure: " + paramKey);
             }
         }
         return pathBuilder.toString();
