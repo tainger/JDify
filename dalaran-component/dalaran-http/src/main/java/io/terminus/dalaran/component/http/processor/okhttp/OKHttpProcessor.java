@@ -46,8 +46,8 @@ public class OKHttpProcessor implements Processor {
         if (StringUtils.isNotBlank(config.getHeaders())) {
             headers = Headers.of(buildValues(exchange, config.getHeaders()));
         }
-
         if (config.getMethod() == HttpMethod.GET) {
+            log.error("url: " + url);
             Map<String, Object> params = buildQueryString(exchange.getIn().getBody());
             //params.forEach(httpBuilder::addQueryParameter);
             for(String string: params.keySet()) {
@@ -61,6 +61,7 @@ public class OKHttpProcessor implements Processor {
                 }
                 url += Joiner.on("&").withKeyValueSeparator("=").join(buildValues(exchange, config.getQueryParams()));
             }
+            log.error("url: " + url);
             switch (config.getContentType()) {
                 case APPLICATION_FORM_URLENCODED:
                     Map<String, String> formBody = buildFormBody(exchange.getIn().getBody());
@@ -175,16 +176,15 @@ public class OKHttpProcessor implements Processor {
                 continue;
             }
             String paramKey = StringUtils.substring(param, 1, param.length() - 1);
-            if (contextValues.containsKey(paramKey)) {
-                String pathValue = contextValues.get(paramKey).toString();
+            if (contextValues.containsKey(paramKey) || bodyParameter.containsKey(paramKey)) {
+                String pathValue = bodyParameter.get(paramKey);
                 if(null == pathValue) {
-                    pathValue = bodyParameter.get(paramKey);
-                    if(null == pathValue) {
-                        throw  new RuntimeException("parameter in url path not configure:" + paramKey);
-                    }
+                    Object object =  contextValues.get(paramKey);
+                    pathValue = object.toString();
                 }
                 pathBuilder = new StringBuilder(StringUtils.replace(pathBuilder.toString(), param, pathValue));
-
+            }else  {
+                throw  new RuntimeException("parameter in url path not configure:" + paramKey);
             }
         }
         return pathBuilder.toString();
