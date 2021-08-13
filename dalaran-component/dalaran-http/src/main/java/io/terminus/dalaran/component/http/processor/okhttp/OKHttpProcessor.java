@@ -1,6 +1,8 @@
 package io.terminus.dalaran.component.http.processor.okhttp;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Joiner;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Maps;
@@ -13,6 +15,7 @@ import org.apache.camel.Message;
 import org.apache.camel.Processor;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.util.CollectionUtils;
 
 import java.util.*;
 
@@ -34,7 +37,7 @@ public class OKHttpProcessor implements Processor {
     public void process(Exchange exchange) throws Exception {
         String path = buildPath(config.getPath(), exchange);
         String url;
-        if (config.getConnector().getProtocol().name().equals("HTTPS")){
+        if (config.getConnector().getProtocol().name().equals("HTTPS")) {
             url = config.getConnector().getProtocol().name().toLowerCase() + "://" + config.getConnector().getHost() + path;
         } else {
             url = config.getConnector().getProtocol().name().toLowerCase() + "://" + config.getConnector().getHost() + ":" + config.getConnector().getPort() + path;
@@ -50,7 +53,7 @@ public class OKHttpProcessor implements Processor {
             log.error("url: " + url);
             Map<String, Object> params = buildQueryString(exchange.getIn().getBody());
             //params.forEach(httpBuilder::addQueryParameter);
-            for(String string: params.keySet()) {
+            for (String string : params.keySet()) {
                 httpBuilder.addQueryParameter(string, params.get(string).toString());
             }
             request = new Request.Builder().url(httpBuilder.build()).headers(headers).build();
@@ -74,7 +77,7 @@ public class OKHttpProcessor implements Processor {
                     Map<String, String> formData = buildValues(exchange, config.getFormData());
                     var multipartBuilder = new MultipartBody.Builder();
                     formData.forEach((k, v) -> multipartBuilder.addFormDataPart(k, v));
-                    MultipartBody multipartBody =  multipartBuilder.setType(MultipartBody.FORM).build();
+                    MultipartBody multipartBody = multipartBuilder.setType(MultipartBody.FORM).build();
                     request = makeRequest(url, headers, config.getMethod(), multipartBody);
                     break;
                 default:
@@ -83,7 +86,7 @@ public class OKHttpProcessor implements Processor {
             }
         }
         Response response = client.newCall(request).execute();
-        if ( !SUCCESS_CODE.contains(response.code())) {
+        if (!SUCCESS_CODE.contains(response.code())) {
             throw new RuntimeException("Http Request Error! " + Objects.requireNonNull(response.body()).string());
         }
         String responseBody = Objects.requireNonNull(response.body()).string();
@@ -111,7 +114,7 @@ public class OKHttpProcessor implements Processor {
         if (obj instanceof byte[]) {
             inBody = JSON.parseObject(IOUtils.toString((byte[]) obj), Map.class);
         } else if (obj instanceof String) {
-            inBody = JSON.parseObject((String)obj, Map.class);
+            inBody = JSON.parseObject((String) obj, Map.class);
         } else {
             inBody = JSON.parseObject(JSON.toJSONString(obj), Map.class);
         }
@@ -124,9 +127,9 @@ public class OKHttpProcessor implements Processor {
             return null;
         }
         if (body instanceof byte[]) {
-            return IOUtils.toString((byte[])body);
+            return IOUtils.toString((byte[]) body);
         } else if (body instanceof String) {
-            return (String)body;
+            return (String) body;
         } else {
             return JSON.toJSONString(body);
         }
@@ -134,11 +137,11 @@ public class OKHttpProcessor implements Processor {
 
     private Map<String, String> buildValues(Exchange exchange, String params) {
         String contextKey = "DalaranContextExchange" + exchange.getExchangeId();
-        Map<String, Object> contextValues = (Map)exchange.getProperties().get(contextKey);
+        Map<String, Object> contextValues = (Map) exchange.getProperties().get(contextKey);
         Map<String, String> values = new HashMap<>();
         String[] headerNames = StringUtils.split(StringUtils.replaceChars(params, " ", ""), ",");
-        for (String name: headerNames) {
-            values.put(name, (String)contextValues.get(name));
+        for (String name : headerNames) {
+            values.put(name, (String) contextValues.get(name));
         }
 //        if (config.getAddLastHeaders()) {
 //            exchange.getIn().getHeaders().forEach((k, v) -> {
@@ -152,40 +155,48 @@ public class OKHttpProcessor implements Processor {
         if (body == null) {
             return null;
         }
+        String toParse;
         if (body instanceof byte[]) {
-            return JSON.parseObject(IOUtils.toString((byte[])body), Map.class);
+            toParse = IOUtils.toString((byte[]) body);
         } else if (body instanceof String) {
-            return JSON.parseObject((String) body, Map.class);
+            toParse = (String) body;
         } else {
-            return JSON.parseObject(JSON.toJSONString(body), Map.class);
+            toParse = JSON.toJSONString(body);
         }
+        if (toParse.startsWith("[")) {
+            return null;
+        }
+        return JSONObject.parseObject(toParse, Map.class);
     }
 
     private String buildPath(String path, Exchange exchange) throws Exception {
         Object body = exchange.getIn().getBody();
         Map<String, String> bodyParameter = buildFormBody(body);
-        if (!StringUtils.contains(path, "{") || !StringUtils.contains(path, "}")) {
-            return path;
-        }
-        String contextKey = "DalaranContextExchange" + exchange.getExchangeId();
-        Map<String, Object> contextValues = (Map)exchange.getProperties().get(contextKey);
-        StringBuilder pathBuilder = new StringBuilder(path);
-        String[] params = StringUtils.split(path, "/");
-        for (String param: params) {
-            if (!StringUtils.contains(param, "{") || !StringUtils.contains(param, "}")) {
-                continue;
+        if(!CollectionUtils.isEmpty(bodyParameter)) {
+            if (!StringUtils.contains(path, "{") || !StringUtils.contains(path, "}")) {
+                return path;
             }
-            String paramKey = StringUtils.substring(param, 1, param.length() - 1);
-            if (contextValues.containsKey(paramKey) || bodyParameter.containsKey(paramKey)) {
-                String pathValue = bodyParameter.get(paramKey);
-                if(null == pathValue) {
-                    pathValue =  contextValues.get(paramKey).toString();
+            String contextKey = "DalaranContextExchange" + exchange.getExchangeId();
+            Map<String, Object> contextValues = (Map) exchange.getProperties().get(contextKey);
+            StringBuilder pathBuilder = new StringBuilder(path);
+            String[] params = StringUtils.split(path, "/");
+            for (String param : params) {
+                if (!StringUtils.contains(param, "{") || !StringUtils.contains(param, "}")) {
+                    continue;
                 }
-                pathBuilder = new StringBuilder(StringUtils.replace(pathBuilder.toString(), param, pathValue));
-            }else  {
-                throw  new RuntimeException("parameter in url path not configure: " + paramKey);
+                String paramKey = StringUtils.substring(param, 1, param.length() - 1);
+                if (contextValues.containsKey(paramKey) || bodyParameter.containsKey(paramKey)) {
+                    String pathValue = bodyParameter.get(paramKey);
+                    if (null == pathValue) {
+                        pathValue = contextValues.get(paramKey).toString();
+                    }
+                    pathBuilder = new StringBuilder(StringUtils.replace(pathBuilder.toString(), param, pathValue));
+                } else {
+                    throw new RuntimeException("parameter in url path not configure: " + paramKey);
+                }
             }
+            return pathBuilder.toString();
         }
-        return pathBuilder.toString();
+        return path;
     }
 }
