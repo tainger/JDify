@@ -301,6 +301,8 @@ public class DefaultCamelFlowBuilder implements DalaranFlowBuilder<DalaranRoute>
             // 如果下一个组件声明类型为 Unknown, 则尝试取下一个模型的类型
             if (UNKNOWN_MODEL_TYPE.equalsIgnoreCase(nextBodyType) && nextModel != null) {
                 nextBodyType = nextModel.getModelType();
+            } else {
+                return nextBodyType;
             }
             // 如果目前是 Object, 则从 Object 转至目标类型
             if (DalaranConstants.OBJECT_MODEL_TYPE.equalsIgnoreCase(currentBodyType)) {

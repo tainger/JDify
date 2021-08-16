@@ -1,7 +1,6 @@
 package io.terminus.dalaran.component.http.processor.okhttp;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Joiner;
 import com.google.common.base.Predicate;
@@ -11,7 +10,6 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.var;
 import okhttp3.*;
 import org.apache.camel.Exchange;
-import org.apache.camel.Message;
 import org.apache.camel.Processor;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -50,7 +48,6 @@ public class OKHttpProcessor implements Processor {
             headers = Headers.of(buildValues(exchange, config.getHeaders()));
         }
         if (config.getMethod() == HttpMethod.GET) {
-            log.error("url: " + url);
             Map<String, Object> params = buildQueryString(exchange.getIn().getBody());
             //params.forEach(httpBuilder::addQueryParameter);
             for (String string : params.keySet()) {
@@ -64,7 +61,6 @@ public class OKHttpProcessor implements Processor {
                 }
                 url += Joiner.on("&").withKeyValueSeparator("=").join(buildValues(exchange, config.getQueryParams()));
             }
-            log.error("url: " + url);
             switch (config.getContentType()) {
                 case APPLICATION_FORM_URLENCODED:
                     Map<String, String> formBody = buildFormBody(exchange.getIn().getBody());
