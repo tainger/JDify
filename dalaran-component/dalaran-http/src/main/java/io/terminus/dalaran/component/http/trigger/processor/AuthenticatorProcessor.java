@@ -100,7 +100,7 @@ public class AuthenticatorProcessor implements Processor {
             }
             if (StringUtils.isNotBlank(requestSign)) {
                 String appSecret = authenticatorSign.getAppSecret();
-                Map<String, String> sortedBody = new TreeMap<>(body);
+                Map<String, Object> sortedBody = new TreeMap<>(body);
                 sortedBody.remove(AUTH_SIGN);
                 String bodyString = sortedBody.entrySet().stream()
                         .map(entry -> entry.getKey() + "=" + entry.getValue())
@@ -142,7 +142,7 @@ public class AuthenticatorProcessor implements Processor {
             }
             if (StringUtils.isNotBlank(requestSign)) {
                 String appSecret = authenticatorSign.getAppSecret();
-                Map<String, String> sortedBody = new TreeMap<>(param);
+                Map<String, Object> sortedBody = new TreeMap<>(param);
                 sortedBody.remove(AUTH_SIGN);
                 String bodyString = sortedBody.entrySet().stream()
                         .map(entry -> entry.getKey() + "=" + entry.getValue())
