@@ -1,7 +1,6 @@
 package io.terminus.dalaran.component.http.processor.okhttp;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Joiner;
 import com.google.common.base.Predicate;
@@ -11,7 +10,6 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.var;
 import okhttp3.*;
 import org.apache.camel.Exchange;
-import org.apache.camel.Message;
 import org.apache.camel.Processor;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;

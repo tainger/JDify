@@ -27,6 +27,10 @@ public class RedisService {
         }
     }
 
+    public Boolean setValue(String key, String value, Long timeout) {
+        return redisTemplate.opsForValue().setIfAbsent(key, value, timeout, TimeUnit.SECONDS);
+    }
+
     public Boolean setValueMinutes(String key, String value, long timeout) {
         try {
             return redisTemplate.opsForValue().setIfAbsent(key, value, timeout, TimeUnit.MINUTES);
