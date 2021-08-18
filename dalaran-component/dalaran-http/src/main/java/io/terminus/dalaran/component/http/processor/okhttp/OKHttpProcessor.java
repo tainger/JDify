@@ -24,7 +24,9 @@ public class OKHttpProcessor implements Processor {
 
     private OkHttpClient client;
 
-    private final List<Integer> SUCCESS_CODE = Arrays.asList(200, 201, 202, 203, 204, 205, 206);
+    private final String RESPONSE_CODE = "responseCode";
+
+    private final String RESPONSE_BODY = "responseBody";
 
     public OKHttpProcessor(OKHttpClientConfig config, OkHttpClient client) {
         this.config = config;
@@ -81,13 +83,15 @@ public class OKHttpProcessor implements Processor {
                     request = makeRequest(url, headers, config.getMethod(), body);
             }
         }
+
         Response response = client.newCall(request).execute();
-        if (!SUCCESS_CODE.contains(response.code())) {
-            throw new RuntimeException("Http Request Error! " + Objects.requireNonNull(response.body()).string());
-        }
         String responseBody = Objects.requireNonNull(response.body()).string();
         log.info("response: " + responseBody);
-        exchange.getOut().setBody(responseBody);
+
+        Map<String, Object> okHttpResponse = new HashMap<>();
+        okHttpResponse.put(RESPONSE_CODE, response.code());
+        okHttpResponse.put(RESPONSE_BODY, responseBody);
+        exchange.getOut().setBody(okHttpResponse);
     }
 
     public Request makeRequest(String url, Headers headers, HttpMethod method, RequestBody requestBody) {
@@ -159,16 +163,18 @@ public class OKHttpProcessor implements Processor {
         } else {
             toParse = JSON.toJSONString(body);
         }
-        if (toParse.startsWith("[")) {
+        //省一次JSONObject.parse
+        try {
+            return JSONObject.parseObject(toParse, Map.class);
+        } catch (Exception e) {
             return null;
         }
-        return JSONObject.parseObject(toParse, Map.class);
     }
 
     private String buildPath(String path, Exchange exchange) throws Exception {
         Object body = exchange.getIn().getBody();
         Map<String, String> bodyParameter = buildFormBody(body);
-        if(!CollectionUtils.isEmpty(bodyParameter)) {
+        if (!CollectionUtils.isEmpty(bodyParameter)) {
             if (!StringUtils.contains(path, "{") || !StringUtils.contains(path, "}")) {
                 return path;
             }
