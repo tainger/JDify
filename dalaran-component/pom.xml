@@ -36,7 +36,6 @@
         <module>dalaran-end</module>
         <module>dalaran-elasticjob</module>
         <module>dalaran-csb</module>
-        <module>dalaran-DingDingNotice</module>
     </modules>
 
 </project>
