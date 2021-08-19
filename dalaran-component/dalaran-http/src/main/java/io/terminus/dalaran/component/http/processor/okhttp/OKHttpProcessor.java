@@ -87,11 +87,8 @@ public class OKHttpProcessor implements Processor {
         Response response = client.newCall(request).execute();
         String responseBody = Objects.requireNonNull(response.body()).string();
         log.info("response: " + responseBody);
-
-        Map<String, Object> okHttpResponse = new HashMap<>();
-        okHttpResponse.put(RESPONSE_CODE, response.code());
-        okHttpResponse.put(RESPONSE_BODY, responseBody);
-        exchange.getOut().setBody(okHttpResponse);
+        HttpClientResponse httpClientResponse = new HttpClientResponse(response.code(), responseBody);
+        exchange.getOut().setBody(JSONObject.toJSONString(httpClientResponse));
     }
 
     public Request makeRequest(String url, Headers headers, HttpMethod method, RequestBody requestBody) {
