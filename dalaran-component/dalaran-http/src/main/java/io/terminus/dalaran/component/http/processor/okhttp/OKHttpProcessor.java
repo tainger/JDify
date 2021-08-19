@@ -86,7 +86,7 @@ public class OKHttpProcessor implements Processor {
         String responseBody = Objects.requireNonNull(response.body()).string();
         log.info("response: " + responseBody);
         if (!SUCCESS_CODE.contains(response.code())) {
-            throw new RuntimeException("Http Request Error! " + Objects.requireNonNull(response.body()).string());
+            throw new RuntimeException("Http Request Error! " + responseBody);
         }
         exchange.getOut().setBody(responseBody);
     }
