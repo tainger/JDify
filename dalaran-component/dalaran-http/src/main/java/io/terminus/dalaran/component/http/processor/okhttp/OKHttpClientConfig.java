@@ -42,8 +42,8 @@ public class OKHttpClientConfig extends OutModelConfig implements ConnectorConfi
     @ConfigFieldInfo(label = "Form Data", inputType = FieldInputType.String, required = false)
     private String formData;
 
-//    @ConfigFieldInfo(label = "Add Last Headers", inputType = FieldInputType.Switch, required = false)
-//    private Boolean addLastHeaders = false;
+    @ConfigFieldInfo(label = "Add Last Headers", inputType = FieldInputType.Switch, required = false)
+    private Boolean addLastHeaders = false;
 
     @ConfigFieldInfo(label = "是否校验证书", inputType = FieldInputType.Switch, required = false)
     private Boolean checkCertificate = true;
