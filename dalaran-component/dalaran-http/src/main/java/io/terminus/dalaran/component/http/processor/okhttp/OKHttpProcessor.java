@@ -24,9 +24,8 @@ public class OKHttpProcessor implements Processor {
 
     private OkHttpClient client;
 
-    private final String RESPONSE_CODE = "responseCode";
+    private final List<Integer> SUCCESS_CODE = Arrays.asList(200, 201, 202, 203, 204, 205, 206);
 
-    private final String RESPONSE_BODY = "responseBody";
 
     public OKHttpProcessor(OKHttpClientConfig config, OkHttpClient client) {
         this.config = config;
@@ -83,12 +82,10 @@ public class OKHttpProcessor implements Processor {
                     request = makeRequest(url, headers, config.getMethod(), body);
             }
         }
-
         Response response = client.newCall(request).execute();
         String responseBody = Objects.requireNonNull(response.body()).string();
         log.info("response: " + responseBody);
-        HttpClientResponse httpClientResponse = new HttpClientResponse(response.code(), responseBody);
-        exchange.getOut().setBody(JSONObject.toJSONString(httpClientResponse));
+        exchange.getOut().setBody(responseBody);
     }
 
     public Request makeRequest(String url, Headers headers, HttpMethod method, RequestBody requestBody) {

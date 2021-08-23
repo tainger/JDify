@@ -30,7 +30,11 @@ public class SqlBeforeProcessor implements Processor {
             Map<String, Object> body = exchange.getIn().getBody(Map.class);
             for (Map.Entry<String, Object> entry: body.entrySet()) {
                 if (StringUtils.contains(sql, SQL_PREFIX + entry.getKey())) {
-                    sql = StringUtils.replace(sql, SQL_PREFIX + entry.getKey(), entry.getValue().toString());
+                    if (entry.getValue() == null) {
+                        sql = StringUtils.replace(sql, SQL_PREFIX + entry.getKey(), "");
+                    } else {
+                        sql = StringUtils.replace(sql, SQL_PREFIX + entry.getKey(), entry.getValue().toString());
+                    }
                 }
             }
             logger.info("after handle: " + sql);
