@@ -11,6 +11,7 @@ import lombok.var;
 import okhttp3.*;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.CollectionUtils;
@@ -44,10 +45,21 @@ public class OKHttpProcessor implements Processor {
         Request request;
         HttpUrl.Builder httpBuilder = HttpUrl.parse(url).newBuilder();
 
-        Headers headers = Headers.of();
+        Map<String, String> headerValue = new HashMap<>();
+
         if (StringUtils.isNotBlank(config.getHeaders())) {
-            headers = Headers.of(buildValues(exchange, config.getHeaders()));
+            headerValue.putAll(buildValues(exchange, config.getHeaders()));
         }
+
+        if (config.getAddLastHeaders()) {
+            exchange.getIn().getHeaders().forEach((k, v) -> {
+                log.info("name: " + k + ", value: " + v);
+                headerValue.put(k, String.valueOf(v));
+            });
+        }
+
+        Headers headers = Headers.of(headerValue);
+
         if (config.getMethod() == HttpMethod.GET) {
             Map<String, Object> params = buildQueryString(exchange.getIn().getBody());
             //params.forEach(httpBuilder::addQueryParameter);
@@ -135,13 +147,18 @@ public class OKHttpProcessor implements Processor {
         Map<String, String> values = new HashMap<>();
         String[] headerNames = StringUtils.split(StringUtils.replaceChars(params, " ", ""), ",");
         for (String name : headerNames) {
-            values.put(name, (String) contextValues.get(name));
+            String value = null;
+            if (MapUtils.isNotEmpty(contextValues)) {
+                value = String.valueOf(contextValues.get(name));
+            }
+            if (StringUtils.isBlank(value)) {
+                value = String.valueOf(exchange.getIn().getHeader(name));
+            }
+            if (value != null) {
+                values.put(name, value);
+            }
         }
-        if (config.getAddLastHeaders()) {
-            exchange.getIn().getHeaders().forEach((k, v) -> {
-                values.put(k, String.valueOf(v));
-            });
-        }
+        log.info("headers: " + values.toString());
         return values;
     }
 
