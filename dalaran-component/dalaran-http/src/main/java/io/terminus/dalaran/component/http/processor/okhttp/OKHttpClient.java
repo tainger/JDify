@@ -8,6 +8,7 @@ import io.terminus.dalaran.core.component.DalaranProcessor;
 import io.terminus.dalaran.core.component.annotation.Processor;
 import io.terminus.dalaran.core.oss.OSSAccount;
 import lombok.extern.slf4j.Slf4j;
+import okhttp3.ConnectionPool;
 import okhttp3.ConnectionSpec;
 import okhttp3.OkHttpClient;
 import org.apache.camel.model.ProcessorDefinition;
@@ -57,6 +58,7 @@ public class OKHttpClient implements DalaranProcessor<OKHttpClientConfig> {
                     OkHttpClient client = new OkHttpClient().newBuilder()
                             .connectTimeout(config.getConnector().getTimeout(), TimeUnit.MILLISECONDS)
                             .readTimeout(config.getConnector().getTimeout(), TimeUnit.MILLISECONDS)
+                            .connectionPool(new ConnectionPool(50, 5, TimeUnit.MINUTES))
                             .sslSocketFactory(sslSocketFactory, trustManager)
                             .connectionSpecs(Arrays.asList(ConnectionSpec.COMPATIBLE_TLS))
                             .build();
@@ -68,6 +70,7 @@ public class OKHttpClient implements DalaranProcessor<OKHttpClientConfig> {
                 OkHttpClient client = new OkHttpClient().newBuilder()
                         .connectTimeout(config.getConnector().getTimeout(), TimeUnit.MILLISECONDS)
                         .readTimeout(config.getConnector().getTimeout(), TimeUnit.MILLISECONDS)
+                        .connectionPool(new ConnectionPool(50, 5, TimeUnit.MINUTES))
                         .sslSocketFactory(createSSLSocketFactory(),new TrustAllCertificates())
                         .connectionSpecs(Arrays.asList(ConnectionSpec.COMPATIBLE_TLS))
                         .hostnameVerifier((s, sslSession) -> true)
@@ -78,6 +81,7 @@ public class OKHttpClient implements DalaranProcessor<OKHttpClientConfig> {
             OkHttpClient client = new OkHttpClient().newBuilder()
                     .connectTimeout(config.getConnector().getTimeout(), TimeUnit.MILLISECONDS)
                     .readTimeout(config.getConnector().getTimeout(), TimeUnit.MILLISECONDS)
+                    .connectionPool(new ConnectionPool(50, 5, TimeUnit.MINUTES))
                     .build();
             route.process(new OKHttpProcessor(config, client));
         }
