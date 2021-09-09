@@ -45,6 +45,7 @@ public class OKHttpProcessor implements Processor {
         Request request;
         HttpUrl.Builder httpBuilder = HttpUrl.parse(url).newBuilder();
 
+
         Map<String, String> headerValue = new HashMap<>();
 
         if (StringUtils.isNotBlank(config.getHeaders())) {
@@ -58,6 +59,12 @@ public class OKHttpProcessor implements Processor {
             });
         }
 
+        String username = config.getConnector().getUsername();
+        String password = config.getConnector().getPassword();
+        if(StringUtils.isNotEmpty(username) && StringUtils.isNotEmpty(password)){
+            String credential = Credentials.basic(username, password);
+            headerValue.put("Authorization", credential);
+        }
         Headers headers = Headers.of(headerValue);
 
         if (config.getMethod() == HttpMethod.GET) {
