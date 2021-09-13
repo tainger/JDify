@@ -81,7 +81,6 @@ public class OKHttpProcessor implements Processor {
                 }
                 url += Joiner.on("&").withKeyValueSeparator("=").join(buildValues(exchange, config.getQueryParams()));
             }
-            RequestBody body = null;
             switch (config.getContentType()) {
                 case APPLICATION_FORM_URLENCODED:
                     Map<String, String> formBody = buildFormBody(exchange.getIn().getBody());
@@ -97,11 +96,8 @@ public class OKHttpProcessor implements Processor {
                     MultipartBody multipartBody = multipartBuilder.setType(MultipartBody.FORM).build();
                     request = makeRequest(url, headers, config.getMethod(), multipartBody);
                     break;
-                case APPLICATION_X_WWW_FORM_URLENCODED:
-                    body = RequestBody.create(MediaType.parse("application/x-www-form-urlencoded"), buildRequestBody(exchange.getIn().getBody()));
-                    request = makeRequest(url, headers, config.getMethod(), body);
                 default:
-                    body = RequestBody.create(MediaType.parse("application/json"), buildRequestBody(exchange.getIn().getBody()));
+                    RequestBody body = RequestBody.create(MediaType.parse("application/json"), buildRequestBody(exchange.getIn().getBody()));
                     request = makeRequest(url, headers, config.getMethod(), body);
             }
         }

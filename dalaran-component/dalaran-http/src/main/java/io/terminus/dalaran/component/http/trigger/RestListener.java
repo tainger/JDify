@@ -87,6 +87,9 @@ public class RestListener implements DalaranTrigger<RestConfig>, DalaranTriggerA
             if (config.getContentType() == ContentType.APPLICATION_FORM_URLENCODED) {
                 route.process(new UrlEncodedProcessor());
             }
+            if (config.getContentType() == ContentType.APPLICATION_X_WWW_FORM_URLENCODED) {
+                route.process(new XWwwFormUrlencodedProcessor());
+            }
         }
     }
 
