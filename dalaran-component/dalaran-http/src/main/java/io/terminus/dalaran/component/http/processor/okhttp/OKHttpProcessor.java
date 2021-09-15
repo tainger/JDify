@@ -2,10 +2,14 @@ package io.terminus.dalaran.component.http.processor.okhttp;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.aliyun.oss.OSS;
+import com.aliyun.oss.OSSClientBuilder;
+import com.aliyun.oss.model.GetObjectRequest;
 import com.google.common.base.Joiner;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Maps;
 import io.terminus.dalaran.component.common.HttpMethod;
+import io.terminus.dalaran.core.oss.OSSAccount;
 import lombok.extern.slf4j.Slf4j;
 import lombok.var;
 import okhttp3.*;
@@ -14,16 +18,24 @@ import org.apache.camel.Processor;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.*;
 
+@Component
 @Slf4j
 public class OKHttpProcessor implements Processor {
 
     private OKHttpClientConfig config;
 
     private OkHttpClient client;
+
+    @Autowired
+    private OSSAccount ossAccount;
 
     private final List<Integer> SUCCESS_CODE = Arrays.asList(200, 201, 202, 203, 204, 205, 206);
 
@@ -44,21 +56,16 @@ public class OKHttpProcessor implements Processor {
         }
         Request request;
         HttpUrl.Builder httpBuilder = HttpUrl.parse(url).newBuilder();
-
-
         Map<String, String> headerValue = new HashMap<>();
-
         if (StringUtils.isNotBlank(config.getHeaders())) {
             headerValue.putAll(buildValues(exchange, config.getHeaders()));
         }
-
         if (config.getAddLastHeaders()) {
             exchange.getIn().getHeaders().forEach((k, v) -> {
                 log.info("name: " + k + ", value: " + v);
                 headerValue.put(k, String.valueOf(v));
             });
         }
-
         String username = config.getConnector().getUsername();
         String password = config.getConnector().getPassword();
         if(StringUtils.isNotEmpty(username) && StringUtils.isNotEmpty(password)){
@@ -66,7 +73,6 @@ public class OKHttpProcessor implements Processor {
             headerValue.put("Authorization", credential);
         }
         Headers headers = Headers.of(headerValue);
-
         if (config.getMethod() == HttpMethod.GET) {
             Map<String, Object> params = buildQueryString(exchange.getIn().getBody());
             //params.forEach(httpBuilder::addQueryParameter);
@@ -93,6 +99,17 @@ public class OKHttpProcessor implements Processor {
                     Map<String, String> formData = buildValues(exchange, config.getFormData());
                     var multipartBuilder = new MultipartBody.Builder();
                     formData.forEach((k, v) -> multipartBuilder.addFormDataPart(k, v));
+                    List<FormDataFileConfig> formDataFileConfigs = config.getFormDataFile();
+                    if (formDataFileConfigs != null) {
+                        formDataFileConfigs.parallelStream().forEach(formDataFileConfig -> {
+                            try {
+                                File file = getOssFile(formDataFileConfig.value, ossAccount);
+                                multipartBuilder.addFormDataPart(formDataFileConfig.key, "dalaran-" + formDataFileConfig.value.hashCode(), RequestBody.create(MediaType.parse("multipart/form-data"), file));
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        });
+                    }
                     MultipartBody multipartBody = multipartBuilder.setType(MultipartBody.FORM).build();
                     request = makeRequest(url, headers, config.getMethod(), multipartBody);
                     break;
@@ -218,5 +235,13 @@ public class OKHttpProcessor implements Processor {
             return pathBuilder.toString();
         }
         return path;
+    }
+
+    private File getOssFile(String object, OSSAccount ossAccount) throws IOException {
+        String fileName = "dalaran-" + object.hashCode();
+        File tempFile = File.createTempFile(fileName, "", new File("/var/tmp"));
+        OSS ossClient = new OSSClientBuilder().build(ossAccount.getEndpoint(), ossAccount.getAccessId(), ossAccount.getAccessSecret());
+        ossClient.getObject(new GetObjectRequest(ossAccount.getBucketName(), object), tempFile);
+        return tempFile;
     }
 }

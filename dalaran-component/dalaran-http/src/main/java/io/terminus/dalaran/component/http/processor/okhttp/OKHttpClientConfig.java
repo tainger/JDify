@@ -12,6 +12,8 @@ import io.terminus.dalaran.core.component.config.ConnectorConfig;
 import io.terminus.dalaran.core.component.config.OutModelConfig;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 public class OKHttpClientConfig extends OutModelConfig implements ConnectorConfig<RestClientConnector> {
 
@@ -41,6 +43,9 @@ public class OKHttpClientConfig extends OutModelConfig implements ConnectorConfi
 
     @ConfigFieldInfo(label = "Form Data", inputType = FieldInputType.String, required = false)
     private String formData;
+
+    @ConfigFieldInfo(label = "Form Data File", inputType = FieldInputType.FormDataFile, required = false)
+    private List<FormDataFileConfig> formDataFile;
 
     @ConfigFieldInfo(label = "Add Last Headers", inputType = FieldInputType.Switch, required = false)
     private Boolean addLastHeaders = false;

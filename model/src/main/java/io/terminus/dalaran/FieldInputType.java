@@ -38,9 +38,7 @@ public class FieldInputType {
     public static final String Pipeline = "Pipeline";
     public static final String Branches = "Branches";
     public static final String ErrorCatch = "ErrorCatch";
-    public static final String TrantorModule = "TrantorModule";
-    public static final String TrantorIntegration = "TrantorIntegration";
-    public static final String TrantorIntegrationPoint = "TrantorIntegrationPoint";
     public static final String AuthenticatorSelector = "AuthenticatorSelector";
     public static final String NodeSelector = "NodeSelector";
+    public static final String FormDataFile = "FormDataFile";
 }
