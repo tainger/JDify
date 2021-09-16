@@ -19,7 +19,7 @@ public class OSSManagementServiceImpl implements OSSManagementService {
     @Override
     public String upload(MultipartFile file) {
         OSS client = new OSSClientBuilder().build(ossAccount.getEndpoint(), ossAccount.getAccessId(), ossAccount.getAccessSecret());
-        String key = ossAccount.getRootDir() + "/" + FILE_ROOT + "/" + file.getOriginalFilename();
+        String key = ossAccount.getRootDir() + "/" + FILE_ROOT + "/" + System.currentTimeMillis() + "-" + file.getOriginalFilename();
         try {
             client.putObject(ossAccount.getBucketName(), key, file.getInputStream());
             client.shutdown();
