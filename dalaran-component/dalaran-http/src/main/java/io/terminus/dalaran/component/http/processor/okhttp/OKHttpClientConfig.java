@@ -44,9 +44,6 @@ public class OKHttpClientConfig extends OutModelConfig implements ConnectorConfi
     @ConfigFieldInfo(label = "Form Data", inputType = FieldInputType.String, required = false)
     private String formData;
 
-    @ConfigFieldInfo(label = "Form Data File", inputType = FieldInputType.FormDataFile, required = false, show = "contentType == \"MULTIPART_FORM_DATA\"")
-    private List<FormDataFileConfig> formDataFile;
-
     @ConfigFieldInfo(label = "Add Last Headers", inputType = FieldInputType.Switch, required = false)
     private Boolean addLastHeaders = false;
 
@@ -56,4 +53,7 @@ public class OKHttpClientConfig extends OutModelConfig implements ConnectorConfi
     @ConfigFieldInfo(label = "SSL Certificate", inputType = FieldInputType.FileUpload, required = false,
      show = "checkCertificate == true", dynamic = true)
     private String sslCertificate;
+
+    @ConfigFieldInfo(label = "Form Data File", inputType = FieldInputType.FormDataFile, required = false, show = "contentType == \"MULTIPART_FORM_DATA\"")
+    private List<FormDataFileConfig> formDataFile;
 }
