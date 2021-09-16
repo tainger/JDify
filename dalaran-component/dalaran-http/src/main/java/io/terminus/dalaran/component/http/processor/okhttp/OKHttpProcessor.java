@@ -18,15 +18,12 @@ import org.apache.camel.Processor;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
-@Component
 @Slf4j
 public class OKHttpProcessor implements Processor {
 
@@ -34,15 +31,15 @@ public class OKHttpProcessor implements Processor {
 
     private OkHttpClient client;
 
-    @Autowired
     private OSSAccount ossAccount;
 
     private final List<Integer> SUCCESS_CODE = Arrays.asList(200, 201, 202, 203, 204, 205, 206);
 
 
-    public OKHttpProcessor(OKHttpClientConfig config, OkHttpClient client) {
+    public OKHttpProcessor(OKHttpClientConfig config, OkHttpClient client, OSSAccount ossAccount) {
         this.config = config;
         this.client = client;
+        this.ossAccount = ossAccount;
     }
 
     @Override

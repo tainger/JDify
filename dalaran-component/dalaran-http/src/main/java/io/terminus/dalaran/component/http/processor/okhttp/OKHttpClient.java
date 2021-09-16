@@ -62,7 +62,7 @@ public class OKHttpClient implements DalaranProcessor<OKHttpClientConfig> {
                             .sslSocketFactory(sslSocketFactory, trustManager)
                             .connectionSpecs(Arrays.asList(ConnectionSpec.COMPATIBLE_TLS))
                             .build();
-                    route.process(new OKHttpProcessor(config, client));
+                    route.process(new OKHttpProcessor(config, client, ossAccount));
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -75,7 +75,7 @@ public class OKHttpClient implements DalaranProcessor<OKHttpClientConfig> {
                         .connectionSpecs(Arrays.asList(ConnectionSpec.COMPATIBLE_TLS))
                         .hostnameVerifier((s, sslSession) -> true)
                         .build();
-                route.process(new OKHttpProcessor(config, client));
+                route.process(new OKHttpProcessor(config, client, ossAccount));
             }
         } else {
             OkHttpClient client = new OkHttpClient().newBuilder()
@@ -83,7 +83,7 @@ public class OKHttpClient implements DalaranProcessor<OKHttpClientConfig> {
                     .readTimeout(config.getConnector().getTimeout(), TimeUnit.MILLISECONDS)
                     .connectionPool(new ConnectionPool(50, 5, TimeUnit.MINUTES))
                     .build();
-            route.process(new OKHttpProcessor(config, client));
+            route.process(new OKHttpProcessor(config, client, ossAccount));
         }
     }
 
