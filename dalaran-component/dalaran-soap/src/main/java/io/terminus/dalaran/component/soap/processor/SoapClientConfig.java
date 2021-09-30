@@ -30,4 +30,7 @@ public class SoapClientConfig extends OutModelConfig implements ConnectorConfig<
 
     @ConfigFieldInfo(label = "路径", inputType = FieldInputType.String, defaultValue = "/")
     private String path;
+
+    @ConfigFieldInfo(label = "Headers", inputType = FieldInputType.String, required = false)
+    private String headers;
 }
