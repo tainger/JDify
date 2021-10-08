@@ -21,7 +21,7 @@ public class NodeEntity extends BasicEntity {
     @Column(nullable = false)
     private String application;
 
-    private String system;
+    private String systems;
 
     private String icon;
 
