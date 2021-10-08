@@ -47,6 +47,7 @@ public class SoapClientProcessor implements Processor {
         String contextKey = "DalaranContextExchange" + exchange.getExchangeId();
         Map<String, Object> contextValues = (Map) exchange.getProperties().get(contextKey);
         Map<String, String> values = new HashMap<>();
+        values.put("Content-Type", "text/xml");
         String[] headerNames = StringUtils.split(StringUtils.replaceChars(params, " ", ""), ",");
         for (String name : headerNames) {
             String value = null;
