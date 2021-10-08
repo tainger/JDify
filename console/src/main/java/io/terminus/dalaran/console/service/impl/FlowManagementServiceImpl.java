@@ -808,7 +808,7 @@ public class FlowManagementServiceImpl implements FlowManagementService {
                             nodeFlowDTO.setId(nodeEntity.getResourceKey());
                             nodeFlowDTO.setCompany(nodeEntity.getCompany());
                             nodeFlowDTO.setApplication(nodeEntity.getApplication());
-                            nodeFlowDTO.setSystem(nodeEntity.getSystem());
+                            nodeFlowDTO.setSystem(nodeEntity.getSystems());
                             nodeFlowDTO.setIcon(nodeEntity.getIcon());
                             nodeFlowDTO.setIconColour(nodeEntity.getIconColour());
                             if (isRouter) {
@@ -829,7 +829,7 @@ public class FlowManagementServiceImpl implements FlowManagementService {
                             nodeFlowDTO.setId(nodeEntity.getResourceKey());
                             nodeFlowDTO.setCompany(nodeEntity.getCompany());
                             nodeFlowDTO.setApplication(nodeEntity.getApplication());
-                            nodeFlowDTO.setSystem(nodeEntity.getSystem());
+                            nodeFlowDTO.setSystem(nodeEntity.getSystems());
                             nodeFlowDTO.setIcon(nodeEntity.getIcon());
                             nodeFlowDTO.setIconColour(nodeEntity.getIconColour());
                             if (isRouter) {

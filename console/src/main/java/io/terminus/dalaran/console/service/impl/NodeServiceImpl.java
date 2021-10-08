@@ -69,7 +69,7 @@ public class NodeServiceImpl implements NodeService {
         nodeEntity.setName(nodeDTO.getName());
         nodeEntity.setCompany(nodeDTO.getCompany());
         nodeEntity.setApplication(nodeDTO.getApplication());
-        nodeEntity.setSystem(nodeDTO.getSystem());
+        nodeEntity.setSystems(nodeDTO.getSystem());
         nodeEntity.setIcon(nodeDTO.getIcon());
         nodeEntity.setIconColour(nodeDTO.getIconColour());
         String resourceKey = nodeDTO.getId();
@@ -94,7 +94,7 @@ public class NodeServiceImpl implements NodeService {
         nodeDTO.setId(entity.getResourceKey());
         nodeDTO.setCompany(entity.getCompany());
         nodeDTO.setApplication(entity.getApplication());
-        nodeDTO.setSystem(entity.getSystem());
+        nodeDTO.setSystem(entity.getSystems());
         nodeDTO.setIcon(entity.getIcon());
         nodeDTO.setIconColour(entity.getIconColour());
         return nodeDTO;
@@ -105,7 +105,5 @@ public class NodeServiceImpl implements NodeService {
             entity.setCreatedBy(UserContext.getUserInfo().getUsername());
         }
     }
-
-
 
 }
