@@ -2,6 +2,7 @@ package io.terminus.dalaran.model.soap;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.parser.Feature;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import io.terminus.dalaran.DalaranConstants;
@@ -73,7 +74,7 @@ public class SoapModelType implements DalaranModelType<String, SoapSchema> {
             Map<String, Object> map = (Map) xmlMapper.readValue(sr, Object.class);
             SoapSchema soapSchema;
             if (StringUtils.isNotBlank(originSchema)) {
-                soapSchema = JSON.parseObject(originSchema, SoapSchema.class);
+                soapSchema = JSON.parseObject(originSchema, SoapSchema.class, Feature.OrderedField);
             } else {
                 soapSchema = new SoapSchema();
             }

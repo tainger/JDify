@@ -3,6 +3,7 @@ package io.terminus.dalaran.component.processor.mapper.jsonPath;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.JSONPath;
+import com.alibaba.fastjson.parser.Feature;
 import com.google.common.collect.Lists;
 import io.terminus.dalaran.component.common.exception.FieldParseException;
 import io.terminus.dalaran.component.common.exception.MapperFunctionExecuteException;
@@ -384,13 +385,13 @@ public class Converter {
         }
         try {
             if (in instanceof byte[]) {
-                out = (JSON)JSON.parse(IOUtils.toString((byte[]) in));
+                out = (JSON)JSON.parse(IOUtils.toString((byte[]) in), Feature.OrderedField);
             } else if (in instanceof String) {
-                out = (JSON)JSON.parse((String)in);
+                out = (JSON)JSON.parse((String)in, Feature.OrderedField);
             } else if (in instanceof char[]) {
-                out = (JSON)JSON.parse(Arrays.toString(((char[]) in)));
+                out = (JSON)JSON.parse(Arrays.toString(((char[]) in)), Feature.OrderedField);
             } else {
-                out = (JSON)JSON.parse(JSON.toJSONString(in));
+                out = (JSON)JSON.parse(JSON.toJSONString(in), Feature.OrderedField);
             }
         } catch (Exception e) {
             e.printStackTrace();

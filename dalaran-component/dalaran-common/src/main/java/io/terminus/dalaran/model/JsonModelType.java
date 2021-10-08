@@ -2,6 +2,7 @@ package io.terminus.dalaran.model;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.parser.Feature;
 import io.terminus.dalaran.core.component.annotation.ModelType;
 import io.terminus.dalaran.core.component.model.DalaranModelType;
 import io.terminus.dalaran.model.json.JsonMarshalPreProcessor;
@@ -45,7 +46,7 @@ public class JsonModelType implements DalaranModelType<String, JsonSchema> {
 
     @Override
     public JsonSchema importTemplateData(DataTemplate dataTemplate, String originSchema) {
-        Object body = JSON.parse(dataTemplate.getDataTemplate());
+        Object body = JSON.parse(dataTemplate.getDataTemplate(), Feature.OrderedField);
         Map<String, ModelField> root = ModelUtils.parseDataTemplate(body);
         JsonSchema schema;
         if (StringUtils.isNotBlank(originSchema)) {
