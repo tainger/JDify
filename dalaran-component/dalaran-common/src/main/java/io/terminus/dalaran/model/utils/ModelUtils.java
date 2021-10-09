@@ -16,7 +16,7 @@ import static io.terminus.dalaran.ComponentConstants.MODEL_FIELD_ROOT;
 public class ModelUtils {
 
     public static Map<String, ModelField> parseDataTemplate(Object body) {
-        SortedMap<String, ModelField> root = new TreeMap<>();
+        LinkedHashMap<String, ModelField> root = new LinkedHashMap<>();
         ModelField modelField = new ModelField();
         root.put(MODEL_FIELD_ROOT, modelField);
         String type = body.getClass().getTypeName();
@@ -36,7 +36,7 @@ public class ModelUtils {
     }
 
     private static void buildModel(Object body, String type, ModelField modelField) {
-        SortedMap<String, ModelField> child = new TreeMap<>();
+        LinkedHashMap<String, ModelField> child = new LinkedHashMap<>();
         modelField.setFields(child);
         if (type.equalsIgnoreCase(ComponentConstants.JSON_OBJECT)) {
             modelField.setType(FieldType.OBJECT);
@@ -56,7 +56,7 @@ public class ModelUtils {
         }
     }
 
-    private static void buildChildren(Object element, SortedMap<String, ModelField> child) {
+    private static void buildChildren(Object element, LinkedHashMap<String, ModelField> child) {
         JSONObject jsonObject = (JSONObject) element;
         jsonObject.forEach((name, value) -> {
             ModelField field = new ModelField();

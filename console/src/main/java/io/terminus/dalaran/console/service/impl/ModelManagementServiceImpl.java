@@ -3,6 +3,7 @@ package io.terminus.dalaran.console.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.parser.Feature;
 import com.google.common.collect.Maps;
 import io.terminus.dalaran.DalaranConsoleConstants;
 import io.terminus.dalaran.ServiceType;
@@ -200,7 +201,7 @@ public class ModelManagementServiceImpl implements ModelManagementService {
         SortedMap<String, ModelField> root = new TreeMap<>();
         ModelField modelField = new ModelField();
         root.put(MapperConstants.MODEL_ROOT, modelField);
-        Object body = JSON.parse(dataTemplate.getDataTemplate());
+        Object body = JSON.parse(dataTemplate.getDataTemplate(), Feature.OrderedField);
         String type = body.getClass().getTypeName();
         if (isComplexType(type)) {
             buildModel(body, type, modelField);
@@ -422,7 +423,7 @@ public class ModelManagementServiceImpl implements ModelManagementService {
     }
 
     private void buildModel(Object body, String type, ModelField modelField) {
-        SortedMap<String, ModelField> child = new TreeMap<>();
+        LinkedHashMap<String, ModelField> child = new LinkedHashMap<>();
         modelField.setFields(child);
         if (type.equalsIgnoreCase(DalaranConsoleConstants.JSON_OBJECT)) {
             modelField.setType(FieldType.OBJECT);
@@ -442,7 +443,7 @@ public class ModelManagementServiceImpl implements ModelManagementService {
         }
     }
 
-    private void buildChildren(Object element, SortedMap<String, ModelField> child) {
+    private void buildChildren(Object element, LinkedHashMap<String, ModelField> child) {
         JSONObject jsonObject = (JSONObject) element;
         jsonObject.forEach((name, value) -> {
             ModelField field = new ModelField();
@@ -506,11 +507,11 @@ public class ModelManagementServiceImpl implements ModelManagementService {
         model.setModuleId(entity.getModuleId());
         model.setName(entity.getName());
 
-        Map modelSchema = JSON.parseObject(entity.getModelSchema(), Map.class);
+        LinkedHashMap modelSchema = JSON.parseObject(entity.getModelSchema(), LinkedHashMap.class, Feature.OrderedField);
         if (modelSchema != null) {
-            model.setModelSchema(JSON.parseObject(entity.getModelSchema(), Map.class));
+            model.setModelSchema(JSON.parseObject(entity.getModelSchema(), LinkedHashMap.class, Feature.OrderedField));
         } else {
-            model.setModelSchema(new HashMap<>());
+            model.setModelSchema(new LinkedHashMap<>());
         }
 
         model.setModelType(entity.getType());

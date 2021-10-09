@@ -1,6 +1,7 @@
 package io.terminus.dalaran.model.json;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.parser.Feature;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
@@ -11,7 +12,7 @@ public class JsonMarshalPreProcessor implements Processor {
     public void process(Exchange exchange) throws Exception {
         Object in = exchange.getIn().getBody();
         if (in instanceof byte[]) {
-            exchange.getOut().setBody(JSON.toJSONString(JSON.parse((byte[])in), SerializerFeature.WriteMapNullValue));
+            exchange.getOut().setBody(JSON.toJSONString(JSON.parse((byte[])in, Feature.OrderedField), SerializerFeature.WriteMapNullValue));
             exchange.getOut().setHeaders(exchange.getIn().getHeaders());
         } else if (in instanceof String) {
             exchange.getOut().setBody(in);
