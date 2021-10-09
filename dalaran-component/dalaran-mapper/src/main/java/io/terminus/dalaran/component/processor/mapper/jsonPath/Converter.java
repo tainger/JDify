@@ -34,7 +34,7 @@ public class Converter {
 
     public static Map<String, Object> convert(DalaranMappingConfig mappingConfig, Exchange exchange, DalaranContext dalaranContext) {
         Object source = parseBody(exchange.getIn().getBody());
-        Map<String, Object> destination = new HashMap<>();
+        LinkedHashMap<String, Object> destination = new LinkedHashMap<>();
         List<MessageMapping> messageMappings = mappingConfig.getMessageMappings();
         SimpleMappingField sourceRoot = mappingConfig.getSourceRoot();
         SimpleMappingField destinationRoot = mappingConfig.getDestinationRoot();
@@ -62,9 +62,11 @@ public class Converter {
     }
 
     private static SourceFieldDetail buildSource(Object source, MessageMapping mapping, SimpleMappingField sourceRoot) {
-
         Map<String, List<SourcePath>> sourcePaths = new HashMap<>();
         List<Integer> arrayFieldSize = new ArrayList<>();
+        if (source == null) {
+            return new SourceFieldDetail(arrayFieldSize, sourcePaths);
+        }
         Integer lastArray = 0;
         List<SourceField> fields = mapping.getSourceFields();
         if (sourceRoot.getType() == FieldType.ARRAY) {
