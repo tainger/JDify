@@ -65,7 +65,7 @@ public class OKHttpProcessor implements Processor {
         }
         String username = config.getConnector().getUsername();
         String password = config.getConnector().getPassword();
-        if(StringUtils.isNotEmpty(username) && StringUtils.isNotEmpty(password)){
+        if (StringUtils.isNotEmpty(username) && StringUtils.isNotEmpty(password)) {
             String credential = Credentials.basic(username, password);
             headerValue.put("Authorization", credential);
         }
@@ -117,7 +117,7 @@ public class OKHttpProcessor implements Processor {
         }
         Response response = client.newCall(request).execute();
         String responseBody = Objects.requireNonNull(response.body()).string();
-        log.info("response: " + responseBody);
+        log.info("url:{}, response:{}", url, responseBody);
         exchange.getOut().setBody(responseBody);
     }
 
@@ -206,14 +206,14 @@ public class OKHttpProcessor implements Processor {
     private String buildPath(String path, Exchange exchange) throws Exception {
         Object body = exchange.getIn().getBody();
         Map<String, String> bodyParameter = buildFormBody(body);
+        if (!StringUtils.contains(path, "{") || !StringUtils.contains(path, "}")) {
+            return path;
+        }
+        String contextKey = "DalaranContextExchange" + exchange.getExchangeId();
+        Map<String, Object> contextValues = (Map) exchange.getProperties().get(contextKey);
+        StringBuilder pathBuilder = new StringBuilder(path);
+        String[] params = StringUtils.split(path, "/");
         if (!CollectionUtils.isEmpty(bodyParameter)) {
-            if (!StringUtils.contains(path, "{") || !StringUtils.contains(path, "}")) {
-                return path;
-            }
-            String contextKey = "DalaranContextExchange" + exchange.getExchangeId();
-            Map<String, Object> contextValues = (Map) exchange.getProperties().get(contextKey);
-            StringBuilder pathBuilder = new StringBuilder(path);
-            String[] params = StringUtils.split(path, "/");
             for (String param : params) {
                 if (!StringUtils.contains(param, "{") || !StringUtils.contains(param, "}")) {
                     continue;
@@ -229,9 +229,21 @@ public class OKHttpProcessor implements Processor {
                     throw new RuntimeException("parameter in url path not configure: " + paramKey);
                 }
             }
-            return pathBuilder.toString();
+        } else {
+            for (String param : params) {
+                if (!StringUtils.contains(param, "{") || !StringUtils.contains(param, "}")) {
+                    continue;
+                }
+                String paramKey = StringUtils.substring(param, 1, param.length() - 1);
+                if (contextValues.containsKey(paramKey)) {
+                    String pathValue = contextValues.get(paramKey).toString();
+                    pathBuilder = new StringBuilder(StringUtils.replace(pathBuilder.toString(), param, pathValue));
+                } else {
+                    throw new RuntimeException("parameter in url path not configure: " + paramKey);
+                }
+            }
         }
-        return path;
+        return pathBuilder.toString();
     }
 
     private File getOssFile(String object, OSSAccount ossAccount) throws IOException {
