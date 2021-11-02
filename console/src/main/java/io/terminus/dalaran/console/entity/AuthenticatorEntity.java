@@ -10,4 +10,5 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "dalaran_authenticator")
 public class AuthenticatorEntity extends AuthenticatorAbstractEntity {
+
 }
