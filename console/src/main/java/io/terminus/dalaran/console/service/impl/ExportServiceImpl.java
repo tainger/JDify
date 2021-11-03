@@ -234,12 +234,10 @@ public class ExportServiceImpl implements ExportService {
             exportData.getConnectors().forEach(connector -> {
                 connector.setExist(true);
                 ConnectorEntity connectorEntity = connectorRepository.findByResourceKey(connector.getResourceKey());
-                if(null != connectorEntity) {
-                    connector.setId(connectorEntity.getId());
-                }else {
+                if(null == connectorEntity) {
                     connector.setId(null);
+                    connectorRepository.save(connector);
                 }
-                connectorRepository.save(connector);
             });
         }
 
