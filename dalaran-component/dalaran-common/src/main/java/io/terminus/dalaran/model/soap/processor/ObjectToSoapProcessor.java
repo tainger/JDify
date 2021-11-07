@@ -101,7 +101,7 @@ public class ObjectToSoapProcessor implements Processor, Traceable {
             Object ob = ((Map) body).get(entry.getKey());
             SOAPElement element = soapElement.addChildElement(entry.getKey(), PREFIX);
             if (soapOperationConfig.getBodyContainsXmlns()) {
-                element.addNamespaceDeclaration("", soapOperationConfig.getTargetNamespace());
+                element.addNamespaceDeclaration(soapOperationConfig.getPrefix(), soapOperationConfig.getTargetNamespace());
             }
             Map<String, ModelField> child = entry.getValue().getFields();
             buildBody(child, ob, element, soapOperationConfig.getBodyContainsXmlns(), soapOperationConfig.getBodyContainsPrefix());
