@@ -8,16 +8,22 @@ import net.schmizz.sshj.sftp.SFTPClient;
 import net.schmizz.sshj.transport.verification.PromiscuousVerifier;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.Reader;
+import javax.crypto.Cipher;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
+import javax.xml.bind.DatatypeConverter;
+import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Map;
+
+import static io.terminus.dalaran.DalaranConstants.DALARAN_CONTEXT_EXCHANGE;
+import static sun.security.x509.CertificateAlgorithmId.ALGORITHM;
 
 @Slf4j
 public class CustomFtpDownloadProcessor implements Processor {
@@ -43,19 +49,24 @@ public class CustomFtpDownloadProcessor implements Processor {
 
         String fileName;
         if (downloadConfig.isDynamicFileName()) {
-            Object in = exchange.getIn().getBody();
-            JSON body;
-            if (in instanceof String) {
-                body = JSON.parseObject((String)in, JSON.class);
-            } else if (in instanceof byte[]) {
-                body = JSON.parseObject(IOUtils.toString((byte[])in), JSON.class);
+            Map<String, Object> contextValues = (Map<String, Object>)exchange.getProperties().get(DALARAN_CONTEXT_EXCHANGE + exchange.getExchangeId());
+            if (MapUtils.isNotEmpty(contextValues) && contextValues.containsKey(downloadConfig.getDynamicPath())) {
+                fileName = String.valueOf(contextValues.get(downloadConfig.getDynamicPath()));
             } else {
-                body = JSON.parseObject(JSON.toJSONString(in), JSON.class);
+                Object in = exchange.getIn().getBody();
+                JSON body;
+                if (in instanceof String) {
+                    body = JSON.parseObject((String)in, JSON.class);
+                } else if (in instanceof byte[]) {
+                    body = JSON.parseObject(IOUtils.toString((byte[])in), JSON.class);
+                } else {
+                    body = JSON.parseObject(JSON.toJSONString(in), JSON.class);
+                }
+                if (!JSONPath.contains(body, downloadConfig.getDynamicPath())) {
+                    throw new RuntimeException("body: " + body + ", no file name");
+                }
+                fileName = JSONPath.eval(body, downloadConfig.getDynamicPath()).toString();
             }
-            if (!JSONPath.contains(body, downloadConfig.getDynamicPath())) {
-                throw new RuntimeException("body: " + body + ", no file name");
-            }
-            fileName = JSONPath.eval(body, downloadConfig.getDynamicPath()).toString();
         } else {
             fileName = downloadConfig.getFileName();
             if (StringUtils.isNotBlank(downloadConfig.getDatePattern())) {
@@ -82,6 +93,9 @@ public class CustomFtpDownloadProcessor implements Processor {
     }
 
     private String readFile(String localPath) throws Exception {
+        if (downloadConfig.getEncrypted()) {
+            return readEncryptedFile(localPath);
+        }
         Reader fileReader = new FileReader(localPath);
         BufferedReader bufferedReader = new BufferedReader(fileReader);
         try {
@@ -99,6 +113,20 @@ public class CustomFtpDownloadProcessor implements Processor {
         }
     }
 
+    private String readEncryptedFile(String localPath) throws Exception {
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        FileInputStream fis = new FileInputStream(new File(localPath));
+        byte[] buf = new byte[1024]; //数据中转站 临时缓冲区
+        int length = 0;
+        //循环读取文件内容，输入流中将最多buf.length个字节的数据读入一个buf数组中,返回类型是读取到的字节数。
+        //当文件读取到结尾时返回 -1,循环结束。
+        while ((length = fis.read(buf)) != -1) {
+            byteArrayOutputStream.write(buf, 0, buf.length);
+        }
+        byte[] toByteArray = byteArrayOutputStream.toByteArray();
+        return decrypt(toByteArray, downloadConfig.getDecryptKey(), downloadConfig.getDecryptIv());
+    }
+
     private SFTPClient reconnect() throws Exception {
         if (sftpClient != null) {
             sftpClient.close();
@@ -114,5 +142,16 @@ public class CustomFtpDownloadProcessor implements Processor {
         this.sftpClient = sshClient.newSFTPClient();
         this.sshClient = sshClient;
         return this.sftpClient;
+    }
+
+    public static String decrypt(byte[] sSrc, String key, String iv) throws Exception {
+        byte[] keyByte = DatatypeConverter.parseHexBinary(key);
+        byte[] ivByte = DatatypeConverter.parseHexBinary(iv);
+        SecretKeySpec secretKeySpec = new SecretKeySpec(keyByte, ALGORITHM);
+        IvParameterSpec ivParameterSpec = new IvParameterSpec(ivByte);//使用CBC模式，需要一个向量iv，可增加加密算法的强度
+        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");//"算法/模式/补码方式"
+        cipher.init(Cipher.DECRYPT_MODE, secretKeySpec, ivParameterSpec);
+        byte[] doFinal = cipher.doFinal(sSrc);
+        return IOUtils.toString(doFinal);
     }
 }

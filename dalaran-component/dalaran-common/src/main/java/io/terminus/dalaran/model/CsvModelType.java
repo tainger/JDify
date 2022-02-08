@@ -180,6 +180,8 @@ public class CsvModelType implements DalaranModelType<String, CsvModelSchema> {
 
     private List<Map<String, Object>> carsoToObject(String[] records, CsvModelSchema schema) {
         String[] columnArray = schema.getColumnSequence().trim().split(schema.getColumnDelimiter());
+        logger.info("columns: " + Arrays.toString(columnArray));
+        logger.info("record line: " + records.length);
         List<Map<String, Object>> out = new ArrayList<>();
         for (String record : records) {
             Map<String, Object> recordObj = new HashMap<>();

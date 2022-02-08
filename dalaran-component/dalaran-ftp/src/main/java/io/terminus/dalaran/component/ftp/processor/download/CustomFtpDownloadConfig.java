@@ -42,4 +42,12 @@ public class CustomFtpDownloadConfig extends OutModelConfig implements Connector
     @ConfigFieldInfo(label = "文件名后缀", inputType = FieldInputType.String, required = false)
     private String fileSuffix;
 
+    @ConfigFieldInfo(label = "文件是否加密", inputType = FieldInputType.Switch, defaultValue = "false")
+    private Boolean encrypted = false;
+
+    @ConfigFieldInfo(label = "解密key", inputType = FieldInputType.String, required = false)
+    private String decryptKey;
+
+    @ConfigFieldInfo(label = "解密iv", inputType = FieldInputType.String, required = false)
+    private String decryptIv;
 }
