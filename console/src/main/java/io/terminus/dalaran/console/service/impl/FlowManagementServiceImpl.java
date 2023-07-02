@@ -21,7 +21,6 @@ import io.terminus.dalaran.console.model.UserContext;
 import io.terminus.dalaran.console.repository.*;
 import io.terminus.dalaran.console.service.FlowManagementService;
 import io.terminus.dalaran.console.service.ModelManagementService;
-import io.terminus.dalaran.console.service.PrivateRepositoryService;
 import io.terminus.dalaran.console.service.jpa.FlowQueryService;
 import io.terminus.dalaran.console.service.jpa.PrivateResourceQueryService;
 import io.terminus.dalaran.console.util.GenerateKeyUtils;
@@ -153,8 +152,8 @@ public class FlowManagementServiceImpl implements FlowManagementService {
     @Autowired
     private TriggerFlowAlarmRuleRepository triggerFlowAlarmRuleRepository;
 
-    @Autowired
-    private PrivateRepositoryService privateRepositoryService;
+//    @Autowired
+//    private PrivateRepositoryService privateRepositoryService;
 
     @Autowired
     private PrivateRepositoryRepository privateRepositoryRepository;
@@ -413,7 +412,7 @@ public class FlowManagementServiceImpl implements FlowManagementService {
         flowTemplate.setData(templateData);
         flowTemplate.setName(abstractEntity.getName());
         flowTemplate.setTenantCode(propertyService.getTenantCode());
-        return privateRepositoryService.saveTemplate(flowTemplate);
+        return new BasicResponse(false, "Template is exist!");
     }
 
     @Override

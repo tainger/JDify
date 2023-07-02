@@ -68,8 +68,6 @@ public class PlatformRest implements PlatformInfoAPI, PlatformImportAPI, Platfor
     @Autowired
     private FlowManagementService flowManagementService;
 
-    @Autowired
-    private PrivateRepositoryService privateRepositoryService;
 
     @Autowired
     private PropertyService propertyService;
@@ -288,7 +286,7 @@ public class PlatformRest implements PlatformInfoAPI, PlatformImportAPI, Platfor
 
     @Override
     public BasicResponse localUpload(ResourceUploadRequest resourceUploadRequest) {
-        return privateRepositoryService.localResourceUpload(resourceUploadRequest);
+        return new BasicResponse();
     }
 
     @Override

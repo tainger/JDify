@@ -1,0 +1,74 @@
+server:
+  port: 8082
+  servlet:
+    context-path: /transformer
+
+
+Spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/dalaran?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+    password: Jia19971210.
+    username: root
+    database: mysql
+  jpa:
+    hibernate.ddl-auto: none
+    # spring.jpa.show-sql用来设置hibernate操作的时候在控制台显示其真实的sql语句
+    jpa.show-sql: true
+  # 让控制器输出的json字符串格式更美观
+#    hibernate:
+#      ddl-auto: create
+
+oss:
+  bucketName: f
+  accessSecret: f
+  endpoint: f
+  accessId: f
+  rootDir: f
+
+terminus:
+  dalaran:
+    runtime-location: 2
+    tenant-code: 5
+    tenant-console-url: 5
+    market:
+      host: 5
+      upload: 5
+      delete.resource-relation: 5
+      group: 5
+      register: 5
+noticeMessage:
+  mailNoticeCode: 4
+  SMSNoticeCode: 4
+  dingAccessToken: 4
+  interval: 4
+
+draco:
+  filter: false
+  login: http://www.4399.com
+
+wechat:
+  mini-program:
+    #    app-id: wx27993077234749b4
+    #    app-secret: cab50df701dfe17960954d5e5c90b923
+
+    app-id: wxad77c6048c608569
+    app-secret: 23fbe9d771f74e22211171f23a4e3991
+  login-url: https://api.weixin.qq.com/sns/jscode2session
+
+
+mybatis:
+  mapper-locations: classpath:/mapper/*.xml
+  type-aliases-package: com.bonbon.transformer.model.entity
+  configuration:
+    useGeneratedKeys: true
+    mapUnderscoreToCamelCase: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+spring:
+  security:
+    user:
+      name: jzy
+      password: password
+      role: role
+    ant-matchers: 2

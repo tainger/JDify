@@ -1,7 +1,7 @@
 package io.terminus.dalaran.model.schema;
 
 import io.terminus.dalaran.FieldInputType;
-import io.terminus.dalaran.model.CSVModelType;
+import io.terminus.dalaran.model.CsvModelTypeEnum;
 import io.terminus.dalaran.model.DalaranModelSchema;
 import io.terminus.dalaran.model.annotation.Model;
 import io.terminus.dalaran.model.annotation.ModelFieldInfo;
@@ -20,7 +20,7 @@ public class CsvModelSchema extends DalaranModelSchema {
     private String dataDelimiter;
 
     @ModelFieldInfo(label = "模型类型", inputType = FieldInputType.Select, defaultValue = "COMMON")
-    private CSVModelType type = CSVModelType.COMMON;
+    private CsvModelTypeEnum type = CsvModelTypeEnum.COMMON;
 
     @ModelFieldInfo(label = "保留行结束符", inputType = FieldInputType.Switch, required = false, defaultValue = "false")
     private boolean remainEOF = false;

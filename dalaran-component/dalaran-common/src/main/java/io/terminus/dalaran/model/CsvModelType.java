@@ -1,7 +1,6 @@
 package io.terminus.dalaran.model;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Lists;
 import io.terminus.dalaran.core.component.annotation.ModelType;
 import io.terminus.dalaran.core.component.model.DalaranModelType;
@@ -32,7 +31,7 @@ public class CsvModelType implements DalaranModelType<String, CsvModelSchema> {
             }
             String data;
             Object body = exchange.getIn().getBody();
-            if (schema.getType() == CSVModelType.CARSO || schema.getType() == CSVModelType.CUSTOMIZE) {
+            if (schema.getType() == CsvModelTypeEnum.CARSO || schema.getType() == CsvModelTypeEnum.CUSTOMIZE) {
                 data = carsoFromObject(body, schema);
             } else {
                 if (body instanceof String) {
@@ -159,7 +158,7 @@ public class CsvModelType implements DalaranModelType<String, CsvModelSchema> {
             String contentStr = new String(content);
             String[] records = contentStr.split(System.lineSeparator());
             List out;
-            if (schema.getType() == CSVModelType.CARSO || schema.getType() == CSVModelType.CUSTOMIZE) {
+            if (schema.getType() == CsvModelTypeEnum.CARSO || schema.getType() == CsvModelTypeEnum.CUSTOMIZE) {
                 out = carsoToObject(records, schema);
             } else {
 //                out = new ArrayList<>();

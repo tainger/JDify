@@ -29,6 +29,7 @@
         <module>dalaran-component</module>
         <module>resource-core</module>
         <module>dalaran-open</module>
+        <module>dalaran-console-starter</module>
     </modules>
 
     <properties>

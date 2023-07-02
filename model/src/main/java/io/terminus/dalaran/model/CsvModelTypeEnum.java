@@ -1,5 +1,5 @@
 package io.terminus.dalaran.model;
 
-public enum CSVModelType {
+public enum CsvModelTypeEnum {
     CARSO, COMMON, CUSTOMIZE
 }
