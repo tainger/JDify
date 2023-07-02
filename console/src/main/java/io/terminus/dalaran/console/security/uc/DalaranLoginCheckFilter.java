@@ -1,9 +1,9 @@
 package io.terminus.dalaran.console.security.uc;
 
 import com.alibaba.fastjson.JSON;
+import io.terminus.dalaran.console.model.UserContext;
 import io.terminus.dalaran.model.security.CustomResponseBody;
 import io.terminus.dalaran.model.security.SecurityType;
-import io.terminus.draco.web.autoconfig.context.UserContext;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;

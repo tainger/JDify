@@ -2,13 +2,13 @@ package io.terminus.dalaran.console.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import io.terminus.dalaran.console.entity.ConnectorEntity;
+import io.terminus.dalaran.console.model.UserContext;
 import io.terminus.dalaran.console.repository.ConnectorRepository;
 import io.terminus.dalaran.console.service.ConnectorService;
 import io.terminus.dalaran.console.service.jpa.model.QueryConnectorInfo;
 import io.terminus.dalaran.console.util.GenerateKeyUtils;
 import io.terminus.dalaran.model.dto.ConnectorDTO;
 import io.terminus.dalaran.model.dto.basic.BasicConnectorInfo;
-import io.terminus.draco.web.autoconfig.context.UserContext;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;

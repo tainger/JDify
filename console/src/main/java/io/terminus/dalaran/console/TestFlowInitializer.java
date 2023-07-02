@@ -1,7 +1,5 @@
 package io.terminus.dalaran.console;
 
-import com.alibaba.fastjson.JSON;
-import io.terminus.dalaran.component.utils.OSSUtils;
 import io.terminus.dalaran.console.entity.FunctionEntity;
 import io.terminus.dalaran.console.entity.SubFlowEntity;
 import io.terminus.dalaran.console.entity.TriggerFlowEntity;
@@ -16,11 +14,9 @@ import io.terminus.dalaran.core.resource.entity.common.PrivateRepositoryEntity;
 import io.terminus.dalaran.core.resource.repository.ReleaseRecordRepository;
 import io.terminus.dalaran.model.flow.BasicFlow;
 import io.terminus.dalaran.model.flow.SubFlow;
-import io.terminus.dalaran.model.market.ResourceFile;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.io.File;
 import java.util.List;
 
 @Slf4j
@@ -73,13 +69,13 @@ public class TestFlowInitializer implements DalaranStarter {
         List<PrivateRepositoryEntity> privateRepositoryEntityList = resourceLoader.loadPackage();
         for (PrivateRepositoryEntity entity : privateRepositoryEntityList) {
             try {
-                ResourceFile resourceFile = JSON.parseObject(entity.getData(), ResourceFile.class);
-                File file = OSSUtils.downloadByPath(resourceFile.getFilePath(), ossAccount);
-//                String origin = entity.getOrigin();
-//                if (StringUtils.equalsIgnoreCase(origin, "PRIVATE")) {
-//                    origin = "CUSTOM";
-//                }
-                marketResourceLoader.install(file, entity.getOrigin(), entity.getVersion());
+//                ResourceFile resourceFile = JSON.parseObject(entity.getData(), ResourceFile.class);
+//                File file = OSSUtils.downloadByPath(resourceFile.getFilePath(), ossAccount);
+////                String origin = entity.getOrigin();
+////                if (StringUtils.equalsIgnoreCase(origin, "PRIVATE")) {
+////                    origin = "CUSTOM";
+////                }
+//                marketResourceLoader.install(file, entity.getOrigin(), entity.getVersion());
             } catch (Exception e) {
                 e.printStackTrace();
             }

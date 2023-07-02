@@ -1,13 +1,12 @@
 package io.terminus.dalaran.console.service.impl;
 
 import io.terminus.dalaran.console.entity.PropertyEntity;
+import io.terminus.dalaran.console.model.UserContext;
 import io.terminus.dalaran.console.repository.PropertyRepository;
 import io.terminus.dalaran.console.service.PropertyManagementService;
 import io.terminus.dalaran.console.service.jpa.PropertyQueryService;
-import io.terminus.dalaran.core.resource.entity.common.ModuleEntity;
 import io.terminus.dalaran.model.dto.PropertyDTO;
 import io.terminus.dalaran.model.query.PropertyQuery;
-import io.terminus.draco.web.autoconfig.context.UserContext;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

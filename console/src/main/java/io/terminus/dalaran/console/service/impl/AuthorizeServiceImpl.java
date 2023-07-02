@@ -1,11 +1,11 @@
 package io.terminus.dalaran.console.service.impl;
 
 import io.terminus.dalaran.console.model.TenantInfo;
+import io.terminus.dalaran.console.model.UserContext;
 import io.terminus.dalaran.console.service.AuthorizeService;
 import io.terminus.dalaran.core.resource.property.PropertyService;
 import io.terminus.dalaran.model.DalaranAccount;
-import io.terminus.draco.api.response.UserInfo;
-import io.terminus.draco.web.autoconfig.context.UserContext;
+import io.terminus.dalaran.model.user.UserInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

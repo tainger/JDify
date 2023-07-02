@@ -3,7 +3,7 @@ package io.terminus.dalaran.component.as2.trigger;
 import com.alibaba.fastjson.JSON;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
-import org.apache.camel.component.as2.api.AS2MediaType;
+//import org.apache.camel.component.as2.api.AS2MediaType;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 
@@ -14,7 +14,7 @@ public class AS2ServerAfterProcessor implements Processor {
 
     @Override
     public void process(Exchange exchange) throws Exception {
-        exchange.getIn().setHeader(Exchange.CONTENT_TYPE, AS2MediaType.APPLICATION_EDIFACT);
+        exchange.getIn().setHeader(Exchange.CONTENT_TYPE, "APPLICATION_EDIFACT");
         Object inBody = exchange.getIn().getBody();
         if (!(inBody instanceof byte[])) {
             byte[] bytes = IOUtils.toByteArray(JSON.toJSONString(inBody));

@@ -1,6 +1,6 @@
 package io.terminus.dalaran.console.filter;
 
-import io.terminus.draco.web.autoconfig.context.UserContext;
+import io.terminus.dalaran.console.model.UserContext;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
