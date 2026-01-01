@@ -1,9 +1,7 @@
 server:
   port: 8082
   servlet:
-    context-path: /transformer
-
-
+    context-path: /flowsHub
 Spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
