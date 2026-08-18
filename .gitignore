@@ -2,6 +2,7 @@
 **/target/
 **/out/
 .idea/
+.DS_Store
 
 *.log
 
